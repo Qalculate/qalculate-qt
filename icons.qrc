@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="icons/Qalculate">
+	<file alias="index.theme">data/index.theme</file>
+	<file alias="apps/scalable/qalculate.svg">data/scalable/qalculate.svg</file>
+	<file alias="apps/16x16/qalculate.png">data/16/qalculate.png</file>
+	<file alias="apps/22x22/qalculate.png">data/22/qalculate.png</file>
+	<file alias="apps/32x32/qalculate.png">data/32/qalculate.png</file>
+	<file alias="apps/48x48/qalculate.png">data/48/qalculate.png</file>
+	<file alias="apps/64x64/qalculate.png">data/64/qalculate.png</file>
+	<file alias="apps/128x128/qalculate.png">data/128/qalculate.png</file>
+</qresource>
+</RCC>

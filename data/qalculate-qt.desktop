@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Qalculate! (Qt)
+GenericName=Calculator
+Exec=qalculate-qt
+Icon=qalculate
+Type=Application
+Categories=Qt;Utility;Calculator;Science;Math;
+X-KDE-StartupNotify=true
+Terminal=false
+Comment=Powerful and easy to use calculator
+Keywords=calculation;arithmetic;scientific;financial;
