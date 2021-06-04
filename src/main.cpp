@@ -93,18 +93,7 @@ int main(int argc, char **argv) {
 	CALCULATOR->setExchangeRatesWarningEnabled(false);
 
 	settings->loadPreferences();
-	bool canfetch = CALCULATOR->canFetch();
 
-	QalculateWindow *win = new QalculateWindow();
-	win->setCommandLineParser(parser);
-	win->show();
-
-	app.processEvents();
-
-	if(settings->fetch_exchange_rates_at_startup && canfetch) {
-		settings->fetchExchangeRates(5, -1, win);
-		app.processEvents();
-	}
 	CALCULATOR->loadExchangeRates();
 
 	if(!CALCULATOR->loadGlobalDefinitions()) {
@@ -114,6 +103,10 @@ int main(int argc, char **argv) {
 	}
 
 	CALCULATOR->loadLocalDefinitions();
+
+	QalculateWindow *win = new QalculateWindow();
+	win->setCommandLineParser(parser);
+	win->show();
 
 	QStringList args = parser->positionalArguments();
 	QString expression;

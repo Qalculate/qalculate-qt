@@ -16,6 +16,8 @@
 
 class QWidget;
 
+bool can_display_unicode_string_function(const char *str, void *w);
+
 class QalculateQtSettings {
 	public:
 
@@ -28,6 +30,8 @@ class QalculateQtSettings {
 		void updateMessagePrintOptions();
 
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
+
+		bool isAnswerVariable(Variable *v);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;

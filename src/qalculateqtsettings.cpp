@@ -14,6 +14,10 @@
 #include <QApplication>
 #include <QWidget>
 
+bool can_display_unicode_string_function(const char *str, void *w) {
+	return true;
+}
+
 QalculateQtSettings::QalculateQtSettings() {
 	ignore_locale = false;
 	fetch_exchange_rates_at_startup = false;
@@ -35,6 +39,10 @@ QalculateQtSettings::QalculateQtSettings() {
 	}
 }
 QalculateQtSettings::~QalculateQtSettings() {}
+
+bool QalculateQtSettings::isAnswerVariable(Variable *v) {
+	return v == vans[0] || v == vans[1] || v == vans[2] || v == vans[3] || v == vans[4];
+}
 
 void QalculateQtSettings::loadPreferences() {
 
@@ -79,7 +87,8 @@ void QalculateQtSettings::loadPreferences() {
 	printops.twos_complement = true;
 	printops.hexadecimal_twos_complement = false;
 	printops.limit_implicit_multiplication = false;
-	printops.can_display_unicode_string_function = NULL;
+	printops.can_display_unicode_string_function = &can_display_unicode_string_function;
+	printops.can_display_unicode_string_arg = NULL;
 	printops.allow_factorization = false;
 	printops.spell_out_logical_operators = true;
 	printops.exp_to_root = true;

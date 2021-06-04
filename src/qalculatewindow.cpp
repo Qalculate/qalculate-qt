@@ -71,6 +71,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	parsed_mstruct = new MathStructure();
 	view_thread = new ViewThread;
 
+	settings->printops.can_display_unicode_string_arg = (void*) historyView;
+
 	b_busy = false;
 
 }

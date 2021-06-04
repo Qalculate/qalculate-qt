@@ -13,10 +13,41 @@
 #define EXPRESSION_EDIT_H
 
 #include <QTextEdit>
+#include <QSortFilterProxyModel>
+
+class QCompleter;
+class QStandardItemModel;
+class QTableView;
+
+class ExpressionProxyModel : public QSortFilterProxyModel {
+
+	Q_OBJECT
+
+	public:
+
+		ExpressionProxyModel(QObject *parent = NULL);
+		~ExpressionProxyModel();
+
+		void setFilter(std::string str);
+
+	protected:
+
+		std::string s_filter;
+
+		bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+
+};
 
 class ExpressionEdit : public QTextEdit {
 
 	Q_OBJECT
+
+	protected:
+
+		QCompleter *completer;
+		ExpressionProxyModel *completionModel;
+		QStandardItemModel *sourceModel;
+		QTableView *completionView;
 
 	public:
 
@@ -25,6 +56,8 @@ class ExpressionEdit : public QTextEdit {
 
 		std::string expression() const;
 		QSize sizeHint() const;
+
+		void updateCompletion();
 
 	protected slots:
 
