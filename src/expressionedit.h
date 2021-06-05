@@ -14,6 +14,7 @@
 
 #include <QTextEdit>
 #include <QSortFilterProxyModel>
+#include <QStringList>
 
 class QCompleter;
 class QStandardItemModel;
@@ -49,6 +50,15 @@ class ExpressionEdit : public QTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 
+		QStringList history;
+		QString current_history;
+		int history_index;
+		int current_object_start, current_object_end;
+		std::string current_object_text;
+		int completion_blocked;
+		bool editing_to_expression, editing_to_expression1;
+		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
+
 	public:
 
 		ExpressionEdit(QWidget *parent = NULL);
@@ -61,11 +71,19 @@ class ExpressionEdit : public QTextEdit {
 
 	protected slots:
 
-		void keyPressEvent(QKeyEvent*);
+		void keyPressEvent(QKeyEvent*) override;
+		void keyReleaseEvent(QKeyEvent*) override;
+		void onTextChanged();
+		void onCursorPositionChanged();
+		void onCompletionActivated(const QModelIndex&);
 
 	public slots:
 
 		void setExpression(std::string);
+		void blockCompletion();
+		void unblockCompletion();
+		void hideCompletion();
+		void addToHistory();
 
 	signals:
 
