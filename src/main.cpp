@@ -31,7 +31,7 @@
 #include <QLocale>
 #include <locale.h>
 
-#include "libqalculate/qalculate.h"
+#include <libqalculate/qalculate.h>
 #include "qalculatewindow.h"
 #include "qalculateqtsettings.h"
 
