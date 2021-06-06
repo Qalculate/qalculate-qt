@@ -106,6 +106,7 @@ int main(int argc, char **argv) {
 
 	QalculateWindow *win = new QalculateWindow();
 	win->setCommandLineParser(parser);
+	win->resize(500, 500);
 	win->show();
 
 	QStringList args = parser->positionalArguments();

@@ -99,6 +99,7 @@ void QalculateWindow::setCommandLineParser(QCommandLineParser *p) {
 
 void QalculateWindow::calculate() {
 	calculateExpression();
+	expressionEdit->addToHistory();
 	expressionEdit->clear();
 }
 
@@ -477,8 +478,9 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 	}
 	while(CALCULATOR->busy()) {
 		sleep_ms(100);
+		qApp->processEvents();
 	}
-
+	statusBar()->showMessage("");
 	bool units_changed = false;
 
 	if(!do_mathoperation && !str_conv.empty() && to_struct.containsType(STRUCT_UNIT, true) && !mstruct->containsType(STRUCT_UNIT) && !parsed_mstruct->containsType(STRUCT_UNIT, false, true, true) && !CALCULATOR->hasToExpression(str_conv, false, settings->evalops)) {
