@@ -219,7 +219,7 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 						itz = tzh * 60 + tzm;
 						if(b_minus) itz = -itz;
 					} else {
-						CALCULATOR->error(true, tr("Time zone parsing failed.").toUtf8(), NULL);
+						CALCULATOR->error(true, tr("Time zone parsing failed.").toStdString().c_str(), NULL);
 					}
 					settings->printops.time_zone = TIME_ZONE_CUSTOM;
 					settings->printops.custom_time_zone = itz;
