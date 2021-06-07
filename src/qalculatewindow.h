@@ -21,6 +21,7 @@ class QCommandLineParser;
 class ExpressionEdit;
 class HistoryView;
 class QSplitter;
+class QLabel;
 
 #ifdef LOAD_EQZICONS_FROM_FILE
 	#ifdef RESOURCES_COMPILED
@@ -64,9 +65,11 @@ class QalculateWindow : public QMainWindow {
 		ExpressionEdit *expressionEdit;
 		HistoryView *historyView;
 		QSplitter *ehSplitter;
+		QLabel *statusLabel, *statusIconLabel;
 
 		void calculateExpression(bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_parse = false, size_t stack_index = 0, bool register_moved = false, bool noprint = false);
+		void changeEvent(QEvent *e) override;
 
 	public slots:
 

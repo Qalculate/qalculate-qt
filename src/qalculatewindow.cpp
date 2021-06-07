@@ -15,7 +15,7 @@
 #include <QTextBrowser>
 #include <QVBoxLayout>
 #include <QSplitter>
-#include <QStatusBar>
+#include <QLabel>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -48,25 +48,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
 	ehSplitter = new QSplitter(Qt::Vertical, this);
-	topLayout->addWidget(ehSplitter);
+	topLayout->addWidget(ehSplitter, 1);
 
 	expressionEdit = new ExpressionEdit(this);
 	ehSplitter->addWidget(expressionEdit);
 	historyView = new HistoryView(this);
+
 	ehSplitter->addWidget(historyView);
 	ehSplitter->setStretchFactor(0, 0);
 	ehSplitter->setStretchFactor(1, 1);
-
-	statusBar();
 
 	QLocalServer::removeServer("qalculate-qt");
 	server = new QLocalServer(this);
 	server->listen("qalculate-qt");
 	connect(server, SIGNAL(newConnection()), this, SLOT(serverNewConnection()));
-
+	
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 
 	mstruct = new MathStructure();
+	settings->current_result = mstruct;
 	mstruct_exact.setUndefined();
 	parsed_mstruct = new MathStructure();
 	view_thread = new ViewThread;
@@ -103,9 +103,6 @@ void QalculateWindow::calculate() {
 	expressionEdit->clear();
 }
 
-#define EQUALS_IGNORECASE_AND_LOCAL(x,y,z)	(equalsIgnoreCase(x, y) || equalsIgnoreCase(x, z.toStdString()))
-#define EQUALS_IGNORECASE_AND_LOCAL_NR(x,y,z,a)	(equalsIgnoreCase(x, y a) || (x.length() == z.length() + strlen(a) && equalsIgnoreCase(x.substr(0, x.length() - strlen(a)), z.toStdString()) && equalsIgnoreCase(x.substr(x.length() - strlen(a)), a)))
-
 void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, bool check_exrates) {
 
 	std::string str, str_conv;
@@ -134,6 +131,29 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 		str = expressionEdit->expression();
 		std::string to_str = CALCULATOR->parseComments(str, settings->evalops.parse_options);
 		if(!to_str.empty() && str.empty()) return;
+
+		if(str == "MC") {
+			settings->v_memory->set(m_zero);
+			return;
+		} else if(str == "MS") {
+			if(mstruct) settings->v_memory->set(*mstruct);
+			return;
+		} else if(str == "M+") {
+			if(mstruct) {
+				MathStructure m = settings->v_memory->get();
+				m.calculateAdd(*mstruct, settings->evalops);
+				settings->v_memory->set(m);
+			}
+			return;
+		} else if(str == "M-" || str == "M−") {
+			if(mstruct) {
+				MathStructure m = settings->v_memory->get();
+				m.calculateSubtract(*mstruct, settings->evalops);
+				settings->v_memory->set(m);
+			}
+			return;
+		}
+
 		std::string from_str = str;
 		//if(test_ask_dot(from_str)) ask_dot();
 		if(CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true)) {
@@ -220,7 +240,7 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 						itz = tzh * 60 + tzm;
 						if(b_minus) itz = -itz;
 					} else {
-						CALCULATOR->error(true, tr("Time zone parsing failed.").toUtf8(), NULL);
+						CALCULATOR->error(true, tr("Time zone parsing failed.").toUtf8().constData(), NULL);
 					}
 					settings->printops.time_zone = TIME_ZONE_CUSTOM;
 					settings->printops.custom_time_zone = itz;
@@ -328,8 +348,6 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 			}
 		}
 	}
-
-	if(settings->caret_as_xor) gsub("^", "⊻", str);
 
 	b_busy = true;
 
@@ -473,14 +491,14 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 	i = 0;
 
 	if(CALCULATOR->busy()) {
-		statusBar()->showMessage("Calculating...");
+		//statusBar()->showMessage("Calculating...");
 		qApp->processEvents();
 	}
 	while(CALCULATOR->busy()) {
 		sleep_ms(100);
 		qApp->processEvents();
 	}
-	statusBar()->showMessage("");
+
 	bool units_changed = false;
 
 	if(!do_mathoperation && !str_conv.empty() && to_struct.containsType(STRUCT_UNIT, true) && !mstruct->containsType(STRUCT_UNIT) && !parsed_mstruct->containsType(STRUCT_UNIT, false, true, true) && !CALCULATOR->hasToExpression(str_conv, false, settings->evalops)) {
@@ -543,6 +561,7 @@ void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation o
 		mstruct = CALCULATOR->getRPNRegister(1);
 		if(!mstruct) mstruct = new MathStructure();
 		else mstruct->ref();
+		settings->current_result = mstruct;
 	}
 
 	/*if(!do_mathoperation && ((ask_questions && test_ask_tc(*parsed_mstruct) && ask_tc()) || (check_exrates && check_exchange_rates()))) {
@@ -709,7 +728,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, true, true, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, true, settings->color, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -719,7 +738,7 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, true, true, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, true, settings->color, TAG_TYPE_HTML);
 
 		b_busy = false;
 		CALCULATOR->stopControl();
@@ -788,7 +807,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_parse, size_t stack_
 	i = 0;
 
 	if(b_busy && view_thread->running) {
-		statusBar()->showMessage(tr("Processing..."));
+		//statusBar()->showMessage(tr("Processing..."));
 		qApp->processEvents();
 	}
 	while(b_busy && view_thread->running) {
@@ -820,3 +839,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_parse, size_t stack_
 	b_busy = false;
 }
 
+void QalculateWindow::changeEvent(QEvent *e) {
+	if(e->type() == QEvent::StyleChange) {
+		QColor c = historyView->palette().base().color();
+		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
+		else settings->color = 1;
+	}
+	QMainWindow::changeEvent(e);
+}

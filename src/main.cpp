@@ -29,6 +29,7 @@
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QDebug>
 #include <locale.h>
 
 #include "libqalculate/qalculate.h"
@@ -106,7 +107,7 @@ int main(int argc, char **argv) {
 
 	QalculateWindow *win = new QalculateWindow();
 	win->setCommandLineParser(parser);
-	win->resize(500, 500);
+	win->resize(900, 900);
 	win->show();
 
 	QStringList args = parser->positionalArguments();

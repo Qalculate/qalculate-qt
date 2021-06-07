@@ -126,6 +126,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_mode = false;
 	caret_as_xor = false;
 	do_imaginary_j = false;
+	color = 1;
 
 	updateMessagePrintOptions();
 
