@@ -22,28 +22,8 @@ class ExpressionEdit;
 class HistoryView;
 class QSplitter;
 class QLabel;
-
-#ifdef LOAD_EQZICONS_FROM_FILE
-	#ifdef RESOURCES_COMPILED
-		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
-		#define LOAD_ICON(x) QIcon(ICON_DIR "/EQZ/actions/64x64/" x ".png")
-		#define LOAD_ICON_APP(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
-		#define LOAD_ICON_STATUS(x) QIcon(ICON_DIR "/EQZ/status/64x64/" x ".png")
-		#define LOAD_ICON2(x, y) QIcon(ICON_DIR "/EQZ/actions/64x64/" y ".png")
-	#else
-		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/hicolor/64x64/apps/" x ".png")
-		#define LOAD_ICON(x) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x))
-		#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
-		#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
-		#define LOAD_ICON2(x, y) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x, QIcon::fromTheme(y)))
-	#endif
-#else
-	#define LOAD_APP_ICON(x) QIcon::fromTheme(x)
-	#define LOAD_ICON(x) QIcon::fromTheme(x)
-	#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
-	#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
-	#define LOAD_ICON2(x, y) QIcon::fromTheme(x, QIcon::fromTheme(y))
-#endif
+class KeypadWidget;
+class QDockWidget;
 
 class QalculateWindow : public QMainWindow {
 
@@ -55,6 +35,7 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
+		void fetchExchangeRates(int timeout, int n);
 
 	protected:
 
@@ -67,15 +48,52 @@ class QalculateWindow : public QMainWindow {
 		QSplitter *ehSplitter;
 		QLabel *statusLabel, *statusIconLabel;
 
+		KeypadWidget *keypad;
+		QDockWidget *keypadDock;
+
+		bool send_event;
+
 		void calculateExpression(bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_parse = false, size_t stack_index = 0, bool register_moved = false, bool noprint = false);
+		void executeCommand(int command_type, bool show_result = true);
 		void changeEvent(QEvent *e) override;
+		bool checkExchangeRates();
+		bool askTC(MathStructure&);
+		bool askDot(const std::string&);
+		void keyPressEvent(QKeyEvent*) override;
+
+	protected slots:
+
+		void onSymbolClicked(const QString&);
+		void onOperatorClicked(const QString&);
+		void onFunctionClicked(MathFunction*);
+		void onVariableClicked(Variable*);
+		void onUnitClicked(Unit*);
+		void onClearClicked();
+		void onDelClicked();
+		void onEqualsClicked();
+		void onParenthesesClicked();
+		void onBracketsClicked();
+		void onBackspaceClicked();
+		void onLeftClicked();
+		void onRightClicked();
+		void onStartClicked();
+		void onEndClicked();
+		void onMSClicked();
+		void onMRClicked();
+		void onMCClicked();
+		void onMPlusClicked();
+		void onMMinusClicked();
 
 	public slots:
 
 		void serverNewConnection();
 		void socketReadyRead();
 		void calculate();
+		void calculate(const QString&);
+		void onActivateRequested(const QStringList&, const QString&);
+		void abort();
+		void abortCommand();
 
 	signals:
 

@@ -29,28 +29,29 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += QString::fromStdString(expression);
 		str += "</div>";
 	}
-	while(CALCULATOR->message()) {
-		MessageType mtype = CALCULATOR->message()->type();
-		str += "<div align=\"left\"><font size=\"smaller\"";
-		if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-			str += " color=\"";
-			if(mtype == MESSAGE_ERROR) {
-				if(settings->color == 1) str += "#800000";
-				else str += "#FFAAAA";
-			} else {
-				if(settings->color == 1) str += "#000080";
-				else str += "#AAAAFF";
+	if(CALCULATOR->message()) {
+		do {
+			MessageType mtype = CALCULATOR->message()->type();
+			str += "<div align=\"left\"><font size=\"-1\"";
+			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+				str += " color=\"";
+				if(mtype == MESSAGE_ERROR) {
+					if(settings->color == 1) str += "#800000";
+					else str += "#FFAAAA";
+				} else {
+					if(settings->color == 1) str += "#000080";
+					else str += "#AAAAFF";
+				}
+				str += "\"";
 			}
-			str += "\"";
-		}
-		str += ">";
-		QString mstr = QString::fromStdString(CALCULATOR->message()->message());
-		mstr.replace("\n", "<br>");
-		if(!mstr.startsWith("-")) str += "- ";
-		str += mstr;
-		str += "</font>";
-		str += "</div>";
-		CALCULATOR->nextMessage();
+			str += ">";
+			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
+			mstr.replace("\n", "<br>");
+			if(!mstr.startsWith("-")) str += "- ";
+			str += mstr;
+			str += "</font>";
+			str += "</div>";
+		} while(CALCULATOR->nextMessage());
 	}
 	for(size_t i = 0; i < values.size(); i++) {
 		str += "<div align=\"right\">";
@@ -64,3 +65,4 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	else s_text.insert(0, str);
 	setHtml(s_text);
 }
+

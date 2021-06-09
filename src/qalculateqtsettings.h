@@ -22,6 +22,28 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define EQUALS_IGNORECASE_AND_LOCAL(x,y,z)	(equalsIgnoreCase(x, y) || equalsIgnoreCase(x, z.toStdString()))
 #define EQUALS_IGNORECASE_AND_LOCAL_NR(x,y,z,a)	(equalsIgnoreCase(x, y a) || (x.length() == z.length() + strlen(a) && equalsIgnoreCase(x.substr(0, x.length() - strlen(a)), z.toStdString()) && equalsIgnoreCase(x.substr(x.length() - strlen(a)), a)))
 
+#ifdef LOAD_EQZICONS_FROM_FILE
+	#ifdef RESOURCES_COMPILED
+		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
+		#define LOAD_ICON(x) QIcon(ICON_DIR "/EQZ/actions/64x64/" x ".png")
+		#define LOAD_ICON_APP(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
+		#define LOAD_ICON_STATUS(x) QIcon(ICON_DIR "/EQZ/status/64x64/" x ".png")
+		#define LOAD_ICON2(x, y) QIcon(ICON_DIR "/EQZ/actions/64x64/" y ".png")
+	#else
+		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/hicolor/64x64/apps/" x ".png")
+		#define LOAD_ICON(x) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x))
+		#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
+		#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
+		#define LOAD_ICON2(x, y) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x, QIcon::fromTheme(y)))
+	#endif
+#else
+	#define LOAD_APP_ICON(x) QIcon::fromTheme(x)
+	#define LOAD_ICON(x) QIcon::fromTheme(x)
+	#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
+	#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
+	#define LOAD_ICON2(x, y) QIcon::fromTheme(x, QIcon::fromTheme(y))
+#endif
+
 class QalculateQtSettings {
 	public:
 
@@ -32,8 +54,6 @@ class QalculateQtSettings {
 		void savePreferences();
 
 		void updateMessagePrintOptions();
-
-		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 
 		bool isAnswerVariable(Variable *v);
 

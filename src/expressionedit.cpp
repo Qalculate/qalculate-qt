@@ -284,10 +284,10 @@ std::string sub_suffix(const ExpressionName *ename) {
 	} else {
 		str += ename->name.substr(0, i);
 	}
-	str += "<span size=\"small\"><sub>";
+	str += "<sub>";
 	if(b) str += ename->name.substr(ename->name.length() - i2, i2);
 	else str += ename->name.substr(i + 1, ename->name.length() - (i + 1));
-	str += "</sub></span>";
+	str += "</sub>";
 	return str;
 }
 
@@ -500,21 +500,21 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			QString qstr = index.data(Qt::DisplayRole).toString();
 			if(!qstr.isEmpty()) {
 				if(qstr[0] == '<') {
-					size_t i = qstr.indexOf("-) </small>");
+					int i = qstr.indexOf("-) </font>");
 					if(i > 2) {
-						if(prefix && prefix->longName() == qstr.mid(8, i - 8).toStdString()) {
+						if(prefix && prefix->longName() == qstr.mid(22, i - 22).toStdString()) {
 							prefix = NULL;
 						} else {
-							qstr = qstr.mid(i + 11);
+							qstr = qstr.mid(i + 10);
 							if(!prefix) sourceModel()->setData(index, qstr, Qt::DisplayRole);
 						}
 					}
 				}
 				if(prefix) {
 					if(qstr.isEmpty()) qstr = index.data(Qt::DisplayRole).toString();
-					qstr.insert(0, "-) </small>");
+					qstr.insert(0, "-) </font>");
 					qstr.insert(0, QString::fromStdString(prefix->longName()));
-					qstr.insert(0, "<small>(");
+					qstr.insert(0, "<font size=\"smaller\">(");
 					sourceModel()->setData(index, qstr, Qt::DisplayRole);
 				}
 			}
@@ -532,9 +532,9 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		if(item->type() == TYPE_UNIT && item->category() == cdata->current_from_unit->category()) {
 			QString qstr = index.data(Qt::DisplayRole).toString();
 			if(!qstr.isEmpty() && qstr[0] == '<') {
-				int i = qstr.indexOf("-) </small>");
+				int i = qstr.indexOf("-) </font>");
 				if(i > 2) {
-					qstr = qstr.right(i + 11);
+					qstr = qstr.mid(i + 10);
 					sourceModel()->setData(index, qstr, Qt::DisplayRole);
 				}
 			}
@@ -622,6 +622,7 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 
 ExpressionEdit::ExpressionEdit(QWidget *parent) : QTextEdit(parent) {
 	setAcceptRichText(false);
+	setTabChangesFocus(true);
 	completion_blocked = 0;
 	cdata = new CompletionData;
 	history_index = -1;
@@ -631,12 +632,13 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QTextEdit(parent) {
 	block_text_change = 0;
 	dont_change_index = false;
 	cursor_has_moved = false;
+	expression_has_changed = false;
 	expression_has_changed2 = false;
 	previous_epos = 0;
 	parsed_had_errors = false;
 	parsed_had_warnings = false;
 	parentheses_highlighted = false;
-	setUndoRedoEnabled(true);
+	setUndoRedoEnabled(false);
 	completionModel = new ExpressionProxyModel(cdata, this);
 	sourceModel = new QStandardItemModel(this);
 	sourceModel->setColumnCount(2);
@@ -799,7 +801,7 @@ void ExpressionEdit::updateCompletion() {
 				if(b) {
 					while(pos != std::string::npos) {
 						if((pos == 1 && str[0] == 'm') || (pos > 1 && str[pos - 1] == 'm' && str[pos - 2] == '>')) {
-							str.replace(pos, 4, "<span size=\"small\"><sup>-1</sup></span>→");
+							str.replace(pos, 4, "<sup>-1</sup>→");
 						} else {
 							str.replace(pos, 4, "→");
 						}
@@ -940,15 +942,15 @@ void ExpressionEdit::updateCompletion() {
 							i_end = str.find_first_not_of(NUMBERS, i_end + 1);
 						}
 						str.erase(i_pow, 1);
-						if(i_end == std::string::npos) str += "</sup></span>";
-						else str.insert(i_end, "</sup></span>");
-						str.insert(i_pow, "<span size=\"small\"><sup>");
+						if(i_end == std::string::npos) str += "</sup>";
+						else str.insert(i_end, "</sup>");
+						str.insert(i_pow, "<sup>");
 						if(i_end == std::string::npos) break;
 						i_pow = str.find("^", i_pow + 1);
 					}
 					//if(settings->printops.multiplication_sign == MULTIPLICATION_SIGN_DOT) gsub(saltdot, sdot, str);
 					gsub("_unit", "", str);
-					gsub("_eunit", "<span size=\"small\"><sub>e</sub></span>", str);
+					gsub("_eunit", "<sub>e</sub>", str);
 				}
 				size_t i_slash = std::string::npos;
 				if(cu->category().length() > 1) i_slash = cu->category().rfind("/", cu->category().length() - 2);
@@ -1097,7 +1099,7 @@ std::string ExpressionEdit::expression() const {
 QSize ExpressionEdit::sizeHint() const {
 	QSize size = QTextEdit::sizeHint();
 	QFontMetrics fm(font());
-	size.setHeight(fm.boundingRect("Äy").height() * 3);
+	size.setHeight(fm.boundingRect("Åj").height() * 3.2 + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
 	return size;
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
@@ -1117,6 +1119,15 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 			case Qt::Key_Dead_Circumflex: {
 				insertPlainText("^");
+				return;
+			}
+		}
+	}
+	if(event->modifiers() == Qt::ControlModifier || (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		switch(event->key()) {
+			case Qt::Key_BraceLeft: {}
+			case Qt::Key_BraceRight: {
+				smartParentheses();
 				return;
 			}
 		}
@@ -1245,7 +1256,7 @@ void ExpressionEdit::setStatusText(QString text) {
 		QToolTip::hideText();
 	} else {
 		text.replace("\n", "<br>");
-		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), "<small>" + text + "</small>");
+		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), "<font size=\"-1\">" + text + "</font>");
 	}
 }
 
@@ -1391,8 +1402,6 @@ void ExpressionEdit::displayParseStatus() {
 	std::string str_e, str_u, str_w;
 	bool had_errors = false, had_warnings = false;
 	settings->evalops.parse_options.preserve_format = true;
-	//on_display_errors_timeout(NULL);
-	//block_error_timeout++;
 	if(!cursor.atStart()) {
 		settings->evalops.parse_options.unended_function = &mfunc;
 		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_unit = NULL;}
@@ -1710,7 +1719,6 @@ void ExpressionEdit::displayParseStatus() {
 			}
 			CALCULATOR->nextMessage();
 		}
-		//block_error_timeout--;
 		parsed_had_errors = had_errors; parsed_had_warnings = had_warnings;
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
 		gsub("&", "&amp;", parsed_expression);
@@ -1724,7 +1732,6 @@ void ExpressionEdit::displayParseStatus() {
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
-		//block_error_timeout--;
 		if(prev_func) setStatusText(prev_parsed_expression);
 	}
 	settings->evalops.parse_options.preserve_format = false;
@@ -1733,6 +1740,7 @@ void ExpressionEdit::displayParseStatus() {
 
 void ExpressionEdit::onTextChanged() {
 	if(block_text_change) return;
+	expression_has_changed = true;
 	if(!dont_change_index) history_index = -1;
 	highlightParentheses();
 	bool b = completionView->isVisible();
@@ -1742,6 +1750,12 @@ void ExpressionEdit::onTextChanged() {
 	qApp->processEvents();
 	if(b != completionView->isVisible()) displayParseStatus();
 	expression_has_changed2 = true;
+}
+bool ExpressionEdit::expressionHasChanged() {
+	return expression_has_changed && !toPlainText().trimmed().isEmpty();
+}
+void ExpressionEdit::setExpressionHasChanged(bool b) {
+	expression_has_changed = b;
 }
 void ExpressionEdit::complete() {
 	if(!cdata->enable_completion) {hideCompletion(); return;}
@@ -1998,6 +2012,144 @@ void ExpressionEdit::highlightParentheses() {
 		block_text_change--;
 		parentheses_highlighted = true;
 	}
+}
+void ExpressionEdit::selectAll() {
+	QTextCursor cur = textCursor();
+	cur.select(QTextCursor::Document);
+	setTextCursor(cur);
+}
+void ExpressionEdit::insertBrackets() {
+	QTextCursor cur = textCursor();
+	cur.beginEditBlock();
+	if(cur.hasSelection()) {
+		int istart = cur.selectionStart();
+		int iend = cur.selectionEnd();
+		std::string str = CALCULATOR->unlocalizeExpression(toPlainText().mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
+		cur.setPosition(istart);
+		cur.insertText("[");
+		iend++;
+		cur.setPosition(iend);
+		cur.insertText("]");
+		iend++;
+		istart++;
+		CALCULATOR->parseSigns(str);
+		if(str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+			iend--;
+		}
+		cur.setPosition(iend);
+		setTextCursor(cur);
+	} else {
+		insertPlainText("[]");
+		moveCursor(QTextCursor::PreviousCharacter);
+	}
+	cur.endEditBlock();
+	highlightParentheses();
+}
+void ExpressionEdit::wrapSelection(const QString &text) {
+	QTextCursor cur = textCursor();
+	if(cur.hasSelection()) {
+		QString qstr = toPlainText();
+		std::string str = qstr.toStdString();
+		if(text.isEmpty() && (CALCULATOR->hasToExpression(str, true, settings->evalops) || CALCULATOR->hasWhereExpression(str, settings->evalops))) {
+			return;
+		}
+		int istart = cur.selectionStart();
+		int iend = cur.selectionEnd();
+		if(text.isEmpty() && istart == 0 && iend == qstr.length() && str.find_first_not_of(NUMBER_ELEMENTS SPACE) == std::string::npos) {
+			moveCursor(QTextCursor::End);
+			return;
+		}
+		cur.beginEditBlock();
+		str = CALCULATOR->unlocalizeExpression(qstr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
+		cur.setPosition(istart);
+		cur.insertText(text + "(");
+		iend += text.length() + 1;
+		cur.setPosition(iend);
+		cur.insertText(")");
+		iend++;
+		istart++;
+		CALCULATOR->parseSigns(str);
+		if(str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+			iend--;
+		}
+		cur.setPosition(iend);
+		cur.endEditBlock();
+		setTextCursor(cur);
+	} else {
+		cur.beginEditBlock();
+		insertPlainText(text + "()");
+		moveCursor(QTextCursor::PreviousCharacter);
+		cur.endEditBlock();
+	}
+	highlightParentheses();
+}
+void ExpressionEdit::smartParentheses() {
+	QString qexpr = toPlainText();
+	int istart = 0, iend = 0, ipos;
+	QTextCursor cur = textCursor();
+	cur.beginEditBlock();
+	if(qexpr.isEmpty()) {
+		insertPlainText("()");
+		moveCursor(QTextCursor::PreviousCharacter);
+		cur.endEditBlock();
+		return;
+	}
+	ipos = cur.position();
+	bool goto_start = false;
+	if(cur.hasSelection()) {
+		istart = cur.selectionStart();
+		iend = cur.selectionEnd();
+	} else {
+		iend = ipos;
+		if(iend != 0) {
+			std::string str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
+			CALCULATOR->parseSigns(str);
+			if(str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+				istart = iend;
+				iend = qexpr.length();
+				if(istart < iend) {
+					str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
+					CALCULATOR->parseSigns(str);
+					if(str.empty() || (is_in(OPERATORS SPACES SEXADOT DOT RIGHT_VECTOR_WRAP LEFT_PARENTHESIS RIGHT_PARENTHESIS COMMAS, str[0]) && str[0] != MINUS_CH)) {
+						iend = istart;
+					}
+				}
+			}
+		} else {
+			goto_start = true;
+			iend = qexpr.length();
+			std::string str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart).toStdString(), settings->evalops.parse_options);
+			CALCULATOR->parseSigns(str);
+			if(str.empty() || (is_in(OPERATORS SPACES SEXADOT DOT RIGHT_VECTOR_WRAP LEFT_PARENTHESIS RIGHT_PARENTHESIS COMMAS, str[0]) && str[0] != MINUS_CH)) {
+				iend = istart;
+			}
+		}
+	}
+	if(istart >= iend) {
+		cur.setPosition(istart);
+		setTextCursor(cur);
+		insertPlainText("()");
+		moveCursor(QTextCursor::PreviousCharacter);
+		return;
+	}
+	std::string str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
+	cur.setPosition(istart);
+	cur.insertText("(");
+	iend++;
+	cur.setPosition(iend);
+	cur.insertText(")");
+	iend++;
+	istart++;
+	CALCULATOR->parseSigns(str);
+	if(str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+		iend--;
+		goto_start = false;
+	}
+	if(goto_start) cur.setPosition(istart);
+	else cur.setPosition(iend);
+	setTextCursor(cur);
+	cur.endEditBlock();
+	highlightParentheses();
 }
 void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	if(!index_pre.isValid()) return;

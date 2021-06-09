@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 				QLocalSocket socket;
 				socket.connectToServer("qalculate-qt");
 				if(socket.waitForConnected()) {
-					QString command;
+					QString command = "0";
 					QStringList args = parser->positionalArguments();
 					for(int i = 0; i < args.count(); i++) {
 						if(i > 0) command += " ";
@@ -116,6 +116,8 @@ int main(int argc, char **argv) {
 		if(i > 0) expression += " ";
 		expression += args.at(i);
 	}
+	expression = expression.trimmed();
+	if(!expression.isEmpty()) win->calculate(expression);
 
 	args.clear();
 
