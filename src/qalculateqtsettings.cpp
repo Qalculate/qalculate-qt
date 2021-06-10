@@ -14,7 +14,7 @@
 #include <QApplication>
 #include <QWidget>
 
-bool can_display_unicode_string_function(const char *str, void *w) {
+bool can_display_unicode_string_function(const char*, void*) {
 	return true;
 }
 
@@ -122,10 +122,11 @@ void QalculateQtSettings::loadPreferences() {
 	tc_set = false;
 	dual_fraction = -1;
 	dual_approximation = -1;
-	auto_update_exchange_rates = -1;
+	auto_update_exchange_rates = 7;
 	rpn_mode = false;
 	caret_as_xor = false;
 	do_imaginary_j = false;
+	color = 1;
 
 	updateMessagePrintOptions();
 
@@ -169,43 +170,4 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
 }
 
-class FetchExchangeRatesThread : public Thread {
-protected:
-	virtual void run();
-};
-
-void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent) {
-	//bool b_busy_bak = b_busy;
-	//block_error_timeout++;
-	//b_busy = true;
-	FetchExchangeRatesThread fetch_thread;
-	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
-		int i = 0;
-		while(fetch_thread.running && i < 50) {
-			qApp->processEvents();
-			sleep_ms(10);
-			i++;
-		}
-		if(fetch_thread.running) {
-			//GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(gtk_builder_get_object(main_builder, "main_window")), (GtkDialogFlags) (GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL), GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, _("Fetching exchange rates."));
-			//if(always_on_top) gtk_window_set_keep_above(GTK_WINDOW(dialog), always_on_top);
-			//gtk_widget_show(dialog);
-			while(fetch_thread.running) {
-				qApp->processEvents();
-				sleep_ms(10);
-			}
-			//gtk_widget_destroy(dialog);
-		}
-	}
-	//b_busy = b_busy_bak;
-	//block_error_timeout--;
-}
-
-void FetchExchangeRatesThread::run() {
-	int timeout = 15;
-	int n = -1;
-	if(!read(&timeout)) return;
-	if(!read(&n)) return;
-	CALCULATOR->fetchExchangeRates(timeout, n);
-}
 

@@ -16,9 +16,12 @@
 #include <QSortFilterProxyModel>
 #include <QStringList>
 
+#include <libqalculate/qalculate.h>
+
 class QCompleter;
 class QStandardItemModel;
 class QTableView;
+struct CompletionData;
 
 class ExpressionProxyModel : public QSortFilterProxyModel {
 
@@ -26,16 +29,19 @@ class ExpressionProxyModel : public QSortFilterProxyModel {
 
 	public:
 
-		ExpressionProxyModel(QObject *parent = NULL);
+		ExpressionProxyModel(CompletionData*, QObject *parent = NULL);
 		~ExpressionProxyModel();
 
-		void setFilter(std::string str);
+		void setFilter(std::string);
+
+		CompletionData *cdata;
 
 	protected:
 
-		std::string s_filter;
+		std::string str;
 
 		bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
+		bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
 
 };
 
@@ -53,11 +59,30 @@ class ExpressionEdit : public QTextEdit {
 		QStringList history;
 		QString current_history;
 		int history_index;
+		
+		CompletionData *cdata;
+		
 		int current_object_start, current_object_end;
+		int current_function_index;
 		std::string current_object_text;
 		int completion_blocked;
-		bool editing_to_expression, editing_to_expression1;
+		int block_text_change;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
+		bool display_expression_status;
+		int block_display_parse;
+		QString prev_parsed_expression, parsed_expression_tooltip;
+		bool expression_has_changed, expression_has_changed2;
+		bool parsed_had_errors, parsed_had_warnings;
+		int previous_epos;
+		bool parentheses_highlighted;
+
+		void setCurrentObject();
+		void setStatusText(QString text);
+		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
+		void highlightParentheses();
+
+		void keyPressEvent(QKeyEvent*) override;
+		void keyReleaseEvent(QKeyEvent*) override;
 
 	public:
 
@@ -68,11 +93,12 @@ class ExpressionEdit : public QTextEdit {
 		QSize sizeHint() const;
 
 		void updateCompletion();
+		void wrapSelection(const QString &text = QString());
+		bool expressionHasChanged();
+		void setExpressionHasChanged(bool);
 
 	protected slots:
 
-		void keyPressEvent(QKeyEvent*) override;
-		void keyReleaseEvent(QKeyEvent*) override;
 		void onTextChanged();
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
@@ -84,6 +110,11 @@ class ExpressionEdit : public QTextEdit {
 		void unblockCompletion();
 		void hideCompletion();
 		void addToHistory();
+		void complete();
+		void displayParseStatus();
+		void smartParentheses();
+		void insertBrackets();
+		void selectAll();
 
 	signals:
 

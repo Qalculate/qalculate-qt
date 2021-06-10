@@ -29,6 +29,7 @@
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QDebug>
 #include <locale.h>
 
 #include <libqalculate/qalculate.h>
@@ -63,7 +64,7 @@ int main(int argc, char **argv) {
 				QLocalSocket socket;
 				socket.connectToServer("qalculate-qt");
 				if(socket.waitForConnected()) {
-					QString command;
+					QString command = "0";
 					QStringList args = parser->positionalArguments();
 					for(int i = 0; i < args.count(); i++) {
 						if(i > 0) command += " ";
@@ -106,7 +107,7 @@ int main(int argc, char **argv) {
 
 	QalculateWindow *win = new QalculateWindow();
 	win->setCommandLineParser(parser);
-	win->resize(500, 500);
+	win->resize(900, 900);
 	win->show();
 
 	QStringList args = parser->positionalArguments();
@@ -115,6 +116,8 @@ int main(int argc, char **argv) {
 		if(i > 0) expression += " ";
 		expression += args.at(i);
 	}
+	expression = expression.trimmed();
+	if(!expression.isEmpty()) win->calculate(expression);
 
 	args.clear();
 
