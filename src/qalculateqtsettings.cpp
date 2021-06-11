@@ -115,6 +115,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.local_currency_conversion = true;
 	evalops.interval_calculation = INTERVAL_CALCULATION_VARIANCE_FORMULA;
 
+	title_type = TITLE_APP;
 	dot_question_asked = false;
 	complex_angle_form = false;
 	b_decimal_comma = -1;
@@ -127,6 +128,7 @@ void QalculateQtSettings::loadPreferences() {
 	caret_as_xor = false;
 	do_imaginary_j = false;
 	color = 1;
+	rpn_mode = false;
 
 	updateMessagePrintOptions();
 
@@ -156,6 +158,7 @@ void QalculateQtSettings::loadPreferences() {
 	}
 
 }
+void QalculateQtSettings::savePreferences() {}
 void QalculateQtSettings::updateMessagePrintOptions() {
 	PrintOptions message_printoptions = printops;
 	message_printoptions.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
@@ -169,5 +172,4 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 	}
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
 }
-
 

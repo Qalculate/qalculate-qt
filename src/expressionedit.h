@@ -56,17 +56,18 @@ class ExpressionEdit : public QTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 
-		QStringList history;
+		QStringList history, expression_undo_buffer;
 		QString current_history;
-		int history_index;
+		int history_index, undo_index;
 		
 		CompletionData *cdata;
 		
 		int current_object_start, current_object_end;
 		int current_function_index;
 		std::string current_object_text;
-		int completion_blocked;
+		int completion_blocked, parse_blocked, block_add_to_undo;
 		int block_text_change;
+		bool do_completion_signal;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		bool display_expression_status;
 		int block_display_parse;
@@ -93,9 +94,11 @@ class ExpressionEdit : public QTextEdit {
 		QSize sizeHint() const;
 
 		void updateCompletion();
-		void wrapSelection(const QString &text = QString());
+		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
+		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
+		void displayParseStatus(bool = false);
 
 	protected slots:
 
@@ -106,19 +109,19 @@ class ExpressionEdit : public QTextEdit {
 	public slots:
 
 		void setExpression(std::string);
-		void blockCompletion();
-		void unblockCompletion();
+		void blockCompletion(bool = true);
+		void blockParseStatus(bool = true);
+		void blockUndo(bool = true);
 		void hideCompletion();
 		void addToHistory();
-		void complete();
-		void displayParseStatus();
 		void smartParentheses();
 		void insertBrackets();
-		void selectAll();
+		void selectAll(bool b = true);
 
 	signals:
 
 		void returnPressed();
+		void toConversionRequested(std::string);
 
 };
 

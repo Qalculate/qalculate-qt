@@ -44,7 +44,14 @@ bool can_display_unicode_string_function(const char *str, void *w);
 	#define LOAD_ICON2(x, y) QIcon::fromTheme(x, QIcon::fromTheme(y))
 #endif
 
+enum {
+	TITLE_APP,
+	TITLE_RESULT,
+	TITLE_APP_RESULT
+};
+
 class QalculateQtSettings {
+
 	public:
 
 		QalculateQtSettings();
@@ -60,7 +67,7 @@ class QalculateQtSettings {
 		EvaluationOptions evalops;
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup;
-		int b_decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates;
+		int b_decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int color;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

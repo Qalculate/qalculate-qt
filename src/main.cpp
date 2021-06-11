@@ -36,7 +36,9 @@
 #include "qalculatewindow.h"
 #include "qalculateqtsettings.h"
 
+QString custom_title;
 QalculateQtSettings *settings;
+extern bool title_modified;
 
 QTranslator translator, translator_qt, translator_qtbase;
 
@@ -49,32 +51,46 @@ int main(int argc, char **argv) {
 	app.setApplicationVersion(VERSION);
 
 	QCommandLineParser *parser = new QCommandLineParser();
-	parser->addPositionalArgument("expression", QApplication::tr("Expression to calculate"), "[expression]");
+	/*QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("[FILE]"));
+	parser->addOption(fOption);*/
+	QCommandLineOption nOption(QStringList() << "n" << "new-instance", QApplication::tr("Start a new instance of the application"));
+	parser->addOption(nOption);
+	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("[TITLE]"));
+	parser->addOption(tOption);
+	QCommandLineOption vOption(QStringList() << "v" << "verison", QApplication::tr("Display the application version"));
+	parser->addOption(vOption);
+	parser->addPositionalArgument("expression", QApplication::tr("Expression to calculate"), QApplication::tr("[EXPRESSION]"));
 	parser->addHelpOption();
 	parser->process(app);
 
-	QString lockpath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-	QDir lockdir(lockpath);
-	QLockFile lockFile(lockpath + "/qalculate-qt.lock");
-	if(lockdir.mkpath(lockpath)) {
-		if(!lockFile.tryLock(100)){
-			if(lockFile.error() == QLockFile::LockFailedError) {
-				QTextStream outStream(stdout);
-				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
-				QLocalSocket socket;
-				socket.connectToServer("qalculate-qt");
-				if(socket.waitForConnected()) {
-					QString command = "0";
-					QStringList args = parser->positionalArguments();
-					for(int i = 0; i < args.count(); i++) {
-						if(i > 0) command += " ";
-						command += args.at(i);
+	if(parser->isSet(vOption)) {
+		printf(VERSION "\n");
+		return 0;
+	}
+	if(!parser->isSet(nOption)) {
+		QString lockpath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+		QDir lockdir(lockpath);
+		QLockFile lockFile(lockpath + "/qalculate-qt.lock");
+		if(lockdir.mkpath(lockpath)) {
+			if(!lockFile.tryLock(100)){
+				if(lockFile.error() == QLockFile::LockFailedError) {
+					QTextStream outStream(stdout);
+					outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
+					QLocalSocket socket;
+					socket.connectToServer("qalculate-qt");
+					if(socket.waitForConnected()) {
+						QString command = "0";
+						QStringList args = parser->positionalArguments();
+						for(int i = 0; i < args.count(); i++) {
+							if(i > 0) command += " ";
+							command += args.at(i);
+						}
+						socket.write(command.toUtf8());
+						socket.waitForBytesWritten(3000);
+						socket.disconnectFromServer();
 					}
-					socket.write(command.toUtf8());
-					socket.waitForBytesWritten(3000);
-					socket.disconnectFromServer();
+					return 1;
 				}
-				return 1;
 			}
 		}
 	}
@@ -106,6 +122,13 @@ int main(int argc, char **argv) {
 	CALCULATOR->loadLocalDefinitions();
 
 	QalculateWindow *win = new QalculateWindow();
+	if(parser->value(tOption).isEmpty()) {
+		win->updateWindowTitle();
+		title_modified = false;
+	} else {
+		win->setWindowTitle(parser->value(tOption));
+		title_modified = true;
+	}
 	win->setCommandLineParser(parser);
 	win->resize(900, 900);
 	win->show();

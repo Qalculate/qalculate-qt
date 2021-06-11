@@ -18,7 +18,7 @@
 
 extern QalculateQtSettings *settings;
 
-HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent) {
+HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
 }
 HistoryView::~HistoryView() {}
 
@@ -46,12 +46,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 			str += ">";
 			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
-			mstr.replace("\n", "<br>");
 			if(!mstr.startsWith("-")) str += "- ";
 			str += mstr;
 			str += "</font>";
 			str += "</div>";
 		} while(CALCULATOR->nextMessage());
+		if(str.isEmpty() && values.empty() && expression.empty()) return;
 	}
 	for(size_t i = 0; i < values.size(); i++) {
 		str += "<div align=\"right\">";
@@ -60,9 +60,18 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += QString::fromStdString(values[i]);
 		str += "</div>";
 	}
-	if(!s_text.isEmpty() && !expression.empty()) str += "<hr>";
-	if(expression.empty()) s_text += str;
-	else s_text.insert(0, str);
+	str.replace("\n", "<br>");
+	if(expression.empty()) {
+		s_text.insert(i_pos, str);
+		i_pos += str.length();
+	} else {
+		i_pos = str.length();
+		if(!s_text.isEmpty()) str += "<hr/>";
+		s_text.insert(0, str);
+	}
 	setHtml(s_text);
 }
-
+void HistoryView::addMessages() {
+	std::vector<std::string> values;
+	addResult(values, "", true);
+}

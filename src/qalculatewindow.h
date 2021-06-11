@@ -24,6 +24,8 @@ class QSplitter;
 class QLabel;
 class KeypadWidget;
 class QDockWidget;
+class QAction;
+class QToolBar;
 
 class QalculateWindow : public QMainWindow {
 
@@ -35,7 +37,13 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
-		void fetchExchangeRates(int timeout, int n);
+		void fetchExchangeRates(int timeout, int n = -1);
+		static bool displayMessages(QWidget *parent = NULL);
+		void resultFormatUpdated();
+		void resultDisplayUpdated();
+		void expressionFormatUpdated(bool);
+		void expressionCalculationUpdated();
+		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 
 	protected:
 
@@ -49,18 +57,23 @@ class QalculateWindow : public QMainWindow {
 		QLabel *statusLabel, *statusIconLabel;
 
 		KeypadWidget *keypad;
-		QDockWidget *keypadDock;
+		QDockWidget *keypadDock, *basesDock;
+		QToolBar *tb;
+		QAction *menuAction, *toAction, *storeAction, *keypadAction, *basesAction;
 
 		bool send_event;
 
-		void calculateExpression(bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, bool check_exrates = true);
-		void setResult(Prefix *prefix = NULL, bool update_parse = false, size_t stack_index = 0, bool register_moved = false, bool noprint = false);
-		void executeCommand(int command_type, bool show_result = true);
+		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
+		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
+		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
 		bool checkExchangeRates();
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
 		void keyPressEvent(QKeyEvent*) override;
+		void setPreviousExpression();
+		void setOption(std::string);
+		void updateResultBases();
 
 	protected slots:
 
@@ -84,6 +97,14 @@ class QalculateWindow : public QMainWindow {
 		void onMCClicked();
 		void onMPlusClicked();
 		void onMMinusClicked();
+		void onToActivated();
+		void onStoreActivated();
+		void onKeypadActivated(bool);
+		void onKeypadVisibilityChanged(bool);
+		void onBasesActivated(bool);
+		void onBasesVisibilityChanged(bool);
+		void onExpressionChanged();
+		void onToConversionRequested(std::string);
 
 	public slots:
 
@@ -94,9 +115,11 @@ class QalculateWindow : public QMainWindow {
 		void onActivateRequested(const QStringList&, const QString&);
 		void abort();
 		void abortCommand();
+		void fetchExchangeRates();
 
 	signals:
 
 };
 
 #endif //QALCULATE_WINDOW_H
+

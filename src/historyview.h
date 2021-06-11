@@ -24,8 +24,10 @@ class HistoryView : public QTextBrowser {
 		virtual ~HistoryView();
 
 		QString s_text;
+		int i_pos;
 
 		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true);
+		void addMessages();
 
 	public slots:
 
