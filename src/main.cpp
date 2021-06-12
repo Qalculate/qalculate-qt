@@ -95,13 +95,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-#ifndef LOAD_EQZICONS_FROM_FILE
-	if(QIcon::themeName().isEmpty() || !QIcon::hasThemeIcon("qalculate")) {
-		QIcon::setThemeSearchPaths(QStringList(ICON_DIR));
-		QIcon::setThemeName("QALCULATE");
-	}
-#endif
-	app.setWindowIcon(LOAD_APP_ICON("qalculate"));
+	app.setWindowIcon(LOAD_APP_ICON("qalculate-qt"));
 
 	settings = new QalculateQtSettings();
 
@@ -130,7 +124,6 @@ int main(int argc, char **argv) {
 		title_modified = true;
 	}
 	win->setCommandLineParser(parser);
-	win->resize(900, 900);
 	win->show();
 
 	QStringList args = parser->positionalArguments();

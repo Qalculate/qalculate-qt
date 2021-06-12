@@ -14,6 +14,8 @@
 
 #include <QTextBrowser>
 
+class QImage;
+
 class HistoryView : public QTextBrowser {
 
 	Q_OBJECT
@@ -25,13 +27,22 @@ class HistoryView : public QTextBrowser {
 
 		QString s_text;
 		int i_pos;
+		QImage *paste_image;
+		std::vector<std::string> v_text;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false);
 		void addMessages();
+
+	protected:
+	
+		void mouseReleaseEvent(QMouseEvent *e) override;
 
 	public slots:
 
 	signals:
+
+		void insertTextRequested(std::string);
+		void insertValueRequested(int);
 
 };
 

@@ -26,6 +26,9 @@ class KeypadWidget;
 class QDockWidget;
 class QAction;
 class QToolBar;
+class QLineEdit;
+class QTextEdit;
+class QToolButton;
 
 class QalculateWindow : public QMainWindow {
 
@@ -58,7 +61,11 @@ class QalculateWindow : public QMainWindow {
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
+		QLineEdit *octEdit, *decEdit, *hexEdit;
+		QTextEdit *binEdit;
+		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
+		QToolButton *modeAction;
 		QAction *menuAction, *toAction, *storeAction, *keypadAction, *basesAction;
 
 		bool send_event;
@@ -71,9 +78,10 @@ class QalculateWindow : public QMainWindow {
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
 		void keyPressEvent(QKeyEvent*) override;
+		void closeEvent(QCloseEvent*) override;
 		void setPreviousExpression();
 		void setOption(std::string);
-		void updateResultBases();
+		void updateResultBases(int = 0);
 
 	protected slots:
 
@@ -97,6 +105,7 @@ class QalculateWindow : public QMainWindow {
 		void onMCClicked();
 		void onMPlusClicked();
 		void onMMinusClicked();
+		void onAnswerClicked();
 		void onToActivated();
 		void onStoreActivated();
 		void onKeypadActivated(bool);
@@ -105,6 +114,19 @@ class QalculateWindow : public QMainWindow {
 		void onBasesVisibilityChanged(bool);
 		void onExpressionChanged();
 		void onToConversionRequested(std::string);
+		void onInsertTextRequested(std::string);
+		void onInsertValueRequested(int);
+		void onBinChanged();
+		void onDecChanged(const QString&);
+		void onHexChanged(const QString&);
+		void onOctChanged(const QString&);
+
+		void gradiansActivated();
+		void radiansActivated();
+		void degreesActivated();
+		void normalActivated();
+		void scientificActivated();
+		void simpleActivated();
 
 	public slots:
 

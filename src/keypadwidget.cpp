@@ -20,8 +20,6 @@
 #include "keypadwidget.h"
 #include "qalculateqtsettings.h"
 
-extern QalculateQtSettings *settings;
-
 #define BUTTON_DATA "QALCULATE DATA1"
 #define BUTTON_DATA2 "QALCULATE DATA2"
 #define BUTTON_DATA3 "QALCULATE DATA3"
@@ -206,18 +204,18 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true)));
 	SYMBOL_ITEM2_BUTTON("±", CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY), CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL), c, 0);
 	button->setToolTip(tr("Uncertainty/interval"), tr("Relative error"), tr("Interval"));
-	button = new KeypadButton(LOAD_ICON("go-previous"), this, true);
-	button->setToolTip(tr("Move cursor left"), tr("Move cursor to start"));
-	connect(button, SIGNAL(clicked()), this, SIGNAL(leftClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(startClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(startClicked()));
-	grid->addWidget(button, c, 2, 1, 1);
-	button = new KeypadButton(LOAD_ICON("go-next"), this, true);
-	button->setToolTip(tr("Move cursor right"), tr("Move cursor to end"));
-	connect(button, SIGNAL(clicked()), this, SIGNAL(rightClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(endClicked()));
-	grid->addWidget(button, c, 3, 1, 1);
+	backButton = new KeypadButton(LOAD_ICON("go-back"), this, true);
+	backButton->setToolTip(tr("Move cursor left"), tr("Move cursor to start"));
+	connect(backButton, SIGNAL(clicked()), this, SIGNAL(leftClicked()));
+	connect(backButton, SIGNAL(clicked2()), this, SIGNAL(startClicked()));
+	connect(backButton, SIGNAL(clicked3()), this, SIGNAL(startClicked()));
+	grid->addWidget(backButton, c, 2, 1, 1);
+	forwardButton = new KeypadButton(LOAD_ICON("go-forward"), this, true);
+	forwardButton->setToolTip(tr("Move cursor right"), tr("Move cursor to end"));
+	connect(forwardButton, SIGNAL(clicked()), this, SIGNAL(rightClicked()));
+	connect(forwardButton, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
+	connect(forwardButton, SIGNAL(clicked3()), this, SIGNAL(endClicked()));
+	grid->addWidget(forwardButton, c, 3, 1, 1);
 	grid = grid2;
 	c = 0;
 	SYMBOL_BUTTON2("(", "[", 1, c)
@@ -274,14 +272,21 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setText("EXP");
 	c++;
 	ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
+	button = new KeypadButton("ANS", this);
+	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
+	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Last answer (static)"));
+	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
+	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
+	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
+	grid->addWidget(button, 3, c, 1, 1);
 	OPERATOR_BUTTON3(SIGN_MULTIPLICATION, "&", "<<", 1, c);
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
-	button = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
-	connect(button, SIGNAL(clicked()), this, SIGNAL(delClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
-	button->setToolTip(tr("Delete"), tr("Backspace"));
-	grid->addWidget(button, 0, c, 1, 1);
+	delButton = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
+	connect(delButton, SIGNAL(clicked()), this, SIGNAL(delClicked()));
+	connect(delButton, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
+	connect(delButton, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
+	delButton->setToolTip(tr("Delete"), tr("Backspace"));
+	grid->addWidget(delButton, 0, c, 1, 1);
 	OPERATOR_SYMBOL_BUTTON("+", "+", 2, c);
 	button->setToolTip(tr("Addition"), tr("Plus"));
 	c++;
@@ -295,12 +300,12 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	}
 	OPERATOR_BUTTON3(SIGN_DIVISION_SLASH, "|", "~", 1, c);
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
-	button = new KeypadButton(LOAD_ICON("edit-clear"), this);
-	button->setToolTip(tr("Clear expression"));
-	connect(button, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
-	grid->addWidget(button, 0, c, 1, 1);
+	acButton = new KeypadButton(LOAD_ICON("edit-clear"), this);
+	acButton->setToolTip(tr("Clear expression"));
+	connect(acButton, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
+	connect(acButton, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
+	connect(acButton, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
+	grid->addWidget(acButton, 0, c, 1, 1);
 	button = new KeypadButton("=", this);
 	button->setToolTip(tr("Calculate expression"));
 	connect(button, SIGNAL(clicked()), this, SIGNAL(equalsClicked()));
@@ -330,6 +335,15 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::changeEvent(QEvent *e) {
+	if(e->type() == QEvent::StyleChange) {
+		acButton->setIcon(LOAD_ICON("edit-clear"));
+		delButton->setIcon(LOAD_ICON("edit-delete"));
+		backButton->setIcon(LOAD_ICON("go-back"));
+		forwardButton->setIcon(LOAD_ICON("go-forward"));
+	}
+	QWidget::changeEvent(e);
+}
 void KeypadWidget::onHypToggled(bool b) {
 	if(b) {
 		SET_ITEM_BUTTON2(sinButton, CALCULATOR->getFunctionById(FUNCTION_ID_SINH), CALCULATOR->getFunctionById(FUNCTION_ID_ASINH));
@@ -462,6 +476,5 @@ void KeypadButton::setToolTip(const QString &s1, const QString &s2, const QStrin
 	}
 	QPushButton::setToolTip(str);
 }
-
 
 

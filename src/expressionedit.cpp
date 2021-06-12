@@ -26,14 +26,12 @@
 #include "expressionedit.h"
 #include "qalculateqtsettings.h"
 
-extern QalculateQtSettings *settings;
-
 #define ITEM_ROLE (Qt::UserRole + 10)
 #define TYPE_ROLE (Qt::UserRole + 11)
 #define MATCH_ROLE (Qt::UserRole + 12)
 #define IMATCH_ROLE (Qt::UserRole + 13)
 
-bool last_is_operator(std::string str, bool allow_exp = false) {
+bool last_is_operator(std::string str, bool allow_exp) {
 	remove_blank_ends(str);
 	if(str.empty()) return false;
 	if(str[str.length() - 1] > 0) {
@@ -153,8 +151,12 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 			}
 			if(!isequal) {
 				char *gstr1 = utf8_strdown(str1.c_str() + (sizeof(char) * i1), iu1);
+				if(!gstr1) return false;
 				char *gstr2 = utf8_strdown(str2.c_str() + (sizeof(char) * i2), iu2);
-				if(!gstr1 || !gstr2) return false;
+				if(!gstr2) {
+					free(gstr1);
+					return false;
+				}
 				bool b = strcmp(gstr1, gstr2) == 0;
 				free(gstr1);
 				free(gstr2);
@@ -566,7 +568,9 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		else b_match = completion_names_match(qstr.toStdString(), str, cdata->completion_min, &i_match);
 		if(b_match > 1) {
 			if(cdata->current_from_struct && str.length() < 3) {
-				if(p_type >= 100 && p_type < 200) {
+				if(cdata->current_from_struct->isZero()) {
+					b_match = 0;
+				} else if(p_type >= 100 && p_type < 200) {
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
 				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && cdata->current_from_unit) {
 					if(cdata->current_from_unit != CALCULATOR->getDegUnit()) b_match = 0;
@@ -620,8 +624,7 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 	invalidateFilter();
 }
 
-ExpressionEdit::ExpressionEdit(QWidget *parent) : QTextEdit(parent) {
-	setAcceptRichText(false);
+ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 	completion_blocked = 0;
 	parse_blocked = 0;
 	block_add_to_undo = 0;
@@ -1099,14 +1102,14 @@ std::string ExpressionEdit::expression() const {
 	return toPlainText().toStdString();
 }
 QSize ExpressionEdit::sizeHint() const {
-	QSize size = QTextEdit::sizeHint();
+	QSize size = QPlainTextEdit::sizeHint();
 	QFontMetrics fm(font());
 	size.setHeight(fm.boundingRect("Åj").height() * 3.2 + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
 	return size;
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
 	disable_history_arrow_keys = false;
-	QTextEdit::keyReleaseEvent(event);
+	QPlainTextEdit::keyReleaseEvent(event);
 }
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
@@ -1154,7 +1157,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				} else if(completionView->isVisible()) {
 					hideCompletion();
 				} else if(toPlainText().isEmpty()) {
-					QApplication::quit();
+					qApp->closeAllWindows();
 				} else {
 					clear();
 				}
@@ -1273,7 +1276,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 		insertPlainText("^");
 		return;
 	}
-	QTextEdit::keyPressEvent(event);
+	QPlainTextEdit::keyPressEvent(event);
 }
 void ExpressionEdit::blockCompletion(bool b) {
 	if(b) {completionView->hide(); completion_blocked++;}

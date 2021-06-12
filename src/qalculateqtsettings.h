@@ -13,42 +13,31 @@
 #define QALCULATE_Q_SETTINGS_H
 
 #include <QString>
+#include <QIcon>
 #include <libqalculate/qalculate.h>
 
 class QWidget;
+class QByteArray;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
 #define EQUALS_IGNORECASE_AND_LOCAL(x,y,z)	(equalsIgnoreCase(x, y) || equalsIgnoreCase(x, z.toStdString()))
 #define EQUALS_IGNORECASE_AND_LOCAL_NR(x,y,z,a)	(equalsIgnoreCase(x, y a) || (x.length() == z.length() + strlen(a) && equalsIgnoreCase(x.substr(0, x.length() - strlen(a)), z.toStdString()) && equalsIgnoreCase(x.substr(x.length() - strlen(a)), a)))
 
-#ifdef LOAD_EQZICONS_FROM_FILE
-	#ifdef RESOURCES_COMPILED
-		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
-		#define LOAD_ICON(x) QIcon(ICON_DIR "/EQZ/actions/64x64/" x ".png")
-		#define LOAD_ICON_APP(x) QIcon(ICON_DIR "/EQZ/apps/64x64/" x ".png")
-		#define LOAD_ICON_STATUS(x) QIcon(ICON_DIR "/EQZ/status/64x64/" x ".png")
-		#define LOAD_ICON2(x, y) QIcon(ICON_DIR "/EQZ/actions/64x64/" y ".png")
-	#else
-		#define LOAD_APP_ICON(x) QIcon(ICON_DIR "/hicolor/64x64/apps/" x ".png")
-		#define LOAD_ICON(x) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x))
-		#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
-		#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
-		#define LOAD_ICON2(x, y) (QString(x).startsWith("eqz") ? QIcon(ICON_DIR "/hicolor/64x64/actions/" x ".png") : QIcon::fromTheme(x, QIcon::fromTheme(y)))
-	#endif
-#else
-	#define LOAD_APP_ICON(x) QIcon::fromTheme(x)
-	#define LOAD_ICON(x) QIcon::fromTheme(x)
-	#define LOAD_ICON_APP(x) QIcon::fromTheme(x)
-	#define LOAD_ICON_STATUS(x) QIcon::fromTheme(x)
-	#define LOAD_ICON2(x, y) QIcon::fromTheme(x, QIcon::fromTheme(y))
-#endif
+#define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
+#define LOAD_ICON(x) load_icon(x, this)
+
+std::string unhtmlize(std::string str, bool replace_all_i = false);
+QIcon load_icon(const QString &str, QWidget*);
+bool last_is_operator(std::string str, bool allow_exp = false);
 
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
 	TITLE_APP_RESULT
 };
+
+DECLARE_BUILTIN_FUNCTION(AnswerFunction, 0)
 
 class QalculateQtSettings {
 
@@ -69,9 +58,15 @@ class QalculateQtSettings {
 		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup;
 		int b_decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int color;
+		bool first_time;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
+		MathFunction *f_answer;
+		std::vector<MathStructure*> history_answer;
+		QByteArray window_geometry, window_state;
 
 };
+
+extern QalculateQtSettings *settings;
 
 #endif //QALCULATE_Q_SETTINGS_H

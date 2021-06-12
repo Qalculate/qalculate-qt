@@ -12,7 +12,7 @@
 #ifndef EXPRESSION_EDIT_H
 #define EXPRESSION_EDIT_H
 
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QSortFilterProxyModel>
 #include <QStringList>
 
@@ -45,7 +45,7 @@ class ExpressionProxyModel : public QSortFilterProxyModel {
 
 };
 
-class ExpressionEdit : public QTextEdit {
+class ExpressionEdit : public QPlainTextEdit {
 
 	Q_OBJECT
 
