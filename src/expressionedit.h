@@ -21,6 +21,9 @@
 class QCompleter;
 class QStandardItemModel;
 class QTableView;
+class QMenu;
+class QAction;
+
 struct CompletionData;
 
 class ExpressionProxyModel : public QSortFilterProxyModel {
@@ -55,8 +58,11 @@ class ExpressionEdit : public QPlainTextEdit {
 		ExpressionProxyModel *completionModel;
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
+		QMenu *cmenu;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
 
-		QStringList history, expression_undo_buffer;
+		QStringList expression_undo_buffer;
+		QList<int> expression_undo_pos;
 		QString current_history;
 		int history_index, undo_index;
 		
@@ -84,6 +90,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 		void keyPressEvent(QKeyEvent*) override;
 		void keyReleaseEvent(QKeyEvent*) override;
+		void contextMenuEvent(QContextMenuEvent *e) override;
 
 	public:
 
@@ -117,6 +124,9 @@ class ExpressionEdit : public QPlainTextEdit {
 		void smartParentheses();
 		void insertBrackets();
 		void selectAll(bool b = true);
+		void editUndo();
+		void editRedo();
+		void editDelete();
 
 	signals:
 

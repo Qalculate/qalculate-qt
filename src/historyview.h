@@ -15,6 +15,8 @@
 #include <QTextBrowser>
 
 class QImage;
+class QMenu;
+class QAction;
 
 class HistoryView : public QTextBrowser {
 
@@ -29,6 +31,8 @@ class HistoryView : public QTextBrowser {
 		int i_pos;
 		QImage *paste_image;
 		std::vector<std::string> v_text;
+		QMenu *cmenu;
+		QAction *copyAction, *selectAllAction;
 
 		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false);
 		void addMessages();
@@ -36,8 +40,12 @@ class HistoryView : public QTextBrowser {
 	protected:
 	
 		void mouseReleaseEvent(QMouseEvent *e) override;
+		void contextMenuEvent(QContextMenuEvent *e) override;
+		void keyPressEvent(QKeyEvent *e) override;
 
 	public slots:
+
+		void editCopy();
 
 	signals:
 

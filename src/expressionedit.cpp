@@ -21,6 +21,8 @@
 #include <QAbstractTextDocumentLayout>
 #include <QPainter>
 #include <QToolTip>
+#include <QAction>
+#include <QMenu>
 #include <QDebug>
 
 #include "expressionedit.h"
@@ -625,6 +627,7 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 }
 
 ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
+	cmenu = NULL;
 	completion_blocked = 0;
 	parse_blocked = 0;
 	block_add_to_undo = 0;
@@ -1112,6 +1115,14 @@ void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
 	QPlainTextEdit::keyReleaseEvent(event);
 }
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
+	if(event->matches(QKeySequence::Undo)) {
+		editUndo();
+		return;
+	}
+	if(event->matches(QKeySequence::Redo)) {
+		editRedo();
+		return;
+	}
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Asterisk: {
@@ -1199,7 +1210,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 			}
 			case Qt::Key_PageUp: {
-				if(history_index + 1 < history.size()) {
+				if((size_t) history_index + 1 < settings->expression_history.size()) {
 					if(history_index == -1) current_history = toPlainText();
 					history_index++;
 					dont_change_index = true;
@@ -1207,7 +1218,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					blockParseStatus(true);
 					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
 					if(history_index == -1) setPlainText(current_history);
-					else setPlainText(history.at(history_index));
+					else setPlainText(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
 					QTextCursor c = textCursor();
@@ -1248,7 +1259,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					if(history_index == -1 && current_history != toPlainText()) setPlainText(current_history);
 					else clear();
 				} else {
-					setPlainText(history.at(history_index));
+					setPlainText(QString::fromStdString(settings->expression_history[history_index]));
 				}
 				QTextCursor c = textCursor();
 				c.movePosition(QTextCursor::End);
@@ -1277,6 +1288,75 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 		return;
 	}
 	QPlainTextEdit::keyPressEvent(event);
+}
+void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
+	if(!cmenu) {
+		cmenu = new QMenu(this);
+		undoAction = cmenu->addAction(tr("Undo"), this, SLOT(editUndo()));
+		undoAction->setShortcut(QKeySequence::Undo);
+		undoAction->setShortcutContext(Qt::WidgetShortcut);
+		redoAction = cmenu->addAction(tr("Redo"), this, SLOT(editRedo()));
+		redoAction->setShortcut(QKeySequence::Redo);
+		redoAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addSeparator();
+		cutAction = cmenu->addAction(tr("Cut"), this, SLOT(cut()));
+		cutAction->setShortcut(QKeySequence::Cut);
+		cutAction->setShortcutContext(Qt::WidgetShortcut);
+		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(copy()));
+		copyAction->setShortcut(QKeySequence::Copy);
+		copyAction->setShortcutContext(Qt::WidgetShortcut);
+		pasteAction = cmenu->addAction(tr("Paste"), this, SLOT(paste()));
+		pasteAction->setShortcut(QKeySequence::Copy);
+		pasteAction->setShortcutContext(Qt::WidgetShortcut);
+		deleteAction = cmenu->addAction(tr("Delete"), this, SLOT(editDelete()));
+		deleteAction->setShortcut(QKeySequence::Delete);
+		deleteAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addSeparator();
+		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
+		selectAllAction->setShortcut(QKeySequence::SelectAll);
+		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
+		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(clear()));
+		clearAction->setShortcut(Qt::Key_Escape);
+		clearAction->setShortcutContext(Qt::WidgetShortcut);
+	}
+	bool b_sel = textCursor().hasSelection();
+	bool b_empty = toPlainText().isEmpty();
+	undoAction->setEnabled(undo_index == 0);
+	redoAction->setEnabled(undo_index < expression_undo_buffer.size() - 1);
+	cutAction->setEnabled(b_sel);
+	copyAction->setEnabled(b_sel);
+	pasteAction->setEnabled(canPaste());
+	deleteAction->setEnabled(b_sel);
+	selectAllAction->setEnabled(!b_empty);
+	clearAction->setEnabled(!b_empty);
+	cmenu->popup(e->globalPos());
+}
+void ExpressionEdit::editUndo() {
+	if(undo_index == 0) return;
+	undo_index--;
+	block_add_to_undo++;
+	setCursorWidth(0);
+	setPlainText(expression_undo_buffer.at(undo_index));
+	QTextCursor cur = textCursor();
+	cur.setPosition(expression_undo_pos.at(undo_index));
+	setTextCursor(cur);
+	setCursorWidth(1);
+	block_add_to_undo--;
+}
+void ExpressionEdit::editRedo() {
+	if(undo_index >= expression_undo_buffer.size() - 1) return;
+	undo_index++;
+	block_add_to_undo++;
+	setCursorWidth(0);
+	setPlainText(expression_undo_buffer.at(undo_index));
+	QTextCursor cur = textCursor();
+	cur.setPosition(expression_undo_pos.at(undo_index));
+	setTextCursor(cur);
+	setCursorWidth(1);
+	block_add_to_undo--;
+}
+void ExpressionEdit::editDelete() {
+	textCursor().removeSelectedText();
 }
 void ExpressionEdit::blockCompletion(bool b) {
 	if(b) {completionView->hide(); completion_blocked++;}
@@ -1782,13 +1862,19 @@ void ExpressionEdit::onTextChanged() {
 	if(block_text_change) return;
 	QString str = toPlainText();
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
+		if(expression_undo_buffer.isEmpty()) {
+			expression_undo_buffer.push_back(QString());
+			expression_undo_pos.push_back(0);
+		}
 		if(!block_add_to_undo) {
-			if(expression_undo_buffer.size() > 100) expression_undo_buffer.pop_front();
+			if(expression_undo_buffer.size() > 100) {expression_undo_buffer.pop_front(); expression_undo_pos.pop_front();}
 			else undo_index++;
 			while(undo_index < expression_undo_buffer.size()) {
 				expression_undo_buffer.pop_back();
+				expression_undo_pos.pop_back();
 			}
 			expression_undo_buffer.push_back(str);
+			expression_undo_pos.push_back(textCursor().position());
 		}
 		expression_has_changed = true;
 	}
@@ -1808,6 +1894,7 @@ bool ExpressionEdit::expressionHasChanged() {
 void ExpressionEdit::setExpressionHasChanged(bool b) {
 	expression_has_changed = b;
 }
+#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
@@ -1829,20 +1916,22 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	if(current_object_start < 0) {
 		if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_unit) {
 			cdata->to_type = 4;
-		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && cdata->current_from_struct->isNumber()) {
+		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && (cdata->current_from_struct->isNumber() || cdata->current_from_struct->isAddition())) {
 			cdata->to_type = 2;
 		} else if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET && cdata->current_function_index > 1) {
 			Argument *arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
 			if(!arg || arg->type() != ARGUMENT_TYPE_DATA_PROPERTY) {
 				hideCompletion();
+				MFROM_CLEANUP
 				return false;
 			}
 		} else if(cdata->to_type < 2) {
 			hideCompletion();
+			MFROM_CLEANUP
 			return false;
 		}
 	} else {
-		if(current_object_text.length() < (size_t) cdata->completion_min) {hideCompletion(); return false;}
+		if(current_object_text.length() < (size_t) cdata->completion_min) {hideCompletion(); MFROM_CLEANUP; return false;}
 	}
 	if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 		if((cdata->current_from_struct->isUnit() && cdata->current_from_struct->unit()->isCurrency()) || (cdata->current_from_struct->isMultiplication() && cdata->current_from_struct->size() == 2 && (*cdata->current_from_struct)[0].isNumber() && (*cdata->current_from_struct)[1].isUnit() && (*cdata->current_from_struct)[1].unit()->isCurrency())) {
@@ -1852,6 +1941,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	}
 	if(cdata->to_type < 2 && (current_object_text.empty() || is_in(NUMBERS NOT_IN_NAMES "%", current_object_text[0])) && (!current_object_text.empty() || !cdata->current_function || cdata->current_function->subtype() != SUBTYPE_DATA_SET)) {
 		hideCompletion();
+		MFROM_CLEANUP
 		return false;
 	}
 	cdata->exact_prefix_match = QModelIndex();
@@ -1862,7 +1952,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET) {
 		cdata->arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
 		if(cdata->arg && (cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT || cdata->arg->type() == ARGUMENT_TYPE_DATA_PROPERTY)) {
-			if(cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT && (current_object_text.empty() || current_object_text.length() < (size_t) cdata->completion_min)) {hideCompletion(); return false;}
+			if(cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT && (current_object_text.empty() || current_object_text.length() < (size_t) cdata->completion_min)) {hideCompletion(); MFROM_CLEANUP; return false;}
 			if(cdata->current_function_index == 1) {
 				for(size_t i = 1; i <= cdata->current_function->countNames(); i++) {
 					if(current_object_text.find(cdata->current_function->getName(i).name) != std::string::npos) {
@@ -2008,12 +2098,11 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 		completionView->setCurrentIndex(QModelIndex());
 	} else {
 		hideCompletion();
+		MFROM_CLEANUP
 		return false;
 	}
-	if(mstruct_from) {
-		cdata->current_from_struct = from_struct_bak;
-		cdata->current_from_unit = from_unit_bak;
-	}
+	
+	MFROM_CLEANUP
 	return true;
 }
 
@@ -2028,7 +2117,6 @@ void ExpressionEdit::onCursorPositionChanged() {
 	displayParseStatus();
 }
 void ExpressionEdit::highlightParentheses() {
-	if(textCursor().hasSelection()) return;
 	if(parentheses_highlighted) {
 		block_text_change++;
 		QTextCursor cur = textCursor();
@@ -2037,6 +2125,7 @@ void ExpressionEdit::highlightParentheses() {
 		block_text_change--;
 		parentheses_highlighted = false;
 	}
+	if(textCursor().hasSelection()) return;
 	int pos = textCursor().position(), ipar2;
 	QString text = toPlainText();
 	bool b = text.at(pos) == ')';
@@ -2543,8 +2632,17 @@ void ExpressionEdit::hideCompletion() {
 	completionView->hide();
 }
 void ExpressionEdit::addToHistory() {
-	history.removeAll(toPlainText());
-	history.insert(0, toPlainText());
+	std::string str = toPlainText().toStdString();
+	for(size_t i = 0; i < settings->expression_history.size(); i++) {
+		if(settings->expression_history[i] == str) {
+			settings->expression_history.erase(settings->expression_history.begin() + i);
+			break;
+		}
+	}
+	if(settings->expression_history.size() >= 100) {
+		settings->expression_history.pop_back();
+	}
+	settings->expression_history.insert(settings->expression_history.begin(), str);
 	history_index = 0;
 	cursor_has_moved = false;
 }

@@ -29,6 +29,7 @@ class QToolBar;
 class QLineEdit;
 class QTextEdit;
 class QToolButton;
+class QSpinBox;
 
 class QalculateWindow : public QMainWindow {
 
@@ -65,10 +66,11 @@ class QalculateWindow : public QMainWindow {
 		QTextEdit *binEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *modeAction;
-		QAction *menuAction, *toAction, *storeAction, *keypadAction, *basesAction;
+		QToolButton *menuAction, *modeAction;
+		QAction *toAction, *storeAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 
-		bool send_event;
+		bool send_event, bases_shown;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
@@ -127,6 +129,11 @@ class QalculateWindow : public QMainWindow {
 		void normalActivated();
 		void scientificActivated();
 		void simpleActivated();
+		void onPrecisionChanged(int);
+		void outputBaseActivated();
+		void onCustomOutputBaseChanged(int);
+		void inputBaseActivated();
+		void onCustomInputBaseChanged(int);
 
 	public slots:
 
@@ -138,6 +145,7 @@ class QalculateWindow : public QMainWindow {
 		void abort();
 		void abortCommand();
 		void fetchExchangeRates();
+		void showAbout();
 
 	signals:
 

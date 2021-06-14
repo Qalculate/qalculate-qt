@@ -46,8 +46,8 @@ int main(int argc, char **argv) {
 
 	QApplication app(argc, argv);
 	app.setApplicationName("qalculate-qt");
-	app.setApplicationDisplayName("Qalculate!");
-	app.setOrganizationName("Qalculate");
+	app.setApplicationDisplayName("Qalculate! (Qt)");
+	app.setOrganizationName("qalculate");
 	app.setApplicationVersion(VERSION);
 
 	QCommandLineParser *parser = new QCommandLineParser();
@@ -68,29 +68,28 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 	if(!parser->isSet(nOption)) {
-		QString lockpath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-		QDir lockdir(lockpath);
-		QLockFile lockFile(lockpath + "/qalculate-qt.lock");
-		if(lockdir.mkpath(lockpath)) {
-			if(!lockFile.tryLock(100)){
-				if(lockFile.error() == QLockFile::LockFailedError) {
-					QTextStream outStream(stdout);
-					outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
-					QLocalSocket socket;
-					socket.connectToServer("qalculate-qt");
-					if(socket.waitForConnected()) {
-						QString command = "0";
-						QStringList args = parser->positionalArguments();
-						for(int i = 0; i < args.count(); i++) {
-							if(i > 0) command += " ";
-							command += args.at(i);
-						}
-						socket.write(command.toUtf8());
-						socket.waitForBytesWritten(3000);
-						socket.disconnectFromServer();
+		std::string homedir = getLocalDir();
+		recursiveMakeDir(homedir);
+		QString lockpath = QString::fromStdString(buildPath(homedir, "qalculate-qt.lock"));
+		QLockFile lockFile(lockpath);
+		if(!lockFile.tryLock(100)) {
+			if(lockFile.error() == QLockFile::LockFailedError) {
+				QTextStream outStream(stdout);
+				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
+				QLocalSocket socket;
+				socket.connectToServer("qalculate-qt");
+				if(socket.waitForConnected()) {
+					QString command = "0";
+					QStringList args = parser->positionalArguments();
+					for(int i = 0; i < args.count(); i++) {
+						if(i > 0) command += " ";
+						command += args.at(i);
 					}
-					return 1;
+					socket.write(command.toUtf8());
+					socket.waitForBytesWritten(3000);
+					socket.disconnectFromServer();
 				}
+				return 1;
 			}
 		}
 	}

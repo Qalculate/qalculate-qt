@@ -63,6 +63,7 @@ class QalculateQtSettings {
 		MathStructure *current_result;
 		MathFunction *f_answer;
 		std::vector<MathStructure*> history_answer;
+		std::vector<std::string> expression_history;
 		QByteArray window_geometry, window_state;
 
 };

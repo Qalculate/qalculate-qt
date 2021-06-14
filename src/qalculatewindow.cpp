@@ -29,6 +29,8 @@
 #include <QMenu>
 #include <QActionGroup>
 #include <QToolButton>
+#include <QSpinBox>
+#include <QWidgetAction>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -180,29 +182,153 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	tb = new QToolBar(this);
 	tb->setOrientation(Qt::Vertical);
-	menuAction = new QAction(LOAD_ICON("menu"), tr("Menu"));
-	tb->addAction(menuAction);
-	tb->setOrientation(Qt::Vertical);
+
+	QAction *action; QActionGroup *group; QMenu *menu, *menu2;
+	int w, w2; QWidgetAction *aw; QWidget *aww; QHBoxLayout *awl;
+
+	menuAction = new QToolButton(this); menuAction->setIcon(LOAD_ICON("menu")); menuAction->setText(tr("Menu"));
+	menuAction->setPopupMode(QToolButton::InstantPopup);
+	menu = new QMenu(this);
+	menuAction->setMenu(menu);
+	menu->addAction(tr("Update exchange rates"), this, SLOT(fetchExchangeRates()));
+	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
+	tb->addWidget(menuAction);
 
 	modeAction = new QToolButton(this); modeAction->setIcon(LOAD_ICON("configure")); modeAction->setText(tr("Mode"));
 	modeAction->setPopupMode(QToolButton::InstantPopup);
-	QMenu *modeMenu = new QMenu(this);
-	modeAction->setMenu(modeMenu);
-	QActionGroup *group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-	QAction *action = modeMenu->addAction(tr("Normal"), this, SLOT(normalActivated())); action->setCheckable(true); group->addAction(action);
-	if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
-	action = modeMenu->addAction(tr("Scientific"), this, SLOT(scientificActivated())); action->setCheckable(true); group->addAction(action);
-	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
-	action = modeMenu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
-	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
-	modeMenu->addSeparator();
+	menu = new QMenu(this);
+	modeAction->setMenu(menu);
+	menu->addSection(tr("General display mode"));
+	QFontMetrics fm1(menu->font());
+	w = fm1.boundingRect(tr("General display mode")).width() * 1.5;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-	action = modeMenu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Normal"), this, SLOT(normalActivated())); action->setCheckable(true); group->addAction(action);
+	if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
+	action = menu->addAction(tr("Scientific"), this, SLOT(scientificActivated())); action->setCheckable(true); group->addAction(action);
+	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
+	action = menu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
+	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
+	menu->addSection(tr("Angle unit"));
+	w2 = fm1.boundingRect(tr("Angle unit")).width() * 1.5; if(w2 > w) w = w2;
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = modeMenu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = modeMenu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
+	menu->addSeparator();
+	menu->addSection(tr("Output base"));
+	QFontMetrics fmB(menu->font());
+	w2 = fm1.boundingRect(tr("Output base")).width() * 1.5; if(w2 > w) w = w2;
+	bool base_checked = false;
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Binary"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BINARY); if(settings->printops.base == BASE_BINARY) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Octal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_OCTAL); if(settings->printops.base == BASE_OCTAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Decimal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_DECIMAL); if(settings->printops.base == BASE_DECIMAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Hexadecimal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_HEXADECIMAL); if(settings->printops.base == BASE_HEXADECIMAL) {base_checked = true; action->setChecked(true);}
+	menu2 = menu;
+	menu = menu2->addMenu(tr("Other"));
+	action = menu->addAction(tr("Duodecimal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_DUODECIMAL); if(settings->printops.base == BASE_DUODECIMAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Sexagesimal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_SEXAGESIMAL); if(settings->printops.base == BASE_SEXAGESIMAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Time format"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_TIME); if(settings->printops.base == BASE_TIME) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Roman numerals"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_ROMAN_NUMERALS); if(settings->printops.base == BASE_ROMAN_NUMERALS) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Unicode"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_UNICODE); if(settings->printops.base == BASE_UNICODE) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Bijective base-26"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BIJECTIVE_26); if(settings->printops.base == BASE_BIJECTIVE_26) action->setChecked(true);
+	action = menu->addAction("Float", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_FP32); if(settings->printops.base == BASE_FP32) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("Double", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_FP64); if(settings->printops.base == BASE_FP64) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("φ", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_GOLDEN_RATIO); if(settings->printops.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("ψ", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_SUPER_GOLDEN_RATIO); if(settings->printops.base == BASE_SUPER_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("π", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_PI); if(settings->printops.base == BASE_PI) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("e"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_E); if(settings->printops.base == BASE_E) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("√2"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_SQRT2); if(settings->printops.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Custom"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customOutputBaseAction = action;
+	aw = new QWidgetAction(this);
+	aww = new QWidget(this);
+	aw->setDefaultWidget(aww);
+	awl = new QHBoxLayout(aww);
+	QSpinBox *customOutputBaseEdit = new QSpinBox(this);
+	customOutputBaseEdit->setRange(INT_MIN, INT_MAX);
+	customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : settings->printops.base);
+	connect(customOutputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomOutputBaseChanged(int)));
+	awl->addWidget(customOutputBaseEdit, 0, Qt::AlignRight);
+	menu->addAction(aw);
+	menu = menu2;
+	menu->addSection(tr("Input base"));
+	w2 = fm1.boundingRect(tr("Input base")).width() * 1.5; if(w2 > w) w = w2;
+	base_checked = false;
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Binary"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BINARY); if(settings->evalops.parse_options.base == BASE_BINARY) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Octal"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_OCTAL); if(settings->evalops.parse_options.base == BASE_OCTAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Decimal"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_DECIMAL); if(settings->evalops.parse_options.base == BASE_DECIMAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Hexadecimal"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_HEXADECIMAL); if(settings->evalops.parse_options.base == BASE_HEXADECIMAL) {base_checked = true; action->setChecked(true);}
+	menu2 = menu;
+	menu = menu2->addMenu(tr("Other"));
+	action = menu->addAction(tr("Duodecimal"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_DUODECIMAL); if(settings->evalops.parse_options.base == BASE_DUODECIMAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Roman numerals"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_ROMAN_NUMERALS); if(settings->evalops.parse_options.base == BASE_ROMAN_NUMERALS) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Unicode"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_UNICODE); if(settings->evalops.parse_options.base == BASE_UNICODE) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Bijective base-26"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BIJECTIVE_26); if(settings->evalops.parse_options.base == BASE_BIJECTIVE_26) action->setChecked(true);
+	action = menu->addAction("φ", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_GOLDEN_RATIO); if(settings->evalops.parse_options.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("ψ", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_SUPER_GOLDEN_RATIO); if(settings->evalops.parse_options.base == BASE_SUPER_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction("π", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_PI); if(settings->evalops.parse_options.base == BASE_PI) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("e"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_E); if(settings->evalops.parse_options.base == BASE_E) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("√2"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_SQRT2); if(settings->evalops.parse_options.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Custom"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customInputBaseAction = action;
+	aw = new QWidgetAction(this);
+	aww = new QWidget(this);
+	aw->setDefaultWidget(aww);
+	awl = new QHBoxLayout(aww);
+	QSpinBox *customInputBaseEdit = new QSpinBox(this);
+	customInputBaseEdit->setRange(INT_MIN, INT_MAX);
+	customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : settings->evalops.parse_options.base);
+	connect(customInputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomInputBaseChanged(int)));
+	awl->addWidget(customInputBaseEdit, 0, Qt::AlignRight);
+	menu->addAction(aw);
+	menu = menu2;
+	aw = new QWidgetAction(this);
+	aww = new QWidget(this);
+	aw->setDefaultWidget(aww);
+	awl = new QHBoxLayout(aww);
+	awl->addWidget(new QLabel(tr("Precision"), this), 1);
+	QSpinBox *precisionEdit = new QSpinBox(this);
+	precisionEdit->setRange(2, 10000);
+	precisionEdit->setValue(CALCULATOR->getPrecision());
+	connect(precisionEdit, SIGNAL(valueChanged(int)), this, SLOT(onPrecisionChanged(int)));
+	awl->addWidget(precisionEdit, 0, Qt::AlignRight);
+	menu->addAction(aw);
+	menu->setMinimumWidth(w);
 	tb->addWidget(modeAction);
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"));
@@ -261,10 +387,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexEdit->setAlignment(Qt::AlignRight);
 	basesGrid->addWidget(hexEdit, 3, 1);
 	basesDock->setWidget(basesWidget);
-	QFontMetrics fm(binEdit->font());
-	basesDock->resize(fm.boundingRect(tr("Hexadecimal") + "0000 0000 0000 0000 0000 0000 0000 0000").width() + basesGrid->spacing() * 5, 1);
-	addDockWidget(Qt::BottomDockWidgetArea, basesDock, Qt::Vertical);
-	basesDock->setFloating(true);
+	QFontMetrics fm2(binEdit->font());
+	basesDock->resize(fm2.boundingRect(tr("Hexadecimal") + "0000 0000 0000 0000 0000 0000 0000 0000").width() + basesGrid->spacing() * 5, 1);
+	addDockWidget(Qt::BottomDockWidgetArea, basesDock);
 	basesDock->hide();
 	connect(binEdit, SIGNAL(textChanged()), this, SLOT(onBinChanged()));
 	connect(octEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onOctChanged(const QString&)));
@@ -329,6 +454,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	else resize(700, 700);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
+	bases_shown = !settings->window_state.isEmpty();
 
 }
 QalculateWindow::~QalculateWindow() {}
@@ -337,24 +463,33 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion();
 	expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(str)));
+	expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 	expressionEdit->blockParseStatus(false);
-	expressionEdit->setFocus();
+}
+void QalculateWindow::showAbout() {
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v3.20.0</b></font><br><font size=+1>%2</font><br><<font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	Number nr(i, 1, 0);
 	expressionEdit->insertPlainText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name)).arg(QString::fromStdString(print_with_evalops(nr))));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onSymbolClicked(const QString &str) {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(str);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onOperatorClicked(const QString &str) {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	bool do_exec = false;
 	if(str == "~") {
 		expressionEdit->wrapSelection(str, true, false);
@@ -370,6 +505,8 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) calculate();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 
 bool last_is_number(std::string str) {
@@ -379,7 +516,8 @@ bool last_is_number(std::string str) {
 	return is_not_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1]);
 }
 void QalculateWindow::onFunctionClicked(MathFunction *f) {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	bool do_exec = false;
 	if(cur.hasSelection()) {
@@ -390,68 +528,105 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	}
 	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 	if(do_exec) calculate();
 }
 void QalculateWindow::onVariableClicked(Variable *v) {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onUnitClicked(Unit *u) {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onDelClicked() {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	if(cur.atEnd()) cur.deletePreviousChar();
 	else cur.deleteChar();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onBackspaceClicked() {
-	expressionEdit->blockCompletion(true);
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	if(!cur.atStart()) cur.deletePreviousChar();
 	else cur.deleteChar();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onClearClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->clear();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onEqualsClicked() {
 	calculate();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 }
 void QalculateWindow::onParenthesesClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->smartParentheses();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onBracketsClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->insertBrackets();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onLeftClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::PreviousCharacter);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onRightClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::NextCharacter);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onStartClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::Start);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onEndClicked() {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::End);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onMSClicked() {
 	if(expressionEdit->expressionHasChanged()) calculate();
@@ -534,8 +709,8 @@ void QalculateWindow::setPreviousExpression() {
 	if(settings->rpn_mode) {
 		expressionEdit->clear();
 	} else {
-		expressionEdit->blockCompletion(true);
-		expressionEdit->blockParseStatus(true);
+		expressionEdit->blockCompletion();
+		expressionEdit->blockParseStatus();
 		expressionEdit->setPlainText(QString::fromStdString(previous_expression));
 		expressionEdit->selectAll();
 		expressionEdit->blockCompletion(false);
@@ -571,14 +746,14 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 void QalculateWindow::expressionCalculationUpdated() {
 	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
 	settings->updateMessagePrintOptions();
-	/*if(!settings->rpn_mode) {
+	if(!settings->rpn_mode) {
 		if(parsed_mstruct) {
 			for(size_t i = 0; i < 5; i++) {
-				if(parsed_mstruct->contains(vans[i])) return;
+				if(parsed_mstruct->contains(settings->vans[i])) return;
 			}
 		}
-		execute_expression(false);
-	}*/
+		calculateExpression(false);
+	}
 }
 
 int s2b(const std::string &str) {
@@ -2653,8 +2828,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitSelector)));
 			}
 		}*/
-		expressionEdit->blockCompletion(true);
-		expressionEdit->blockParseStatus(true);
+		expressionEdit->blockCompletion();
+		expressionEdit->blockParseStatus();
 		if(!execute_str.empty()) {
 			from_str = execute_str;
 			CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
@@ -3671,7 +3846,6 @@ void ViewThread::run() {
 		if(!read(&x)) break;
 		CALCULATOR->startControl();
 		MathStructure *mparse = (MathStructure*) x;
-
 		PrintOptions po;
 		if(mparse) {
 			if(!read(&po.is_approximate)) break;
@@ -3905,7 +4079,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		if(!view_thread->write((void *) parsed_mstruct)) {b_busy--; view_thread->cancel(); return;}
 		bool *parsed_approx_p = &parsed_approx;
 		if(!view_thread->write(parsed_approx_p)) {b_busy--; view_thread->cancel(); return;}
-		if(!view_thread->write(b_rpn_operation)) {b_busy--; view_thread->cancel(); return;}
+		if(!view_thread->write(!b_rpn_operation)) {b_busy--; view_thread->cancel(); return;}
 	} else {
 		if(settings->printops.base != BASE_DECIMAL && settings->dual_approximation <= 0) mstruct_exact.setUndefined();
 		if(!view_thread->write((void *) NULL)) {b_busy--; view_thread->cancel(); return;}
@@ -4052,6 +4226,7 @@ bool QalculateWindow::checkExchangeRates() {
 	}
 	return false;
 }
+
 void QalculateWindow::fetchExchangeRates() {
 	CALCULATOR->clearMessages();
 	fetchExchangeRates(15);
@@ -4279,6 +4454,14 @@ bool QalculateWindow::askDot(const std::string &str) {
 }
 void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 	if(!send_event) return;
+	if(e->matches(QKeySequence::Undo)) {
+		expressionEdit->editUndo();
+		return;
+	}
+	if(e->matches(QKeySequence::Redo)) {
+		expressionEdit->editRedo();
+		return;
+	}
 	QMainWindow::keyPressEvent(e);
 	if(!e->isAccepted() && (e->key() < Qt::Key_Tab || e->key() > Qt::Key_ScrollLock) && !(e->modifiers() & Qt::ControlModifier) && !(e->modifiers() & Qt::MetaModifier)) {
 		e->accept();
@@ -4300,21 +4483,22 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 
 void QalculateWindow::onToActivated() {
 	QTextCursor cur = expressionEdit->textCursor();
+	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
 	if(!expressionEdit->expressionHasChanged() && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length()) {
-		if(!expressionEdit->complete(mstruct, tb->widgetForAction(toAction)->mapToGlobal(tb->widgetForAction(toAction)->pos()))) {
+		if(!expressionEdit->complete(mstruct, pos)) {
 			expressionEdit->insertPlainText("➞");
 		}
 	} else {
 		expressionEdit->selectAll(false);
-		expressionEdit->blockCompletion(true);
+		expressionEdit->blockCompletion();
 		expressionEdit->insertPlainText("➞");
-		expressionEdit->complete(NULL, tb->widgetForAction(toAction)->mapToGlobal(tb->widgetForAction(toAction)->pos()));
+		expressionEdit->complete(NULL, pos);
 		expressionEdit->blockCompletion(false);
 	}
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
-	if(str[str.length() - 1]) expressionEdit->insertPlainText(QString::fromStdString(str));
+	if(str[str.length() - 1] == ' ') expressionEdit->insertPlainText(QString::fromStdString(str));
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::onStoreActivated() {
@@ -4326,6 +4510,7 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	keypadAction->setChecked(b);
 }
 void QalculateWindow::onBasesActivated(bool b) {
+	if(b && !bases_shown) basesDock->setFloating(true);
 	basesDock->setVisible(b);
 }
 void QalculateWindow::onBasesVisibilityChanged(bool b) {
@@ -4384,7 +4569,7 @@ void QalculateWindow::degreesActivated() {settings->evalops.parse_options.angle_
 void QalculateWindow::normalActivated() {
 	settings->printops.sort_options.minus_last = true;
 	settings->printops.min_exp = EXP_PRECISION;
-	settings->printops.show_ending_zeroes = false;
+	settings->printops.show_ending_zeroes = true;
 	settings->printops.use_unit_prefixes = true;
 	settings->printops.negative_exponents = false;
 	resultFormatUpdated();
@@ -4405,4 +4590,60 @@ void QalculateWindow::simpleActivated() {
 	settings->printops.negative_exponents = false;
 	resultFormatUpdated();
 }
-		
+void QalculateWindow::onPrecisionChanged(int v) {
+	CALCULATOR->setPrecision(v);
+	expressionCalculationUpdated();
+}
+void QalculateWindow::outputBaseActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	if(v == BASE_CUSTOM) {
+		v = customOutputBaseEdit->value();
+		if(v > 2 && v <= 36) {
+			settings->printops.base = v;
+		} else {
+			settings->printops.base = BASE_CUSTOM;
+			CALCULATOR->setCustomOutputBase(v);
+		}
+	} else {
+		settings->printops.base = v;
+	}
+	resultFormatUpdated();
+}
+void QalculateWindow::onCustomOutputBaseChanged(int v) {
+	customOutputBaseAction->setChecked(true);
+	if(v > 2 && v <= 36) {
+		settings->printops.base = v;
+	} else {
+		settings->printops.base = BASE_CUSTOM;
+		CALCULATOR->setCustomOutputBase(Number(v, 1));
+	}
+	resultFormatUpdated();
+}
+void QalculateWindow::inputBaseActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	if(v == BASE_CUSTOM) {
+		v = customOutputBaseEdit->value();
+		if(v > 2 && v <= 36) {
+			settings->evalops.parse_options.base = v;
+		} else {
+			settings->evalops.parse_options.base = BASE_CUSTOM;
+			CALCULATOR->setCustomInputBase(v);
+		}
+	} else {
+		settings->evalops.parse_options.base = v;
+	}
+	expressionFormatUpdated(false);
+}
+void QalculateWindow::onCustomInputBaseChanged(int v) {
+	customInputBaseAction->setChecked(true);
+	if(v > 2 && v <= 36) {
+		settings->evalops.parse_options.base = v;
+	} else {
+		settings->evalops.parse_options.base = BASE_CUSTOM;
+		CALCULATOR->setCustomInputBase(Number(v, 1));
+	}
+	expressionFormatUpdated(false);
+}
+
+
+

@@ -211,6 +211,8 @@ void QalculateQtSettings::loadPreferences() {
 					if(v >= 0 && v <= 4) title_type = v;
 				} else if(svar == "auto_update_exchange_rates") {
 					auto_update_exchange_rates = v;
+				} else if(svar == "expression_history") {
+					expression_history.push_back(svalue);
 				/*} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
@@ -509,7 +511,12 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "version=%s\n", VERSION);
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+	for(size_t i = 0; i < expression_history.size(); i++) {
+		gsub("\n", " ", expression_history[i]);
+		fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
+	}
 	fprintf(file, "\n[Mode]\n");
+	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
 	fprintf(file, "min_exp=%i\n", settings->printops.min_exp);
 	fprintf(file, "negative_exponents=%i\n", settings->printops.negative_exponents);
 	fprintf(file, "sort_minus_last=%i\n", settings->printops.sort_options.minus_last);
@@ -525,16 +532,15 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "mixed_units_conversion=%i\n", settings->evalops.mixed_units_conversion);
 	fprintf(file, "local_currency_conversion=%i\n", settings->evalops.local_currency_conversion);
 	fprintf(file, "number_base=%i\n", settings->printops.base);
-	if(settings->printops.base == BASE_CUSTOM) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
+	if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
 	fprintf(file, "number_base_expression=%i\n", settings->evalops.parse_options.base);
-	if(settings->evalops.parse_options.base == BASE_CUSTOM) fprintf(file, "custom_number_base_expression=%s\n", CALCULATOR->customInputBase().print(CALCULATOR->save_printoptions).c_str());
+	if(!CALCULATOR->customInputBase().isZero()) fprintf(file, "custom_number_base_expression=%s\n", CALCULATOR->customInputBase().print(CALCULATOR->save_printoptions).c_str());
 	fprintf(file, "read_precision=%i\n", settings->evalops.parse_options.read_precision);
 	fprintf(file, "assume_denominators_nonzero=%i\n", settings->evalops.assume_denominators_nonzero);
 	fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", settings->evalops.warn_about_denominators_assumed_nonzero);
 	fprintf(file, "structuring=%i\n", settings->evalops.structuring);
 	fprintf(file, "angle_unit=%i\n", settings->evalops.parse_options.angle_unit);
 	fprintf(file, "show_ending_zeroes=%i\n", settings->printops.show_ending_zeroes);
-
 	fclose(file);
 
 }
