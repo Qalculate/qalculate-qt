@@ -164,6 +164,12 @@ void QalculateQtSettings::loadPreferences() {
 	do_imaginary_j = false;
 	color = 1;
 	rpn_mode = false;
+	enable_input_method = false;
+	enable_completion = true;
+	enable_completion2 = true;
+	completion_min = 1;
+	completion_min2 = 1;
+	completion_delay = 500;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -213,6 +219,21 @@ void QalculateQtSettings::loadPreferences() {
 					auto_update_exchange_rates = v;
 				} else if(svar == "expression_history") {
 					expression_history.push_back(svalue);
+				} else if(svar == "enable_input_method") {
+					enable_input_method = v;
+				} else if(svar == "enable_completion") {
+					enable_completion = v;
+				} else if(svar == "enable_completion2") {
+					enable_completion2 = v;
+				} else if(svar == "completion_min") {
+					if(v < 1) v = 1;
+					completion_min = v;
+				} else if(svar == "completion_min2") {
+					if(v < 1) v = 1;
+					completion_min2 = v;
+				} else if(svar == "completion_delay") {
+					if(v < 0) v = 0;
+					completion_delay = v;
 				/*} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
@@ -511,6 +532,12 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "version=%s\n", VERSION);
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+	fprintf(file, "enable_input_method=%i\n", enable_input_method);
+	fprintf(file, "enable_completion=%i\n", enable_completion);
+	fprintf(file, "enable_completion2=%i\n", enable_completion2);
+	fprintf(file, "completion_min=%i\n", completion_min);
+	fprintf(file, "completion_min2=%i\n", completion_min2);
+	fprintf(file, "completion_delay=%i\n", completion_delay);
 	for(size_t i = 0; i < expression_history.size(); i++) {
 		gsub("\n", " ", expression_history[i]);
 		fprintf(file, "expression_history=%s\n", expression_history[i].c_str());

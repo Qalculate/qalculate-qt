@@ -26,7 +26,6 @@ class KeypadWidget;
 class QDockWidget;
 class QAction;
 class QToolBar;
-class QLineEdit;
 class QTextEdit;
 class QToolButton;
 class QSpinBox;
@@ -62,8 +61,7 @@ class QalculateWindow : public QMainWindow {
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
-		QLineEdit *octEdit, *decEdit, *hexEdit;
-		QTextEdit *binEdit;
+		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
 		QToolButton *menuAction, *modeAction;
@@ -83,7 +81,7 @@ class QalculateWindow : public QMainWindow {
 		void closeEvent(QCloseEvent*) override;
 		void setPreviousExpression();
 		void setOption(std::string);
-		void updateResultBases(int = 0);
+		void updateResultBases();
 
 	protected slots:
 
@@ -118,10 +116,6 @@ class QalculateWindow : public QMainWindow {
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);
-		void onBinChanged();
-		void onDecChanged(const QString&);
-		void onHexChanged(const QString&);
-		void onOctChanged(const QString&);
 
 		void gradiansActivated();
 		void radiansActivated();

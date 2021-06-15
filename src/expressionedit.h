@@ -23,6 +23,7 @@ class QStandardItemModel;
 class QTableView;
 class QMenu;
 class QAction;
+class QTimer;
 
 struct CompletionData;
 
@@ -60,6 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QTableView *completionView;
 		QMenu *cmenu;
 		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
+		QTimer *completionTimer;
 
 		QStringList expression_undo_buffer;
 		QList<int> expression_undo_pos;
@@ -73,7 +75,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		std::string current_object_text;
 		int completion_blocked, parse_blocked, block_add_to_undo;
 		int block_text_change;
-		bool do_completion_signal;
+		int do_completion_signal;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		bool display_expression_status;
 		int block_display_parse;
@@ -88,7 +90,6 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
-		void keyPressEvent(QKeyEvent*) override;
 		void keyReleaseEvent(QKeyEvent*) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 
@@ -104,14 +105,18 @@ class ExpressionEdit : public QPlainTextEdit {
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
-		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
 		void displayParseStatus(bool = false);
+		void inputMethodEvent(QInputMethodEvent*) override;
+		void keyPressEvent(QKeyEvent*) override;
 
 	protected slots:
 
 		void onTextChanged();
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
+		void enableIM();
+		void enableCompletionDelay();
+		void onCompletionModeChanged();
 
 	public slots:
 
@@ -127,6 +132,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editUndo();
 		void editRedo();
 		void editDelete();
+		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
 
 	signals:
 

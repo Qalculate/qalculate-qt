@@ -402,12 +402,14 @@ void KeypadWidget::onItemButtonClicked3() {
 }
 
 KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat) : QPushButton(text.contains("</") ? QString() : text, parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
+	setFocusPolicy(Qt::TabFocus);
 	if(text.contains("</")) richtext = text;
 	QFontMetrics fm(font());
 	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QPushButton(icon, QString(), parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
+	setFocusPolicy(Qt::TabFocus);
 	QFontMetrics fm(font());
 	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);

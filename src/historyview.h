@@ -17,6 +17,7 @@
 class QImage;
 class QMenu;
 class QAction;
+class ExpressionEdit;
 
 class HistoryView : public QTextBrowser {
 
@@ -27,6 +28,13 @@ class HistoryView : public QTextBrowser {
 		HistoryView(QWidget *parent = NULL);
 		virtual ~HistoryView();
 
+		ExpressionEdit *expressionEdit;
+
+		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false);
+		void addMessages();
+
+	protected:
+
 		QString s_text;
 		int i_pos;
 		QImage *paste_image;
@@ -34,14 +42,10 @@ class HistoryView : public QTextBrowser {
 		QMenu *cmenu;
 		QAction *copyAction, *selectAllAction;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false);
-		void addMessages();
-
-	protected:
-	
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void keyPressEvent(QKeyEvent *e) override;
+		void inputMethodEvent(QInputMethodEvent*) override;
 
 	public slots:
 

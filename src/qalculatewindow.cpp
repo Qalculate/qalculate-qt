@@ -181,6 +181,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hLayout->addWidget(ehSplitter, 1);
 
 	tb = new QToolBar(this);
+	tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	tb->setOrientation(Qt::Vertical);
 
 	QAction *action; QActionGroup *group; QMenu *menu, *menu2;
@@ -217,7 +218,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
 	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
-	menu->addSeparator();
 	menu->addSection(tr("Output base"));
 	QFontMetrics fmB(menu->font());
 	w2 = fm1.boundingRect(tr("Output base")).width() * 1.5; if(w2 > w) w = w2;
@@ -317,6 +317,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	awl->addWidget(customInputBaseEdit, 0, Qt::AlignRight);
 	menu->addAction(aw);
 	menu = menu2;
+	menu->addSeparator();
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
 	aw->setDefaultWidget(aww);
@@ -351,50 +352,51 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	expressionEdit->setFocus();
 	ehSplitter->addWidget(expressionEdit);
 	historyView = new HistoryView(this);
+	historyView->expressionEdit = expressionEdit;
 
 	ehSplitter->addWidget(historyView);
 	ehSplitter->setStretchFactor(0, 0);
 	ehSplitter->setStretchFactor(1, 1);
 
 	basesDock = new QDockWidget(tr("Number bases"), this);
-	basesDock->setObjectName("bases-dock");
+	basesDock->setObjectName("number-bases-dock");
 	QWidget *basesWidget = new QWidget(this);
 	QGridLayout *basesGrid = new QGridLayout(basesWidget);
-	binLabel = new QLabel(tr("Binary"));
+	binLabel = new QLabel(tr("Binary:"));
 	basesGrid->addWidget(binLabel, 0, 0, Qt::AlignTop);
-	octLabel = new QLabel(tr("Octal"));
+	octLabel = new QLabel(tr("Octal:"));
 	basesGrid->addWidget(octLabel, 1, 0);
-	decLabel = new QLabel(tr("Decimal"));
+	decLabel = new QLabel(tr("Decimal:"));
 	basesGrid->addWidget(decLabel, 2, 0);
-	hexLabel = new QLabel(tr("Hexadecimal"));
+	hexLabel = new QLabel(tr("Hexadecimal:"));
 	basesGrid->addWidget(hexLabel, 3, 0);
-	binEdit = new QTextEdit();
-	binEdit->setPlainText("0");
-	QTextCursor cursor = binEdit->textCursor();
-	QTextBlockFormat textBlockFormat = cursor.blockFormat();
-	textBlockFormat.setAlignment(Qt::AlignRight);
-	cursor.mergeBlockFormat(textBlockFormat);
-	binEdit->setTextCursor(cursor);
-	binEdit->setPlainText("");
-	basesGrid->addWidget(binEdit, 0, 1);
-	octEdit = new QLineEdit();
-	octEdit->setAlignment(Qt::AlignRight);
-	basesGrid->addWidget(octEdit, 1, 1);
-	decEdit = new QLineEdit();
-	decEdit->setAlignment(Qt::AlignRight);
-	basesGrid->addWidget(decEdit, 2, 1);
-	hexEdit = new QLineEdit();
-	hexEdit->setAlignment(Qt::AlignRight);
-	basesGrid->addWidget(hexEdit, 3, 1);
-	basesDock->setWidget(basesWidget);
+	binEdit = new QLabel();
+	binEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
 	QFontMetrics fm2(binEdit->font());
-	basesDock->resize(fm2.boundingRect(tr("Hexadecimal") + "0000 0000 0000 0000 0000 0000 0000 0000").width() + basesGrid->spacing() * 5, 1);
-	addDockWidget(Qt::BottomDockWidgetArea, basesDock);
+	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
+	binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
+	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
+	basesGrid->addWidget(binEdit, 0, 1);
+	octEdit = new QLabel();
+	octEdit->setAlignment(Qt::AlignRight);
+	octEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	octEdit->setMinimumHeight(fm2.lineSpacing());
+	basesGrid->addWidget(octEdit, 1, 1);
+	decEdit = new QLabel();
+	decEdit->setAlignment(Qt::AlignRight);
+	decEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	decEdit->setMinimumHeight(fm2.lineSpacing());
+	basesGrid->addWidget(decEdit, 2, 1);
+	hexEdit = new QLabel();
+	hexEdit->setAlignment(Qt::AlignRight);
+	hexEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	hexEdit->setMinimumHeight(fm2.lineSpacing());
+	basesGrid->addWidget(hexEdit, 3, 1);
+	//basesGrid->addItem(new QSpacerItem(1, 1), 4, 0, 1, 2);
+	basesGrid->setRowStretch(4, 1);
+	basesDock->setWidget(basesWidget);
+	addDockWidget(Qt::TopDockWidgetArea, basesDock);
 	basesDock->hide();
-	connect(binEdit, SIGNAL(textChanged()), this, SLOT(onBinChanged()));
-	connect(octEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onOctChanged(const QString&)));
-	connect(decEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onDecChanged(const QString&)));
-	connect(hexEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onHexChanged(const QString&)));
 
 	keypad = new KeypadWidget(this);
 	keypadDock = new QDockWidget(tr("Keypad"), this);
@@ -3674,25 +3676,16 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 
 }
 
-void QalculateWindow::updateResultBases(int i_excl) {
-	if(i_excl != BASE_BINARY) {
-		binEdit->blockSignals(true);
-		binEdit->setPlainText(QString::fromStdString(result_bin));
-		QTextCursor cursor = binEdit->textCursor();
-		QTextBlockFormat textBlockFormat = cursor.blockFormat();
-		textBlockFormat.setAlignment(Qt::AlignRight);
-		cursor.mergeBlockFormat(textBlockFormat);
-		binEdit->setTextCursor(cursor);
-		binEdit->blockSignals(false);
-	}
-	if(i_excl != BASE_OCTAL) octEdit->setText(QString::fromStdString(result_oct));
-	if(i_excl != BASE_DECIMAL) decEdit->setText(QString::fromStdString(result_dec));
-	if(i_excl != BASE_HEXADECIMAL) hexEdit->setText(QString::fromStdString(result_hex));
+void QalculateWindow::updateResultBases() {
+	binEdit->setText(QString::fromStdString(result_bin));
+	octEdit->setText(QString::fromStdString(result_oct));
+	decEdit->setText(QString::fromStdString(result_dec));
+	hexEdit->setText(QString::fromStdString(result_hex));
 }
 
 void set_result_bases(const MathStructure &m) {
 	result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	if(max_bases.isZero()) {max_bases = 2; max_bases ^= 256; min_bases = -max_bases;}
+	if(max_bases.isZero()) {max_bases = 2; max_bases ^= 64; min_bases = 2; min_bases ^= 32; min_bases.negate();}
 	if(!CALCULATOR->aborted() && ((m.isNumber() && m.number() < max_bases && m.number() > min_bases) || (m.isNegate() && m[0].isNumber() && m[0].number() < max_bases && m[0].number() > min_bases))) {
 		Number nr;
 		if(m.isNumber()) {
@@ -3707,7 +3700,10 @@ void set_result_bases(const MathStructure &m) {
 		po.base_display = BASE_DISPLAY_NORMAL;
 		po.min_exp = 0;
 		po.base = 2;
+		po.binary_bits = 64;
 		result_bin = nr.print(po);
+		if(result_bin.length() > 80 && result_bin.find("1") >= 80) result_bin.erase(0, 80);
+		if(result_bin.length() >= 40) result_bin.insert(39, "\n");
 		po.base = 8;
 		result_oct = nr.print(po);
 		size_t i = result_oct.find_first_of(NUMBERS);
@@ -3746,91 +3742,6 @@ void QalculateWindow::onExpressionChanged() {
 	}
 	CALCULATOR->endTemporaryStopMessages();
 	updateResultBases();
-}
-void QalculateWindow::onBinChanged() {
-	std::string str = binEdit->toPlainText().toStdString();
-	if(str == result_bin) return;
-	remove_blank_ends(str);
-	if(str.empty()) return;
-	if(last_is_operator(str, true)) return;
-	EvaluationOptions eo;
-	eo.parse_options = settings->evalops.parse_options;
-	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-	eo.parse_options.read_precision = DONT_READ_PRECISION;
-	eo.parse_options.base = BASE_BINARY;
-	//eo.parse_options.twos_complement = twos_complement_in;
-	MathStructure value;
-	CALCULATOR->beginTemporaryStopMessages();
-	if(CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
-		set_result_bases(value);
-	} else {
-		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	}
-	CALCULATOR->endTemporaryStopMessages();
-	updateResultBases(BASE_BINARY);
-}
-void QalculateWindow::onDecChanged(const QString &s) {
-	std::string str = s.toStdString();
-	if(str == result_dec) return;
-	remove_blank_ends(str);
-	if(str.empty()) return;
-	if(last_is_operator(str, true)) return;
-	EvaluationOptions eo;
-	eo.parse_options = settings->evalops.parse_options;
-	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-	eo.parse_options.read_precision = DONT_READ_PRECISION;
-	eo.parse_options.base = BASE_DECIMAL;
-	MathStructure value;
-	CALCULATOR->beginTemporaryStopMessages();
-	if(CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
-		set_result_bases(value);
-	} else {
-		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	}
-	CALCULATOR->endTemporaryStopMessages();
-	updateResultBases(BASE_DECIMAL);
-}
-void QalculateWindow::onHexChanged(const QString &s) {
-	std::string str = s.toStdString();
-	if(str == result_hex) return;
-	remove_blank_ends(str);
-	if(str.empty()) return;
-	if(last_is_operator(str, true)) return;
-	EvaluationOptions eo;
-	eo.parse_options = settings->evalops.parse_options;
-	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-	eo.parse_options.read_precision = DONT_READ_PRECISION;
-	eo.parse_options.base = BASE_HEXADECIMAL;
-	MathStructure value;
-	CALCULATOR->beginTemporaryStopMessages();
-	if(CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
-		set_result_bases(value);
-	} else {
-		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	}
-	CALCULATOR->endTemporaryStopMessages();
-	updateResultBases(BASE_HEXADECIMAL);
-}
-void QalculateWindow::onOctChanged(const QString &s) {
-	std::string str = s.toStdString();
-	if(str == result_oct) return;
-	remove_blank_ends(str);
-	if(str.empty()) return;
-	if(last_is_operator(str, true)) return;
-	EvaluationOptions eo;
-	eo.parse_options = settings->evalops.parse_options;
-	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-	eo.parse_options.read_precision = DONT_READ_PRECISION;
-	eo.parse_options.base = BASE_OCTAL;
-	MathStructure value;
-	CALCULATOR->beginTemporaryStopMessages();
-	if(CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
-		set_result_bases(value);
-	} else {
-		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	}
-	CALCULATOR->endTemporaryStopMessages();
-	updateResultBases(BASE_OCTAL);
 }
 
 void ViewThread::run() {
@@ -4453,7 +4364,6 @@ bool QalculateWindow::askDot(const std::string &str) {
 	return false;
 }
 void QalculateWindow::keyPressEvent(QKeyEvent *e) {
-	if(!send_event) return;
 	if(e->matches(QKeySequence::Undo)) {
 		expressionEdit->editUndo();
 		return;
@@ -4463,15 +4373,6 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 		return;
 	}
 	QMainWindow::keyPressEvent(e);
-	if(!e->isAccepted() && (e->key() < Qt::Key_Tab || e->key() > Qt::Key_ScrollLock) && !(e->modifiers() & Qt::ControlModifier) && !(e->modifiers() & Qt::MetaModifier)) {
-		e->accept();
-		QKeyEvent *e2 = new QKeyEvent(e->type(), e->key(), e->modifiers(), e->text());
-		send_event = false;
-		qApp->postEvent((QObject*) expressionEdit, (QEvent*) e2);
-		expressionEdit->setFocus();
-		qApp->processEvents();
-		send_event = true;
-	}
 }
 void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();

@@ -18,15 +18,16 @@
 #include <QKeySequence>
 #include <QClipboard>
 #include <QTextDocumentFragment>
-#include <QApplication>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
 
+#include "expressionedit.h"
 #include "historyview.h"
 #include "qalculateqtsettings.h"
 
 HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
+	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 	setOpenLinks(false);
 	cmenu = NULL;
 }
@@ -77,7 +78,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(settings->color == 1) str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(w);
 		else str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(w);
 		str += "</div>";
-		v_text.push_back(values[i]);
 	}
 	str.replace("\n", "<br>");
 	if(expression.empty()) {
@@ -98,7 +98,7 @@ void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 	if(!str.isEmpty()) {
 		if(str[0] == '#') {
-			emit insertValueRequested(str.right(1).toInt());
+			emit insertValueRequested(str.mid(1).toInt());
 		} else {
 			int i = str.toInt();
 			if(i >= 0 && (size_t) i < v_text.size()) emit insertTextRequested(v_text[str.toInt()]);
@@ -113,6 +113,17 @@ void HistoryView::keyPressEvent(QKeyEvent *e) {
 		return;
 	}
 	QTextBrowser::keyPressEvent(e);
+	if(!e->isAccepted()) {
+		expressionEdit->setFocus();
+		expressionEdit->keyPressEvent(e);
+	}
+}
+void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
+	QTextBrowser::inputMethodEvent(e);
+	if(!e->isAccepted()) {
+		expressionEdit->setFocus();
+		expressionEdit->inputMethodEvent(e);
+	}
 }
 void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	if(!cmenu) {
