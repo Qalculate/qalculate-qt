@@ -51,11 +51,11 @@ int main(int argc, char **argv) {
 	app.setApplicationVersion(VERSION);
 
 	QCommandLineParser *parser = new QCommandLineParser();
-	/*QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("[FILE]"));
+	/*QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("FILE"));
 	parser->addOption(fOption);*/
 	QCommandLineOption nOption(QStringList() << "n" << "new-instance", QApplication::tr("Start a new instance of the application"));
 	parser->addOption(nOption);
-	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("[TITLE]"));
+	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("TITLE"));
 	parser->addOption(tOption);
 	QCommandLineOption vOption(QStringList() << "v" << "verison", QApplication::tr("Display the application version"));
 	parser->addOption(vOption);

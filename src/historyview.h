@@ -30,7 +30,7 @@ class HistoryView : public QTextBrowser {
 
 		ExpressionEdit *expressionEdit;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false, const QString &image = QString());
 		void addMessages();
 
 	protected:
@@ -40,7 +40,7 @@ class HistoryView : public QTextBrowser {
 		QImage *paste_image;
 		std::vector<std::string> v_text;
 		QMenu *cmenu;
-		QAction *copyAction, *selectAllAction;
+		QAction *copyAction, *selectAllAction, *clearAction;
 
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
@@ -50,6 +50,7 @@ class HistoryView : public QTextBrowser {
 	public slots:
 
 		void editCopy();
+		void editClear();
 
 	signals:
 

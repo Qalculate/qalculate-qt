@@ -211,6 +211,8 @@ void QalculateQtSettings::loadPreferences() {
 					window_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "window_geometry") {
 					window_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "splitter_state") {
+					splitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "ignore_locale") {
 					ignore_locale = v;
 				} else if(svar == "window_title_mode") {
@@ -532,6 +534,7 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "version=%s\n", VERSION);
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
 	fprintf(file, "enable_completion2=%i\n", enable_completion2);

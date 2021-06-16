@@ -29,6 +29,7 @@ class QToolBar;
 class QTextEdit;
 class QToolButton;
 class QSpinBox;
+class QTimer;
 
 class QalculateWindow : public QMainWindow {
 
@@ -45,7 +46,6 @@ class QalculateWindow : public QMainWindow {
 		void resultFormatUpdated();
 		void resultDisplayUpdated();
 		void expressionFormatUpdated(bool);
-		void expressionCalculationUpdated();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 
 	protected:
@@ -67,6 +67,7 @@ class QalculateWindow : public QMainWindow {
 		QToolButton *menuAction, *modeAction;
 		QAction *toAction, *storeAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
+		QTimer *ecTimer;
 
 		bool send_event, bases_shown;
 
@@ -140,6 +141,7 @@ class QalculateWindow : public QMainWindow {
 		void abortCommand();
 		void fetchExchangeRates();
 		void showAbout();
+		void expressionCalculationUpdated(int delay = 0);
 
 	signals:
 

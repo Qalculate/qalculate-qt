@@ -42,9 +42,14 @@ class VariableEditDialog : public QDialog {
 		virtual ~VariableEditDialog();
 
 		KnownVariable *createVariable(MathStructure *default_value = NULL);
-		void editVariable(KnownVariable *v, MathStructure *default_value = NULL);
+		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL);
 		void setVariable(KnownVariable *v);
 		void setValue(const QString&);
+		QString value() const;
+		void setName(const QString&);
+
+		static bool editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value = NULL);
+		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString());
 
 };
 

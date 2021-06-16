@@ -33,6 +33,24 @@
 						connect(button, SIGNAL(clicked3()), this, SLOT(onSymbolButtonClicked3())); \
 						grid->addWidget(button, r, c, 1, 1);
 
+#define SYMBOL_OPERATOR_SYMBOL_BUTTON(x, y, z, r, c)	button = new KeypadButton(x, this); \
+							button->setProperty(BUTTON_DATA, x); \
+							button->setProperty(BUTTON_DATA2, y); \
+							button->setProperty(BUTTON_DATA3, z); \
+							connect(button, SIGNAL(clicked()), this, SLOT(onSymbolButtonClicked())); \
+							connect(button, SIGNAL(clicked2()), this, SLOT(onOperatorButtonClicked2())); \
+							connect(button, SIGNAL(clicked3()), this, SLOT(onSymbolButtonClicked3())); \
+							grid->addWidget(button, r, c, 1, 1);
+
+#define SYMBOL_OPERATOR_ITEM_BUTTON(x, y, z, r, c)	button = new KeypadButton(x, this); \
+							button->setProperty(BUTTON_DATA, x); \
+							button->setProperty(BUTTON_DATA2, y); \
+							button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) z)); \
+							connect(button, SIGNAL(clicked()), this, SLOT(onSymbolButtonClicked())); \
+							connect(button, SIGNAL(clicked2()), this, SLOT(onOperatorButtonClicked2())); \
+							connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked3())); \
+							grid->addWidget(button, r, c, 1, 1);
+
 #define SYMBOL2_ITEM_BUTTON(x, y, o, r, c)	button = new KeypadButton(x, this); \
 						button->setProperty(BUTTON_DATA, x); \
 						button->setProperty(BUTTON_DATA2, y); \
@@ -231,35 +249,35 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getComma()), " ", "\n", 3, c)
 	button->setToolTip(tr("Argument separator"), tr("Blank space"), tr("New line"));
 	c++;
-	SYMBOL_BUTTON3("0", "⁰", "°", 3, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
 	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true)));
 	f = CALCULATOR->getActiveFunction("inv");
 	if(f) {
-		SYMBOL2_ITEM_BUTTON("1", "¹", f, 2, c)
+		SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
 		button->setToolTip(QString(), "x<sup>1</sup>", "1/x");
 	} else {
-		SYMBOL_BUTTON2("1", "¹", 2, c)
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("1", "¹", "¹", 2, c)
 		button->setToolTip(QString(), "x<sup>1</sup>");
 	}
-	SYMBOL_BUTTON3("4", "⁴", "¼", 1, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("4", "⁴", "¼", 1, c)
 	button->setToolTip(QString(), "x<sup>4</sup>", "1/4");
-	SYMBOL_BUTTON3("7", "⁷", "⅐", 0, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("7", "⁷", "⅐", 0, c)
 	button->setToolTip(QString(), "x<sup>7</sup>", "1/7");
 	c++;
 	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getDecimalPoint()), " ", "\n", 3, c)
 	button->setToolTip(tr("Decimal point"), tr("Blank space"), tr("New line"));
-	SYMBOL_BUTTON3("2", "²", "½", 2, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("2", "²", "½", 2, c)
 	button->setToolTip(QString(), "x<sup>2</sup>", "1/2");
-	SYMBOL_BUTTON3("5", "⁵", "⅕", 1, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("5", "⁵", "⅕", 1, c)
 	button->setToolTip(QString(), "x<sup>5</sup>", "1/5");
-	SYMBOL_BUTTON3("8", "⁸", "⅛", 0, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("8", "⁸", "⅛", 0, c)
 	button->setToolTip(QString(), "x<sup>8</sup>", "1/8");
 	c++;
-	SYMBOL_BUTTON3("3", "³", "⅓", 2, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("3", "³", "⅓", 2, c)
 	button->setToolTip(QString(), "x<sup>3</sup>", "1/3");
-	SYMBOL_BUTTON3("6", "⁶", "⅙", 1, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("6", "⁶", "⅙", 1, c)
 	button->setToolTip(QString(), "x<sup>6</sup>", "1/6");
-	SYMBOL_BUTTON3("9", "⁹", "⅑", 0, c)
+	SYMBOL_OPERATOR_SYMBOL_BUTTON("9", "⁹", "⅑", 0, c)
 	button->setToolTip(QString(), "x<sup>9</sup>", "1/9");
 	f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
 	if(f && f2) {

@@ -36,8 +36,8 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value) 
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	grid->addWidget(buttonBox, 3, 0, 1, 2);
-	connect(nameEdit, SLOT(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
-	if(!b_empty) connect(valueEdit, SLOT(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
+	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
+	if(!b_empty) connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	okButton->setEnabled(false);
@@ -55,7 +55,7 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value) 
 	Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 	if(var && var->isLocal() && var->isKnown()) {
 		v = (KnownVariable*) var;
-		editVariable(v, default_value);
+		if(!modifyVariable(v, default_value)) return NULL;
 		return v;
 	}
 	if(default_value && valueEdit->text().isEmpty()) {
@@ -69,11 +69,11 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value) 
 	CALCULATOR->addVariable(v);
 	return v;
 }
-void VariableEditDialog::editVariable(KnownVariable *v, MathStructure *default_value) {
+bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value) {
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
 		if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
-			return;
+			return false;
 		}
 	}
 	if(v->countNames() > 1) v->clearNames();
@@ -86,6 +86,7 @@ void VariableEditDialog::editVariable(KnownVariable *v, MathStructure *default_v
 	}
 	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
 	else if(v->category() == CALCULATOR->temporaryCategory()) v->setCategory("");
+	return true;
 }
 void VariableEditDialog::setVariable(KnownVariable *v) {
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
@@ -112,5 +113,45 @@ void VariableEditDialog::onValueEdited(const QString &str) {
 void VariableEditDialog::setValue(const QString &str) {
 	valueEdit->setText(str);
 	if(!b_empty) onValueEdited(str);
+}
+void VariableEditDialog::setName(const QString &str) {
+	nameEdit->setText(str);
+	onNameEdited(str);
+}
+QString VariableEditDialog::value() const {
+	return valueEdit->text();
+}
+bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value) {
+	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL);
+	d->setVariable(v);
+	while(d->exec() == QDialog::Accepted) {
+		if(d->modifyVariable(v, default_value)) {
+			d->deleteLater();
+			return true;
+		}
+	}
+	d->deleteLater();
+	return false;
+}
+KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *default_value, const QString &value_str) {
+	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && value_str.isEmpty());
+	std::string v_name;
+	int i = 1;
+	do {
+		v_name = "v"; v_name += i2s(i);
+		i++;
+	} while(CALCULATOR->nameTaken(v_name));
+	d->setName(QString::fromStdString(v_name));
+	d->setValue(value_str);
+	KnownVariable *v = NULL;
+	while(d->exec() == QDialog::Accepted) {
+		QString str = d->value().trimmed();
+		if(default_value && str == value_str) d->setValue("");
+		v = d->createVariable(default_value);
+		if(v) break;
+		d->setValue(str);
+	}
+	d->deleteLater();
+	return v;
 }
 

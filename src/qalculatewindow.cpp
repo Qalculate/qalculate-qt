@@ -31,6 +31,7 @@
 #include <QToolButton>
 #include <QSpinBox>
 #include <QWidgetAction>
+#include <QTimer>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -38,6 +39,7 @@
 #include "expressionedit.h"
 #include "historyview.h"
 #include "keypadwidget.h"
+#include "variableeditdialog.h"
 
 class ViewThread : public Thread {
 protected:
@@ -164,6 +166,8 @@ std::string unhtmlize(std::string str, bool replace_all_i) {
 	gsub("&amp;", "&", str);
 	gsub("&gt;", ">", str);
 	gsub("&lt;", "<", str);
+	gsub("&hairsp;", "", str);
+	gsub("&thinsp;", " ", str);
 	return str;
 }
 
@@ -173,6 +177,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	setCentralWidget(w_top);
 
 	send_event = true;
+
+	ecTimer = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
 	QHBoxLayout *hLayout = new QHBoxLayout();
@@ -349,6 +355,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hLayout->addWidget(tb, 0);
 
 	expressionEdit = new ExpressionEdit(this);
+	QFont font = expressionEdit->font();
+	if(font.pixelSize() >= 0) {
+		font.setPixelSize(font.pixelSize() * 1.35);
+	} else {
+		font.setPointSize(font.pointSize() * 1.35);
+	}
+	expressionEdit->setFont(font);
 	expressionEdit->setFocus();
 	ehSplitter->addWidget(expressionEdit);
 	historyView = new HistoryView(this);
@@ -357,6 +370,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ehSplitter->addWidget(historyView);
 	ehSplitter->setStretchFactor(0, 0);
 	ehSplitter->setStretchFactor(1, 1);
+	ehSplitter->setCollapsible(0, false);
+	ehSplitter->setCollapsible(1, false);
 
 	basesDock = new QDockWidget(tr("Number bases"), this);
 	basesDock->setObjectName("number-bases-dock");
@@ -456,6 +471,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	else resize(700, 700);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
+	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 	bases_shown = !settings->window_state.isEmpty();
 
 }
@@ -745,7 +761,17 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 		calculateExpression(false);
 	}
 }
-void QalculateWindow::expressionCalculationUpdated() {
+void QalculateWindow::expressionCalculationUpdated(int delay) {
+	if(ecTimer) ecTimer->stop();
+	if(delay > 0) {
+		if(!ecTimer) {
+			ecTimer = new QTimer();
+			ecTimer->setSingleShot(true);
+			connect(ecTimer, SIGNAL(timeout()), this, SLOT(expressionCalculationUpdated()));
+		}
+		ecTimer->start(delay);
+		return;
+	}
 	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
 	settings->updateMessagePrintOptions();
 	if(!settings->rpn_mode) {
@@ -2286,7 +2312,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					if(current_expr) setPreviousExpression();
-					//convert_number_bases(result_text.c_str());
+					basesDock->show();
 					return;
 				}
 				do_bases = true;
@@ -2651,7 +2677,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		qApp->processEvents();
 		sleep_ms(100);
 	}
-	
+
 	bool units_changed = false;
 	if(!do_mathoperation && !str_conv.empty() && parsed_tostruct->containsType(STRUCT_UNIT, true) && !mstruct->containsType(STRUCT_UNIT) && !parsed_mstruct->containsType(STRUCT_UNIT, false, true, true) && !CALCULATOR->hasToExpression(str_conv, false, settings->evalops)) {
 		MathStructure to_struct(*parsed_tostruct);
@@ -2798,11 +2824,16 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
+	if(stack_index == 0) {
+		if(!mstruct_exact.isUndefined()) settings->history_answer.push_back(new MathStructure(mstruct_exact));
+		settings->history_answer.push_back(new MathStructure(*mstruct));
+	}
+
 	if(!do_stack) previous_expression = execute_str.empty() ? str : execute_str;
 	setResult(NULL, true, stack_index == 0, true, "", stack_index);
 	
-	/*if(do_bases) convert_number_bases(execute_str.c_str());
-	if(do_calendars) on_popup_menu_item_calendarconversion_activate(NULL, NULL);*/
+	if(do_bases) basesDock->show();
+	//if(do_calendars) on_popup_menu_item_calendarconversion_activate(NULL, NULL);
 	
 	settings->evalops.complex_number_form = cnf_bak;
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
@@ -3670,6 +3701,8 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 			}
 		}
 		if(show_result) {
+			if(!mstruct_exact.isUndefined()) settings->history_answer.push_back(new MathStructure(mstruct_exact));
+			settings->history_answer.push_back(new MathStructure(*mstruct));
 			setResult(NULL, true, false, true, command_type == COMMAND_TRANSFORM ? ceu_str : "");
 		}
 	}
@@ -4068,11 +4101,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			exact_text = "";
 		}
 		alt_results.push_back(result_text);
-		if(update_parse) {
-			if(!mstruct_exact.isUndefined()) settings->history_answer.push_back(new MathStructure(mstruct_exact));
-			settings->history_answer.push_back(new MathStructure(*mstruct));
+		QString flag;
+		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
+			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
 		}
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate())), update_parse && !mstruct_exact.isUndefined());
+		historyView->addResult(alt_results, update_parse ? parsed_text : "", (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate())), update_parse && !mstruct_exact.isUndefined(), flag);
 	}
 
 	if(do_to) {
@@ -4105,6 +4138,10 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		keypadAction->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
 		modeAction->setIcon(LOAD_ICON("configure"));
+	} else if(e->type() == QEvent::FontChange) {
+		QFontMetrics fm2(binEdit->font());
+		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
+		binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
 	}
 	QMainWindow::changeEvent(e);
 }
@@ -4377,6 +4414,7 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();
 	settings->window_geometry = saveGeometry();
+	settings->splitter_state = ehSplitter->saveState();
 	settings->savePreferences();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
@@ -4386,16 +4424,13 @@ void QalculateWindow::onToActivated() {
 	QTextCursor cur = expressionEdit->textCursor();
 	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
 	if(!expressionEdit->expressionHasChanged() && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length()) {
-		if(!expressionEdit->complete(mstruct, pos)) {
-			expressionEdit->insertPlainText("➞");
-		}
-	} else {
-		expressionEdit->selectAll(false);
-		expressionEdit->blockCompletion();
-		expressionEdit->insertPlainText("➞");
-		expressionEdit->complete(NULL, pos);
-		expressionEdit->blockCompletion(false);
+		if(expressionEdit->complete(mstruct, pos)) return;
 	}
+	expressionEdit->selectAll(false);
+	expressionEdit->blockCompletion();
+	expressionEdit->insertPlainText("➞");
+	expressionEdit->complete(NULL, pos);
+	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
@@ -4403,6 +4438,8 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::onStoreActivated() {
+	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : (exact_text.empty() ? QString::fromStdString(result_text) : QString::fromStdString(exact_text)));
+	if(v) expressionEdit->updateCompletion();
 }
 void QalculateWindow::onKeypadActivated(bool b) {
 	keypadDock->setVisible(b);
@@ -4493,7 +4530,7 @@ void QalculateWindow::simpleActivated() {
 }
 void QalculateWindow::onPrecisionChanged(int v) {
 	CALCULATOR->setPrecision(v);
-	expressionCalculationUpdated();
+	expressionCalculationUpdated(500);
 }
 void QalculateWindow::outputBaseActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();

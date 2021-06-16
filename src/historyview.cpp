@@ -26,119 +26,6 @@
 #include "historyview.h"
 #include "qalculateqtsettings.h"
 
-HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
-	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
-	setOpenLinks(false);
-	cmenu = NULL;
-}
-HistoryView::~HistoryView() {}
-
-void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool exact, bool dual_approx) {
-	QFontMetrics fm(font());
-	int w = fm.ascent();
-	QString str;
-	if(!expression.empty()) {
-		str += "<div align=\"left\">";
-		if(settings->color == 1) str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(w);
-		else str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(w);
-		str += QString::fromStdString(expression);
-		str += "</div>";
-		v_text.push_back(expression);
-	}
-	if(CALCULATOR->message()) {
-		do {
-			MessageType mtype = CALCULATOR->message()->type();
-			str += "<div align=\"left\"><font size=\"-1\"";
-			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-				str += " color=\"";
-				if(mtype == MESSAGE_ERROR) {
-					if(settings->color == 1) str += "#800000";
-					else str += "#FFAAAA";
-				} else {
-					if(settings->color == 1) str += "#000080";
-					else str += "#AAAAFF";
-				}
-				str += "\"";
-			}
-			str += ">";
-			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
-			if(!mstr.startsWith("-")) str += "- ";
-			str += mstr;
-			str += "</font>";
-			str += "</div>";
-		} while(CALCULATOR->nextMessage());
-		if(str.isEmpty() && values.empty() && expression.empty()) return;
-	}
-	for(size_t i = 0; i < values.size(); i++) {
-		str += "<div align=\"right\">";
-		if(exact || i < values.size() - 1) str += "= ";
-		else str += SIGN_ALMOST_EQUAL " ";
-		str += QString::fromStdString(values[i]);
-		str += " ";
-		if(settings->color == 1) str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(w);
-		else str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(w);
-		str += "</div>";
-	}
-	str.replace("\n", "<br>");
-	if(expression.empty()) {
-		s_text.insert(i_pos, str);
-		i_pos += str.length();
-	} else {
-		i_pos = str.length();
-		if(!s_text.isEmpty()) str += "<hr/>";
-		s_text.insert(0, str);
-	}
-	setHtml(s_text);
-}
-void HistoryView::addMessages() {
-	std::vector<std::string> values;
-	addResult(values, "", true);
-}
-void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
-	QString str = anchorAt(e->pos());
-	if(!str.isEmpty()) {
-		if(str[0] == '#') {
-			emit insertValueRequested(str.mid(1).toInt());
-		} else {
-			int i = str.toInt();
-			if(i >= 0 && (size_t) i < v_text.size()) emit insertTextRequested(v_text[str.toInt()]);
-		}
-	} else {
-		QTextBrowser::mouseReleaseEvent(e);
-	}
-}
-void HistoryView::keyPressEvent(QKeyEvent *e) {
-	if(e->matches(QKeySequence::Copy)) {
-		editCopy();
-		return;
-	}
-	QTextBrowser::keyPressEvent(e);
-	if(!e->isAccepted()) {
-		expressionEdit->setFocus();
-		expressionEdit->keyPressEvent(e);
-	}
-}
-void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
-	QTextBrowser::inputMethodEvent(e);
-	if(!e->isAccepted()) {
-		expressionEdit->setFocus();
-		expressionEdit->inputMethodEvent(e);
-	}
-}
-void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
-	if(!cmenu) {
-		cmenu = new QMenu(this);
-		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
-		copyAction->setShortcut(QKeySequence::Copy);
-		copyAction->setShortcutContext(Qt::WidgetShortcut);
-		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
-		selectAllAction->setShortcut(QKeySequence::SelectAll);
-		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
-	}
-	copyAction->setEnabled(textCursor().hasSelection());
-	selectAllAction->setEnabled(!toPlainText().isEmpty());
-	cmenu->popup(e->globalPos());
-}
 QString unhtmlize(QString str) {
 	int i = 0, i2;
 	while(true) {
@@ -203,6 +90,168 @@ QString unhtmlize(QString str) {
 	str.replace("&gt;", ">");
 	str.replace("&lt;", "<");
 	return str;
+}
+
+HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
+	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+	setOpenLinks(false);
+	QImage img1px(1, 1, QImage::Format_ARGB32);
+	img1px.fill(Qt::transparent);
+	document()->addResource(QTextDocument::ImageResource, QUrl("data://img1px.png"), QVariant(img1px));
+	cmenu = NULL;
+}
+HistoryView::~HistoryView() {}
+
+void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool exact, bool dual_approx, const QString &image) {
+	QFontMetrics fm(font());
+	int h = fm.ascent();
+	QString str;
+	if(!expression.empty()) {
+		str += "<div style=\"text-align:left; line-height:120%\">";
+		if(settings->color == 1) str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
+		else str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
+		str += QString::fromStdString(expression);
+		str += "</div>";
+		v_text.push_back(expression);
+	}
+	if(CALCULATOR->message()) {
+		do {
+			MessageType mtype = CALCULATOR->message()->type();
+			str += "<div style=\"text-align:left; font-size:normal";
+			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+				str += "; color:";
+				if(mtype == MESSAGE_ERROR) {
+					if(settings->color == 1) str += "#800000";
+					else str += "#FFAAAA";
+				} else {
+					if(settings->color == 1) str += "#000080";
+					else str += "#AAAAFF";
+				}
+				str += "";
+			}
+			str += "\">";
+			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
+			if(!mstr.startsWith("-")) str += "- ";
+			str += mstr;
+			str += "</div>";
+		} while(CALCULATOR->nextMessage());
+		if(str.isEmpty() && values.empty() && expression.empty()) return;
+	}
+	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
+	for(size_t i = 0; i < values.size(); i++) {
+		QFontMetrics fm(font());
+		int w = fm.boundingRect(unhtmlize(QString::fromStdString(values[i]))).width();
+		if(w > width() * 2) {
+			str += "<div style=\"text-align:right\">";
+			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
+		} else if(w * 2 > width()) {
+			str += "<div style=\"text-align:right; font-size:large\">";
+			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
+		} else {
+			str += "<div style=\"text-align:right; font-size:x-large\">";
+			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
+		}
+		if(exact || i < values.size() - 1) str += "= ";
+		else str += SIGN_ALMOST_EQUAL " ";
+		str += QString::fromStdString(values[i]);
+		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
+		str += " ";
+		if(settings->color == 1) str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
+		else str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
+		str += "</div>";
+	}
+	str.replace("\n", "<br>");
+	s_text.replace("font-size:normal", "font-size:small ");
+	s_text.replace("width=\"2\"", "width=\"1\"");
+	int i = 0;
+	while(true) {
+		i = s_text.indexOf("<img valign=\"top\"", i);
+		if(i < 0) break;
+		int i2 = s_text.indexOf(">", i);
+		s_text.remove(i, i2 - i + 1);
+		if(i < i_pos) i_pos -= (i2 - i + 1);
+	}
+	if(expression.empty()) {
+		i = 0;
+		while(true) {
+			i = s_text.indexOf("; font-size:x-large", i);
+			if(i < 0) break;
+			s_text.remove(i, 19);
+			if(i < i_pos) i_pos -= 19;
+		}
+		i = 0;
+		while(true) {
+			i = s_text.indexOf("; font-size:large", i);
+			if(i < 0) break;
+			s_text.remove(i, 17);
+			if(i < i_pos) i_pos -= 17;
+		}
+		s_text.insert(i_pos, str);
+		i_pos += str.length();
+	} else {
+		s_text.remove("; font-size:x-large");
+		s_text.remove("; font-size:large");
+		i_pos = str.length();
+		if(!s_text.isEmpty()) str += "<hr/>";
+		s_text.insert(0, str);
+	}
+	setHtml(s_text);
+}
+void HistoryView::addMessages() {
+	std::vector<std::string> values;
+	addResult(values, "", true);
+}
+void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
+	QString str = anchorAt(e->pos());
+	if(!str.isEmpty()) {
+		if(str[0] == '#') {
+			emit insertValueRequested(str.mid(1).toInt());
+		} else {
+			int i = str.toInt();
+			if(i >= 0 && (size_t) i < v_text.size()) emit insertTextRequested(v_text[str.toInt()]);
+		}
+	} else {
+		QTextBrowser::mouseReleaseEvent(e);
+	}
+}
+void HistoryView::keyPressEvent(QKeyEvent *e) {
+	if(e->matches(QKeySequence::Copy)) {
+		editCopy();
+		return;
+	}
+	QTextBrowser::keyPressEvent(e);
+	if(!e->isAccepted() && (e->key() != Qt::Key_Control && e->key() != Qt::Key_Meta && e->key() != Qt::Key_Alt)) {
+		expressionEdit->setFocus();
+		expressionEdit->keyPressEvent(e);
+	}
+}
+void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
+	QTextBrowser::inputMethodEvent(e);
+	if(!e->isAccepted()) {
+		expressionEdit->setFocus();
+		expressionEdit->inputMethodEvent(e);
+	}
+}
+void HistoryView::editClear() {
+	clear();
+	s_text.clear();
+	v_text.clear();
+}
+void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
+	if(!cmenu) {
+		cmenu = new QMenu(this);
+		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
+		copyAction->setShortcut(QKeySequence::Copy);
+		copyAction->setShortcutContext(Qt::WidgetShortcut);
+		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
+		selectAllAction->setShortcut(QKeySequence::SelectAll);
+		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
+		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
+	}
+	copyAction->setEnabled(textCursor().hasSelection());
+	selectAllAction->setEnabled(!s_text.isEmpty());
+	clearAction->setEnabled(!s_text.isEmpty());
+	cmenu->popup(e->globalPos());
 }
 void HistoryView::editCopy() {
 	QString str = textCursor().selection().toHtml();

@@ -571,7 +571,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && cdata->current_from_unit) {
 					if(cdata->current_from_unit != CALCULATOR->getDegUnit()) b_match = 0;
 				} else if(p_type >= 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
-					if(!cdata->current_from_struct->isNumber() || (str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
+					if(!cdata->current_from_struct->isNumber() || (p_type > 290 && str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
 				} else if(p_type >= 200 && p_type < 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
 					if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) b_match = 0;
@@ -1110,6 +1110,10 @@ QSize ExpressionEdit::sizeHint() const {
 }
 void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
 	if(event->commitString() == "⁽") event->setCommitString("^(");
+	if(event->commitString() == "⁰" || event->commitString() == "¹" || event->commitString() == "²" || event->commitString() == "³" || event->commitString() == "⁴" || event->commitString() == "⁵" || event->commitString() == "⁶" || event->commitString() == "⁷" || event->commitString() == "⁸" || event->commitString() == "⁹" || event->commitString() == "⁻") {
+		wrapSelection(event->commitString());
+		return;
+	}
 	QPlainTextEdit::inputMethodEvent(event);
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
@@ -1155,12 +1159,19 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				wrapSelection("/");
 				return;
 			}
+			case Qt::Key_ParenRight: {
+				QTextCursor cur = textCursor();
+				if(cur.hasSelection() || cur.position() == 0) {
+					smartParentheses();
+					return;
+				}
+			}
 		}
 	}
 	if(event->modifiers() == Qt::ControlModifier || (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
 		switch(event->key()) {
-			case Qt::Key_BraceLeft: {}
-			case Qt::Key_BraceRight: {
+			case Qt::Key_ParenLeft: {}
+			case Qt::Key_ParenRight: {
 				smartParentheses();
 				return;
 			}
@@ -1173,7 +1184,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					CALCULATOR->abort();
 				} else if(completionView->isVisible()) {
 					hideCompletion();
-				} else if(toPlainText().isEmpty()) {
+				} else if(document()->isEmpty()) {
 					qApp->closeAllWindows();
 				} else {
 					clear();
@@ -1354,7 +1365,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		enableIMAction->setChecked(settings->enable_input_method);
 	}
 	bool b_sel = textCursor().hasSelection();
-	bool b_empty = toPlainText().isEmpty();
+	bool b_empty = document()->isEmpty();
 	undoAction->setEnabled(undo_index == 0);
 	redoAction->setEnabled(undo_index < expression_undo_buffer.size() - 1);
 	cutAction->setEnabled(b_sel);
@@ -1950,7 +1961,7 @@ void ExpressionEdit::onTextChanged() {
 	expression_has_changed2 = true;
 }
 bool ExpressionEdit::expressionHasChanged() {
-	return expression_has_changed && !toPlainText().trimmed().isEmpty();
+	return expression_has_changed && !document()->isEmpty() && !toPlainText().trimmed().isEmpty();
 }
 void ExpressionEdit::setExpressionHasChanged(bool b) {
 	expression_has_changed = b;
