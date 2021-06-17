@@ -65,7 +65,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton;
 		void changeEvent(QEvent *e);
 
 	protected slots:
@@ -80,6 +80,10 @@ class KeypadWidget : public QWidget {
 		void onOperatorButtonClicked3();
 		void onItemButtonClicked3();
 		void onHypToggled(bool);
+
+	public slots:
+
+		void updateSymbols();
 
 	signals:
 

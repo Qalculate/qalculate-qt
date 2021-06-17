@@ -123,6 +123,7 @@ QString VariableEditDialog::value() const {
 }
 bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value) {
 	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL);
+	d->setWindowTitle(tr("Edit Variable"));
 	d->setVariable(v);
 	while(d->exec() == QDialog::Accepted) {
 		if(d->modifyVariable(v, default_value)) {
@@ -135,6 +136,7 @@ bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, MathStr
 }
 KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *default_value, const QString &value_str) {
 	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && value_str.isEmpty());
+	d->setWindowTitle(tr("New Variable"));
 	std::string v_name;
 	int i = 1;
 	do {

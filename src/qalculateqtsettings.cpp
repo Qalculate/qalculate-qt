@@ -153,7 +153,7 @@ void QalculateQtSettings::loadPreferences() {
 	title_type = TITLE_APP;
 	dot_question_asked = false;
 	complex_angle_form = false;
-	b_decimal_comma = -1;
+	decimal_comma = -1;
 	adaptive_interval_display = true;
 	tc_set = false;
 	dual_fraction = -1;
@@ -163,6 +163,7 @@ void QalculateQtSettings::loadPreferences() {
 	caret_as_xor = false;
 	do_imaginary_j = false;
 	color = 1;
+	colorize_result = true;
 	rpn_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
@@ -170,6 +171,9 @@ void QalculateQtSettings::loadPreferences() {
 	completion_min = 1;
 	completion_min2 = 1;
 	completion_delay = 500;
+	always_on_top = false;
+	display_expression_status = true;
+	prefixes_default = true;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -213,12 +217,18 @@ void QalculateQtSettings::loadPreferences() {
 					window_geometry = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "splitter_state") {
 					splitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "always_on_top") {
+					always_on_top = v;
+				} else if(svar == "color") {
+					colorize_result = v;
 				} else if(svar == "ignore_locale") {
 					ignore_locale = v;
 				} else if(svar == "window_title_mode") {
-					if(v >= 0 && v <= 4) title_type = v;
+					if(v >= 0 && v <= 2) title_type = v;
 				} else if(svar == "auto_update_exchange_rates") {
 					auto_update_exchange_rates = v;
+				} else if(svar == "display_expression_status") {
+					display_expression_status = v;
 				} else if(svar == "expression_history") {
 					expression_history.push_back(svalue);
 				} else if(svar == "enable_input_method") {
@@ -298,6 +308,8 @@ void QalculateQtSettings::loadPreferences() {
 					printops.use_prefixes_for_all_units = v;
 				} else if(svar == "use_prefixes_for_currencies") {
 					printops.use_prefixes_for_currencies = v;
+				} else if(svar == "prefixes_default") {
+					prefixes_default = v;
 				} else if(svar == "number_fraction_format") {
 					if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
 						printops.number_fraction_format = (NumberFractionFormat) v;
@@ -421,20 +433,13 @@ void QalculateQtSettings::loadPreferences() {
 					evalops.parse_options.limit_implicit_multiplication = v;
 					printops.limit_implicit_multiplication = v;
 				} else if(svar == "parsing_mode") {
-					if((evalops.parse_options.parsing_mode != PARSING_MODE_RPN || version_numbers[0] > 3 || (version_numbers[0] == 3 && version_numbers[1] > 15)) && v >= PARSING_MODE_ADAPTIVE && v <= PARSING_MODE_RPN) {
-						evalops.parse_options.parsing_mode = (ParsingMode) v;
-					}
+					evalops.parse_options.parsing_mode = (ParsingMode) v;
 				} else if(svar == "default_assumption_type") {
 					if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
-						if(v < ASSUMPTION_TYPE_NUMBER && version_numbers[0] < 1) v = ASSUMPTION_TYPE_NUMBER;
-						if(v == ASSUMPTION_TYPE_COMPLEX && version_numbers[0] < 2) v = ASSUMPTION_TYPE_NUMBER;
 						CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
 					}
 				} else if(svar == "default_assumption_sign") {
 					if(v >= ASSUMPTION_SIGN_UNKNOWN && v <= ASSUMPTION_SIGN_NONZERO) {
-						if(v == ASSUMPTION_SIGN_NONZERO && version_numbers[0] == 0 && (version_numbers[1] < 9 || (version_numbers[1] == 9 && version_numbers[2] == 0))) {
-							v = ASSUMPTION_SIGN_UNKNOWN;
-						}
 						CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
 					}
 				} else if(svar == "spacious") {
@@ -445,10 +450,10 @@ void QalculateQtSettings::loadPreferences() {
 					printops.short_multiplication = v;
 				} else if(svar == "use_unicode_signs") {
 					printops.use_unicode_signs = v;
+				} else if(svar == "e_notation") {
+					printops.lower_case_e = v;
 				} else if(svar == "lower_case_numbers") {
 					printops.lower_case_numbers = v;
-				} else if(svar == "lower_case_e") {
-					printops.lower_case_e = v;
 				} else if(svar == "imaginary_j") {
 					do_imaginary_j = v;
 				} else if(svar == "base_display") {
@@ -466,7 +471,7 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "caret_as_xor") {
 					caret_as_xor = v;
 				} else if(svar == "decimal_comma") {
-					b_decimal_comma = v;
+					decimal_comma = v;
 					if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
 					else if(v > 0) CALCULATOR->useDecimalComma();
 				} else if(svar == "dot_as_separator") {
@@ -535,7 +540,10 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
+	fprintf(file, "always_on_top=%i\n", always_on_top);
+	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
+	fprintf(file, "display_expression_status=%i\n", display_expression_status);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
 	fprintf(file, "enable_completion2=%i\n", enable_completion2);
 	fprintf(file, "completion_min=%i\n", completion_min);
@@ -545,32 +553,74 @@ void QalculateQtSettings::savePreferences() {
 		gsub("\n", " ", expression_history[i]);
 		fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
 	}
-	fprintf(file, "\n[Mode]\n");
-	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
-	fprintf(file, "min_exp=%i\n", settings->printops.min_exp);
-	fprintf(file, "negative_exponents=%i\n", settings->printops.negative_exponents);
-	fprintf(file, "sort_minus_last=%i\n", settings->printops.sort_options.minus_last);
-	fprintf(file, "use_prefixes=%i\n", settings->printops.use_unit_prefixes);
-	fprintf(file, "use_prefixes_for_all_units=%i\n", settings->printops.use_prefixes_for_all_units);
-	fprintf(file, "use_prefixes_for_currencies=%i\n", settings->printops.use_prefixes_for_currencies);
+	fprintf(file, "color=%i\n", colorize_result);
+	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
+	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
+	fprintf(file, "decimal_comma=%i\n", decimal_comma);
+	fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
+	fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
+	fprintf(file, "twos_complement=%i\n", printops.twos_complement);
+	fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
+	fprintf(file, "e_notation=%i\n", printops.lower_case_e);
+	fprintf(file, "imaginary_j=%i\n", CALCULATOR->v_i->hasName("j") > 0);
+	if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
+	fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
+	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
-	fprintf(file, "abbreviate_names=%i\n", settings->printops.abbreviate_names);
-	fprintf(file, "all_prefixes_enabled=%i\n", settings->printops.use_all_prefixes);
-	fprintf(file, "denominator_prefix_enabled=%i\n", settings->printops.use_denominator_prefix);
-	fprintf(file, "place_units_separately=%i\n", settings->printops.place_units_separately);
-	fprintf(file, "auto_post_conversion=%i\n", settings->evalops.auto_post_conversion);
-	fprintf(file, "mixed_units_conversion=%i\n", settings->evalops.mixed_units_conversion);
-	fprintf(file, "local_currency_conversion=%i\n", settings->evalops.local_currency_conversion);
-	fprintf(file, "number_base=%i\n", settings->printops.base);
+	fprintf(file, "prefixes_default=%i\n", prefixes_default);
+	fprintf(file, "\n[Mode]\n");
+	fprintf(file, "min_deci=%i\n", printops.min_decimals);
+	fprintf(file, "use_min_deci=%i\n", printops.use_min_decimals);
+	fprintf(file, "max_deci=%i\n", printops.max_decimals);
+	fprintf(file, "use_max_deci=%i\n", printops.use_max_decimals);
+	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
+	fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
+	fprintf(file, "interval_display=%i\n", adaptive_interval_display ? 0 : printops.interval_display + 1);
+	fprintf(file, "min_exp=%i\n", printops.min_exp);
+	fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
+	fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
+	fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
+	fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
+	fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);
+	fprintf(file, "use_prefixes_for_currencies=%i\n", printops.use_prefixes_for_currencies);
+	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
+	fprintf(file, "abbreviate_names=%i\n", printops.abbreviate_names);
+	fprintf(file, "all_prefixes_enabled=%i\n", printops.use_all_prefixes);
+	fprintf(file, "denominator_prefix_enabled=%i\n", printops.use_denominator_prefix);
+	fprintf(file, "place_units_separately=%i\n", printops.place_units_separately);
+	fprintf(file, "auto_post_conversion=%i\n", evalops.auto_post_conversion);
+	fprintf(file, "mixed_units_conversion=%i\n", evalops.mixed_units_conversion);
+	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
+	fprintf(file, "number_base=%i\n", printops.base);
 	if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
-	fprintf(file, "number_base_expression=%i\n", settings->evalops.parse_options.base);
+	fprintf(file, "number_base_expression=%i\n", evalops.parse_options.base);
 	if(!CALCULATOR->customInputBase().isZero()) fprintf(file, "custom_number_base_expression=%s\n", CALCULATOR->customInputBase().print(CALCULATOR->save_printoptions).c_str());
-	fprintf(file, "read_precision=%i\n", settings->evalops.parse_options.read_precision);
-	fprintf(file, "assume_denominators_nonzero=%i\n", settings->evalops.assume_denominators_nonzero);
-	fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", settings->evalops.warn_about_denominators_assumed_nonzero);
-	fprintf(file, "structuring=%i\n", settings->evalops.structuring);
-	fprintf(file, "angle_unit=%i\n", settings->evalops.parse_options.angle_unit);
-	fprintf(file, "show_ending_zeroes=%i\n", settings->printops.show_ending_zeroes);
+	fprintf(file, "read_precision=%i\n", evalops.parse_options.read_precision);
+	fprintf(file, "assume_denominators_nonzero=%i\n", evalops.assume_denominators_nonzero);
+	fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
+	fprintf(file, "structuring=%i\n", evalops.structuring);
+	fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
+	fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
+	fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
+	fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);
+	fprintf(file, "calculate_variables=%i\n", evalops.calculate_variables);
+	fprintf(file, "variable_units_enabled=%i\n", CALCULATOR->variableUnitsEnabled());
+	fprintf(file, "sync_units=%i\n", evalops.sync_units);
+	fprintf(file, "unknownvariables_enabled=%i\n", evalops.parse_options.unknowns_enabled);
+	fprintf(file, "units_enabled=%i\n", evalops.parse_options.units_enabled);
+	fprintf(file, "allow_complex=%i\n", evalops.allow_complex);
+	fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
+	fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
+	fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
+	fprintf(file, "round_halfway_to_even=%i\n", printops.round_halfway_to_even);
+	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
+	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
+	fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
+	fprintf(file, "spacious=%i\n", printops.spacious);
+	fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
+	fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());
+	if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_BOOLEAN) fprintf(file, "default_assumption_sign=%i\n", CALCULATOR->defaultAssumptions()->sign());
 	fclose(file);
 
 }

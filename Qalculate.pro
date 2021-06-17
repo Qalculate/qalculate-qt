@@ -39,8 +39,8 @@ OBJECTS_DIR = build
 DEFINES += ICON_DIR=\\\"$$ICON_DIR\\\"
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/expressionedit.h src/historyview.h src/keypadwidget.h src/qalculateqtsettings.h src/qalculatewindow.h src/variableeditdialog.h
-SOURCES += src/expressionedit.cpp src/historyview.cpp src/keypadwidget.cpp src/main.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/variableeditdialog.cpp
+HEADERS += src/expressionedit.h src/historyview.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/variableeditdialog.h
+SOURCES += src/expressionedit.cpp src/historyview.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/variableeditdialog.cpp
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 

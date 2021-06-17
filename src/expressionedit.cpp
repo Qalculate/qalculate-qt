@@ -527,7 +527,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
 		}
 	} else if(item && cdata->to_type == 4) {
-		if(item->type() == TYPE_UNIT && item->category() == cdata->current_from_unit->category()) {
+		if(item->type() == TYPE_UNIT && cdata->current_from_unit && item->category() == cdata->current_from_unit->category()) {
 			QString qstr = index.data(Qt::DisplayRole).toString();
 			if(!qstr.isEmpty() && qstr[0] == '<') {
 				int i = qstr.indexOf("-) </font>");
@@ -630,7 +630,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 	cdata = new CompletionData;
 	history_index = -1;
 	disable_history_arrow_keys = false;
-	display_expression_status = true;
+	settings->display_expression_status = true;
 	block_display_parse = 0;
 	block_text_change = 0;
 	dont_change_index = false;
@@ -1392,6 +1392,8 @@ void ExpressionEdit::onCompletionModeChanged() {
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;
+	blockCompletion();
+	blockParseStatus();
 	undo_index--;
 	block_add_to_undo++;
 	setCursorWidth(0);
@@ -1401,9 +1403,14 @@ void ExpressionEdit::editUndo() {
 	setTextCursor(cur);
 	setCursorWidth(1);
 	block_add_to_undo--;
+	blockCompletion(false);
+	blockParseStatus(false);
+	displayParseStatus(false, false);
 }
 void ExpressionEdit::editRedo() {
 	if(undo_index >= expression_undo_buffer.size() - 1) return;
+	blockCompletion();
+	blockParseStatus();
 	undo_index++;
 	block_add_to_undo++;
 	setCursorWidth(0);
@@ -1413,6 +1420,9 @@ void ExpressionEdit::editRedo() {
 	setTextCursor(cur);
 	setCursorWidth(1);
 	block_add_to_undo--;
+	blockCompletion(false);
+	blockParseStatus(false);
+	displayParseStatus(false, false);
 }
 void ExpressionEdit::editDelete() {
 	textCursor().removeSelectedText();
@@ -1523,12 +1533,12 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	setStatusText(QString::fromStdString(str));
 	return true;
 }
-void ExpressionEdit::displayParseStatus(bool update) {
+void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(parse_blocked) return;
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
-	if(!display_expression_status) return;
+	if(!settings->display_expression_status) return;
 	if(block_display_parse) return;
 	QString qtext = toPlainText();
 	std::string text = qtext.toStdString(), str_f;
@@ -1548,20 +1558,20 @@ void ExpressionEdit::displayParseStatus(bool update) {
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
 		if(i != std::string::npos && text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
-			setStatusText("qalc command");
+			if(show_tooltip) setStatusText("qalc command");
 			return;
 		}
 	} else if(text == "MC") {
-		setStatusText(tr("MC (memory clear)"));
+		if(show_tooltip) setStatusText(tr("MC (memory clear)"));
 		return;
 	} else if(text == "MS") {
-		setStatusText(tr("MS (memory store)"));
+		if(show_tooltip) setStatusText(tr("MS (memory store)"));
 		return;
 	} else if(text == "M+") {
-		setStatusText(tr("M+ (memory plus)"));
+		if(show_tooltip) setStatusText(tr("M+ (memory plus)"));
 		return;
 	} else if(text == "M-" || text == "M−") {
-		setStatusText(tr("M− (memory minus)"));
+		if(show_tooltip) setStatusText(tr("M− (memory minus)"));
 		return;
 	}
 	std::string parsed_expression, parsed_expression_tooltip;
@@ -1635,7 +1645,7 @@ void ExpressionEdit::displayParseStatus(bool update) {
 					eo.auto_post_conversion = POST_CONVERSION_NONE;
 					eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					eo.expand = -2;
-					if(!CALCULATOR->calculate(cdata->current_from_struct, str_e, 20, eo)) cdata->current_from_struct->setAborted();
+					if(!CALCULATOR->calculate(cdata->current_from_struct, str_e, 50, eo)) cdata->current_from_struct->setAborted();
 					cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
 				}
 			} else if(cdata->current_from_struct) {
@@ -1912,11 +1922,11 @@ void ExpressionEdit::displayParseStatus(bool update) {
 			if(had_errors || had_warnings) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 			else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		}
-		if(!b_func) setStatusText(prev_parsed_expression);
+		if(!b_func && show_tooltip) setStatusText(prev_parsed_expression);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
-		if(prev_func) setStatusText(prev_parsed_expression);
+		if(prev_func && show_tooltip) setStatusText(prev_parsed_expression);
 	}
 	settings->evalops.parse_options.preserve_format = false;
 }
@@ -1988,7 +1998,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
-		if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_unit) {
+		if(cdata->editing_to_expression && cdata->current_from_struct && (cdata->current_from_unit || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
 			cdata->to_type = 4;
 		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && (cdata->current_from_struct->isNumber() || cdata->current_from_struct->isAddition())) {
 			cdata->to_type = 2;
@@ -2368,9 +2378,11 @@ void ExpressionEdit::smartParentheses() {
 	QTextCursor cur = textCursor();
 	cur.beginEditBlock();
 	if(qexpr.isEmpty()) {
+		setCursorWidth(0);
 		insertPlainText("()");
 		moveCursor(QTextCursor::PreviousCharacter);
 		cur.endEditBlock();
+		setCursorWidth(1);
 		return;
 	}
 	ipos = cur.position();
@@ -2405,12 +2417,15 @@ void ExpressionEdit::smartParentheses() {
 		}
 	}
 	if(istart >= iend) {
+		setCursorWidth(0);
 		cur.setPosition(istart);
 		setTextCursor(cur);
 		insertPlainText("()");
 		moveCursor(QTextCursor::PreviousCharacter);
+		setCursorWidth(1);
 		return;
 	}
+	setCursorWidth(0);
 	std::string str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 	cur.setPosition(istart);
 	cur.insertText("(");
@@ -2428,6 +2443,7 @@ void ExpressionEdit::smartParentheses() {
 	else cur.setPosition(iend);
 	setTextCursor(cur);
 	cur.endEditBlock();
+	setCursorWidth(1);
 	highlightParentheses();
 }
 void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {

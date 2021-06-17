@@ -30,6 +30,7 @@ class QTextEdit;
 class QToolButton;
 class QSpinBox;
 class QTimer;
+class PreferencesDialog;
 
 class QalculateWindow : public QMainWindow {
 
@@ -43,9 +44,6 @@ class QalculateWindow : public QMainWindow {
 		void setCommandLineParser(QCommandLineParser*);
 		void fetchExchangeRates(int timeout, int n = -1);
 		static bool displayMessages(QWidget *parent = NULL);
-		void resultFormatUpdated();
-		void resultDisplayUpdated();
-		void expressionFormatUpdated(bool);
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 
 	protected:
@@ -58,6 +56,7 @@ class QalculateWindow : public QMainWindow {
 		HistoryView *historyView;
 		QSplitter *ehSplitter;
 		QLabel *statusLabel, *statusIconLabel;
+		PreferencesDialog *preferencesDialog;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
@@ -117,6 +116,9 @@ class QalculateWindow : public QMainWindow {
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);
+		void onAlwaysOnTopChanged();
+		void onPreferencesClosed();
+		void onTitleTypeChanged();
 
 		void gradiansActivated();
 		void radiansActivated();
@@ -129,6 +131,7 @@ class QalculateWindow : public QMainWindow {
 		void onCustomOutputBaseChanged(int);
 		void inputBaseActivated();
 		void onCustomInputBaseChanged(int);
+		void editPreferences();
 
 	public slots:
 
@@ -142,6 +145,9 @@ class QalculateWindow : public QMainWindow {
 		void fetchExchangeRates();
 		void showAbout();
 		void expressionCalculationUpdated(int delay = 0);
+		void resultFormatUpdated();
+		void resultDisplayUpdated();
+		void expressionFormatUpdated(bool);
 
 	signals:
 

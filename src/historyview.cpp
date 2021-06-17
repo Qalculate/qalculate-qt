@@ -108,8 +108,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	QString str;
 	if(!expression.empty()) {
 		str += "<div style=\"text-align:left; line-height:120%\">";
-		if(settings->color == 1) str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
-		else str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
+		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
+		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
 		str += QString::fromStdString(expression);
 		str += "</div>";
 		v_text.push_back(expression);
@@ -121,11 +121,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
 				str += "; color:";
 				if(mtype == MESSAGE_ERROR) {
-					if(settings->color == 1) str += "#800000";
-					else str += "#FFAAAA";
+					if(settings->color == 2) str += "#FFAAAA";
+					else str += "#800000";
 				} else {
-					if(settings->color == 1) str += "#000080";
-					else str += "#AAAAFF";
+					if(settings->color == 2) str += "#AAAAFF";
+					else str += "#000080";
 				}
 				str += "";
 			}
@@ -156,8 +156,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
 		str += " ";
-		if(settings->color == 1) str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
-		else str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
+		if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
+		else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
 		str += "</div>";
 	}
 	str.replace("\n", "<br>");

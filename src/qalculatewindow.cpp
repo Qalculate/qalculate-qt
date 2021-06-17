@@ -40,6 +40,7 @@
 #include "historyview.h"
 #include "keypadwidget.h"
 #include "variableeditdialog.h"
+#include "preferencesdialog.h"
 
 class ViewThread : public Thread {
 protected:
@@ -179,6 +180,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	send_event = true;
 
 	ecTimer = NULL;
+	preferencesDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
 	QHBoxLayout *hLayout = new QHBoxLayout();
@@ -198,6 +200,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu = new QMenu(this);
 	menuAction->setMenu(menu);
 	menu->addAction(tr("Update exchange rates"), this, SLOT(fetchExchangeRates()));
+	menu->addSeparator();
+	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
+	menu->addSeparator();
 	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
 	tb->addWidget(menuAction);
 
@@ -386,7 +391,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexLabel = new QLabel(tr("Hexadecimal:"));
 	basesGrid->addWidget(hexLabel, 3, 0);
 	binEdit = new QLabel();
-	binEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	binEdit->setFocusPolicy(Qt::NoFocus);
 	QFontMetrics fm2(binEdit->font());
 	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
 	binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
@@ -394,20 +400,22 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel();
 	octEdit->setAlignment(Qt::AlignRight);
-	octEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	octEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	octEdit->setFocusPolicy(Qt::NoFocus);
 	octEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(octEdit, 1, 1);
 	decEdit = new QLabel();
 	decEdit->setAlignment(Qt::AlignRight);
-	decEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	decEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	decEdit->setFocusPolicy(Qt::NoFocus);
 	decEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(decEdit, 2, 1);
 	hexEdit = new QLabel();
 	hexEdit->setAlignment(Qt::AlignRight);
-	hexEdit->setTextInteractionFlags(Qt::TextSelectableByKeyboard);
+	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	hexEdit->setFocusPolicy(Qt::NoFocus);
 	hexEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(hexEdit, 3, 1);
-	//basesGrid->addItem(new QSpacerItem(1, 1), 4, 0, 1, 2);
 	basesGrid->setRowStretch(4, 1);
 	basesDock->setWidget(basesWidget);
 	addDockWidget(Qt::TopDockWidgetArea, basesDock);
@@ -469,10 +477,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
-	else resize(700, 700);
+	else resize(550, 550);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 	bases_shown = !settings->window_state.isEmpty();
+	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
 }
 QalculateWindow::~QalculateWindow() {}
@@ -743,12 +752,10 @@ void QalculateWindow::resultFormatUpdated() {
 	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
 }
 void QalculateWindow::resultDisplayUpdated() {
-	if(block_result_update) return;
-	settings->updateMessagePrintOptions();
-	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
+	resultFormatUpdated();
 }
 void QalculateWindow::expressionFormatUpdated(bool recalculate) {
-	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
+	expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 	settings->updateMessagePrintOptions();
 	if(!expressionEdit->expressionHasChanged() && !recalculate && !settings->rpn_mode) {
 		expressionEdit->clear();
@@ -772,7 +779,7 @@ void QalculateWindow::expressionCalculationUpdated(int delay) {
 		ecTimer->start(delay);
 		return;
 	}
-	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
+	expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 	settings->updateMessagePrintOptions();
 	if(!settings->rpn_mode) {
 		if(parsed_mstruct) {
@@ -3736,7 +3743,7 @@ void set_result_bases(const MathStructure &m) {
 		po.binary_bits = 64;
 		result_bin = nr.print(po);
 		if(result_bin.length() > 80 && result_bin.find("1") >= 80) result_bin.erase(0, 80);
-		if(result_bin.length() >= 40) result_bin.insert(39, "\n");
+		if(result_bin.length() >= 40) result_bin.replace(39, 1, "\n");
 		po.base = 8;
 		result_oct = nr.print(po);
 		size_t i = result_oct.find_first_of(NUMBERS);
@@ -3826,7 +3833,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, true, settings->color, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -3836,7 +3843,7 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, true, settings->color, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 
 		if(!b_stack) {
 			set_result_bases(*mresult);
@@ -4062,7 +4069,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(stack_index == 0) {
 		if(basesDock->isVisible()) updateResultBases();
-		if(!updateWindowTitle(QString::fromStdString(result_text), true) && title_set) updateWindowTitle();
+		if((settings->title_type == TITLE_APP || !updateWindowTitle(QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct))), true)) && title_set) updateWindowTitle();
 	}
 	if(register_moved) {
 		update_parse = true;
@@ -4426,9 +4433,12 @@ void QalculateWindow::onToActivated() {
 	if(!expressionEdit->expressionHasChanged() && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length()) {
 		if(expressionEdit->complete(mstruct, pos)) return;
 	}
-	expressionEdit->selectAll(false);
 	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
+	expressionEdit->moveCursor(QTextCursor::End);
 	expressionEdit->insertPlainText("➞");
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->displayParseStatus(true, false);
 	expressionEdit->complete(NULL, pos);
 	expressionEdit->blockCompletion(false);
 }
@@ -4508,7 +4518,7 @@ void QalculateWindow::normalActivated() {
 	settings->printops.sort_options.minus_last = true;
 	settings->printops.min_exp = EXP_PRECISION;
 	settings->printops.show_ending_zeroes = true;
-	settings->printops.use_unit_prefixes = true;
+	if(settings->prefixes_default) settings->printops.use_unit_prefixes = true;
 	settings->printops.negative_exponents = false;
 	resultFormatUpdated();
 }
@@ -4516,7 +4526,7 @@ void QalculateWindow::scientificActivated() {
 	settings->printops.sort_options.minus_last = false;
 	settings->printops.min_exp = EXP_SCIENTIFIC;
 	settings->printops.show_ending_zeroes = true;
-	settings->printops.use_unit_prefixes = false;
+	if(settings->prefixes_default) settings->printops.use_unit_prefixes = false;
 	settings->printops.negative_exponents = true;
 	resultFormatUpdated();
 }
@@ -4524,7 +4534,7 @@ void QalculateWindow::simpleActivated() {
 	settings->printops.sort_options.minus_last = true;
 	settings->printops.min_exp = EXP_NONE;
 	settings->printops.show_ending_zeroes = false;
-	settings->printops.use_unit_prefixes = true;
+	if(settings->prefixes_default) settings->printops.use_unit_prefixes = true;
 	settings->printops.negative_exponents = false;
 	resultFormatUpdated();
 }
@@ -4582,6 +4592,37 @@ void QalculateWindow::onCustomInputBaseChanged(int v) {
 	}
 	expressionFormatUpdated(false);
 }
-
+void QalculateWindow::onAlwaysOnTopChanged() {
+	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	else setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+	show();
+}
+void QalculateWindow::onTitleTypeChanged() {
+	title_modified = false;
+	updateWindowTitle();
+}
+void QalculateWindow::onPreferencesClosed() {
+	preferencesDialog->deleteLater();
+	preferencesDialog = NULL;
+}
+void QalculateWindow::editPreferences() {
+	if(preferencesDialog) {
+		preferencesDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		preferencesDialog->show();
+		preferencesDialog->raise();
+		preferencesDialog->activateWindow();
+		return;
+	}
+	preferencesDialog = new PreferencesDialog(this);
+	connect(preferencesDialog, SIGNAL(resultFormatUpdated()), this, SLOT(resultFormatUpdated()));
+	connect(preferencesDialog, SIGNAL(resultDisplayUpdated()), this, SLOT(resultDisplayUpdated()));
+	connect(preferencesDialog, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
+	connect(preferencesDialog, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
+	connect(preferencesDialog, SIGNAL(alwaysOnTopChanged()), this, SLOT(onAlwaysOnTopChanged()));
+	connect(preferencesDialog, SIGNAL(titleTypeChanged()), this, SLOT(onTitleTypeChanged()));
+	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
+	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
+	preferencesDialog->show();
+}
 
 

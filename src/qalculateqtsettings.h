@@ -55,12 +55,13 @@ class QalculateQtSettings {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup;
-		int b_decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
+		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default;
+		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay;
 		int completion_min, completion_min2;
 		bool enable_completion, enable_completion2;
 		int color;
+		bool colorize_result;
 		bool first_time;
 		bool enable_input_method;
 		KnownVariable *vans[5], *v_memory;

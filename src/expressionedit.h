@@ -77,7 +77,6 @@ class ExpressionEdit : public QPlainTextEdit {
 		int block_text_change;
 		int do_completion_signal;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
-		bool display_expression_status;
 		int block_display_parse;
 		QString prev_parsed_expression, parsed_expression_tooltip;
 		bool expression_has_changed, expression_has_changed2;
@@ -105,7 +104,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
-		void displayParseStatus(bool = false);
+		void displayParseStatus(bool = false, bool = true);
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void keyPressEvent(QKeyEvent*) override;
 

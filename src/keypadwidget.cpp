@@ -248,6 +248,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	grid->addWidget(button, 0, c, 1, 1);
 	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getComma()), " ", "\n", 3, c)
 	button->setToolTip(tr("Argument separator"), tr("Blank space"), tr("New line"));
+	commaButton = button;
 	c++;
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
 	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true)));
@@ -266,6 +267,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	c++;
 	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getDecimalPoint()), " ", "\n", 3, c)
 	button->setToolTip(tr("Decimal point"), tr("Blank space"), tr("New line"));
+	dotButton = button;
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("2", "²", "½", 2, c)
 	button->setToolTip(QString(), "x<sup>2</sup>", "1/2");
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("5", "⁵", "⅕", 1, c)
@@ -353,6 +355,12 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::updateSymbols() {
+	commaButton->setText(QString::fromStdString(CALCULATOR->getComma()));
+	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
+	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));
+	dotButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getDecimalPoint()));
+}
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::StyleChange) {
 		acButton->setIcon(LOAD_ICON("edit-clear"));
