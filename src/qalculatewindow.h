@@ -13,6 +13,7 @@
 #define QALCULATE_WINDOW_H
 
 #include <QMainWindow>
+#include <QFont>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -65,8 +66,10 @@ class QalculateWindow : public QMainWindow {
 		QToolBar *tb;
 		QToolButton *menuAction, *modeAction;
 		QAction *toAction, *storeAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
-		QTimer *ecTimer;
+		QTimer *ecTimer, *rfTimer;
+		QFont saved_app_font;
 
 		bool send_event, bases_shown;
 
@@ -119,7 +122,10 @@ class QalculateWindow : public QMainWindow {
 		void onAlwaysOnTopChanged();
 		void onPreferencesClosed();
 		void onTitleTypeChanged();
-
+		void onResultFontChanged();
+		void onExpressionFontChanged();
+		void onKeypadFontChanged();
+		void onAppFontChanged();
 		void gradiansActivated();
 		void radiansActivated();
 		void degreesActivated();
@@ -127,11 +133,15 @@ class QalculateWindow : public QMainWindow {
 		void scientificActivated();
 		void simpleActivated();
 		void onPrecisionChanged(int);
+		void onMinDecimalsChanged(int);
+		void onMaxDecimalsChanged(int);
 		void outputBaseActivated();
 		void onCustomOutputBaseChanged(int);
 		void inputBaseActivated();
 		void onCustomInputBaseChanged(int);
 		void editPreferences();
+		void assumptionsTypeActivated();
+		void assumptionsSignActivated();
 
 	public slots:
 
@@ -145,7 +155,7 @@ class QalculateWindow : public QMainWindow {
 		void fetchExchangeRates();
 		void showAbout();
 		void expressionCalculationUpdated(int delay = 0);
-		void resultFormatUpdated();
+		void resultFormatUpdated(int delay = 0);
 		void resultDisplayUpdated();
 		void expressionFormatUpdated(bool);
 

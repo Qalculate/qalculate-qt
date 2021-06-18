@@ -48,7 +48,8 @@ class QalculateQtSettings {
 
 		void loadPreferences();
 		void savePreferences();
-
+		void updateStyle();
+		void updatePalette();
 		void updateMessagePrintOptions();
 
 		bool isAnswerVariable(Variable *v);
@@ -59,11 +60,15 @@ class QalculateQtSettings {
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay;
 		int completion_min, completion_min2;
+		int style, palette;
 		bool enable_completion, enable_completion2;
 		int color;
 		bool colorize_result;
 		bool first_time;
 		bool enable_input_method;
+		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
+		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
+		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
 		MathFunction *f_answer;

@@ -64,6 +64,16 @@ class PreferencesDialog : public QDialog {
 		void intervalDisplayChanged(int);
 		void limitImplicitToggled(bool);
 		void titleChanged(int);
+		void resultFontClicked();
+		void resultFontToggled(bool);
+		void expressionFontClicked();
+		void expressionFontToggled(bool);
+		void keypadFontClicked();
+		void keypadFontToggled(bool);
+		void appFontClicked();
+		void appFontToggled(bool);
+		void darkModeToggled(bool);
+		void styleChanged(int);
 
 	public:
 
@@ -78,6 +88,10 @@ class PreferencesDialog : public QDialog {
 		void expressionFormatUpdated(bool);
 		void alwaysOnTopChanged();
 		void titleTypeChanged();
+		void resultFontChanged();
+		void expressionFontChanged();
+		void keypadFontChanged();
+		void appFontChanged();
 		void symbolsUpdated();
 		void dialogClosed();
 

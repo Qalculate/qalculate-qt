@@ -31,6 +31,7 @@
 #include <QToolButton>
 #include <QSpinBox>
 #include <QWidgetAction>
+#include <QStyle>
 #include <QTimer>
 #include <QDebug>
 
@@ -172,6 +173,19 @@ std::string unhtmlize(std::string str, bool replace_all_i) {
 	return str;
 }
 
+#define ADD_SECTION(str) \
+	if(!menu->style()->styleHint(QStyle::SH_Menu_SupportsSections)) { \
+		aw = new QWidgetAction(this); \
+		QLabel *label = new QLabel(str, this); \
+		label->setAlignment(Qt::AlignCenter); \
+		aw->setDefaultWidget(label); \
+		menu->addSeparator(); \
+		menu->addAction(aw); \
+		menu->addSeparator(); \
+	} else { \
+		menu->addSection(str); \
+	}
+
 QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	QWidget *w_top = new QWidget(this);
@@ -180,6 +194,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	send_event = true;
 
 	ecTimer = NULL;
+	rfTimer = NULL;
 	preferencesDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
@@ -210,7 +225,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	modeAction->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	modeAction->setMenu(menu);
-	menu->addSection(tr("General display mode"));
+
+	ADD_SECTION(tr("General display mode"));
 	QFontMetrics fm1(menu->font());
 	w = fm1.boundingRect(tr("General display mode")).width() * 1.5;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
@@ -220,7 +236,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
 	action = menu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
-	menu->addSection(tr("Angle unit"));
+
+	ADD_SECTION(tr("Angle unit"));
 	w2 = fm1.boundingRect(tr("Angle unit")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action);
@@ -229,7 +246,38 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
 	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
-	menu->addSection(tr("Output base"));
+
+	ADD_SECTION(tr("Assumptions"));
+	menu2 = menu;
+	menu = menu2->addMenu(tr("Type", "Assumptions type"));
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true);
+	action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_TYPE_REAL); assumptionTypeActions[1] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_REAL) action->setChecked(true);
+	action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_TYPE_RATIONAL); assumptionTypeActions[2] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_RATIONAL) action->setChecked(true);
+	action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_TYPE_INTEGER); assumptionTypeActions[3] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_INTEGER) action->setChecked(true);
+	action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_TYPE_BOOLEAN); assumptionTypeActions[4] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_BOOLEAN) action->setChecked(true);
+	menu = menu2->addMenu(tr("Sign", "Assumptions sign"));
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_UNKNOWN); assumptionSignActions[0] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_UNKNOWN) action->setChecked(true);
+	action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_NONZERO); assumptionSignActions[1] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_NONZERO) action->setChecked(true);
+	action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_POSITIVE); assumptionSignActions[2] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_POSITIVE) action->setChecked(true);
+	action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_NONNEGATIVE); assumptionSignActions[3] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_NONNEGATIVE) action->setChecked(true);
+	action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_NEGATIVE); assumptionSignActions[4] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_NEGATIVE) action->setChecked(true);
+	action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(ASSUMPTION_SIGN_NONPOSITIVE); assumptionSignActions[5] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_NONPOSITIVE) action->setChecked(true);
+	menu = menu2;
+
+	ADD_SECTION(tr("Output base"));
 	QFontMetrics fmB(menu->font());
 	w2 = fm1.boundingRect(tr("Output base")).width() * 1.5; if(w2 > w) w = w2;
 	bool base_checked = false;
@@ -270,7 +318,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_E); if(settings->printops.base == BASE_E) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("√2"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_SQRT2); if(settings->printops.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
-	action = menu->addAction(tr("Custom"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Custom:", "Number base"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customOutputBaseAction = action;
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
@@ -279,11 +327,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QSpinBox *customOutputBaseEdit = new QSpinBox(this);
 	customOutputBaseEdit->setRange(INT_MIN, INT_MAX);
 	customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : settings->printops.base);
+	customOutputBaseEdit->setAlignment(Qt::AlignRight);
 	connect(customOutputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomOutputBaseChanged(int)));
-	awl->addWidget(customOutputBaseEdit, 0, Qt::AlignRight);
+	awl->addWidget(customOutputBaseEdit, 0);
 	menu->addAction(aw);
 	menu = menu2;
-	menu->addSection(tr("Input base"));
+
+	ADD_SECTION(tr("Input base"));
 	w2 = fm1.boundingRect(tr("Input base")).width() * 1.5; if(w2 > w) w = w2;
 	base_checked = false;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
@@ -315,7 +365,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_E); if(settings->evalops.parse_options.base == BASE_E) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("√2"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_SQRT2); if(settings->evalops.parse_options.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
-	action = menu->addAction(tr("Custom"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Custom:", "Number base"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customInputBaseAction = action;
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
@@ -324,22 +374,41 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QSpinBox *customInputBaseEdit = new QSpinBox(this);
 	customInputBaseEdit->setRange(INT_MIN, INT_MAX);
 	customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : settings->evalops.parse_options.base);
+	customInputBaseEdit->setAlignment(Qt::AlignRight);
 	connect(customInputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomInputBaseChanged(int)));
-	awl->addWidget(customInputBaseEdit, 0, Qt::AlignRight);
+	awl->addWidget(customInputBaseEdit, 0);
 	menu->addAction(aw);
 	menu = menu2;
 	menu->addSeparator();
+
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
 	aw->setDefaultWidget(aww);
-	awl = new QHBoxLayout(aww);
-	awl->addWidget(new QLabel(tr("Precision"), this), 1);
+	QGridLayout *awg = new QGridLayout(aww);
+	awg->addWidget(new QLabel(tr("Precision:"), this), 0, 0);
 	QSpinBox *precisionEdit = new QSpinBox(this);
 	precisionEdit->setRange(2, 10000);
 	precisionEdit->setValue(CALCULATOR->getPrecision());
+	precisionEdit->setAlignment(Qt::AlignRight);
 	connect(precisionEdit, SIGNAL(valueChanged(int)), this, SLOT(onPrecisionChanged(int)));
-	awl->addWidget(precisionEdit, 0, Qt::AlignRight);
+	awg->addWidget(precisionEdit, 0, 1);
+	awg->addWidget(new QLabel(tr("Min decimals:"), this), 1, 0);
+	QSpinBox *minDecimalsEdit = new QSpinBox(this);
+	minDecimalsEdit->setRange(0, 10000);
+	minDecimalsEdit->setValue(settings->printops.use_min_decimals ? settings->printops.min_decimals : 0);
+	minDecimalsEdit->setAlignment(Qt::AlignRight);
+	connect(minDecimalsEdit, SIGNAL(valueChanged(int)), this, SLOT(onMinDecimalsChanged(int)));
+	awg->addWidget(minDecimalsEdit, 1, 1);
+	awg->addWidget(new QLabel(tr("Max decimals:"), this), 2, 0);
+	QSpinBox *maxDecimalsEdit = new QSpinBox(this);
+	maxDecimalsEdit->setRange(-1, 10000);
+	maxDecimalsEdit->setSpecialValueText(tr("off", "Max decimals"));
+	maxDecimalsEdit->setValue(settings->printops.use_max_decimals ? settings->printops.max_decimals : -1);
+	maxDecimalsEdit->setAlignment(Qt::AlignRight);
+	connect(maxDecimalsEdit, SIGNAL(valueChanged(int)), this, SLOT(onMaxDecimalsChanged(int)));
+	awg->addWidget(maxDecimalsEdit, 2, 1);
 	menu->addAction(aw);
+
 	menu->setMinimumWidth(w);
 	tb->addWidget(modeAction);
 
@@ -446,6 +515,16 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	b_busy = 0;
 
 	expressionEdit->setFocus();
+
+	QFont saved_app_font = QApplication::font();
+	if(settings->custom_result_font.empty()) settings->custom_result_font = historyView->font().toString().toStdString();
+	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
+	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
+	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
+	if(settings->use_custom_app_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_app_font)); QApplication::setFont(font);}
+	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
+	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
+	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
 
 	connect(historyView, SIGNAL(insertTextRequested(std::string)), this, SLOT(onInsertTextRequested(std::string)));
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
@@ -745,8 +824,18 @@ void QalculateWindow::setPreviousExpression() {
 	}
 }
 
-void QalculateWindow::resultFormatUpdated() {
+void QalculateWindow::resultFormatUpdated(int delay) {
+	if(rfTimer) rfTimer->stop();
 	if(block_result_update) return;
+	if(delay > 0) {
+		if(!rfTimer) {
+			rfTimer = new QTimer();
+			rfTimer->setSingleShot(true);
+			connect(rfTimer, SIGNAL(timeout()), this, SLOT(resultFormatUpdated()));
+		}
+		rfTimer->start(delay);
+		return;
+	}
 	settings->updateMessagePrintOptions();
 	setResult(NULL, true, false, false);
 	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
@@ -4135,7 +4224,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 }
 
 void QalculateWindow::changeEvent(QEvent *e) {
-	if(e->type() == QEvent::StyleChange) {
+	if(e->type() == QEvent::PaletteChange) {
 		QColor c = historyView->palette().base().color();
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
@@ -4542,6 +4631,16 @@ void QalculateWindow::onPrecisionChanged(int v) {
 	CALCULATOR->setPrecision(v);
 	expressionCalculationUpdated(500);
 }
+void QalculateWindow::onMinDecimalsChanged(int v) {
+	settings->printops.use_min_decimals = (v > 0);
+	settings->printops.min_decimals = v;
+	resultFormatUpdated(500);
+}
+void QalculateWindow::onMaxDecimalsChanged(int v) {
+	settings->printops.use_max_decimals = (v >= 0);
+	settings->printops.max_decimals = v;
+	resultFormatUpdated(500);
+}
 void QalculateWindow::outputBaseActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	if(v == BASE_CUSTOM) {
@@ -4592,6 +4691,28 @@ void QalculateWindow::onCustomInputBaseChanged(int v) {
 	}
 	expressionFormatUpdated(false);
 }
+void QalculateWindow::assumptionsTypeActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
+	for(int i = 0; i < 5; i++) {
+		if(assumptionSignActions[i]->data().toInt() == CALCULATOR->defaultAssumptions()->sign()) {
+			assumptionSignActions[i]->setChecked(true);
+			break;
+		}
+	}
+	expressionCalculationUpdated();
+}
+void QalculateWindow::assumptionsSignActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
+	for(int i = 0; i < 4; i++) {
+		if(assumptionTypeActions[i]->data().toInt() == CALCULATOR->defaultAssumptions()->type()) {
+			assumptionTypeActions[i]->setChecked(true);
+			break;
+		}
+	}
+	expressionCalculationUpdated();
+}
 void QalculateWindow::onAlwaysOnTopChanged() {
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	else setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -4604,6 +4725,36 @@ void QalculateWindow::onTitleTypeChanged() {
 void QalculateWindow::onPreferencesClosed() {
 	preferencesDialog->deleteLater();
 	preferencesDialog = NULL;
+}
+void QalculateWindow::onResultFontChanged() {
+	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
+	else historyView->setFont(QApplication::font());
+}
+void QalculateWindow::onExpressionFontChanged() {
+	if(settings->use_custom_expression_font) {
+		QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);
+	} else {
+		QFont font = QApplication::font();
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
+		else font.setPointSize(font.pointSize() * 1.35);
+		expressionEdit->setFont(font);
+	}
+}
+void QalculateWindow::onKeypadFontChanged() {
+	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
+	else keypad->setFont(QApplication::font());
+}
+void QalculateWindow::onAppFontChanged() {
+	if(settings->use_custom_app_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_app_font)); QApplication::setFont(font);}
+	else QApplication::setFont(saved_app_font);
+	if(!settings->use_custom_expression_font) {
+		QFont font = QApplication::font();
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
+		else font.setPointSize(font.pointSize() * 1.35);
+		expressionEdit->setFont(font);
+	}
+	if(!settings->use_custom_result_font) historyView->setFont(QApplication::font());
+	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
 }
 void QalculateWindow::editPreferences() {
 	if(preferencesDialog) {
@@ -4620,6 +4771,10 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(preferencesDialog, SIGNAL(alwaysOnTopChanged()), this, SLOT(onAlwaysOnTopChanged()));
 	connect(preferencesDialog, SIGNAL(titleTypeChanged()), this, SLOT(onTitleTypeChanged()));
+	connect(preferencesDialog, SIGNAL(resultFontChanged()), this, SLOT(onResultFontChanged()));
+	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));
+	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
+	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	preferencesDialog->show();

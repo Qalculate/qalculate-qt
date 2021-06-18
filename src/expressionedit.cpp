@@ -2554,7 +2554,13 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 			str = ename->name;
 			str += item->preferredInputName(settings->printops.abbreviate_names && ename->abbreviation, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this).name;
 		} else {
-			std::string str2 = current_object_text.substr(i_match);
+			std::string str2;
+			if(i_match > 0) {
+				str2 = current_object_text.substr(i_match);
+				current_object_start += unicode_length(current_object_text.substr(0, i_match));
+			} else {
+				str2 = current_object_text;
+			}
 			ename_r = &item->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this);
 			if(settings->printops.abbreviate_names && ename_r->abbreviation) ename_r2 = &item->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this);
 			else ename_r2 = NULL;

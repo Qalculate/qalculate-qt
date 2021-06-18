@@ -20,13 +20,26 @@
 #include <QToolTip>
 #include <QComboBox>
 #include <QLabel>
+#include <QFontDialog>
+#include <QStyleFactory>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
 #include "preferencesdialog.h"
 
 #define BOX(t, x, f) box = new QCheckBox(t, this); l->addWidget(box); box->setChecked(x); connect(box, SIGNAL(toggled(bool)), this, SLOT(f));
-#define BOX_G(t, x, f) box = new QCheckBox(t, this); l2->addWidget(box, r, 0, 1, 2); box->setChecked(x); connect(box, SIGNAL(toggled(bool)), this, SLOT(f));
+#define BOX_G(t, x, f) box = new QCheckBox(t, this); l2->addWidget(box, r, 0, 1, 2); box->setChecked(x); connect(box, SIGNAL(toggled(bool)), this, SLOT(f)); r++;
+#define BOX_G1(t, x, f) box = new QCheckBox(t, this); l2->addWidget(box, r, 0); box->setChecked(x); connect(box, SIGNAL(toggled(bool)), this, SLOT(f));
+
+QString font_string(std::string str) {
+	size_t i = str.find(",");
+	if(i != std::string::npos && i < str.length() - 1) {
+		if(str[i + 1] != ' ') str.insert(i + 1, 1, ' ');
+		i = str.find(",", i + 1);
+		if(i != std::string::npos) str = str.substr(0, i);
+	}
+	return QString::fromStdString(str);
+}
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout *topbox = new QVBoxLayout(this);
@@ -37,17 +50,16 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	QWidget *w2 = new QWidget(this);
 	QWidget *w3 = new QWidget(this);
 	QWidget *w4 = new QWidget(this);
-	tabs->addTab(w1, tr("General"));
+	tabs->addTab(w1, tr("Look && Feel"));
 	tabs->addTab(w2, tr("Numbers && Operators"));
 	tabs->addTab(w3, tr("Units && Currencies"));
-	tabs->addTab(w4, tr("Fonts && Colors"));
+	tabs->addTab(w4, tr("Parsing && Calculation"));
 	QCheckBox *box; QVBoxLayout *l; QGridLayout *l2; QComboBox *combo;
-	l = new QVBoxLayout(w1);
-	BOX(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
-	BOX(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
-	BOX(tr("Display expression status"), settings->display_expression_status, expressionStatusToggled(bool));
 	int r = 0;
-	l2 = new QGridLayout();
+	l2 = new QGridLayout(w1);
+	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
+	BOX_G(tr("Display expression status"), settings->display_expression_status, expressionStatusToggled(bool));
+	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Application name"), TITLE_APP);
@@ -56,6 +68,31 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->title_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(titleChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(new QLabel(tr("Style:"), this), r, 0);
+	combo = new QComboBox(this);
+	QStringList list = QStyleFactory::keys();
+	combo->addItem(tr("Default (requires restart)", "Default style"));
+	combo->addItems(list);
+	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
+	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
+	BOX_G1(tr("Custom result font"), settings->use_custom_result_font, resultFontToggled(bool)); 
+	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX_G1(tr("Custom expression font"), settings->use_custom_expression_font, expressionFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_expression_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(expressionFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX_G1(tr("Custom keypad font"), settings->use_custom_keypad_font, keypadFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_keypad_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_app_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	l2->setRowStretch(r, 1);
+	r = 0;
+	l2 = new QGridLayout(w4);
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -66,8 +103,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.parse_options.parsing_mode));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(parsingModeChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
-	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool)); r++;
-	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool)); r++;
+	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
+	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Variance formula"), INTERVAL_CALCULATION_VARIANCE_FORMULA);
@@ -75,8 +112,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.interval_calculation));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalCalculationChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
-	l->addLayout(l2);
-	l->addStretch(1);
+	l2->setRowStretch(r, 1);
 	l = new QVBoxLayout(w2);
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
@@ -126,7 +162,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l->addStretch(1);
 	l2 = new QGridLayout(w3);
 	r = 0;
-	BOX_G(tr("Use binary prefixes for information units"), CALCULATOR->usesBinaryPrefixes() > 0, binaryPrefixesToggled(bool)); r++;
+	BOX_G(tr("Use binary prefixes for information units"), CALCULATOR->usesBinaryPrefixes() > 0, binaryPrefixesToggled(bool));
 	l2->addWidget(new QLabel(tr("Automatic unit conversion:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("No conversion"), POST_CONVERSION_NONE);
@@ -136,7 +172,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.auto_post_conversion));
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(conversionChanged(int)));
-	BOX_G(tr("Convert to mixed units"), settings->evalops.mixed_units_conversion != MIXED_UNITS_CONVERSION_NONE, mixedUnitsToggled(bool)); r++;
+	BOX_G(tr("Convert to mixed units"), settings->evalops.mixed_units_conversion != MIXED_UNITS_CONVERSION_NONE, mixedUnitsToggled(bool));
 	l2->addWidget(new QLabel(tr("Automatic unit prefixes:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Default"));
@@ -151,9 +187,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	else combo->setCurrentIndex(2);
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(prefixesChanged(int)));
-	BOX_G(tr("Enable all SI-prefixes"), settings->printops.use_all_prefixes, allPrefixesToggled(bool)); r++;
-	BOX_G(tr("Enable denominator prefixes"), settings->printops.use_denominator_prefix, denominatorPrefixToggled(bool)); r++;
-	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool)); r++;
+	BOX_G(tr("Enable all SI-prefixes"), settings->printops.use_all_prefixes, allPrefixesToggled(bool));
+	BOX_G(tr("Enable denominator prefixes"), settings->printops.use_denominator_prefix, denominatorPrefixToggled(bool));
+	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool));
 	l2->addWidget(new QLabel(tr("Temperature calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Absolute"), TEMPERATURE_CALCULATION_ABSOLUTE);
@@ -163,11 +199,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l2->addWidget(box, r, 0);
-	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days")); spin->setValue(settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
+	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days")); spin->setValue(settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); spin->setAlignment(Qt::AlignRight); exratesSpin = spin; r++;
 	l2->setRowStretch(r, 1);
-	l = new QVBoxLayout(w4);
-	BOX(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
-	l->addStretch(1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
@@ -344,6 +377,79 @@ void PreferencesDialog::limitImplicitToggled(bool b) {
 void PreferencesDialog::titleChanged(int i) {
 	settings->title_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit titleTypeChanged();
+}
+void PreferencesDialog::resultFontClicked() {
+	bool ok = true;
+	QFont font; font.fromString(QString::fromStdString(settings->custom_result_font));
+	font = QFontDialog::getFont(&ok, font);
+	if(ok) {
+		settings->save_custom_result_font = true;
+		settings->use_custom_result_font = true;
+		settings->custom_result_font = font.toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_result_font));
+		emit resultFontChanged();
+	}
+}
+void PreferencesDialog::resultFontToggled(bool b) {
+	settings->use_custom_result_font = b;
+	emit resultFontChanged();
+}
+void PreferencesDialog::expressionFontClicked() {
+	bool ok = true;
+	QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font));
+	font = QFontDialog::getFont(&ok, font);
+	if(ok) {
+		settings->save_custom_expression_font = true;
+		settings->use_custom_expression_font = true;
+		settings->custom_expression_font = font.toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_expression_font));
+		emit expressionFontChanged();
+	}
+}
+void PreferencesDialog::expressionFontToggled(bool b) {
+	settings->use_custom_expression_font = b;
+	emit expressionFontChanged();
+}
+void PreferencesDialog::keypadFontClicked() {
+	bool ok = true;
+	QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font));
+	font = QFontDialog::getFont(&ok, font);
+	if(ok) {
+		settings->save_custom_keypad_font = true;
+		settings->use_custom_keypad_font = true;
+		settings->custom_keypad_font = font.toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_keypad_font));
+		emit keypadFontChanged();
+	}
+}
+void PreferencesDialog::keypadFontToggled(bool b) {
+	settings->use_custom_keypad_font = b;
+	emit keypadFontChanged();
+}
+void PreferencesDialog::appFontClicked() {
+	bool ok = true;
+	QFont font; font.fromString(QString::fromStdString(settings->custom_app_font));
+	font = QFontDialog::getFont(&ok, font);
+	if(ok) {
+		settings->save_custom_app_font = true;
+		settings->use_custom_app_font = true;
+		settings->custom_app_font = font.toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_app_font));
+		emit appFontChanged();
+	}
+}
+void PreferencesDialog::appFontToggled(bool b) {
+	settings->use_custom_app_font = b;
+	emit appFontChanged();
+}
+void PreferencesDialog::darkModeToggled(bool b) {
+	if(b) settings->palette = 1;
+	else settings->palette = -1;
+	settings->updatePalette();
+}
+void PreferencesDialog::styleChanged(int i) {
+	settings->style = i - 1;
+	settings->updateStyle();
 }
 void PreferencesDialog::closeEvent(QCloseEvent *e) {
 	QDialog::closeEvent(e);

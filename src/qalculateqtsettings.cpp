@@ -12,6 +12,9 @@
 #include "qalculateqtsettings.h"
 
 #include <QApplication>
+#include <QPalette>
+#include <QStyle>
+#include <QStyleFactory>
 #include <QWidget>
 #include <QMessageBox>
 #include <QColor>
@@ -174,6 +177,20 @@ void QalculateQtSettings::loadPreferences() {
 	always_on_top = false;
 	display_expression_status = true;
 	prefixes_default = true;
+	use_custom_result_font = false;
+	use_custom_expression_font = false;
+	use_custom_keypad_font = false;
+	use_custom_app_font = false;
+	save_custom_result_font = false;
+	save_custom_expression_font = false;
+	save_custom_keypad_font = false;
+	save_custom_app_font = false;
+	custom_result_font = "";
+	custom_expression_font = "";
+	custom_keypad_font = "";
+	custom_app_font = "";
+	style = -1;
+	palette = -1;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -219,6 +236,10 @@ void QalculateQtSettings::loadPreferences() {
 					splitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
+				} else if(svar == "style") {
+					style = v;
+				} else if(svar == "palette") {
+					palette = v;
 				} else if(svar == "color") {
 					colorize_result = v;
 				} else if(svar == "ignore_locale") {
@@ -246,29 +267,32 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "completion_delay") {
 					if(v < 0) v = 0;
 					completion_delay = v;
+				} else if(svar == "use_custom_result_font") {
+					use_custom_result_font = v;
+				} else if(svar == "use_custom_expression_font") {
+					use_custom_expression_font = v;
+				} else if(svar == "use_custom_keypad_font") {
+					use_custom_keypad_font = v;
+				} else if(svar == "use_custom_application_font") {
+					use_custom_app_font = v;
+				} else if(svar == "custom_result_font") {
+					custom_result_font = svalue;
+					save_custom_result_font = true;
+				} else if(svar == "custom_expression_font") {
+					custom_expression_font = svalue;
+					save_custom_expression_font = true;
+				} else if(svar == "custom_keypad_font") {
+					custom_keypad_font = svalue;
+					save_custom_keypad_font = true;
+				} else if(svar == "custom_application_font") {
+					custom_app_font = svalue;
+					save_custom_app_font = true;
 				/*} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
 					last_version_check_date.set(svalue);
 				} else if(svar == "last_found_version") {
 					last_found_version = svalue;
-				} else if(svar == "enable_completion") {
-					enable_completion = v;
-				} else if(svar == "enable_completion2") {
-					enable_completion2 = v;
-				} else if(svar == "completion_min") {
-					if(v < 1) v = 1;
-					completion_min = v;
-				} else if(svar == "completion_min2") {
-					if(v < 1) v = 1;
-					completion_min2 = v;
-				} else if(svar == "completion_delay") {
-					if(v < 0) v = 0;
-					completion_delay = v;
-				} else if(svar == "programming_outbase") {
-					programming_outbase = v;
-				} else if(svar == "programming_inbase") {
-					programming_inbase = v;
 				} else if(svar == "bit_width") {
 					default_bits = v;
 				} else if(svar == "signed_integer") {
@@ -523,6 +547,54 @@ void QalculateQtSettings::loadPreferences() {
 		CALCULATOR->v_i->setChanged(false);
 	}
 
+	if(style >= 0) updateStyle();
+	else if(palette >= 0) updatePalette();
+
+}
+void QalculateQtSettings::updatePalette() {
+	QPalette p;
+	if(palette == 1) {
+		p.setColor(QPalette::Active, QPalette::Window, QColor(42, 46, 50));
+		p.setColor(QPalette::Active, QPalette::WindowText, QColor(252, 252, 252));
+		p.setColor(QPalette::Active, QPalette::Base, QColor(27, 30, 32));
+		p.setColor(QPalette::Active, QPalette::AlternateBase, QColor(35, 38, 41));
+		p.setColor(QPalette::Active, QPalette::ToolTipBase, QColor(49, 54, 59));
+		p.setColor(QPalette::Active, QPalette::ToolTipText, QColor(252, 252, 252));
+		p.setColor(QPalette::Active, QPalette::PlaceholderText, QColor(161, 169, 177));
+		p.setColor(QPalette::Active, QPalette::Text, QColor(252, 252, 252));
+		p.setColor(QPalette::Active, QPalette::Button, QColor(49, 54, 59));
+		p.setColor(QPalette::Active, QPalette::ButtonText, QColor(252, 252, 252));
+		p.setColor(QPalette::Active, QPalette::BrightText, QColor(39, 174, 96));
+		p.setColor(QPalette::Inactive, QPalette::Window, QColor(42, 46, 50));
+		p.setColor(QPalette::Inactive, QPalette::WindowText, QColor(252, 252, 252));
+		p.setColor(QPalette::Inactive, QPalette::Base, QColor(27, 30, 32));
+		p.setColor(QPalette::Inactive, QPalette::AlternateBase, QColor(35, 38, 41));
+		p.setColor(QPalette::Inactive, QPalette::ToolTipBase, QColor(49, 54, 59));
+		p.setColor(QPalette::Inactive, QPalette::ToolTipText, QColor(252, 252, 252));
+		p.setColor(QPalette::Inactive, QPalette::PlaceholderText, QColor(161, 169, 177));
+		p.setColor(QPalette::Inactive, QPalette::Text, QColor(252, 252, 252));
+		p.setColor(QPalette::Inactive, QPalette::Button, QColor(49, 54, 59));
+		p.setColor(QPalette::Inactive, QPalette::ButtonText, QColor(252, 252, 252));
+		p.setColor(QPalette::Inactive, QPalette::BrightText, QColor(39, 174, 96));
+		p.setColor(QPalette::Disabled, QPalette::Window, QColor(42, 46, 50));
+		p.setColor(QPalette::Disabled, QPalette::WindowText, QColor(101, 101, 191));
+		p.setColor(QPalette::Disabled, QPalette::Base, QColor(27, 30, 32));
+		p.setColor(QPalette::Disabled, QPalette::AlternateBase, QColor(35, 38, 41));
+		p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(49, 54, 59));
+		p.setColor(QPalette::Disabled, QPalette::ToolTipText, QColor(161, 252, 252));
+		p.setColor(QPalette::Disabled, QPalette::PlaceholderText, QColor(161, 169, 177));
+		p.setColor(QPalette::Disabled, QPalette::Text, QColor(101, 101, 101));
+		p.setColor(QPalette::Disabled, QPalette::Button, QColor(47, 52, 56));
+		p.setColor(QPalette::Disabled, QPalette::ButtonText,QColor(101, 101, 101));
+		p.setColor(QPalette::Disabled, QPalette::BrightText, QColor(39, 174, 96));
+	} else {
+		p = QApplication::style()->standardPalette();
+	}
+	QApplication::setPalette(p);
+}
+void QalculateQtSettings::updateStyle() {
+	if(style >= 0 && style < QStyleFactory::keys().count()) QApplication::setStyle(QStyleFactory::create(QStyleFactory::keys().at(style)));
+	updatePalette();
 }
 void QalculateQtSettings::savePreferences() {
 
@@ -553,7 +625,17 @@ void QalculateQtSettings::savePreferences() {
 		gsub("\n", " ", expression_history[i]);
 		fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
 	}
+	fprintf(file, "style=%i\n", style);
+	fprintf(file, "palette=%i\n", palette);
 	fprintf(file, "color=%i\n", colorize_result);
+	fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
+	fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
+	fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);
+	fprintf(file, "use_custom_application_font=%i\n", use_custom_app_font);
+	if(use_custom_result_font || save_custom_result_font) fprintf(file, "custom_result_font=%s\n", custom_result_font.c_str());
+	if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
+	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
+	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
