@@ -98,6 +98,8 @@ HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
 	document()->addResource(QTextDocument::ImageResource, QUrl("data://img1px.png"), QVariant(img1px));
+	setTextColor(palette().text().color());
+	prev_color = textColor();
 	cmenu = NULL;
 }
 HistoryView::~HistoryView() {}
@@ -141,16 +143,17 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	for(size_t i = 0; i < values.size(); i++) {
 		QFontMetrics fm(font());
 		int w = fm.boundingRect(unhtmlize(QString::fromStdString(values[i]))).width();
+		str += "<div style=\"text-align:right";
 		if(w > width() * 2) {
-			str += "<div style=\"text-align:right\">";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 2 > width()) {
-			str += "<div style=\"text-align:right; font-size:large\">";
+			str += "; font-size:large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		} else {
-			str += "<div style=\"text-align:right; font-size:x-large\">";
+			str += "; font-size:x-large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		}
+		str += "\">";
 		if(exact || i < values.size() - 1) str += "= ";
 		else str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
@@ -195,7 +198,36 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(!s_text.isEmpty()) str += "<hr/>";
 		s_text.insert(0, str);
 	}
-	setHtml(s_text);
+	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
+}
+void HistoryView::changeEvent(QEvent *e) {
+	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
+		setTextColor(palette().text().color());
+		if(!s_text.isEmpty()) {
+			if(settings->color == 2) {
+				s_text.replace("color: #800000", "color: #AAAAFF");
+				s_text.replace("color: #000080", "color: #FFAAAA");
+				s_text.replace("color:#005858", "color:#AAFFFF");
+				s_text.replace("color:#585800", "color:#FFFFAA");
+				s_text.replace("color:#580058", "color:#FFAAFF");
+				s_text.replace("color:#000080", "color:#FFAAAA");
+				s_text.replace("color:#008000", "color:#BBFFBB");
+				s_text.replace(":/icons/actions", ":/icons/dark/actions");
+			} else {
+				s_text.replace("color: #AAAAFF", "color: #800000");
+				s_text.replace("color: #FFAAAA", "color: #000080");
+				s_text.replace("color:#AAFFFF", "color:#005858");
+				s_text.replace("color:#FFFFAA", "color:#585800");
+				s_text.replace("color:#FFAAFF", "color:#580058");
+				s_text.replace("color:#FFAAAA", "color:#000080");
+				s_text.replace("color:#BBFFBB", "color:#008000");
+				s_text.replace(":/icons/dark/actions", ":/icons/actions");
+			}
+			setHtml("<body style=\"color: " + textColor().name() + "\">" + s_text + "</body>");
+		}
+		prev_color = textColor();
+	}
+	QTextBrowser::changeEvent(e);
 }
 void HistoryView::addMessages() {
 	std::vector<std::string> values;

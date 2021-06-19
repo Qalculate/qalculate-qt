@@ -58,7 +58,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	int r = 0;
 	l2 = new QGridLayout(w1);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
-	BOX_G(tr("Display expression status"), settings->display_expression_status, expressionStatusToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -87,12 +86,22 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G1(tr("Custom keypad font"), settings->use_custom_keypad_font, keypadFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_keypad_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
+	/*BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_app_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));*/
 	l2->setRowStretch(r, 1);
 	r = 0;
 	l2 = new QGridLayout(w4);
+	BOX_G(tr("Display expression status"), settings->display_expression_status, expressionStatusToggled(bool));
+	l2->addWidget(new QLabel(tr("Expression after calculation:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Keep expression"), KEEP_EXPRESSION);
+	combo->addItem(tr("Clear expression"), CLEAR_EXPRESSION);
+	combo->addItem(tr("Replace with result"), REPLACE_EXPRESSION_WITH_RESULT);
+	combo->addItem(tr("Replace with result if shorter"), REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER);
+	combo->setCurrentIndex(combo->findData(settings->replace_expression));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -112,6 +121,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.interval_calculation));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalCalculationChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Factorize result"), settings->evalops.structuring == STRUCTURING_FACTORIZE, factorizeToggled(bool));
 	l2->setRowStretch(r, 1);
 	l = new QVBoxLayout(w2);
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
@@ -451,8 +461,16 @@ void PreferencesDialog::styleChanged(int i) {
 	settings->style = i - 1;
 	settings->updateStyle();
 }
+void PreferencesDialog::factorizeToggled(bool b) {
+	if(b) settings->evalops.structuring = STRUCTURING_FACTORIZE;
+	else settings->evalops.structuring = STRUCTURING_EXPAND;
+	emit expressionCalculationUpdated(0);
+}
 void PreferencesDialog::closeEvent(QCloseEvent *e) {
 	QDialog::closeEvent(e);
 	emit dialogClosed();
+}
+void PreferencesDialog::replaceExpressionChanged(int i) {
+	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 }
 

@@ -362,7 +362,7 @@ void KeypadWidget::updateSymbols() {
 	dotButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getDecimalPoint()));
 }
 void KeypadWidget::changeEvent(QEvent *e) {
-	if(e->type() == QEvent::StyleChange) {
+	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
 		acButton->setIcon(LOAD_ICON("edit-clear"));
 		delButton->setIcon(LOAD_ICON("edit-delete"));
 		backButton->setIcon(LOAD_ICON("go-back"));

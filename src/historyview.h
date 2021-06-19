@@ -18,6 +18,7 @@ class QImage;
 class QMenu;
 class QAction;
 class ExpressionEdit;
+class QColor;
 
 class HistoryView : public QTextBrowser {
 
@@ -41,11 +42,13 @@ class HistoryView : public QTextBrowser {
 		std::vector<std::string> v_text;
 		QMenu *cmenu;
 		QAction *copyAction, *selectAllAction, *clearAction;
+		QColor prev_color;
 
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void keyPressEvent(QKeyEvent *e) override;
 		void inputMethodEvent(QInputMethodEvent*) override;
+		void changeEvent(QEvent*) override;
 
 	public slots:
 

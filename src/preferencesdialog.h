@@ -74,6 +74,8 @@ class PreferencesDialog : public QDialog {
 		void appFontToggled(bool);
 		void darkModeToggled(bool);
 		void styleChanged(int);
+		void factorizeToggled(bool);
+		void replaceExpressionChanged(int);
 
 	public:
 

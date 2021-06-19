@@ -42,6 +42,7 @@
 #include "keypadwidget.h"
 #include "variableeditdialog.h"
 #include "preferencesdialog.h"
+#include "functionsdialog.h"
 
 class ViewThread : public Thread {
 protected:
@@ -92,6 +93,14 @@ extern void fix_to_struct(MathStructure &m);
 extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1);
 extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
 extern int has_information_unit(const MathStructure &m, bool top = true);
+
+bool contains_unknown_variable(const MathStructure &m) {
+	if(m.isVariable()) return !m.variable()->isKnown();
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_unknown_variable(m[i])) return true;
+	}
+	return false;
+}
 
 std::string print_with_evalops(const Number &nr) {
 	PrintOptions po;
@@ -196,6 +205,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ecTimer = NULL;
 	rfTimer = NULL;
 	preferencesDialog = NULL;
+	functionsDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
 	QHBoxLayout *hLayout = new QHBoxLayout();
@@ -247,9 +257,22 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
 
-	ADD_SECTION(tr("Assumptions"));
+	ADD_SECTION(tr("Approximation"));
+	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	action = menu->addAction(tr("Automatic", "Automatic approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(-1); assumptionTypeActions[0] = action; if(settings->dual_approximation < 0) action->setChecked(true);
+	action = menu->addAction(tr("Dual", "Dual approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(-2); assumptionTypeActions[0] = action; if(settings->dual_approximation > 0) action->setChecked(true);
+	action = menu->addAction(tr("Exact", "Exact approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(APPROXIMATION_EXACT); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_EXACT) action->setChecked(true);
+	action = menu->addAction(tr("Approximate"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(APPROXIMATION_APPROXIMATE); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_APPROXIMATE) action->setChecked(true);
+
+	menu->addSeparator();
 	menu2 = menu;
-	menu = menu2->addMenu(tr("Type", "Assumptions type"));
+	menu = menu2->addMenu(tr("Assumptions"));
+	ADD_SECTION(tr("Type", "Assumptions type"));
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 	action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true);
@@ -261,7 +284,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(ASSUMPTION_TYPE_INTEGER); assumptionTypeActions[3] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_INTEGER) action->setChecked(true);
 	action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_TYPE_BOOLEAN); assumptionTypeActions[4] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_BOOLEAN) action->setChecked(true);
-	menu = menu2->addMenu(tr("Sign", "Assumptions sign"));
+	ADD_SECTION(tr("Sign", "Assumptions sign"));
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 	action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_SIGN_UNKNOWN); assumptionSignActions[0] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_UNKNOWN) action->setChecked(true);
@@ -278,7 +301,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu = menu2;
 
 	ADD_SECTION(tr("Output base"));
-	QFontMetrics fmB(menu->font());
 	w2 = fm1.boundingRect(tr("Output base")).width() * 1.5; if(w2 > w) w = w2;
 	bool base_checked = false;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
@@ -418,6 +440,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"));
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
 	tb->addAction(storeAction);
+	functionsAction = new QAction(LOAD_ICON("function"), tr("Functions"));
+	connect(functionsAction, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
+	tb->addAction(functionsAction);
 	keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"));
 	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
 	keypadAction->setCheckable(true);
@@ -459,7 +484,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(decLabel, 2, 0);
 	hexLabel = new QLabel(tr("Hexadecimal:"));
 	basesGrid->addWidget(hexLabel, 3, 0);
-	binEdit = new QLabel();
+	binEdit = new QLabel("0000 0000 0000 0000 0000 0000 0000 0000\n0000 0000 0000 0000 0000 0000 0000 0000");
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	binEdit->setFocusPolicy(Qt::NoFocus);
 	QFontMetrics fm2(binEdit->font());
@@ -467,19 +492,19 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
-	octEdit = new QLabel();
+	octEdit = new QLabel("0");
 	octEdit->setAlignment(Qt::AlignRight);
 	octEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	octEdit->setFocusPolicy(Qt::NoFocus);
 	octEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(octEdit, 1, 1);
-	decEdit = new QLabel();
+	decEdit = new QLabel("0");
 	decEdit->setAlignment(Qt::AlignRight);
 	decEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	decEdit->setFocusPolicy(Qt::NoFocus);
 	decEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(decEdit, 2, 1);
-	hexEdit = new QLabel();
+	hexEdit = new QLabel("0");
 	hexEdit->setAlignment(Qt::AlignRight);
 	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	hexEdit->setFocusPolicy(Qt::NoFocus);
@@ -556,7 +581,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
-	else resize(550, 550);
+	else resize(600, 650);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 	bases_shown = !settings->window_state.isEmpty();
@@ -2959,15 +2984,20 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}*/
 		expressionEdit->blockCompletion();
 		expressionEdit->blockParseStatus();
-		if(!execute_str.empty()) {
-			from_str = execute_str;
-			CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
-		}
-		if(!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str)) {
-			if(exact_text == "0") expressionEdit->clear();
-			else expressionEdit->setPlainText(QString::fromStdString(exact_text));
-		} else {
-			expressionEdit->setPlainText(QString::fromStdString(from_str));
+		if(settings->replace_expression == CLEAR_EXPRESSION) {
+			expressionEdit->clear();
+		} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
+			if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
+				if(exact_text == "0") expressionEdit->clear();
+				else if(exact_text.empty()) expressionEdit->setPlainText(QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct))));
+				else expressionEdit->setPlainText(QString::fromStdString(exact_text));
+			} else {
+				if(!execute_str.empty()) {
+					from_str = execute_str;
+					CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
+				}
+				expressionEdit->setPlainText(QString::fromStdString(from_str));
+			}
 		}
 		if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 		expressionEdit->selectAll();
@@ -3944,14 +3974,6 @@ void ViewThread::run() {
 	}
 }
 
-bool contains_unknown_variable(const MathStructure &m) {
-	if(m.isVariable()) return !m.variable()->isKnown();
-	for(size_t i = 0; i < m.size(); i++) {
-		if(contains_unknown_variable(m[i])) return true;
-	}
-	return false;
-}
-
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, size_t stack_index, bool register_moved, bool supress_dialog) {
 
 	if(block_result_update) return;
@@ -4224,20 +4246,27 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 }
 
 void QalculateWindow::changeEvent(QEvent *e) {
-	if(e->type() == QEvent::PaletteChange) {
-		QColor c = historyView->palette().base().color();
+	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
+		QColor c = QApplication::palette().base().color();
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
 		menuAction->setIcon(LOAD_ICON("menu"));
 		toAction->setIcon(LOAD_ICON("convert"));
 		storeAction->setIcon(LOAD_ICON("document-save"));
+		functionsAction->setIcon(LOAD_ICON("function"));
 		keypadAction->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
 		modeAction->setIcon(LOAD_ICON("configure"));
-	} else if(e->type() == QEvent::FontChange) {
-		QFontMetrics fm2(binEdit->font());
+	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
+		QFontMetrics fm2(QApplication::font());
 		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
 		binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
+		if(!settings->use_custom_expression_font) {
+			QFont font = QApplication::font();
+			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
+			else font.setPointSize(font.pointSize() * 1.35);
+			expressionEdit->setFont(font);
+		}
 	}
 	QMainWindow::changeEvent(e);
 }
@@ -4512,6 +4541,7 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_geometry = saveGeometry();
 	settings->splitter_state = ehSplitter->saveState();
 	settings->savePreferences();
+	CALCULATOR->saveDefinitions();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
 }
@@ -4640,6 +4670,17 @@ void QalculateWindow::onMaxDecimalsChanged(int v) {
 	settings->printops.use_max_decimals = (v >= 0);
 	settings->printops.max_decimals = v;
 	resultFormatUpdated(500);
+}
+void QalculateWindow::approximationActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	if(v < 0) {
+		settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
+		if(v == -2) settings->dual_approximation = 1;
+		else settings->dual_approximation = -1;
+	} else {
+		settings->evalops.approximation = (ApproximationMode) v;
+	}
+	expressionCalculationUpdated();
 }
 void QalculateWindow::outputBaseActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
@@ -4778,6 +4819,41 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	preferencesDialog->show();
+}
+void QalculateWindow::applyFunction(MathFunction *f) {
+	if(b_busy) return;
+	/*if(settings->rpn_mode) {
+		calculateRPN(f);
+		return;
+	}*/
+	QString str = QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name);
+	if(f->args() == 0) {
+		str += "()";
+	} else {
+		str += "(";
+		str += expressionEdit->toPlainText();
+		str += ")";
+	}
+	expressionEdit->blockParseStatus();
+	expressionEdit->blockUndo();
+	expressionEdit->clear();
+	expressionEdit->blockUndo(false);
+	expressionEdit->setPlainText(str);
+	expressionEdit->blockParseStatus(false);
+	calculate();
+}
+void QalculateWindow::openFunctions() {
+	if(functionsDialog) {
+		functionsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		functionsDialog->show();
+		functionsDialog->raise();
+		functionsDialog->activateWindow();
+		return;
+	}
+	functionsDialog = new FunctionsDialog(this);
+	connect(functionsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
+	functionsDialog->show();
 }
 
 

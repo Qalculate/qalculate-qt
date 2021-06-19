@@ -30,11 +30,19 @@ bool can_display_unicode_string_function(const char *str, void *w);
 std::string unhtmlize(std::string str, bool replace_all_i = false);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
+bool string_is_less(std::string str1, std::string str2);
 
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
 	TITLE_APP_RESULT
+};
+
+enum {
+	KEEP_EXPRESSION,
+	REPLACE_EXPRESSION_WITH_RESULT,
+	REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER,
+	CLEAR_EXPRESSION
 };
 
 DECLARE_BUILTIN_FUNCTION(AnswerFunction, 0)
@@ -68,6 +76,7 @@ class QalculateQtSettings {
 		bool enable_input_method;
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
+		int replace_expression;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

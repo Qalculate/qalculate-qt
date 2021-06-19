@@ -24,6 +24,18 @@ bool can_display_unicode_string_function(const char*, void*) {
 	return true;
 }
 
+bool string_is_less(std::string str1, std::string str2) {
+	size_t i = 0;
+	bool b_uni = false;
+	while(i < str1.length() && i < str2.length()) {
+		if(str1[i] == str2[i]) i++;
+		else if(str1[i] < 0 || str2[i] < 0) {b_uni = true; break;}
+		else return str1[i] < str2[i];
+	}
+	if(b_uni) return QString::fromStdString(str1).compare(QString::fromStdString(str2)) < 0;
+	return str1 < str2;
+}
+
 AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, CALCULATOR->f_warning->category(), QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName("answer");
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
@@ -160,7 +172,7 @@ void QalculateQtSettings::loadPreferences() {
 	adaptive_interval_display = true;
 	tc_set = false;
 	dual_fraction = -1;
-	dual_approximation = 1;
+	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
 	rpn_mode = false;
 	caret_as_xor = false;
@@ -191,6 +203,7 @@ void QalculateQtSettings::loadPreferences() {
 	custom_app_font = "";
 	style = -1;
 	palette = -1;
+	replace_expression = KEEP_EXPRESSION;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -230,6 +243,8 @@ void QalculateQtSettings::loadPreferences() {
 					clear_history_on_exit = v;*/
 				} else if(svar == "window_state") {
 					window_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "replace_expression") {
+					replace_expression = v;
 				} else if(svar == "window_geometry") {
 					window_geometry = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "splitter_state") {
@@ -337,8 +352,19 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "number_fraction_format") {
 					if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
 						printops.number_fraction_format = (NumberFractionFormat) v;
+						printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
+						dual_fraction = 0;
+					} else if(v == FRACTION_COMBINED + 1) {
+						printops.number_fraction_format = FRACTION_FRACTIONAL;
+						printops.restrict_fraction_length = false;
+						dual_fraction = 0;
+					} else if(v == FRACTION_COMBINED + 2) {
+						printops.number_fraction_format = FRACTION_DECIMAL;
+						dual_fraction = 1;
+					} else if(v < 0) {
+						printops.number_fraction_format = FRACTION_DECIMAL;
+						dual_fraction = -1;
 					}
-					printops.restrict_fraction_length = (printops.number_fraction_format >= FRACTION_FRACTIONAL);
 				} else if(svar == "complex_number_form") {
 					if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
 						evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
@@ -438,6 +464,12 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "approximation") {
 					if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
 						evalops.approximation = (ApproximationMode) v;
+					} else if(v == APPROXIMATION_APPROXIMATE + 1) {
+						evalops.approximation = APPROXIMATION_TRY_EXACT;
+						dual_approximation = 1;
+					} else if(v < 0) {
+						evalops.approximation = APPROXIMATION_TRY_EXACT;
+						dual_approximation = -1;
 					}
 				} else if(svar == "interval_calculation") {
 					if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
@@ -577,7 +609,7 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Inactive, QPalette::ButtonText, QColor(252, 252, 252));
 		p.setColor(QPalette::Inactive, QPalette::BrightText, QColor(39, 174, 96));
 		p.setColor(QPalette::Disabled, QPalette::Window, QColor(42, 46, 50));
-		p.setColor(QPalette::Disabled, QPalette::WindowText, QColor(101, 101, 191));
+		p.setColor(QPalette::Disabled, QPalette::WindowText, QColor(101, 101, 101));
 		p.setColor(QPalette::Disabled, QPalette::Base, QColor(27, 30, 32));
 		p.setColor(QPalette::Disabled, QPalette::AlternateBase, QColor(35, 38, 41));
 		p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(49, 54, 59));
@@ -614,6 +646,7 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
 	fprintf(file, "always_on_top=%i\n", always_on_top);
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
+	fprintf(file, "ignore_locale=%i\n", ignore_locale);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "display_expression_status=%i\n", display_expression_status);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
@@ -636,6 +669,7 @@ void QalculateQtSettings::savePreferences() {
 	if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
+	fprintf(file, "replace_expression=%i\n", replace_expression);
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
@@ -662,6 +696,9 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "min_exp=%i\n", printops.min_exp);
 	fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
 	fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
+	if(dual_fraction < 0) fprintf(file, "number_fraction_format=%i\n", -1);
+	else if(dual_fraction > 0) fprintf(file, "number_fraction_format=%i\n", FRACTION_COMBINED + 2);
+	else fprintf(file, "number_fraction_format=%i\n", printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL ? FRACTION_COMBINED + 1 : printops.number_fraction_format);
 	fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
 	fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
 	fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);
@@ -696,6 +733,9 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
 	fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
 	fprintf(file, "round_halfway_to_even=%i\n", printops.round_halfway_to_even);
+	if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
+	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
+	else fprintf(file, "approximation=%i\n", evalops.approximation);
 	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
 	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
 	fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);

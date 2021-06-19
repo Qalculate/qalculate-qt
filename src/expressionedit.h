@@ -100,7 +100,6 @@ class ExpressionEdit : public QPlainTextEdit {
 		std::string expression() const;
 		QSize sizeHint() const;
 
-		void updateCompletion();
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
@@ -119,6 +118,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 	public slots:
 
+		void updateCompletion();
 		void setExpression(std::string);
 		void blockCompletion(bool = true);
 		void blockParseStatus(bool = true);

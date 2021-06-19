@@ -22,7 +22,6 @@
 #include <QStandardPaths>
 #include <QtGlobal>
 #include <QLocalSocket>
-#include <QDebug>
 #include <QTranslator>
 #include <QDir>
 #include <QTextStream>
@@ -136,6 +135,11 @@ int main(int argc, char **argv) {
 
 	args.clear();
 
+	QColor c = QApplication::palette().base().color();
+	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
+	else settings->color = 1;
+
 	return app.exec();
 
 }
+

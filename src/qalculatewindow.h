@@ -32,6 +32,7 @@ class QToolButton;
 class QSpinBox;
 class QTimer;
 class PreferencesDialog;
+class FunctionsDialog;
 
 class QalculateWindow : public QMainWindow {
 
@@ -58,6 +59,7 @@ class QalculateWindow : public QMainWindow {
 		QSplitter *ehSplitter;
 		QLabel *statusLabel, *statusIconLabel;
 		PreferencesDialog *preferencesDialog;
+		FunctionsDialog *functionsDialog;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
@@ -65,7 +67,7 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
 		QToolButton *menuAction, *modeAction;
-		QAction *toAction, *storeAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QAction *toAction, *storeAction, *functionsAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 		QTimer *ecTimer, *rfTimer;
@@ -140,8 +142,11 @@ class QalculateWindow : public QMainWindow {
 		void inputBaseActivated();
 		void onCustomInputBaseChanged(int);
 		void editPreferences();
+		void openFunctions();
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
+		void approximationActivated();
+		void applyFunction(MathFunction*);
 
 	public slots:
 
