@@ -32,6 +32,8 @@ class FunctionEditDialog : public QDialog {
 		QPushButton *okButton;
 		QRadioButton *ref1Button, *ref2Button;
 
+		bool read_only;
+
 	protected slots:
 
 		void onNameEdited(const QString&);

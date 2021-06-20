@@ -1140,7 +1140,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
-				wrapSelection("^");
+				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Dead_Tilde: {
@@ -1148,7 +1148,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
-				wrapSelection("^");
+				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Plus: {
@@ -1447,8 +1447,12 @@ void ExpressionEdit::setStatusText(QString text) {
 	if(completionView->isVisible() || text.isEmpty()) {
 		QToolTip::hideText();
 	} else {
-		text.replace("\n", "<br>");
-		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), "<font size=\"-1\">" + text + "</font>");
+		if(text.length() >= 30) {
+			text.replace("\n", "<br>");
+			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text.length() >= 60 ? ("<font size=\"-1\">" + text + "</font>") : ("<font size=\"+0\">" + text + "</font>"));
+		} else {
+			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text);
+		}
 	}
 }
 

@@ -55,7 +55,7 @@ class QalculateQtSettings {
 		~QalculateQtSettings();
 
 		void loadPreferences();
-		void savePreferences();
+		void savePreferences(bool save_mode = true);
 		void updateStyle();
 		void updatePalette();
 		void updateMessagePrintOptions();
@@ -77,6 +77,7 @@ class QalculateQtSettings {
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
+		bool save_defs_on_exit, save_mode_on_exit;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

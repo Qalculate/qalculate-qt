@@ -204,6 +204,8 @@ void QalculateQtSettings::loadPreferences() {
 	style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
+	save_mode_on_exit = true;
+	save_defs_on_exit = true;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -628,7 +630,7 @@ void QalculateQtSettings::updateStyle() {
 	if(style >= 0 && style < QStyleFactory::keys().count()) QApplication::setStyle(QStyleFactory::create(QStyleFactory::keys().at(style)));
 	updatePalette();
 }
-void QalculateQtSettings::savePreferences() {
+void QalculateQtSettings::savePreferences(bool save_mode) {
 
 	FILE *file = NULL;
 	std::string homedir = getLocalDir();
@@ -685,6 +687,7 @@ void QalculateQtSettings::savePreferences() {
 	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 	fprintf(file, "prefixes_default=%i\n", prefixes_default);
+	if(!save_mode) {fclose(file); return;}
 	fprintf(file, "\n[Mode]\n");
 	fprintf(file, "min_deci=%i\n", printops.min_decimals);
 	fprintf(file, "use_min_deci=%i\n", printops.use_min_decimals);

@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
 	app.setApplicationVersion(VERSION);
 
 	QCommandLineParser *parser = new QCommandLineParser();
-	/*QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("FILE"));
-	parser->addOption(fOption);*/
+	QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("FILE"));
+	parser->addOption(fOption);
 	QCommandLineOption nOption(QStringList() << "n" << "new-instance", QApplication::tr("Start a new instance of the application"));
 	parser->addOption(nOption);
 	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("TITLE"));
@@ -66,36 +66,49 @@ int main(int argc, char **argv) {
 		printf(VERSION "\n");
 		return 0;
 	}
-	if(!parser->isSet(nOption)) {
-		std::string homedir = getLocalDir();
-		recursiveMakeDir(homedir);
-		QString lockpath = QString::fromStdString(buildPath(homedir, "qalculate-qt.lock"));
-		QLockFile lockFile(lockpath);
-		if(!lockFile.tryLock(100)) {
-			if(lockFile.error() == QLockFile::LockFailedError) {
-				QTextStream outStream(stdout);
-				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
-				QLocalSocket socket;
-				socket.connectToServer("qalculate-qt");
-				if(socket.waitForConnected()) {
-					QString command = "0";
-					QStringList args = parser->positionalArguments();
-					for(int i = 0; i < args.count(); i++) {
-						if(i > 0) command += " ";
-						command += args.at(i);
-					}
-					socket.write(command.toUtf8());
-					socket.waitForBytesWritten(3000);
-					socket.disconnectFromServer();
+
+	std::string homedir = getLocalDir();
+	recursiveMakeDir(homedir);
+	QLockFile lockFile(QString::fromStdString(buildPath(homedir, "qalculate-qt.lock")));
+	if(!parser->isSet(nOption) && !lockFile.tryLock(100)) {
+		if(lockFile.error() == QLockFile::LockFailedError) {
+			QTextStream outStream(stdout);
+			outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
+			QLocalSocket socket;
+			socket.connectToServer("qalculate-qt");
+			if(socket.waitForConnected()) {
+				QString command;
+				if(!parser->value(fOption).isEmpty()) {
+					command = "f";
+					command += parser->value(fOption);
+				} else {
+					command = "0";
 				}
-				return 1;
+				QStringList args = parser->positionalArguments();
+				for(int i = 0; i < args.count(); i++) {
+					if(i > 0) command += " ";
+					else if(command == "f") command += ";";
+					command += args.at(i);
+				}
+				socket.write(command.toUtf8());
+				socket.waitForBytesWritten(3000);
+				socket.disconnectFromServer();
 			}
+			return 1;
 		}
 	}
 
 	app.setWindowIcon(LOAD_APP_ICON("qalculate-qt"));
 
 	settings = new QalculateQtSettings();
+
+	if(!settings->ignore_locale) {
+		QalculateTranslator eqtr;
+		app.installTranslator(&eqtr);
+		if(translator.load(QLocale(), QLatin1String("eqonomize"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
+		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
+	}
 
 	new Calculator(settings->ignore_locale);
 
@@ -124,6 +137,8 @@ int main(int argc, char **argv) {
 	win->setCommandLineParser(parser);
 	win->show();
 
+	if(!parser->value(fOption).isEmpty()) win->executeFromFile(parser->value(fOption));
+
 	QStringList args = parser->positionalArguments();
 	QString expression;
 	for(int i = 0; i < args.count(); i++) {
@@ -141,5 +156,34 @@ int main(int argc, char **argv) {
 
 	return app.exec();
 
+}
+
+QalculateTranslator::QalculateTranslator() : QTranslator() {}
+QString	QalculateTranslator::translate(const char *context, const char *sourceText, const char *disambiguation, int n) const {
+	if(!translator_qt.translate(context, sourceText, disambiguation, n).isEmpty() || !translator_qtbase.translate(context, sourceText, disambiguation, n).isEmpty()) return QString();
+	if(strcmp(context, "EqonomizeTranslator") == 0) return QString();
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "OK") == 0) return tr("OK");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "Cancel") == 0) return tr("Cancel");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "Close") == 0) return tr("Close");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "&Yes") == 0) return tr("&Yes");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "&No") == 0) return tr("&No");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "&Open") == 0) return tr("&Open");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "&Save") == 0) return tr("&Save");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "&Select All") == 0) return tr("&Select All");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "Look in:") == 0) return tr("Look in:");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "File &name:") == 0) return tr("File &name:");
+	//: Only used when Qt translation is missing
+	if(strcmp(sourceText, "Files of type:") == 0) return tr("Files of type:");
+	return QString();
 }
 

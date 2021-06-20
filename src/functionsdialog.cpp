@@ -126,6 +126,12 @@ void FunctionsDialog::applyClicked() {
 	emit applyFunctionRequest(f);
 }
 void FunctionsDialog::insertClicked() {
+	QModelIndex index = functionsView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
+	if(f) {
+		emit insertFunctionRequest(f, this);
+	}
 }
 void FunctionsDialog::deactivateClicked() {
 	QModelIndex index = functionsView->selectionModel()->currentIndex();

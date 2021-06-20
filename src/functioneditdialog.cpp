@@ -23,7 +23,7 @@
 #include "qalculateqtsettings.h"
 #include "functioneditdialog.h"
 
-FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
+FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent), read_only(false) {
 	QGridLayout *grid = new QGridLayout(this);
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
@@ -36,7 +36,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	box->addWidget(new QLabel(tr("Parameter references:"), this), 1); 
 	ref1Button = new QRadioButton(tr("x, y, z"), this); group->addButton(ref1Button, 1); box->addWidget(ref1Button);
 	ref1Button->setChecked(true);
-	ref2Button = new QRadioButton(tr("\\x, \\y, \\z, \\a, …"), this); group->addButton(ref2Button, 2); box->addWidget(ref2Button);
+	ref2Button = new QRadioButton(tr("\\x, \\y, \\z, \\a, \\b, …"), this); group->addButton(ref2Button, 2); box->addWidget(ref2Button);
 	grid->addLayout(box, 3, 0, 1, 2);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
@@ -95,24 +95,28 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f) {
 	return true;
 }
 void FunctionEditDialog::setFunction(MathFunction *f) {
+	read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);
 		expressionEdit->setPlainText(QString::fromStdString(CALCULATOR->localizeExpression(((UserFunction*) f)->formula(), settings->evalops.parse_options)));
 	} else {
+		read_only = true;
 		expressionEdit->setEnabled(false);
 		expressionEdit->clear();
 	}
-	okButton->setEnabled(true);
+	okButton->setEnabled(!read_only);
+	nameEdit->setReadOnly(read_only);
+	expressionEdit->setReadOnly(read_only);
 }
 void FunctionEditDialog::onNameEdited(const QString &str) {
-	okButton->setEnabled(!str.trimmed().isEmpty() && (!expressionEdit->isEnabled() || !expressionEdit->document()->isEmpty()));
+	if(!read_only) okButton->setEnabled(!str.trimmed().isEmpty() && (!expressionEdit->isEnabled() || !expressionEdit->document()->isEmpty()));
 	if(!str.trimmed().isEmpty() && !CALCULATOR->functionNameIsValid(str.trimmed().toStdString())) {
 		nameEdit->setText(QString::fromStdString(CALCULATOR->convertToValidFunctionName(str.trimmed().toStdString())));
 	}
 }
 void FunctionEditDialog::onExpressionChanged() {
-	okButton->setEnabled((!expressionEdit->document()->isEmpty() || !expressionEdit->isEnabled()) && !nameEdit->text().trimmed().isEmpty());
+	if(!read_only) okButton->setEnabled((!expressionEdit->document()->isEmpty() || !expressionEdit->isEnabled()) && !nameEdit->text().trimmed().isEmpty());
 }
 void FunctionEditDialog::setExpression(const QString &str) {
 	expressionEdit->setPlainText(str);

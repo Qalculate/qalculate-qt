@@ -82,6 +82,7 @@ class FunctionsDialog : public QDialog {
 
 		void itemsChanged();
 		void applyFunctionRequest(MathFunction*);
+		void insertFunctionRequest(MathFunction*, QWidget*);
 
 };
 

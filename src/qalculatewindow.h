@@ -14,6 +14,7 @@
 
 #include <QMainWindow>
 #include <QFont>
+#include <QTranslator>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -33,6 +34,7 @@ class QSpinBox;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
+class FPConversionDialog;
 
 class QalculateWindow : public QMainWindow {
 
@@ -47,6 +49,7 @@ class QalculateWindow : public QMainWindow {
 		void fetchExchangeRates(int timeout, int n = -1);
 		static bool displayMessages(QWidget *parent = NULL);
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
+		void executeFromFile(const QString&);
 
 	protected:
 
@@ -60,6 +63,7 @@ class QalculateWindow : public QMainWindow {
 		QLabel *statusLabel, *statusIconLabel;
 		PreferencesDialog *preferencesDialog;
 		FunctionsDialog *functionsDialog;
+		FPConversionDialog *fpConversionDialog;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
@@ -147,6 +151,7 @@ class QalculateWindow : public QMainWindow {
 		void assumptionsSignActivated();
 		void approximationActivated();
 		void applyFunction(MathFunction*);
+		void openFPConversion();
 
 	public slots:
 
@@ -163,8 +168,22 @@ class QalculateWindow : public QMainWindow {
 		void resultFormatUpdated(int delay = 0);
 		void resultDisplayUpdated();
 		void expressionFormatUpdated(bool);
+		void insertFunction(MathFunction*, QWidget* = NULL);
 
 	signals:
+
+};
+
+
+class QalculateTranslator : public QTranslator {
+
+	Q_OBJECT
+
+	public:
+
+		QalculateTranslator();
+
+		QString	translate(const char *context, const char *sourceText, const char *disambiguation = NULL, int n = -1) const;
 
 };
 

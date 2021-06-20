@@ -86,9 +86,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G1(tr("Custom keypad font"), settings->use_custom_keypad_font, keypadFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_keypad_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	/*BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
+	BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_app_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));*/
+	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	l2->setRowStretch(r, 1);
 	r = 0;
 	l2 = new QGridLayout(w4);

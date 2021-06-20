@@ -43,6 +43,7 @@
 #include "variableeditdialog.h"
 #include "preferencesdialog.h"
 #include "functionsdialog.h"
+#include "fpconversiondialog.h"
 
 class ViewThread : public Thread {
 protected:
@@ -79,6 +80,7 @@ CommandThread *command_thread;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, mstruct_exact, lastx;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
+bool block_expression_history = false;
 bool to_fraction = false;
 char to_prefix = 0;
 int to_base = 0;
@@ -206,6 +208,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rfTimer = NULL;
 	preferencesDialog = NULL;
 	functionsDialog = NULL;
+	fpConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
 	QHBoxLayout *hLayout = new QHBoxLayout();
@@ -224,6 +227,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menuAction->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	menuAction->setMenu(menu);
+	menu->addAction(tr("Floating point conversion (IEEE 754)"), this, SLOT(openFPConversion()));
+	menu->addSeparator();
 	menu->addAction(tr("Update exchange rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
@@ -250,32 +255,32 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Angle unit"));
 	w2 = fm1.boundingRect(tr("Angle unit")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians");
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees");
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians");
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
 
 	ADD_SECTION(tr("Approximation"));
 	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
-	action = menu->addAction(tr("Automatic", "Automatic approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Automatic", "Automatic approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_autoappr");
 	action->setData(-1); assumptionTypeActions[0] = action; if(settings->dual_approximation < 0) action->setChecked(true);
-	action = menu->addAction(tr("Dual", "Dual approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Dual", "Dual approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_dualappr");
 	action->setData(-2); assumptionTypeActions[0] = action; if(settings->dual_approximation > 0) action->setChecked(true);
 	action = menu->addAction(tr("Exact", "Exact approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(APPROXIMATION_EXACT); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_EXACT) action->setChecked(true);
+	action->setData(APPROXIMATION_EXACT); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_EXACT) action->setChecked(true); action->setObjectName("action_exact");
 	action = menu->addAction(tr("Approximate"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(APPROXIMATION_APPROXIMATE); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_APPROXIMATE) action->setChecked(true);
+	action->setData(APPROXIMATION_APPROXIMATE); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_APPROXIMATE) action->setChecked(true); action->setObjectName("action_approximate");
 
 	menu->addSeparator();
 	menu2 = menu;
 	menu = menu2->addMenu(tr("Assumptions"));
 	ADD_SECTION(tr("Type", "Assumptions type"));
-	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive); group->setObjectName("group_type");
 	action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true);
+	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true); action->setObjectName("");
 	action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_TYPE_REAL); assumptionTypeActions[1] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_REAL) action->setChecked(true);
 	action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
@@ -285,7 +290,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_TYPE_BOOLEAN); assumptionTypeActions[4] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_BOOLEAN) action->setChecked(true);
 	ADD_SECTION(tr("Sign", "Assumptions sign"));
-	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive); group->setObjectName("group_sign");
 	action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_SIGN_UNKNOWN); assumptionSignActions[0] = action; if(CALCULATOR->defaultAssumptions()->sign() == ASSUMPTION_SIGN_UNKNOWN) action->setChecked(true);
 	action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
@@ -303,7 +308,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Output base"));
 	w2 = fm1.boundingRect(tr("Output base")).width() * 1.5; if(w2 > w) w = w2;
 	bool base_checked = false;
-	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive); group->setObjectName("group_outbase");
 	action = menu->addAction(tr("Binary"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BINARY); if(settings->printops.base == BASE_BINARY) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("Octal"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
@@ -348,7 +353,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	awl = new QHBoxLayout(aww);
 	QSpinBox *customOutputBaseEdit = new QSpinBox(this);
 	customOutputBaseEdit->setRange(INT_MIN, INT_MAX);
-	customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : settings->printops.base);
+	customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : ((settings->printops.base >= 2 && settings->printops.base <= 36) ? settings->printops.base : 10)); customOutputBaseEdit->setObjectName("spinbox_outbase");
 	customOutputBaseEdit->setAlignment(Qt::AlignRight);
 	connect(customOutputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomOutputBaseChanged(int)));
 	awl->addWidget(customOutputBaseEdit, 0);
@@ -358,7 +363,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Input base"));
 	w2 = fm1.boundingRect(tr("Input base")).width() * 1.5; if(w2 > w) w = w2;
 	base_checked = false;
-	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive); group->setObjectName("group_inbase");
 	action = menu->addAction(tr("Binary"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BINARY); if(settings->evalops.parse_options.base == BASE_BINARY) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("Octal"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
@@ -395,7 +400,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	awl = new QHBoxLayout(aww);
 	QSpinBox *customInputBaseEdit = new QSpinBox(this);
 	customInputBaseEdit->setRange(INT_MIN, INT_MAX);
-	customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : settings->evalops.parse_options.base);
+	customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : ((settings->evalops.parse_options.base >= 2 && settings->evalops.parse_options.base <= 36) ? settings->evalops.parse_options.base : 10)); customInputBaseEdit->setObjectName("spinbox_inbase");
 	customInputBaseEdit->setAlignment(Qt::AlignRight);
 	connect(customInputBaseEdit, SIGNAL(valueChanged(int)), this, SLOT(onCustomInputBaseChanged(int)));
 	awl->addWidget(customInputBaseEdit, 0);
@@ -408,21 +413,21 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	aw->setDefaultWidget(aww);
 	QGridLayout *awg = new QGridLayout(aww);
 	awg->addWidget(new QLabel(tr("Precision:"), this), 0, 0);
-	QSpinBox *precisionEdit = new QSpinBox(this);
+	QSpinBox *precisionEdit = new QSpinBox(this); precisionEdit->setObjectName("spinbox_precision");
 	precisionEdit->setRange(2, 10000);
 	precisionEdit->setValue(CALCULATOR->getPrecision());
 	precisionEdit->setAlignment(Qt::AlignRight);
 	connect(precisionEdit, SIGNAL(valueChanged(int)), this, SLOT(onPrecisionChanged(int)));
 	awg->addWidget(precisionEdit, 0, 1);
 	awg->addWidget(new QLabel(tr("Min decimals:"), this), 1, 0);
-	QSpinBox *minDecimalsEdit = new QSpinBox(this);
+	QSpinBox *minDecimalsEdit = new QSpinBox(this); minDecimalsEdit->setObjectName("spinbox_mindecimals");
 	minDecimalsEdit->setRange(0, 10000);
 	minDecimalsEdit->setValue(settings->printops.use_min_decimals ? settings->printops.min_decimals : 0);
 	minDecimalsEdit->setAlignment(Qt::AlignRight);
 	connect(minDecimalsEdit, SIGNAL(valueChanged(int)), this, SLOT(onMinDecimalsChanged(int)));
 	awg->addWidget(minDecimalsEdit, 1, 1);
 	awg->addWidget(new QLabel(tr("Max decimals:"), this), 2, 0);
-	QSpinBox *maxDecimalsEdit = new QSpinBox(this);
+	QSpinBox *maxDecimalsEdit = new QSpinBox(this); maxDecimalsEdit->setObjectName("spinbox_maxdecimals");
 	maxDecimalsEdit->setRange(-1, 10000);
 	maxDecimalsEdit->setSpecialValueText(tr("off", "Max decimals"));
 	maxDecimalsEdit->setValue(settings->printops.use_max_decimals ? settings->printops.max_decimals : -1);
@@ -489,7 +494,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	binEdit->setFocusPolicy(Qt::NoFocus);
 	QFontMetrics fm2(binEdit->font());
 	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
-	binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
+	binEdit->setFixedHeight(fm2.lineSpacing() * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
@@ -546,7 +551,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
 	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
 	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
-	if(settings->use_custom_app_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_app_font)); QApplication::setFont(font);}
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
@@ -556,8 +560,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
-	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
+	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
@@ -586,6 +590,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 	bases_shown = !settings->window_state.isEmpty();
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+	if(settings->use_custom_app_font) {
+		QTimer *timer = new QTimer();
+		timer->setSingleShot(true);
+		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontChanged()));
+		timer->start(1);
+	}
 
 }
 QalculateWindow::~QalculateWindow() {}
@@ -805,6 +816,18 @@ void QalculateWindow::socketReadyRead() {
 	raise();
 	activateWindow();
 	QString command = socket->readAll();
+	if(command.isEmpty()) return;
+	if(command[0] == 'f') {
+		command = command.mid(1).trimmed();
+		if(!command.isEmpty()) {
+			int i = command.indexOf(";");
+			if(i > 0) {
+				QString file = command.left(i);
+				executeFromFile(file);
+				command = command.mid(i);
+			}
+		}
+	}
 	command = command.mid(1).trimmed();
 	if(!command.isEmpty()) {expressionEdit->setPlainText(command); calculate();}
 }
@@ -844,6 +867,7 @@ void QalculateWindow::setPreviousExpression() {
 		expressionEdit->blockParseStatus();
 		expressionEdit->setPlainText(QString::fromStdString(previous_expression));
 		expressionEdit->selectAll();
+		expressionEdit->setExpressionHasChanged(false);
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
 	}
@@ -975,13 +999,22 @@ void set_assumption(const std::string &str, AssumptionType &at, AssumptionSign &
 	}
 }
 
-//#define SET_BOOL_MENU(x)	{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, x)), v);}
-#define SET_BOOL_MENU(x)	{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);}}
 #define SET_BOOL_D(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; resultDisplayUpdated();}}
-//#define SET_BOOL_PREF(x)	{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else {if(!preferences_builder) {get_preferences_dialog();} gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, x)), v);}}
-#define SET_BOOL_PREF(x)	{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);}}
 #define SET_BOOL_E(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionCalculationUpdated();}}
 #define SET_BOOL(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v;}}
+#define SET_BOOL_PV(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionFormatUpdated(v);}}
+#define SET_BOOL_PT(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionFormatUpdated(true);}}
+#define SET_BOOL_PF(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionFormatUpdated(false);}}
+
+QAction *find_child_data(QObject *parent, const QString &name, int v) {
+	QActionGroup *group = parent->findChild<QActionGroup*>(name);
+	if(!group) return NULL;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == v) return actions.at(i);
+	}
+	return NULL;
+}
 
 void QalculateWindow::setOption(std::string str) {
 	remove_blank_ends(str);
@@ -1077,8 +1110,21 @@ void QalculateWindow::setOption(std::string str) {
 		} else if(b_in) {
 			if(v == BASE_CUSTOM || v != settings->evalops.parse_options.base) {
 				settings->evalops.parse_options.base = v;
-				/*input_base_updated_from_menu();
-				update_keypad_bases();*/
+				QAction *action = find_child_data(this, "group_intbase", v);
+				if(!action) action = find_child_data(this, "group_inbase", BASE_CUSTOM);
+				if(action) {
+					action->blockSignals(true);
+					action->setChecked(true);
+					action->blockSignals(false);
+					if(action->data().toInt() == BASE_CUSTOM && (v == BASE_CUSTOM || (v >= 2 && v <= 36))) {
+						QSpinBox *w = findChild<QSpinBox*>("spinbox_inbase");
+						if(w) {
+							w->blockSignals(true);
+							w->setValue(v == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : v);
+							w->blockSignals(false);
+						}
+					}
+				}
 				expressionFormatUpdated(false);
 			}
 		} else {
@@ -1086,9 +1132,21 @@ void QalculateWindow::setOption(std::string str) {
 				settings->printops.base = v;
 				to_base = 0;
 				to_bits = 0;
-				/*update_menu_base();
-				output_base_updated_from_menu();
-				update_keypad_bases();*/
+				QAction *action = find_child_data(this, "group_outbase", v);
+				if(!action) action = find_child_data(this, "group_outbase", BASE_CUSTOM);
+				if(action) {
+					action->blockSignals(true);
+					action->setChecked(true);
+					action->blockSignals(false);
+					if(action->data().toInt() == BASE_CUSTOM && (v == BASE_CUSTOM || (v >= 2 && v <= 36))) {
+						QSpinBox *w = findChild<QSpinBox*>("spinbox_outbase");
+						if(w) {
+							w->blockSignals(true);
+							w->setValue(v == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : v);
+							w->blockSignals(false);
+						}
+					}
+				}
 				resultFormatUpdated();
 			}
 		}
@@ -1102,21 +1160,39 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			set_assumption(svalue, at, as, false);
 		}
-		//set_assumptions_items(at, as);
-	} else if(equalsIgnoreCase(svar, "all prefixes") || svar == "allpref") SET_BOOL_MENU("menu_item_all_prefixes")
-	else if(equalsIgnoreCase(svar, "complex numbers") || svar == "cplx") SET_BOOL_MENU("menu_item_allow_complex")
+		QAction *action = find_child_data(this, "group_type", CALCULATOR->defaultAssumptions()->type());
+		if(action) {
+			action->blockSignals(true);
+			action->setChecked(true);
+			action->blockSignals(false);
+		}
+		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
+		if(action) {
+			action->blockSignals(true);
+			action->setChecked(true);
+			action->blockSignals(false);
+		}
+	} else if(equalsIgnoreCase(svar, "all prefixes") || svar == "allpref") SET_BOOL_D(settings->printops.use_all_prefixes)
+	else if(equalsIgnoreCase(svar, "complex numbers") || svar == "cplx") SET_BOOL_E(settings->evalops.allow_complex)
 	else if(equalsIgnoreCase(svar, "excessive parentheses") || svar == "expar") SET_BOOL_D(settings->printops.excessive_parenthesis)
-	else if(equalsIgnoreCase(svar, "functions") || svar == "func") SET_BOOL_MENU("menu_item_enable_functions")
-	else if(equalsIgnoreCase(svar, "infinite numbers") || svar == "inf") SET_BOOL_MENU("menu_item_allow_infinite")
-	else if(equalsIgnoreCase(svar, "show negative exponents") || svar == "negexp") SET_BOOL_MENU("menu_item_negative_exponents")
-	else if(equalsIgnoreCase(svar, "minus last") || svar == "minlast") SET_BOOL_MENU("menu_item_sort_minus_last")
-	else if(equalsIgnoreCase(svar, "assume nonzero denominators") || svar == "nzd") SET_BOOL_MENU("menu_item_assume_nonzero_denominators")
-	else if(equalsIgnoreCase(svar, "warn nonzero denominators") || svar == "warnnzd") SET_BOOL_MENU("menu_item_warn_about_denominators_assumed_nonzero")
-	else if(equalsIgnoreCase(svar, "prefixes") || svar == "pref") SET_BOOL_MENU("menu_item_prefixes_for_selected_units")
-	else if(equalsIgnoreCase(svar, "binary prefixes") || svar == "binpref") SET_BOOL_PREF("preferences_checkbutton_binary_prefixes")
-	else if(equalsIgnoreCase(svar, "denominator prefixes") || svar == "denpref") SET_BOOL_MENU("menu_item_denominator_prefixes")
-	else if(equalsIgnoreCase(svar, "place units separately") || svar == "unitsep") SET_BOOL_MENU("menu_item_place_units_separately")
-	else if(equalsIgnoreCase(svar, "calculate variables") || svar == "calcvar") SET_BOOL_MENU("menu_item_calculate_variables")
+	else if(equalsIgnoreCase(svar, "functions") || svar == "func") SET_BOOL_PV(settings->evalops.parse_options.functions_enabled)
+	else if(equalsIgnoreCase(svar, "infinite numbers") || svar == "inf") SET_BOOL_E(settings->evalops.allow_infinite)
+	else if(equalsIgnoreCase(svar, "show negative exponents") || svar == "negexp") SET_BOOL_D(settings->printops.negative_exponents)
+	else if(equalsIgnoreCase(svar, "minus last") || svar == "minlast") {
+		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(settings->printops.sort_options.minus_last != v) {settings->printops.sort_options.minus_last = v; resultDisplayUpdated();}}
+	} else if(equalsIgnoreCase(svar, "assume nonzero denominators") || svar == "nzd") SET_BOOL_E(settings->evalops.assume_denominators_nonzero)
+	else if(equalsIgnoreCase(svar, "warn nonzero denominators") || svar == "warnnzd") SET_BOOL_E(settings->evalops.warn_about_denominators_assumed_nonzero)
+	else if(equalsIgnoreCase(svar, "prefixes") || svar == "pref") SET_BOOL_D(settings->printops.use_unit_prefixes)
+	else if(equalsIgnoreCase(svar, "binary prefixes") || svar == "binpref") {
+		bool b = CALCULATOR->usesBinaryPrefixes() > 0;
+		SET_BOOL(b)
+		if(b != (CALCULATOR->usesBinaryPrefixes() > 0)) {
+			CALCULATOR->useBinaryPrefixes(b ? 1 : 0);
+			resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "denominator prefixes") || svar == "denpref") SET_BOOL_D(settings->printops.use_denominator_prefix)
+	else if(equalsIgnoreCase(svar, "place units separately") || svar == "unitsep") SET_BOOL_D(settings->printops.place_units_separately)
+	else if(equalsIgnoreCase(svar, "calculate variables") || svar == "calcvar") SET_BOOL_E(settings->evalops.calculate_variables)
 	else if(equalsIgnoreCase(svar, "calculate functions") || svar == "calcfunc") SET_BOOL_E(settings->evalops.calculate_functions)
 	else if(equalsIgnoreCase(svar, "sync units") || svar == "sync") SET_BOOL_E(settings->evalops.sync_units)
 	else if(equalsIgnoreCase(svar, "temperature calculation") || svar == "temp")  {
@@ -1130,36 +1206,45 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			switch(v) {
-				case TEMPERATURE_CALCULATION_RELATIVE: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_rel")), TRUE);
-					break;
-				}
-				case TEMPERATURE_CALCULATION_ABSOLUTE: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_abs")), TRUE);
-					break;
-				}
-				case TEMPERATURE_CALCULATION_HYBRID: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_hybrid")), TRUE);
-					break;
-				}
-			}*/
+			CALCULATOR->setTemperatureCalculationMode((TemperatureCalculationMode) v);
+			settings->tc_set = true;
+			expressionCalculationUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") SET_BOOL_MENU("menu_item_round_halfway_to_even")
+	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") SET_BOOL_D(settings->printops.round_halfway_to_even)
 	else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
 		bool b = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN);
 		SET_BOOL(b)
 		if(b != (settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN)) {
-			/*if(b) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_syntax")), TRUE);
-			else gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_adaptive_parsing")), TRUE);*/
+			if(b) {
+				settings->evalops.parse_options.parsing_mode = PARSING_MODE_RPN;
+			} else {
+				settings->evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+			}
+			expressionFormatUpdated(false);
 		}
-	} else if(equalsIgnoreCase(svar, "rpn") && svalue.find(" ") == std::string::npos) SET_BOOL_MENU("menu_item_rpn_mode")
-	else if(equalsIgnoreCase(svar, "short multiplication") || svar == "shortmul") SET_BOOL_D(settings->printops.short_multiplication)
-	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_PREF("preferences_checkbutton_lower_case_e")
-	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_PREF("preferences_checkbutton_lower_case_numbers")
-	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") SET_BOOL_PREF("preferences_checkbutton_imaginary_j")
-	else if(equalsIgnoreCase(svar, "base display") || svar == "basedisp") {
+	} else if(equalsIgnoreCase(svar, "rpn") && svalue.find(" ") == std::string::npos) {
+		//SET_BOOL_MENU("menu_item_rpn_mode")
+	} else if(equalsIgnoreCase(svar, "short multiplication") || svar == "shortmul") SET_BOOL_D(settings->printops.short_multiplication)
+	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_D(settings->printops.lower_case_e)
+	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
+	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
+		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
+		if(v_i) {
+		bool b = v_i->hasName("j") > 0;
+			SET_BOOL(b)
+			if(b) {
+				ExpressionName ename = v_i->getName(1);
+				ename.name = "j";
+				ename.reference = false;
+				v_i->addName(ename, 1, true);
+				v_i->setChanged(false);
+			} else {
+				v_i->clearNonReferenceNames();
+				v_i->setChanged(false);
+			}
+			expressionFormatUpdated(false);
+		}
+	} else if(equalsIgnoreCase(svar, "base display") || svar == "basedisp") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "none")) v = BASE_DISPLAY_NONE;
 		else if(empty_value || equalsIgnoreCase(svalue, "normal")) v = BASE_DISPLAY_NORMAL;
@@ -1170,11 +1255,11 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_alternative_base_prefixes")), v == BASE_DISPLAY_ALTERNATIVE);*/
+			settings->printops.base_display = (BaseDisplay) v;
+			resultDisplayUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_PREF("preferences_checkbutton_twos_complement")
-	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_PREF("preferences_checkbutton_hexadecimal_twos_complement")
+	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_D(settings->printops.twos_complement)
+	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
 	else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = DIGIT_GROUPING_NONE;
@@ -1187,15 +1272,18 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < DIGIT_GROUPING_NONE || v > DIGIT_GROUPING_LOCALE) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			if(v == DIGIT_GROUPING_NONE) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_digit_grouping_none")), TRUE);
-			else if(v == DIGIT_GROUPING_STANDARD) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_digit_grouping_standard")), TRUE);
-			else if(v == DIGIT_GROUPING_LOCALE) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_digit_grouping_locale")), TRUE);*/
+			settings->printops.digit_grouping = (DigitGrouping) v;
+			resultDisplayUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "spell out logical") || svar == "spellout") SET_BOOL_PREF("preferences_checkbutton_spell_out_logical_operators")
-	else if((equalsIgnoreCase(svar, "ignore dot") || svar == "nodot") && CALCULATOR->getDecimalPoint() != DOT) SET_BOOL_PREF("preferences_checkbutton_dot_as_separator")
-	else if((equalsIgnoreCase(svar, "ignore comma") || svar == "nocomma") && CALCULATOR->getDecimalPoint() != COMMA) SET_BOOL_PREF("preferences_checkbutton_comma_as_separator")
-	else if(equalsIgnoreCase(svar, "decimal comma")) {
+	} else if(equalsIgnoreCase(svar, "spell out logical") || svar == "spellout") SET_BOOL_D(settings->printops.spell_out_logical_operators)
+	else if((equalsIgnoreCase(svar, "ignore dot") || svar == "nodot") && CALCULATOR->getDecimalPoint() != DOT) {
+		SET_BOOL_PF(settings->evalops.parse_options.dot_as_separator)
+		settings->dot_question_asked = true;
+	} else if((equalsIgnoreCase(svar, "ignore comma") || svar == "nocomma") && CALCULATOR->getDecimalPoint() != COMMA) {
+		SET_BOOL(settings->evalops.parse_options.comma_as_separator)
+		CALCULATOR->useDecimalPoint(settings->evalops.parse_options.comma_as_separator);
+		expressionFormatUpdated(false);
+	} else if(equalsIgnoreCase(svar, "decimal comma")) {
 		int v = -2;
 		if(equalsIgnoreCase(svalue, "off")) v = 0;
 		else if(empty_value || equalsIgnoreCase(svalue, "on")) v = 1;
@@ -1206,19 +1294,30 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < -1 || v > 1) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			if(v >= 0) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_decimal_comma")), v);
-			else b_decimal_comma = v;*/
+			settings->decimal_comma = v;
+			if(settings->decimal_comma > 0) CALCULATOR->useDecimalComma();
+			else if(settings->decimal_comma == 0) CALCULATOR->useDecimalPoint(settings->evalops.parse_options.comma_as_separator);
+			if(v >= 0) {
+				expressionFormatUpdated(false);
+				resultDisplayUpdated();
+			}
 		}
-	} else if(equalsIgnoreCase(svar, "limit implicit multiplication") || svar == "limimpl") SET_BOOL_MENU("menu_item_limit_implicit_multiplication")
-	else if(equalsIgnoreCase(svar, "spacious") || svar == "space") SET_BOOL_D(settings->printops.spacious)
-	else if(equalsIgnoreCase(svar, "unicode") || svar == "uni") SET_BOOL_PREF("preferences_checkbutton_unicode_signs")
-	else if(equalsIgnoreCase(svar, "units") || svar == "unit") SET_BOOL_MENU("menu_item_enable_units")
-	else if(equalsIgnoreCase(svar, "unknowns") || svar == "unknown") SET_BOOL_MENU("menu_item_enable_unknown_variables")
-	else if(equalsIgnoreCase(svar, "variables") || svar == "var") SET_BOOL_MENU("menu_item_enable_variables")
-	else if(equalsIgnoreCase(svar, "abbreviations") || svar == "abbr" || svar == "abbrev") SET_BOOL_MENU("menu_item_abbreviate_names")
-	else if(equalsIgnoreCase(svar, "show ending zeroes") || svar == "zeroes") SET_BOOL_MENU("menu_item_show_ending_zeroes")
-	else if(equalsIgnoreCase(svar, "repeating decimals") || svar == "repdeci") SET_BOOL_MENU("menu_item_indicate_infinite_series")
+	} else if(equalsIgnoreCase(svar, "limit implicit multiplication") || svar == "limimpl") {
+		int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str());} else {settings->printops.limit_implicit_multiplication = v; settings->evalops.parse_options.limit_implicit_multiplication = v; expressionFormatUpdated(true);}
+	} else if(equalsIgnoreCase(svar, "spacious") || svar == "space") SET_BOOL_D(settings->printops.spacious)
+	else if(equalsIgnoreCase(svar, "unicode") || svar == "uni") {
+		int v = s2b(svalue);
+		if(v < 0) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str());
+		} else {
+			settings->printops.use_unicode_signs = v; resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "units") || svar == "unit") SET_BOOL_PV(settings->evalops.parse_options.units_enabled)
+	else if(equalsIgnoreCase(svar, "unknowns") || svar == "unknown") SET_BOOL_PV(settings->evalops.parse_options.unknowns_enabled)
+	else if(equalsIgnoreCase(svar, "variables") || svar == "var") SET_BOOL_PV(settings->evalops.parse_options.variables_enabled)
+	else if(equalsIgnoreCase(svar, "abbreviations") || svar == "abbr" || svar == "abbrev") SET_BOOL_D(settings->printops.abbreviate_names)
+	else if(equalsIgnoreCase(svar, "show ending zeroes") || svar == "zeroes") SET_BOOL_D(settings->printops.show_ending_zeroes)
+	else if(equalsIgnoreCase(svar, "repeating decimals") || svar == "repdeci") SET_BOOL_D(settings->printops.indicate_infinite_series)
 	else if(equalsIgnoreCase(svar, "angle unit") || svar == "angle") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "rad") || equalsIgnoreCase(svalue, "radians")) v = ANGLE_UNIT_RADIANS;
@@ -1231,12 +1330,19 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 3) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(v == ANGLE_UNIT_DEGREES) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_degrees")), TRUE);
-			else if(v == ANGLE_UNIT_RADIANS) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_radians")), TRUE);
-			else if(v == ANGLE_UNIT_GRADIANS) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_gradians")), TRUE);
-			else if(v == ANGLE_UNIT_NONE) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_no_default_angle_unit")), TRUE);*/
+			QAction *w = NULL;
+			if(v == ANGLE_UNIT_DEGREES) w = findChild<QAction*>("action_degrees");
+			else if(v == ANGLE_UNIT_RADIANS)w = findChild<QAction*>("action_radians");
+			else if(v == ANGLE_UNIT_GRADIANS) w = findChild<QAction*>("action_gradians");
+			if(w) {
+				w->blockSignals(true);
+				w->setChecked(true);
+				w->blockSignals(false);
+			}
+			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
+			expressionFormatUpdated(true);
 		}
-	} else if(equalsIgnoreCase(svar, "caret as xor") || equalsIgnoreCase(svar, "xor^")) SET_BOOL_PREF("preferences_checkbutton_caret_as_xor")
+	} else if(equalsIgnoreCase(svar, "caret as xor") || equalsIgnoreCase(svar, "xor^")) SET_BOOL_PT(settings->caret_as_xor)
 	else if(equalsIgnoreCase(svar, "parsing mode") || svar == "parse" || svar == "syntax") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "adaptive")) v = PARSING_MODE_ADAPTIVE;
@@ -1250,24 +1356,21 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < PARSING_MODE_ADAPTIVE || v > PARSING_MODE_RPN) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(v == PARSING_MODE_ADAPTIVE) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_adaptive_parsing")), TRUE);
-			else if(v == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_ignore_whitespace")), TRUE);
-			else if(v == PARSING_MODE_CONVENTIONAL) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_no_special_implicit_multiplication")), TRUE);
-			else if(v == PARSING_MODE_CHAIN) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_chain_syntax")), TRUE);
-			else if(v == PARSING_MODE_RPN) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_syntax")), TRUE);*/
+			settings->evalops.parse_options.parsing_mode = (ParsingMode) v;
+			expressionFormatUpdated(true);
 		}
 	} else if(equalsIgnoreCase(svar, "update exchange rates") || svar == "upxrates") {
 		int v = -2;
 		if(equalsIgnoreCase(svalue, "never")) {
-			v = 0;
+			settings->auto_update_exchange_rates = 0;
 		} else if(equalsIgnoreCase(svalue, "ask")) {
-			v = -1;
+			CALCULATOR->error(true, "Unsupported value: %s.", svalue.c_str(), NULL);
 		} else {
 			v = s2i(svalue);
+			if(empty_value) v = 7;
+			if(v < 0) CALCULATOR->error(true, "Unsupported value: %s.", svalue.c_str(), NULL);
+			else settings->auto_update_exchange_rates = v;
 		}
-		if(v < -1) v = -1;
-		/*if(!preferences_builder) get_preferences_dialog();
-		gtk_spin_button_set_value(GTK_SPIN_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_update_exchange_rates_spin_button")), v);*/
 	} else if(equalsIgnoreCase(svar, "multiplication sign") || svar == "mulsign") {
 		int v = -1;
 		if(svalue == SIGN_MULTIDOT || svalue == ".") v = MULTIPLICATION_SIGN_DOT;
@@ -1280,25 +1383,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < MULTIPLICATION_SIGN_ASTERISK || v > MULTIPLICATION_SIGN_ALTDOT) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			switch(v) {
-				case MULTIPLICATION_SIGN_DOT: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_dot")), TRUE);
-					break;
-				}
-				case MULTIPLICATION_SIGN_ALTDOT: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_altdot")), TRUE);
-					break;
-				}
-				case MULTIPLICATION_SIGN_X: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_ex")), TRUE);
-					break;
-				}
-				default: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_asterisk")), TRUE);
-					break;
-				}
-			}*/
+			settings->printops.multiplication_sign = (MultiplicationSign) v;
+			resultDisplayUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "division sign") || svar == "divsign") {
 		int v = -1;
@@ -1311,21 +1397,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(!preferences_builder) get_preferences_dialog();
-			switch(v) {
-				case DIVISION_SIGN_DIVISION_SLASH: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_division_slash")), TRUE);
-					break;
-				}
-				case DIVISION_SIGN_DIVISION: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_division")), TRUE);
-					break;
-				}
-				default: {
-					gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_slash")), TRUE);
-					break;
-				}
-			}*/
+			settings->printops.division_sign = (DivisionSign) v;
+			resultDisplayUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "approximation") || svar == "appr" || svar == "approx") {
 		int v = -1;
@@ -1339,12 +1412,29 @@ void QalculateWindow::setOption(std::string str) {
 		}
 		if(v > APPROXIMATION_APPROXIMATE + 1) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
-		} else if(v < APPROXIMATION_EXACT || v > APPROXIMATION_APPROXIMATE) {
-			CALCULATOR->error(true, "Unsupported value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(v == APPROXIMATION_EXACT) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_always_exact")), TRUE);
-			else if(v == APPROXIMATION_TRY_EXACT) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_try_exact")), TRUE);
-			else if(v == APPROXIMATION_APPROXIMATE) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_approximate")), TRUE);*/
+			QAction *w = NULL;
+			if(v < 0) w = findChild<QAction*>("action_autoappr");
+			else if(v == APPROXIMATION_APPROXIMATE + 1) w = findChild<QAction*>("action_dualappr");
+			else if(v == APPROXIMATION_EXACT) w = findChild<QAction*>("action_exact");
+			else if(v == APPROXIMATION_TRY_EXACT) w = findChild<QAction*>("action_approximate");
+			else if(v == APPROXIMATION_APPROXIMATE) w = findChild<QAction*>("action_approximate");
+			if(w) {
+				w->blockSignals(true);
+				w->setChecked(true);
+				w->blockSignals(false);
+			}
+			if(v < 0) {
+				settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
+				settings->dual_approximation = -1;
+			} else if(v == APPROXIMATION_APPROXIMATE + 1) {
+				settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
+				settings->dual_approximation = 1;
+			} else {
+				settings->evalops.approximation = (ApproximationMode) v;
+				settings->dual_approximation = 0;
+			}
+			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "interval calculation") || svar == "ic" || equalsIgnoreCase(svar, "uncertainty propagation") || svar == "up") {
 		int v = -1;
@@ -1356,24 +1446,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < INTERVAL_CALCULATION_NONE || v > INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*switch(v) {
-				case INTERVAL_CALCULATION_VARIANCE_FORMULA: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_ic_variance")), TRUE);
-					break;
-				}
-				case INTERVAL_CALCULATION_INTERVAL_ARITHMETIC: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_ic_interval_arithmetic")), TRUE);
-					break;
-				}
-				case INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_ic_simple")), TRUE);
-					break;
-				}
-				case INTERVAL_CALCULATION_NONE: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_ic_none")), TRUE);
-					break;
-				}
-			}*/
+			settings->evalops.interval_calculation = (IntervalCalculation) v;
+			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "autoconversion") || svar == "conv") {
 		int v = -1;
@@ -1399,27 +1473,11 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > POST_CONVERSION_OPTIMAL) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*switch(v) {
-				case POST_CONVERSION_OPTIMAL: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_post_conversion_optimal")), TRUE);
-					break;
-				}
-				case POST_CONVERSION_OPTIMAL_SI: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_post_conversion_optimal_si")), TRUE);
-					break;
-				}
-				case POST_CONVERSION_BASE: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_post_conversion_base")), TRUE);
-					break;
-				}
-				default: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_post_conversion_none")), TRUE);
-					break;
-				}
-			}
-			gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_mixed_units_conversion")), muc != MIXED_UNITS_CONVERSION_NONE);*/
+			settings->evalops.auto_post_conversion = (AutoPostConversion) v;
+			settings->evalops.mixed_units_conversion = muc;
+			expressionCalculationUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "currency conversion") || svar == "curconv") SET_BOOL_PREF("preferences_checkbutton_local_currency_conversion")
+	} else if(equalsIgnoreCase(svar, "currency conversion") || svar == "curconv") SET_BOOL_E(settings->evalops.local_currency_conversion)
 	else if(equalsIgnoreCase(svar, "algebra mode") || svar == "alg") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "none")) v = STRUCTURING_NONE;
@@ -1431,25 +1489,48 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > STRUCTURING_FACTORIZE) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(v == STRUCTURING_FACTORIZE) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_algebraic_mode_factorize")), TRUE);
-			else if(v == STRUCTURING_SIMPLIFY) gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_algebraic_mode_simplify")), TRUE);
-			else  {
-				settings->evalops.structuring = (StructuringMode) v;
-				settings->printops.allow_factorization = false;
-				expressionCalculationUpdated();
-			}*/
+			settings->evalops.structuring = (StructuringMode) v;
+			settings->printops.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
+			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "exact")) {
 		int v = s2b(svalue);
 		if(v < 0) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			//gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(main_builder, "button_exact")), v > 0);
+			setOption("approx exact");
 		}
-	} else if(equalsIgnoreCase(svar, "ignore locale")) SET_BOOL_PREF("preferences_checkbutton_ignore_locale")
-	else if(equalsIgnoreCase(svar, "save mode")) SET_BOOL_PREF("preferences_checkbutton_mode")
-	else if(equalsIgnoreCase(svar, "save definitions") || svar == "save defs") SET_BOOL_PREF("preferences_checkbutton_save_defs")
-	else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp") {
+	} else if(equalsIgnoreCase(svar, "ignore locale")) {
+		int v = s2b(svalue);
+		if(v < 0) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v != settings->ignore_locale) {
+			if(v > 0) {
+				settings->ignore_locale = true;
+			} else {
+				settings->ignore_locale = false;
+			}
+			CALCULATOR->error(false, "Please restart the program for the change to take effect.", NULL);
+		}
+	} else if(equalsIgnoreCase(svar, "save mode")) {
+		int v = s2b(svalue);
+		if(v < 0) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v > 0) {
+			settings->save_mode_on_exit = true;
+		} else {
+			settings->save_mode_on_exit = false;
+		}
+	} else if(equalsIgnoreCase(svar, "save definitions") || svar == "save defs") {
+		int v = s2b(svalue);
+		if(v < 0) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v > 0) {
+			settings->save_defs_on_exit = true;
+		} else {
+			settings->save_defs_on_exit = false;
+		}
+	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp") {
 		int v = -1;
 		bool valid = true;
 		if(equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
@@ -1460,47 +1541,25 @@ void QalculateWindow::setOption(std::string str) {
 		else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) v = s2i(svalue);
 		else valid = false;
 		if(valid) {
-			/*switch(v) {
-				case EXP_PRECISION: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_display_normal")), TRUE);
-					break;
-				}
-				case EXP_BASE_3: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_display_engineering")), TRUE);
-					break;
-				}
-				case EXP_SCIENTIFIC: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_display_scientific")), TRUE);
-					break;
-				}
-				case EXP_PURE: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_display_purely_scientific")), TRUE);
-					break;
-				}
-				case EXP_NONE: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_display_non_scientific")), TRUE);
-					break;
-				}
-				default: {
-					settings->printops.min_exp = v;
-					resultFormatUpdated();
-				}
-			}*/
+			settings->printops.min_exp = v;
+			resultFormatUpdated();
 		} else {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		}
 	} else if(equalsIgnoreCase(svar, "precision") || svar == "prec") {
 		int v = 0;
 		if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) v = s2i(svalue);
-		if(v < 1) {
+		if(v < 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			/*if(precision_builder) {
-				gtk_spin_button_set_value(GTK_SPIN_BUTTON(gtk_builder_get_object(precision_builder, "precision_dialog_spinbutton_precision")), v);
-			} else {
-				CALCULATOR->setPrecision(v);
-				expressionCalculationUpdated();
-			}*/
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_precision");
+			if(w) {
+				w->blockSignals(true);
+				w->setValue(v);
+				w->blockSignals(false);
+			}
+			CALCULATOR->setPrecision(v);
+			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "interval display") || svar == "ivdisp") {
 		int v = -1;
@@ -1515,47 +1574,67 @@ void QalculateWindow::setOption(std::string str) {
 			v = s2i(svalue);
 		}
 		if(v == 0) {
-			//gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_interval_adaptive")), TRUE);
+			settings->adaptive_interval_display = true;
+			settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+			resultFormatUpdated();
 		} else {
 			v--;
 			if(v < INTERVAL_DISPLAY_SIGNIFICANT_DIGITS || v > INTERVAL_DISPLAY_UPPER) {
 				CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 			} else {
-				/*switch(v) {
-					case INTERVAL_DISPLAY_INTERVAL: {gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_interval_interval")), TRUE); break;}
-					case INTERVAL_DISPLAY_PLUSMINUS: {gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_interval_plusminus")), TRUE); break;}
-					case INTERVAL_DISPLAY_MIDPOINT: {gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_interval_midpoint")), TRUE); break;}
-					default: {gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_interval_significant")), TRUE); break;}
-				}*/
+				settings->adaptive_interval_display = false;
+				settings->printops.interval_display = (IntervalDisplay) v;
+				resultFormatUpdated();
 			}
 		}
-	} else if(equalsIgnoreCase(svar, "interval arithmetic") || svar == "ia" || svar == "interval") SET_BOOL_MENU("menu_item_interval_arithmetic")
-	else if(equalsIgnoreCase(svar, "variable units") || svar == "varunits") SET_BOOL_MENU("menu_item_enable_variable_units")
-	else if(equalsIgnoreCase(svar, "color")) CALCULATOR->error(true, "Unsupported option: %s.", svar.c_str(), NULL);
-	else if(equalsIgnoreCase(svar, "max decimals") || svar == "maxdeci") {
+	} else if(equalsIgnoreCase(svar, "interval arithmetic") || svar == "ia" || svar == "interval") {
+		bool b = CALCULATOR->usesIntervalArithmetic();
+		SET_BOOL(b)
+		if(b != CALCULATOR->usesIntervalArithmetic()) {
+			CALCULATOR->useIntervalArithmetic(b);
+			expressionCalculationUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "variable units") || svar == "varunits") {
+		bool b = CALCULATOR->variableUnitsEnabled();
+		SET_BOOL(b)
+		if(b != CALCULATOR->variableUnitsEnabled()) {
+			CALCULATOR->setVariableUnitsEnabled(b);
+			expressionCalculationUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "color")) {
+		int v = -1;
+		if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) v = s2i(svalue);
+		if(v < 0) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else {
+			settings->colorize_result = v;
+		}
+	} else if(equalsIgnoreCase(svar, "max decimals") || svar == "maxdeci") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = -1;
 		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) v = s2i(svalue);
-		/*if(decimals_builder) {
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object(decimals_builder, "decimals_dialog_checkbutton_max")), v >= 0);
-			if(v >= 0) gtk_spin_button_set_value(GTK_SPIN_BUTTON(gtk_builder_get_object(decimals_builder, "decimals_dialog_spinbutton_max")), v);
-		} else {
-			if(v >= 0) settings->printops.max_decimals = v;
-			settings->printops.use_max_decimals = v >= 0;
-			resultFormatUpdated();
-		}*/
+		QSpinBox *w = findChild<QSpinBox*>("spinbox_maxdecimals");
+		if(w) {
+			w->blockSignals(true);
+			w->setValue(v < 0 ? -1 : v);
+			w->blockSignals(false);
+		}
+		settings->printops.use_max_decimals = (v >= 0);
+		settings->printops.max_decimals = v;
+		resultFormatUpdated();
 	} else if(equalsIgnoreCase(svar, "min decimals") || svar == "mindeci") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = -1;
 		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) v = s2i(svalue);
-		/*if(decimals_builder) {
-			gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (gtk_builder_get_object(decimals_builder, "decimals_dialog_checkbutton_min")), v >= 0);
-			if(v >= 0) gtk_spin_button_set_value(GTK_SPIN_BUTTON(gtk_builder_get_object(decimals_builder, "decimals_dialog_spinbutton_min")), v);
-		} else {
-			if(v >= 0) settings->printops.min_decimals = v;
-			settings->printops.use_min_decimals = v >= 0;
-			resultFormatUpdated();
-		}*/
+		QSpinBox *w = findChild<QSpinBox*>("spinbox_mindecimals");
+		if(w) {
+			w->blockSignals(true);
+			w->setValue(v < 0 ? 0 : v);
+			w->blockSignals(false);
+		}
+		settings->printops.use_min_decimals = (v > 0);
+		settings->printops.min_decimals = v;
+		resultFormatUpdated();
 	} else if(equalsIgnoreCase(svar, "fractions") || svar == "fr") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = FRACTION_DECIMAL;
@@ -1571,32 +1650,14 @@ void QalculateWindow::setOption(std::string str) {
 		if(v > FRACTION_COMBINED + 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else if(v < 0 || v > FRACTION_COMBINED + 1) {
-			CALCULATOR->error(true, "Unsupported value: %s.", svalue.c_str(), NULL);
-		} else {
-			/*int dff = default_fraction_fraction;
-			switch(v > FRACTION_COMBINED ? FRACTION_FRACTIONAL : v) {
-				case FRACTION_DECIMAL: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_fraction_decimal")), TRUE);
-					break;
-				}
-				case FRACTION_DECIMAL_EXACT: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_fraction_decimal_exact")), TRUE);
-					break;
-				}
-				case FRACTION_COMBINED: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_fraction_combined")), TRUE);
-					break;
-				}
-				case FRACTION_FRACTIONAL: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_fraction_fraction")), TRUE);
-					if(v > FRACTION_COMBINED) {
-						settings->printops.restrict_fraction_length = false;
-						resultFormatUpdated();
-					}
-					break;
-				}
-			}
-			default_fraction_fraction = dff;*/
+			settings->printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
+			if(v < 0) settings->dual_fraction = -1;
+			else if(v == FRACTION_COMBINED + 2) settings->dual_fraction = 1;
+			else settings->dual_fraction = 0;
+			if(v == FRACTION_COMBINED + 1) v = FRACTION_FRACTIONAL;
+			else if(v < 0 || v == FRACTION_COMBINED + 2) v = FRACTION_DECIMAL;
+			settings->printops.number_fraction_format = (NumberFractionFormat) v;
+			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "complex form") || svar == "cplxform") {
 		int v = -1;
@@ -1611,27 +1672,10 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 4) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			switch(v) {
-				/*case COMPLEX_NUMBER_FORM_RECTANGULAR: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_complex_rectangular")), TRUE);
-					break;
-				}
-				case COMPLEX_NUMBER_FORM_EXPONENTIAL: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_complex_exponential")), TRUE);
-					break;
-				}
-				case COMPLEX_NUMBER_FORM_POLAR: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_complex_polar")), TRUE);
-					break;
-				}
-				case COMPLEX_NUMBER_FORM_CIS: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_complex_polar")), TRUE);
-					break;
-				}
-				default: {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_complex_angle")), TRUE);
-				}*/
-			}
+			settings->complex_angle_form = (v > 3);
+			if(v == 4) v--;
+			settings->evalops.complex_number_form = (ComplexNumberForm) v;
+			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "read precision") || svar == "readprec") {
 		int v = -1;
@@ -1644,12 +1688,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			if(v == ALWAYS_READ_PRECISION) {
-				settings->evalops.parse_options.read_precision = (ReadPrecisionMode) v;
-				expressionFormatUpdated(true);
-			} else {
-				//gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_read_precision")), v != DONT_READ_PRECISION);
-			}
+			settings->evalops.parse_options.read_precision = (ReadPrecisionMode) v;
+			expressionFormatUpdated(true);
 		}
 	} else {
 		if(i_underscore == std::string::npos) {
@@ -1715,7 +1755,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				return;
 			}
 			expressionEdit->setExpressionHasChanged(false);
-			if(!do_mathoperation && !str.empty()) expressionEdit->addToHistory();
+			if(!do_mathoperation && !str.empty() && !block_expression_history) expressionEdit->addToHistory();
 			askDot(str);
 		}
 	}
@@ -1861,7 +1901,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 							} else {
 								CALCULATOR->addVariable(new KnownVariable(cat, name, *mstruct, title));
 							}
-							//update_vmenu();
+							expressionEdit->updateCompletion();
 						}
 					}
 				}
@@ -1914,7 +1954,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					} else {
 						CALCULATOR->addVariable(new KnownVariable("", name, expr));
 					}
-					//update_vmenu();
+					expressionEdit->updateCompletion();
 				}
 			} else if(equalsIgnoreCase(scom, "function")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
@@ -1969,7 +2009,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					} else {
 						CALCULATOR->addFunction(new UserFunction("", name, expr));
 					}
-					//update_fmenu();
+					expressionEdit->updateCompletion();
+					if(functionsDialog) functionsDialog->updateFunctions();
 				}
 			} else if(equalsIgnoreCase(scom, "delete")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
@@ -1977,12 +2018,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				Variable *v = CALCULATOR->getActiveVariable(str);
 				if(v && v->isLocal()) {
 					v->destroy();
-					//update_vmenu();
+					expressionEdit->updateCompletion();
 				} else {
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
 					if(f && f->isLocal()) {
 						f->destroy();
-						//update_fmenu();
+						expressionEdit->updateCompletion();
+						if(functionsDialog) functionsDialog->updateFunctions();
 					} else {
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
 					}
@@ -2137,10 +2179,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				executeCommand(COMMAND_EXPAND);
 			} else if(equalsIgnoreCase(str, "exact")) {
 				if(current_expr) setPreviousExpression();
-				//gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(main_builder, "button_exact")), TRUE);
+				setOption("approx exact");
 			} else if(equalsIgnoreCase(str, "approximate") || str == "approx") {
 				if(current_expr) setPreviousExpression();
-				//gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(main_builder, "button_exact")), FALSE);
+				setOption("approx try exact");
 			} else if(equalsIgnoreCase(str, "mode")) {
 				CALCULATOR->error(true, "Unsupported command: %s.", str.c_str(), NULL);
 			} else if(equalsIgnoreCase(str, "help") || str == "?") {
@@ -2237,11 +2279,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else {
 				CALCULATOR->error(true, "Unknown command: %s.", str.c_str(), NULL);
 			}
-			/*GtkTextIter istart, iend;
-			gtk_text_buffer_get_start_iter(expressionbuffer, &istart);
-			gtk_text_buffer_get_end_iter(expressionbuffer, &iend);
-			gtk_text_buffer_select_range(expressionbuffer, &istart, &iend);
-			if(current_inhistory_index < 0) current_inhistory_index = 0;*/
 			displayMessages(this);
 			return;
 		}
@@ -3007,589 +3044,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 }
 
-/*void QalculateWindow::calculateExpression(bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, bool check_exrates) {
-
-	std::string str, str_conv;
-	bool do_bases = false, do_factors = false, do_expand = false, do_pfe = false, do_calendars = false, do_binary_prefixes = false;
-
-	int save_base = settings->printops.base;
-	bool save_pre = settings->printops.use_unit_prefixes;
-	bool save_cur = settings->printops.use_prefixes_for_currencies;
-	bool save_den = settings->printops.use_denominator_prefix;
-	bool save_allu = settings->printops.use_prefixes_for_all_units;
-	bool save_all = settings->printops.use_all_prefixes;
-	int save_bin = CALCULATOR->usesBinaryPrefixes();
-	ComplexNumberForm save_complex_number_form = settings->evalops.complex_number_form;
-	bool caf_bak = settings->complex_angle_form;
-	bool b_units_saved = settings->evalops.parse_options.units_enabled;
-	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
-	MixedUnitsConversion save_mixed_units_conversion = settings->evalops.mixed_units_conversion;
-	NumberFractionFormat save_format = settings->printops.number_fraction_format;
-	bool save_rfl = settings->printops.restrict_fraction_length;
-	Number save_cbase;
-	bool custom_base_set = false;
-	bool had_to_expression = false;
-
-	if(do_stack) {
-	} else {
-		str = expressionEdit->expression();
-		std::string to_str = CALCULATOR->parseComments(str, settings->evalops.parse_options);
-		if(!to_str.empty() && str.empty()) return;
-
-		if(str == "MC") {
-			settings->v_memory->set(m_zero);
-			return;
-		} else if(str == "MS") {
-			if(mstruct) settings->v_memory->set(*mstruct);
-			return;
-		} else if(str == "M+") {
-			if(mstruct) {
-				MathStructure m = settings->v_memory->get();
-				m.calculateAdd(*mstruct, settings->evalops);
-				settings->v_memory->set(m);
-			}
-			return;
-		} else if(str == "M-" || str == "M−") {
-			if(mstruct) {
-				MathStructure m = settings->v_memory->get();
-				m.calculateSubtract(*mstruct, settings->evalops);
-				settings->v_memory->set(m);
-			}
-			return;
-		}
-
-		std::string from_str = str;
-		askDot(str);
-		if(CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true)) {
-			had_to_expression = true;
-			remove_duplicate_blanks(to_str);
-			std::string str_left;
-			std::string to_str1, to_str2;
-			while(true) {
-				CALCULATOR->separateToExpression(to_str, str_left, settings->evalops, true);
-				remove_blank_ends(to_str);
-				size_t ispace = to_str.find_first_of(SPACES);
-				if(ispace != std::string::npos) {
-					to_str1 = to_str.substr(0, ispace);
-					remove_blank_ends(to_str1);
-					to_str2 = to_str.substr(ispace + 1);
-					remove_blank_ends(to_str2);
-				}
-				if(equalsIgnoreCase(to_str, "hex") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "hexadecimal", tr("hexadecimal"))) {
-					settings->printops.base = BASE_HEXADECIMAL;
-				} else if(equalsIgnoreCase(to_str, "bin") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "binary", tr("binary"))) {
-					settings->printops.base = BASE_BINARY;
-				} else if(equalsIgnoreCase(to_str, "dec") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "decimal", tr("decimal"))) {
-					settings->printops.base = BASE_DECIMAL;
-				} else if(equalsIgnoreCase(to_str, "oct") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "octal", tr("octal"))) {
-					settings->printops.base = BASE_OCTAL;
-				} else if(equalsIgnoreCase(to_str, "duo") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "duodecimal", tr("duodecimal"))) {
-					settings->printops.base = BASE_DUODECIMAL;
-				} else if(equalsIgnoreCase(to_str, "roman") || equalsIgnoreCase(to_str, tr("roman").toStdString())) {
-					settings->printops.base = BASE_ROMAN_NUMERALS;
-				} else if(equalsIgnoreCase(to_str, "bijective") || equalsIgnoreCase(to_str, tr("bijective").toStdString())) {
-					settings->printops.base = BASE_BIJECTIVE_26;
-				} else if(equalsIgnoreCase(to_str, "sexa") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "sexagesimal", tr("sexagesimal"))) {
-					settings->printops.base = BASE_SEXAGESIMAL;
-				} else if(equalsIgnoreCase(to_str, "sexa2") || EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "sexagesimal", tr("sexagesimal"), "2")) {
-					settings->printops.base = BASE_SEXAGESIMAL_2;
-				} else if(equalsIgnoreCase(to_str, "sexa3") || EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "sexagesimal", tr("sexagesimal"), "3")) {
-					settings->printops.base = BASE_SEXAGESIMAL_3;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "longitude", tr("longitude"))) {
-					settings->printops.base = BASE_LONGITUDE;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "longitude", tr("longitude"), "2")) {
-					settings->printops.base = BASE_LONGITUDE_2;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "latitude", tr("latitude"))) {
-					settings->printops.base = BASE_LATITUDE;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "latitude", tr("latitude"), "2")) {
-					settings->printops.base = BASE_LATITUDE_2;
-				} else if(equalsIgnoreCase(to_str, "fp32") || equalsIgnoreCase(to_str, "binary32") || equalsIgnoreCase(to_str, "float")) {
-					settings->printops.base = BASE_FP32;
-				} else if(equalsIgnoreCase(to_str, "fp64") || equalsIgnoreCase(to_str, "binary64") || equalsIgnoreCase(to_str, "double")) {
-					settings->printops.base = BASE_FP64;
-				} else if(equalsIgnoreCase(to_str, "fp16") || equalsIgnoreCase(to_str, "binary16")) {
-					settings->printops.base = BASE_FP16;
-				} else if(equalsIgnoreCase(to_str, "fp80")) {
-					settings->printops.base = BASE_FP80;
-				} else if(equalsIgnoreCase(to_str, "fp128") || equalsIgnoreCase(to_str, "binary128")) {
-					settings->printops.base = BASE_FP128;
-				} else if(equalsIgnoreCase(to_str, "time") || equalsIgnoreCase(to_str, tr("time").toStdString())) {
-					settings->printops.base = BASE_TIME;
-				} else if(equalsIgnoreCase(str, "unicode")) {
-					settings->printops.base = BASE_UNICODE;
-				} else if(equalsIgnoreCase(to_str, "utc") || equalsIgnoreCase(to_str, "gmt")) {
-					settings->printops.time_zone = TIME_ZONE_UTC;
-				} else if(to_str.length() > 3 && equalsIgnoreCase(to_str.substr(0, 3), "bin") && is_in(NUMBERS, to_str[3])) {
-					settings->printops.base = BASE_BINARY;
-					settings->printops.binary_bits = s2i(to_str.substr(3));
-				} else if(to_str.length() > 3 && equalsIgnoreCase(to_str.substr(0, 3), "hex") && is_in(NUMBERS, to_str[3])) {
-					settings->printops.base = BASE_HEXADECIMAL;
-					settings->printops.binary_bits = s2i(to_str.substr(3));
-				} else if(to_str.length() > 3 && (equalsIgnoreCase(to_str.substr(0, 3), "utc") || equalsIgnoreCase(to_str.substr(0, 3), "gmt"))) {
-					to_str = to_str.substr(3);
-					remove_blanks(to_str);
-					bool b_minus = false;
-					if(to_str[0] == '+') {
-						to_str.erase(0, 1);
-					} else if(to_str[0] == '-') {
-						b_minus = true;
-						to_str.erase(0, 1);
-					} else if(to_str.find(SIGN_MINUS) == 0) {
-						b_minus = true;
-						to_str.erase(0, strlen(SIGN_MINUS));
-					}
-					unsigned int tzh = 0, tzm = 0;
-					int itz = 0;
-					if(!to_str.empty() && sscanf(to_str.c_str(), "%2u:%2u", &tzh, &tzm) > 0) {
-						itz = tzh * 60 + tzm;
-						if(b_minus) itz = -itz;
-					} else {
-						CALCULATOR->error(true, tr("Time zone parsing failed.").toUtf8().constData(), NULL);
-					}
-					settings->printops.time_zone = TIME_ZONE_CUSTOM;
-					settings->printops.custom_time_zone = itz;
-				} else if(to_str == "CET") {
-					settings->printops.time_zone = TIME_ZONE_CUSTOM;
-					settings->printops.custom_time_zone = 60;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "fraction", tr("fraction")) || to_str == "frac") {
-					settings->printops.restrict_fraction_length = false;
-					settings->printops.number_fraction_format = FRACTION_COMBINED;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "factors", tr("factors")) || to_str == "factor") {
-					do_factors = true;
-				}  else if(equalsIgnoreCase(to_str, "partial fraction") || equalsIgnoreCase(to_str, tr("partial fraction").toStdString()) || to_str == "partial") {
-					do_pfe = true;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "bases", tr("bases"))) {
-					do_bases = true;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "calendars", tr("calendars"))) {
-					do_calendars = true;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "rectangular", tr("rectangular")) || EQUALS_IGNORECASE_AND_LOCAL(to_str, "cartesian", tr("cartesian")) || to_str == "rect") {
-					settings->complex_angle_form = false;
-					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "exponential", tr("exponential")) || to_str == "exp") {
-					settings->complex_angle_form = false;
-					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_EXPONENTIAL;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "polar", tr("polar"))) {
-					settings->complex_angle_form = false;
-					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_POLAR;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "angle", tr("angle")) || EQUALS_IGNORECASE_AND_LOCAL(to_str, "phasor", tr("phasor"))) {
-					settings->complex_angle_form = true;
-					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
-				} else if(to_str == "cis") {
-					settings->complex_angle_form = false;
-					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "optimal", tr("optimal"))) {
-					settings->evalops.parse_options.units_enabled = true;
-					settings->evalops.auto_post_conversion = POST_CONVERSION_OPTIMAL_SI;
-					str_conv = "";
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "base", tr("base", "units"))) {
-					settings->evalops.parse_options.units_enabled = true;
-					settings->evalops.auto_post_conversion = POST_CONVERSION_BASE;
-					str_conv = "";
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str1, "base", tr("base"))) {
-					if(to_str2 == "b26" || to_str2 == "B26") settings->printops.base = BASE_BIJECTIVE_26;
-					else if(equalsIgnoreCase(to_str2, "golden") || equalsIgnoreCase(to_str2, "golden ratio") || to_str2 == "φ") settings->printops.base = BASE_GOLDEN_RATIO;
-					else if(equalsIgnoreCase(to_str2, "unicode")) settings->printops.base = BASE_UNICODE;
-					else if(equalsIgnoreCase(to_str2, "supergolden") || equalsIgnoreCase(to_str2, "supergolden ratio") || to_str2 == "ψ") settings->printops.base = BASE_SUPER_GOLDEN_RATIO;
-					else if(equalsIgnoreCase(to_str2, "pi") || to_str2 == "π") settings->printops.base = BASE_PI;
-					else if(to_str2 == "e") settings->printops.base = BASE_E;
-					else if(to_str2 == "sqrt(2)" || to_str2 == "sqrt 2" || to_str2 == "sqrt2" || to_str2 == "√2") settings->printops.base = BASE_SQRT2;
-					else {
-						EvaluationOptions eo = settings->evalops;
-						eo.parse_options.base = 10;
-						MathStructure m;
-						eo.approximation = APPROXIMATION_TRY_EXACT;
-						CALCULATOR->beginTemporaryStopMessages();
-						CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(to_str2, eo.parse_options), 500, eo);
-						if(CALCULATOR->endTemporaryStopMessages()) {
-							settings->printops.base = BASE_CUSTOM;
-							custom_base_set = true;
-							save_cbase = CALCULATOR->customOutputBase();
-							CALCULATOR->setCustomOutputBase(nr_zero);
-						} else if(m.isInteger() && m.number() >= 2 && m.number() <= 36) {
-							settings->printops.base = m.number().intValue();
-						} else {
-							settings->printops.base = BASE_CUSTOM;
-							custom_base_set = true;
-							save_cbase = CALCULATOR->customOutputBase();
-							CALCULATOR->setCustomOutputBase(m.number());
-						}
-					}
-				} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "mixed", tr("mixed", "units"))) {
-					settings->evalops.auto_post_conversion = POST_CONVERSION_NONE;
-					settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
-				} else {
-					settings->evalops.parse_options.units_enabled = true;
-					if((to_str[0] == '?' && (!settings->printops.use_unit_prefixes || !settings->printops.use_prefixes_for_currencies || !settings->printops.use_prefixes_for_all_units)) || (to_str.length() > 1 && to_str[1] == '?' && to_str[0] == 'a' && (!settings->printops.use_unit_prefixes || !settings->printops.use_prefixes_for_currencies || !settings->printops.use_all_prefixes || !settings->printops.use_prefixes_for_all_units)) || (to_str.length() > 1 && to_str[1] == '?' && to_str[0] == 'd' && (!settings->printops.use_unit_prefixes || !settings->printops.use_prefixes_for_currencies || !settings->printops.use_prefixes_for_all_units || CALCULATOR->usesBinaryPrefixes() > 0))) {
-						settings->printops.use_unit_prefixes = true;
-						settings->printops.use_prefixes_for_currencies = true;
-						settings->printops.use_prefixes_for_all_units = true;
-						if(to_str[0] == 'a') settings->printops.use_all_prefixes = true;
-						else if(to_str[0] == 'd') CALCULATOR->useBinaryPrefixes(0);
-					} else if(to_str.length() > 1 && to_str[1] == '?' && to_str[0] == 'b') {
-						do_binary_prefixes = true;
-					}
-					if(!str_conv.empty()) str_conv += " to ";
-					str_conv += to_str;
-				}
-				if(str_left.empty()) break;
-				to_str = str_left;
-			}
-			str = from_str;
-			if(!str_conv.empty()) {
-				str += " to ";
-				str += str_conv;
-			}
-		}
-		size_t i = str.find_first_of(SPACES LEFT_PARENTHESIS);
-		if(i != std::string::npos) {
-			to_str = str.substr(0, i);
-			if(to_str == "factor" || EQUALS_IGNORECASE_AND_LOCAL(to_str, "factorize", tr("factorize"))) {
-				str = str.substr(i + 1);
-				do_factors = true;
-			} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "expand", tr("expand"))) {
-				str = str.substr(i + 1);
-				do_expand = true;
-			}
-		}
-	}
-
-	b_busy++;
-
-	size_t stack_size = 0;
-
-	CALCULATOR->resetExchangeRatesUsed();
-
-	MathStructure to_struct;
-
-	if(do_stack) {
-		stack_size = CALCULATOR->RPNStackSize();
-		CALCULATOR->setRPNRegister(stack_index + 1, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), 0, settings->evalops, parsed_mstruct, NULL);
-	} else if(settings->rpn_mode) {
-		stack_size = CALCULATOR->RPNStackSize();
-		if(do_mathoperation) {
-			if(f) CALCULATOR->calculateRPN(f, 0, settings->evalops, parsed_mstruct);
-			else CALCULATOR->calculateRPN(op, 0, settings->evalops, parsed_mstruct);
-		} else {
-			std::string str2 = CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options);
-			CALCULATOR->parseSigns(str2);
-			remove_blank_ends(str2);
-			if(str2.length() == 1) {
-				do_mathoperation = true;
-				switch(str2[0]) {
-					case '^': {CALCULATOR->calculateRPN(OPERATION_RAISE, 0, settings->evalops, parsed_mstruct); break;}
-					case '+': {CALCULATOR->calculateRPN(OPERATION_ADD, 0, settings->evalops, parsed_mstruct); break;}
-					case '-': {CALCULATOR->calculateRPN(OPERATION_SUBTRACT, 0, settings->evalops, parsed_mstruct); break;}
-					case '*': {CALCULATOR->calculateRPN(OPERATION_MULTIPLY, 0, settings->evalops, parsed_mstruct); break;}
-					case '/': {CALCULATOR->calculateRPN(OPERATION_DIVIDE, 0, settings->evalops, parsed_mstruct); break;}
-					case '&': {CALCULATOR->calculateRPN(OPERATION_BITWISE_AND, 0, settings->evalops, parsed_mstruct); break;}
-					case '|': {CALCULATOR->calculateRPN(OPERATION_BITWISE_OR, 0, settings->evalops, parsed_mstruct); break;}
-					case '~': {CALCULATOR->calculateRPNBitwiseNot(0, settings->evalops, parsed_mstruct); break;}
-					case '!': {CALCULATOR->calculateRPN(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL), 0, settings->evalops, parsed_mstruct); break;}
-					case '>': {CALCULATOR->calculateRPN(OPERATION_GREATER, 0, settings->evalops, parsed_mstruct); break;}
-					case '<': {CALCULATOR->calculateRPN(OPERATION_LESS, 0, settings->evalops, parsed_mstruct); break;}
-					case '=': {CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct); break;}
-					case '\\': {
-						MathFunction *fdiv = CALCULATOR->getActiveFunction("div");
-						if(fdiv) {
-							CALCULATOR->calculateRPN(fdiv, 0, settings->evalops, parsed_mstruct);
-							break;
-						}
-					}
-					default: {do_mathoperation = false;}
-				}
-			} else if(str2.length() == 2) {
-				if(str2 == "**") {
-					CALCULATOR->calculateRPN(OPERATION_RAISE, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == "!!") {
-					CALCULATOR->calculateRPN(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL), 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == "!=" || str == "=!" || str == "<>") {
-					CALCULATOR->calculateRPN(OPERATION_NOT_EQUALS, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == "<=" || str == "=<") {
-					CALCULATOR->calculateRPN(OPERATION_EQUALS_LESS, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == ">=" || str == "=>") {
-					CALCULATOR->calculateRPN(OPERATION_EQUALS_GREATER, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == "==") {
-					CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				} else if(str2 == "//") {
-					MathFunction *fdiv = CALCULATOR->getActiveFunction("div");
-					if(fdiv) {
-						CALCULATOR->calculateRPN(fdiv, 0, settings->evalops, parsed_mstruct);
-						do_mathoperation = true;
-					}
-				}
-			} else if(str2.length() == 3) {
-				if(str2 == "⊻") {
-					CALCULATOR->calculateRPN(OPERATION_BITWISE_XOR, 0, settings->evalops, parsed_mstruct);
-					do_mathoperation = true;
-				}
-			}
-			if(!do_mathoperation) {
-				bool had_nonnum = false, test_function = true;
-				int in_par = 0;
-				for(size_t i = 0; i < str2.length(); i++) {
-					if(is_in(NUMBERS, str2[i])) {
-						if(!had_nonnum || in_par) {
-							test_function = false;
-							break;
-						}
-					} else if(str2[i] == '(') {
-						if(in_par || !had_nonnum) {
-							test_function = false;
-							break;
-						}
-						in_par = i;
-					} else if(str2[i] == ')') {
-						if(i != str2.length() - 1) {
-							test_function = false;
-							break;
-						}
-					} else if(str2[i] == ' ') {
-						if(!in_par) {
-							test_function = false;
-							break;
-						}
-					} else if(is_in(NOT_IN_NAMES, str2[i])) {
-						test_function = false;
-						break;
-					} else {
-						if(in_par) {
-							test_function = false;
-							break;
-						}
-						had_nonnum = true;
-					}
-				}
-				f = NULL;
-				if(test_function) {
-					if(in_par) f = CALCULATOR->getActiveFunction(str2.substr(0, in_par));
-					else f = CALCULATOR->getActiveFunction(str2);
-				}
-				if(f && f->minargs() > 0) {
-					do_mathoperation = true;
-					original_expression = "";
-					CALCULATOR->calculateRPN(f, 0, settings->evalops, parsed_mstruct);
-				} else {
-					original_expression = str2;
-					CALCULATOR->RPNStackEnter(str2, 0, settings->evalops, parsed_mstruct, NULL);
-				}
-			}
-		}
-	} else {
-		original_expression = CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options);
-		CALCULATOR->calculate(mstruct, original_expression, 0, settings->evalops, parsed_mstruct, &to_struct);
-	}
-
-	calculation_wait:
-
-	int i = 0;
-	while(CALCULATOR->busy() && i < 75) {
-		sleep_ms(10);
-		i++;
-	}
-	i = 0;
-	QProgressDialog *dialog = NULL;
-	if(CALCULATOR->busy()) {
-		dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
-		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
-		dialog->setWindowModality(Qt::WindowModal);
-		dialog->show();
-	}
-	while(CALCULATOR->busy()) {
-		qApp->processEvents();
-		sleep_ms(100);
-	}
-	if(dialog) {
-		dialog->hide();
-		dialog->deleteLater();
-	}
-	bool units_changed = false;
-
-	if(!do_mathoperation && !str_conv.empty() && to_struct.containsType(STRUCT_UNIT, true) && !mstruct->containsType(STRUCT_UNIT) && !parsed_mstruct->containsType(STRUCT_UNIT, false, true, true) && !CALCULATOR->hasToExpression(str_conv, false, settings->evalops)) {
-		to_struct.unformat();
-		to_struct = CALCULATOR->convertToOptimalUnit(to_struct, settings->evalops, true);
-		fix_to_struct(to_struct);
-		if(!to_struct.isZero()) {
-			mstruct->multiply(to_struct);
-			PrintOptions po = settings->printops;
-			po.negative_exponents = false;
-			to_struct.format(po);
-			if(to_struct.isMultiplication() && to_struct.size() >= 2) {
-				if(to_struct[0].isOne()) to_struct.delChild(1, true);
-				else if(to_struct[1].isOne()) to_struct.delChild(2, true);
-			}
-			parsed_mstruct->multiply(to_struct);
-			to_struct.clear();
-			CALCULATOR->calculate(mstruct, 0, settings->evalops, CALCULATOR->unlocalizeExpression(str_conv, settings->evalops.parse_options));
-			units_changed = true;
-			goto calculation_wait;
-		}
-	}
-
-	// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
-	if(!settings->rpn_mode && !had_to_expression && ((settings->evalops.approximation == APPROXIMATION_EXACT && settings->evalops.auto_post_conversion != POST_CONVERSION_NONE) || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL) && parsed_mstruct && mstruct && ((parsed_mstruct->isMultiplication() && parsed_mstruct->size() == 2 && (*parsed_mstruct)[0].isNumber() && (*parsed_mstruct)[1].isUnit_exp() && parsed_mstruct->equals(*mstruct)) || (parsed_mstruct->isNegate() && (*parsed_mstruct)[0].isMultiplication() && (*parsed_mstruct)[0].size() == 2 && (*parsed_mstruct)[0][0].isNumber() && (*parsed_mstruct)[0][1].isUnit_exp() && mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1] == (*parsed_mstruct)[0][1] && (*mstruct)[0].isNumber() && (*parsed_mstruct)[0][0].number() == -(*mstruct)[0].number()) || (parsed_mstruct->isUnit_exp() && parsed_mstruct->equals(*mstruct)))) {
-		Unit *u = NULL;
-		MathStructure *munit = NULL;
-		if(mstruct->isMultiplication()) munit = &(*mstruct)[1];
-		else munit = mstruct;
-		if(munit->isUnit()) u = munit->unit();
-		else u = (*munit)[0].unit();
-		if(u && u->isCurrency()) {
-			if(settings->evalops.local_currency_conversion && CALCULATOR->getLocalCurrency() && u != CALCULATOR->getLocalCurrency()) {
-				ApproximationMode abak = settings->evalops.approximation;
-				if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-				mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				settings->evalops.approximation = abak;
-			}
-		} else if(u && u->subtype() != SUBTYPE_BASE_UNIT && !u->isSIUnit()) {
-			MathStructure mbak(*mstruct);
-			if(settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL) {
-				if(munit->isUnit() && u->referenceName() == "oF") {
-					u = CALCULATOR->getActiveUnit("oC");
-					if(u) mstruct->set(CALCULATOR->convert(*mstruct, u, settings->evalops, true, false));
-				} else {
-					mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				}
-			}
-			if(settings->evalops.approximation == APPROXIMATION_EXACT && (settings->evalops.auto_post_conversion != POST_CONVERSION_OPTIMAL || mstruct->equals(mbak))) {
-				settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-				if(settings->evalops.auto_post_conversion == POST_CONVERSION_BASE) mstruct->set(CALCULATOR->convertToBaseUnits(*mstruct, settings->evalops));
-				else mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				settings->evalops.approximation = APPROXIMATION_EXACT;
-			}
-		}
-	}
-
-	if(settings->rpn_mode && (!do_stack || stack_index == 0)) {
-		mstruct->unref();
-		mstruct = CALCULATOR->getRPNRegister(1);
-		if(!mstruct) mstruct = new MathStructure();
-		else mstruct->ref();
-		settings->current_result = mstruct;
-	}
-
-	if(!do_mathoperation && (askTC(*parsed_mstruct) || (check_exrates && checkExchangeRates()))) {
-		b_busy--;
-		calculateExpression(do_mathoperation, op, f, settings->rpn_mode, do_stack ? stack_index : 0, false);
-		settings->evalops.auto_post_conversion = save_auto_post_conversion;
-		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-		settings->evalops.parse_options.units_enabled = b_units_saved;
-		if(custom_base_set) CALCULATOR->setCustomOutputBase(save_cbase);
-		settings->evalops.complex_number_form = save_complex_number_form;
-		settings->complex_angle_form = caf_bak;
-		settings->printops.custom_time_zone = 0;
-		settings->printops.time_zone = TIME_ZONE_LOCAL;
-		settings->printops.binary_bits = 0;
-		settings->printops.base = save_base;
-		settings->printops.use_unit_prefixes = save_pre;
-		settings->printops.use_prefixes_for_currencies = save_cur;
-		settings->printops.use_prefixes_for_all_units = save_allu;
-		settings->printops.use_all_prefixes = save_all;
-		settings->printops.use_denominator_prefix = save_den;
-		settings->printops.restrict_fraction_length = save_rfl;
-		settings->printops.number_fraction_format = save_format;
-		CALCULATOR->useBinaryPrefixes(save_bin);
-		return;
-	}
-
-	mstruct_exact.setUndefined();
-	
-	if((!do_calendars || !mstruct->isDateTime()) && (settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) && !do_bases && !units_changed) {
-		long int i_timeleft = 0;
-		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
-		if(i_timeleft > 0) {
-			calculate_dual_exact(mstruct_exact, mstruct, original_expression, parsed_mstruct, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), i_timeleft, 5);
-		}
-	}
-
-	b_busy--;
-
-	if(do_factors || do_expand || do_pfe) {
-		if(do_stack && stack_index != 0) {
-			MathStructure *save_mstruct = mstruct;
-			mstruct = CALCULATOR->getRPNRegister(stack_index + 1);
-			executeCommand(do_pfe ? COMMAND_EXPAND_PARTIAL_FRACTIONS : (do_expand ? COMMAND_EXPAND : COMMAND_FACTORIZE), false);
-			mstruct = save_mstruct;
-		} else {
-			executeCommand(do_pfe ? COMMAND_EXPAND_PARTIAL_FRACTIONS : (do_expand ? COMMAND_EXPAND : COMMAND_FACTORIZE), false);
-		}
-	}
-
-	//update "ans" variables
-	if(!do_stack || stack_index == 0) {
-		MathStructure m4(settings->vans[3]->get());
-		m4.replace(settings->vans[4], settings->vans[4]->get());
-		settings->vans[4]->set(m4);
-		MathStructure m3(settings->vans[2]->get());
-		m3.replace(settings->vans[3], settings->vans[4]);
-		settings->vans[3]->set(m3);
-		MathStructure m2(settings->vans[1]->get());
-		m2.replace(settings->vans[2], settings->vans[3]);
-		settings->vans[2]->set(m2);
-		MathStructure m1(settings->vans[0]->get());
-		m1.replace(settings->vans[1], settings->vans[2]);
-		settings->vans[1]->set(m1);
-		mstruct->replace(settings->vans[0], settings->vans[1]);
-		settings->vans[0]->set(*mstruct);
-	}
-
-	if(do_stack && stack_index > 0) {
-	} else if(settings->rpn_mode && do_mathoperation) {
-		result_text = tr("RPN Operation").toStdString();
-	} else {
-		result_text = str;
-	}
-	settings->printops.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
-	if(settings->rpn_mode && (!do_stack || stack_index == 0)) {
-		if(CALCULATOR->RPNStackSize() < stack_size) {
-			//RPNRegisterRemoved(1);
-		} else if(CALCULATOR->RPNStackSize() > stack_size) {
-			//RPNRegisterAdded("");
-		}
-	}
-
-	if(do_binary_prefixes) {
-		int i = 0;
-		if(!do_stack || stack_index == 0) i = has_information_unit(*mstruct);
-		CALCULATOR->useBinaryPrefixes(i > 0 ? 1 : 2);
-		settings->printops.use_unit_prefixes = true;
-		if(i == 1) {
-			settings->printops.use_denominator_prefix = false;
-		} else if(i > 1) {
-			settings->printops.use_denominator_prefix = true;
-		} else {
-			settings->printops.use_prefixes_for_currencies = true;
-			settings->printops.use_prefixes_for_all_units = true;
-		}
-	}
-	setResult(NULL, (!do_stack || stack_index == 0), do_stack ? stack_index : 0);
-	
-	settings->evalops.auto_post_conversion = save_auto_post_conversion;
-	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-	settings->evalops.parse_options.units_enabled = b_units_saved;
-	if(custom_base_set) CALCULATOR->setCustomOutputBase(save_cbase);
-	settings->evalops.complex_number_form = save_complex_number_form;
-	settings->complex_angle_form = caf_bak;
-	settings->printops.custom_time_zone = 0;
-	settings->printops.time_zone = TIME_ZONE_LOCAL;
-	settings->printops.binary_bits = 0;
-	settings->printops.base = save_base;
-	settings->printops.use_unit_prefixes = save_pre;
-	settings->printops.use_prefixes_for_currencies = save_cur;
-	settings->printops.use_prefixes_for_all_units = save_allu;
-	settings->printops.use_all_prefixes = save_all;
-	settings->printops.use_denominator_prefix = save_den;
-	settings->printops.restrict_fraction_length = save_rfl;
-	settings->printops.number_fraction_format = save_format;
-	CALCULATOR->useBinaryPrefixes(save_bin);
-
-}*/
-
 void CommandThread::run() {
 
 	enableAsynchronousCancel();
@@ -3886,6 +3340,7 @@ void set_result_bases(const MathStructure &m) {
 }
 
 void QalculateWindow::onExpressionChanged() {
+	if(!expressionEdit->expressionHasChanged() || !basesDock->isVisible()) return;
 	MathStructure m;
 	EvaluationOptions eo = settings->evalops;
 	eo.structuring = STRUCTURING_NONE;
@@ -4540,8 +3995,9 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();
 	settings->window_geometry = saveGeometry();
 	settings->splitter_state = ehSplitter->saveState();
-	settings->savePreferences();
-	CALCULATOR->saveDefinitions();
+	settings->savePreferences(settings->save_mode_on_exit);
+	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
+	CALCULATOR->abort();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
 }
@@ -4582,7 +4038,8 @@ void QalculateWindow::onBasesActivated(bool b) {
 }
 void QalculateWindow::onBasesVisibilityChanged(bool b) {
 	basesAction->setChecked(b);
-	if(b) updateResultBases();
+	if(b && expressionEdit->expressionHasChanged()) onExpressionChanged();
+	else if(b && !settings->history_answer.empty()) updateResultBases();
 }
 bool QalculateWindow::displayMessages(QWidget *parent) {
 	if(!CALCULATOR->message()) return false;
@@ -4853,7 +4310,91 @@ void QalculateWindow::openFunctions() {
 	functionsDialog = new FunctionsDialog(this);
 	connect(functionsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
+	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*, QWidget*)), this, SLOT(insertFunction(MathFunction*, QWidget*)));
 	functionsDialog->show();
 }
-
+void QalculateWindow::openFPConversion() {
+	if(fpConversionDialog) {
+		fpConversionDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		fpConversionDialog->show();
+		fpConversionDialog->raise();
+		fpConversionDialog->activateWindow();
+		return;
+	}
+	fpConversionDialog = new FPConversionDialog(this);
+	QString str;
+	int base;
+	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
+		str = QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct)));
+		if(to_base != 0) base = to_base;
+		else base = settings->printops.base;
+	} else {
+		str = expressionEdit->toPlainText();
+		base = settings->evalops.parse_options.base;
+	}
+	switch(base) {
+		case BASE_BINARY: {
+			fpConversionDialog->setBin(str);
+			break;
+		}
+		case BASE_HEXADECIMAL: {
+			fpConversionDialog->setHex(str);
+			break;
+		}
+		default: {
+			fpConversionDialog->setValue(str);
+			break;
+		}
+	}
+	fpConversionDialog->show();
+}
+void QalculateWindow::insertFunction(MathFunction*, QWidget *parent) {
+}
+void QalculateWindow::executeFromFile(const QString &file) {
+	QFile qfile(file);
+	if(!qfile.open(QIODevice::ReadOnly)) {
+		qDebug() << tr("Failed to open %1.\n%1").arg(file).arg(qfile.errorString());
+		return;
+	}
+	char buffer[10000];
+	std::string str, scom;
+	size_t ispace;
+	bool rpn_save = settings->rpn_mode;
+	settings->rpn_mode = false;
+	previous_expression = "";
+	expressionEdit->blockUndo(true);
+	expressionEdit->blockCompletion(true);
+	expressionEdit->blockParseStatus(true);
+	block_expression_history = true;
+	while(qfile.readLine(buffer, 10000)) {
+		str = buffer;
+		remove_blank_ends(str);
+		ispace = str.find_first_of(SPACES);
+		if(ispace == std::string::npos) scom = "";
+		else scom = str.substr(0, ispace);
+		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
+		if(!str.empty()) calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str, false);
+	}
+	expressionEdit->clear();
+	expressionEdit->setExpressionHasChanged(true);
+	if(parsed_mstruct) parsed_mstruct->clear();
+	if(parsed_tostruct) parsed_tostruct->setUndefined();
+	expressionEdit->blockUndo(false);
+	expressionEdit->blockCompletion(false);
+	expressionEdit->blockParseStatus(false);
+	block_expression_history = false;
+	settings->rpn_mode = rpn_save;
+	previous_expression = "";
+	if(mstruct) {
+		if(settings->rpn_mode) {
+			mstruct->unref();
+			mstruct = CALCULATOR->getRPNRegister(1);
+			if(!mstruct) mstruct = new MathStructure();
+			else mstruct->ref();
+		} else {
+			mstruct->clear();
+		}
+	}
+	qfile.close();
+}
 

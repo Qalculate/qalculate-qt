@@ -19,8 +19,12 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 			ICON_DIR = $$PREFIX/share/icons
 		}
 	}
+	isEmpty(TRANSLATIONS_DIR) {
+		TRANSLATIONS_DIR = $$PREFIX/share/eqonomize/translations
+	}
 } else {
 	ICON_DIR = ":/icons"
+	TRANSLATIONS_DIR = ":/translations"
 	DEFINES += RESOURCES_COMPILED=1
 }
 isEmpty(MAN_DIR) {
@@ -36,11 +40,12 @@ CONFIG += qt
 QT += widgets network
 MOC_DIR = build
 OBJECTS_DIR = build
+DEFINES += TRANSLATIONS_DIR=\\\"$$TRANSLATIONS_DIR\\\"
 DEFINES += ICON_DIR=\\\"$$ICON_DIR\\\"
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/expressionedit.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/variableeditdialog.h
-SOURCES += src/expressionedit.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/variableeditdialog.cpp
+HEADERS += src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/variableeditdialog.h
+SOURCES += src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/variableeditdialog.cpp
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
