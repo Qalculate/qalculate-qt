@@ -46,6 +46,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent), read_
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	okButton->setEnabled(false);
+	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 }
 FunctionEditDialog::~FunctionEditDialog() {}
 

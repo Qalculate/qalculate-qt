@@ -33,6 +33,13 @@
 #include <QWidgetAction>
 #include <QStyle>
 #include <QTimer>
+#include <QComboBox>
+#include <QButtonGroup>
+#include <QDialogButtonBox>
+#include <QRadioButton>
+#include <QCheckBox>
+#include <QDateTimeEdit>
+#include <QFileDialog>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -106,6 +113,7 @@ bool contains_unknown_variable(const MathStructure &m) {
 
 std::string print_with_evalops(const Number &nr) {
 	PrintOptions po;
+	po.is_approximate = NULL;
 	po.base = settings->evalops.parse_options.base;
 	po.base_display = BASE_DISPLAY_NONE;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
@@ -131,7 +139,7 @@ std::string print_with_evalops(const Number &nr) {
 	return str;
 }
 
-std::string unhtmlize(std::string str, bool replace_all_i) {
+std::string unhtmlize(std::string str) {
 	size_t i = 0, i2;
 	while(true) {
 		i = str.find("<", i);
@@ -151,21 +159,18 @@ std::string unhtmlize(std::string str, bool replace_all_i) {
 			} else if(str.substr(i + 1, 3) == "sub") {
 				size_t i3 = str.find("</sub>", i + 4);
 				if(i3 != std::string::npos) {
-					str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5)));
+					if(i2 - i3 > 16 && str.substr(i2 + 1, 7) == "<small>" && str.substr(i3 - 9, 8) == "</small>") str.erase(i, i3 - i + 6);
+					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5)));
 					continue;
 				}
 			}
-		} else if(i2 - i == 2 && str[i + 1] == 'i') {
+		} else if(i2 - i == 17 && str.substr(i + 1, 16) == "i class=\"symbol\"") {
 			size_t i3 = str.find("</i>", i2 + 1);
 			if(i3 != std::string::npos) {
-				std::string name = unhtmlize(str.substr(i + 3, i3 - i - 3));
-				if(!replace_all_i) {
-					Variable *v = CALCULATOR->getActiveVariable(name);
-					replace_all_i = (!v || v->isKnown());
-				}
-				if(replace_all_i && name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
+				std::string name = unhtmlize(str.substr(i2 + 1, i3 - i2 - 1));
+				if(name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
 					name.insert(0, 1, '\\');
-				} else if(replace_all_i) {
+				} else {
 					name.insert(0, 1, '\"');
 					name += '\"';
 				}
@@ -180,7 +185,7 @@ std::string unhtmlize(std::string str, bool replace_all_i) {
 	gsub("&gt;", ">", str);
 	gsub("&lt;", "<", str);
 	gsub("&hairsp;", "", str);
-	gsub("&thinsp;", " ", str);
+	gsub("&thinsp;", THIN_SPACE, str);
 	return str;
 }
 
@@ -3026,7 +3031,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
 			if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
 				if(exact_text == "0") expressionEdit->clear();
-				else if(exact_text.empty()) expressionEdit->setPlainText(QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct))));
+				else if(exact_text.empty()) expressionEdit->setPlainText(QString::fromStdString(unhtmlize(result_text)));
 				else expressionEdit->setPlainText(QString::fromStdString(exact_text));
 			} else {
 				if(!execute_str.empty()) {
@@ -3309,6 +3314,7 @@ void set_result_bases(const MathStructure &m) {
 		}
 		nr.round(settings->printops.round_halfway_to_even);
 		PrintOptions po = settings->printops;
+		po.is_approximate = NULL;
 		po.show_ending_zeroes = false;
 		po.base_display = BASE_DISPLAY_NORMAL;
 		po.min_exp = 0;
@@ -3635,7 +3641,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(stack_index == 0) {
 		if(basesDock->isVisible()) updateResultBases();
-		if((settings->title_type == TITLE_APP || !updateWindowTitle(QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct))), true)) && title_set) updateWindowTitle();
+		if((settings->title_type == TITLE_APP || !updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true)) && title_set) updateWindowTitle();
 	}
 	if(register_moved) {
 		update_parse = true;
@@ -3667,9 +3673,9 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		if(mstruct->isAborted() || settings->printops.base != settings->evalops.parse_options.base || (settings->printops.base > 32 || settings->printops.base < 2)) {
 			exact_text = "";
 		} else if(!mstruct->isApproximate() && !(*settings->printops.is_approximate)) {
-			exact_text = unhtmlize(result_text, !contains_unknown_variable(*mstruct));
+			exact_text = unhtmlize(result_text);
 		} else if(!alt_results.empty()) {
-			exact_text = unhtmlize(alt_results[0], !contains_unknown_variable(*mstruct));
+			exact_text = unhtmlize(alt_results[0]);
 		} else {
 			exact_text = "";
 		}
@@ -3822,78 +3828,45 @@ bool QalculateWindow::askTC(MathStructure &m) {
 		}
 		if(!b) return false;
 	}
-	/*GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Temperature Calculation Mode"), GTK_WINDOW(gtk_builder_get_object(main_builder, "main_window")), (GtkDialogFlags) (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT), _("_OK"), GTK_RESPONSE_ACCEPT, NULL);
-	if(always_on_top) gtk_window_set_keep_above(GTK_WINDOW(dialog), always_on_top);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 6);
-	GtkWidget *grid = gtk_grid_new();
-	gtk_grid_set_row_spacing(GTK_GRID(grid), 12);
-	gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-	gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid);
-	gtk_widget_show(grid);
-	GtkWidget *label = gtk_label_new(_("The expression is ambiguous.\nPlease select temperature calculation mode\n(the mode can later be changed in preferences)."));
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 2, 1);
-	GtkWidget *w_abs = gtk_radio_button_new_with_label(NULL, _("Absolute"));
-	gtk_widget_set_valign(w_abs, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_abs, 0, 1, 1, 1);
-	label = gtk_label_new("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 1, 1, 1);
-	GtkWidget *w_rel = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(w_abs), _("Relative"));
-	gtk_widget_set_valign(w_rel, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_rel, 0, 2, 1, 1);
-	label = gtk_label_new("<i>1 °C + 1 °C = 2 °C\n1 °C + 5 °F = 1 °C + 5 °R ≈ 4 °C ≈ 277 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 1 °C - 5 °R ≈ −2 °C\n1 °C + 1 K = 2 °C</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 2, 1, 1);
-	GtkWidget *w_hybrid = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(w_abs), _("Hybrid"));
-	gtk_widget_set_valign(w_hybrid, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_hybrid, 0, 3, 1, 1);
-	label = gtk_label_new("<i>1 °C + 1 °C ≈ 2 °C\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 3, 1, 1);
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Temperature calculation mode"));
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	box->addWidget(buttonBox);
+	grid->addWidget(new QLabel(tr("The expression is ambiguous.\nPlease select temperature calculation mode\n(the mode can later be changed in preferences).")), 0, 0, 1, 2);
+	QButtonGroup *group = new QButtonGroup(dialog);
+	group->setExclusive(true);
+	QRadioButton *w_abs = new QRadioButton(tr("Absolute"));
+	group->addButton(w_abs);
+	grid->addWidget(w_abs, 1, 0);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 1, 1);
+	QRadioButton *w_relative = new QRadioButton(tr("Relative"));
+	group->addButton(w_relative);
+	grid->addWidget(w_relative, 2, 0);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 2, 1);
+	QRadioButton *w_hybrid = new QRadioButton(tr("Hybrid"));
+	group->addButton(w_hybrid);
+	grid->addWidget(w_hybrid, 3, 0);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 2 °C\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 3, 1);
 	switch(CALCULATOR->getTemperatureCalculationMode()) {
-		case TEMPERATURE_CALCULATION_ABSOLUTE: {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_abs), TRUE); break;}
-		case TEMPERATURE_CALCULATION_RELATIVE: {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_rel), TRUE); break;}
-		default: {gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_hybrid), TRUE); break;}
+		case TEMPERATURE_CALCULATION_ABSOLUTE: {w_abs->setChecked(true); break;}
+		case TEMPERATURE_CALCULATION_RELATIVE: {w_relative->setChecked(true); break;}
+		default: {w_hybrid->setChecked(true); break;}
 	}
-	gtk_widget_show_all(grid);
-	gtk_dialog_run(GTK_DIALOG(dialog));
+	dialog->exec();
 	TemperatureCalculationMode tc_mode = TEMPERATURE_CALCULATION_HYBRID;
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w_abs))) tc_mode = TEMPERATURE_CALCULATION_ABSOLUTE;
-	else if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w_rel))) tc_mode = TEMPERATURE_CALCULATION_RELATIVE;
-	gtk_widget_destroy(dialog);
-	if(preferences_builder) {
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_abs"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_abs_toggled, NULL);
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_rel"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_rel_toggled, NULL);
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_hybrid"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_hybrid_toggled, NULL);
-		switch(tc_mode) {
-			case TEMPERATURE_CALCULATION_ABSOLUTE: {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_abs")), TRUE);
-				break;
-			}
-			case TEMPERATURE_CALCULATION_RELATIVE: {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_rel")), TRUE);
-				break;
-			}
-			default: {
-				gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_hybrid")), TRUE);
-				break;
-			}
-		}
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_abs"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_abs_toggled, NULL);
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_rel"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_rel_toggled, NULL);
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_radiobutton_temp_hybrid"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_radiobutton_temp_hybrid_toggled, NULL);
-	}
-	tc_set = true;
+	if(w_abs->isChecked()) tc_mode = TEMPERATURE_CALCULATION_ABSOLUTE;
+	else if(w_relative->isChecked()) tc_mode = TEMPERATURE_CALCULATION_RELATIVE;
+	dialog->deleteLater();
+	settings->tc_set = true;
 	if(tc_mode != CALCULATOR->getTemperatureCalculationMode()) {
 		CALCULATOR->setTemperatureCalculationMode(tc_mode);
 		return true;
-	}*/
+	}
 	return false;
 }
 
@@ -3912,73 +3885,48 @@ bool QalculateWindow::askDot(const std::string &str) {
 		}
 	}
 	if(!b) return false;
-	/*GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Interpretation of dots"), GTK_WINDOW(gtk_builder_get_object(main_builder, "main_window")), (GtkDialogFlags) (GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT), _("_OK"), GTK_RESPONSE_ACCEPT, NULL);
-	if(always_on_top) gtk_window_set_keep_above(GTK_WINDOW(dialog), always_on_top);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_ACCEPT);
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 6);
-	GtkWidget *grid = gtk_grid_new();
-	gtk_grid_set_row_spacing(GTK_GRID(grid), 12);
-	gtk_grid_set_column_spacing(GTK_GRID(grid), 12);
-	gtk_container_set_border_width(GTK_CONTAINER(grid), 6);
-	gtk_container_add(GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))), grid);
-	gtk_widget_show(grid);
-	GtkWidget *label = gtk_label_new(_("Please select interpretation of dots (\".\")\n(this can later be changed in preferences)."));
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 0, 0, 2, 1);
-	GtkWidget *w_bothdeci = gtk_radio_button_new_with_label(NULL, _("Both dot and comma as decimal separators"));
-	gtk_widget_set_valign(w_bothdeci, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_bothdeci, 0, 1, 1, 1);
-	label = gtk_label_new("<i>(1.2 = 1,2)</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 1, 1, 1);
-	GtkWidget *w_ignoredot = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(w_bothdeci), _("Dot as thousands separator"));
-	gtk_widget_set_valign(w_ignoredot, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_ignoredot, 0, 2, 1, 1);
-	label = gtk_label_new("<i>(1.000.000 = 1000000)</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 2, 1, 1);
-	GtkWidget *w_dotdeci = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(w_bothdeci), _("Only dot as decimal separator"));
-	gtk_widget_set_valign(w_dotdeci, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), w_dotdeci, 0, 3, 1, 1);
-	label = gtk_label_new("<i>(1.2 + root(16, 4) = 3.2)</i>");
-	gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
-	gtk_widget_set_halign(label, GTK_ALIGN_START);
-	gtk_grid_attach(GTK_GRID(grid), label, 1, 3, 1, 1);
-	if(evalops.parse_options.dot_as_separator) gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_ignoredot), TRUE);
-	else gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_bothdeci), TRUE);
-	gtk_widget_show_all(grid);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	dot_question_asked = true;
-	bool das = evalops.parse_options.dot_as_separator;
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w_dotdeci))) {
-		evalops.parse_options.dot_as_separator = false;
-		evalops.parse_options.comma_as_separator = false;
-		b_decimal_comma = false;
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Interpretation of dots"));
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	box->addWidget(buttonBox);
+	grid->addWidget(new QLabel(tr("Please select interpretation of dots (\".\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
+	QButtonGroup *group = new QButtonGroup(dialog);
+	group->setExclusive(true);
+	QRadioButton *w_bothdeci = new QRadioButton(tr("Both dot and comma as decimal separators"));
+	group->addButton(w_bothdeci);
+	grid->addWidget(w_bothdeci, 1, 0);
+	grid->addWidget(new QLabel("<i>(1.2 = 1,2)</i>"), 1, 1);
+	QRadioButton *w_ignoredot = new QRadioButton(tr("Dot as thousands separator"));
+	group->addButton(w_ignoredot);
+	grid->addWidget(w_ignoredot, 2, 0);
+	grid->addWidget(new QLabel("<i>(1.000.000 = 1000000)</i>"), 2, 1);
+	QRadioButton *w_dotdeci = new QRadioButton(tr("Only dot as decimal separator"));
+	group->addButton(w_dotdeci);
+	grid->addWidget(w_dotdeci, 3, 0);
+	grid->addWidget(new QLabel("<i>(1.2 + root(16, 4) = 3.2)</i>"), 3, 1);
+	if(settings->evalops.parse_options.dot_as_separator) w_ignoredot->setChecked(true);
+	else w_bothdeci->setChecked(true);
+	dialog->exec();
+	settings->dot_question_asked = true;
+	bool das = settings->evalops.parse_options.dot_as_separator;
+	if(w_dotdeci->isChecked()) {
+		settings->evalops.parse_options.dot_as_separator = false;
+		settings->evalops.parse_options.comma_as_separator = false;
+		settings->decimal_comma = false;
 		CALCULATOR->useDecimalPoint(false);
-		das = !evalops.parse_options.dot_as_separator;
-	} else if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w_ignoredot))) {
-		evalops.parse_options.dot_as_separator = true;
+		das = !settings->evalops.parse_options.dot_as_separator;
+	} else if(w_ignoredot->isChecked()) {
+		settings->evalops.parse_options.dot_as_separator = true;
 	} else {
-		evalops.parse_options.dot_as_separator = false;
+		settings->evalops.parse_options.dot_as_separator = false;
 	}
-	if(preferences_builder) {
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_dot_as_separator"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_dot_as_separator_toggled, NULL);
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_comma_as_separator"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_comma_as_separator_toggled, NULL);
-		g_signal_handlers_block_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_decimal_comma"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_decimal_comma_toggled, NULL);
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_decimal_comma")), CALCULATOR->getDecimalPoint() == COMMA);
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_dot_as_separator")), evalops.parse_options.dot_as_separator);
-		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_comma_as_separator")), evalops.parse_options.comma_as_separator);
-		gtk_widget_set_visible(GTK_WIDGET(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_dot_as_separator")), CALCULATOR->getDecimalPoint() != DOT);
-		gtk_widget_set_visible(GTK_WIDGET(gtk_builder_get_object(preferences_builder, "preferences_checkbutton_comma_as_separator")), CALCULATOR->getDecimalPoint() != COMMA);
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_dot_as_separator"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_dot_as_separator_toggled, NULL);
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_comma_as_separator"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_comma_as_separator_toggled, NULL);
-		g_signal_handlers_unblock_matched((gpointer) gtk_builder_get_object(preferences_builder, "preferences_checkbutton_decimal_comma"), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_preferences_checkbutton_decimal_comma_toggled, NULL);
-	}
-	gtk_widget_destroy(dialog);
-	return das != evalops.parse_options.dot_as_separator;*/
-	return false;
+	dialog->deleteLater();
+	return das != settings->evalops.parse_options.dot_as_separator;
 }
 void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 	if(e->matches(QKeySequence::Undo)) {
@@ -4141,6 +4089,8 @@ void QalculateWindow::approximationActivated() {
 }
 void QalculateWindow::outputBaseActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	to_base = 0;
+	to_bits = 0;
 	if(v == BASE_CUSTOM) {
 		v = customOutputBaseEdit->value();
 		if(v > 2 && v <= 36) {
@@ -4156,6 +4106,8 @@ void QalculateWindow::outputBaseActivated() {
 }
 void QalculateWindow::onCustomOutputBaseChanged(int v) {
 	customOutputBaseAction->setChecked(true);
+	to_base = 0;
+	to_bits = 0;
 	if(v > 2 && v <= 36) {
 		settings->printops.base = v;
 	} else {
@@ -4307,14 +4259,16 @@ void QalculateWindow::openFunctions() {
 		functionsDialog->activateWindow();
 		return;
 	}
-	functionsDialog = new FunctionsDialog(this);
+	functionsDialog = new FunctionsDialog();
 	connect(functionsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
-	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*, QWidget*)), this, SLOT(insertFunction(MathFunction*, QWidget*)));
+	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(onInsertFunctionRequested(MathFunction*)));
+	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));
 	functionsDialog->show();
 }
 void QalculateWindow::openFPConversion() {
 	if(fpConversionDialog) {
+		if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		fpConversionDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		fpConversionDialog->show();
 		fpConversionDialog->raise();
@@ -4322,10 +4276,11 @@ void QalculateWindow::openFPConversion() {
 		return;
 	}
 	fpConversionDialog = new FPConversionDialog(this);
+	if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	QString str;
 	int base;
 	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
-		str = QString::fromStdString(unhtmlize(result_text, !contains_unknown_variable(*mstruct)));
+		str = QString::fromStdString(unhtmlize(result_text));
 		if(to_base != 0) base = to_base;
 		else base = settings->printops.base;
 	} else {
@@ -4348,7 +4303,666 @@ void QalculateWindow::openFPConversion() {
 	}
 	fpConversionDialog->show();
 }
-void QalculateWindow::insertFunction(MathFunction*, QWidget *parent) {
+
+struct FunctionDialog {
+	MathFunction *f;
+	QDialog *dialog;
+	QPushButton *b_cancel, *b_exec, *b_insert;
+	QCheckBox *b_keepopen;
+	QLabel *w_result;
+	std::vector<QLabel*> label;
+	std::vector<QWidget*> entry;
+	std::vector<QRadioButton*> boolean_buttons;
+	std::vector<int> boolean_index;
+	bool add_to_menu, keep_open, rpn;
+	int args;
+};
+
+MathSpinBox::MathSpinBox(QWidget *parent) : QSpinBox(parent) {
+	setLineEdit(new MathLineEdit(this));
+	connect(lineEdit(), SIGNAL(returnPressed()), this, SIGNAL(returnPressed()));
+}
+MathSpinBox::~MathSpinBox() {}
+
+int MathSpinBox::valueFromText(const QString &text) const {
+	if(settings->evalops.parse_options.base != BASE_DECIMAL) return QSpinBox::valueFromText(text);
+	bool b = false;
+	int v = text.toInt(&b);
+	if(b) return v;
+	MathStructure value;
+	CALCULATOR->beginTemporaryStopMessages();
+	EvaluationOptions eo = settings->evalops;
+	eo.parse_options.base = 10;
+	CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(text.toStdString(), eo.parse_options), 100, eo);
+	CALCULATOR->endTemporaryStopMessages();
+	return value.number().intValue();
+}
+QValidator::State MathSpinBox::validate(QString &text, int &pos) const {
+	if(settings->evalops.parse_options.base != BASE_DECIMAL) return QSpinBox::validate(text, pos);
+	std::string str = text.trimmed().toStdString();
+	if(str.empty()) return QValidator::Intermediate;
+	if(str.find_first_not_of(NUMBERS) == std::string::npos) return QValidator::Acceptable;
+	if(last_is_operator(str)) return QValidator::Intermediate;
+	MathStructure value;
+	CALCULATOR->beginTemporaryStopMessages();
+	EvaluationOptions eo = settings->evalops;
+	eo.parse_options.base = 10;
+	CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(text.toStdString(), eo.parse_options), 100, eo);
+	CALCULATOR->endTemporaryStopMessages();
+	if(value.isNumber()) return QValidator::Acceptable;
+	return QValidator::Intermediate;
+}
+QLineEdit *MathSpinBox::entry() const {
+	return lineEdit();
+}
+void MathSpinBox::keyPressEvent(QKeyEvent *event) {
+	QSpinBox::keyPressEvent(event);
+	if(event->key() == Qt::Key_Return) event->accept();
+}
+
+class MathDateTimeEdit : public QDateTimeEdit {
+
+	public:
+
+		MathDateTimeEdit(QWidget *parent = NULL) : QDateTimeEdit(parent) {}
+		virtual ~MathDateTimeEdit() {}
+
+		QLineEdit *entry() const {return lineEdit();}
+
+	protected:
+
+		void keyPressEvent(QKeyEvent *event) override {
+			QDateTimeEdit::keyPressEvent(event);
+			if(event->key() == Qt::Key_Return) event->accept();
+		}
+
+};
+
+void QalculateWindow::onCalculateFunctionRequested(MathFunction *f) {
+	insertFunction(f, functionsDialog);
+}
+void QalculateWindow::onInsertFunctionRequested(MathFunction *f) {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
+	if(!expressionEdit->expressionHasChanged()) {
+		expressionEdit->blockUndo(true);
+		expressionEdit->clear();
+		expressionEdit->blockUndo(false);
+	}
+	QTextCursor cur = expressionEdit->textCursor();
+	expressionEdit->wrapSelection(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
+}
+void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
+	if(!f) return;
+
+	//if function takes no arguments, do not display dialog and insert function directly
+	if(f->args() == 0) {
+		expressionEdit->insertPlainText(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name) + "()");
+		//function_inserted(f);
+		return;
+	}
+
+	FunctionDialog *fd = new FunctionDialog;
+
+	int args = 0;
+	bool has_vector = false;
+	if(f->args() > 0) {
+		args = f->args();
+	} else if(f->minargs() > 0) {
+		args = f->minargs() + 1;
+		has_vector = true;
+	} else {
+		args = 1;
+		has_vector = true;
+	}
+	fd->args = args;
+	fd->rpn = settings->rpn_mode && expressionEdit->document()->isEmpty() && CALCULATOR->RPNStackSize() >= (f->minargs() <= 0 ? 1 : (size_t) f->minargs());
+	fd->add_to_menu = true;
+	fd->f = f;
+
+	std::string f_title = f->title(true);
+	fd->dialog = new QDialog(parent ? parent : this);
+	if(settings->always_on_top) fd->dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	fd->dialog->setWindowTitle(QString::fromStdString(f_title));
+
+	QVBoxLayout *box = new QVBoxLayout(fd->dialog);
+
+	box->addSpacing(box->spacing());
+	QLabel *titleLabel = new QLabel("<big>" + QString::fromStdString(f_title) + "</big>");
+	box->addWidget(titleLabel);
+	box->addSpacing(box->spacing());
+
+	QGridLayout *table = new QGridLayout();
+	box->addLayout(table);
+
+	box->addSpacing(box->spacing());
+	if(!f->description().empty() || !f->example(true).empty()) {
+		QTextBrowser *descr = new QTextBrowser();
+		box->addWidget(descr);
+		QString str = QString::fromStdString(f->description());
+		if(!f->example(true).empty()) {
+			if(!str.isEmpty()) str += "\n\n";
+			str += tr("Example:");
+			str += " ";
+			str += QString::fromStdString(f->example(false));
+		}
+		str.replace(">=", SIGN_GREATER_OR_EQUAL);
+		str.replace("<=", SIGN_LESS_OR_EQUAL);
+		str.replace("!=", SIGN_NOT_EQUAL);
+		descr->setPlainText(str);
+		QFontMetrics fm(descr->font());
+		descr->setFixedHeight(fm.lineSpacing() * 5 + descr->frameWidth() * 2 + descr->contentsMargins().top() + descr->contentsMargins().bottom());
+	}
+
+	fd->w_result = new QLabel();
+	fd->w_result->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	fd->w_result->setWordWrap(true);
+	fd->w_result->setAlignment(Qt::AlignRight);
+	QFont font(fd->w_result->font());
+	font.setWeight(QFont::Bold);
+	QFontMetrics fm(font);
+	fd->w_result->setFixedHeight(fm.lineSpacing() * 2 + fd->w_result->frameWidth() * 2 + fd->w_result->contentsMargins().top() + fd->w_result->contentsMargins().bottom());
+	fd->w_result->setFixedWidth(fm.averageCharWidth() * 40);
+	box->addWidget(fd->w_result, Qt::AlignRight);
+
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, fd->dialog);
+	box->addWidget(buttonBox);
+	fd->b_cancel = buttonBox->button(QDialogButtonBox::Close);
+	fd->b_exec = buttonBox->addButton(settings->rpn_mode ? tr("Enter", "RPN Enter") : tr("Calculate"), QDialogButtonBox::ApplyRole);
+	fd->b_insert = buttonBox->addButton(settings->rpn_mode ? tr("Apply to stack") : tr("Insert"), QDialogButtonBox::AcceptRole);
+	if(settings->rpn_mode && CALCULATOR->RPNStackSize() < (f->minargs() <= 0 ? 1 : (size_t) f->minargs())) fd->b_insert->setEnabled(false);
+	fd->b_keepopen = new QCheckBox(tr("Keep open"));
+	fd->keep_open = settings->keep_function_dialog_open;
+	fd->b_keepopen->setChecked(fd->keep_open);
+	buttonBox->addButton(fd->b_keepopen, QDialogButtonBox::ActionRole);
+	box->addWidget(buttonBox);
+
+	box->setSizeConstraint(QLayout::SetFixedSize);
+
+	fd->label.resize(args, NULL);
+	fd->entry.resize(args, NULL);
+	fd->boolean_index.resize(args, 0);
+
+	int bindex = 0;
+	QString argstr, typestr, defstr;
+	QString freetype = QString::fromStdString(Argument().printlong());
+	Argument *arg;
+	int r = 0;
+	for(int i = 0; i < args; i++) {
+		arg = f->getArgumentDefinition(i + 1);
+		if(!arg || arg->name().empty()) {
+			if(args == 1) {
+				argstr = tr("Value");
+			} else {
+				argstr = tr("Argument");
+				argstr += " ";
+				argstr += QString::number(i + 1);
+			}
+		} else {
+			argstr = QString::fromStdString(arg->name());
+		}
+		typestr = "";
+		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+		defstr = QString::fromStdString(CALCULATOR->localizeExpression(f->getDefaultValue(i + 1), pa));
+		if(arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
+			defstr = defstr.mid(1, defstr.length() - 2);
+		}
+		fd->label[i] = new QLabel(argstr);
+		fd->label[i]->setAlignment(Qt::AlignRight);
+		QWidget *entry = NULL;
+		if(arg) {
+			switch(arg->type()) {
+				case ARGUMENT_TYPE_INTEGER: {
+					IntegerArgument *iarg = (IntegerArgument*) arg;
+					int min = INT_MIN, max = INT_MAX;
+					if(iarg->min()) {
+						min = iarg->min()->intValue();
+					}
+					if(iarg->max()) {
+						max = iarg->max()->intValue();
+					}
+					MathSpinBox *spin = new MathSpinBox();
+					entry = spin;
+					fd->entry[i] = spin->entry();
+					spin->setRange(min, max);
+					spin->setAlignment(Qt::AlignRight);
+					if(!defstr.isEmpty()) {
+						spin->setValue(defstr.toInt());
+					} else if(!arg->zeroForbidden() && min <= 0 && max >= 0) {
+						spin->setValue(0);
+					} else {
+						if(max < 0) {
+							spin->setValue(max);
+						} else if(min <= 1) {
+							spin->setValue(1);
+						} else {
+							spin->setValue(min);
+						}
+					}
+					spin->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+					connect(spin, SIGNAL(textChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
+					connect(spin, SIGNAL(valueChanged(int)), this, SLOT(onInsertFunctionChanged()));
+					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+					break;
+				}
+				case ARGUMENT_TYPE_DATE: {
+					MathDateTimeEdit *dateEdit = new MathDateTimeEdit();
+					entry = dateEdit;
+					if(defstr == "now") {
+						dateEdit->setDateTime(QDateTime::currentDateTime());
+						dateEdit->setDisplayFormat("yyyy-MM-ddTHH:mm:ss");
+					} else {
+						dateEdit->setDate(QDate::currentDate());
+						dateEdit->setDisplayFormat("yyyy-MM-dd");
+						dateEdit->setCalendarPopup(true);
+					}
+					dateEdit->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+					fd->entry[i] = dateEdit->entry();
+					dateEdit->setAlignment(Qt::AlignRight);
+					connect(dateEdit, SIGNAL(dateTimeChanged(const QDateTime&)), this, SLOT(onInsertFunctionChanged()));
+					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+					break;
+				}
+				case ARGUMENT_TYPE_BOOLEAN: {
+					fd->boolean_index[i] = bindex;
+					bindex += 2;
+					fd->entry[i] = new QWidget();
+					QHBoxLayout *hbox = new QHBoxLayout(fd->entry[i]);
+					QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
+					QRadioButton *w = new QRadioButton(tr("True")); group->addButton(w); hbox->addWidget(w);
+					w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+					fd->boolean_buttons.push_back(w);
+					w = new QRadioButton(tr("False")); group->addButton(w); hbox->addWidget(w);
+					w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+					fd->boolean_buttons.push_back(w); w->setChecked(true);
+					hbox->addStretch(1);
+					connect(fd->boolean_buttons[fd->boolean_buttons.size() - 2], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
+					connect(fd->boolean_buttons[fd->boolean_buttons.size() - 1], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
+					break;
+				}
+				case ARGUMENT_TYPE_DATA_PROPERTY: {
+					if(f->subtype() == SUBTYPE_DATA_SET) {
+						QComboBox *w = new QComboBox();
+						fd->entry[i] = w;
+						DataPropertyIter it;
+						DataSet *ds = (DataSet*) f;
+						DataProperty *dp = ds->getFirstProperty(&it);
+						/*if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
+							GtkTreeIter iter;
+							if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, i)) {
+								gchar *gstr;
+								gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
+								defstr = gstr;
+								g_free(gstr);
+							}
+						}*/
+						int active_index = -1;
+						for(int i = 0; dp; i++) {
+							if(!dp->isHidden()) {
+								w->addItem(QString::fromStdString(dp->title()), QVariant::fromValue((void*) dp));
+								if(active_index < 0 && defstr.toStdString() == dp->getName()) {
+									active_index = i;
+								}
+							}
+							dp = ds->getNextProperty(&it);
+						}
+						w->addItem(tr("Info"), QVariant::fromValue((void*) NULL));
+						if(active_index < 0) active_index = i + 1;
+						w->setCurrentIndex(active_index);
+						connect(w, SIGNAL(currentTextChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
+						break;
+					}
+				}
+				default: {
+					typestr = QString::fromStdString(arg->printlong());
+					if(typestr == freetype) typestr = "";
+					if(i == 1 && f == CALCULATOR->f_ascii && arg->type() == ARGUMENT_TYPE_TEXT) {
+						QComboBox *combo = new QComboBox();
+						combo->setEditable(true);
+						combo->addItem("UTF-8");
+						combo->addItem("UTF-16");
+						combo->addItem("UTF-32");
+						fd->entry[i] = combo->lineEdit();
+						entry = combo;
+					} else if(i == 3 && f == CALCULATOR->f_date && arg->type() == ARGUMENT_TYPE_TEXT) {
+						QComboBox *combo = new QComboBox();
+						combo->setEditable(true);
+						combo->addItem("chinese");
+						combo->addItem("coptic");
+						combo->addItem("egyptian");
+						combo->addItem("ethiopian");
+						combo->addItem("gregorian");
+						combo->addItem("hebrew");
+						combo->addItem("indian");
+						combo->addItem("islamic");
+						combo->addItem("julian");
+						combo->addItem("milankovic");
+						combo->addItem("persian");
+						entry = combo;
+						fd->entry[i] = combo->lineEdit();
+					} else {
+						fd->entry[i] = new MathLineEdit();
+					}
+					if(i >= f->minargs() && !has_vector) {
+						((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional parameter"));
+					}
+					((QLineEdit*) fd->entry[i])->setAlignment(Qt::AlignRight);
+					connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));
+					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+				}
+			}
+		} else {
+			fd->entry[i] = new MathLineEdit();
+			if(i >= f->minargs() && !has_vector) {
+				((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional parameter"));
+			}
+			((QLineEdit*) fd->entry[i])->setAlignment(Qt::AlignRight);
+			connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));
+			connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+		}
+		if(arg && arg->type() == ARGUMENT_TYPE_FILE) {
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
+			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
+			connect(action, SIGNAL(triggered()), this, SLOT(onEntrySelectFile()));
+		/*} else if(arg && (arg->type() == ARGUMENT_TYPE_VECTOR || arg->type() == ARGUMENT_TYPE_MATRIX)) {
+			QPushButton *w = new QPushButton(typestr);
+			if(arg->type() == ARGUMENT_TYPE_VECTOR) g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_vector_clicked), (gpointer) fd->entry[i]);
+			else g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_matrix_clicked), (gpointer) fd->entry[i]);*/
+		}
+		/*if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
+			GtkTreeIter iter;
+			if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, i)) {
+				gchar *gstr;
+				gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
+				if(arg && arg->type() == ARGUMENT_TYPE_BOOLEAN) {
+					if(g_strcmp0(gstr, "1") == 0) {
+						g_signal_handlers_block_matched((gpointer) fd->boolean_buttons[fd->boolean_buttons.size() - 2], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+						gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fd->boolean_buttons[fd->boolean_buttons.size() - 2]), TRUE);
+						g_signal_handlers_unblock_matched((gpointer) fd->boolean_buttons[fd->boolean_buttons.size() - 2], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+					}
+				} else if(fd->properties_store && arg && arg->type() == ARGUMENT_TYPE_DATA_PROPERTY) {
+				} else {
+					g_signal_handlers_block_matched((gpointer) fd->entry[i], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+					if(i == 0 && args == 1 && (has_vector || arg->type() == ARGUMENT_TYPE_VECTOR)) {
+						string rpn_vector = gstr;
+						while(gtk_tree_model_iter_next(GTK_TREE_MODEL(stackstore), &iter)) {
+							g_free(gstr);
+							gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
+							rpn_vector += CALCULATOR->getComma();
+							rpn_vector += " ";
+							rpn_vector += gstr;
+						}
+						gtk_entry_set_text(GTK_ENTRY(fd->entry[i]), rpn_vector.c_str());
+					} else {
+						gtk_entry_set_text(GTK_ENTRY(fd->entry[i]), gstr);
+						if(arg && arg->type() == ARGUMENT_TYPE_INTEGER) {
+							gtk_spin_button_update(GTK_SPIN_BUTTON(fd->entry[i]));
+						}
+					}
+					g_signal_handlers_unblock_matched((gpointer) fd->entry[i], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+				}
+				g_free(gstr);
+			}
+		} else */if(arg && arg->type() == ARGUMENT_TYPE_BOOLEAN) {
+			if(defstr == "1") {
+				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(true);
+				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->setChecked(true);
+				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(false);
+			}
+		} else if(!arg || arg->type() != ARGUMENT_TYPE_DATA_PROPERTY || f->subtype() != SUBTYPE_DATA_SET) {
+			fd->entry[i]->blockSignals(true);
+			if(!defstr.isEmpty() && (!arg || (arg->type() != ARGUMENT_TYPE_DATE && arg->type() != ARGUMENT_TYPE_INTEGER))&& (i < f->minargs() || has_vector || (defstr != "undefined" && defstr != "\"\""))) {
+				((QLineEdit*) fd->entry[i])->setText(defstr);
+			}
+			if(i == 0) {
+				std::string seltext, str2;
+				if(expressionEdit->textCursor().hasSelection()) seltext = expressionEdit->textCursor().selectedText().toStdString();
+				else seltext = expressionEdit->toPlainText().toStdString();
+				CALCULATOR->separateToExpression(seltext, str2, settings->evalops, true);
+				remove_blank_ends(seltext);
+				if(!seltext.empty()) {
+					if(arg && arg->type() == ARGUMENT_TYPE_INTEGER) {
+						MathStructure m;
+						CALCULATOR->beginTemporaryStopMessages();
+						CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
+						if(CALCULATOR->endTemporaryStopMessages() && m.isInteger()) {
+							bool overflow = false;
+							int v = m.number().intValue(&overflow);
+							QSpinBox *spin = (QSpinBox*) entry;
+							if(!overflow && v >= spin->minimum() && v <= spin->maximum()) spin->setValue(v);
+						}
+					} else if(arg && arg->type() == ARGUMENT_TYPE_DATE) {
+						MathStructure m;
+						CALCULATOR->beginTemporaryStopMessages();
+						CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
+						if(CALCULATOR->endTemporaryStopMessages() && m.isDateTime()) {
+							QDateTime d;
+							d.setDate(QDate(m.datetime()->year(), m.datetime()->month(), m.datetime()->day()));
+							Number nr_sec = m.datetime()->second();
+							Number nr_msec(nr_sec); nr_msec.frac(); nr_msec *= 1000; nr_msec.round();
+							nr_sec.trunc();
+							d.setTime(QTime(m.datetime()->hour(), m.datetime()->minute(), nr_sec.intValue(), nr_msec.intValue()));
+							((QDateTimeEdit*) entry)->setDateTime(d);
+						}
+					} else {
+						((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(seltext));
+					}
+				}
+			}
+			fd->entry[i]->blockSignals(false);
+		}
+		table->addWidget(fd->label[i], r, 0, 1, 1);
+		if(entry) table->addWidget(entry, r, 1, 1, 1);
+		else table->addWidget(fd->entry[i], r, 1, 1, 1);
+		r++;
+		fd->entry[i]->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+		if(i == 0) fd->entry[i]->setFocus();
+		if(!typestr.isEmpty()) {
+			typestr.replace(">=", SIGN_GREATER_OR_EQUAL);
+			typestr.replace("<=", SIGN_LESS_OR_EQUAL);
+			typestr.replace("!=", SIGN_NOT_EQUAL);
+			QLabel *w = new QLabel("<i>" + typestr.toHtmlEscaped() + "</i>");
+			w->setAlignment(Qt::AlignRight | Qt::AlignTop);
+			table->addWidget(w, r, 1, 1, 1);
+			r++;
+		}
+	}
+	table->setColumnStretch(1, 1);
+
+	fd->b_exec->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+	fd->b_cancel->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+	fd->b_insert->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+	fd->b_keepopen->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+	fd->b_exec->setDefault(false);
+	fd->b_cancel->setDefault(false);
+	fd->b_insert->setDefault(false);
+	fd->dialog->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+	connect(fd->b_exec, SIGNAL(clicked()), this, SLOT(onInsertFunctionExec()));
+	if(fd->rpn) connect(fd->b_insert, SIGNAL(clicked()), this, SLOT(onInsertFunctionRPN()));
+	else connect(fd->b_insert, SIGNAL(clicked()), this, SLOT(onInsertFunctionInsert()));
+	connect(fd->b_cancel, SIGNAL(clicked()), fd->dialog, SLOT(reject()));
+	connect(fd->b_keepopen, SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionKeepOpen(bool)));
+	connect(fd->dialog, SIGNAL(rejected()), this, SLOT(onInsertFunctionClosed()));
+
+	fd->dialog->show();
+
+}
+void QalculateWindow::onEntrySelectFile() {
+	QLineEdit *w = (QLineEdit*) sender()->property("QALCULATE ENTRY").value<void*>();
+	FunctionDialog *fd = (FunctionDialog*) w->property("QALCULATE FD").value<void*>();
+	QString str = QFileDialog::getOpenFileName(fd->dialog, QString(), w->text());
+	if(!str.isEmpty()) w->setText(str);
+}
+void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
+	MathFunction *f = fd->f;
+	std::string str = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name + "(", str2;
+	int argcount = fd->args;
+	if(f->maxargs() > 0 && f->minargs() < f->maxargs() && argcount > f->minargs()) {
+		while(true) {
+			ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+			std::string defstr = CALCULATOR->localizeExpression(f->getDefaultValue(argcount), pa);
+			remove_blank_ends(defstr);
+			if(f->getArgumentDefinition(argcount) && f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_BOOLEAN) {
+				if(fd->boolean_buttons[fd->boolean_index[argcount - 1]]->isChecked()) str2 = "1";
+				else str2 = "0";
+			} else if(settings->evalops.parse_options.base != BASE_DECIMAL && f->getArgumentDefinition(argcount) && f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_INTEGER) {
+				Number nr(((QLineEdit*) fd->entry[argcount - 1])->text().toStdString());
+				str2 = print_with_evalops(nr);
+			} else if(f->getArgumentDefinition(argcount) && f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_DATA_PROPERTY && f->subtype() == SUBTYPE_DATA_SET) {
+				DataProperty *dp = (DataProperty*) ((QComboBox*) fd->entry[argcount - 1])->currentData().value<void*>();
+				if(dp) {
+					str2 = dp->getName();
+				} else {
+					str2 = "info";
+				}
+			} else {
+				str2 = ((QLineEdit*) fd->entry[argcount - 1])->text().toStdString();
+				remove_blank_ends(str2);
+			}
+			if(!str2.empty() && f->getArgumentDefinition(argcount) && (f->getArgumentDefinition(argcount)->suggestsQuotes() || (f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
+				if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+					str2.insert(0, "\"");
+					str2 += "\"";
+				}
+			}
+			if(str2.empty() || str2 == defstr) argcount--;
+			else break;
+			if(argcount == 0 || argcount == f->minargs()) break;
+		}
+	}
+
+	int i_vector = f->maxargs() > 0 ? f->maxargs() : argcount;
+	for(int i = 0; i < argcount; i++) {
+		if(f->getArgumentDefinition(i + 1) && f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_BOOLEAN) {
+			if(fd->boolean_buttons[fd->boolean_index[i]]->isChecked()) str2 = "1";
+			else str2 = "0";
+		} else if((i != (f->maxargs() > 0 ? f->maxargs() : argcount) - 1 || i_vector == i - 1) && f->getArgumentDefinition(i + 1) && f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_VECTOR) {
+			i_vector = i;
+			str2 = ((QLineEdit*) fd->entry[i])->text().toStdString();
+			remove_blank_ends(str2);
+			if(str2.find_first_of(PARENTHESISS VECTOR_WRAPS) == std::string::npos && str2.find_first_of(CALCULATOR->getComma() == COMMA ? COMMAS : CALCULATOR->getComma()) != std::string::npos) {
+				str2.insert(0, 1, '[');
+				str2 += ']';
+			}
+		} else if(settings->evalops.parse_options.base != BASE_DECIMAL && f->getArgumentDefinition(i + 1) && f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_INTEGER) {
+			Number nr(((QLineEdit*) fd->entry[i])->text().toStdString());
+			str2 = print_with_evalops(nr);
+		} else if(f->getArgumentDefinition(i + 1) && f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_DATA_PROPERTY && f->subtype() == SUBTYPE_DATA_SET) {
+			DataProperty *dp = (DataProperty*) ((QComboBox*) fd->entry[i])->currentData().value<void*>();
+			if(dp) {
+				str2 = dp->getName();
+			} else {
+				str2 = "info";
+			}
+		} else {
+			str2 = ((QLineEdit*) fd->entry[i])->text().toStdString();
+			remove_blank_ends(str2);
+		}
+		if((i < f->minargs() || !str2.empty()) && f->getArgumentDefinition(i + 1) && (f->getArgumentDefinition(i + 1)->suggestsQuotes() || (f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
+			if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+				str2.insert(0, "\"");
+				str2 += "\"";
+			}
+		}
+		if(i > 0) {
+			str += CALCULATOR->getComma();
+			str += " ";
+		}
+		str += str2;
+	}
+	str += ")";
+	expressionEdit->blockParseStatus(true);
+	expressionEdit->blockCompletion(true);
+	expressionEdit->insertPlainText(QString::fromStdString(str));
+	expressionEdit->blockCompletion(false);
+	expressionEdit->blockParseStatus(false);
+	//if(fd->add_to_menu) function_inserted(f);
+}
+
+void QalculateWindow::onInsertFunctionChanged() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	fd->w_result->clear();
+}
+void QalculateWindow::onInsertFunctionEntryActivated() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	for(int i = 0; i < fd->args; i++) {
+		if(fd->entry[i] == sender()) {
+			if(i == fd->args - 1) {
+				if(fd->rpn) onInsertFunctionRPN();
+				else if(fd->keep_open || settings->rpn_mode) onInsertFunctionExec();
+				else onInsertFunctionInsert();
+			} else {
+				if(fd->f->getArgumentDefinition(i + 2) && fd->f->getArgumentDefinition(i + 2)->type() == ARGUMENT_TYPE_BOOLEAN) {
+					fd->boolean_buttons[fd->boolean_index[i + 1]]->setFocus();
+				} else {
+					fd->entry[i + 1]->setFocus();
+				}
+			}
+			break;
+		}
+	}
+}
+void QalculateWindow::onInsertFunctionExec() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	expressionEdit->blockUndo(true);
+	expressionEdit->clear();
+	expressionEdit->blockUndo(false);
+	if(!fd->keep_open) fd->dialog->hide();
+	insertFunctionDo(fd);
+	calculateExpression();
+	if(fd->keep_open) {
+		QString str;
+		bool b_approx = *settings->printops.is_approximate || (mstruct && mstruct->isApproximate());
+		str = "<span font-weight=\"bold\">";
+		if(!b_approx) str += "= ";
+		else str += SIGN_ALMOST_EQUAL " ";
+		str += QString::fromStdString(result_text);
+		str += "</span>";
+		fd->w_result->setText(str);
+		fd->entry[0]->setFocus();
+		expressionEdit->selectAll();
+	} else {
+		fd->dialog->deleteLater();
+		delete fd;
+	}
+}
+void QalculateWindow::onInsertFunctionRPN() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	if(!fd->keep_open) fd->dialog->hide();
+	//calculateRPN(f);
+	//if(fd->add_to_menu) function_inserted(f);
+	if(fd->keep_open) {
+		fd->entry[0]->setFocus();
+		expressionEdit->selectAll();
+	} else {
+		fd->dialog->deleteLater();
+		delete fd;
+	}
+}
+void QalculateWindow::onInsertFunctionInsert() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	if(!fd->keep_open) fd->dialog->hide();
+	insertFunctionDo(fd);
+	if(fd->keep_open) {
+		fd->entry[0]->setFocus();
+		expressionEdit->selectAll();
+	} else {
+		fd->dialog->deleteLater();
+		delete fd;
+	}
+}
+void QalculateWindow::onInsertFunctionKeepOpen(bool b) {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	fd->keep_open = b;
+	settings->keep_function_dialog_open = b;
+}
+void QalculateWindow::onInsertFunctionClosed() {
+	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
+	fd->dialog->deleteLater();
+	delete fd;
 }
 void QalculateWindow::executeFromFile(const QString &file) {
 	QFile qfile(file);

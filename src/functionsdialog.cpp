@@ -19,6 +19,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QPushButton>
+#include <QLineEdit>
+#include <QKeyEvent>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -38,6 +40,10 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	categoriesView->setRootIsDecorated(false);
 	categoriesView->headerItem()->setText(0, tr("Category"));
 	hsplitter->addWidget(categoriesView);
+	QWidget *w = new QWidget(this);
+	QVBoxLayout *vbox = new QVBoxLayout(w);
+	vbox->setSpacing(0);
+	vbox->setContentsMargins(0, 0, 0, 0);
 	functionsView = new QTreeView(this);
 	functionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 	functionsView->setRootIsDecorated(false);
@@ -48,12 +54,16 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	sourceModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Function")));
 	functionsView->setModel(functionsModel);
 	selected_item = NULL;
-	hsplitter->addWidget(functionsView);
+	vbox->addWidget(functionsView, 1);
+	searchEdit = new QLineEdit(this);
+	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
+	vbox->addWidget(searchEdit, 0);
+	hsplitter->addWidget(w);
 	vsplitter->addWidget(hsplitter);
 	descriptionView = new QTextBrowser(this);
 	vsplitter->addWidget(descriptionView);
-	vsplitter->setStretchFactor(0, 3);
-	vsplitter->setStretchFactor(1, 2);
+	vsplitter->setStretchFactor(0, 2);
+	vsplitter->setStretchFactor(1, 1);
 	hsplitter->setStretchFactor(0, 2);
 	hsplitter->setStretchFactor(1, 3);
 	QVBoxLayout *box = new QVBoxLayout();
@@ -62,8 +72,10 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	box->addSpacing(24);
-	insertButton = new QPushButton(tr("Calculate"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
+	calculateButton = new QPushButton(tr("Calculate"), this); box->addWidget(calculateButton); connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateClicked()));
+	calculateButton->setDefault(true);
 	applyButton = new QPushButton(tr("Apply"), this); box->addWidget(applyButton); connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
+	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
@@ -72,18 +84,45 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	updateFunctions();
 	functionsModel->setFilter("All");
 	functionsModel->sort(0);
+	connect(searchEdit, SIGNAL(textEdited(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(categoriesView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(functionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedFunctionChanged(const QModelIndex&, const QModelIndex&)));
+	connect(functionsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(calculateClicked()));
+	selectedFunctionChanged(QModelIndex(), QModelIndex());
 	resize(900, 800);
 }
 FunctionsDialog::~FunctionsDialog() {}
 
+void FunctionsDialog::keyPressEvent(QKeyEvent *event) {
+	if(event->matches(QKeySequence::Find)) {
+		searchEdit->setFocus();
+		return;
+	}
+	if(event->key() == Qt::Key_Escape && searchEdit->hasFocus()) {
+		searchEdit->clear();
+		functionsView->setFocus();
+		return;
+	}
+	if(event->key() == Qt::Key_Return && functionsView->hasFocus()) {
+		QModelIndex index = functionsView->selectionModel()->currentIndex();
+		if(index.isValid()) {
+			calculateClicked();
+			return;
+		}
+	}
+	QDialog::keyPressEvent(event);
+}
+void FunctionsDialog::searchChanged(const QString &str) {
+	functionsModel->setSecondaryFilter(str.toStdString());
+	functionsView->selectionModel()->setCurrentIndex(functionsModel->index(0, 0), QItemSelectionModel::SelectCurrent);
+}
 void FunctionsDialog::newClicked() {
 	UserFunction *f = FunctionEditDialog::newFunction(this);
 	if(f) {
 		selected_item = f;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
 		functionsView->selectionModel()->clear();
@@ -99,6 +138,7 @@ void FunctionsDialog::editClicked() {
 	if(f && FunctionEditDialog::editFunction(this, f)) {
 		sourceModel->removeRow(functionsModel->mapToSource(functionsView->selectionModel()->currentIndex()).row());
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
 		selected_item = f;
@@ -125,12 +165,20 @@ void FunctionsDialog::applyClicked() {
 	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
 	emit applyFunctionRequest(f);
 }
+void FunctionsDialog::calculateClicked() {
+	QModelIndex index = functionsView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
+	if(f) {
+		emit calculateFunctionRequest(f);
+	}
+}
 void FunctionsDialog::insertClicked() {
 	QModelIndex index = functionsView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
 	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
 	if(f) {
-		emit insertFunctionRequest(f, this);
+		emit insertFunctionRequest(f);
 	}
 }
 void FunctionsDialog::deactivateClicked() {
@@ -302,6 +350,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			}
 			editButton->setEnabled(!f->isBuiltin());
 			insertButton->setEnabled(f->isActive());
+			calculateButton->setEnabled(f->isActive());
 			delButton->setEnabled(f->isLocal());
 			deactivateButton->setEnabled(true);
 			applyButton->setEnabled(f->isActive() && (f->minargs() <= 1 || settings->rpn_mode));
@@ -311,6 +360,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 	}
 	editButton->setEnabled(false);
 	insertButton->setEnabled(false);
+	calculateButton->setEnabled(false);
 	delButton->setEnabled(false);
 	deactivateButton->setEnabled(false);
 	applyButton->setEnabled(false);
@@ -404,6 +454,7 @@ void FunctionsDialog::updateFunctions() {
 			}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
 		if(f == selected_item) functionsView->selectionModel()->setCurrentIndex(functionsModel->mapFromSource(item->index()), QItemSelectionModel::SelectCurrent);
@@ -495,23 +546,54 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 	if(!index.isValid()) return false;
 	ExpressionItem *item = (ExpressionItem*) index.data(Qt::UserRole).value<void*>();
 	if(cat.empty()) return false;
-	if(cat == "All") return item->isActive();
-	if(cat == "Inactive") return !item->isActive();
-	if(cat == "Uncategorized") return item->isActive() && item->category().empty() && !item->isLocal();
-	if(cat == "User functions") return item->isActive() && item->isLocal();
-	if(!item->isActive()) return false;
-	if(!subcat.empty()) {
-		size_t l1 = subcat.length(), l2;
-		l2 = item->category().length();
-		return (l2 == l1 || (l2 > l1 && item->category()[l1] == '/')) && item->category().substr(0, l1) == subcat;
+	if(cat == "All") {
+		if(!item->isActive()) return false;
+	} else if(cat == "Inactive") {
+		if(item->isActive()) return false;
+	} else if(cat == "Uncategorized") {
+		if(!item->isActive() || !item->category().empty() || item->isLocal()) return false;
+	} else if(cat == "User functions") {
+		if(!item->isActive() || !item->isLocal()) return false;
 	} else {
-		return item->category() == cat;
+		if(!item->isActive()) return false;
+		if(!subcat.empty()) {
+			size_t l1 = subcat.length(), l2;
+			l2 = item->category().length();
+			if((l2 != l1 && (l2 <= l1 || item->category()[l1] != '/')) || item->category().substr(0, l1) != subcat) return false;
+		} else {
+			if(item->category() != cat) return false;
+		}
 	}
+	if(filter.empty()) return true;
+	std::string title = item->title(true);
+	remove_blank_ends(title);
+	while(title.length() >= filter.length()) {
+		if(equalsIgnoreCase(filter, title.substr(0, filter.length()))) {
+			return true;
+		}
+		size_t i = title.find(' ');
+		if(i == std::string::npos) break;
+		title = title.substr(i + 1);
+		remove_blank_ends(title);
+	}
+	for(size_t i2 = 1; i2 <= item->countNames(); i2++) {
+		if(item->getName(i2).case_sensitive) {
+			if(filter == item->getName(i2).name.substr(0, filter.length())) return true;
+		} else {
+			if(equalsIgnoreCase(filter, item->getName(i2).name.substr(0, filter.length()))) return true;
+		}
+	}
+	return false;
 }
 void ItemProxyModel::setFilter(std::string sfilter) {
 	cat = sfilter;
 	if(cat[0] == '/') subcat = cat.substr(1, cat.length() - 1);
 	else subcat = "";
+	invalidateFilter();
+}
+void ItemProxyModel::setSecondaryFilter(std::string sfilter) {
+	filter = sfilter;
+	remove_blank_ends(filter);
 	invalidateFilter();
 }
 

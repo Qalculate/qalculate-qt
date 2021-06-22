@@ -41,7 +41,7 @@ class HistoryView : public QTextBrowser {
 		QImage *paste_image;
 		std::vector<std::string> v_text;
 		QMenu *cmenu;
-		QAction *copyAction, *selectAllAction, *clearAction;
+		QAction *copyAction, *copyFormattedAction, *selectAllAction, *clearAction;
 		QColor prev_color;
 
 		void mouseReleaseEvent(QMouseEvent *e) override;

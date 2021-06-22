@@ -14,6 +14,7 @@
 
 #include <QMainWindow>
 #include <QFont>
+#include <QSpinBox>
 #include <QTranslator>
 #include <libqalculate/qalculate.h>
 
@@ -30,11 +31,11 @@ class QAction;
 class QToolBar;
 class QTextEdit;
 class QToolButton;
-class QSpinBox;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
 class FPConversionDialog;
+struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
 
@@ -152,6 +153,18 @@ class QalculateWindow : public QMainWindow {
 		void approximationActivated();
 		void applyFunction(MathFunction*);
 		void openFPConversion();
+		void onInsertFunctionExec();
+		void onInsertFunctionRPN();
+		void onInsertFunctionInsert();
+		void onInsertFunctionKeepOpen(bool);
+		void onInsertFunctionClosed();
+		void onInsertFunctionChanged();
+		void onInsertFunctionEntryActivated();
+		void insertFunctionDo(FunctionDialog*);
+		void onEntrySelectFile();
+		void onCalculateFunctionRequested(MathFunction*);
+		void onInsertFunctionRequested(MathFunction*);
+
 
 	public slots:
 
@@ -184,6 +197,29 @@ class QalculateTranslator : public QTranslator {
 		QalculateTranslator();
 
 		QString	translate(const char *context, const char *sourceText, const char *disambiguation = NULL, int n = -1) const;
+
+};
+
+class MathSpinBox : public QSpinBox {
+
+	Q_OBJECT
+
+	public:
+
+		MathSpinBox(QWidget *parent = NULL);
+		virtual ~MathSpinBox();
+
+		QLineEdit *entry() const;
+
+	protected:
+
+		int valueFromText(const QString &text) const override;
+		QValidator::State validate(QString &text, int &pos) const override;
+		void keyPressEvent(QKeyEvent *event);
+
+	signals:
+
+		void returnPressed();
 
 };
 

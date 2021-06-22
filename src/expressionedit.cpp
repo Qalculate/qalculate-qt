@@ -1105,7 +1105,7 @@ std::string ExpressionEdit::expression() const {
 QSize ExpressionEdit::sizeHint() const {
 	QSize size = QPlainTextEdit::sizeHint();
 	QFontMetrics fm(font());
-	size.setHeight(fm.lineSpacing() * 3.2 + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
 	return size;
 }
 void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {

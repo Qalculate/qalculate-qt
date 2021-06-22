@@ -13,6 +13,7 @@
 #define QALCULATE_Q_SETTINGS_H
 
 #include <QString>
+#include <QLineEdit>
 #include <QIcon>
 #include <libqalculate/qalculate.h>
 
@@ -27,7 +28,7 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
 
-std::string unhtmlize(std::string str, bool replace_all_i = false);
+std::string unhtmlize(std::string str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
@@ -77,6 +78,7 @@ class QalculateQtSettings {
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
+		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
@@ -85,6 +87,19 @@ class QalculateQtSettings {
 		std::vector<MathStructure*> history_answer;
 		std::vector<std::string> expression_history;
 		QByteArray window_geometry, window_state, splitter_state;
+
+};
+
+class MathLineEdit : public QLineEdit {
+
+	public:
+
+		MathLineEdit(QWidget *parent = NULL);
+		virtual ~MathLineEdit();
+
+	protected:
+
+		void keyPressEvent(QKeyEvent*) override;
 
 };
 

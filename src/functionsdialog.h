@@ -23,6 +23,7 @@ class QTextBrowser;
 class QTreeWidgetItem;
 class QStandardItemModel;
 class QPushButton;
+class QLineEdit;
 
 class ItemProxyModel : public QSortFilterProxyModel {
 
@@ -34,10 +35,11 @@ class ItemProxyModel : public QSortFilterProxyModel {
 		~ItemProxyModel();
 
 		void setFilter(std::string);
+		void setSecondaryFilter(std::string);
 
 	protected:
 
-		std::string cat, subcat;
+		std::string cat, subcat, filter;
 
 		bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 
@@ -54,10 +56,13 @@ class FunctionsDialog : public QDialog {
 		QTextBrowser *descriptionView;
 		ItemProxyModel *functionsModel;
 		QStandardItemModel *sourceModel;
-		QPushButton *deactivateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
+		QPushButton *deactivateButton, *calculateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
+		QLineEdit *searchEdit;
 
 		std::string selected_category;
 		ExpressionItem *selected_item;
+
+		void keyPressEvent(QKeyEvent *event) override;
 
 	protected slots:
 
@@ -69,7 +74,9 @@ class FunctionsDialog : public QDialog {
 		void delClicked();
 		void applyClicked();
 		void insertClicked();
+		void calculateClicked();
 		void deactivateClicked();
+		void searchChanged(const QString&);
 
 	public:
 
@@ -82,7 +89,8 @@ class FunctionsDialog : public QDialog {
 
 		void itemsChanged();
 		void applyFunctionRequest(MathFunction*);
-		void insertFunctionRequest(MathFunction*, QWidget*);
+		void insertFunctionRequest(MathFunction*);
+		void calculateFunctionRequest(MathFunction*);
 
 };
 

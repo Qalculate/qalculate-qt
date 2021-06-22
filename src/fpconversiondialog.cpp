@@ -17,26 +17,12 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QPushButton>
-#include <QKeyEvent>
 #include <QFontMetrics>
 #include <QLineEdit>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
 #include "fpconversiondialog.h"
-
-class MathLineEdit : public QLineEdit {
-
-	public:
-
-		MathLineEdit(QWidget *parent = NULL);
-		virtual ~MathLineEdit();
-
-	protected:
-
-		void keyPressEvent(QKeyEvent*) override;
-
-};
 
 FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("Floating point conversion (IEEE 754)"));
@@ -83,6 +69,7 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	connect(binEdit, SIGNAL(textChanged()), this, SLOT(binChanged()));
 	connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(valueChanged()));
 	connect(hexEdit, SIGNAL(textEdited(const QString&)), this, SLOT(hexChanged()));
+	box->setSizeConstraint(QLayout::SetFixedSize);
 }
 FPConversionDialog::~FPConversionDialog() {}
 int FPConversionDialog::getBits() {
@@ -315,42 +302,4 @@ void FPConversionDialog::binChanged() {
 void FPConversionDialog::valueChanged() {
 	updateFields(10);
 }
-
-MathLineEdit::MathLineEdit(QWidget *parent) : QLineEdit(parent) {}
-MathLineEdit::~MathLineEdit() {}
-void MathLineEdit::keyPressEvent(QKeyEvent *event) {
-	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
-		switch(event->key()) {
-			case Qt::Key_Asterisk: {
-				insert(SIGN_MULTIPLICATION);
-				return;
-			}
-			case Qt::Key_Minus: {
-				insert(SIGN_MINUS);
-				return;
-			}
-			case Qt::Key_Dead_Circumflex: {
-				insert(settings->caret_as_xor ? " xor " : "^");
-				return;
-			}
-			case Qt::Key_Dead_Tilde: {
-				insert("~");
-				return;
-			}
-			case Qt::Key_AsciiCircum: {
-				if(settings->caret_as_xor) {
-					insert(" xor ");
-					return;
-				}
-				break;
-			}
-		}
-	}
-	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		insert("^");
-		return;
-	}
-	QLineEdit::keyPressEvent(event);
-}
-
 

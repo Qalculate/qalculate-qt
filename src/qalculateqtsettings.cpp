@@ -17,6 +17,7 @@
 #include <QStyleFactory>
 #include <QWidget>
 #include <QMessageBox>
+#include <QKeyEvent>
 #include <QColor>
 #include <QDebug>
 
@@ -133,7 +134,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.allow_non_usable = false;
 	printops.lower_case_numbers = false;
 	printops.lower_case_e = false;
-	printops.base_display = BASE_DISPLAY_NORMAL;
+	printops.base_display = BASE_DISPLAY_SUFFIX;
 	printops.twos_complement = true;
 	printops.hexadecimal_twos_complement = false;
 	printops.limit_implicit_multiplication = false;
@@ -206,6 +207,7 @@ void QalculateQtSettings::loadPreferences() {
 	replace_expression = KEEP_EXPRESSION;
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
+	keep_function_dialog_open = false;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -515,7 +517,7 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "imaginary_j") {
 					do_imaginary_j = v;
 				} else if(svar == "base_display") {
-					if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_ALTERNATIVE) printops.base_display = (BaseDisplay) v;
+					if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_SUFFIX) printops.base_display = (BaseDisplay) v;
 				} else if(svar == "twos_complement") {
 					printops.twos_complement = v;
 				} else if(svar == "hexadecimal_twos_complement") {
@@ -615,7 +617,7 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Disabled, QPalette::Base, QColor(27, 30, 32));
 		p.setColor(QPalette::Disabled, QPalette::AlternateBase, QColor(35, 38, 41));
 		p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(49, 54, 59));
-		p.setColor(QPalette::Disabled, QPalette::ToolTipText, QColor(161, 252, 252));
+		p.setColor(QPalette::Disabled, QPalette::ToolTipText, QColor(252, 252, 252));
 		p.setColor(QPalette::Disabled, QPalette::PlaceholderText, QColor(161, 169, 177));
 		p.setColor(QPalette::Disabled, QPalette::Text, QColor(101, 101, 101));
 		p.setColor(QPalette::Disabled, QPalette::Button, QColor(47, 52, 56));
@@ -762,5 +764,43 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 		message_printoptions.max_decimals = 10;
 	}
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
+}
+
+MathLineEdit::MathLineEdit(QWidget *parent) : QLineEdit(parent) {}
+MathLineEdit::~MathLineEdit() {}
+void MathLineEdit::keyPressEvent(QKeyEvent *event) {
+	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+		switch(event->key()) {
+			case Qt::Key_Asterisk: {
+				insert(SIGN_MULTIPLICATION);
+				return;
+			}
+			case Qt::Key_Minus: {
+				insert(SIGN_MINUS);
+				return;
+			}
+			case Qt::Key_Dead_Circumflex: {
+				insert(settings->caret_as_xor ? " xor " : "^");
+				return;
+			}
+			case Qt::Key_Dead_Tilde: {
+				insert("~");
+				return;
+			}
+			case Qt::Key_AsciiCircum: {
+				if(settings->caret_as_xor) {
+					insert(" xor ");
+					return;
+				}
+				break;
+			}
+		}
+	}
+	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		insert("^");
+		return;
+	}
+	QLineEdit::keyPressEvent(event);
+	if(event->key() == Qt::Key_Return) event->accept();
 }
 

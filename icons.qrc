@@ -4,8 +4,10 @@
 	<file alias="actions/scalable/configure.svg">data/scalable/configure.svg</file>
 	<file alias="actions/scalable/convert.svg">data/scalable/convert.svg</file>
 	<file alias="actions/scalable/document-save.svg">data/scalable/document-save.svg</file>
+	<file alias="actions/scalable/document-open.svg">data/scalable/document-open.svg</file>
 	<file alias="actions/scalable/edit-clear.svg">data/scalable/edit-clear.svg</file>
 	<file alias="actions/scalable/edit-delete.svg">data/scalable/edit-delete.svg</file>
+	<file alias="actions/scalable/edit-find.svg">data/scalable/edit-find.svg</file>
 	<file alias="actions/scalable/edit-paste.svg">data/scalable/edit-paste.svg</file>
 	<file alias="actions/scalable/go-back.svg">data/scalable/go-back.svg</file>
 	<file alias="actions/scalable/go-forward.svg">data/scalable/go-forward.svg</file>
@@ -16,9 +18,11 @@
 	<file alias="actions/scalable/menu.svg">data/scalable/open-menu.svg</file>
 	<file alias="dark/actions/scalable/configure.svg">data/scalable/configure-dark.svg</file>
 	<file alias="dark/actions/scalable/convert.svg">data/scalable/convert-dark.svg</file>
+	<file alias="dark/actions/scalable/document-open.svg">data/scalable/document-open-dark.svg</file>
 	<file alias="dark/actions/scalable/document-save.svg">data/scalable/document-save-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-clear.svg">data/scalable/edit-clear-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-delete.svg">data/scalable/edit-delete-dark.svg</file>
+	<file alias="dark/actions/scalable/edit-find.svg">data/scalable/edit-find-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-paste.svg">data/scalable/edit-paste-dark.svg</file>
 	<file alias="dark/actions/scalable/go-back.svg">data/scalable/go-back-dark.svg</file>
 	<file alias="dark/actions/scalable/go-forward.svg">data/scalable/go-forward-dark.svg</file>

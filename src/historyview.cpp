@@ -35,6 +35,8 @@ QString unhtmlize(QString str) {
 		if(i2 < 0) break;
 		int i_sup = str.indexOf("vertical-align:super", i);
 		int i_sub = str.indexOf("vertical-align:sub", i);
+		int i_small = str.indexOf("font-size:small", i);
+		int i_italic = str.indexOf("font-style:italic", i);
 		if(i_sup > i && i2 > i_sup) {
 			int i3 = str.indexOf("</", i2 + 1);
 			if(i3 >= 0) {
@@ -47,7 +49,23 @@ QString unhtmlize(QString str) {
 		} else if(i_sub > i && i2 > i_sub) {
 			int i3 = str.indexOf("</", i2 + 1);
 			if(i3 >= 0) {
-				str.replace(i, i3 - i, "_" + unhtmlize(str.mid(i2 + 1, i3 - i2 - 1)));
+				if(i_small > i && i2 > i_small) str.remove(i, i3 - i);
+				else str.replace(i, i3 - i, "_" + unhtmlize(str.mid(i2 + 1, i3 - i2 - 1)));
+				continue;
+			}
+		} else if(i_italic > i && i2 > i_italic) {
+			int i3 = str.indexOf("</", i2 + 1);
+			if(i3 >= 0) {
+				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
+				Variable *v = CALCULATOR->getActiveVariable(name.toStdString());
+				bool replace_all_i = (!v || v->isKnown());
+				if(replace_all_i && name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
+					name.insert(0, "\\");
+				} else if(replace_all_i) {
+					name.insert(0, "\"");
+					name += "\"";
+				}
+				str.replace(i, i3 - i, name);
 				continue;
 			}
 		} else if(i2 - i == 4) {
@@ -67,15 +85,13 @@ QString unhtmlize(QString str) {
 					continue;
 				}
 			}
-		} else if(i2 - i == 2 && str[i + 1] == 'i') {
+		} else if(i2 - i == 17 && str.mid(i + 1, 16) == "i class=\"symbol\"") {
 			int i3 = str.indexOf("</i>", i2 + 1);
 			if(i3 >= 0) {
-				QString name = unhtmlize(str.mid(i + 3, i3 - i - 3));
-				Variable *v = CALCULATOR->getActiveVariable(name.toStdString());
-				bool replace_all_i = (!v || v->isKnown());
-				if(replace_all_i && name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
+				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
+				if(name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
 					name.insert(0, "\\");
-				} else if(replace_all_i) {
+				} else {
 					name.insert(0, "\"");
 					name += "\"";
 				}
@@ -106,12 +122,13 @@ HistoryView::~HistoryView() {}
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool exact, bool dual_approx, const QString &image) {
 	QFontMetrics fm(font());
-	int h = fm.ascent();
+	int paste_h = fm.ascent();
 	QString str;
 	if(!expression.empty()) {
 		str += "<div style=\"text-align:left; line-height:120%\">";
-		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
-		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a> ").arg(v_text.size()).arg(h);
+		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(v_text.size()).arg(paste_h);
+		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(v_text.size()).arg(paste_h);
+		str += THIN_SPACE;
 		str += QString::fromStdString(expression);
 		str += "</div>";
 		v_text.push_back(expression);
@@ -158,9 +175,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		else str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
-		str += " ";
-		if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
-		else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(h);
+		str += "<font size=\"+0\">" THIN_SPACE "</font>";
+		if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
+		else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
 		str += "</div>";
 	}
 	str.replace("\n", "<br>");
@@ -189,9 +206,17 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			s_text.remove(i, 17);
 			if(i < i_pos) i_pos -= 17;
 		}
+		i = 0;
+		while(true) {
+			i = s_text.indexOf("<font size=\"+0\">" THIN_SPACE "</font>", i);
+			if(i < 0) break;
+			s_text.replace(i, 24, THIN_SPACE);
+			if(i < i_pos) i_pos -= 23;
+		}
 		s_text.insert(i_pos, str);
 		i_pos += str.length();
 	} else {
+		s_text.replace("<font size=\"+0\">" THIN_SPACE "</font>", THIN_SPACE);
 		s_text.remove("; font-size:x-large");
 		s_text.remove("; font-size:large");
 		i_pos = str.length();
@@ -275,12 +300,14 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
+		copyFormattedAction = cmenu->addAction(tr("Copy (formatted)"), this, SLOT(copy()));
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
 	copyAction->setEnabled(textCursor().hasSelection());
+	copyFormattedAction->setEnabled(textCursor().hasSelection());
 	selectAllAction->setEnabled(!s_text.isEmpty());
 	clearAction->setEnabled(!s_text.isEmpty());
 	cmenu->popup(e->globalPos());
