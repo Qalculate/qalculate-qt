@@ -12,7 +12,7 @@
 #include <QLocalSocket>
 #include <QLocalServer>
 #include <QCommandLineParser>
-#include <QTextBrowser>
+#include <QPlainTextEdit>
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QLabel>
@@ -40,6 +40,7 @@
 #include <QCheckBox>
 #include <QDateTimeEdit>
 #include <QFileDialog>
+#include <QScrollArea>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -48,8 +49,11 @@
 #include "historyview.h"
 #include "keypadwidget.h"
 #include "variableeditdialog.h"
+#include "functioneditdialog.h"
 #include "preferencesdialog.h"
 #include "functionsdialog.h"
+#include "variablesdialog.h"
+#include "unitsdialog.h"
 #include "fpconversiondialog.h"
 
 class ViewThread : public Thread {
@@ -57,10 +61,6 @@ protected:
 	virtual void run();
 };
 class CommandThread : public Thread {
-protected:
-	virtual void run();
-};
-class FetchExchangeRatesThread : public Thread {
 protected:
 	virtual void run();
 };
@@ -213,6 +213,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rfTimer = NULL;
 	preferencesDialog = NULL;
 	functionsDialog = NULL;
+	variablesDialog = NULL;
+	unitsDialog = NULL;
 	fpConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
@@ -232,6 +234,16 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menuAction->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	menuAction->setMenu(menu);
+	menu2 = menu;
+	menu = menu2->addMenu(tr("New"));
+	menu->addAction(tr("Function"), this, SLOT(newFunction()));
+	menu->addAction(tr("Variable"), this, SLOT(newVariable()));
+	menu = menu2;
+	menu->addSeparator();
+	menu->addAction(tr("Functions list"), this, SLOT(openFunctions()));
+	menu->addAction(tr("Units list"), this, SLOT(openUnits()));
+	menu->addAction(tr("Variables list"), this, SLOT(openVariables()));
+	menu->addSeparator();
 	menu->addAction(tr("Floating point conversion (IEEE 754)"), this, SLOT(openFPConversion()));
 	menu->addSeparator();
 	menu->addAction(tr("Update exchange rates"), this, SLOT(fetchExchangeRates()));
@@ -1907,6 +1919,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 								CALCULATOR->addVariable(new KnownVariable(cat, name, *mstruct, title));
 							}
 							expressionEdit->updateCompletion();
+							if(variablesDialog) variablesDialog->updateVariables();
 						}
 					}
 				}
@@ -1960,6 +1973,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						CALCULATOR->addVariable(new KnownVariable("", name, expr));
 					}
 					expressionEdit->updateCompletion();
+					if(variablesDialog) variablesDialog->updateVariables();
 				}
 			} else if(equalsIgnoreCase(scom, "function")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
@@ -2024,6 +2038,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(v && v->isLocal()) {
 					v->destroy();
 					expressionEdit->updateCompletion();
+					if(variablesDialog) variablesDialog->updateVariables();
 				} else {
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
 					if(f && f->isLocal()) {
@@ -2197,8 +2212,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) {
 				str = str.substr(ispace + 1);
 				remove_blank_ends(str);
-				/*char list_type = 0;
-				GtkTreeIter iter;
+				char list_type = 0;
 				if(equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find")) {
 					size_t i = str.find_first_of(SPACES);
 					std::string str1, str2;
@@ -2215,40 +2229,21 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					else if(equalsIgnoreCase(str1, "units")) list_type = 'u';
 					else if(equalsIgnoreCase(str1, "prefixes")) list_type = 'p';
 					if(list_type == 'c') {
-						manage_units();
-						std::string s_cat = CALCULATOR->u_euro->category();
-						GtkTreeIter iter1;
-						if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tUnitCategories_store), &iter1) && gtk_tree_model_iter_children(GTK_TREE_MODEL(tUnitCategories_store), &iter, &iter1)) {
-							do {
-								gchar *gstr;
-								gtk_tree_model_get(GTK_TREE_MODEL(tUnitCategories_store), &iter, 0, &gstr, -1);
-								if(s_cat == gstr) {
-									gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitCategories)), &iter);
-									g_free(gstr);
-									break;
-								}
-								g_free(gstr);
-							} while(gtk_tree_model_iter_next(GTK_TREE_MODEL(tUnitCategories_store), &iter));
-						}
-						gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(units_builder, "units_entry_search")), str2.c_str());
+						openUnits();
+						unitsDialog->selectCategory(CALCULATOR->u_euro->category());
+						unitsDialog->setSearch(QString::fromStdString(str2));
 					} else if(list_type == 'f') {
-						manage_functions();
-						if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tFunctionCategories_store), &iter)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tFunctionCategories)), &iter);
-						}
-						gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(functions_builder, "functions_entry_search")), str2.c_str());
+						openFunctions();
+						functionsDialog->selectCategory("All");
+						functionsDialog->setSearch(QString::fromStdString(str2));
 					} else if(list_type == 'v') {
-						manage_variables();
-						if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tUnitCategories_store), &iter)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitCategories)), &iter);
-						}
-						gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(units_builder, "units_entry_search")), str2.c_str());
+						openVariables();
+						variablesDialog->selectCategory("All");
+						variablesDialog->setSearch(QString::fromStdString(str2));
 					} else if(list_type == 'u') {
-						manage_units();
-						if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tUnitCategories_store), &iter)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitCategories)), &iter);
-						}
-						gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(units_builder, "units_entry_search")), str2.c_str());
+						openUnits();
+						unitsDialog->selectCategory("All");
+						unitsDialog->setSearch(QString::fromStdString(str2));
 					} else if(list_type == 'p') {
 						CALCULATOR->error(true, "Unsupported command: %s.", str.c_str(), NULL);
 					}
@@ -2257,28 +2252,22 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					ExpressionItem *item = CALCULATOR->getActiveExpressionItem(str);
 					if(item) {
 						if(item->type() == TYPE_UNIT) {
-							manage_units();
-							if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tUnitCategories_store), &iter)) {
-								gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitCategories)), &iter);
-							}
-							gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(units_builder, "units_entry_search")), str.c_str());
+							openUnits();
+							unitsDialog->selectCategory("All");
+							unitsDialog->setSearch(QString::fromStdString(str));
 						} else if(item->type() == TYPE_FUNCTION) {
-							manage_functions();
-							if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tFunctionCategories_store), &iter)) {
-								gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tFunctionCategories)), &iter);
-							}
-							gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(functions_builder, "functions_entry_search")), str.c_str());
+							openFunctions();
+							functionsDialog->selectCategory("All");
+							functionsDialog->setSearch(QString::fromStdString(str));
 						} else if(item->type() == TYPE_VARIABLE) {
-							manage_variables();
-							if(gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tVariableCategories_store), &iter)) {
-								gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tVariableCategories)), &iter);
-							}
-							gtk_entry_set_text(GTK_ENTRY(gtk_builder_get_object(variables_builder, "variables_entry_search")), str.c_str());
+							openVariables();
+							variablesDialog->selectCategory("All");
+							variablesDialog->setSearch(QString::fromStdString(str));
 						}
 					} else {
 						CALCULATOR->error(true, "No function, variable, or unit with the specified name (%s) was found.", str.c_str(), NULL);
 					}
-				}*/
+				}
 			} else if(equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "exit")) {
 				qApp->closeAllWindows();
 			} else {
@@ -2850,6 +2839,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		if(!to_struct.isZero()) {
 			mstruct->multiply(to_struct);
 			PrintOptions po = settings->printops;
+			po.is_approximate = NULL;
 			po.negative_exponents = false;
 			to_struct.format(po);
 			if(to_struct.isMultiplication() && to_struct.size() >= 2) {
@@ -2934,7 +2924,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
-	if(!do_mathoperation && (askTC(*parsed_mstruct) || (check_exrates && checkExchangeRates()))) {
+	if(!do_mathoperation && (askTC(*parsed_mstruct) || (check_exrates && settings->checkExchangeRates(this)))) {
 		calculateExpression(force, do_mathoperation, op, f, settings->rpn_mode, stack_index, saved_execute_str, str, false);
 		settings->evalops.complex_number_form = cnf_bak;
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
@@ -3006,24 +2996,12 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
 
 	if(stack_index == 0) {
-		/*if(!block_conversion_category_switch) {
+		if(unitsDialog && unitsDialog->isVisible()) {
 			Unit *u = CALCULATOR->findMatchingUnit(*mstruct);
 			if(u && !u->category().empty()) {
-				std::string s_cat = u->category();
-				if(s_cat.empty()) s_cat = tr("Uncategorized").toStdString();
-				if(s_cat != selected_unit_category) {
-					GtkTreeIter iter = convert_category_map[s_cat];
-					GtkTreePath *path = gtk_tree_model_get_path(gtk_tree_view_get_model(GTK_TREE_VIEW(tUnitSelectorCategories)), &iter);
-					gtk_tree_view_expand_to_path(GTK_TREE_VIEW(tUnitSelectorCategories), path);
-					gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(tUnitSelectorCategories), path, NULL, TRUE, 0.5, 0);
-					gtk_tree_path_free(path);
-					gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitSelectorCategories)), &iter);
-				}
+				unitsDialog->selectCategory(u->category());
 			}
-			if(!gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gtk_builder_get_object(main_builder, "convert_button_continuous_conversion")))) {
-				gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(tUnitSelector)));
-			}
-		}*/
+		}
 		expressionEdit->blockCompletion();
 		expressionEdit->blockParseStatus();
 		if(settings->replace_expression == CLEAR_EXPRESSION) {
@@ -3246,7 +3224,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 	}
 	if(!command_thread->running) command_aborted = true;
 
-	if(!command_aborted && run == 1 && command_type >= COMMAND_CONVERT_UNIT && checkExchangeRates()) {
+	if(!command_aborted && run == 1 && command_type >= COMMAND_CONVERT_UNIT && settings->checkExchangeRates(this)) {
 		b_busy++;
 		mfactor->set(*mstruct);
 		run = 2;
@@ -3732,58 +3710,12 @@ void QalculateWindow::changeEvent(QEvent *e) {
 	QMainWindow::changeEvent(e);
 }
 
-void FetchExchangeRatesThread::run() {
-	int timeout = 15;
-	int n = -1;
-	if(!read(&timeout)) return;
-	if(!read(&n)) return;
-	CALCULATOR->fetchExchangeRates(timeout, n);
-}
-bool QalculateWindow::checkExchangeRates() {
-	int i = CALCULATOR->exchangeRatesUsed();
-	if(i == 0) return false;
-	if(settings->auto_update_exchange_rates == 0) return false;
-	if(CALCULATOR->checkExchangeRatesDate(settings->auto_update_exchange_rates > 0 ? settings->auto_update_exchange_rates : 7, false, settings->auto_update_exchange_rates == 0, i)) return false;
-	if(settings->auto_update_exchange_rates == 0) return false;
-	bool b = false;
-	if(settings->auto_update_exchange_rates < 0) {
-		int days = (int) floor(difftime(time(NULL), CALCULATOR->getExchangeRatesTime(i)) / 86400);
-		if(QMessageBox::question(this, tr("Update exchange rates?"), tr("It has been %n day(s) since the exchange rates last were updated.\n\nDo you wish to update the exchange rates now?", "", days), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
-			b = true;
-		}
-	}
-	if(b || settings->auto_update_exchange_rates > 0) {
-		if(settings->auto_update_exchange_rates <= 0) i = -1;
-		fetchExchangeRates(b ? 15 : 8, i);
-		CALCULATOR->loadExchangeRates();
-		return true;
-	}
-	return false;
-}
-
 void QalculateWindow::fetchExchangeRates() {
 	CALCULATOR->clearMessages();
-	fetchExchangeRates(15);
+	settings->fetchExchangeRates(15, -1, this);
 	CALCULATOR->loadExchangeRates();
 	displayMessages(this);
 	expressionCalculationUpdated();
-}
-void QalculateWindow::fetchExchangeRates(int timeout, int n) {
-	b_busy++;
-	FetchExchangeRatesThread fetch_thread;
-	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
-		if(fetch_thread.running) {
-			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates."), QString(), 0, 0, this);
-			dialog->setWindowModality(Qt::WindowModal);
-			dialog->setMinimumDuration(200);
-			while(fetch_thread.running) {
-				qApp->processEvents();
-				sleep_ms(10);
-			}
-			dialog->deleteLater();
-		}
-	}
-	b_busy--;
 }
 void QalculateWindow::abort() {
 	CALCULATOR->abort();
@@ -3943,11 +3875,11 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();
 	settings->window_geometry = saveGeometry();
 	settings->splitter_state = ehSplitter->saveState();
-	settings->savePreferences(settings->save_mode_on_exit);
 	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	CALCULATOR->abort();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
+	settings->savePreferences(settings->save_mode_on_exit);
 }
 
 void QalculateWindow::onToActivated() {
@@ -3972,7 +3904,24 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 }
 void QalculateWindow::onStoreActivated() {
 	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : (exact_text.empty() ? QString::fromStdString(result_text) : QString::fromStdString(exact_text)));
-	if(v) expressionEdit->updateCompletion();
+	if(v) {
+		expressionEdit->updateCompletion();
+		if(variablesDialog) variablesDialog->updateVariables();
+	}
+}
+void QalculateWindow::newVariable() {
+	KnownVariable *v = VariableEditDialog::newVariable(this);
+	if(v) {
+		expressionEdit->updateCompletion();
+		if(variablesDialog) variablesDialog->updateVariables();
+	}
+}
+void QalculateWindow::newFunction() {
+	MathFunction *f = FunctionEditDialog::newFunction(this);
+	if(f) {
+		expressionEdit->updateCompletion();
+		if(functionsDialog) functionsDialog->updateFunctions();
+	}
 }
 void QalculateWindow::onKeypadActivated(bool b) {
 	keypadDock->setVisible(b);
@@ -4266,6 +4215,45 @@ void QalculateWindow::openFunctions() {
 	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));
 	functionsDialog->show();
 }
+void QalculateWindow::openVariables() {
+	if(variablesDialog) {
+		variablesDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		variablesDialog->show();
+		variablesDialog->raise();
+		variablesDialog->activateWindow();
+		return;
+	}
+	variablesDialog = new VariablesDialog();
+	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
+	variablesDialog->show();
+}
+void QalculateWindow::openUnits() {
+	Unit *u = NULL;
+	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
+		u = CALCULATOR->findMatchingUnit(*mstruct);
+	}
+	if(unitsDialog) {
+		if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
+		else unitsDialog->selectCategory("All");
+		unitsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		unitsDialog->show();
+		unitsDialog->raise();
+		unitsDialog->activateWindow();
+		return;
+	}
+	unitsDialog = new UnitsDialog();
+	if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
+	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
+	connect(unitsDialog, SIGNAL(convertToUnitRequest(Unit*)), this, SLOT(convertToUnit(Unit*)));
+	connect(unitsDialog, SIGNAL(unitActivated(Unit*)), this, SLOT(onUnitActivated(Unit*)));
+	unitsDialog->show();
+}
+void QalculateWindow::onUnitActivated(Unit *u) {
+	if(expressionEdit->expressionHasChanged() || settings->history_answer.empty()) onUnitClicked(u);
+	else convertToUnit(u);
+}
 void QalculateWindow::openFPConversion() {
 	if(fpConversionDialog) {
 		if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -4440,7 +4428,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 
 	box->addSpacing(box->spacing());
 	if(!f->description().empty() || !f->example(true).empty()) {
-		QTextBrowser *descr = new QTextBrowser();
+		QPlainTextEdit *descr = new QPlainTextEdit();
+		descr->setReadOnly(true);
 		box->addWidget(descr);
 		QString str = QString::fromStdString(f->description());
 		if(!f->example(true).empty()) {
@@ -4457,6 +4446,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		descr->setFixedHeight(fm.lineSpacing() * 5 + descr->frameWidth() * 2 + descr->contentsMargins().top() + descr->contentsMargins().bottom());
 	}
 
+	QScrollArea *scroll = new QScrollArea();
+	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	fd->w_result = new QLabel();
 	fd->w_result->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	fd->w_result->setWordWrap(true);
@@ -4464,9 +4455,12 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	QFont font(fd->w_result->font());
 	font.setWeight(QFont::Bold);
 	QFontMetrics fm(font);
-	fd->w_result->setFixedHeight(fm.lineSpacing() * 2 + fd->w_result->frameWidth() * 2 + fd->w_result->contentsMargins().top() + fd->w_result->contentsMargins().bottom());
-	fd->w_result->setFixedWidth(fm.averageCharWidth() * 40);
-	box->addWidget(fd->w_result, Qt::AlignRight);
+	scroll->setMinimumWidth(fm.averageCharWidth() * 40);
+	scroll->setWidget(fd->w_result);
+	scroll->setWidgetResizable(true);
+	scroll->setFrameShape(QFrame::NoFrame);
+	scroll->setFixedHeight(fm.lineSpacing() * 2 + scroll->frameWidth() * 2 + scroll->contentsMargins().top() + scroll->contentsMargins().bottom());
+	box->addWidget(scroll, Qt::AlignRight);
 
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, fd->dialog);
 	box->addWidget(buttonBox);
@@ -5011,4 +5005,8 @@ void QalculateWindow::executeFromFile(const QString &file) {
 	}
 	qfile.close();
 }
+void QalculateWindow::convertToUnit(Unit *u) {
+	executeCommand(COMMAND_CONVERT_UNIT, true, "", u);
+}
+
 

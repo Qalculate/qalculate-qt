@@ -819,9 +819,7 @@ void ExpressionEdit::updateCompletion() {
 				COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), QString::fromStdString(CALCULATOR->variables[i]->title()), 1, CALCULATOR->variables[i])
 			} else {
 				Variable *v = CALCULATOR->variables[i];
-				if(settings->isAnswerVariable(v)) {
-					title = tr("a previous result").toStdString();
-				} else if(v->isKnown()) {
+				if(v->isKnown()) {
 					if(((KnownVariable*) v)->isExpression()) {
 						ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 						title = CALCULATOR->localizeExpression(((KnownVariable*) v)->expression(), pa);

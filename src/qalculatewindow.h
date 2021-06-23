@@ -34,6 +34,8 @@ class QToolButton;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
+class VariablesDialog;
+class UnitsDialog;
 class FPConversionDialog;
 struct FunctionDialog;
 
@@ -47,7 +49,6 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
-		void fetchExchangeRates(int timeout, int n = -1);
 		static bool displayMessages(QWidget *parent = NULL);
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 		void executeFromFile(const QString&);
@@ -64,6 +65,8 @@ class QalculateWindow : public QMainWindow {
 		QLabel *statusLabel, *statusIconLabel;
 		PreferencesDialog *preferencesDialog;
 		FunctionsDialog *functionsDialog;
+		VariablesDialog *variablesDialog;
+		UnitsDialog *unitsDialog;
 		FPConversionDialog *fpConversionDialog;
 
 		KeypadWidget *keypad;
@@ -84,7 +87,6 @@ class QalculateWindow : public QMainWindow {
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
-		bool checkExchangeRates();
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
 		void keyPressEvent(QKeyEvent*) override;
@@ -148,6 +150,8 @@ class QalculateWindow : public QMainWindow {
 		void onCustomInputBaseChanged(int);
 		void editPreferences();
 		void openFunctions();
+		void openUnits();
+		void openVariables();
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
 		void approximationActivated();
@@ -164,6 +168,7 @@ class QalculateWindow : public QMainWindow {
 		void onEntrySelectFile();
 		void onCalculateFunctionRequested(MathFunction*);
 		void onInsertFunctionRequested(MathFunction*);
+		void onUnitActivated(Unit *u);
 
 
 	public slots:
@@ -182,6 +187,9 @@ class QalculateWindow : public QMainWindow {
 		void resultDisplayUpdated();
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
+		void newVariable();
+		void newFunction();
+		void convertToUnit(Unit*);
 
 	signals:
 

@@ -19,7 +19,10 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QColor>
+#include <QProgressDialog>
 #include <QDebug>
+
+extern int b_busy;
 
 bool can_display_unicode_string_function(const char*, void*) {
 	return true;
@@ -253,6 +256,14 @@ void QalculateQtSettings::loadPreferences() {
 					window_geometry = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "splitter_state") {
 					splitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "functions_geometry") {
+					functions_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "functions_vsplitter_state") {
+					functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "functions_hsplitter_state") {
+					functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "keep_function_dialog_open") {
+					keep_function_dialog_open = v;
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
 				} else if(svar == "style") {
@@ -648,6 +659,16 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
+	if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());
+	if(!functions_vsplitter_state.isEmpty()) fprintf(file, "functions_vsplitter_state=%s\n", functions_vsplitter_state.toBase64().data());
+	if(!functions_hsplitter_state.isEmpty()) fprintf(file, "functions_hsplitter_state=%s\n", functions_hsplitter_state.toBase64().data());
+	fprintf(file, "keep_function_dialog_open=%i\n", keep_function_dialog_open);
+	if(!units_geometry.isEmpty()) fprintf(file, "units_geometry=%s\n", units_geometry.toBase64().data());
+	if(!units_vsplitter_state.isEmpty()) fprintf(file, "units_vsplitter_state=%s\n", units_vsplitter_state.toBase64().data());
+	if(!units_hsplitter_state.isEmpty()) fprintf(file, "units_hsplitter_state=%s\n", units_hsplitter_state.toBase64().data());
+	if(!variables_geometry.isEmpty()) fprintf(file, "variables_geometry=%s\n", variables_geometry.toBase64().data());
+	if(!variables_vsplitter_state.isEmpty()) fprintf(file, "variables_vsplitter_state=%s\n", variables_vsplitter_state.toBase64().data());
+	if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
 	fprintf(file, "always_on_top=%i\n", always_on_top);
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
 	fprintf(file, "ignore_locale=%i\n", ignore_locale);
@@ -802,5 +823,54 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 	}
 	QLineEdit::keyPressEvent(event);
 	if(event->key() == Qt::Key_Return) event->accept();
+}
+bool QalculateQtSettings::checkExchangeRates(QWidget *parent) {
+	int i = CALCULATOR->exchangeRatesUsed();
+	if(i == 0) return false;
+	if(auto_update_exchange_rates == 0) return false;
+	if(CALCULATOR->checkExchangeRatesDate(auto_update_exchange_rates > 0 ? auto_update_exchange_rates : 7, false, auto_update_exchange_rates == 0, i)) return false;
+	if(auto_update_exchange_rates == 0) return false;
+	bool b = false;
+	if(auto_update_exchange_rates < 0) {
+		int days = (int) floor(difftime(time(NULL), CALCULATOR->getExchangeRatesTime(i)) / 86400);
+		if(QMessageBox::question(parent, tr("Update exchange rates?"), tr("It has been %n day(s) since the exchange rates last were updated.\n\nDo you wish to update the exchange rates now?", "", days), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
+			b = true;
+		}
+	}
+	if(b || auto_update_exchange_rates > 0) {
+		if(auto_update_exchange_rates <= 0) i = -1;
+		fetchExchangeRates(b ? 15 : 8, i);
+		CALCULATOR->loadExchangeRates();
+		return true;
+	}
+	return false;
+}
+class FetchExchangeRatesThread : public Thread {
+protected:
+	virtual void run();
+};
+void FetchExchangeRatesThread::run() {
+	int timeout = 15;
+	int n = -1;
+	if(!read(&timeout)) return;
+	if(!read(&n)) return;
+	CALCULATOR->fetchExchangeRates(timeout, n);
+}
+void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent) {
+	b_busy++;
+	FetchExchangeRatesThread fetch_thread;
+	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
+		if(fetch_thread.running) {
+			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates."), QString(), 0, 0, parent);
+			dialog->setWindowModality(Qt::WindowModal);
+			dialog->setMinimumDuration(200);
+			while(fetch_thread.running) {
+				qApp->processEvents();
+				sleep_ms(10);
+			}
+			dialog->deleteLater();
+		}
+	}
+	b_busy--;
 }
 

@@ -13,37 +13,20 @@
 #define FUNCTIONS_DIALOG_H
 
 #include <QDialog>
-#include <QSortFilterProxyModel>
 
 #include <libqalculate/qalculate.h>
 
 class QTreeView;
 class QTreeWidget;
-class QTextBrowser;
+class QTextEdit;
 class QTreeWidgetItem;
 class QStandardItemModel;
 class QPushButton;
 class QLineEdit;
-
-class ItemProxyModel : public QSortFilterProxyModel {
-
-	Q_OBJECT
-
-	public:
-
-		ItemProxyModel(QObject *parent = NULL);
-		~ItemProxyModel();
-
-		void setFilter(std::string);
-		void setSecondaryFilter(std::string);
-
-	protected:
-
-		std::string cat, subcat, filter;
-
-		bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
-
-};
+class QSplitter;
+class ItemProxyModel;
+class QComboBox;
+class QLabel;
 
 class FunctionsDialog : public QDialog {
 
@@ -53,16 +36,18 @@ class FunctionsDialog : public QDialog {
 
 		QTreeView *functionsView;
 		QTreeWidget *categoriesView;
-		QTextBrowser *descriptionView;
+		QTextEdit *descriptionView;
 		ItemProxyModel *functionsModel;
 		QStandardItemModel *sourceModel;
 		QPushButton *deactivateButton, *calculateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
 		QLineEdit *searchEdit;
+		QSplitter *vsplitter, *hsplitter;
 
 		std::string selected_category;
 		ExpressionItem *selected_item;
 
 		void keyPressEvent(QKeyEvent *event) override;
+		void closeEvent(QCloseEvent*) override;
 
 	protected slots:
 
@@ -84,6 +69,12 @@ class FunctionsDialog : public QDialog {
 		virtual ~FunctionsDialog();
 
 		void updateFunctions();
+		void setSearch(const QString&);
+		void selectCategory(std::string);
+
+	public slots:
+
+		void reject() override;
 
 	signals:
 

@@ -28,6 +28,7 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value) 
 	grid->addWidget(nameEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Value:"), this), 1, 0);
 	valueEdit = new QLineEdit(this);
+	valueEdit->setAlignment(Qt::AlignRight);
 	if(b_empty) valueEdit->setPlaceholderText(tr("current result"));
 	grid->addWidget(valueEdit, 1, 1);
 	temporaryBox = new QCheckBox(tr("Temporary"), this);
@@ -96,9 +97,10 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 		valueEdit->setText(QString::fromStdString(CALCULATOR->localizeExpression(v->expression(), pa)));
 	} else {
 		PrintOptions po = settings->printops;
+		po.is_approximate = NULL;
 		po.allow_non_usable = false;
 		po.base = 10;
-		valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 100, po)));
+		valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
 	}
 	okButton->setEnabled(true);
 }

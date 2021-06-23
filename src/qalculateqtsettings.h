@@ -48,7 +48,9 @@ enum {
 
 DECLARE_BUILTIN_FUNCTION(AnswerFunction, 0)
 
-class QalculateQtSettings {
+class QalculateQtSettings : QObject {
+
+	Q_OBJECT
 
 	public:
 
@@ -60,6 +62,8 @@ class QalculateQtSettings {
 		void updateStyle();
 		void updatePalette();
 		void updateMessagePrintOptions();
+		bool checkExchangeRates(QWidget *parent);
+		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 
 		bool isAnswerVariable(Variable *v);
 
@@ -87,6 +91,9 @@ class QalculateQtSettings {
 		std::vector<MathStructure*> history_answer;
 		std::vector<std::string> expression_history;
 		QByteArray window_geometry, window_state, splitter_state;
+		QByteArray functions_geometry, functions_vsplitter_state, functions_hsplitter_state;
+		QByteArray units_geometry, units_vsplitter_state, units_hsplitter_state;
+		QByteArray variables_geometry, variables_vsplitter_state, variables_hsplitter_state;
 
 };
 
