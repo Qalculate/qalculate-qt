@@ -13,6 +13,9 @@
 #define QALCULATE_WINDOW_H
 
 #include <QMainWindow>
+#include <QFont>
+#include <QSpinBox>
+#include <QTranslator>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -24,6 +27,15 @@ class QSplitter;
 class QLabel;
 class KeypadWidget;
 class QDockWidget;
+class QAction;
+class QToolBar;
+class QTextEdit;
+class QToolButton;
+class QTimer;
+class PreferencesDialog;
+class FunctionsDialog;
+class FPConversionDialog;
+struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
 
@@ -35,7 +47,10 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
-		void fetchExchangeRates(int timeout, int n);
+		void fetchExchangeRates(int timeout, int n = -1);
+		static bool displayMessages(QWidget *parent = NULL);
+		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
+		void executeFromFile(const QString&);
 
 	protected:
 
@@ -47,20 +62,36 @@ class QalculateWindow : public QMainWindow {
 		HistoryView *historyView;
 		QSplitter *ehSplitter;
 		QLabel *statusLabel, *statusIconLabel;
+		PreferencesDialog *preferencesDialog;
+		FunctionsDialog *functionsDialog;
+		FPConversionDialog *fpConversionDialog;
 
 		KeypadWidget *keypad;
-		QDockWidget *keypadDock;
+		QDockWidget *keypadDock, *basesDock;
+		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
+		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
+		QToolBar *tb;
+		QToolButton *menuAction, *modeAction;
+		QAction *toAction, *storeAction, *functionsAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
+		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
+		QTimer *ecTimer, *rfTimer;
+		QFont saved_app_font;
 
-		bool send_event;
+		bool send_event, bases_shown;
 
-		void calculateExpression(bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, bool check_exrates = true);
-		void setResult(Prefix *prefix = NULL, bool update_parse = false, size_t stack_index = 0, bool register_moved = false, bool noprint = false);
-		void executeCommand(int command_type, bool show_result = true);
+		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
+		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
+		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
 		bool checkExchangeRates();
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
 		void keyPressEvent(QKeyEvent*) override;
+		void closeEvent(QCloseEvent*) override;
+		void setPreviousExpression();
+		void setOption(std::string);
+		void updateResultBases();
 
 	protected slots:
 
@@ -84,6 +115,56 @@ class QalculateWindow : public QMainWindow {
 		void onMCClicked();
 		void onMPlusClicked();
 		void onMMinusClicked();
+		void onAnswerClicked();
+		void onToActivated();
+		void onStoreActivated();
+		void onKeypadActivated(bool);
+		void onKeypadVisibilityChanged(bool);
+		void onBasesActivated(bool);
+		void onBasesVisibilityChanged(bool);
+		void onExpressionChanged();
+		void onToConversionRequested(std::string);
+		void onInsertTextRequested(std::string);
+		void onInsertValueRequested(int);
+		void onAlwaysOnTopChanged();
+		void onPreferencesClosed();
+		void onTitleTypeChanged();
+		void onResultFontChanged();
+		void onExpressionFontChanged();
+		void onKeypadFontChanged();
+		void onAppFontChanged();
+		void gradiansActivated();
+		void radiansActivated();
+		void degreesActivated();
+		void normalActivated();
+		void scientificActivated();
+		void simpleActivated();
+		void onPrecisionChanged(int);
+		void onMinDecimalsChanged(int);
+		void onMaxDecimalsChanged(int);
+		void outputBaseActivated();
+		void onCustomOutputBaseChanged(int);
+		void inputBaseActivated();
+		void onCustomInputBaseChanged(int);
+		void editPreferences();
+		void openFunctions();
+		void assumptionsTypeActivated();
+		void assumptionsSignActivated();
+		void approximationActivated();
+		void applyFunction(MathFunction*);
+		void openFPConversion();
+		void onInsertFunctionExec();
+		void onInsertFunctionRPN();
+		void onInsertFunctionInsert();
+		void onInsertFunctionKeepOpen(bool);
+		void onInsertFunctionClosed();
+		void onInsertFunctionChanged();
+		void onInsertFunctionEntryActivated();
+		void insertFunctionDo(FunctionDialog*);
+		void onEntrySelectFile();
+		void onCalculateFunctionRequested(MathFunction*);
+		void onInsertFunctionRequested(MathFunction*);
+
 
 	public slots:
 
@@ -94,9 +175,53 @@ class QalculateWindow : public QMainWindow {
 		void onActivateRequested(const QStringList&, const QString&);
 		void abort();
 		void abortCommand();
+		void fetchExchangeRates();
+		void showAbout();
+		void expressionCalculationUpdated(int delay = 0);
+		void resultFormatUpdated(int delay = 0);
+		void resultDisplayUpdated();
+		void expressionFormatUpdated(bool);
+		void insertFunction(MathFunction*, QWidget* = NULL);
 
 	signals:
 
 };
 
+
+class QalculateTranslator : public QTranslator {
+
+	Q_OBJECT
+
+	public:
+
+		QalculateTranslator();
+
+		QString	translate(const char *context, const char *sourceText, const char *disambiguation = NULL, int n = -1) const;
+
+};
+
+class MathSpinBox : public QSpinBox {
+
+	Q_OBJECT
+
+	public:
+
+		MathSpinBox(QWidget *parent = NULL);
+		virtual ~MathSpinBox();
+
+		QLineEdit *entry() const;
+
+	protected:
+
+		int valueFromText(const QString &text) const override;
+		QValidator::State validate(QString &text, int &pos) const override;
+		void keyPressEvent(QKeyEvent *event);
+
+	signals:
+
+		void returnPressed();
+
+};
+
 #endif //QALCULATE_WINDOW_H
+

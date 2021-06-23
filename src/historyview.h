@@ -14,6 +14,12 @@
 
 #include <QTextBrowser>
 
+class QImage;
+class QMenu;
+class QAction;
+class ExpressionEdit;
+class QColor;
+
 class HistoryView : public QTextBrowser {
 
 	Q_OBJECT
@@ -23,13 +29,36 @@ class HistoryView : public QTextBrowser {
 		HistoryView(QWidget *parent = NULL);
 		virtual ~HistoryView();
 
-		QString s_text;
+		ExpressionEdit *expressionEdit;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false, const QString &image = QString());
+		void addMessages();
+
+	protected:
+
+		QString s_text;
+		int i_pos;
+		QImage *paste_image;
+		std::vector<std::string> v_text;
+		QMenu *cmenu;
+		QAction *copyAction, *copyFormattedAction, *selectAllAction, *clearAction;
+		QColor prev_color;
+
+		void mouseReleaseEvent(QMouseEvent *e) override;
+		void contextMenuEvent(QContextMenuEvent *e) override;
+		void keyPressEvent(QKeyEvent *e) override;
+		void inputMethodEvent(QInputMethodEvent*) override;
+		void changeEvent(QEvent*) override;
 
 	public slots:
 
+		void editCopy();
+		void editClear();
+
 	signals:
+
+		void insertTextRequested(std::string);
+		void insertValueRequested(int);
 
 };
 

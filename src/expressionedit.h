@@ -12,7 +12,7 @@
 #ifndef EXPRESSION_EDIT_H
 #define EXPRESSION_EDIT_H
 
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QSortFilterProxyModel>
 #include <QStringList>
 
@@ -21,6 +21,10 @@
 class QCompleter;
 class QStandardItemModel;
 class QTableView;
+class QMenu;
+class QAction;
+class QTimer;
+
 struct CompletionData;
 
 class ExpressionProxyModel : public QSortFilterProxyModel {
@@ -45,7 +49,7 @@ class ExpressionProxyModel : public QSortFilterProxyModel {
 
 };
 
-class ExpressionEdit : public QTextEdit {
+class ExpressionEdit : public QPlainTextEdit {
 
 	Q_OBJECT
 
@@ -55,20 +59,24 @@ class ExpressionEdit : public QTextEdit {
 		ExpressionProxyModel *completionModel;
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
+		QMenu *cmenu;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
+		QTimer *completionTimer;
 
-		QStringList history;
+		QStringList expression_undo_buffer;
+		QList<int> expression_undo_pos;
 		QString current_history;
-		int history_index;
+		int history_index, undo_index;
 		
 		CompletionData *cdata;
 		
 		int current_object_start, current_object_end;
 		int current_function_index;
 		std::string current_object_text;
-		int completion_blocked;
+		int completion_blocked, parse_blocked, block_add_to_undo;
 		int block_text_change;
+		int do_completion_signal;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
-		bool display_expression_status;
 		int block_display_parse;
 		QString prev_parsed_expression, parsed_expression_tooltip;
 		bool expression_has_changed, expression_has_changed2;
@@ -81,8 +89,8 @@ class ExpressionEdit : public QTextEdit {
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
-		void keyPressEvent(QKeyEvent*) override;
 		void keyReleaseEvent(QKeyEvent*) override;
+		void contextMenuEvent(QContextMenuEvent *e) override;
 
 	public:
 
@@ -92,33 +100,43 @@ class ExpressionEdit : public QTextEdit {
 		std::string expression() const;
 		QSize sizeHint() const;
 
-		void updateCompletion();
-		void wrapSelection(const QString &text = QString());
+		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
+		void displayParseStatus(bool = false, bool = true);
+		void inputMethodEvent(QInputMethodEvent*) override;
+		void keyPressEvent(QKeyEvent*) override;
 
 	protected slots:
 
 		void onTextChanged();
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
+		void enableIM();
+		void enableCompletionDelay();
+		void onCompletionModeChanged();
 
 	public slots:
 
+		void updateCompletion();
 		void setExpression(std::string);
-		void blockCompletion();
-		void unblockCompletion();
+		void blockCompletion(bool = true);
+		void blockParseStatus(bool = true);
+		void blockUndo(bool = true);
 		void hideCompletion();
 		void addToHistory();
-		void complete();
-		void displayParseStatus();
 		void smartParentheses();
 		void insertBrackets();
-		void selectAll();
+		void selectAll(bool b = true);
+		void editUndo();
+		void editRedo();
+		void editDelete();
+		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
 
 	signals:
 
 		void returnPressed();
+		void toConversionRequested(std::string);
 
 };
 
