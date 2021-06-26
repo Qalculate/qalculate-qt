@@ -32,8 +32,6 @@ class FunctionEditDialog : public QDialog {
 		QPushButton *okButton;
 		QRadioButton *ref1Button, *ref2Button;
 
-		bool read_only;
-
 	protected slots:
 
 		void onNameEdited(const QString&);
@@ -44,16 +42,16 @@ class FunctionEditDialog : public QDialog {
 		FunctionEditDialog(QWidget *parent = NULL);
 		virtual ~FunctionEditDialog();
 
-		UserFunction *createFunction();
-		bool modifyFunction(MathFunction *f);
+		UserFunction *createFunction(MathFunction **replaced_item = NULL);
+		bool modifyFunction(MathFunction *f, MathFunction **replaced_item = NULL);
 		void setFunction(MathFunction *f);
 		void setExpression(const QString&);
 		QString expression() const;
 		void setName(const QString&);
 		void setRefType(int);
 
-		static bool editFunction(QWidget *parent, MathFunction *f);
-		static UserFunction* newFunction(QWidget *parent);
+		static bool editFunction(QWidget *parent, MathFunction *f, MathFunction **replaced_item = NULL);
+		static UserFunction* newFunction(QWidget *parent, MathFunction **replaced_item = NULL);
 
 };
 

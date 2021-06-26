@@ -37,6 +37,7 @@ class FunctionsDialog;
 class VariablesDialog;
 class UnitsDialog;
 class FPConversionDialog;
+class CalendarConversionDialog;
 struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
@@ -68,6 +69,7 @@ class QalculateWindow : public QMainWindow {
 		VariablesDialog *variablesDialog;
 		UnitsDialog *unitsDialog;
 		FPConversionDialog *fpConversionDialog;
+		CalendarConversionDialog *calendarConversionDialog;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock;
@@ -157,6 +159,7 @@ class QalculateWindow : public QMainWindow {
 		void approximationActivated();
 		void applyFunction(MathFunction*);
 		void openFPConversion();
+		void openCalendarConversion();
 		void onInsertFunctionExec();
 		void onInsertFunctionRPN();
 		void onInsertFunctionInsert();
@@ -169,7 +172,11 @@ class QalculateWindow : public QMainWindow {
 		void onCalculateFunctionRequested(MathFunction*);
 		void onInsertFunctionRequested(MathFunction*);
 		void onUnitActivated(Unit *u);
-
+		void onUnitRemoved(Unit*);
+		void onVariableRemoved(Variable*);
+		void normalModeActivated();
+		void rpnModeActivated();
+		void chainModeActivated();
 
 	public slots:
 
@@ -188,6 +195,7 @@ class QalculateWindow : public QMainWindow {
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
 		void newVariable();
+		void newUnknown();
 		void newFunction();
 		void convertToUnit(Unit*);
 

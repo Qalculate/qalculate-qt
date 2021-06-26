@@ -136,14 +136,27 @@ void FunctionsDialog::searchChanged(const QString &str) {
 	functionsView->selectionModel()->setCurrentIndex(functionsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 }
 void FunctionsDialog::newClicked() {
-	UserFunction *f = FunctionEditDialog::newFunction(this);
+	MathFunction *replaced_item = NULL;
+	UserFunction *f = FunctionEditDialog::newFunction(this, &replaced_item);
 	if(f) {
+		if(replaced_item && (replaced_item == f || !CALCULATOR->hasFunction(replaced_item))) {
+			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+		}
 		selected_item = f;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
-		functionsModel->invalidate();
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(!list.isEmpty()) {
+				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			}
+		} else {
+			functionsModel->invalidate();
+		}
+		sourceModel->sort(0);
 		QModelIndex index = functionsModel->mapFromSource(item->index());
 		if(index.isValid()) {
 			functionsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -155,15 +168,28 @@ void FunctionsDialog::newClicked() {
 void FunctionsDialog::editClicked() {
 	QModelIndex index = functionsView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
+	MathFunction *replaced_item = NULL;
 	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
-	if(f && FunctionEditDialog::editFunction(this, f)) {
+	if(f && FunctionEditDialog::editFunction(this, f, &replaced_item)) {
 		sourceModel->removeRow(functionsModel->mapToSource(functionsView->selectionModel()->currentIndex()).row());
+		if(replaced_item && !CALCULATOR->hasFunction(replaced_item)) {
+			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
 		selected_item = f;
-		functionsModel->invalidate();
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(!list.isEmpty()) {
+				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			}
+		} else {
+			functionsModel->invalidate();
+		}
+		sourceModel->sort(0);
 		QModelIndex index = functionsModel->mapFromSource(item->index());
 		if(index.isValid()) {
 			functionsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -563,7 +589,7 @@ void FunctionsDialog::setSearch(const QString &str) {
 	searchChanged(str);
 }
 void FunctionsDialog::selectCategory(std::string str) {
-	QList<QTreeWidgetItem*> list = categoriesView->findItems((str.empty() || str == "All") ? "All" : "/" + QString::fromStdString(str), Qt::MatchExactly, 1);
+	QList<QTreeWidgetItem*> list = categoriesView->findItems((str.empty() || str == "All") ? "All" : "/" + QString::fromStdString(str), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 	if(!list.isEmpty()) {
 		categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	}

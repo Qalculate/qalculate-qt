@@ -41,15 +41,15 @@ class VariableEditDialog : public QDialog {
 		VariableEditDialog(QWidget *parent = NULL, bool allow_empty_value = true);
 		virtual ~VariableEditDialog();
 
-		KnownVariable *createVariable(MathStructure *default_value = NULL);
-		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL);
+		KnownVariable *createVariable(MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
+		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
 		void setVariable(KnownVariable *v);
 		void setValue(const QString&);
 		QString value() const;
 		void setName(const QString&);
 
-		static bool editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value = NULL);
-		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString());
+		static bool editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
+		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString(), ExpressionItem **replaced_item = NULL);
 
 };
 

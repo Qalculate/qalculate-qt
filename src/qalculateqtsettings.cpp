@@ -39,8 +39,15 @@ bool string_is_less(std::string str1, std::string str2) {
 	if(b_uni) return QString::fromStdString(str1).compare(QString::fromStdString(str2)) < 0;
 	return str1 < str2;
 }
+bool item_in_calculator(ExpressionItem *item) {
+	if(!CALCULATOR->stillHasVariable((Variable*) item) || !CALCULATOR->stillHasFunction((MathFunction*) item) || !CALCULATOR->stillHasUnit((Unit*) item)) return false;
+	if(item->type() == STRUCT_VARIABLE) return CALCULATOR->hasVariable((Variable*) item);
+	if(item->type() == STRUCT_UNIT) return CALCULATOR->hasUnit((Unit*) item);
+	if(item->type() == STRUCT_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
+	return false;
+}
 
-AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, CALCULATOR->f_warning->category(), QApplication::tr("History Answer Value").toStdString()) {
+AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName("answer");
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
 	arg->addArgument(new IntegerArgument("", ARGUMENT_MIN_MAX_NONZERO, true, true, INTEGER_TYPE_SINT));
@@ -179,11 +186,12 @@ void QalculateQtSettings::loadPreferences() {
 	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
 	rpn_mode = false;
+	rpn_keys = true;
 	caret_as_xor = false;
 	do_imaginary_j = false;
 	color = 1;
 	colorize_result = true;
-	rpn_mode = false;
+	chain_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
 	enable_completion2 = true;
@@ -235,8 +243,7 @@ void QalculateQtSettings::loadPreferences() {
 				v = s2i(svalue);
 				if(svar == "version") {
 					parse_qalculate_version(svalue, version_numbers);
-				/*} else if(svar == "allow_multiple_instances") {
-					if(v == 0 && version_numbers[0] < 3) v = -1;
+				} else if(svar == "allow_multiple_instances") {
 					allow_multiple_instances = v;
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
@@ -246,9 +253,9 @@ void QalculateQtSettings::loadPreferences() {
 					save_mode_on_exit = v;
 				} else if(svar == "save_definitions_on_exit") {
 					save_defs_on_exit = v;
-				} else if(svar == "clear_history_on_exit") {
-					clear_history_on_exit = v;*/
-				} else if(svar == "window_state") {
+				}/* else if(svar == "clear_history_on_exit") {
+					clear_history_on_exit = v;
+				}*/ else if(svar == "window_state") {
 					window_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "replace_expression") {
 					replace_expression = v;
@@ -262,10 +269,6 @@ void QalculateQtSettings::loadPreferences() {
 					functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "functions_hsplitter_state") {
 					functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "keep_function_dialog_open") {
-					keep_function_dialog_open = v;
-				} else if(svar == "always_on_top") {
-					always_on_top = v;
 				} else if(svar == "style") {
 					style = v;
 				} else if(svar == "palette") {
@@ -490,16 +493,12 @@ void QalculateQtSettings::loadPreferences() {
 					if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 						evalops.interval_calculation = (IntervalCalculation) v;
 					}
-				/*} else if(svar == "chain_mode") {
-					chain_mode = v;*/
-				} else if(svar == "in_rpn_mode") {
+				} else if(svar == "chain_mode") {
+					chain_mode = v;
+				} else if(svar == "rpn_mode") {
 					rpn_mode = v;
-				/*} else if(svar == "rpn_keys") {
-					rpn_keys = v;*/
-				} else if(svar == "rpn_syntax") {
-					if(v) {
-						evalops.parse_options.parsing_mode = PARSING_MODE_RPN;
-					}
+				} else if(svar == "rpn_keys") {
+					rpn_keys = v;
 				} else if(svar == "limit_implicit_multiplication") {
 					evalops.parse_options.limit_implicit_multiplication = v;
 					printops.limit_implicit_multiplication = v;
@@ -570,14 +569,14 @@ void QalculateQtSettings::loadPreferences() {
 	updateMessagePrintOptions();
 
 	std::string ans_str = "ans";
-	vans[0] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str, m_undefined, QApplication::tr("Last Answer").toStdString(), false));
+	vans[0] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str, m_undefined, QApplication::tr("Last Answer").toStdString(), false, true));
 	vans[0]->addName(QApplication::tr("answer").toStdString());
 	vans[0]->addName(ans_str + "1");
-	vans[1] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "2", m_undefined, QApplication::tr("Answer 2").toStdString(), false));
-	vans[2] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "3", m_undefined, QApplication::tr("Answer 3").toStdString(), false));
-	vans[3] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "4", m_undefined, QApplication::tr("Answer 4").toStdString(), false));
-	vans[4] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "5", m_undefined, QApplication::tr("Answer 5").toStdString(), false));
-	v_memory = new KnownVariable(CALCULATOR->temporaryCategory(), "", m_zero, QApplication::tr("Memory").toStdString(), true, true);
+	vans[1] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "2", m_undefined, QApplication::tr("Answer 2").toStdString(), false, true));
+	vans[2] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "3", m_undefined, QApplication::tr("Answer 3").toStdString(), false, true));
+	vans[3] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "4", m_undefined, QApplication::tr("Answer 4").toStdString(), false, true));
+	vans[4] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "5", m_undefined, QApplication::tr("Answer 5").toStdString(), false, true));
+	v_memory = new KnownVariable(CALCULATOR->temporaryCategory(), "", m_zero, QApplication::tr("Memory").toStdString(), false, true);
 	ExpressionName ename;
 	ename.name = "MR";
 	ename.case_sensitive = true;
@@ -656,6 +655,12 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	}
 	fprintf(file, "\n[General]\n");
 	fprintf(file, "version=%s\n", VERSION);
+	fprintf(file, "ignore_locale=%i\n", ignore_locale);
+	/*fprintf(file, "check_version=%i\n", check_version);
+	if(check_version) {
+		fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
+		if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
+	}*/
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
@@ -671,7 +676,9 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
 	fprintf(file, "always_on_top=%i\n", always_on_top);
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
-	fprintf(file, "ignore_locale=%i\n", ignore_locale);
+	fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
+	fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
+	//fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "display_expression_status=%i\n", display_expression_status);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
@@ -695,6 +702,9 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 	fprintf(file, "replace_expression=%i\n", replace_expression);
+	fprintf(file, "rpn_keys=%i\n", rpn_keys);
+	/*if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
+	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);*/
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
@@ -703,8 +713,13 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
 	fprintf(file, "twos_complement=%i\n", printops.twos_complement);
 	fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
+	/*fprintf(file, "twos_complement_input=%i\n", twos_complement_in);
+	fprintf(file, "hexadecimal_twos_complement_input=%i\n", hexadecimal_twos_complement_in);*/
+	fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
+	fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
 	fprintf(file, "e_notation=%i\n", printops.lower_case_e);
 	fprintf(file, "imaginary_j=%i\n", CALCULATOR->v_i->hasName("j") > 0);
+	fprintf(file, "base_display=%i\n", printops.base_display);
 	if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
 	fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
 	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
@@ -736,7 +751,6 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "place_units_separately=%i\n", printops.place_units_separately);
 	fprintf(file, "auto_post_conversion=%i\n", evalops.auto_post_conversion);
 	fprintf(file, "mixed_units_conversion=%i\n", evalops.mixed_units_conversion);
-	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 	fprintf(file, "number_base=%i\n", printops.base);
 	if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
 	fprintf(file, "number_base_expression=%i\n", evalops.parse_options.base);
@@ -763,6 +777,8 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 	else fprintf(file, "approximation=%i\n", evalops.approximation);
 	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
+	fprintf(file, "rpn_mode=%i\n", rpn_mode);
+	fprintf(file, "chain_mode=%i\n", chain_mode);
 	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
 	fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
 	fprintf(file, "spacious=%i\n", printops.spacious);

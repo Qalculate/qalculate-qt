@@ -124,6 +124,8 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	settings->f_answer->setCategory(CALCULATOR->getFunctionById(FUNCTION_ID_WARNING)->category());
+
 	CALCULATOR->loadLocalDefinitions();
 
 	QalculateWindow *win = new QalculateWindow();

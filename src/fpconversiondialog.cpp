@@ -25,7 +25,7 @@
 #include "fpconversiondialog.h"
 
 FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
-	setWindowTitle(tr("Floating point conversion (IEEE 754)"));
+	setWindowTitle(tr("Floating Point Conversion (IEEE 754)"));
 	QVBoxLayout *box = new QVBoxLayout(this);
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Format"), this), 0, 0, Qt::AlignRight);

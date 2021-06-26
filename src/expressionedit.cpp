@@ -1040,8 +1040,8 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND(str1, tr("Bijective base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
 	COMPLETION_APPEND(str1, tr("Binary number"), 202, NULL)
-	/*COMPLETION_CONVERT_STRING("calendars")
-	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)*/
+	COMPLETION_CONVERT_STRING("calendars")
+	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
 	COMPLETION_APPEND(str1, tr("Complex cis form"), 401, NULL)
 	COMPLETION_CONVERT_STRING("decimal") str1 += " <i>"; str1 += "dec"; str1 += "</i>";
@@ -1095,7 +1095,15 @@ void ExpressionEdit::updateCompletion() {
 }
 
 void ExpressionEdit::setExpression(std::string str) {
-	setPlainText(QString::fromStdString(str));
+	setExpression(QString::fromStdString(str));
+}
+void ExpressionEdit::setExpression(const QString &str) {
+	block_add_to_undo++;
+	setCursorWidth(0);
+	clear();
+	block_add_to_undo--;
+	insertPlainText(str);
+	setCursorWidth(1);
 }
 std::string ExpressionEdit::expression() const {
 	return toPlainText().toStdString();
@@ -1130,14 +1138,17 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Asterisk: {
+				if(doChainMode(SIGN_MULTIPLICATION)) return;
 				wrapSelection(SIGN_MULTIPLICATION);
 				return;
 			}
 			case Qt::Key_Minus: {
+				if(doChainMode(SIGN_MINUS)) return;
 				wrapSelection(SIGN_MINUS);
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
+				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
@@ -1146,14 +1157,17 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
+				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Plus: {
+				if(doChainMode("+")) return;
 				wrapSelection("+");
 				return;
 			}
 			case Qt::Key_Slash: {
+				if(doChainMode("/")) return;
 				wrapSelection("/");
 				return;
 			}
@@ -1168,6 +1182,14 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	}
 	if(event->modifiers() == Qt::ControlModifier || (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
 		switch(event->key()) {
+			case Qt::Key_A: {
+				if(event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier)) {
+					if(doChainMode("∠")) return;
+					insertPlainText("∠");
+					return;
+				}
+				break;
+			}
 			case Qt::Key_ParenLeft: {}
 			case Qt::Key_ParenRight: {
 				smartParentheses();
@@ -1235,8 +1257,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					blockParseStatus(true);
 					setCursorWidth(0);
 					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
-					if(history_index == -1) setPlainText(current_history);
-					else setPlainText(QString::fromStdString(settings->expression_history[history_index]));
+					if(history_index == -1) setExpression(current_history);
+					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
 					QTextCursor c = textCursor();
@@ -1276,10 +1298,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				blockParseStatus(true);
 				setCursorWidth(0);
 				if(history_index < 0) {
-					if(history_index == -1 && current_history != toPlainText()) setPlainText(current_history);
+					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
-					setPlainText(QString::fromStdString(settings->expression_history[history_index]));
+					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
 				QTextCursor c = textCursor();
 				c.movePosition(QTextCursor::End);
@@ -1444,7 +1466,7 @@ void ExpressionEdit::blockUndo(bool b) {
 void ExpressionEdit::setStatusText(QString text) {
 	if(completionView->isVisible() || text.isEmpty()) {
 		QToolTip::hideText();
-	} else {
+	} else if(settings->display_expression_status) {
 		if(text.length() >= 30) {
 			text.replace("\n", "<br>");
 			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text.length() >= 60 ? ("<font size=\"-1\">" + text + "</font>") : ("<font size=\"+0\">" + text + "</font>"));
@@ -1455,6 +1477,7 @@ void ExpressionEdit::setStatusText(QString text) {
 }
 
 bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
+	if(!settings->display_expression_status) return false;
 	if(!f) return false;
 	int iargs = f->maxargs();
 	Argument *arg;
@@ -1540,7 +1563,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
-	if(!settings->display_expression_status) return;
 	if(block_display_parse) return;
 	QString qtext = toPlainText();
 	std::string text = qtext.toStdString(), str_f;
@@ -1930,11 +1952,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			if(had_errors || had_warnings) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 			else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		}
-		if(!b_func && show_tooltip) setStatusText(prev_parsed_expression);
+		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
-		if(prev_func && show_tooltip) setStatusText(prev_parsed_expression);
+		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
 	}
 	settings->evalops.parse_options.preserve_format = false;
 }
@@ -1985,6 +2007,7 @@ void ExpressionEdit::onTextChanged() {
 		cdata->current_function = settings->f_answer;
 		displayParseStatus();
 	}
+	if(document()->isEmpty()) expression_has_changed = false;
 }
 bool ExpressionEdit::expressionHasChanged() {
 	return expression_has_changed && !document()->isEmpty() && !toPlainText().trimmed().isEmpty();
@@ -2813,7 +2836,7 @@ void ExpressionEdit::setCurrentObject() {
 		l_to = current_object_text.length();
 		pos = current_object_text.length();
 		pos2 = pos;
-		//if(current_object_text[0] == '/') return;
+		if(l_to > 0 && current_object_text[0] == '/') return;
 		for(size_t i = 0; i < l_to; i++) {
 			if(current_object_text[i] == '#') {
 				current_object_start = -1;
@@ -2895,3 +2918,59 @@ void ExpressionEdit::setCurrentObject() {
 		}
 	}
 }
+
+bool ExpressionEdit::doChainMode(const QString &op) {
+	if(expression_has_changed && !settings->rpn_mode && settings->chain_mode && !cdata->current_function && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || (CALCULATOR->customInputBase() <= 62 && CALCULATOR->customInputBase() >= -62))) {
+		QTextCursor cur = textCursor();
+		if(cur.hasSelection()) {
+			if(cur.selectionStart() != 0 || cur.selectionEnd() != toPlainText().length()) return false;
+		} else if(!cur.atEnd()) {
+			return false;
+		}
+		std::string str = toPlainText().toStdString();
+		remove_blanks(str);
+		if(str.empty() || str[0] == '/' || CALCULATOR->hasToExpression(str, true, settings->evalops) || CALCULATOR->hasWhereExpression(str, settings->evalops) || last_is_operator(str)) return false;
+		size_t par_n = 0, vec_n = 0;
+		for(size_t i = 0; i < str.length(); i++) {
+			if(str[i] == LEFT_PARENTHESIS_CH) par_n++;
+			else if(par_n > 0 && str[i] == RIGHT_PARENTHESIS_CH) par_n--;
+			else if(str[i] == LEFT_VECTOR_WRAP_CH) vec_n++;
+			else if(vec_n > 0 && str[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
+		}
+		if(par_n > 0 || vec_n > 0) return false;
+		MathStructure m;
+		CALCULATOR->clearMessages();
+		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), 1000, settings->evalops, NULL, NULL, false);
+		if(m.isAborted()) return false;
+		PrintOptions po = settings->printops;
+		po.allow_non_usable = false;
+		po.is_approximate = NULL;
+		po.can_display_unicode_string_arg = (void*) this;
+		str = CALCULATOR->print(m, 1000, settings->printops);
+		if(str == CALCULATOR->abortedMessage() || str.length() > 100) return false;
+		std::string warnings;
+		int message_n = 0;
+		while(CALCULATOR->message()) {
+			MessageType mtype = CALCULATOR->message()->type();
+			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+				if(mtype == MESSAGE_ERROR) return false;
+				if(message_n > 0) {
+					if(message_n == 1) warnings.insert(0, "• ");
+					warnings += "\n• ";
+				}
+				warnings += CALCULATOR->message()->message();
+			}
+			message_n++;
+			CALCULATOR->nextMessage();
+		}
+		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != SIGN_MULTIPLICATION) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
+			str.insert(0, "(");
+			str += ")";
+		}
+		setExpression(QString::fromStdString(str) + op);
+		setStatusText(QString::fromStdString(warnings));
+		return true;
+	}
+	return false;
+}
+

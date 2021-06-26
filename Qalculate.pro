@@ -44,8 +44,8 @@ DEFINES += TRANSLATIONS_DIR=\\\"$$TRANSLATIONS_DIR\\\"
 DEFINES += ICON_DIR=\\\"$$ICON_DIR\\\"
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/variableeditdialog.h src/variablesdialog.h
-SOURCES += src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
+HEADERS += src/calendarconversiondialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
+SOURCES += src/calendarconversiondialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 

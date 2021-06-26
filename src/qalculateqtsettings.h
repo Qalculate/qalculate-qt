@@ -32,6 +32,7 @@ std::string unhtmlize(std::string str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
+bool item_in_calculator(ExpressionItem *item);
 
 enum {
 	TITLE_APP,
@@ -69,7 +70,7 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default;
+		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay;
 		int completion_min, completion_min2;
