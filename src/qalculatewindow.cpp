@@ -41,6 +41,8 @@
 #include <QDateTimeEdit>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QTableWidget>
+#include <QHeaderView>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -233,34 +235,44 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QAction *action; QActionGroup *group; QMenu *menu, *menu2;
 	int w, w2; QWidgetAction *aw; QWidget *aww; QHBoxLayout *awl;
 
+	action = new QAction("Negate", this);
+	action->setShortcut(Qt::CTRL | Qt::Key_Minus); action->setShortcutContext(Qt::ApplicationShortcut);
+	addAction(action);
+	connect(action, SIGNAL(triggered()), this, SLOT(negate()));
+
 	menuAction = new QToolButton(this); menuAction->setIcon(LOAD_ICON("menu")); menuAction->setText(tr("Menu"));
 	menuAction->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	menuAction->setMenu(menu);
 	menu2 = menu;
 	menu = menu2->addMenu(tr("New"));
-	menu->addAction(tr("Function"), this, SLOT(newFunction()));
-	menu->addAction(tr("Variable/Constant"), this, SLOT(newVariable()));
-	menu->addAction(tr("Unknown Variable"), this, SLOT(newUnknown()));
+	menu->addAction(tr("Function…"), this, SLOT(newFunction()));
+	menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
+	menu->addAction(tr("Unknown Variable…"), this, SLOT(newUnknown()));
 	menu = menu2;
 	menu->addSeparator();
-	menu->addAction(tr("Functions List"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F);
-	menu->addAction(tr("Variables and Constants List"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M);
-	menu->addAction(tr("Units List and Conversion"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U);
+	menu->addAction(tr("Functions List…"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Variables and Constants List…"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Units List and Conversion…"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addSeparator();
-	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
-	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
+	menu->addAction(tr("Floating Point Conversion (IEEE 754)…"), this, SLOT(openFPConversion()));
+	menu->addAction(tr("Calendar Conversion…"), this, SLOT(openCalendarConversion()));
 	menu->addSeparator();
 	menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
 	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
 	action = menu->addAction(tr("Normal Mode"), this, SLOT(normalModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_normalmode"); if(!settings->rpn_mode && !settings->chain_mode) action->setChecked(true);
-	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
+	action = new QAction("Toggle RPN Mode", this);
+	action->setShortcut(Qt::CTRL | Qt::Key_R); action->setShortcutContext(Qt::ApplicationShortcut);
+	addAction(action);
+	connect(action, SIGNAL(triggered()), this, SLOT(toggleRPNMode()));
+	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setShortcutContext(Qt::WidgetShortcut); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
 	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true);
 	menu->addSeparator();
-	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
-	menu->addSeparator();
+	menu->addAction(tr("Preferences…"), this, SLOT(editPreferences()));
 	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
+	menu->addSeparator();
+	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 	tb->addWidget(menuAction);
 
 	modeAction = new QToolButton(this); modeAction->setIcon(LOAD_ICON("configure")); modeAction->setText(tr("Mode"));
@@ -270,13 +282,20 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	ADD_SECTION(tr("General display mode"));
 	QFontMetrics fm1(menu->font());
+	menu->setToolTipsVisible(true);
 	w = fm1.boundingRect(tr("General display mode")).width() * 1.5;
-	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+	group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive); group->setObjectName("group_general");
 	action = menu->addAction(tr("Normal"), this, SLOT(normalActivated())); action->setCheckable(true); group->addAction(action);
+	action->setToolTip("500 000<br>5 × 10<sup>14</sup><br>50 km/s<br>y − x<br>erf(10) ≈ 1.000 000 000");
 	if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
 	action = menu->addAction(tr("Scientific"), this, SLOT(scientificActivated())); action->setCheckable(true); group->addAction(action);
+	action->setToolTip("5 × 10<sup>5</sup><br>5 × 10<sup>4</sup> m·s<sup>−1</sup><br>−y + x<br>erf(10) ≈ 1.000 000 000");
 	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
+	action = menu->addAction(tr("Engineering"), this, SLOT(engineeringActivated())); action->setCheckable(true); group->addAction(action);
+	action->setToolTip("500 × 10<sup>3</sup><br>50 × 10<sup>3</sup> m/s<br>−y + x<br>erf(10) ≈ 1.000 000 000");
+	if(settings->printops.min_exp == EXP_BASE_3) action->setChecked(true);
 	action = menu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
+	action->setToolTip("500 000 000 000 000<br>50 km/s<br>y − x<br>erf(10) ≈ 1");
 	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
 
 	ADD_SECTION(tr("Angle unit"));
@@ -469,7 +488,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"));
 	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
 	tb->addAction(toAction);
-	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store")); storeAction->setShortcut(QKeySequence::Save);
+	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store")); storeAction->setShortcut(QKeySequence::Save); storeAction->setShortcutContext(Qt::ApplicationShortcut);
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
 	tb->addAction(storeAction);
 	functionsAction = new QAction(LOAD_ICON("function"), tr("Functions"));
@@ -554,6 +573,50 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
 	keypadDock->hide();
 
+	QWidget *rpnWidget = new QWidget(this);
+	rpnDock = new QDockWidget(tr("RPN stack"), this);
+	rpnDock->setObjectName("rpn-dock");
+	QHBoxLayout *rpnBox = new QHBoxLayout(rpnWidget);
+	rpnView = new QTableWidget(this);
+	rpnView->setColumnCount(1);
+	rpnView->setRowCount(0);
+	rpnView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	rpnView->horizontalHeader()->setStretchLastSection(true);
+	rpnView->horizontalHeader()->hide();
+	rpnView->verticalHeader()->setSectionsMovable(true);
+	rpnView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+	rpnView->setSelectionMode(QAbstractItemView::SingleSelection);
+	connect(rpnView, SIGNAL(cellChanged(int, int)), this, SLOT(registerChanged(int)));
+	rpnBox->addWidget(rpnView);
+	QToolBar *rpnTB = new QToolBar(this);
+	rpnTB->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	rpnTB->setOrientation(Qt::Vertical);
+	rpnBox->addWidget(rpnTB);
+	rpnUpAction = new QAction(LOAD_ICON("go-up"), "RPN Up"); rpnUpAction->setShortcut(Qt::CTRL | Qt::Key_Up); rpnUpAction->setEnabled(false); rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up (%1)").arg(rpnUpAction->shortcut().toString(QKeySequence::NativeText)));
+	connect(rpnUpAction, SIGNAL(triggered(bool)), this, SLOT(registerUp())); rpnUpAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnTB->addAction(rpnUpAction);
+	rpnDownAction = new QAction(LOAD_ICON("go-down"), "RPN Down"); rpnDownAction->setShortcut(Qt::CTRL | Qt::Key_Down); rpnDownAction->setEnabled(false); rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down (%1)").arg(rpnDownAction->shortcut().toString(QKeySequence::NativeText))); rpnDownAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnDownAction, SIGNAL(triggered(bool)), this, SLOT(registerDown()));
+	rpnTB->addAction(rpnDownAction);
+	rpnSwapAction = new QAction(LOAD_ICON("rpn-swap"), "RPN Swap"); rpnSwapAction->setShortcut(Qt::CTRL | Qt::Key_Right); rpnSwapAction->setEnabled(false); rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack (%1)").arg(rpnSwapAction->shortcut().toString(QKeySequence::NativeText))); rpnSwapAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnSwapAction, SIGNAL(triggered(bool)), this, SLOT(registerSwap()));
+	rpnTB->addAction(rpnSwapAction);
+	rpnCopyAction = new QAction(LOAD_ICON("edit-copy"), "RPN Copy"); rpnCopyAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C); rpnCopyAction->setEnabled(false); rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack (%1)").arg(rpnCopyAction->shortcut().toString(QKeySequence::NativeText))); rpnCopyAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnCopyAction, SIGNAL(triggered(bool)), this, SLOT(copyRegister()));
+	rpnTB->addAction(rpnCopyAction);
+	rpnLastxAction = new QAction(LOAD_ICON("edit-undo"), "RPN LastX"); rpnLastxAction->setShortcut(Qt::CTRL | Qt::Key_Left); rpnLastxAction->setEnabled(false); rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation (%1)").arg(rpnLastxAction->shortcut().toString(QKeySequence::NativeText))); rpnLastxAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnLastxAction, SIGNAL(triggered(bool)), this, SLOT(rpnLastX()));
+	rpnTB->addAction(rpnLastxAction);
+	rpnDeleteAction = new QAction(LOAD_ICON("edit-delete"), "RPN Delete"); rpnDeleteAction->setShortcut(Qt::CTRL | Qt::Key_Delete); rpnDeleteAction->setEnabled(false); rpnDeleteAction->setToolTip(tr("Delete the top or selected value (%1)").arg(rpnDeleteAction->shortcut().toString(QKeySequence::NativeText))); rpnDeleteAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnDeleteAction, SIGNAL(triggered(bool)), this, SLOT(deleteRegister()));
+	rpnTB->addAction(rpnDeleteAction);
+	rpnClearAction = new QAction(LOAD_ICON("edit-clear"), "RPN Clear"); rpnClearAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_Delete); rpnClearAction->setEnabled(false); rpnClearAction->setToolTip(tr("Clear the RPN stack (%1)").arg(rpnClearAction->shortcut().toString(QKeySequence::NativeText))); rpnClearAction->setShortcutContext(Qt::ApplicationShortcut);
+	connect(rpnClearAction, SIGNAL(triggered(bool)), this, SLOT(clearStack()));
+	rpnTB->addAction(rpnClearAction);
+	rpnDock->setWidget(rpnWidget);
+	addDockWidget(Qt::TopDockWidgetArea, rpnDock);
+	if(!settings->rpn_mode) rpnDock->hide();
+
 	QLocalServer::removeServer("qalculate-qt");
 	server = new QLocalServer(this);
 	server->listen("qalculate-qt");
@@ -587,6 +650,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
+	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
@@ -616,6 +680,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 	bases_shown = !settings->window_state.isEmpty();
+	rpn_shown = !settings->window_state.isEmpty();
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
 	if(settings->use_custom_app_font) {
@@ -627,6 +692,121 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 }
 QalculateWindow::~QalculateWindow() {}
+
+void QalculateWindow::registerUp() {
+	if(CALCULATOR->RPNStackSize() <= 1) return;
+	QList<QTableWidgetItem*> list = rpnView->selectedItems();
+	QTableWidgetItem *item, *item2;
+	if(list.isEmpty()) item = rpnView->item(0, 0);
+	else item = list[0];
+	if(!item) return;
+	int index = item->row();
+	if(index == 0) {
+		CALCULATOR->moveRPNRegister(1, CALCULATOR->RPNStackSize());
+		item2 = rpnView->item(CALCULATOR->RPNStackSize() - 1, 0);
+	} else {
+		CALCULATOR->moveRPNRegisterUp(index + 1);
+		item2 = rpnView->item(index - 1, 0);
+	}
+	if(item2) {
+		QString str = item->text();
+		rpnView->blockSignals(true);
+		item->setText(item2->text());
+		item2->setText(str);
+		rpnView->blockSignals(false);
+	}
+}
+void QalculateWindow::registerDown() {
+	if(CALCULATOR->RPNStackSize() <= 1) return;
+	QList<QTableWidgetItem*> list = rpnView->selectedItems();
+	QTableWidgetItem *item, *item2;
+	if(list.isEmpty()) item = rpnView->item(0, 0);
+	else item = list[0];
+	if(!item) return;
+	int index = item->row();
+	if(index + 1 == (int) CALCULATOR->RPNStackSize()) {
+		CALCULATOR->moveRPNRegister(CALCULATOR->RPNStackSize(), 1);
+		item2 = rpnView->item(0, 0);
+	} else {
+		CALCULATOR->moveRPNRegisterDown(index + 1);
+		item2 = rpnView->item(index + 1, 0);
+	}
+	if(item2) {
+		QString str = item->text();
+		rpnView->blockSignals(true);
+		item->setText(item2->text());
+		item2->setText(str);
+		rpnView->blockSignals(false);
+	}
+}
+void QalculateWindow::registerSwap() {
+	if(CALCULATOR->RPNStackSize() <= 1) return;
+	QList<QTableWidgetItem*> list = rpnView->selectedItems();
+	QTableWidgetItem *item, *item2;
+	if(list.isEmpty()) item = rpnView->item(0, 0);
+	else item = list[0];
+	if(!item) return;
+	int index = item->row();
+	if(index == 0) {
+		CALCULATOR->moveRPNRegister(1, 2);
+		item2 = rpnView->item(1, 0);
+	} else {
+		CALCULATOR->moveRPNRegister(index + 1, 1);
+		item2 = rpnView->item(0, 0);
+	}
+	if(item2) {
+		QString str = item->text();
+		rpnView->blockSignals(true);
+		item->setText(item2->text());
+		item2->setText(str);
+		rpnView->blockSignals(false);
+	}
+}
+void QalculateWindow::rpnLastX() {
+	if(expressionEdit->expressionHasChanged()) {
+		if(!expressionEdit->toPlainText().trimmed().isEmpty()) {
+			calculateExpression(true);
+		}
+	}
+	CALCULATOR->RPNStackEnter(new MathStructure(lastx));
+	RPNRegisterAdded("", 0);
+}
+void QalculateWindow::copyRegister() {
+	if(CALCULATOR->RPNStackSize() == 0) return;
+	QList<QTableWidgetItem*> list = rpnView->selectedItems();
+	QTableWidgetItem *item;
+	if(list.isEmpty()) item = rpnView->item(0, 0);
+	else item = list[0];
+	if(!item) return;
+	int index = item->row();
+	CALCULATOR->RPNStackEnter(new MathStructure(*CALCULATOR->getRPNRegister(index + 1)));
+	RPNRegisterAdded(item->text().toStdString(), 0);
+}
+void QalculateWindow::deleteRegister() {
+	if(CALCULATOR->RPNStackSize() == 0) return;
+	QList<QTableWidgetItem*> list = rpnView->selectedItems();
+	QTableWidgetItem *item;
+	if(list.isEmpty()) item = rpnView->item(0, 0);
+	else item = list[0];
+	if(!item) return;
+	int index = item->row();
+	CALCULATOR->deleteRPNRegister(index + 1);
+	RPNRegisterRemoved(index);
+}
+void QalculateWindow::clearStack() {
+	CALCULATOR->clearRPNStack();
+	rpnView->clear();
+	rpnView->setRowCount(0);
+	rpnCopyAction->setEnabled(false);
+	rpnDeleteAction->setEnabled(false);
+	rpnClearAction->setEnabled(false);
+	rpnUpAction->setEnabled(false);
+	rpnDownAction->setEnabled(false);
+	rpnSwapAction->setEnabled(false);
+}
+void QalculateWindow::registerChanged(int index) {
+	calculateExpression(true, false, OPERATION_ADD, NULL, true, index);
+}
 
 void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion();
@@ -657,6 +837,15 @@ void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onOperatorClicked(const QString &str) {
+	if(settings->rpn_mode) {
+		if(expressionEdit->expressionHasChanged()) {
+			if(!expressionEdit->toPlainText().trimmed().isEmpty()) {
+				calculateExpression(true);
+			}
+		}
+		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, str.toStdString());
+		return;
+	}
 	expressionEdit->blockCompletion();
 	expressionEdit->blockParseStatus();
 	bool do_exec = false;
@@ -685,6 +874,11 @@ bool last_is_number(std::string str) {
 	return is_not_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1]);
 }
 void QalculateWindow::onFunctionClicked(MathFunction *f) {
+	if(!f) return;
+	if(settings->rpn_mode && (f->minargs() <= 1 || (int) CALCULATOR->RPNStackSize() >= f->minargs())) {
+		calculateRPN(f);
+		return;
+	}
 	expressionEdit->blockCompletion();
 	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
@@ -697,12 +891,17 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	} else if(cur.hasSelection()) {
 		do_exec = cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
+		expressionEdit->selectAll();
+		do_exec = true;
 	}
 	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 	if(do_exec) calculate();
+}
+void QalculateWindow::negate() {
+	onFunctionClicked(CALCULATOR->getActiveFunction("neg"));
 }
 void QalculateWindow::onVariableClicked(Variable *v) {
 	expressionEdit->blockCompletion();
@@ -1143,9 +1342,7 @@ void QalculateWindow::setOption(std::string str) {
 				QAction *action = find_child_data(this, "group_intbase", v);
 				if(!action) action = find_child_data(this, "group_inbase", BASE_CUSTOM);
 				if(action) {
-					action->blockSignals(true);
 					action->setChecked(true);
-					action->blockSignals(false);
 					if(action->data().toInt() == BASE_CUSTOM && (v == BASE_CUSTOM || (v >= 2 && v <= 36))) {
 						QSpinBox *w = findChild<QSpinBox*>("spinbox_inbase");
 						if(w) {
@@ -1165,9 +1362,7 @@ void QalculateWindow::setOption(std::string str) {
 				QAction *action = find_child_data(this, "group_outbase", v);
 				if(!action) action = find_child_data(this, "group_outbase", BASE_CUSTOM);
 				if(action) {
-					action->blockSignals(true);
 					action->setChecked(true);
-					action->blockSignals(false);
 					if(action->data().toInt() == BASE_CUSTOM && (v == BASE_CUSTOM || (v >= 2 && v <= 36))) {
 						QSpinBox *w = findChild<QSpinBox*>("spinbox_outbase");
 						if(w) {
@@ -1192,15 +1387,11 @@ void QalculateWindow::setOption(std::string str) {
 		}
 		QAction *action = find_child_data(this, "group_type", CALCULATOR->defaultAssumptions()->type());
 		if(action) {
-			action->blockSignals(true);
 			action->setChecked(true);
-			action->blockSignals(false);
 		}
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) {
-			action->blockSignals(true);
 			action->setChecked(true);
-			action->blockSignals(false);
 		}
 	} else if(equalsIgnoreCase(svar, "all prefixes") || svar == "allpref") SET_BOOL_D(settings->printops.use_all_prefixes)
 	else if(equalsIgnoreCase(svar, "complex numbers") || svar == "cplx") SET_BOOL_E(settings->evalops.allow_complex)
@@ -1259,11 +1450,7 @@ void QalculateWindow::setOption(std::string str) {
 			QAction *w = NULL;
 			if(b) w = findChild<QAction*>("action_rpnmode");
 			else w = findChild<QAction*>("action_normalmode");
-			if(w) {
-				w->blockSignals(true);
-				w->setChecked(true);
-				w->blockSignals(false);
-			}
+			if(w) w->setChecked(true);
 			if(b) rpnModeActivated();
 			else normalModeActivated();
 		}
@@ -1378,9 +1565,7 @@ void QalculateWindow::setOption(std::string str) {
 			else if(v == ANGLE_UNIT_RADIANS)w = findChild<QAction*>("action_radians");
 			else if(v == ANGLE_UNIT_GRADIANS) w = findChild<QAction*>("action_gradians");
 			if(w) {
-				w->blockSignals(true);
 				w->setChecked(true);
-				w->blockSignals(false);
 			}
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
@@ -1463,9 +1648,7 @@ void QalculateWindow::setOption(std::string str) {
 			else if(v == APPROXIMATION_TRY_EXACT) w = findChild<QAction*>("action_approximate");
 			else if(v == APPROXIMATION_APPROXIMATE) w = findChild<QAction*>("action_approximate");
 			if(w) {
-				w->blockSignals(true);
 				w->setChecked(true);
-				w->blockSignals(false);
 			}
 			if(v < 0) {
 				settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
@@ -1585,6 +1768,10 @@ void QalculateWindow::setOption(std::string str) {
 		else valid = false;
 		if(valid) {
 			settings->printops.min_exp = v;
+			QAction *action = find_child_data(this, "group_general", v);
+			if(action) {
+				action->setChecked(true);
+			}
 			resultFormatUpdated();
 		} else {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
@@ -1759,6 +1946,60 @@ void QalculateWindow::setOption(std::string str) {
 	}
 }
 
+void QalculateWindow::calculateRPN(int op) {
+	if(expressionEdit->expressionHasChanged()) {
+		if(!expressionEdit->toPlainText().trimmed().isEmpty()) {
+			calculateExpression(true);
+		}
+	}
+	calculateExpression(true, true, (MathOperation) op, NULL);
+}
+void QalculateWindow::calculateRPN(MathFunction *f) {
+	if(expressionEdit->expressionHasChanged()) {
+		if(!expressionEdit->toPlainText().trimmed().isEmpty()) {
+			calculateExpression(true);
+		}
+	}
+	calculateExpression(true, true, OPERATION_ADD, f);
+}
+void QalculateWindow::RPNRegisterAdded(std::string text, int index) {
+	rpnView->insertRow(index);
+	QTableWidgetItem *item = new QTableWidgetItem(QString::fromStdString(unhtmlize(text)));
+	item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	rpnView->setItem(index, 0, item);
+	rpnCopyAction->setEnabled(true);
+	rpnDeleteAction->setEnabled(true);
+	rpnClearAction->setEnabled(true);
+	if(CALCULATOR->RPNStackSize() >= 2) {
+		rpnUpAction->setEnabled(true);
+		rpnDownAction->setEnabled(true);
+		rpnSwapAction->setEnabled(true);
+	}
+}
+void QalculateWindow::RPNRegisterRemoved(int index) {
+	rpnView->removeRow(index);
+	if(CALCULATOR->RPNStackSize() == 0) {
+		rpnCopyAction->setEnabled(false);
+		rpnDeleteAction->setEnabled(false);
+		rpnClearAction->setEnabled(false);
+	}
+	if(CALCULATOR->RPNStackSize() < 2) {
+		rpnUpAction->setEnabled(false);
+		rpnDownAction->setEnabled(false);
+		rpnSwapAction->setEnabled(false);
+	}
+}
+void QalculateWindow::RPNRegisterChanged(std::string text, int index) {
+	QTableWidgetItem *item = rpnView->item(index, 0);
+	if(item) {
+		item->setText(QString::fromStdString(unhtmlize(text)));
+	} else {
+		item = new QTableWidgetItem(QString::fromStdString(unhtmlize(text)));
+		item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+		rpnView->setItem(index, 0, item);
+	}
+}
+
 void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates) {
 
 	//if(block_expression_execution || exit_in_progress) return;
@@ -1784,12 +2025,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	bool current_expr = false;
 	if(str.empty() && !do_mathoperation) {
 		if(do_stack) {
-			/*GtkTreeIter iter;
-			gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, stack_index);
-			gchar *gstr;
-			gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
-			str = gstr;
-			g_free(gstr);*/
+			QTableWidgetItem *item = rpnView->item(stack_index, 0);
+			if(!item) {b_busy--; return;}
+			str = item->text().toStdString();
 		} else {
 			current_expr = true;
 			str = expressionEdit->toPlainText().toStdString();
@@ -2122,7 +2360,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(current_expr) setPreviousExpression();
 				fetchExchangeRates();
 			} else if(equalsIgnoreCase(str, "stack")) {
-				//gtk_expander_set_expanded(GTK_EXPANDER(expander_stack), TRUE);
+				rpnDock->show();
+				rpnDock->raise();
 			} else if(equalsIgnoreCase(str, "swap")) {
 				/*if(CALCULATOR->RPNStackSize() > 1) {
 					gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
@@ -2722,7 +2961,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		stack_size = CALCULATOR->RPNStackSize();
 		if(do_mathoperation) {
 			if(mstruct) lastx = *mstruct;
-			//gtk_widget_set_sensitive(GTK_WIDGET(gtk_builder_get_object(main_builder, "button_lastx")), TRUE);
+			rpnLastxAction->setEnabled(true);
 			if(f) CALCULATOR->calculateRPN(f, 0, settings->evalops, parsed_mstruct);
 			else CALCULATOR->calculateRPN(op, 0, settings->evalops, parsed_mstruct);
 		} else {
@@ -2734,6 +2973,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			if(str2.length() == 1) {
 				do_mathoperation = true;
 				switch(str2[0]) {
+					case 'E': {CALCULATOR->calculateRPN(OPERATION_EXP10, 0, settings->evalops, parsed_mstruct); break;}
 					case '^': {CALCULATOR->calculateRPN(OPERATION_RAISE, 0, settings->evalops, parsed_mstruct); break;}
 					case '+': {CALCULATOR->calculateRPN(OPERATION_ADD, 0, settings->evalops, parsed_mstruct); break;}
 					case '-': {CALCULATOR->calculateRPN(OPERATION_SUBTRACT, 0, settings->evalops, parsed_mstruct); break;}
@@ -2836,9 +3076,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					original_expression = str2;
 					CALCULATOR->RPNStackEnter(str2, 0, settings->evalops, parsed_mstruct, parsed_tostruct);
 				}
-				/*if(do_mathoperation) gtk_widget_set_sensitive(GTK_WIDGET(gtk_builder_get_object(main_builder, "button_lastx")), TRUE);
-				else lastx = lastx_bak;*/
 			}
+			if(do_mathoperation) rpnLastxAction->setEnabled(true);
+			else lastx = lastx_bak;
 		}
 	} else {
 		original_expression = CALCULATOR->unlocalizeExpression(execute_str.empty() ? str : execute_str, settings->evalops.parse_options);
@@ -2919,11 +3159,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(settings->rpn_mode && stack_index == 0) {
 		expressionEdit->clear();
 		while(CALCULATOR->RPNStackSize() < stack_size) {
-			//RPNRegisterRemoved(1);
+			RPNRegisterRemoved(1);
 			stack_size--;
 		}
 		if(CALCULATOR->RPNStackSize() > stack_size) {
-			//RPNRegisterAdded("");
+			RPNRegisterAdded("");
 		}
 	}
 
@@ -2997,7 +3237,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	mstruct_exact.setUndefined();
 	
-	if((!do_calendars || !mstruct->isDateTime()) && (settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) && !do_bases && !units_changed) {
+	if((!settings->rpn_mode || (!do_stack && !do_mathoperation)) && (!do_calendars || !mstruct->isDateTime()) && (settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) && !do_bases && !units_changed) {
 		long int i_timeleft = 0;
 		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
 		if(i_timeleft > 0) {
@@ -3485,7 +3725,6 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	std::string prev_result_text = result_text;
 	bool prev_approximate = *settings->printops.is_approximate;
-	result_text = "?";
 
 	if(update_parse) {
 		parsed_text = tr("aborted").toStdString();
@@ -3677,12 +3916,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		update_parse = true;
 		parsed_text = result_text;
 	}
-	/*if(current_inhistory_index < 0) {
+	if(settings->history_answer.empty()) {
 		update_parse = true;
-		current_inhistory_index = 0;
-	}*/
+	}
 	if(stack_index != 0) {
-		//RPNRegisterChanged(result_text, stack_index);
+		RPNRegisterChanged(result_text, stack_index);
 		if(supress_dialog) CALCULATOR->clearMessages();
 		else displayMessages(this);
 	} else if(update_history) {
@@ -3698,8 +3936,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	}
 
 	if(stack_index != 0) {
-		//RPNRegisterChanged(result_text, stack_index);
+		RPNRegisterChanged(result_text, stack_index);
 	} else {
+		if(settings->rpn_mode && !register_moved) {
+			RPNRegisterChanged(result_text, stack_index);
+		}
 		if(mstruct->isAborted() || settings->printops.base != settings->evalops.parse_options.base || (settings->printops.base > 32 || settings->printops.base < 2)) {
 			exact_text = "";
 		} else if(!mstruct->isApproximate() && !(*settings->printops.is_approximate)) {
@@ -3987,13 +4228,15 @@ void QalculateWindow::newFunction() {
 }
 void QalculateWindow::onKeypadActivated(bool b) {
 	keypadDock->setVisible(b);
+	if(b) keypadDock->raise();
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	keypadAction->setChecked(b);
 }
 void QalculateWindow::onBasesActivated(bool b) {
-	if(b && !bases_shown) basesDock->setFloating(true);
+	if(b && !bases_shown) {basesDock->setFloating(true); bases_shown = true;}
 	basesDock->setVisible(b);
+	if(b) basesDock->raise();
 }
 void QalculateWindow::onBasesVisibilityChanged(bool b) {
 	basesAction->setChecked(b);
@@ -4063,6 +4306,14 @@ void QalculateWindow::scientificActivated() {
 	settings->printops.show_ending_zeroes = true;
 	if(settings->prefixes_default) settings->printops.use_unit_prefixes = false;
 	settings->printops.negative_exponents = true;
+	resultFormatUpdated();
+}
+void QalculateWindow::engineeringActivated() {
+	settings->printops.sort_options.minus_last = false;
+	settings->printops.min_exp = EXP_BASE_3;
+	settings->printops.show_ending_zeroes = true;
+	if(settings->prefixes_default) settings->printops.use_unit_prefixes = false;
+	settings->printops.negative_exponents = false;
 	resultFormatUpdated();
 }
 void QalculateWindow::simpleActivated() {
@@ -4257,10 +4508,10 @@ void QalculateWindow::editPreferences() {
 }
 void QalculateWindow::applyFunction(MathFunction *f) {
 	if(b_busy) return;
-	/*if(settings->rpn_mode) {
+	if(settings->rpn_mode) {
 		calculateRPN(f);
 		return;
-	}*/
+	}
 	QString str = QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name);
 	if(f->args() == 0) {
 		str += "()";
@@ -4689,15 +4940,10 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 						DataPropertyIter it;
 						DataSet *ds = (DataSet*) f;
 						DataProperty *dp = ds->getFirstProperty(&it);
-						/*if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
-							GtkTreeIter iter;
-							if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, i)) {
-								gchar *gstr;
-								gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
-								defstr = gstr;
-								g_free(gstr);
-							}
-						}*/
+						if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
+							QTableWidgetItem *item = rpnView->item(i, 0);
+							if(item) defstr = item->text();
+						}
 						int active_index = -1;
 						for(int i = 0; dp; i++) {
 							if(!dp->isHidden()) {
@@ -4771,43 +5017,39 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			if(arg->type() == ARGUMENT_TYPE_VECTOR) g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_vector_clicked), (gpointer) fd->entry[i]);
 			else g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_matrix_clicked), (gpointer) fd->entry[i]);*/
 		}
-		/*if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
-			GtkTreeIter iter;
-			if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, i)) {
-				gchar *gstr;
-				gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
+		if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
+			QTableWidgetItem *item = rpnView->item(i, 0);
+			if(item) {
 				if(arg && arg->type() == ARGUMENT_TYPE_BOOLEAN) {
-					if(g_strcmp0(gstr, "1") == 0) {
-						g_signal_handlers_block_matched((gpointer) fd->boolean_buttons[fd->boolean_buttons.size() - 2], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
-						gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(fd->boolean_buttons[fd->boolean_buttons.size() - 2]), TRUE);
-						g_signal_handlers_unblock_matched((gpointer) fd->boolean_buttons[fd->boolean_buttons.size() - 2], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+					if(item->text() == "1") {
+						fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(true);
+						fd->boolean_buttons[fd->boolean_buttons.size() - 1]->setChecked(false);
+						fd->boolean_buttons[fd->boolean_buttons.size() - 2]->setChecked(true);
+						fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(false);
 					}
-				} else if(fd->properties_store && arg && arg->type() == ARGUMENT_TYPE_DATA_PROPERTY) {
-				} else {
-					g_signal_handlers_block_matched((gpointer) fd->entry[i], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+				} else if(!arg || arg->type() != ARGUMENT_TYPE_DATA_PROPERTY || f->subtype() != SUBTYPE_DATA_SET) {
+					fd->entry[i]->blockSignals(true);
 					if(i == 0 && args == 1 && (has_vector || arg->type() == ARGUMENT_TYPE_VECTOR)) {
-						string rpn_vector = gstr;
-						while(gtk_tree_model_iter_next(GTK_TREE_MODEL(stackstore), &iter)) {
-							g_free(gstr);
-							gtk_tree_model_get(GTK_TREE_MODEL(stackstore), &iter, 1, &gstr, -1);
-							rpn_vector += CALCULATOR->getComma();
-							rpn_vector += " ";
-							rpn_vector += gstr;
+						QString rpn_vector = item->text();
+						for(int i2 = i + 1; i2 < rpnView->rowCount(); i2++) {
+							item = rpnView->item(i, 0);
+							if(item) {
+								rpn_vector += QString::fromStdString(CALCULATOR->getComma());
+								rpn_vector += " ";
+								rpn_vector += item->text();
+							}
 						}
-						gtk_entry_set_text(GTK_ENTRY(fd->entry[i]), rpn_vector.c_str());
+						((QLineEdit*) fd->entry[i])->setText(rpn_vector);
 					} else {
-						gtk_entry_set_text(GTK_ENTRY(fd->entry[i]), gstr);
-						if(arg && arg->type() == ARGUMENT_TYPE_INTEGER) {
-							gtk_spin_button_update(GTK_SPIN_BUTTON(fd->entry[i]));
-						}
+						((QLineEdit*) fd->entry[i])->setText(item->text());
 					}
-					g_signal_handlers_unblock_matched((gpointer) fd->entry[i], G_SIGNAL_MATCH_FUNC, 0, 0, NULL, (gpointer) on_insert_function_changed, NULL);
+					fd->entry[i]->blockSignals(false);
 				}
-				g_free(gstr);
 			}
-		} else */if(arg && arg->type() == ARGUMENT_TYPE_BOOLEAN) {
+		} else if(arg && arg->type() == ARGUMENT_TYPE_BOOLEAN) {
 			if(defstr == "1") {
 				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(true);
+				fd->boolean_buttons[fd->boolean_buttons.size() - 1]->setChecked(false);
 				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->setChecked(true);
 				fd->boolean_buttons[fd->boolean_buttons.size() - 2]->blockSignals(false);
 			}
@@ -5031,7 +5273,7 @@ void QalculateWindow::onInsertFunctionExec() {
 void QalculateWindow::onInsertFunctionRPN() {
 	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
 	if(!fd->keep_open) fd->dialog->hide();
-	//calculateRPN(f);
+	calculateRPN(fd->f);
 	//if(fd->add_to_menu) function_inserted(f);
 	if(fd->keep_open) {
 		fd->entry[0]->setFocus();
@@ -5113,16 +5355,36 @@ void QalculateWindow::executeFromFile(const QString &file) {
 void QalculateWindow::convertToUnit(Unit *u) {
 	executeCommand(COMMAND_CONVERT_UNIT, true, "", u);
 }
+void QalculateWindow::toggleRPNMode() {
+	bool b = !settings->rpn_mode;
+	QAction *w = NULL;
+	if(b) w = findChild<QAction*>("action_rpnmode");
+	else w = findChild<QAction*>("action_normalmode");
+	if(w) w->setChecked(true);
+	if(b) rpnModeActivated();
+	else normalModeActivated();
+}
 void QalculateWindow::normalModeActivated() {
 	settings->rpn_mode = false;
 	settings->chain_mode = false;
+	rpnDock->hide();
+	CALCULATOR->clearRPNStack();
+	rpnView->clear();
+	rpnView->setRowCount(0);
 }
 void QalculateWindow::rpnModeActivated() {
 	settings->rpn_mode = true;
 	settings->chain_mode = false;
+	if(!rpn_shown) {rpnDock->setFloating(true); rpn_shown = true;}
+	rpnDock->show();
+	rpnDock->raise();
 }
 void QalculateWindow::chainModeActivated() {
 	settings->rpn_mode = false;
 	settings->chain_mode = true;
+	rpnDock->hide();
+	CALCULATOR->clearRPNStack();
+	rpnView->clear();
+	rpnView->setRowCount(0);
 }
 

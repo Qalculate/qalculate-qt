@@ -217,7 +217,7 @@ void VariablesDialog::editClicked() {
 	bool b = false;
 	ExpressionItem *replaced_item = NULL;
 	if(v->isKnown()) {
-		b = VariableEditDialog::editVariable(this, (KnownVariable*) v, NULL, &replaced_item);
+		b = VariableEditDialog::editVariable(this, (KnownVariable*) v, &replaced_item);
 	} else {
 		b = UnknownEditDialog::editVariable(this, (UnknownVariable*) v, &replaced_item);
 	}

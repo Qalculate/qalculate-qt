@@ -26,6 +26,14 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QMenu>
+#include <QCalendarWidget>
+#include <QTableWidget>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QLabel>
 #include <QDebug>
 
 #include "expressionedit.h"
@@ -177,7 +185,7 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 	return l >= minlength;
 }
 
-bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0) {
+bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength) {
 	bool big_A = false;
 	if(minlength > 1 && str.length() == 1) {
 		if(str[0] == 'a' || str[0] == 'x' || str[0] == 'y' || str[0] == 'X' || str[0] == 'Y') return false;
@@ -231,7 +239,7 @@ int name_matches2(ExpressionItem *item, const std::string &str, size_t minlength
 	}
 	return b_match ? 2 : 0;
 }
-bool country_matches(Unit *u, const std::string &str, size_t minlength = 0) {
+bool country_matches(Unit *u, const std::string &str, size_t minlength) {
 	const std::string &countries = u->countries();
 	size_t i = 0;
 	while(true) {
@@ -1138,6 +1146,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Asterisk: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_MULTIPLY);
+					return;
+				}
 				if(doChainMode(SIGN_MULTIPLICATION)) return;
 				wrapSelection(SIGN_MULTIPLICATION);
 				return;
@@ -1148,6 +1160,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
+					return;
+				}
 				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
@@ -1157,16 +1173,28 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
+					return;
+				}
 				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Plus: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_ADD);
+					return;
+				}
 				if(doChainMode("+")) return;
 				wrapSelection("+");
 				return;
 			}
 			case Qt::Key_Slash: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_DIVIDE);
+					return;
+				}
 				if(doChainMode("/")) return;
 				wrapSelection("/");
 				return;
@@ -1179,6 +1207,15 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 			}
 		}
+	}
+	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		if(settings->rpn_mode && settings->rpn_keys) {
+			emit calculateRPNRequest(OPERATION_RAISE);
+			return;
+		}
+		if(doChainMode("^")) return;
+		wrapSelection("^");
+		return;
 	}
 	if(event->modifiers() == Qt::ControlModifier || (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
 		switch(event->key()) {
@@ -1194,6 +1231,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_ParenRight: {
 				smartParentheses();
 				return;
+			}
+			case Qt::Key_E: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_EXP10);
+					return;
+				}
 			}
 		}
 	}
@@ -1326,10 +1369,6 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 		}
 	}
-	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		insertPlainText("^");
-		return;
-	}
 	QPlainTextEdit::keyPressEvent(event);
 }
 void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
@@ -1354,6 +1393,9 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		deleteAction = cmenu->addAction(tr("Delete"), this, SLOT(editDelete()));
 		deleteAction->setShortcut(QKeySequence::Delete);
 		deleteAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addSeparator();
+		cmenu->addAction(tr("Insert Date…"), this, SLOT(insertDate()));
+		cmenu->addAction(tr("Insert Matrix…"), this, SLOT(insertMatrix()));
 		cmenu->addSeparator();
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
@@ -1395,6 +1437,99 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	selectAllAction->setEnabled(!b_empty);
 	clearAction->setEnabled(!b_empty);
 	cmenu->popup(e->globalPos());
+}
+void ExpressionEdit::insertDate() {
+	QDialog *dialog = new QDialog(this, Qt::Popup);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	box->setContentsMargins(0, 0, 0, 0);
+	QCalendarWidget *w = new QCalendarWidget(dialog);
+	box->addWidget(w);
+	connect(w, SIGNAL(clicked(QDate)), dialog, SLOT(accept()));
+	connect(w, SIGNAL(activated(QDate)), dialog, SLOT(accept()));
+	if(dialog->exec() == QDialog::Accepted) {
+		insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
+	}
+	dialog->deleteLater();
+}
+void ExpressionEdit::matrixRowsChanged(int i) {
+	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->setRowCount(i);
+	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->adjustSize();
+}
+void ExpressionEdit::matrixColumnsChanged(int i) {
+	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->setColumnCount(i);
+	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->adjustSize();
+}
+void ExpressionEdit::insertMatrix() {
+	QDialog *dialog = new QDialog(this);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Matrix"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	QHBoxLayout *hbox = new QHBoxLayout();
+	box->addLayout(hbox);
+	hbox->addStretch(1);
+	QSpinBox *rowsSpin = new QSpinBox(dialog);
+	rowsSpin->setRange(1, 20);
+	rowsSpin->setValue(8);
+	rowsSpin->setAlignment(Qt::AlignRight);
+	hbox->addWidget(rowsSpin);
+	connect(rowsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixRowsChanged(int)));
+	hbox->addWidget(new QLabel(SIGN_MULTIPLICATION));
+	QSpinBox *columnsSpin = new QSpinBox(dialog);
+	columnsSpin->setRange(1, 20);
+	columnsSpin->setValue(8);
+	columnsSpin->setAlignment(Qt::AlignRight);
+	hbox->addWidget(columnsSpin);
+	connect(columnsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixColumnsChanged(int)));
+	QTableWidget *w = new QTableWidget(dialog);
+	QFontMetrics fm(w->font());
+	w->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+	QTableWidgetItem *proto = new QTableWidgetItem();
+	proto->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+	w->setItemPrototype(proto);
+	rowsSpin->setProperty("QALCULATE TABLE", QVariant::fromValue((void*) w));
+	columnsSpin->setProperty("QALCULATE TABLE", QVariant::fromValue((void*) w));
+	w->setRowCount(8);
+	w->setColumnCount(8);
+	w->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+	box->addWidget(w);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	box->addWidget(buttonBox);
+	w->setFocus();
+	dialog->resize(fm.boundingRect("000000").width() * 12, dialog->sizeHint().height());
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	if(dialog->exec() == QDialog::Accepted) {
+		int max_c = -1, max_r = -1;
+		for(int r = 0; r < w->rowCount(); r++) {
+			bool b = false;
+			for(int c = 0; c < w->columnCount(); c++) {
+				QTableWidgetItem *item = w->item(r, c);
+				if(item && !item->text().isEmpty()) {
+					b = true;
+					if(c > max_c) max_c = c;
+				}
+			}
+			if(b) max_r = r;
+		}
+		if(max_r >= 0) {
+			QString str = "[";
+			for(int r = 0; r <= max_r; r++) {
+				if(r > 0) str += ", ";
+				str += "[";
+				for(int c = 0; c <= max_c; c++) {
+					if(c > 0) str += ", ";
+					QTableWidgetItem *item = w->item(r, c);
+					if(!item || item->text().isEmpty()) str += "0";
+					else str += item->text();
+				}
+				str += "]";
+			}
+			str += "]";
+			insertPlainText(str);
+		}
+	}
+	dialog->deleteLater();
 }
 void ExpressionEdit::enableCompletionDelay() {
 	if(qobject_cast<QAction*>(sender())->isChecked()) settings->completion_delay = 500;

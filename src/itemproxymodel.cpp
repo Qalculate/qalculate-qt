@@ -14,6 +14,7 @@
 #include "itemproxymodel.h"
 
 #include <libqalculate/qalculate.h>
+#include "qalculateqtsettings.h"
 
 ItemProxyModel::ItemProxyModel(QObject *parent) : QSortFilterProxyModel(parent) {
 	setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -46,6 +47,9 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 		}
 	}
 	if(filter.empty()) return true;
+	if(item->type() == TYPE_UNIT) {
+		return name_matches(item, filter) || title_matches(item, filter) || country_matches((Unit*) item, filter);
+	}
 	std::string title = item->title(true);
 	remove_blank_ends(title);
 	while(title.length() >= filter.length()) {

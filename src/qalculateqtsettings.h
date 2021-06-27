@@ -33,6 +33,9 @@ QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
 bool item_in_calculator(ExpressionItem *item);
+bool name_matches(ExpressionItem *item, const std::string &str);
+bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
+bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
 
 enum {
 	TITLE_APP,

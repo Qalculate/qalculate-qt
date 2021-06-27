@@ -116,6 +116,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
+		void matrixRowsChanged(int);
+		void matrixColumnsChanged(int);
 
 	public slots:
 
@@ -133,12 +135,15 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editUndo();
 		void editRedo();
 		void editDelete();
+		void insertDate();
+		void insertMatrix();
 		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
 
 	signals:
 
 		void returnPressed();
 		void toConversionRequested(std::string);
+		void calculateRPNRequest(int);
 
 };
 

@@ -313,12 +313,13 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	f = CALCULATOR->getActiveFunction("neg");
 	if(f) {
 		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)), tr("Minus"));
+		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL + Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
 	} else {
 		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
 	}
 	OPERATOR_BUTTON3(SIGN_DIVISION_SLASH, "|", "~", 1, c);
+	button->setProperty(BUTTON_DATA, "/");
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
 	acButton = new KeypadButton(LOAD_ICON("edit-clear"), this);
 	acButton->setToolTip(tr("Clear expression"));

@@ -38,6 +38,7 @@ class VariablesDialog;
 class UnitsDialog;
 class FPConversionDialog;
 class CalendarConversionDialog;
+class QTableWidget;
 struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
@@ -72,7 +73,7 @@ class QalculateWindow : public QMainWindow {
 		CalendarConversionDialog *calendarConversionDialog;
 
 		KeypadWidget *keypad;
-		QDockWidget *keypadDock, *basesDock;
+		QDockWidget *keypadDock, *basesDock, *rpnDock;
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
@@ -83,7 +84,10 @@ class QalculateWindow : public QMainWindow {
 		QTimer *ecTimer, *rfTimer;
 		QFont saved_app_font;
 
-		bool send_event, bases_shown;
+		QTableWidget *rpnView;
+		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnEditAction, *rpnClearAction;
+
+		bool send_event, bases_shown, rpn_shown;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
@@ -96,6 +100,10 @@ class QalculateWindow : public QMainWindow {
 		void setPreviousExpression();
 		void setOption(std::string);
 		void updateResultBases();
+		void calculateRPN(MathFunction*);
+		void RPNRegisterAdded(std::string, int = 0);
+		void RPNRegisterRemoved(int);
+		void RPNRegisterChanged(std::string, int);
 
 	protected slots:
 
@@ -142,6 +150,7 @@ class QalculateWindow : public QMainWindow {
 		void degreesActivated();
 		void normalActivated();
 		void scientificActivated();
+		void engineeringActivated();
 		void simpleActivated();
 		void onPrecisionChanged(int);
 		void onMinDecimalsChanged(int);
@@ -177,6 +186,16 @@ class QalculateWindow : public QMainWindow {
 		void normalModeActivated();
 		void rpnModeActivated();
 		void chainModeActivated();
+		void registerUp();
+		void registerDown();
+		void registerSwap();
+		void copyRegister();
+		void rpnLastX();
+		void deleteRegister();
+		void clearStack();
+		void registerChanged(int);
+		void calculateRPN(int);
+		void toggleRPNMode();
 
 	public slots:
 
@@ -198,6 +217,7 @@ class QalculateWindow : public QMainWindow {
 		void newUnknown();
 		void newFunction();
 		void convertToUnit(Unit*);
+		void negate();
 
 	signals:
 
