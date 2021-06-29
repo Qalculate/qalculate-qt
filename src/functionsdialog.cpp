@@ -71,12 +71,12 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	hsplitter->setStretchFactor(0, 2);
 	hsplitter->setStretchFactor(1, 3);
 	QVBoxLayout *box = new QVBoxLayout();
-	newButton = new QPushButton(tr("New"), this); box->addWidget(newButton); connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
-	editButton = new QPushButton(tr("Edit"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+	newButton = new QPushButton(tr("New…"), this); box->addWidget(newButton); connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
+	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	box->addSpacing(24);
-	calculateButton = new QPushButton(tr("Calculate"), this); box->addWidget(calculateButton); connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateClicked()));
+	calculateButton = new QPushButton(tr("Calculate…"), this); box->addWidget(calculateButton); connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateClicked()));
 	calculateButton->setDefault(true);
 	applyButton = new QPushButton(tr("Apply"), this); box->addWidget(applyButton); connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));

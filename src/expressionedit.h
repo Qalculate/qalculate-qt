@@ -98,7 +98,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		virtual ~ExpressionEdit();
 
 		std::string expression() const;
-		QSize sizeHint() const;
+		QSize sizeHint() const override;
 
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
 		bool doChainMode(const QString &op);
@@ -107,6 +107,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void displayParseStatus(bool = false, bool = true);
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void keyPressEvent(QKeyEvent*) override;
+		QString selectedText(bool = false);
 
 	protected slots:
 
@@ -116,8 +117,6 @@ class ExpressionEdit : public QPlainTextEdit {
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
-		void matrixRowsChanged(int);
-		void matrixColumnsChanged(int);
 
 	public slots:
 

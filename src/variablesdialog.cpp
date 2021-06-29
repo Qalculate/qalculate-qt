@@ -75,10 +75,11 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout *box = new QVBoxLayout();
 	newButton = new QPushButton(tr("New"), this); box->addWidget(newButton);
 	QMenu *menu = new QMenu(this);
-	menu->addAction(tr("Variable/constant"), this, SLOT(newVariable()));
-	menu->addAction(tr("Unknown variable"), this, SLOT(newUnknown()));
+	menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
+	menu->addAction(tr("Unknown Variable…"), this, SLOT(newUnknown()));
+	menu->addAction(tr("Matrix…"), this, SLOT(newMatrix()));
 	newButton->setMenu(menu);
-	editButton = new QPushButton(tr("Edit"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	box->addSpacing(24);
@@ -139,9 +140,14 @@ void VariablesDialog::searchChanged(const QString &str) {
 	variablesModel->setSecondaryFilter(str.toStdString());
 	variablesView->selectionModel()->setCurrentIndex(variablesModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 }
-void VariablesDialog::newVariable() {
+void VariablesDialog::newMatrix() {newVariable(2);}
+void VariablesDialog::newVariable() {newVariable(0);}
+void VariablesDialog::newVariable(int type) {
 	ExpressionItem *replaced_item = NULL;
-	KnownVariable *v = VariableEditDialog::newVariable(this, NULL, QString(), &replaced_item);
+	Variable *v;
+	if(type == 2) v = VariableEditDialog::newMatrix(this, &replaced_item);
+	else if(type == 1) v = UnknownEditDialog::newVariable(this, &replaced_item);
+	else v = VariableEditDialog::newVariable(this, NULL, QString(), &replaced_item);
 	if(v) {
 		if(replaced_item && (replaced_item == v || !item_in_calculator(replaced_item))) {
 			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
@@ -169,42 +175,7 @@ void VariablesDialog::newVariable() {
 		emit itemsChanged();
 	}
 }
-void VariablesDialog::newUnknown() {
-	ExpressionItem *replaced_item = NULL;
-	UnknownVariable *v = UnknownEditDialog::newVariable(this, &replaced_item);
-	if(v) {
-		if(replaced_item && (replaced_item == v || !item_in_calculator(replaced_item))) {
-			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
-				emit unitRemoved((Unit*) replaced_item);
-			} else if(replaced_item == v || !CALCULATOR->stillHasVariable((Variable*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasVariable((Variable*) replaced_item))) {
-				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
-				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
-			} else if(replaced_item->type() == TYPE_UNIT && !CALCULATOR->hasUnit((Unit*) replaced_item)) {
-				emit unitRemoved((Unit*) replaced_item);
-			}
-		}
-		selected_item = v;
-		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
-		item->setEditable(false);
-		item->setData(QVariant::fromValue((void*) v), Qt::UserRole);
-		sourceModel->appendRow(item);
-		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + v->category()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(!list.isEmpty()) {
-				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-			}
-		} else {
-			variablesModel->invalidate();
-		}
-		sourceModel->sort(0);
-		QModelIndex index = variablesModel->mapFromSource(item->index());
-		if(index.isValid()) {
-			variablesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-			variablesView->scrollTo(index);
-		}
-		emit itemsChanged();
-	}
-}
+void VariablesDialog::newUnknown() {newVariable(1);}
 void VariablesDialog::variableRemoved(Variable *v) {
 	QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) v), 1, Qt::MatchExactly);
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());

@@ -102,6 +102,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->replace_expression));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -322,6 +323,9 @@ void PreferencesDialog::readPrecisionToggled(bool b) {
 	if(b) settings->evalops.parse_options.read_precision = READ_PRECISION_WHEN_DECIMALS;
 	else settings->evalops.parse_options.read_precision = DONT_READ_PRECISION;
 	emit expressionFormatUpdated(true);
+}
+void PreferencesDialog::rpnKeysToggled(bool b) {
+	settings->rpn_keys = b;
 }
 void PreferencesDialog::intervalCalculationChanged(int i) {
 	settings->evalops.interval_calculation = (IntervalCalculation) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();

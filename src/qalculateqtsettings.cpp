@@ -224,6 +224,23 @@ void QalculateQtSettings::loadPreferences() {
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	file = fopen(filename.c_str(), "r");
 
+	default_plot_legend_placement = PLOT_LEGEND_TOP_RIGHT;
+	default_plot_display_grid = true;
+	default_plot_full_border = false;
+	default_plot_min = "0";
+	default_plot_max = "10";
+	default_plot_step = "1";
+	default_plot_sampling_rate = 1001;
+	default_plot_linewidth = 2;
+	default_plot_rows = false;
+	default_plot_type = 0;
+	default_plot_style = PLOT_STYLE_LINES;
+	default_plot_smoothing = PLOT_SMOOTHING_NONE;
+	default_plot_variable = "x";
+	default_plot_color = true;
+	default_plot_use_sampling_rate = true;
+	max_plot_time = 5;
+
 	int version_numbers[] = {3, 20, 0};
 
 	if(file) {
@@ -320,6 +337,38 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "custom_application_font") {
 					custom_app_font = svalue;
 					save_custom_app_font = true;
+				} else if(svar == "plot_legend_placement") {
+					if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
+				} else if(svar == "plot_style") {
+					if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_DOTS) default_plot_style = (PlotStyle) v;
+				} else if(svar == "plot_smoothing") {
+					if(v >= PLOT_SMOOTHING_NONE && v <= PLOT_SMOOTHING_SBEZIER) default_plot_smoothing = (PlotSmoothing) v;
+				} else if(svar == "plot_display_grid") {
+					default_plot_display_grid = v;
+				} else if(svar == "plot_full_border") {
+					default_plot_full_border = v;
+				} else if(svar == "plot_min") {
+					default_plot_min = svalue;
+				} else if(svar == "plot_max") {
+					default_plot_max = svalue;
+				} else if(svar == "plot_step") {
+					default_plot_step = svalue;
+				} else if(svar == "plot_sampling_rate") {
+					default_plot_sampling_rate = v;
+				} else if(svar == "plot_use_sampling_rate") {
+					default_plot_use_sampling_rate = v;
+				} else if(svar == "plot_variable") {
+					default_plot_variable = svalue;
+				} else if(svar == "plot_rows") {
+					default_plot_rows = v;
+				} else if(svar == "plot_type") {
+					if(v >= 0 && v <= 2) default_plot_type = v;
+				} else if(svar == "plot_color") {
+					default_plot_color = v;
+				} else if(svar == "plot_linewidth") {
+					default_plot_linewidth = v;
+				} else if(svar == "max_plot_time") {
+					max_plot_time = v;
 				/*} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
@@ -785,6 +834,23 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
 	fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());
 	if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_BOOLEAN) fprintf(file, "default_assumption_sign=%i\n", CALCULATOR->defaultAssumptions()->sign());
+	fprintf(file, "\n[Plotting]\n");
+	fprintf(file, "plot_legend_placement=%i\n", default_plot_legend_placement);
+	fprintf(file, "plot_style=%i\n", default_plot_style);
+	fprintf(file, "plot_smoothing=%i\n", default_plot_smoothing);
+	fprintf(file, "plot_display_grid=%i\n", default_plot_display_grid);
+	fprintf(file, "plot_full_border=%i\n", default_plot_full_border);
+	fprintf(file, "plot_min=%s\n", default_plot_min.c_str());
+	fprintf(file, "plot_max=%s\n", default_plot_max.c_str());
+	fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
+	fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
+	fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
+	fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
+	fprintf(file, "plot_rows=%i\n", default_plot_rows);
+	fprintf(file, "plot_type=%i\n", default_plot_type);
+	fprintf(file, "plot_color=%i\n", default_plot_color);
+	fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
+	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
 	fclose(file);
 
 }

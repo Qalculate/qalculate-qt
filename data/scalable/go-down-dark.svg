@@ -1,10 +1,42 @@
-<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-    <style
-        type="text/css"
-        id="current-color-scheme">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="svg1103"
+   sodipodi:docname="go-down-dark.svg"
+   width="32"
+   height="32"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1107" />
+  <sodipodi:namedview
+     id="namedview1105"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="59.9375"
+     inkscape:cx="0.68404588"
+     inkscape:cy="8"
+     inkscape:current-layer="svg1103" />
+  <style
+     type="text/css"
+     id="current-color-scheme">
         .ColorScheme-Text {
             color:#eff0f1;
         }
     </style>
-    <path d="M16 23.707l-14-14L2.707 9 16 22.293 29.293 9l.707.707z" class="ColorScheme-Text" fill="currentColor"/>
+  <path
+     d="M 16,22.707 4,10.707 5.414,9.293 16,19.879 26.586,9.293 28,10.707 Z"
+     class="ColorScheme-Text"
+     fill="currentColor"
+     id="path1101"
+     style="stroke-width:2" />
 </svg>

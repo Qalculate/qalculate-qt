@@ -17,14 +17,11 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QTableWidget>
-#include <QSpinBox>
-#include <QHeaderView>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
 #include "variableeditdialog.h"
+#include "matrixwidget.h"
 
 VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, bool edit_matrix) : QDialog(parent), b_empty(allow_empty_value), b_matrix(edit_matrix), b_changed(false) {
 	QVBoxLayout *box = new QVBoxLayout(this);
@@ -35,39 +32,15 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	grid->addWidget(nameEdit, 0, 1);
 	temporaryBox = new QCheckBox(tr("Temporary"), this);
 	temporaryBox->setChecked(true);
-	grid->addWidget(temporaryBox, b_matrix ? 3 : 2, 0, 1, 2, Qt::AlignRight);
+	grid->addWidget(temporaryBox, 2, 0, 1, 2, Qt::AlignRight);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	box->addWidget(buttonBox);
 	if(b_matrix) {
-		QHBoxLayout *hbox = new QHBoxLayout();
-		grid->addLayout(hbox, 1, 0, 1, 2);
-		hbox->addStretch(1);
-		rowsSpin = new QSpinBox(this);
-		rowsSpin->setRange(1, 20);
-		rowsSpin->setValue(8);
-		rowsSpin->setAlignment(Qt::AlignRight);
-		hbox->addWidget(rowsSpin);
-		connect(rowsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixRowsChanged(int)));
-		hbox->addWidget(new QLabel(SIGN_MULTIPLICATION));
-		columnsSpin = new QSpinBox(this);
-		columnsSpin->setRange(1, 20);
-		columnsSpin->setValue(8);
-		columnsSpin->setAlignment(Qt::AlignRight);
-		hbox->addWidget(columnsSpin);
-		connect(columnsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixColumnsChanged(int)));
-		matrixTable = new QTableWidget(this);
-		QFontMetrics fm(matrixTable->font());
-		matrixTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-		QTableWidgetItem *proto = new QTableWidgetItem();
-		proto->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-		matrixTable->setItemPrototype(proto);
-		matrixTable->setRowCount(8);
-		matrixTable->setColumnCount(8);
-		matrixTable->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-		grid->addWidget(matrixTable, 2, 0, 1, 2);
-		connect(matrixTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(onMatrixChanged()));
-		resize(fm.boundingRect("000000").width() * 12, sizeHint().height());
+		matrixEdit = new MatrixWidget(this);
+		grid->addWidget(matrixEdit, 1, 0, 1, 2);
+		connect(matrixEdit, SIGNAL(matrixChanged()), this, SLOT(onMatrixChanged()));
+		connect(matrixEdit, SIGNAL(dimensionChanged(int, int)), this, SLOT(onMatrixDimensionChanged()));
 	} else {
 		grid->addWidget(new QLabel(tr("Value:"), this), 1, 0);
 		valueEdit = new MathLineEdit(this);
@@ -76,6 +49,7 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 		grid->addWidget(valueEdit, 1, 1);
 		connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
 	}
+	nameEdit->setFocus();
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -84,14 +58,7 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 }
 VariableEditDialog::~VariableEditDialog() {}
 
-void VariableEditDialog::matrixRowsChanged(int i) {
-	matrixTable->setRowCount(i);
-	matrixTable->adjustSize();
-	b_changed = true;
-}
-void VariableEditDialog::matrixColumnsChanged(int i) {
-	matrixTable->setColumnCount(i);
-	matrixTable->adjustSize();
+void VariableEditDialog::onMatrixDimensionChanged() {
 	b_changed = true;
 }
 void VariableEditDialog::onMatrixChanged() {
@@ -127,38 +94,7 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), *default_value);
 	} else {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		QString str;
-		if(b_matrix) {
-			int max_c = -1, max_r = -1;
-			for(int r = 0; r < matrixTable->rowCount(); r++) {
-				bool b = false;
-				for(int c = 0; c < matrixTable->columnCount(); c++) {
-					QTableWidgetItem *item = matrixTable->item(r, c);
-					if(item && !item->text().isEmpty()) {
-						b = true;
-						if(c > max_c) max_c = c;
-					}
-				}
-				if(b) max_r = r;
-			}
-			if(max_r < 0) {max_r = matrixTable->rowCount() - 1; max_c = matrixTable->columnCount() - 1;}
-			str = "[";
-			for(int r = 0; r <= max_r; r++) {
-				if(r > 0) str += ", ";
-				str += "[";
-				for(int c = 0; c <= max_c; c++) {
-					if(c > 0) str += ", ";
-					QTableWidgetItem *item = matrixTable->item(r, c);
-					if(!item || item->text().isEmpty()) str += "0";
-					else str += item->text();
-				}
-				str += "]";
-			}
-			str += "]";
-		} else {
-			str = valueEdit->text().trimmed();
-		}
-		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), CALCULATOR->unlocalizeExpression(str.toStdString(), pa));
+		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), CALCULATOR->unlocalizeExpression(b_matrix ? matrixEdit->getMatrixString().toStdString() : valueEdit->text().toStdString(), pa));
 	}
 	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
 	v->setChanged(false);
@@ -185,38 +121,7 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 		v->set(*default_value);
 	} else {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		QString str;
-		if(b_matrix) {
-			int max_c = -1, max_r = -1;
-			for(int r = 0; r < matrixTable->rowCount(); r++) {
-				bool b = false;
-				for(int c = 0; c < matrixTable->columnCount(); c++) {
-					QTableWidgetItem *item = matrixTable->item(r, c);
-					if(item && !item->text().isEmpty()) {
-						b = true;
-						if(c > max_c) max_c = c;
-					}
-				}
-				if(b) max_r = r;
-			}
-			if(max_r < 0) {max_r = matrixTable->rowCount() - 1; max_c = matrixTable->columnCount() - 1;}
-			str = "[";
-			for(int r = 0; r <= max_r; r++) {
-				if(r > 0) str += ", ";
-				str += "[";
-				for(int c = 0; c <= max_c; c++) {
-					if(c > 0) str += ", ";
-					QTableWidgetItem *item = matrixTable->item(r, c);
-					if(!item || item->text().isEmpty()) str += "0";
-					else str += item->text();
-				}
-				str += "]";
-			}
-			str += "]";
-		} else {
-			str = valueEdit->text().trimmed();
-		}
-		v->set(CALCULATOR->unlocalizeExpression(str.toStdString(), pa));
+		v->set(CALCULATOR->unlocalizeExpression(b_matrix ? matrixEdit->getMatrixString().toStdString() : valueEdit->text().toStdString(), pa));
 	}
 	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
 	else if(v->category() == CALCULATOR->temporaryCategory()) v->setCategory("");
@@ -227,41 +132,18 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 	if(v->isExpression() && !b_matrix) {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		valueEdit->setText(QString::fromStdString(CALCULATOR->localizeExpression(v->expression(), pa)));
+	} else if(b_matrix) {
+		matrixEdit->setMatrix(v->get());
 	} else {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
 		po.allow_non_usable = false;
 		po.base = 10;
-		if(b_matrix) {
-			QTableWidgetItem *item;
-			if(v->get().isMatrix()) {
-				MathStructure m(v->get());
-				rowsSpin->setValue(m.rows());
-				columnsSpin->setValue(m.columns());
-				CALCULATOR->startControl(2000);
-				for(size_t i = 0; i < m.rows(); i++) {
-					for(size_t i2 = 0; i2 < m.columns(); i2++) {
-						m[i][i2].format(po);
-						item = new QTableWidgetItem(QString::fromStdString(m[i][i2].print(po)));
-						item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-						matrixTable->setItem((int) i, (int) i2, item);
-					}
-				}
-				CALCULATOR->stopControl();
-			} else {
-				item = new QTableWidgetItem(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
-				item->setTextAlignment(Qt::AlignRight);
-				matrixTable->setItem(0, 0, item);
-			}
-		} else {
-			valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
-		}
+		valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
 	}
 	nameEdit->setReadOnly(!v->isLocal());
 	if(b_matrix) {
-		matrixTable->setEditTriggers(v->isLocal() ? QAbstractItemView::AllEditTriggers : QAbstractItemView::NoEditTriggers);
-		rowsSpin->setReadOnly(!v->isLocal());
-		columnsSpin->setReadOnly(!v->isLocal());
+		matrixEdit->setEditable(v->isLocal());
 	} else {
 		valueEdit->setReadOnly(!v->isLocal());
 	}
@@ -283,6 +165,9 @@ void VariableEditDialog::setValue(const QString &str) {
 	valueEdit->setText(str);
 	if(!b_empty) onValueEdited(str);
 }
+void VariableEditDialog::disableValue() {
+	valueEdit->setReadOnly(true);
+}
 void VariableEditDialog::setName(const QString &str) {
 	nameEdit->setText(str);
 	onNameEdited(str);
@@ -291,7 +176,7 @@ QString VariableEditDialog::value() const {
 	return valueEdit->text();
 }
 bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, ExpressionItem **replaced_item) {
-	VariableEditDialog *d = new VariableEditDialog(parent, false, v->get().isMatrix());
+	VariableEditDialog *d = new VariableEditDialog(parent, false, v->get().isMatrix() && v->get().rows() * v->get().columns() <= 10000);
 	d->setWindowTitle(tr("Edit Variable"));
 	d->setVariable(v);
 	while(d->exec() == QDialog::Accepted) {
@@ -304,12 +189,14 @@ bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, Express
 	return false;
 }
 KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *default_value, const QString &value_str, ExpressionItem **replaced_item) {
-	bool edit_matrix = default_value && default_value->isMatrix();
-	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && (value_str.isEmpty() || edit_matrix), edit_matrix);
+	bool edit_matrix = default_value && default_value->isMatrix() && default_value->rows() * default_value->columns() <= 10000;
+	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && (value_str.isEmpty() || value_str.length() > 1000 || edit_matrix), edit_matrix);
 	d->setWindowTitle(tr("New Variable"));
 	if(edit_matrix) {
 		KnownVariable v(CALCULATOR->temporaryCategory(), "", *default_value);
 		d->setVariable(&v);
+	} else if(value_str.length() > 1000) {
+		d->setValue(QString());
 	} else {
 		d->setValue(value_str);
 	}

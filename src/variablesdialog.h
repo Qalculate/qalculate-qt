@@ -46,6 +46,7 @@ class VariablesDialog : public QDialog {
 
 		void keyPressEvent(QKeyEvent *event) override;
 		void closeEvent(QCloseEvent*) override;
+		void newVariable(int);
 
 	protected slots:
 
@@ -53,6 +54,7 @@ class VariablesDialog : public QDialog {
 		void selectedVariableChanged(const QModelIndex&, const QModelIndex&);
 
 		void newVariable();
+		void newMatrix();
 		void newUnknown();
 		void editClicked();
 		void delClicked();

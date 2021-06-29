@@ -19,9 +19,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 			ICON_DIR = $$PREFIX/share/icons
 		}
 	}
-	isEmpty(TRANSLATIONS_DIR) {
-		TRANSLATIONS_DIR = $$PREFIX/share/eqonomize/translations
-	}
+	TRANSLATIONS_DIR = ":/translations"
 } else {
 	ICON_DIR = ":/icons"
 	TRANSLATIONS_DIR = ":/translations"
@@ -44,8 +42,9 @@ DEFINES += TRANSLATIONS_DIR=\\\"$$TRANSLATIONS_DIR\\\"
 DEFINES += ICON_DIR=\\\"$$ICON_DIR\\\"
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/calendarconversiondialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
-SOURCES += src/calendarconversiondialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
+HEADERS += src/calendarconversiondialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
+
+SOURCES += src/calendarconversiondialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
@@ -75,7 +74,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 		desktopappicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps
 		INSTALLS += desktopappicon64
 	}
-	RESOURCES = icons.qrc flags.qrc
+	RESOURCES = flags.qrc icons.qrc
 } else {
 	RESOURCES = icons.qrc flags.qrc
 	target.path = $$PREFIX/bin

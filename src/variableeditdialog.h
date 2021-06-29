@@ -19,8 +19,7 @@
 class QLineEdit;
 class QCheckBox;
 class QPushButton;
-class QSpinBox;
-class QTableWidget;
+class MatrixWidget;
 
 class VariableEditDialog : public QDialog {
 
@@ -31,16 +30,14 @@ class VariableEditDialog : public QDialog {
 		QLineEdit *nameEdit, *valueEdit;
 		QCheckBox *temporaryBox;
 		QPushButton *okButton;
-		QSpinBox *rowsSpin, *columnsSpin;
-		QTableWidget *matrixTable;
+		MatrixWidget *matrixEdit;
 		bool b_empty, b_matrix, b_changed;
 
 	protected slots:
 
 		void onNameEdited(const QString&);
 		void onValueEdited(const QString&);
-		void matrixRowsChanged(int);
-		void matrixColumnsChanged(int);
+		void onMatrixDimensionChanged();
 		void onMatrixChanged();
 
 	public:
@@ -52,6 +49,7 @@ class VariableEditDialog : public QDialog {
 		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
 		void setVariable(KnownVariable *v);
 		void setValue(const QString&);
+		void disableValue();
 		bool valueHasChanged() const;
 		QString value() const;
 		void setName(const QString&);

@@ -37,6 +37,7 @@ class FunctionsDialog;
 class VariablesDialog;
 class UnitsDialog;
 class FPConversionDialog;
+class PlotDialog;
 class CalendarConversionDialog;
 class QTableWidget;
 struct FunctionDialog;
@@ -70,6 +71,7 @@ class QalculateWindow : public QMainWindow {
 		VariablesDialog *variablesDialog;
 		UnitsDialog *unitsDialog;
 		FPConversionDialog *fpConversionDialog;
+		PlotDialog *plotDialog;
 		CalendarConversionDialog *calendarConversionDialog;
 
 		KeypadWidget *keypad;
@@ -90,7 +92,7 @@ class QalculateWindow : public QMainWindow {
 		bool send_event, bases_shown, rpn_shown;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
-		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
+		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
 		bool askTC(MathStructure&);
@@ -168,6 +170,7 @@ class QalculateWindow : public QMainWindow {
 		void approximationActivated();
 		void applyFunction(MathFunction*);
 		void openFPConversion();
+		void openPlot();
 		void openCalendarConversion();
 		void onInsertFunctionExec();
 		void onInsertFunctionRPN();
@@ -178,6 +181,7 @@ class QalculateWindow : public QMainWindow {
 		void onInsertFunctionEntryActivated();
 		void insertFunctionDo(FunctionDialog*);
 		void onEntrySelectFile();
+		void onEntryEditMatrix();
 		void onCalculateFunctionRequested(MathFunction*);
 		void onInsertFunctionRequested(MathFunction*);
 		void onUnitActivated(Unit *u);
@@ -214,6 +218,7 @@ class QalculateWindow : public QMainWindow {
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
 		void newVariable();
+		void newMatrix();
 		void newUnknown();
 		void newFunction();
 		void convertToUnit(Unit*);

@@ -58,7 +58,9 @@
 #include "variablesdialog.h"
 #include "unitsdialog.h"
 #include "fpconversiondialog.h"
+#include "plotdialog.h"
 #include "calendarconversiondialog.h"
+#include "matrixwidget.h"
 
 class ViewThread : public Thread {
 protected:
@@ -88,7 +90,7 @@ bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
 ViewThread *view_thread;
 CommandThread *command_thread;
-MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, mstruct_exact, lastx;
+MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, lastx;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
@@ -193,6 +195,45 @@ std::string unhtmlize(std::string str) {
 	return str;
 }
 
+class QalculateDockWidget : public QDockWidget {
+
+	public:
+
+		QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
+		virtual ~QalculateDockWidget() {}
+
+	protected:
+
+		ExpressionEdit *expressionEdit;
+
+		void keyPressEvent(QKeyEvent *e) override {
+			QDockWidget::keyPressEvent(e);
+			if(!e->isAccepted() && isFloating()) {
+				expressionEdit->setFocus();
+				expressionEdit->keyPressEvent(e);
+			}
+		}
+
+};
+class QalculateTableWidget : public QTableWidget {
+
+	public:
+
+		QalculateTableWidget(QWidget *parent) : QTableWidget(parent) {}
+		virtual ~QalculateTableWidget() {}
+
+	protected:
+
+		void keyPressEvent(QKeyEvent *e) override {
+			if(state() != EditingState) {
+				e->ignore();
+				return;
+			}
+			QTableWidget::keyPressEvent(e);
+		}
+
+};
+
 #define ADD_SECTION(str) \
 	if(!menu->style()->styleHint(QStyle::SH_Menu_SupportsSections)) { \
 		aw = new QWidgetAction(this); \
@@ -220,6 +261,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	variablesDialog = NULL;
 	unitsDialog = NULL;
 	fpConversionDialog = NULL;
+	plotDialog = NULL;
 	calendarConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
@@ -249,14 +291,16 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Function…"), this, SLOT(newFunction()));
 	menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
 	menu->addAction(tr("Unknown Variable…"), this, SLOT(newUnknown()));
+	menu->addAction(tr("Matrix…"), this, SLOT(newMatrix()));
 	menu = menu2;
 	menu->addSeparator();
-	menu->addAction(tr("Functions List…"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
-	menu->addAction(tr("Variables and Constants List…"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M)->setShortcutContext(Qt::ApplicationShortcut);
-	menu->addAction(tr("Units List and Conversion…"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Functions List"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Variables and Constants List"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Units List and Conversion"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addSeparator();
-	menu->addAction(tr("Floating Point Conversion (IEEE 754)…"), this, SLOT(openFPConversion()));
-	menu->addAction(tr("Calendar Conversion…"), this, SLOT(openCalendarConversion()));
+	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
+	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
 	menu->addSeparator();
 	menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
@@ -269,7 +313,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setShortcutContext(Qt::WidgetShortcut); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
 	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true);
 	menu->addSeparator();
-	menu->addAction(tr("Preferences…"), this, SLOT(editPreferences()));
+	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
 	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
 	menu->addSeparator();
 	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
@@ -523,7 +567,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ehSplitter->setCollapsible(0, false);
 	ehSplitter->setCollapsible(1, false);
 
-	basesDock = new QDockWidget(tr("Number bases"), this);
+	basesDock = new QalculateDockWidget(tr("Number bases"), this, expressionEdit);
 	basesDock->setObjectName("number-bases-dock");
 	QWidget *basesWidget = new QWidget(this);
 	QGridLayout *basesGrid = new QGridLayout(basesWidget);
@@ -567,17 +611,17 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesDock->hide();
 
 	keypad = new KeypadWidget(this);
-	keypadDock = new QDockWidget(tr("Keypad"), this);
+	keypadDock = new QalculateDockWidget(tr("Keypad"), this, expressionEdit);
 	keypadDock->setObjectName("keypad-dock");
 	keypadDock->setWidget(keypad);
 	addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
 	keypadDock->hide();
 
 	QWidget *rpnWidget = new QWidget(this);
-	rpnDock = new QDockWidget(tr("RPN stack"), this);
+	rpnDock = new QalculateDockWidget(tr("RPN stack"), this, expressionEdit);
 	rpnDock->setObjectName("rpn-dock");
 	QHBoxLayout *rpnBox = new QHBoxLayout(rpnWidget);
-	rpnView = new QTableWidget(this);
+	rpnView = new QalculateTableWidget(this);
 	rpnView->setColumnCount(1);
 	rpnView->setRowCount(0);
 	rpnView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -586,6 +630,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rpnView->verticalHeader()->setSectionsMovable(true);
 	rpnView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 	rpnView->setSelectionMode(QAbstractItemView::SingleSelection);
+	rpnView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
 	connect(rpnView, SIGNAL(cellChanged(int, int)), this, SLOT(registerChanged(int)));
 	rpnBox->addWidget(rpnView);
 	QToolBar *rpnTB = new QToolBar(this);
@@ -3142,14 +3187,14 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		if(title_set) updateWindowTitle();
 	}
 
-	if(settings->rpn_mode && stack_index == 0) {
+	if(settings->rpn_mode && !do_stack) {
 		mstruct->unref();
 		mstruct = CALCULATOR->getRPNRegister(1);
 		if(!mstruct) mstruct = new MathStructure();
 		else mstruct->ref();
 	}
 
-	if(do_stack && stack_index > 0) {
+	if(do_stack) {
 	} else if(settings->rpn_mode && do_mathoperation) {
 		result_text = tr("RPN Operation").toStdString();
 	} else {
@@ -3264,7 +3309,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	if(!do_stack) previous_expression = execute_str.empty() ? str : execute_str;
-	setResult(NULL, true, stack_index == 0, true, "", stack_index);
+	setResult(NULL, true, stack_index == 0, true, "", do_stack, stack_index);
 	
 	if(do_bases) basesDock->show();
 	if(do_calendars) openCalendarConversion();
@@ -3287,14 +3332,19 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		expressionEdit->blockParseStatus();
 		if(settings->chain_mode) {
 			if(exact_text == "0" || result_text == "0") expressionEdit->clear();
-			expressionEdit->setExpression(QString::fromStdString(unhtmlize(result_text)));
+			std::string str = unhtmlize(result_text);
+			if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
 		} else if(settings->replace_expression == CLEAR_EXPRESSION) {
 			expressionEdit->clear();
 		} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
 			if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
 				if(exact_text == "0" || result_text == "0") expressionEdit->clear();
-				else if(exact_text.empty()) expressionEdit->setExpression(QString::fromStdString(unhtmlize(result_text)));
-				else expressionEdit->setExpression(QString::fromStdString(exact_text));
+				else if(exact_text.empty()) {
+					std::string str = unhtmlize(result_text);
+					if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+				} else {
+					if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) expressionEdit->setExpression(QString::fromStdString(exact_text));
+				}
 			} else {
 				if(!execute_str.empty()) {
 					from_str = execute_str;
@@ -3645,8 +3695,10 @@ void ViewThread::run() {
 		bool b_stack = false;
 		if(!read(&b_stack)) break;
 		if(!read(&x)) break;
-		CALCULATOR->startControl();
+		MathStructure *mm = (MathStructure*) x;
+		if(!read(&x)) break;
 		MathStructure *mparse = (MathStructure*) x;
+		CALCULATOR->startControl();
 		PrintOptions po;
 		if(mparse) {
 			if(!read(&po.is_approximate)) break;
@@ -3689,6 +3741,27 @@ void ViewThread::run() {
 			}
 		}
 
+		if(mm && mresult->isMatrix()) {
+			PrintOptions po = settings->printops;
+			po.allow_non_usable = false;
+			mm->set(*mresult);
+			MathStructure mm2(*mresult);
+			std::string mstr;
+			int c = mm->columns(), r = mm->rows();
+			for(int index_r = 0; index_r < r; index_r++) {
+				for(int index_c = 0; index_c < c; index_c++) {
+					mm->getElement(index_r + 1, index_c + 1)->setAborted();
+				}
+			}
+			for(int index_r = 0; index_r < r; index_r++) {
+				for(int index_c = 0; index_c < c; index_c++) {
+					mm2.getElement(index_r + 1, index_c + 1)->format(po);
+					mstr = mm2.getElement(index_r + 1, index_c + 1)->print(po);
+					mm->getElement(index_r + 1, index_c + 1)->set(mstr);
+				}
+			}
+		}
+
 		po = settings->printops;
 
 		po.allow_non_usable = true;
@@ -3705,7 +3778,7 @@ void ViewThread::run() {
 	}
 }
 
-void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, size_t stack_index, bool register_moved, bool supress_dialog) {
+void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
 
 	if(block_result_update) return;
 
@@ -3730,11 +3803,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		parsed_text = tr("aborted").toStdString();
 	}
 
-	if(!settings->rpn_mode) stack_index = 0;
-	if(stack_index != 0) {
+	if(!settings->rpn_mode) {stack_index = 0; do_stack = false;}
+	if(do_stack) {
 		update_history = true;
 		update_parse = false;
-		
 	}
 	if(register_moved) {
 		update_history = true;
@@ -3798,7 +3870,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
 	bool do_to = false;
 
-	if(stack_index == 0) {
+	if(!do_stack) {
 		if(to_base != 0 || to_fraction || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
 			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()))) {
 				settings->printops.base = to_base;
@@ -3859,22 +3931,31 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	settings->printops.prefix = prefix;
 
-	if(stack_index == 0) {
+	if(!do_stack) {
 		if(!view_thread->write((void*) mstruct)) {b_busy--; view_thread->cancel(); return;}
 	} else {
 		MathStructure *mreg = CALCULATOR->getRPNRegister(stack_index + 1);
 		if(!view_thread->write((void*) mreg)) {b_busy--; view_thread->cancel(); return;}
 	}
-	bool b_stack = stack_index != 0;
-	if(!view_thread->write(b_stack)) {b_busy--; view_thread->cancel(); return;}
+	if(!view_thread->write(do_stack)) {b_busy--; view_thread->cancel(); return;}
+	if(do_stack) {
+		if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
+	} else {
+		matrix_mstruct.clear();
+		if(!mstruct->isMatrix() || mstruct->rows() * mstruct->columns() <= 10 || mstruct->columns() * mstruct->rows() > 10000) {
+			if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
+		} else {
+			if(!view_thread->write((void*) &matrix_mstruct)) {b_busy--; view_thread->cancel(); return;}
+		}
+	}
 	if(update_parse) {
-		if(!view_thread->write((void *) parsed_mstruct)) {b_busy--; view_thread->cancel(); return;}
+		if(!view_thread->write((void*) parsed_mstruct)) {b_busy--; view_thread->cancel(); return;}
 		bool *parsed_approx_p = &parsed_approx;
 		if(!view_thread->write(parsed_approx_p)) {b_busy--; view_thread->cancel(); return;}
 		if(!view_thread->write(!b_rpn_operation)) {b_busy--; view_thread->cancel(); return;}
 	} else {
 		if(settings->printops.base != BASE_DECIMAL && settings->dual_approximation <= 0) mstruct_exact.setUndefined();
-		if(!view_thread->write((void *) NULL)) {b_busy--; view_thread->cancel(); return;}
+		if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
 	}
 
 	QProgressDialog *dialog = NULL;
@@ -3905,10 +3986,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		QApplication::restoreOverrideCursor();
 		dialog->hide();
 		dialog->deleteLater();
-		if(title_set && stack_index != 0) updateWindowTitle();
+		if(title_set) updateWindowTitle();
 	}
 
-	if(stack_index == 0) {
+	if(!do_stack) {
 		if(basesDock->isVisible()) updateResultBases();
 		if((settings->title_type == TITLE_APP || !updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true)) && title_set) updateWindowTitle();
 	}
@@ -3919,7 +4000,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	if(settings->history_answer.empty()) {
 		update_parse = true;
 	}
-	if(stack_index != 0) {
+	if(do_stack) {
 		RPNRegisterChanged(result_text, stack_index);
 		if(supress_dialog) CALCULATOR->clearMessages();
 		else displayMessages(this);
@@ -3935,7 +4016,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		parsed_text = result_text;
 	}
 
-	if(stack_index != 0) {
+	if(do_stack) {
 		RPNRegisterChanged(result_text, stack_index);
 	} else {
 		if(settings->rpn_mode && !register_moved) {
@@ -3950,7 +4031,17 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		} else {
 			exact_text = "";
 		}
-		alt_results.push_back(result_text);
+		for(size_t i = 0; i < alt_results.size();) {
+			if(alt_results[i].length() > 50000) {alt_results.erase(alt_results.begin() + i); exact_text = "";}
+			else i++;
+		}
+		if(matrix_mstruct.isMatrix() && matrix_mstruct.rows() * matrix_mstruct.columns() > 500) {
+			alt_results.push_back(result_text.substr(0, 1000) + " (…) " + result_text.substr(result_text.length() - 1000, 1000));
+		} else if(result_text.length() > 100000) {
+			alt_results.push_back(result_text.substr(0, 10000) + " (…) " + result_text.substr(result_text.length() - 10000, 10000));
+		} else {
+			alt_results.push_back(result_text);
+		}
 		QString flag;
 		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
 			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
@@ -3975,6 +4066,23 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	settings->printops.prefix = NULL;
 
 	b_busy--;
+
+	if(!supress_dialog && !register_moved && !do_stack && mstruct->isMatrix() && matrix_mstruct.isMatrix()) {
+		QDialog *dialog = new QDialog(this);
+		if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		dialog->setWindowTitle(tr("Matrix"));
+		QVBoxLayout *box = new QVBoxLayout(dialog);
+		MatrixWidget *w = new MatrixWidget(dialog);
+		w->setMatrixStrings(matrix_mstruct);
+		w->setEditable(false);
+		box->addWidget(w);
+		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
+		box->addWidget(buttonBox);
+		connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), dialog, SLOT(reject()));
+		dialog->exec();
+		dialog->deleteLater();
+	}
+
 }
 
 void QalculateWindow::changeEvent(QEvent *e) {
@@ -3989,6 +4097,13 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		keypadAction->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
 		modeAction->setIcon(LOAD_ICON("configure"));
+		rpnUpAction->setIcon(LOAD_ICON("go-up"));
+		rpnDownAction->setIcon(LOAD_ICON("go-down"));
+		rpnSwapAction->setIcon(LOAD_ICON("rpn-swap"));
+		rpnCopyAction->setIcon(LOAD_ICON("edit-copy"));
+		rpnLastxAction->setIcon(LOAD_ICON("edit-undo"));
+		rpnDeleteAction->setIcon(LOAD_ICON("edit-delete"));
+		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
 		QFontMetrics fm2(QApplication::font());
 		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
@@ -4196,7 +4311,7 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::onStoreActivated() {
-	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : (exact_text.empty() ? QString::fromStdString(result_text) : QString::fromStdString(exact_text)));
+	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : (exact_text.empty() ? QString::fromStdString(unhtmlize(result_text)) : QString::fromStdString(exact_text)));
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
@@ -4205,6 +4320,14 @@ void QalculateWindow::onStoreActivated() {
 }
 void QalculateWindow::newVariable() {
 	KnownVariable *v = VariableEditDialog::newVariable(this);
+	if(v) {
+		expressionEdit->updateCompletion();
+		if(variablesDialog) variablesDialog->updateVariables();
+		if(unitsDialog) unitsDialog->updateUnits();
+	}
+}
+void QalculateWindow::newMatrix() {
+	KnownVariable *v = VariableEditDialog::newMatrix(this);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
@@ -4432,6 +4555,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(plotDialog) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	} else {
@@ -4440,6 +4564,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(plotDialog) plotDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 	}
@@ -4599,18 +4724,21 @@ void QalculateWindow::openFPConversion() {
 		fpConversionDialog->show();
 		fpConversionDialog->raise();
 		fpConversionDialog->activateWindow();
-		return;
-	}
-	fpConversionDialog = new FPConversionDialog(this);
-	if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	QString str;
-	int base;
-	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
-		str = QString::fromStdString(unhtmlize(result_text));
-		if(to_base != 0) base = to_base;
-		else base = settings->printops.base;
 	} else {
-		str = expressionEdit->toPlainText();
+		fpConversionDialog = new FPConversionDialog(this);
+		if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		fpConversionDialog->show();
+	}
+	QString str;
+	int base = 10;
+	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
+		if(mstruct && mstruct->isNumber()) {
+			str = QString::fromStdString(unhtmlize(result_text));
+			if(to_base != 0) base = to_base;
+			else base = settings->printops.base;
+		}
+	} else {
+		str = expressionEdit->selectedText(true);
 		base = settings->evalops.parse_options.base;
 	}
 	switch(base) {
@@ -4627,7 +4755,31 @@ void QalculateWindow::openFPConversion() {
 			break;
 		}
 	}
-	fpConversionDialog->show();
+}
+void QalculateWindow::openPlot() {
+	if(!CALCULATOR->canPlot()) {
+		QMessageBox::critical(this, tr("Gnuplot was not found"), tr("%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.").arg("Gnuplot").arg("<a href=\"http://www.gnuplot.info/\">http://www.gnuplot.info/</a>"), QMessageBox::Ok);
+		return;
+	}
+	if(plotDialog) {
+		if(settings->always_on_top) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		plotDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		plotDialog->show();
+		plotDialog->raise();
+		plotDialog->activateWindow();
+	} else {
+		plotDialog = new PlotDialog(this);
+		if(settings->always_on_top) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		plotDialog->show();
+	}
+	if(settings->evalops.parse_options.base == 10) {
+		std::string str = expressionEdit->selectedText(true).toStdString(), str2;
+		CALCULATOR->separateToExpression(str, str2, settings->evalops, true);
+		remove_blank_ends(str);
+		plotDialog->setExpression(QString::fromStdString(str));
+	} else {
+		plotDialog->setExpression(QString());
+	}
 }
 void QalculateWindow::openCalendarConversion() {
 	if(calendarConversionDialog) {
@@ -5012,10 +5164,10 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
 			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
 			connect(action, SIGNAL(triggered()), this, SLOT(onEntrySelectFile()));
-		/*} else if(arg && (arg->type() == ARGUMENT_TYPE_VECTOR || arg->type() == ARGUMENT_TYPE_MATRIX)) {
-			QPushButton *w = new QPushButton(typestr);
-			if(arg->type() == ARGUMENT_TYPE_VECTOR) g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_vector_clicked), (gpointer) fd->entry[i]);
-			else g_signal_connect(G_OBJECT(fd->type_label[i]), "clicked", G_CALLBACK(on_type_label_matrix_clicked), (gpointer) fd->entry[i]);*/
+		} else if(arg && arg->type() == ARGUMENT_TYPE_MATRIX) {
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("table"), QLineEdit::TrailingPosition);
+			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
+			connect(action, SIGNAL(triggered()), this, SLOT(onEntryEditMatrix()));
 		}
 		if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
 			QTableWidgetItem *item = rpnView->item(i, 0);
@@ -5136,6 +5288,28 @@ void QalculateWindow::onEntrySelectFile() {
 	FunctionDialog *fd = (FunctionDialog*) w->property("QALCULATE FD").value<void*>();
 	QString str = QFileDialog::getOpenFileName(fd->dialog, QString(), w->text());
 	if(!str.isEmpty()) w->setText(str);
+}
+void QalculateWindow::onEntryEditMatrix() {
+	QLineEdit *entry = (QLineEdit*) sender()->property("QALCULATE ENTRY").value<void*>();
+	FunctionDialog *fd = (FunctionDialog*) entry->property("QALCULATE FD").value<void*>();
+	QDialog *dialog = new QDialog(fd->dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Matrix"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	MatrixWidget *w = new MatrixWidget(dialog);
+	w->setMatrixString(entry->text());
+	box->addWidget(w);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	box->addWidget(buttonBox);
+	w->setFocus();
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	if(dialog->exec() == QDialog::Accepted) {
+		if(!w->isEmpty()) {
+			entry->setText(w->getMatrixString());
+		}
+	}
+	dialog->deleteLater();
 }
 void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 	MathFunction *f = fd->f;
@@ -5260,7 +5434,8 @@ void QalculateWindow::onInsertFunctionExec() {
 		str = "<span font-weight=\"bold\">";
 		if(!b_approx) str += "= ";
 		else str += SIGN_ALMOST_EQUAL " ";
-		str += QString::fromStdString(result_text);
+		if(result_text.length() > 100000) str += QString::fromStdString(result_text.substr(0, 10000) + " (…) " + result_text.substr(result_text.length() - 10000, 10000));
+		else str += QString::fromStdString(result_text);
 		str += "</span>";
 		fd->w_result->setText(str);
 		fd->entry[0]->setFocus();
@@ -5334,6 +5509,7 @@ void QalculateWindow::executeFromFile(const QString &file) {
 	expressionEdit->setExpressionHasChanged(true);
 	if(parsed_mstruct) parsed_mstruct->clear();
 	if(parsed_tostruct) parsed_tostruct->setUndefined();
+	matrix_mstruct.clear();
 	expressionEdit->blockUndo(false);
 	expressionEdit->blockCompletion(false);
 	expressionEdit->blockParseStatus(false);

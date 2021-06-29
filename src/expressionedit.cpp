@@ -27,17 +27,15 @@
 #include <QActionGroup>
 #include <QMenu>
 #include <QCalendarWidget>
-#include <QTableWidget>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QSpinBox>
-#include <QLabel>
 #include <QDebug>
 
 #include "expressionedit.h"
 #include "qalculateqtsettings.h"
+#include "matrixwidget.h"
 
 #define ITEM_ROLE (Qt::UserRole + 10)
 #define TYPE_ROLE (Qt::UserRole + 11)
@@ -1085,7 +1083,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_CONVERT_STRING("optimal")
 	COMPLETION_APPEND(str1, tr("Optimal units"), 100, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
-	COMPLETION_APPEND(str1, tr("Expanded partial fraction"), 601, NULL)
+	COMPLETION_APPEND(str1, tr("Expanded partial fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
 	COMPLETION_APPEND(str1, tr("Complex polar form"), 403, NULL)
 	COMPLETION_CONVERT_STRING2("rectangular", "cartesian")
@@ -1112,6 +1110,7 @@ void ExpressionEdit::setExpression(const QString &str) {
 	block_add_to_undo--;
 	insertPlainText(str);
 	setCursorWidth(1);
+	highlightParentheses();
 }
 std::string ExpressionEdit::expression() const {
 	return toPlainText().toStdString();
@@ -1131,7 +1130,7 @@ void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
 	QPlainTextEdit::inputMethodEvent(event);
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
-	disable_history_arrow_keys = false;
+	if(!event->isAutoRepeat()) disable_history_arrow_keys = false;
 	QPlainTextEdit::keyReleaseEvent(event);
 }
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
@@ -1276,8 +1275,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_Up: {
 				if(completionView->isVisible() || disable_history_arrow_keys || event->modifiers() == Qt::ShiftModifier) break;
 				QTextCursor c = textCursor();
-				bool b = (cursor_has_moved && (!c.atStart() || c.hasSelection())) || (!c.atEnd() && !c.atStart());
-				if(b || !c.atStart()) {
+				bool b = (cursor_has_moved && (!c.atStart() || c.hasSelection())) || (!c.atEnd() && !c.atStart()) || history_index + 1 >= (int) settings->expression_history.size();
+				if(b) {
 					QString text = toPlainText();
 					if((b && c.atStart()) || text.lastIndexOf("\n", c.position() - 1) >= 0) {
 						disable_history_arrow_keys = true;
@@ -1298,16 +1297,11 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					dont_change_index = true;
 					blockCompletion(true);
 					blockParseStatus(true);
-					setCursorWidth(0);
 					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
-					QTextCursor c = textCursor();
-					c.movePosition(QTextCursor::End);
-					setTextCursor(c);
-					setCursorWidth(1);
 					dont_change_index = false;
 				} else {
 					break;
@@ -1319,7 +1313,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(completionView->isVisible() || disable_history_arrow_keys) break;
 				QTextCursor c = textCursor();
 				bool b = (cursor_has_moved && (!c.atEnd() || c.hasSelection())) || (!c.atEnd() && !c.atStart());
-				if(b || !c.atEnd()) {
+				if(b) {
 					QString text = toPlainText();
 					if((b && c.atEnd()) || text.indexOf("\n", c.position()) >= 0) {
 						disable_history_arrow_keys = true;
@@ -1339,17 +1333,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				dont_change_index = true;
 				blockCompletion(true);
 				blockParseStatus(true);
-				setCursorWidth(0);
 				if(history_index < 0) {
 					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				QTextCursor c = textCursor();
-				c.movePosition(QTextCursor::End);
-				setTextCursor(c);
-				setCursorWidth(1);
 				blockParseStatus(false);
 				blockCompletion(false);
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -1422,7 +1411,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Limited full completion"), this, SLOT(onCompletionModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); if(completion_level == 3) action->setChecked(true);
 		action = menu->addAction(tr("Full completion"), this, SLOT(onCompletionModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); if(completion_level == 4) action->setChecked(true);
 		menu->addSeparator();
-		action = menu->addAction(tr("Completion delay"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
+		action = menu->addAction(tr("Delayed completion"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
 		QAction *enableIMAction = cmenu->addAction(tr("Enable input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
 	}
@@ -1452,81 +1441,22 @@ void ExpressionEdit::insertDate() {
 	}
 	dialog->deleteLater();
 }
-void ExpressionEdit::matrixRowsChanged(int i) {
-	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->setRowCount(i);
-	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->adjustSize();
-}
-void ExpressionEdit::matrixColumnsChanged(int i) {
-	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->setColumnCount(i);
-	((QTableWidget*) sender()->property("QALCULATE TABLE").value<void*>())->adjustSize();
-}
 void ExpressionEdit::insertMatrix() {
 	QDialog *dialog = new QDialog(this);
 	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Matrix"));
 	QVBoxLayout *box = new QVBoxLayout(dialog);
-	QHBoxLayout *hbox = new QHBoxLayout();
-	box->addLayout(hbox);
-	hbox->addStretch(1);
-	QSpinBox *rowsSpin = new QSpinBox(dialog);
-	rowsSpin->setRange(1, 20);
-	rowsSpin->setValue(8);
-	rowsSpin->setAlignment(Qt::AlignRight);
-	hbox->addWidget(rowsSpin);
-	connect(rowsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixRowsChanged(int)));
-	hbox->addWidget(new QLabel(SIGN_MULTIPLICATION));
-	QSpinBox *columnsSpin = new QSpinBox(dialog);
-	columnsSpin->setRange(1, 20);
-	columnsSpin->setValue(8);
-	columnsSpin->setAlignment(Qt::AlignRight);
-	hbox->addWidget(columnsSpin);
-	connect(columnsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixColumnsChanged(int)));
-	QTableWidget *w = new QTableWidget(dialog);
-	QFontMetrics fm(w->font());
-	w->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-	QTableWidgetItem *proto = new QTableWidgetItem();
-	proto->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-	w->setItemPrototype(proto);
-	rowsSpin->setProperty("QALCULATE TABLE", QVariant::fromValue((void*) w));
-	columnsSpin->setProperty("QALCULATE TABLE", QVariant::fromValue((void*) w));
-	w->setRowCount(8);
-	w->setColumnCount(8);
-	w->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+	MatrixWidget *w = new MatrixWidget(dialog);
+	w->setMatrixString(textCursor().selectedText());
 	box->addWidget(w);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
 	box->addWidget(buttonBox);
 	w->setFocus();
-	dialog->resize(fm.boundingRect("000000").width() * 12, dialog->sizeHint().height());
 	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
 	if(dialog->exec() == QDialog::Accepted) {
-		int max_c = -1, max_r = -1;
-		for(int r = 0; r < w->rowCount(); r++) {
-			bool b = false;
-			for(int c = 0; c < w->columnCount(); c++) {
-				QTableWidgetItem *item = w->item(r, c);
-				if(item && !item->text().isEmpty()) {
-					b = true;
-					if(c > max_c) max_c = c;
-				}
-			}
-			if(b) max_r = r;
-		}
-		if(max_r >= 0) {
-			QString str = "[";
-			for(int r = 0; r <= max_r; r++) {
-				if(r > 0) str += ", ";
-				str += "[";
-				for(int c = 0; c <= max_c; c++) {
-					if(c > 0) str += ", ";
-					QTableWidgetItem *item = w->item(r, c);
-					if(!item || item->text().isEmpty()) str += "0";
-					else str += item->text();
-				}
-				str += "]";
-			}
-			str += "]";
-			insertPlainText(str);
+		if(!w->isEmpty()) {
+			insertPlainText(w->getMatrixString());
 		}
 	}
 	dialog->deleteLater();
@@ -3107,5 +3037,9 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 		return true;
 	}
 	return false;
+}
+QString ExpressionEdit::selectedText(bool b) {
+	if(b && !textCursor().hasSelection()) return toPlainText();
+	return textCursor().selectedText();
 }
 

@@ -72,7 +72,9 @@ class MathTextEdit : public QPlainTextEdit {
 };
 
 FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
-	QGridLayout *grid = new QGridLayout(this);
+	QVBoxLayout *topbox = new QVBoxLayout(this);
+	QGridLayout *grid = new QGridLayout();
+	topbox->addLayout(grid);
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
 	grid->addWidget(nameEdit, 0, 1);
@@ -88,7 +90,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addLayout(box, 3, 0, 1, 2);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
-	grid->addWidget(buttonBox, 4, 0, 1, 2);
+	topbox->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));

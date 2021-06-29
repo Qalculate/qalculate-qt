@@ -99,6 +99,13 @@ class QalculateQtSettings : QObject {
 		QByteArray units_geometry, units_vsplitter_state, units_hsplitter_state;
 		QByteArray variables_geometry, variables_vsplitter_state, variables_hsplitter_state;
 
+		PlotLegendPlacement default_plot_legend_placement;
+		PlotStyle default_plot_style;
+		PlotSmoothing default_plot_smoothing;
+		bool default_plot_display_grid, default_plot_full_border, default_plot_use_sampling_rate, default_plot_rows, default_plot_color;
+		std::string default_plot_min, default_plot_max, default_plot_step, default_plot_variable;
+		int default_plot_sampling_rate, default_plot_linewidth, default_plot_type, max_plot_time;
+
 };
 
 class MathLineEdit : public QLineEdit {
