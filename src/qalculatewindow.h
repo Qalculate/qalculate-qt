@@ -52,7 +52,7 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
-		static bool displayMessages(QWidget *parent = NULL);
+		bool displayMessages();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 		void executeFromFile(const QString&);
 
@@ -161,16 +161,9 @@ class QalculateWindow : public QMainWindow {
 		void onCustomOutputBaseChanged(int);
 		void inputBaseActivated();
 		void onCustomInputBaseChanged(int);
-		void editPreferences();
-		void openFunctions();
-		void openUnits();
-		void openVariables();
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
 		void approximationActivated();
-		void applyFunction(MathFunction*);
-		void openFPConversion();
-		void openPlot();
 		void openCalendarConversion();
 		void onInsertFunctionExec();
 		void onInsertFunctionRPN();
@@ -222,7 +215,18 @@ class QalculateWindow : public QMainWindow {
 		void newUnknown();
 		void newFunction();
 		void convertToUnit(Unit*);
+		void importCSV();
+		void exportCSV();
+		void editPreferences();
+		void openFunctions();
+		void openUnits();
+		void openVariables();
+		void applyFunction(MathFunction*);
+		void openFPConversion();
+		void openPlot();
 		void negate();
+		void checkVersion();
+		void reportBug();
 
 	signals:
 

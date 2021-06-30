@@ -294,7 +294,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
 	button = new KeypadButton("ANS", this);
 	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
-	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Last answer (static)"));
+	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Previous answer (static)"));
 	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));

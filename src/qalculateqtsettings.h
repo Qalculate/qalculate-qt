@@ -68,8 +68,10 @@ class QalculateQtSettings : QObject {
 		void updateMessagePrintOptions();
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
-
+		bool displayMessages(QWidget *parent);
 		bool isAnswerVariable(Variable *v);
+		void checkVersion(bool force, QWidget *parent);
+		void autoUpdate(std::string new_version, QWidget *parent);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
@@ -105,6 +107,10 @@ class QalculateQtSettings : QObject {
 		bool default_plot_display_grid, default_plot_full_border, default_plot_use_sampling_rate, default_plot_rows, default_plot_color;
 		std::string default_plot_min, default_plot_max, default_plot_step, default_plot_variable;
 		int default_plot_sampling_rate, default_plot_linewidth, default_plot_type, max_plot_time;
+
+		QalculateDateTime last_version_check_date;
+		bool check_version;
+		std::string last_found_version;
 
 };
 

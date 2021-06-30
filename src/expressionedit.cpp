@@ -390,7 +390,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	size_t i_match = 0;
 	if(item && cdata->to_type < 2) {
 		if((cdata->editing_to_expression || !settings->evalops.parse_options.functions_enabled) && item->type() == TYPE_FUNCTION) {}
-		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && (!((Variable*) item)->isKnown() || ((KnownVariable*) item)->unit().empty())))) {}
+		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && !((Variable*) item)->isKnown()))) {}
 		else if(!settings->evalops.parse_options.units_enabled && item->type() == TYPE_UNIT) {}
 		else {
 			CompositeUnit *cu = NULL;
@@ -546,6 +546,8 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		}
 	} else if(item && cdata->to_type == 5) {
 		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
+	} else if(item && cdata->to_type == 2 && str.empty() && cdata->current_from_struct) {
+		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger()) b_match = 2;
 	} else if(prefix && cdata->to_type < 2) {
 		for(size_t name_i = 1; name_i <= prefix->countNames() && !b_match; name_i++) {
 			const std::string *pname = &prefix->getName(name_i).name;

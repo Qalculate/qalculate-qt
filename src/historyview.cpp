@@ -300,7 +300,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
-		copyFormattedAction = cmenu->addAction(tr("Copy (formatted)"), this, SLOT(copy()));
+		copyFormattedAction = cmenu->addAction(tr("Copy Formatted Text"), this, SLOT(copy()));
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);

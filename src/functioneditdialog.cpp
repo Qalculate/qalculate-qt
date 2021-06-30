@@ -104,7 +104,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(QMessageBox::question(this, tr("Question"), tr("An function with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		if(QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
@@ -136,7 +136,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
-		if(QMessageBox::question(this, tr("Question"), tr("An function with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		if(QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}

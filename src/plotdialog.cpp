@@ -29,7 +29,6 @@
 
 #include "qalculateqtsettings.h"
 #include "plotdialog.h"
-#include "qalculatewindow.h"
 
 #define TYPE_ROLE Qt::UserRole
 #define YAXIS2_ROLE Qt::UserRole + 1
@@ -105,7 +104,8 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	removeButton = new QPushButton(tr("Remove"), this); hbox->addWidget(removeButton);
 	removeButton->setEnabled(false);
 	connect(removeButton, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
-	graphsTable = new QTreeWidget(this); grid->addWidget(graphsTable, r, 0, 1, 2); r++;
+	graphsTable = new QTreeWidget(this); grid->addWidget(graphsTable, r, 0, 1, 2);
+	grid->setRowStretch(r, 1); r++;
 	graphsTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	graphsTable->headerItem()->setText(0, tr("Category"));
 	graphsTable->setColumnCount(2);
@@ -138,7 +138,8 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	stepButton->setChecked(!settings->default_plot_use_sampling_rate);
 	stepEdit->setEnabled(!settings->default_plot_use_sampling_rate);
 	connect(group, SIGNAL(idToggled(int, bool)), this, SLOT(onRateStepToggled(int, bool)));
-	applyButton2 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton2, r, 0, 1, 2, Qt::AlignRight);
+	applyButton2 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton2, r, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
+	grid->setRowStretch(r, 1);
 	connect(applyButton2, SIGNAL(clicked()), this, SLOT(onApply2Clicked()));
 
 	tab = new QWidget(this);
@@ -187,7 +188,8 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	legendCombo->addItem(tr("Below"), PLOT_LEGEND_BELOW);
 	legendCombo->addItem(tr("Outside"), PLOT_LEGEND_OUTSIDE);
 	legendCombo->setCurrentIndex(legendCombo->findData(settings->default_plot_legend_placement));
-	applyButton3 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton3, r, 0, 1, 2, Qt::AlignRight);
+	applyButton3 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton3, r, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
+	grid->setRowStretch(r, 1);
 	connect(applyButton3, SIGNAL(clicked()), this, SLOT(onApply3Clicked()));
 
 	expressionEdit->setFocus();
@@ -272,13 +274,13 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 		MathStructure min;
 		if(!CALCULATOR->calculate(&min, CALCULATOR->unlocalizeExpression(minxEdit->text().toStdString(), eo.parse_options), 1000, eo)) {
 			QMessageBox::critical(this, tr("Error"), tr("It took too long to generate the plot data."), QMessageBox::Ok);
-			QalculateWindow::displayMessages(this);
+			settings->displayMessages(this);
 			return;
 		}
 		MathStructure max;
 		if(!CALCULATOR->calculate(&max, CALCULATOR->unlocalizeExpression(maxxEdit->text().toStdString(), eo.parse_options), 1000, eo)) {
 			QMessageBox::critical(this, tr("Error"), tr("It took too long to generate the plot data."), QMessageBox::Ok);
-			QalculateWindow::displayMessages(this);
+			settings->displayMessages(this);
 			return;
 		}
 		if(stepButton->isChecked()) {
@@ -288,7 +290,7 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 		}
 	}
 	CALCULATOR->endTemporaryStopIntervalArithmetic();
-	QalculateWindow::displayMessages(this);
+	settings->displayMessages(this);
 }
 bool PlotDialog::generatePlot(PlotParameters &pp, std::vector<MathStructure> &y_vectors, std::vector<MathStructure> &x_vectors, std::vector<PlotDataParameters*> &pdps) {
 	for(int i = 0; ; i++) {
@@ -410,7 +412,7 @@ void PlotDialog::updatePlot() {
 		return;
 	}
 	CALCULATOR->plotVectors(&pp, y_vectors, x_vectors, pdps, false, settings->max_plot_time * 1000);
-	QalculateWindow::displayMessages(this);
+	settings->displayMessages(this);
 	for(size_t i = 0; i < pdps.size(); i++) {
 		if(pdps[i]) delete pdps[i];
 	}

@@ -29,6 +29,7 @@
 #include "itemproxymodel.h"
 #include "unknowneditdialog.h"
 #include "variableeditdialog.h"
+#include "csvdialog.h"
 
 VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout *topbox = new QVBoxLayout(this);
@@ -80,8 +81,9 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	menu->addAction(tr("Matrix…"), this, SLOT(newMatrix()));
 	newButton->setMenu(menu);
 	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
+	exportButton = new QPushButton(tr("Export…"), this); box->addWidget(exportButton); connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
+	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	box->addSpacing(24);
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
@@ -245,6 +247,12 @@ void VariablesDialog::insertClicked() {
 		emit insertVariableRequest(v);
 	}
 }
+void VariablesDialog::exportClicked() {
+	QModelIndex index = variablesView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	Variable *v = (Variable*) index.data(Qt::UserRole).value<void*>();
+	if(v && v->isKnown()) CSVDialog::exportCSVFile(this, NULL, (KnownVariable*) v);
+}
 void VariablesDialog::deactivateClicked() {
 	QModelIndex index = variablesView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
@@ -333,6 +341,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 				}
 			}
 			editButton->setEnabled(!v->isBuiltin());
+			exportButton->setEnabled(v->isKnown() && ((KnownVariable*) v)->get().isVector());
 			insertButton->setEnabled(v->isActive());
 			delButton->setEnabled(v->isLocal());
 			deactivateButton->setEnabled(!settings->isAnswerVariable(v) && v != settings->v_memory);
@@ -342,6 +351,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 	}
 	editButton->setEnabled(false);
 	insertButton->setEnabled(false);
+	exportButton->setEnabled(false);
 	delButton->setEnabled(false);
 	deactivateButton->setEnabled(false);
 	descriptionView->clear();

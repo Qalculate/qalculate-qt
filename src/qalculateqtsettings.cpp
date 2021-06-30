@@ -219,6 +219,12 @@ void QalculateQtSettings::loadPreferences() {
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	keep_function_dialog_open = false;
+#ifdef _WIN32
+	check_version = true;
+#else
+	check_version = false;
+#endif
+	last_version_check_date.setToCurrentDate();
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -369,13 +375,13 @@ void QalculateQtSettings::loadPreferences() {
 					default_plot_linewidth = v;
 				} else if(svar == "max_plot_time") {
 					max_plot_time = v;
-				/*} else if(svar == "check_version") {
+				} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
 					last_version_check_date.set(svalue);
 				} else if(svar == "last_found_version") {
 					last_found_version = svalue;
-				} else if(svar == "bit_width") {
+				/*} else if(svar == "bit_width") {
 					default_bits = v;
 				} else if(svar == "signed_integer") {
 					default_signed = v;*/
@@ -705,11 +711,11 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "\n[General]\n");
 	fprintf(file, "version=%s\n", VERSION);
 	fprintf(file, "ignore_locale=%i\n", ignore_locale);
-	/*fprintf(file, "check_version=%i\n", check_version);
+	fprintf(file, "check_version=%i\n", check_version);
 	if(check_version) {
 		fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
 		if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
-	}*/
+	}
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
@@ -954,5 +960,136 @@ void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent
 		}
 	}
 	b_busy--;
+}
+bool QalculateQtSettings::displayMessages(QWidget *parent) {
+	if(!CALCULATOR->message()) return false;
+	std::string str = "";
+	int index = 0;
+	MessageType mtype, mtype_highest = MESSAGE_INFORMATION;
+	while(true) {
+		mtype = CALCULATOR->message()->type();
+		if(index > 0) {
+			if(index == 1) str = "• " + str;
+				str += "\n• ";
+		}
+		str += CALCULATOR->message()->message();
+		if(mtype == MESSAGE_ERROR || (mtype_highest != MESSAGE_ERROR && mtype == MESSAGE_WARNING)) {
+			mtype_highest = mtype;
+		}
+		index++;
+		if(!CALCULATOR->nextMessage()) break;
+	}
+	if(!str.empty()) {
+		if(mtype_highest == MESSAGE_ERROR) QMessageBox::critical(parent, tr("Error"), QString::fromStdString(str), QMessageBox::Ok);
+		else if(mtype_highest == MESSAGE_WARNING) QMessageBox::warning(parent, tr("Warning"), QString::fromStdString(str), QMessageBox::Ok);
+		else QMessageBox::information(parent, tr("Information"), QString::fromStdString(str), QMessageBox::Ok);
+	}
+	return false;
+}
+
+#ifdef AUTO_UPDATE
+#	include <QProcess>
+void QalculateQtSettings::autoUpdate(std::string new_version, QWidget *parent) {
+	char selfpath[1000];
+	ssize_t n = readlink("/proc/self/exe", selfpath, 999);
+	if(n < 0 || n >= 999) {
+		QMessageBox::critical(parent, tr("Error"), tr("Path of executable not found."));
+		return;
+	}
+	selfpath[n] = '\0';
+	std::string selfdir = selfpath;
+	size_t i = selfdir.rfind("/");
+	if(i != string::npos) selfdir.substr(0, i);
+	FILE *pipe = popen("curl --version 1>/dev/null", "w");
+	if(!pipe) {
+		QMessageBox::critical(parent, tr("Error"), tr("curl not found."));
+		return;
+	}
+	pclose(pipe);
+	std::string tmpdir = getLocalTmpDir();
+	recursiveMakeDir(tmpdir);
+	string script = "#!/bin/sh\n\n";
+	script += "echo \"Updating Qalculate!...\";\n";
+	script += "sleep 1;\n";
+	script += "new_version="; script += new_version; script += ";\n";
+	script += "if cd \""; script += tmpdir; script += "\"; then\n";
+	script += "\tif curl -L -o qalculate-${new_version}-x86_64.tar.xz https://github.com/Qalculate/qalculate-gtk/releases/download/v${new_version}/qalculate-${new_version}-x86_64.tar.xz; then\n";
+	script += "\t\techo \"Extracting files...\";\n";
+	script += "\t\tif tar -xJf qalculate-${new_version}-x86_64.tar.xz; then\n";
+	script += "\t\t\tcd  qalculate-${new_version};\n";
+	script += "\t\t\tif cp -f qalculate-qt \""; script += selfpath; script += "\"; then\n";
+	script += "\t\t\t\tcp -f qalc \""; script += selfdir; script += "/\";\n";
+	script += "\t\t\t\tcd ..;\n\t\t\trm -r qalculate-${new_version};\n\t\t\trm qalculate-${new_version}-x86_64.tar.xz;\n";
+	script += "\t\t\t\texit 0;\n";
+	script += "\t\t\tfi\n";
+	script += "\t\t\tcd ..;\n\t\trm -r qalculate-${new_version};\n";
+	script += "\t\tfi\n";
+	script += "\t\trm qalculate-${new_version}-x86_64.tar.xz;\n";
+	script += "\tfi\n";
+	script += "fi\n";
+	script += "echo \"Update failed\";\n";
+	script += "echo \"Press Enter to continue\";\n";
+	script += "read _;\n";
+	script += "exit 1\n";
+	std::ofstream ofs;
+	std::string scriptpath = tmpdir; scriptpath += "/update.sh";
+	ofs.open(scriptpath.c_str(), std::ofstream::out | std::ofstream::trunc);
+	ofs << script;
+	ofs.close();
+	chmod(scriptpath.c_str(), S_IRWXU);
+	std::string termcom = "#!/bin/sh\n\n";
+	termcom += "if [ $(command -v gnome-terminal) ]; then\n";
+	termcom += "\tif gnome-terminal --wait --version; then\n\t\tdetected_term=\"gnome-terminal --wait -- \";\n";
+	termcom += "\telse\n\t\tdetected_term=\"gnome-terminal --disable-factory -- \";\n\tfi\n";
+	termcom += "elif [ $(command -v xfce4-terminal) ]; then\n\tdetected_term=\"xfce4-terminal --disable-server -e \";\n";
+	termcom += "else\n";
+	termcom += "\tfor t in x-terminal-emulator konsole alacritty qterminal xterm urxvt rxvt kitty sakura terminology termite tilix; do\n\t\tif [ $(command -v $t) ]; then\n\t\t\tdetected_term=\"$t -e \";\n\t\t\tbreak\n\t\tfi\n\tdone\nfi\n";
+	termcom += "$detected_term "; termcom += scriptpath; termcom += ";\n";
+	termcom += "exec "; termcom += selfpath; termcom += "\n";
+	std::ofstream ofs2;
+	std::string scriptpath2 = tmpdir; scriptpath2 += "/terminal.sh";
+	ofs2.open(scriptpath2.c_str(), std::ofstream::out | std::ofstream::trunc);
+	ofs2 << termcom;
+	ofs2.close();
+	chmod(scriptpath2.c_str(), S_IRWXU);
+	if(QProcess::execute(scriptpath2.c_str()) != 0) {
+		QMessageBox::critical(parent, tr("Error"), tr("Failed to run update script.\n%1").arg(error->message));
+		return;
+	}
+	qApp->closeAllWindows();
+}
+#else
+void QalculateQtSettings::autoUpdate(std::string, QWidget*) {}
+#endif
+
+void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
+	if(!force) {
+		if(!check_version) return;
+		QalculateDateTime next_version_check_date(last_version_check_date);
+		next_version_check_date.addDays(14);
+		if(next_version_check_date.isFutureDate()) return;
+	}
+	std::string new_version;
+#ifdef _WIN32
+	int ret = checkAvailableVersion("windows", VERSION, &new_version, force ? 10 : 5);
+#else
+	int ret = checkAvailableVersion("qalculate-qt", VERSION, &new_version, force ? 10 : 5);
+#endif
+	if(force && ret <= 0) {
+		if(ret < 0) QMessageBox::critical(parent, tr("Error"), tr("Failed to check for updates."));
+		else QMessageBox::information(parent, QString(), tr("No updates found."));
+		if(ret < 0) return;
+	}
+	if(ret > 0 && (force || new_version != last_found_version)) {
+		last_found_version = new_version;
+#ifdef AUTO_UPDATE
+		if(QMessageBox::question(parent, QString(), tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes)) {
+			autoUpdate(new_version);
+		}
+#else
+		QMessageBox::information(parent, QString(), tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)));
+#endif
+	}
+	last_version_check_date.setToCurrentDate();
 }
 

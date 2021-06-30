@@ -73,8 +73,8 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout *box = new QVBoxLayout();
 	newButton = new QPushButton(tr("New…"), this); box->addWidget(newButton); connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
 	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
+	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
 	box->addSpacing(24);
 	calculateButton = new QPushButton(tr("Calculate…"), this); box->addWidget(calculateButton); connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateClicked()));
 	calculateButton->setDefault(true);

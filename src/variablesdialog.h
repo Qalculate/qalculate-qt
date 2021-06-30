@@ -37,7 +37,7 @@ class VariablesDialog : public QDialog {
 		QTextEdit *descriptionView;
 		ItemProxyModel *variablesModel;
 		QStandardItemModel *sourceModel;
-		QPushButton *deactivateButton, *insertButton, *delButton, *editButton, *newButton;
+		QPushButton *deactivateButton, *insertButton, *delButton, *exportButton, *editButton, *newButton;
 		QLineEdit *searchEdit;
 		QSplitter *vsplitter, *hsplitter;
 
@@ -59,6 +59,7 @@ class VariablesDialog : public QDialog {
 		void editClicked();
 		void delClicked();
 		void insertClicked();
+		void exportClicked();
 		void deactivateClicked();
 		void searchChanged(const QString&);
 

@@ -49,6 +49,16 @@ int main(int argc, char **argv) {
 	app.setOrganizationName("qalculate");
 	app.setApplicationVersion(VERSION);
 
+	settings = new QalculateQtSettings();
+
+	QalculateTranslator eqtr;
+	app.installTranslator(&eqtr);
+	if(!settings->ignore_locale) {
+		if(translator.load(QLocale(), QLatin1String("qalculate"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
+		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
+	}
+
 	QCommandLineParser *parser = new QCommandLineParser();
 	QCommandLineOption fOption(QStringList() << "f" << "file", QApplication::tr("Execute expressions and commands from a file"), QApplication::tr("FILE"));
 	parser->addOption(fOption);
@@ -100,16 +110,6 @@ int main(int argc, char **argv) {
 
 	app.setWindowIcon(LOAD_APP_ICON("qalculate-qt"));
 
-	settings = new QalculateQtSettings();
-
-	if(!settings->ignore_locale) {
-		QalculateTranslator eqtr;
-		app.installTranslator(&eqtr);
-		if(translator.load(QLocale(), QLatin1String("qalculate"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
-		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
-		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
-	}
-
 	new Calculator(settings->ignore_locale);
 
 	CALCULATOR->setExchangeRatesWarningEnabled(false);
@@ -125,6 +125,7 @@ int main(int argc, char **argv) {
 	}
 
 	settings->f_answer->setCategory(CALCULATOR->getFunctionById(FUNCTION_ID_WARNING)->category());
+	settings->f_answer->setChanged(false);
 
 	CALCULATOR->loadLocalDefinitions();
 
@@ -149,8 +150,9 @@ int main(int argc, char **argv) {
 	}
 	expression = expression.trimmed();
 	if(!expression.isEmpty()) win->calculate(expression);
-
 	args.clear();
+
+	settings->checkVersion(false, win);
 
 	QColor c = QApplication::palette().base().color();
 	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
@@ -163,7 +165,7 @@ int main(int argc, char **argv) {
 QalculateTranslator::QalculateTranslator() : QTranslator() {}
 QString	QalculateTranslator::translate(const char *context, const char *sourceText, const char *disambiguation, int n) const {
 	if(!translator_qt.translate(context, sourceText, disambiguation, n).isEmpty() || !translator_qtbase.translate(context, sourceText, disambiguation, n).isEmpty()) return QString();
-	if(strcmp(context, "EqonomizeTranslator") == 0) return QString();
+	if(strcmp(context, "QalculateTranslator") == 0) return QString();
 	//: Only used when Qt translation is missing
 	if(strcmp(sourceText, "OK") == 0) return tr("OK");
 	//: Only used when Qt translation is missing
