@@ -9,8 +9,8 @@
     (at your option) any later version.
 */
 
-#ifndef FUNCTIONS_DIALOG_H
-#define FUNCTIONS_DIALOG_H
+#ifndef UNITS_DIALOG_H
+#define UNITS_DIALOG_H
 
 #include <QDialog>
 
@@ -28,49 +28,58 @@ class ItemProxyModel;
 class QComboBox;
 class QLabel;
 
-class FunctionsDialog : public QDialog {
+class UnitsDialog : public QDialog {
 
 	Q_OBJECT
 
 	protected:
 
-		QTreeView *functionsView;
+		QTreeView *unitsView;
 		QTreeWidget *categoriesView;
 		QTextEdit *descriptionView;
-		ItemProxyModel *functionsModel;
-		QStandardItemModel *sourceModel;
-		QPushButton *deactivateButton, *calculateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
-		QLineEdit *searchEdit;
+		ItemProxyModel *unitsModel, *toModel;
+		QStandardItemModel *sourceModel, *toSourceModel;
+		QPushButton *deactivateButton, *insertButton, *delButton, *editButton, *newButton, *convertButton;
+		QLineEdit *searchEdit, *fromEdit, *toEdit;
 		QSplitter *vsplitter, *hsplitter;
+		QLabel *fromLabel, *equalsLabel;
+		QComboBox *toCombo;
+		bool last_from;
 
 		std::string selected_category;
 		ExpressionItem *selected_item;
 
 		void keyPressEvent(QKeyEvent *event) override;
 		void closeEvent(QCloseEvent*) override;
+		void convert(bool from);
 
 	protected slots:
 
 		void selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*);
-		void selectedFunctionChanged(const QModelIndex&, const QModelIndex&);
+		void selectedUnitChanged(const QModelIndex&, const QModelIndex&);
 
 		void newClicked();
 		void editClicked();
 		void delClicked();
-		void applyClicked();
 		void insertClicked();
-		void calculateClicked();
+		void convertClicked();
 		void deactivateClicked();
 		void searchChanged(const QString&);
+		void fromChanged();
+		void toChanged();
+		void toUnitChanged();
+		void fromUnitChanged();
+		void onUnitActivated(const QModelIndex&);
 
 	public:
 
-		FunctionsDialog(QWidget *parent = NULL);
-		virtual ~FunctionsDialog();
+		UnitsDialog(QWidget *parent = NULL);
+		virtual ~UnitsDialog();
 
-		void updateFunctions();
+		void updateUnits();
 		void setSearch(const QString&);
 		void selectCategory(std::string);
+		void unitRemoved(Unit*);
 
 	public slots:
 
@@ -79,11 +88,12 @@ class FunctionsDialog : public QDialog {
 	signals:
 
 		void itemsChanged();
-		void applyFunctionRequest(MathFunction*);
-		void insertFunctionRequest(MathFunction*);
-		void calculateFunctionRequest(MathFunction*);
+		void variableRemoved(Variable*);
+		void insertUnitRequest(Unit*);
+		void convertToUnitRequest(Unit*);
+		void unitActivated(Unit*);
 
 };
 
-#endif //FUNCTIONS_DIALOG_H
+#endif //UNITS_DIALOG_H
 

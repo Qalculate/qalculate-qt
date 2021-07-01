@@ -9,8 +9,8 @@
     (at your option) any later version.
 */
 
-#ifndef FUNCTIONS_DIALOG_H
-#define FUNCTIONS_DIALOG_H
+#ifndef VARIABLES_DIALOG_H
+#define VARIABLES_DIALOG_H
 
 #include <QDialog>
 
@@ -25,21 +25,19 @@ class QPushButton;
 class QLineEdit;
 class QSplitter;
 class ItemProxyModel;
-class QComboBox;
-class QLabel;
 
-class FunctionsDialog : public QDialog {
+class VariablesDialog : public QDialog {
 
 	Q_OBJECT
 
 	protected:
 
-		QTreeView *functionsView;
+		QTreeView *variablesView;
 		QTreeWidget *categoriesView;
 		QTextEdit *descriptionView;
-		ItemProxyModel *functionsModel;
+		ItemProxyModel *variablesModel;
 		QStandardItemModel *sourceModel;
-		QPushButton *deactivateButton, *calculateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
+		QPushButton *deactivateButton, *insertButton, *delButton, *exportButton, *editButton, *newButton;
 		QLineEdit *searchEdit;
 		QSplitter *vsplitter, *hsplitter;
 
@@ -48,29 +46,32 @@ class FunctionsDialog : public QDialog {
 
 		void keyPressEvent(QKeyEvent *event) override;
 		void closeEvent(QCloseEvent*) override;
+		void newVariable(int);
 
 	protected slots:
 
 		void selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*);
-		void selectedFunctionChanged(const QModelIndex&, const QModelIndex&);
+		void selectedVariableChanged(const QModelIndex&, const QModelIndex&);
 
-		void newClicked();
+		void newVariable();
+		void newMatrix();
+		void newUnknown();
 		void editClicked();
 		void delClicked();
-		void applyClicked();
 		void insertClicked();
-		void calculateClicked();
+		void exportClicked();
 		void deactivateClicked();
 		void searchChanged(const QString&);
 
 	public:
 
-		FunctionsDialog(QWidget *parent = NULL);
-		virtual ~FunctionsDialog();
+		VariablesDialog(QWidget *parent = NULL);
+		virtual ~VariablesDialog();
 
-		void updateFunctions();
+		void updateVariables();
 		void setSearch(const QString&);
 		void selectCategory(std::string);
+		void variableRemoved(Variable*);
 
 	public slots:
 
@@ -79,11 +80,11 @@ class FunctionsDialog : public QDialog {
 	signals:
 
 		void itemsChanged();
-		void applyFunctionRequest(MathFunction*);
-		void insertFunctionRequest(MathFunction*);
-		void calculateFunctionRequest(MathFunction*);
+		void unitRemoved(Unit*);
+		void applyVariableRequest(Variable*);
+		void insertVariableRequest(Variable*);
 
 };
 
-#endif //FUNCTIONS_DIALOG_H
+#endif //VARIABLES_DIALOG_H
 

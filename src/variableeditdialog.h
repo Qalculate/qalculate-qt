@@ -19,6 +19,7 @@
 class QLineEdit;
 class QCheckBox;
 class QPushButton;
+class MatrixWidget;
 
 class VariableEditDialog : public QDialog {
 
@@ -29,27 +30,33 @@ class VariableEditDialog : public QDialog {
 		QLineEdit *nameEdit, *valueEdit;
 		QCheckBox *temporaryBox;
 		QPushButton *okButton;
-		bool b_empty;
+		MatrixWidget *matrixEdit;
+		bool b_empty, b_matrix, b_changed;
 
 	protected slots:
 
 		void onNameEdited(const QString&);
 		void onValueEdited(const QString&);
+		void onMatrixDimensionChanged();
+		void onMatrixChanged();
 
 	public:
 
-		VariableEditDialog(QWidget *parent = NULL, bool allow_empty_value = true);
+		VariableEditDialog(QWidget *parent = NULL, bool allow_empty_value = true, bool edit_matrix = false);
 		virtual ~VariableEditDialog();
 
-		KnownVariable *createVariable(MathStructure *default_value = NULL);
-		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL);
+		KnownVariable *createVariable(MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
+		bool modifyVariable(KnownVariable *v, MathStructure *default_value = NULL, ExpressionItem **replaced_item = NULL);
 		void setVariable(KnownVariable *v);
 		void setValue(const QString&);
+		void disableValue();
+		bool valueHasChanged() const;
 		QString value() const;
 		void setName(const QString&);
 
-		static bool editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value = NULL);
-		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString());
+		static bool editVariable(QWidget *parent, KnownVariable *v, ExpressionItem **replaced_item = NULL);
+		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString(), ExpressionItem **replaced_item = NULL);
+		static KnownVariable* newMatrix(QWidget *parent, ExpressionItem **replaced_item = NULL);
 
 };
 

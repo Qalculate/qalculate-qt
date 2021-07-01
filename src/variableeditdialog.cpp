@@ -16,28 +16,41 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QLabel>
+#include <QVBoxLayout>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
 #include "variableeditdialog.h"
+#include "matrixwidget.h"
 
-VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value) : QDialog(parent), b_empty(allow_empty_value) {
-	QGridLayout *grid = new QGridLayout(this);
+VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, bool edit_matrix) : QDialog(parent), b_empty(allow_empty_value), b_matrix(edit_matrix), b_changed(false) {
+	QVBoxLayout *box = new QVBoxLayout(this);
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
 	grid->addWidget(nameEdit, 0, 1);
-	grid->addWidget(new QLabel(tr("Value:"), this), 1, 0);
-	valueEdit = new QLineEdit(this);
-	if(b_empty) valueEdit->setPlaceholderText(tr("current result"));
-	grid->addWidget(valueEdit, 1, 1);
 	temporaryBox = new QCheckBox(tr("Temporary"), this);
 	temporaryBox->setChecked(true);
 	grid->addWidget(temporaryBox, 2, 0, 1, 2, Qt::AlignRight);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
-	grid->addWidget(buttonBox, 3, 0, 1, 2);
+	box->addWidget(buttonBox);
+	if(b_matrix) {
+		matrixEdit = new MatrixWidget(this);
+		grid->addWidget(matrixEdit, 1, 0, 1, 2);
+		connect(matrixEdit, SIGNAL(matrixChanged()), this, SLOT(onMatrixChanged()));
+		connect(matrixEdit, SIGNAL(dimensionChanged(int, int)), this, SLOT(onMatrixDimensionChanged()));
+	} else {
+		grid->addWidget(new QLabel(tr("Value:"), this), 1, 0);
+		valueEdit = new MathLineEdit(this);
+		valueEdit->setAlignment(Qt::AlignRight);
+		if(b_empty) valueEdit->setPlaceholderText(tr("current result"));
+		grid->addWidget(valueEdit, 1, 1);
+		connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
+	}
+	nameEdit->setFocus();
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
-	if(!b_empty) connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	okButton->setEnabled(false);
@@ -45,45 +58,70 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value) 
 }
 VariableEditDialog::~VariableEditDialog() {}
 
-KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value) {
+void VariableEditDialog::onMatrixDimensionChanged() {
+	b_changed = true;
+}
+void VariableEditDialog::onMatrixChanged() {
+	b_changed = true;
+	if(!b_empty) okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
+}
+bool VariableEditDialog::valueHasChanged() const {
+	return b_changed;
+}
+KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, ExpressionItem **replaced_item) {
+	if(replaced_item) *replaced_item = NULL;
+	Variable *var = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString())) {
 		if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
+		if(replaced_item) {
+			var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+			else *replaced_item = var;
+		}
 	}
 	KnownVariable *v;
-	Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 	if(var && var->isLocal() && var->isKnown()) {
 		v = (KnownVariable*) var;
+		if(v->countNames() > 1) v->clearNames();
+		v->setHidden(false); v->setDescription(""); v->setTitle("");
 		if(!modifyVariable(v, default_value)) return NULL;
 		return v;
 	}
-	if(default_value && valueEdit->text().isEmpty()) {
+	if(default_value && ((!b_matrix && valueEdit->text().isEmpty()) || !b_changed)) {
 		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), *default_value);
 	} else {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), CALCULATOR->unlocalizeExpression(valueEdit->text().trimmed().toStdString(), pa));
+		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), CALCULATOR->unlocalizeExpression(b_matrix ? matrixEdit->getMatrixString().toStdString() : valueEdit->text().toStdString(), pa));
 	}
 	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
 	v->setChanged(false);
 	CALCULATOR->addVariable(v);
 	return v;
 }
-bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value) {
+bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value, ExpressionItem **replaced_item) {
+	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
 		if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
+		if(replaced_item) {
+			Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+			else if(var != v) *replaced_item = var;
+		}
 	}
-	if(v->countNames() > 1) v->clearNames();
+	if(v->countNames() > 1 && v->getName(1).name != nameEdit->text().trimmed().toStdString()) v->clearNames();
 	v->setName(nameEdit->text().trimmed().toStdString());
-	if(default_value && valueEdit->text().isEmpty()) {
+	v->setApproximate(false); v->setUncertainty(""); v->setUnit("");
+	if(default_value && ((!b_matrix && valueEdit->text().isEmpty()) || !b_changed)) {
 		v->set(*default_value);
 	} else {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		v->set(CALCULATOR->unlocalizeExpression(valueEdit->text().trimmed().toStdString(), pa));
+		v->set(CALCULATOR->unlocalizeExpression(b_matrix ? matrixEdit->getMatrixString().toStdString() : valueEdit->text().toStdString(), pa));
 	}
 	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
 	else if(v->category() == CALCULATOR->temporaryCategory()) v->setCategory("");
@@ -91,29 +129,44 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 }
 void VariableEditDialog::setVariable(KnownVariable *v) {
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
-	if(v->isExpression()) {
+	if(v->isExpression() && !b_matrix) {
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		valueEdit->setText(QString::fromStdString(CALCULATOR->localizeExpression(v->expression(), pa)));
+	} else if(b_matrix) {
+		matrixEdit->setMatrix(v->get());
 	} else {
 		PrintOptions po = settings->printops;
+		po.is_approximate = NULL;
 		po.allow_non_usable = false;
 		po.base = 10;
-		valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 100, po)));
+		valueEdit->setText(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
 	}
-	okButton->setEnabled(true);
+	nameEdit->setReadOnly(!v->isLocal());
+	if(b_matrix) {
+		matrixEdit->setEditable(v->isLocal());
+	} else {
+		valueEdit->setReadOnly(!v->isLocal());
+	}
+	temporaryBox->setChecked(v->category() == CALCULATOR->temporaryCategory());
+	okButton->setEnabled(v->isLocal());
+	b_changed = false;
 }
 void VariableEditDialog::onNameEdited(const QString &str) {
-	okButton->setEnabled(!str.trimmed().isEmpty() && (b_empty || !valueEdit->text().trimmed().isEmpty()));
+	okButton->setEnabled(!str.trimmed().isEmpty() && (b_empty || (!b_matrix && !valueEdit->text().trimmed().isEmpty()) || (b_matrix && b_changed)));
 	if(!str.trimmed().isEmpty() && !CALCULATOR->variableNameIsValid(str.trimmed().toStdString())) {
 		nameEdit->setText(QString::fromStdString(CALCULATOR->convertToValidVariableName(str.trimmed().toStdString())));
 	}
 }
 void VariableEditDialog::onValueEdited(const QString &str) {
-	okButton->setEnabled(!str.trimmed().isEmpty() && !nameEdit->text().trimmed().isEmpty());
+	b_changed = true;
+	if(!b_empty) okButton->setEnabled(!str.trimmed().isEmpty() && !nameEdit->text().trimmed().isEmpty());
 }
 void VariableEditDialog::setValue(const QString &str) {
 	valueEdit->setText(str);
 	if(!b_empty) onValueEdited(str);
+}
+void VariableEditDialog::disableValue() {
+	valueEdit->setReadOnly(true);
 }
 void VariableEditDialog::setName(const QString &str) {
 	nameEdit->setText(str);
@@ -122,12 +175,12 @@ void VariableEditDialog::setName(const QString &str) {
 QString VariableEditDialog::value() const {
 	return valueEdit->text();
 }
-bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, MathStructure *default_value) {
-	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL);
+bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, ExpressionItem **replaced_item) {
+	VariableEditDialog *d = new VariableEditDialog(parent, false, v->get().isMatrix() && v->get().rows() * v->get().columns() <= 10000);
 	d->setWindowTitle(tr("Edit Variable"));
 	d->setVariable(v);
 	while(d->exec() == QDialog::Accepted) {
-		if(d->modifyVariable(v, default_value)) {
+		if(d->modifyVariable(v, NULL, replaced_item)) {
 			d->deleteLater();
 			return true;
 		}
@@ -135,8 +188,43 @@ bool VariableEditDialog::editVariable(QWidget *parent, KnownVariable *v, MathStr
 	d->deleteLater();
 	return false;
 }
-KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *default_value, const QString &value_str) {
-	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && value_str.isEmpty());
+KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *default_value, const QString &value_str, ExpressionItem **replaced_item) {
+	bool edit_matrix = default_value && default_value->isMatrix() && default_value->rows() * default_value->columns() <= 10000;
+	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && (value_str.isEmpty() || value_str.length() > 1000 || edit_matrix), edit_matrix);
+	d->setWindowTitle(tr("New Variable"));
+	if(edit_matrix) {
+		KnownVariable v(CALCULATOR->temporaryCategory(), "", *default_value);
+		d->setVariable(&v);
+	} else if(value_str.length() > 1000) {
+		d->setValue(QString());
+	} else {
+		d->setValue(value_str);
+	}
+	std::string v_name;
+	int i = 1;
+	do {
+		v_name = "v"; v_name += i2s(i);
+		i++;
+	} while(CALCULATOR->nameTaken(v_name));
+	d->setName(QString::fromStdString(v_name));
+	KnownVariable *v = NULL;
+	while(d->exec() == QDialog::Accepted) {
+		if(edit_matrix) {
+			v = d->createVariable(default_value, replaced_item);
+			if(v) break;
+		} else {
+			QString str = d->value().trimmed();
+			if(default_value && str == value_str) d->setValue("");
+			v = d->createVariable(default_value, replaced_item);
+			if(v) break;
+			d->setValue(str);
+		}
+	}
+	d->deleteLater();
+	return v;
+}
+KnownVariable* VariableEditDialog::newMatrix(QWidget *parent, ExpressionItem **replaced_item) {
+	VariableEditDialog *d = new VariableEditDialog(parent, false, true);
 	d->setWindowTitle(tr("New Variable"));
 	std::string v_name;
 	int i = 1;
@@ -145,14 +233,10 @@ KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *d
 		i++;
 	} while(CALCULATOR->nameTaken(v_name));
 	d->setName(QString::fromStdString(v_name));
-	d->setValue(value_str);
 	KnownVariable *v = NULL;
 	while(d->exec() == QDialog::Accepted) {
-		QString str = d->value().trimmed();
-		if(default_value && str == value_str) d->setValue("");
-		v = d->createVariable(default_value);
+		v = d->createVariable(NULL, replaced_item);
 		if(v) break;
-		d->setValue(str);
 	}
 	d->deleteLater();
 	return v;

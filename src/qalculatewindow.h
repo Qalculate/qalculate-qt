@@ -34,7 +34,12 @@ class QToolButton;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
+class VariablesDialog;
+class UnitsDialog;
 class FPConversionDialog;
+class PlotDialog;
+class CalendarConversionDialog;
+class QTableWidget;
 struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
@@ -47,8 +52,7 @@ class QalculateWindow : public QMainWindow {
 		virtual ~QalculateWindow();
 
 		void setCommandLineParser(QCommandLineParser*);
-		void fetchExchangeRates(int timeout, int n = -1);
-		static bool displayMessages(QWidget *parent = NULL);
+		bool displayMessages();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 		void executeFromFile(const QString&);
 
@@ -64,10 +68,14 @@ class QalculateWindow : public QMainWindow {
 		QLabel *statusLabel, *statusIconLabel;
 		PreferencesDialog *preferencesDialog;
 		FunctionsDialog *functionsDialog;
+		VariablesDialog *variablesDialog;
+		UnitsDialog *unitsDialog;
 		FPConversionDialog *fpConversionDialog;
+		PlotDialog *plotDialog;
+		CalendarConversionDialog *calendarConversionDialog;
 
 		KeypadWidget *keypad;
-		QDockWidget *keypadDock, *basesDock;
+		QDockWidget *keypadDock, *basesDock, *rpnDock;
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
@@ -78,13 +86,15 @@ class QalculateWindow : public QMainWindow {
 		QTimer *ecTimer, *rfTimer;
 		QFont saved_app_font;
 
-		bool send_event, bases_shown;
+		QTableWidget *rpnView;
+		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnEditAction, *rpnClearAction;
+
+		bool send_event, bases_shown, rpn_shown;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
-		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
+		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
-		bool checkExchangeRates();
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
 		void keyPressEvent(QKeyEvent*) override;
@@ -92,6 +102,10 @@ class QalculateWindow : public QMainWindow {
 		void setPreviousExpression();
 		void setOption(std::string);
 		void updateResultBases();
+		void calculateRPN(MathFunction*);
+		void RPNRegisterAdded(std::string, int = 0);
+		void RPNRegisterRemoved(int);
+		void RPNRegisterChanged(std::string, int);
 
 	protected slots:
 
@@ -138,6 +152,7 @@ class QalculateWindow : public QMainWindow {
 		void degreesActivated();
 		void normalActivated();
 		void scientificActivated();
+		void engineeringActivated();
 		void simpleActivated();
 		void onPrecisionChanged(int);
 		void onMinDecimalsChanged(int);
@@ -146,13 +161,10 @@ class QalculateWindow : public QMainWindow {
 		void onCustomOutputBaseChanged(int);
 		void inputBaseActivated();
 		void onCustomInputBaseChanged(int);
-		void editPreferences();
-		void openFunctions();
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
 		void approximationActivated();
-		void applyFunction(MathFunction*);
-		void openFPConversion();
+		void openCalendarConversion();
 		void onInsertFunctionExec();
 		void onInsertFunctionRPN();
 		void onInsertFunctionInsert();
@@ -162,9 +174,25 @@ class QalculateWindow : public QMainWindow {
 		void onInsertFunctionEntryActivated();
 		void insertFunctionDo(FunctionDialog*);
 		void onEntrySelectFile();
+		void onEntryEditMatrix();
 		void onCalculateFunctionRequested(MathFunction*);
 		void onInsertFunctionRequested(MathFunction*);
-
+		void onUnitActivated(Unit *u);
+		void onUnitRemoved(Unit*);
+		void onVariableRemoved(Variable*);
+		void normalModeActivated();
+		void rpnModeActivated();
+		void chainModeActivated();
+		void registerUp();
+		void registerDown();
+		void registerSwap();
+		void copyRegister();
+		void rpnLastX();
+		void deleteRegister();
+		void clearStack();
+		void registerChanged(int);
+		void calculateRPN(int);
+		void toggleRPNMode();
 
 	public slots:
 
@@ -182,6 +210,23 @@ class QalculateWindow : public QMainWindow {
 		void resultDisplayUpdated();
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
+		void newVariable();
+		void newMatrix();
+		void newUnknown();
+		void newFunction();
+		void convertToUnit(Unit*);
+		void importCSV();
+		void exportCSV();
+		void editPreferences();
+		void openFunctions();
+		void openUnits();
+		void openVariables();
+		void applyFunction(MathFunction*);
+		void openFPConversion();
+		void openPlot();
+		void negate();
+		void checkVersion();
+		void reportBug();
 
 	signals:
 

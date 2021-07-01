@@ -19,7 +19,10 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QColor>
+#include <QProgressDialog>
 #include <QDebug>
+
+extern int b_busy;
 
 bool can_display_unicode_string_function(const char*, void*) {
 	return true;
@@ -36,8 +39,15 @@ bool string_is_less(std::string str1, std::string str2) {
 	if(b_uni) return QString::fromStdString(str1).compare(QString::fromStdString(str2)) < 0;
 	return str1 < str2;
 }
+bool item_in_calculator(ExpressionItem *item) {
+	if(!CALCULATOR->stillHasVariable((Variable*) item) || !CALCULATOR->stillHasFunction((MathFunction*) item) || !CALCULATOR->stillHasUnit((Unit*) item)) return false;
+	if(item->type() == STRUCT_VARIABLE) return CALCULATOR->hasVariable((Variable*) item);
+	if(item->type() == STRUCT_UNIT) return CALCULATOR->hasUnit((Unit*) item);
+	if(item->type() == STRUCT_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
+	return false;
+}
 
-AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, CALCULATOR->f_warning->category(), QApplication::tr("History Answer Value").toStdString()) {
+AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName("answer");
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
 	arg->addArgument(new IntegerArgument("", ARGUMENT_MIN_MAX_NONZERO, true, true, INTEGER_TYPE_SINT));
@@ -176,11 +186,12 @@ void QalculateQtSettings::loadPreferences() {
 	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
 	rpn_mode = false;
+	rpn_keys = true;
 	caret_as_xor = false;
 	do_imaginary_j = false;
 	color = 1;
 	colorize_result = true;
-	rpn_mode = false;
+	chain_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
 	enable_completion2 = true;
@@ -208,10 +219,33 @@ void QalculateQtSettings::loadPreferences() {
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	keep_function_dialog_open = false;
+#ifdef _WIN32
+	check_version = true;
+#else
+	check_version = false;
+#endif
+	last_version_check_date.setToCurrentDate();
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	file = fopen(filename.c_str(), "r");
+
+	default_plot_legend_placement = PLOT_LEGEND_TOP_RIGHT;
+	default_plot_display_grid = true;
+	default_plot_full_border = false;
+	default_plot_min = "0";
+	default_plot_max = "10";
+	default_plot_step = "1";
+	default_plot_sampling_rate = 1001;
+	default_plot_linewidth = 2;
+	default_plot_rows = false;
+	default_plot_type = 0;
+	default_plot_style = PLOT_STYLE_LINES;
+	default_plot_smoothing = PLOT_SMOOTHING_NONE;
+	default_plot_variable = "x";
+	default_plot_color = true;
+	default_plot_use_sampling_rate = true;
+	max_plot_time = 5;
 
 	int version_numbers[] = {3, 20, 0};
 
@@ -232,8 +266,7 @@ void QalculateQtSettings::loadPreferences() {
 				v = s2i(svalue);
 				if(svar == "version") {
 					parse_qalculate_version(svalue, version_numbers);
-				/*} else if(svar == "allow_multiple_instances") {
-					if(v == 0 && version_numbers[0] < 3) v = -1;
+				} else if(svar == "allow_multiple_instances") {
 					allow_multiple_instances = v;
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
@@ -243,9 +276,9 @@ void QalculateQtSettings::loadPreferences() {
 					save_mode_on_exit = v;
 				} else if(svar == "save_definitions_on_exit") {
 					save_defs_on_exit = v;
-				} else if(svar == "clear_history_on_exit") {
-					clear_history_on_exit = v;*/
-				} else if(svar == "window_state") {
+				}/* else if(svar == "clear_history_on_exit") {
+					clear_history_on_exit = v;
+				}*/ else if(svar == "window_state") {
 					window_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "replace_expression") {
 					replace_expression = v;
@@ -253,8 +286,12 @@ void QalculateQtSettings::loadPreferences() {
 					window_geometry = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "splitter_state") {
 					splitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "always_on_top") {
-					always_on_top = v;
+				} else if(svar == "functions_geometry") {
+					functions_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "functions_vsplitter_state") {
+					functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "functions_hsplitter_state") {
+					functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "style") {
 					style = v;
 				} else if(svar == "palette") {
@@ -306,13 +343,45 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "custom_application_font") {
 					custom_app_font = svalue;
 					save_custom_app_font = true;
-				/*} else if(svar == "check_version") {
+				} else if(svar == "plot_legend_placement") {
+					if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
+				} else if(svar == "plot_style") {
+					if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_DOTS) default_plot_style = (PlotStyle) v;
+				} else if(svar == "plot_smoothing") {
+					if(v >= PLOT_SMOOTHING_NONE && v <= PLOT_SMOOTHING_SBEZIER) default_plot_smoothing = (PlotSmoothing) v;
+				} else if(svar == "plot_display_grid") {
+					default_plot_display_grid = v;
+				} else if(svar == "plot_full_border") {
+					default_plot_full_border = v;
+				} else if(svar == "plot_min") {
+					default_plot_min = svalue;
+				} else if(svar == "plot_max") {
+					default_plot_max = svalue;
+				} else if(svar == "plot_step") {
+					default_plot_step = svalue;
+				} else if(svar == "plot_sampling_rate") {
+					default_plot_sampling_rate = v;
+				} else if(svar == "plot_use_sampling_rate") {
+					default_plot_use_sampling_rate = v;
+				} else if(svar == "plot_variable") {
+					default_plot_variable = svalue;
+				} else if(svar == "plot_rows") {
+					default_plot_rows = v;
+				} else if(svar == "plot_type") {
+					if(v >= 0 && v <= 2) default_plot_type = v;
+				} else if(svar == "plot_color") {
+					default_plot_color = v;
+				} else if(svar == "plot_linewidth") {
+					default_plot_linewidth = v;
+				} else if(svar == "max_plot_time") {
+					max_plot_time = v;
+				} else if(svar == "check_version") {
 					check_version = v;
 				} else if(svar == "last_version_check") {
 					last_version_check_date.set(svalue);
 				} else if(svar == "last_found_version") {
 					last_found_version = svalue;
-				} else if(svar == "bit_width") {
+				/*} else if(svar == "bit_width") {
 					default_bits = v;
 				} else if(svar == "signed_integer") {
 					default_signed = v;*/
@@ -479,16 +548,12 @@ void QalculateQtSettings::loadPreferences() {
 					if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 						evalops.interval_calculation = (IntervalCalculation) v;
 					}
-				/*} else if(svar == "chain_mode") {
-					chain_mode = v;*/
-				} else if(svar == "in_rpn_mode") {
+				} else if(svar == "chain_mode") {
+					chain_mode = v;
+				} else if(svar == "rpn_mode") {
 					rpn_mode = v;
-				/*} else if(svar == "rpn_keys") {
-					rpn_keys = v;*/
-				} else if(svar == "rpn_syntax") {
-					if(v) {
-						evalops.parse_options.parsing_mode = PARSING_MODE_RPN;
-					}
+				} else if(svar == "rpn_keys") {
+					rpn_keys = v;
 				} else if(svar == "limit_implicit_multiplication") {
 					evalops.parse_options.limit_implicit_multiplication = v;
 					printops.limit_implicit_multiplication = v;
@@ -559,14 +624,14 @@ void QalculateQtSettings::loadPreferences() {
 	updateMessagePrintOptions();
 
 	std::string ans_str = "ans";
-	vans[0] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str, m_undefined, QApplication::tr("Last Answer").toStdString(), false));
+	vans[0] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str, m_undefined, QApplication::tr("Last Answer").toStdString(), false, true));
 	vans[0]->addName(QApplication::tr("answer").toStdString());
 	vans[0]->addName(ans_str + "1");
-	vans[1] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "2", m_undefined, QApplication::tr("Answer 2").toStdString(), false));
-	vans[2] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "3", m_undefined, QApplication::tr("Answer 3").toStdString(), false));
-	vans[3] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "4", m_undefined, QApplication::tr("Answer 4").toStdString(), false));
-	vans[4] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "5", m_undefined, QApplication::tr("Answer 5").toStdString(), false));
-	v_memory = new KnownVariable(CALCULATOR->temporaryCategory(), "", m_zero, QApplication::tr("Memory").toStdString(), true, true);
+	vans[1] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "2", m_undefined, QApplication::tr("Answer 2").toStdString(), false, true));
+	vans[2] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "3", m_undefined, QApplication::tr("Answer 3").toStdString(), false, true));
+	vans[3] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "4", m_undefined, QApplication::tr("Answer 4").toStdString(), false, true));
+	vans[4] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "5", m_undefined, QApplication::tr("Answer 5").toStdString(), false, true));
+	v_memory = new KnownVariable(CALCULATOR->temporaryCategory(), "", m_zero, QApplication::tr("Memory").toStdString(), false, true);
 	ExpressionName ename;
 	ename.name = "MR";
 	ename.case_sensitive = true;
@@ -645,12 +710,30 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	}
 	fprintf(file, "\n[General]\n");
 	fprintf(file, "version=%s\n", VERSION);
+	fprintf(file, "ignore_locale=%i\n", ignore_locale);
+	fprintf(file, "check_version=%i\n", check_version);
+	if(check_version) {
+		fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
+		if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
+	}
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
+	if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());
+	if(!functions_vsplitter_state.isEmpty()) fprintf(file, "functions_vsplitter_state=%s\n", functions_vsplitter_state.toBase64().data());
+	if(!functions_hsplitter_state.isEmpty()) fprintf(file, "functions_hsplitter_state=%s\n", functions_hsplitter_state.toBase64().data());
+	fprintf(file, "keep_function_dialog_open=%i\n", keep_function_dialog_open);
+	if(!units_geometry.isEmpty()) fprintf(file, "units_geometry=%s\n", units_geometry.toBase64().data());
+	if(!units_vsplitter_state.isEmpty()) fprintf(file, "units_vsplitter_state=%s\n", units_vsplitter_state.toBase64().data());
+	if(!units_hsplitter_state.isEmpty()) fprintf(file, "units_hsplitter_state=%s\n", units_hsplitter_state.toBase64().data());
+	if(!variables_geometry.isEmpty()) fprintf(file, "variables_geometry=%s\n", variables_geometry.toBase64().data());
+	if(!variables_vsplitter_state.isEmpty()) fprintf(file, "variables_vsplitter_state=%s\n", variables_vsplitter_state.toBase64().data());
+	if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
 	fprintf(file, "always_on_top=%i\n", always_on_top);
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
-	fprintf(file, "ignore_locale=%i\n", ignore_locale);
+	fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
+	fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
+	//fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "display_expression_status=%i\n", display_expression_status);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
@@ -674,6 +757,9 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 	fprintf(file, "replace_expression=%i\n", replace_expression);
+	fprintf(file, "rpn_keys=%i\n", rpn_keys);
+	/*if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
+	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);*/
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
@@ -682,8 +768,13 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
 	fprintf(file, "twos_complement=%i\n", printops.twos_complement);
 	fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
+	/*fprintf(file, "twos_complement_input=%i\n", twos_complement_in);
+	fprintf(file, "hexadecimal_twos_complement_input=%i\n", hexadecimal_twos_complement_in);*/
+	fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
+	fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
 	fprintf(file, "e_notation=%i\n", printops.lower_case_e);
 	fprintf(file, "imaginary_j=%i\n", CALCULATOR->v_i->hasName("j") > 0);
+	fprintf(file, "base_display=%i\n", printops.base_display);
 	if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
 	fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
 	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
@@ -715,7 +806,6 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "place_units_separately=%i\n", printops.place_units_separately);
 	fprintf(file, "auto_post_conversion=%i\n", evalops.auto_post_conversion);
 	fprintf(file, "mixed_units_conversion=%i\n", evalops.mixed_units_conversion);
-	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 	fprintf(file, "number_base=%i\n", printops.base);
 	if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
 	fprintf(file, "number_base_expression=%i\n", evalops.parse_options.base);
@@ -742,12 +832,31 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 	else fprintf(file, "approximation=%i\n", evalops.approximation);
 	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
+	fprintf(file, "rpn_mode=%i\n", rpn_mode);
+	fprintf(file, "chain_mode=%i\n", chain_mode);
 	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
 	fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
 	fprintf(file, "spacious=%i\n", printops.spacious);
 	fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
 	fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());
 	if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_BOOLEAN) fprintf(file, "default_assumption_sign=%i\n", CALCULATOR->defaultAssumptions()->sign());
+	fprintf(file, "\n[Plotting]\n");
+	fprintf(file, "plot_legend_placement=%i\n", default_plot_legend_placement);
+	fprintf(file, "plot_style=%i\n", default_plot_style);
+	fprintf(file, "plot_smoothing=%i\n", default_plot_smoothing);
+	fprintf(file, "plot_display_grid=%i\n", default_plot_display_grid);
+	fprintf(file, "plot_full_border=%i\n", default_plot_full_border);
+	fprintf(file, "plot_min=%s\n", default_plot_min.c_str());
+	fprintf(file, "plot_max=%s\n", default_plot_max.c_str());
+	fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
+	fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
+	fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
+	fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
+	fprintf(file, "plot_rows=%i\n", default_plot_rows);
+	fprintf(file, "plot_type=%i\n", default_plot_type);
+	fprintf(file, "plot_color=%i\n", default_plot_color);
+	fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
+	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
 	fclose(file);
 
 }
@@ -802,5 +911,185 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 	}
 	QLineEdit::keyPressEvent(event);
 	if(event->key() == Qt::Key_Return) event->accept();
+}
+bool QalculateQtSettings::checkExchangeRates(QWidget *parent) {
+	int i = CALCULATOR->exchangeRatesUsed();
+	if(i == 0) return false;
+	if(auto_update_exchange_rates == 0) return false;
+	if(CALCULATOR->checkExchangeRatesDate(auto_update_exchange_rates > 0 ? auto_update_exchange_rates : 7, false, auto_update_exchange_rates == 0, i)) return false;
+	if(auto_update_exchange_rates == 0) return false;
+	bool b = false;
+	if(auto_update_exchange_rates < 0) {
+		int days = (int) floor(difftime(time(NULL), CALCULATOR->getExchangeRatesTime(i)) / 86400);
+		if(QMessageBox::question(parent, tr("Update exchange rates?"), tr("It has been %n day(s) since the exchange rates last were updated.\n\nDo you wish to update the exchange rates now?", "", days), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes) {
+			b = true;
+		}
+	}
+	if(b || auto_update_exchange_rates > 0) {
+		if(auto_update_exchange_rates <= 0) i = -1;
+		fetchExchangeRates(b ? 15 : 8, i);
+		CALCULATOR->loadExchangeRates();
+		return true;
+	}
+	return false;
+}
+class FetchExchangeRatesThread : public Thread {
+protected:
+	virtual void run();
+};
+void FetchExchangeRatesThread::run() {
+	int timeout = 15;
+	int n = -1;
+	if(!read(&timeout)) return;
+	if(!read(&n)) return;
+	CALCULATOR->fetchExchangeRates(timeout, n);
+}
+void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent) {
+	b_busy++;
+	FetchExchangeRatesThread fetch_thread;
+	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
+		if(fetch_thread.running) {
+			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates."), QString(), 0, 0, parent);
+			dialog->setWindowModality(Qt::WindowModal);
+			dialog->setMinimumDuration(200);
+			while(fetch_thread.running) {
+				qApp->processEvents();
+				sleep_ms(10);
+			}
+			dialog->deleteLater();
+		}
+	}
+	b_busy--;
+}
+bool QalculateQtSettings::displayMessages(QWidget *parent) {
+	if(!CALCULATOR->message()) return false;
+	std::string str = "";
+	int index = 0;
+	MessageType mtype, mtype_highest = MESSAGE_INFORMATION;
+	while(true) {
+		mtype = CALCULATOR->message()->type();
+		if(index > 0) {
+			if(index == 1) str = "• " + str;
+				str += "\n• ";
+		}
+		str += CALCULATOR->message()->message();
+		if(mtype == MESSAGE_ERROR || (mtype_highest != MESSAGE_ERROR && mtype == MESSAGE_WARNING)) {
+			mtype_highest = mtype;
+		}
+		index++;
+		if(!CALCULATOR->nextMessage()) break;
+	}
+	if(!str.empty()) {
+		if(mtype_highest == MESSAGE_ERROR) QMessageBox::critical(parent, tr("Error"), QString::fromStdString(str), QMessageBox::Ok);
+		else if(mtype_highest == MESSAGE_WARNING) QMessageBox::warning(parent, tr("Warning"), QString::fromStdString(str), QMessageBox::Ok);
+		else QMessageBox::information(parent, tr("Information"), QString::fromStdString(str), QMessageBox::Ok);
+	}
+	return false;
+}
+
+#ifdef AUTO_UPDATE
+#	include <QProcess>
+void QalculateQtSettings::autoUpdate(std::string new_version, QWidget *parent) {
+	char selfpath[1000];
+	ssize_t n = readlink("/proc/self/exe", selfpath, 999);
+	if(n < 0 || n >= 999) {
+		QMessageBox::critical(parent, tr("Error"), tr("Path of executable not found."));
+		return;
+	}
+	selfpath[n] = '\0';
+	std::string selfdir = selfpath;
+	size_t i = selfdir.rfind("/");
+	if(i != string::npos) selfdir.substr(0, i);
+	FILE *pipe = popen("curl --version 1>/dev/null", "w");
+	if(!pipe) {
+		QMessageBox::critical(parent, tr("Error"), tr("curl not found."));
+		return;
+	}
+	pclose(pipe);
+	std::string tmpdir = getLocalTmpDir();
+	recursiveMakeDir(tmpdir);
+	string script = "#!/bin/sh\n\n";
+	script += "echo \"Updating Qalculate!...\";\n";
+	script += "sleep 1;\n";
+	script += "new_version="; script += new_version; script += ";\n";
+	script += "if cd \""; script += tmpdir; script += "\"; then\n";
+	script += "\tif curl -L -o qalculate-${new_version}-x86_64.tar.xz https://github.com/Qalculate/qalculate-gtk/releases/download/v${new_version}/qalculate-${new_version}-x86_64.tar.xz; then\n";
+	script += "\t\techo \"Extracting files...\";\n";
+	script += "\t\tif tar -xJf qalculate-${new_version}-x86_64.tar.xz; then\n";
+	script += "\t\t\tcd  qalculate-${new_version};\n";
+	script += "\t\t\tif cp -f qalculate-qt \""; script += selfpath; script += "\"; then\n";
+	script += "\t\t\t\tcp -f qalc \""; script += selfdir; script += "/\";\n";
+	script += "\t\t\t\tcd ..;\n\t\t\trm -r qalculate-${new_version};\n\t\t\trm qalculate-${new_version}-x86_64.tar.xz;\n";
+	script += "\t\t\t\texit 0;\n";
+	script += "\t\t\tfi\n";
+	script += "\t\t\tcd ..;\n\t\trm -r qalculate-${new_version};\n";
+	script += "\t\tfi\n";
+	script += "\t\trm qalculate-${new_version}-x86_64.tar.xz;\n";
+	script += "\tfi\n";
+	script += "fi\n";
+	script += "echo \"Update failed\";\n";
+	script += "echo \"Press Enter to continue\";\n";
+	script += "read _;\n";
+	script += "exit 1\n";
+	std::ofstream ofs;
+	std::string scriptpath = tmpdir; scriptpath += "/update.sh";
+	ofs.open(scriptpath.c_str(), std::ofstream::out | std::ofstream::trunc);
+	ofs << script;
+	ofs.close();
+	chmod(scriptpath.c_str(), S_IRWXU);
+	std::string termcom = "#!/bin/sh\n\n";
+	termcom += "if [ $(command -v gnome-terminal) ]; then\n";
+	termcom += "\tif gnome-terminal --wait --version; then\n\t\tdetected_term=\"gnome-terminal --wait -- \";\n";
+	termcom += "\telse\n\t\tdetected_term=\"gnome-terminal --disable-factory -- \";\n\tfi\n";
+	termcom += "elif [ $(command -v xfce4-terminal) ]; then\n\tdetected_term=\"xfce4-terminal --disable-server -e \";\n";
+	termcom += "else\n";
+	termcom += "\tfor t in x-terminal-emulator konsole alacritty qterminal xterm urxvt rxvt kitty sakura terminology termite tilix; do\n\t\tif [ $(command -v $t) ]; then\n\t\t\tdetected_term=\"$t -e \";\n\t\t\tbreak\n\t\tfi\n\tdone\nfi\n";
+	termcom += "$detected_term "; termcom += scriptpath; termcom += ";\n";
+	termcom += "exec "; termcom += selfpath; termcom += "\n";
+	std::ofstream ofs2;
+	std::string scriptpath2 = tmpdir; scriptpath2 += "/terminal.sh";
+	ofs2.open(scriptpath2.c_str(), std::ofstream::out | std::ofstream::trunc);
+	ofs2 << termcom;
+	ofs2.close();
+	chmod(scriptpath2.c_str(), S_IRWXU);
+	if(QProcess::execute(scriptpath2.c_str()) != 0) {
+		QMessageBox::critical(parent, tr("Error"), tr("Failed to run update script.\n%1").arg(error->message));
+		return;
+	}
+	qApp->closeAllWindows();
+}
+#else
+void QalculateQtSettings::autoUpdate(std::string, QWidget*) {}
+#endif
+
+void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
+	if(!force) {
+		if(!check_version) return;
+		QalculateDateTime next_version_check_date(last_version_check_date);
+		next_version_check_date.addDays(14);
+		if(next_version_check_date.isFutureDate()) return;
+	}
+	std::string new_version;
+#ifdef _WIN32
+	int ret = checkAvailableVersion("windows", VERSION, &new_version, force ? 10 : 5);
+#else
+	int ret = checkAvailableVersion("qalculate-qt", VERSION, &new_version, force ? 10 : 5);
+#endif
+	if(force && ret <= 0) {
+		if(ret < 0) QMessageBox::critical(parent, tr("Error"), tr("Failed to check for updates."));
+		else QMessageBox::information(parent, QString(), tr("No updates found."));
+		if(ret < 0) return;
+	}
+	if(ret > 0 && (force || new_version != last_found_version)) {
+		last_found_version = new_version;
+#ifdef AUTO_UPDATE
+		if(QMessageBox::question(parent, QString(), tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes)) {
+			autoUpdate(new_version);
+		}
+#else
+		QMessageBox::information(parent, QString(), tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)));
+#endif
+	}
+	last_version_check_date.setToCurrentDate();
 }
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="edit-undo.svg"
+   width="32"
+   height="32"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="59.9375"
+     inkscape:cx="7.991658"
+     inkscape:cy="8"
+     inkscape:current-layer="svg6" />
+  <defs
+     id="defs3051">
+    <style
+       type="text/css"
+       id="current-color-scheme">
+      .ColorScheme-Text {
+        color:#232629;
+      }
+      </style>
+  </defs>
+  <path
+     style="fill:currentColor;fill-opacity:1;stroke:none;stroke-width:2"
+     d="M 13,4 6.4375,10.5625 6,11 6.4375,11.4375 13,18 14.4375,16.5625 9.8125,12 H 12 14.375 16 17 c 3.865996,0 7,3.133997 7,7 0,3.866004 -3.134004,7 -7,7 h -1 -2 v 2 h 2 1 c 4.970566,0 9,-4.029496 9,-9 0,-4.970504 -4.029434,-9 -9,-9 H 16 14.375 12 9.8125 l 4.625,-4.5625 z"
+     class="ColorScheme-Text"
+     id="path4" />
+</svg>

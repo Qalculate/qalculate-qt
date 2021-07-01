@@ -32,6 +32,10 @@ std::string unhtmlize(std::string str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
+bool item_in_calculator(ExpressionItem *item);
+bool name_matches(ExpressionItem *item, const std::string &str);
+bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
+bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
 
 enum {
 	TITLE_APP,
@@ -48,7 +52,9 @@ enum {
 
 DECLARE_BUILTIN_FUNCTION(AnswerFunction, 0)
 
-class QalculateQtSettings {
+class QalculateQtSettings : QObject {
+
+	Q_OBJECT
 
 	public:
 
@@ -60,12 +66,16 @@ class QalculateQtSettings {
 		void updateStyle();
 		void updatePalette();
 		void updateMessagePrintOptions();
-
+		bool checkExchangeRates(QWidget *parent);
+		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
+		bool displayMessages(QWidget *parent);
 		bool isAnswerVariable(Variable *v);
+		void checkVersion(bool force, QWidget *parent);
+		void autoUpdate(std::string new_version, QWidget *parent);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default;
+		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay;
 		int completion_min, completion_min2;
@@ -87,6 +97,20 @@ class QalculateQtSettings {
 		std::vector<MathStructure*> history_answer;
 		std::vector<std::string> expression_history;
 		QByteArray window_geometry, window_state, splitter_state;
+		QByteArray functions_geometry, functions_vsplitter_state, functions_hsplitter_state;
+		QByteArray units_geometry, units_vsplitter_state, units_hsplitter_state;
+		QByteArray variables_geometry, variables_vsplitter_state, variables_hsplitter_state;
+
+		PlotLegendPlacement default_plot_legend_placement;
+		PlotStyle default_plot_style;
+		PlotSmoothing default_plot_smoothing;
+		bool default_plot_display_grid, default_plot_full_border, default_plot_use_sampling_rate, default_plot_rows, default_plot_color;
+		std::string default_plot_min, default_plot_max, default_plot_step, default_plot_variable;
+		int default_plot_sampling_rate, default_plot_linewidth, default_plot_type, max_plot_time;
+
+		QalculateDateTime last_version_check_date;
+		bool check_version;
+		std::string last_found_version;
 
 };
 

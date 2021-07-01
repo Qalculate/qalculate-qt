@@ -98,14 +98,16 @@ class ExpressionEdit : public QPlainTextEdit {
 		virtual ~ExpressionEdit();
 
 		std::string expression() const;
-		QSize sizeHint() const;
+		QSize sizeHint() const override;
 
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
+		bool doChainMode(const QString &op);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
 		void displayParseStatus(bool = false, bool = true);
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void keyPressEvent(QKeyEvent*) override;
+		QString selectedText(bool = false);
 
 	protected slots:
 
@@ -120,6 +122,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 		void updateCompletion();
 		void setExpression(std::string);
+		void setExpression(const QString &str);
 		void blockCompletion(bool = true);
 		void blockParseStatus(bool = true);
 		void blockUndo(bool = true);
@@ -131,12 +134,15 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editUndo();
 		void editRedo();
 		void editDelete();
+		void insertDate();
+		void insertMatrix();
 		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
 
 	signals:
 
 		void returnPressed();
 		void toConversionRequested(std::string);
+		void calculateRPNRequest(int);
 
 };
 

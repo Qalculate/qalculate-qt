@@ -26,10 +26,16 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QMenu>
+#include <QCalendarWidget>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include <QDebug>
 
 #include "expressionedit.h"
 #include "qalculateqtsettings.h"
+#include "matrixwidget.h"
 
 #define ITEM_ROLE (Qt::UserRole + 10)
 #define TYPE_ROLE (Qt::UserRole + 11)
@@ -177,7 +183,7 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 	return l >= minlength;
 }
 
-bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0) {
+bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength) {
 	bool big_A = false;
 	if(minlength > 1 && str.length() == 1) {
 		if(str[0] == 'a' || str[0] == 'x' || str[0] == 'y' || str[0] == 'X' || str[0] == 'Y') return false;
@@ -231,7 +237,7 @@ int name_matches2(ExpressionItem *item, const std::string &str, size_t minlength
 	}
 	return b_match ? 2 : 0;
 }
-bool country_matches(Unit *u, const std::string &str, size_t minlength = 0) {
+bool country_matches(Unit *u, const std::string &str, size_t minlength) {
 	const std::string &countries = u->countries();
 	size_t i = 0;
 	while(true) {
@@ -384,7 +390,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	size_t i_match = 0;
 	if(item && cdata->to_type < 2) {
 		if((cdata->editing_to_expression || !settings->evalops.parse_options.functions_enabled) && item->type() == TYPE_FUNCTION) {}
-		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && (!((Variable*) item)->isKnown() || ((KnownVariable*) item)->unit().empty())))) {}
+		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && !((Variable*) item)->isKnown()))) {}
 		else if(!settings->evalops.parse_options.units_enabled && item->type() == TYPE_UNIT) {}
 		else {
 			CompositeUnit *cu = NULL;
@@ -540,6 +546,8 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		}
 	} else if(item && cdata->to_type == 5) {
 		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
+	} else if(item && cdata->to_type == 2 && str.empty() && cdata->current_from_struct) {
+		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger()) b_match = 2;
 	} else if(prefix && cdata->to_type < 2) {
 		for(size_t name_i = 1; name_i <= prefix->countNames() && !b_match; name_i++) {
 			const std::string *pname = &prefix->getName(name_i).name;
@@ -819,9 +827,7 @@ void ExpressionEdit::updateCompletion() {
 				COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), QString::fromStdString(CALCULATOR->variables[i]->title()), 1, CALCULATOR->variables[i])
 			} else {
 				Variable *v = CALCULATOR->variables[i];
-				if(settings->isAnswerVariable(v)) {
-					title = tr("a previous result").toStdString();
-				} else if(v->isKnown()) {
+				if(v->isKnown()) {
 					if(((KnownVariable*) v)->isExpression()) {
 						ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 						title = CALCULATOR->localizeExpression(((KnownVariable*) v)->expression(), pa);
@@ -1042,8 +1048,8 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND(str1, tr("Bijective base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
 	COMPLETION_APPEND(str1, tr("Binary number"), 202, NULL)
-	/*COMPLETION_CONVERT_STRING("calendars")
-	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)*/
+	COMPLETION_CONVERT_STRING("calendars")
+	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
 	COMPLETION_APPEND(str1, tr("Complex cis form"), 401, NULL)
 	COMPLETION_CONVERT_STRING("decimal") str1 += " <i>"; str1 += "dec"; str1 += "</i>";
@@ -1079,7 +1085,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_CONVERT_STRING("optimal")
 	COMPLETION_APPEND(str1, tr("Optimal units"), 100, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
-	COMPLETION_APPEND(str1, tr("Expanded partial fraction"), 601, NULL)
+	COMPLETION_APPEND(str1, tr("Expanded partial fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
 	COMPLETION_APPEND(str1, tr("Complex polar form"), 403, NULL)
 	COMPLETION_CONVERT_STRING2("rectangular", "cartesian")
@@ -1097,7 +1103,16 @@ void ExpressionEdit::updateCompletion() {
 }
 
 void ExpressionEdit::setExpression(std::string str) {
-	setPlainText(QString::fromStdString(str));
+	setExpression(QString::fromStdString(str));
+}
+void ExpressionEdit::setExpression(const QString &str) {
+	block_add_to_undo++;
+	setCursorWidth(0);
+	clear();
+	block_add_to_undo--;
+	insertPlainText(str);
+	setCursorWidth(1);
+	highlightParentheses();
 }
 std::string ExpressionEdit::expression() const {
 	return toPlainText().toStdString();
@@ -1117,7 +1132,7 @@ void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
 	QPlainTextEdit::inputMethodEvent(event);
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
-	disable_history_arrow_keys = false;
+	if(!event->isAutoRepeat()) disable_history_arrow_keys = false;
 	QPlainTextEdit::keyReleaseEvent(event);
 }
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
@@ -1132,14 +1147,25 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Asterisk: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_MULTIPLY);
+					return;
+				}
+				if(doChainMode(SIGN_MULTIPLICATION)) return;
 				wrapSelection(SIGN_MULTIPLICATION);
 				return;
 			}
 			case Qt::Key_Minus: {
+				if(doChainMode(SIGN_MINUS)) return;
 				wrapSelection(SIGN_MINUS);
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
+					return;
+				}
+				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
@@ -1148,14 +1174,29 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
+					return;
+				}
+				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Plus: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_ADD);
+					return;
+				}
+				if(doChainMode("+")) return;
 				wrapSelection("+");
 				return;
 			}
 			case Qt::Key_Slash: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_DIVIDE);
+					return;
+				}
+				if(doChainMode("/")) return;
 				wrapSelection("/");
 				return;
 			}
@@ -1168,12 +1209,35 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 		}
 	}
+	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		if(settings->rpn_mode && settings->rpn_keys) {
+			emit calculateRPNRequest(OPERATION_RAISE);
+			return;
+		}
+		if(doChainMode("^")) return;
+		wrapSelection("^");
+		return;
+	}
 	if(event->modifiers() == Qt::ControlModifier || (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
 		switch(event->key()) {
+			case Qt::Key_A: {
+				if(event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier)) {
+					if(doChainMode("∠")) return;
+					insertPlainText("∠");
+					return;
+				}
+				break;
+			}
 			case Qt::Key_ParenLeft: {}
 			case Qt::Key_ParenRight: {
 				smartParentheses();
 				return;
+			}
+			case Qt::Key_E: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_EXP10);
+					return;
+				}
 			}
 		}
 	}
@@ -1213,8 +1277,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_Up: {
 				if(completionView->isVisible() || disable_history_arrow_keys || event->modifiers() == Qt::ShiftModifier) break;
 				QTextCursor c = textCursor();
-				bool b = (cursor_has_moved && (!c.atStart() || c.hasSelection())) || (!c.atEnd() && !c.atStart());
-				if(b || !c.atStart()) {
+				bool b = (cursor_has_moved && (!c.atStart() || c.hasSelection())) || (!c.atEnd() && !c.atStart()) || history_index + 1 >= (int) settings->expression_history.size();
+				if(b) {
 					QString text = toPlainText();
 					if((b && c.atStart()) || text.lastIndexOf("\n", c.position() - 1) >= 0) {
 						disable_history_arrow_keys = true;
@@ -1235,16 +1299,11 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					dont_change_index = true;
 					blockCompletion(true);
 					blockParseStatus(true);
-					setCursorWidth(0);
 					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
-					if(history_index == -1) setPlainText(current_history);
-					else setPlainText(QString::fromStdString(settings->expression_history[history_index]));
+					if(history_index == -1) setExpression(current_history);
+					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
-					QTextCursor c = textCursor();
-					c.movePosition(QTextCursor::End);
-					setTextCursor(c);
-					setCursorWidth(1);
 					dont_change_index = false;
 				} else {
 					break;
@@ -1256,7 +1315,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(completionView->isVisible() || disable_history_arrow_keys) break;
 				QTextCursor c = textCursor();
 				bool b = (cursor_has_moved && (!c.atEnd() || c.hasSelection())) || (!c.atEnd() && !c.atStart());
-				if(b || !c.atEnd()) {
+				if(b) {
 					QString text = toPlainText();
 					if((b && c.atEnd()) || text.indexOf("\n", c.position()) >= 0) {
 						disable_history_arrow_keys = true;
@@ -1276,17 +1335,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				dont_change_index = true;
 				blockCompletion(true);
 				blockParseStatus(true);
-				setCursorWidth(0);
 				if(history_index < 0) {
-					if(history_index == -1 && current_history != toPlainText()) setPlainText(current_history);
+					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
-					setPlainText(QString::fromStdString(settings->expression_history[history_index]));
+					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				QTextCursor c = textCursor();
-				c.movePosition(QTextCursor::End);
-				setTextCursor(c);
-				setCursorWidth(1);
 				blockParseStatus(false);
 				blockCompletion(false);
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -1305,10 +1359,6 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 		}
-	}
-	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		insertPlainText("^");
-		return;
 	}
 	QPlainTextEdit::keyPressEvent(event);
 }
@@ -1335,6 +1385,9 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		deleteAction->setShortcut(QKeySequence::Delete);
 		deleteAction->setShortcutContext(Qt::WidgetShortcut);
 		cmenu->addSeparator();
+		cmenu->addAction(tr("Insert Date…"), this, SLOT(insertDate()));
+		cmenu->addAction(tr("Insert Matrix…"), this, SLOT(insertMatrix()));
+		cmenu->addSeparator();
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
@@ -1360,7 +1413,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Limited full completion"), this, SLOT(onCompletionModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); if(completion_level == 3) action->setChecked(true);
 		action = menu->addAction(tr("Full completion"), this, SLOT(onCompletionModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); if(completion_level == 4) action->setChecked(true);
 		menu->addSeparator();
-		action = menu->addAction(tr("Completion delay"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
+		action = menu->addAction(tr("Delayed completion"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
 		QAction *enableIMAction = cmenu->addAction(tr("Enable input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
 	}
@@ -1375,6 +1428,40 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	selectAllAction->setEnabled(!b_empty);
 	clearAction->setEnabled(!b_empty);
 	cmenu->popup(e->globalPos());
+}
+void ExpressionEdit::insertDate() {
+	QDialog *dialog = new QDialog(this, Qt::Popup);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	box->setContentsMargins(0, 0, 0, 0);
+	QCalendarWidget *w = new QCalendarWidget(dialog);
+	box->addWidget(w);
+	connect(w, SIGNAL(clicked(QDate)), dialog, SLOT(accept()));
+	connect(w, SIGNAL(activated(QDate)), dialog, SLOT(accept()));
+	if(dialog->exec() == QDialog::Accepted) {
+		insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
+	}
+	dialog->deleteLater();
+}
+void ExpressionEdit::insertMatrix() {
+	QDialog *dialog = new QDialog(this);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Matrix"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	MatrixWidget *w = new MatrixWidget(dialog);
+	w->setMatrixString(textCursor().selectedText());
+	box->addWidget(w);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	box->addWidget(buttonBox);
+	w->setFocus();
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	if(dialog->exec() == QDialog::Accepted) {
+		if(!w->isEmpty()) {
+			insertPlainText(w->getMatrixString());
+		}
+	}
+	dialog->deleteLater();
 }
 void ExpressionEdit::enableCompletionDelay() {
 	if(qobject_cast<QAction*>(sender())->isChecked()) settings->completion_delay = 500;
@@ -1446,7 +1533,7 @@ void ExpressionEdit::blockUndo(bool b) {
 void ExpressionEdit::setStatusText(QString text) {
 	if(completionView->isVisible() || text.isEmpty()) {
 		QToolTip::hideText();
-	} else {
+	} else if(settings->display_expression_status) {
 		if(text.length() >= 30) {
 			text.replace("\n", "<br>");
 			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text.length() >= 60 ? ("<font size=\"-1\">" + text + "</font>") : ("<font size=\"+0\">" + text + "</font>"));
@@ -1457,6 +1544,7 @@ void ExpressionEdit::setStatusText(QString text) {
 }
 
 bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
+	if(!settings->display_expression_status) return false;
 	if(!f) return false;
 	int iargs = f->maxargs();
 	Argument *arg;
@@ -1542,7 +1630,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
-	if(!settings->display_expression_status) return;
 	if(block_display_parse) return;
 	QString qtext = toPlainText();
 	std::string text = qtext.toStdString(), str_f;
@@ -1932,11 +2019,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			if(had_errors || had_warnings) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 			else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		}
-		if(!b_func && show_tooltip) setStatusText(prev_parsed_expression);
+		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
-		if(prev_func && show_tooltip) setStatusText(prev_parsed_expression);
+		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
 	}
 	settings->evalops.parse_options.preserve_format = false;
 }
@@ -1987,6 +2074,7 @@ void ExpressionEdit::onTextChanged() {
 		cdata->current_function = settings->f_answer;
 		displayParseStatus();
 	}
+	if(document()->isEmpty()) expression_has_changed = false;
 }
 bool ExpressionEdit::expressionHasChanged() {
 	return expression_has_changed && !document()->isEmpty() && !toPlainText().trimmed().isEmpty();
@@ -2815,7 +2903,7 @@ void ExpressionEdit::setCurrentObject() {
 		l_to = current_object_text.length();
 		pos = current_object_text.length();
 		pos2 = pos;
-		//if(current_object_text[0] == '/') return;
+		if(l_to > 0 && current_object_text[0] == '/') return;
 		for(size_t i = 0; i < l_to; i++) {
 			if(current_object_text[i] == '#') {
 				current_object_start = -1;
@@ -2897,3 +2985,63 @@ void ExpressionEdit::setCurrentObject() {
 		}
 	}
 }
+
+bool ExpressionEdit::doChainMode(const QString &op) {
+	if(expression_has_changed && !settings->rpn_mode && settings->chain_mode && !cdata->current_function && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || (CALCULATOR->customInputBase() <= 62 && CALCULATOR->customInputBase() >= -62))) {
+		QTextCursor cur = textCursor();
+		if(cur.hasSelection()) {
+			if(cur.selectionStart() != 0 || cur.selectionEnd() != toPlainText().length()) return false;
+		} else if(!cur.atEnd()) {
+			return false;
+		}
+		std::string str = toPlainText().toStdString();
+		remove_blanks(str);
+		if(str.empty() || str[0] == '/' || CALCULATOR->hasToExpression(str, true, settings->evalops) || CALCULATOR->hasWhereExpression(str, settings->evalops) || last_is_operator(str)) return false;
+		size_t par_n = 0, vec_n = 0;
+		for(size_t i = 0; i < str.length(); i++) {
+			if(str[i] == LEFT_PARENTHESIS_CH) par_n++;
+			else if(par_n > 0 && str[i] == RIGHT_PARENTHESIS_CH) par_n--;
+			else if(str[i] == LEFT_VECTOR_WRAP_CH) vec_n++;
+			else if(vec_n > 0 && str[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
+		}
+		if(par_n > 0 || vec_n > 0) return false;
+		MathStructure m;
+		CALCULATOR->clearMessages();
+		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), 1000, settings->evalops, NULL, NULL, false);
+		if(m.isAborted()) return false;
+		PrintOptions po = settings->printops;
+		po.allow_non_usable = false;
+		po.is_approximate = NULL;
+		po.can_display_unicode_string_arg = (void*) this;
+		str = CALCULATOR->print(m, 1000, settings->printops);
+		if(str == CALCULATOR->abortedMessage() || str.length() > 100) return false;
+		std::string warnings;
+		int message_n = 0;
+		while(CALCULATOR->message()) {
+			MessageType mtype = CALCULATOR->message()->type();
+			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+				if(mtype == MESSAGE_ERROR) return false;
+				if(message_n > 0) {
+					if(message_n == 1) warnings.insert(0, "• ");
+					warnings += "\n• ";
+				}
+				warnings += CALCULATOR->message()->message();
+			}
+			message_n++;
+			CALCULATOR->nextMessage();
+		}
+		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != SIGN_MULTIPLICATION) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
+			str.insert(0, "(");
+			str += ")";
+		}
+		setExpression(QString::fromStdString(str) + op);
+		setStatusText(QString::fromStdString(warnings));
+		return true;
+	}
+	return false;
+}
+QString ExpressionEdit::selectedText(bool b) {
+	if(b && !textCursor().hasSelection()) return toPlainText();
+	return textCursor().selectedText();
+}
+
