@@ -62,6 +62,8 @@ class QalculateWindow : public QMainWindow {
 		QLocalServer *server;
 		QCommandLineParser *parser;
 
+		Thread *viewThread, *commandThread;
+
 		ExpressionEdit *expressionEdit;
 		HistoryView *historyView;
 		QSplitter *ehSplitter;

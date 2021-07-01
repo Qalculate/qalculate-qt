@@ -72,7 +72,7 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 	if(replaced_item) *replaced_item = NULL;
 	Variable *var = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
@@ -104,7 +104,7 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value, ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
-		if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}

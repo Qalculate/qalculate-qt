@@ -89,8 +89,6 @@ std::vector<std::string> alt_results;
 int b_busy = 0, block_result_update = 0;
 bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
-ViewThread *view_thread;
-CommandThread *command_thread;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
@@ -680,8 +678,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	prepend_mstruct.setUndefined();
 	parsed_mstruct = new MathStructure();
 	parsed_tostruct = new MathStructure();
-	view_thread = new ViewThread;
-	command_thread = new CommandThread;
+	viewThread = new ViewThread;
+	commandThread = new CommandThread;
 
 	settings->printops.can_display_unicode_string_arg = (void*) historyView;
 
@@ -3448,13 +3446,6 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 
 		if(b_busy) return;
 
-		/*if(command_type == COMMAND_CONVERT_UNIT || command_type == COMMAND_CONVERT_STRING) {
-			if(mbak_convert.isUndefined()) mbak_convert.set(*mstruct);
-			else mstruct->set(mbak_convert);
-		} else {
-			if(!mbak_convert.isUndefined()) mbak_convert.setUndefined();
-		}*/
-
 		b_busy++;
 		command_aborted = false;
 
@@ -3479,21 +3470,21 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 
 	rerun_command:
 
-	if((!command_thread->running && !command_thread->start()) || !command_thread->write(command_type) || !command_thread->write((void *) mfactor) || !command_thread->write((void *) mfactor2)) {
-		command_thread->cancel();
+	if((!commandThread->running && !commandThread->start()) || !commandThread->write(command_type) || !commandThread->write((void *) mfactor) || !commandThread->write((void *) mfactor2)) {
+		commandThread->cancel();
 		mfactor->unref();
 		if(mfactor2) mfactor2->unref();
 		b_busy--;
 		return;
 	}
 
-	while(b_busy && command_thread->running && i < 50) {
+	while(b_busy && commandThread->running && i < 50) {
 		sleep_ms(10);
 		i++;
 	}
 	i = 0;
 
-	if(!was_busy && b_busy && command_thread->running) {
+	if(!was_busy && b_busy && commandThread->running) {
 		QString progress_str;
 		switch(command_type) {
 			case COMMAND_FACTORIZE: {
@@ -3525,11 +3516,11 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		was_busy = true;
 	}
-	while(b_busy && command_thread->running) {
+	while(b_busy && commandThread->running) {
 		qApp->processEvents();
 		sleep_ms(100);
 	}
-	if(!command_thread->running) command_aborted = true;
+	if(!commandThread->running) command_aborted = true;
 
 	if(!command_aborted && run == 1 && command_type >= COMMAND_CONVERT_UNIT && settings->checkExchangeRates(this)) {
 		b_busy++;
@@ -3792,7 +3783,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	b_busy++;
 
-	if(!view_thread->running && !view_thread->start()) {b_busy--; return;}
+	if(!viewThread->running && !viewThread->start()) {b_busy--; return;}
 
 	bool b_rpn_operation = false;
 
@@ -3903,51 +3894,51 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	settings->printops.prefix = prefix;
 
 	if(!do_stack) {
-		if(!view_thread->write((void*) mstruct)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write((void*) mstruct)) {b_busy--; viewThread->cancel(); return;}
 	} else {
 		MathStructure *mreg = CALCULATOR->getRPNRegister(stack_index + 1);
-		if(!view_thread->write((void*) mreg)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write((void*) mreg)) {b_busy--; viewThread->cancel(); return;}
 	}
-	if(!view_thread->write(do_stack)) {b_busy--; view_thread->cancel(); return;}
+	if(!viewThread->write(do_stack)) {b_busy--; viewThread->cancel(); return;}
 	if(do_stack) {
-		if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 	} else {
 		matrix_mstruct.clear();
 		if(!mstruct->isMatrix() || mstruct->rows() * mstruct->columns() <= 10 || mstruct->columns() * mstruct->rows() > 10000) {
-			if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
+			if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 		} else {
-			if(!view_thread->write((void*) &matrix_mstruct)) {b_busy--; view_thread->cancel(); return;}
+			if(!viewThread->write((void*) &matrix_mstruct)) {b_busy--; viewThread->cancel(); return;}
 		}
 	}
 	if(update_parse) {
-		if(!view_thread->write((void*) parsed_mstruct)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write((void*) parsed_mstruct)) {b_busy--; viewThread->cancel(); return;}
 		bool *parsed_approx_p = &parsed_approx;
-		if(!view_thread->write(parsed_approx_p)) {b_busy--; view_thread->cancel(); return;}
-		if(!view_thread->write(!b_rpn_operation)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write(parsed_approx_p)) {b_busy--; viewThread->cancel(); return;}
+		if(!viewThread->write(!b_rpn_operation)) {b_busy--; viewThread->cancel(); return;}
 	} else {
 		if(settings->printops.base != BASE_DECIMAL && settings->dual_approximation <= 0) mstruct_exact.setUndefined();
-		if(!view_thread->write((void*) NULL)) {b_busy--; view_thread->cancel(); return;}
+		if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 	}
 
 	QProgressDialog *dialog = NULL;
 
 	int i = 0;
-	while(b_busy && view_thread->running && i < 50) {
+	while(b_busy && viewThread->running && i < 50) {
 		sleep_ms(10);
 		i++;
 	}
 	i = 0;
 
-	if(b_busy && view_thread->running) {
+	if(b_busy && viewThread->running) {
 		if(updateWindowTitle(tr("Processing…"))) title_set = true;
-		dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
+		dialog = new QProgressDialog(tr("Processing…"), tr("Cancel"), 0, 0, this);
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		was_busy = true;
 	}
-	while(b_busy && view_thread->running) {
+	while(b_busy && viewThread->running) {
 		qApp->processEvents();
 		sleep_ms(100);
 	}
@@ -4107,7 +4098,7 @@ void QalculateWindow::abortCommand() {
 		msecs -= 10;
 	}
 	if(b_busy) {
-		command_thread->cancel();
+		commandThread->cancel();
 		b_busy--;
 		CALCULATOR->stopControl();
 		command_aborted = true;
@@ -4424,11 +4415,14 @@ void QalculateWindow::approximationActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	if(v < 0) {
 		settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-		if(v == -2) settings->dual_approximation = 1;
-		else settings->dual_approximation = -1;
+		if(v == -2) {settings->dual_approximation = 1; settings->dual_fraction = 1;}
+		else {settings->dual_approximation = -1; settings->dual_fraction = -1;}
 	} else {
 		settings->evalops.approximation = (ApproximationMode) v;
+		settings->dual_fraction = 0;
 	}
+	if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->printops.number_fraction_format = FRACTION_DECIMAL_EXACT;
+	else settings->printops.number_fraction_format = FRACTION_DECIMAL;
 	expressionCalculationUpdated();
 }
 void QalculateWindow::outputBaseActivated() {
@@ -4901,7 +4895,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		QString str = QString::fromStdString(f->description());
 		if(!f->example(true).empty()) {
 			if(!str.isEmpty()) str += "\n\n";
-			str += tr("Example:");
+			str += tr("Example:", "Example of function usage");
 			str += " ";
 			str += QString::fromStdString(f->example(false));
 		}
@@ -4971,7 +4965,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		if(arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
 			defstr = defstr.mid(1, defstr.length() - 2);
 		}
-		fd->label[i] = new QLabel(argstr);
+		fd->label[i] = new QLabel(tr("%1:").arg(argstr));
 		fd->label[i]->setAlignment(Qt::AlignRight);
 		QWidget *entry = NULL;
 		if(arg) {
@@ -5103,7 +5097,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 						fd->entry[i] = new MathLineEdit();
 					}
 					if(i >= f->minargs() && !has_vector) {
-						((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional parameter"));
+						((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional argument"));
 					}
 					((QLineEdit*) fd->entry[i])->setAlignment(Qt::AlignRight);
 					connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));
@@ -5113,7 +5107,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		} else {
 			fd->entry[i] = new MathLineEdit();
 			if(i >= f->minargs() && !has_vector) {
-				((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional parameter"));
+				((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional argument"));
 			}
 			((QLineEdit*) fd->entry[i])->setAlignment(Qt::AlignRight);
 			connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));

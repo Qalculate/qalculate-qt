@@ -934,16 +934,16 @@ bool QalculateQtSettings::checkExchangeRates(QWidget *parent) {
 	return false;
 }
 class FetchExchangeRatesThread : public Thread {
-protected:
-	virtual void run();
+	protected:
+		void run() {
+			int timeout = 15;
+			int n = -1;
+			if(!read(&timeout)) return;
+			if(!read(&n)) return;
+			CALCULATOR->fetchExchangeRates(timeout, n);
+		}
 };
-void FetchExchangeRatesThread::run() {
-	int timeout = 15;
-	int n = -1;
-	if(!read(&timeout)) return;
-	if(!read(&n)) return;
-	CALCULATOR->fetchExchangeRates(timeout, n);
-}
+
 void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent) {
 	b_busy++;
 	FetchExchangeRatesThread fetch_thread;
