@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru">
+<TS version="2.1" language="pt_BR">
 <context>
     <name></name>
     <message>
@@ -9,39 +9,39 @@
     </message>
     <message>
         <source>Calculator</source>
-        <translation type="vanished">Калькулятор</translation>
+        <translation type="vanished">Calculadora</translation>
     </message>
     <message>
         <source>Powerful and easy to use calculator</source>
-        <translation type="vanished">Мощный и простой в использовании калькулятор</translation>
+        <translation type="vanished">Calculadora potente e fácil de usar</translation>
     </message>
     <message>
         <source>calculation;arithmetic;scientific;financial;</source>
-        <translation type="vanished">расчёт;расчет;арифметика;научный;финансовый</translation>
+        <translation type="vanished">calculadora;aritmética;científica;financeira;</translation>
     </message>
     <message>
         <source>Qalculate! (GTK UI)</source>
-        <translation type="vanished">Qalculate! (Интерфейс GTK)</translation>
+        <translation type="vanished">Qalculate! (GTK UI)</translation>
     </message>
     <message>
         <source>Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation).</source>
-        <translation type="vanished">Qalculate! - это универсальный кроссплатформенный настольный калькулятор. Он прост в использовании, но обеспечивает мощность и универсальность, обычно присущие сложным математическим программам, а также полезные инструменты для повседневных нужд (таких как конвертация валют и расчёт процентов).</translation>
+        <translation type="vanished">Qalculate! é uma calculadora para desktop multiplataforma e multiuso. É simples de usar, mas fornece poder e versatilidade normalmente vistas em pacotes de matemática complicados, além de ferramentas úteis para as necessidades diárias (como conversão de moeda e cálculo de porcentagem).</translation>
     </message>
     <message>
         <source>Features include a large library of customizable functions, unit calculations and conversion, physical constants, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.</source>
-        <translation type="vanished">Возможности включают большую библиотеку настраиваемых функций, расчёт и преобразование единиц измерения, физические константы, символьные вычисления, включая интегралы и уравнения, произвольную точность, распространение неопределенности, интервальную арифметику, построение графиков и удобный интерфейс.</translation>
+        <translation type="vanished">Os recursos incluem uma grande biblioteca de funções personalizáveis, cálculos e conversão de unidades, constantes físicas, cálculos simbólicos (incluindo integrais e equações), precisão arbitrária, propagação de erros, aritmética de intervalos, plotagem e uma interface amigável.</translation>
     </message>
     <message>
         <source>Argument Rules</source>
-        <translation type="vanished">Правила для аргументов</translation>
+        <translation type="vanished">Regras de argumento</translation>
     </message>
     <message>
         <source>_Cancel</source>
-        <translation type="vanished">О_тмена</translation>
+        <translation type="vanished">_Cancelar</translation>
     </message>
     <message>
         <source>Do not save modifications</source>
-        <translation type="vanished">Не сохранять изменения</translation>
+        <translation type="vanished">Não salvar modificações</translation>
     </message>
     <message>
         <source>_OK</source>
@@ -49,1080 +49,1076 @@
     </message>
     <message>
         <source>Accept the modification of argument rules</source>
-        <translation type="vanished">Принять изменение правил для аргументов</translation>
+        <translation type="vanished">Aceitar modificação de regras de argumento</translation>
     </message>
     <message>
         <source>Enable rules and type test</source>
-        <translation type="vanished">Включить правила и проверку типа</translation>
+        <translation type="vanished">Ativar regras e teste de tipo</translation>
     </message>
     <message>
         <source>Custom condition</source>
-        <translation type="vanished">Условие</translation>
+        <translation type="vanished">Condição personalizada</translation>
     </message>
     <message>
         <source>For example if argument is a matrix that must have equal number of rows and columns: rows(\x) = columns(\x)</source>
-        <translation type="vanished">Например, если аргумент - это матрица, которая должна иметь равное количество строк и столбцов: строки(\x) = столбцы(\x)</translation>
+        <translation type="vanished">Por exemplo, se o argumento for uma matriz que deve ter igual número de linhas e colunas:  rows(\x) = columns(\x)</translation>
     </message>
     <message>
         <source>Allow matrix</source>
-        <translation type="vanished">Разрешить матрицы</translation>
+        <translation type="vanished">Permitir matriz</translation>
     </message>
     <message>
         <source>Forbid zero</source>
-        <translation type="vanished">Запретить ноль</translation>
+        <translation type="vanished">Proibir zero</translation>
     </message>
     <message>
         <source>Handle vector</source>
-        <translation type="vanished">Обращаться с вектором</translation>
+        <translation type="vanished">Trabalhar com vetor</translation>
     </message>
     <message>
         <source>Calculate function for each separate element in vector.</source>
-        <translation type="vanished">Вычислить функцию для каждого отдельного элемента вектора.</translation>
+        <translation type="vanished">Calcular a função para cada elemento separado no vetor.</translation>
     </message>
     <message>
         <source>Min</source>
-        <translation type="vanished">Мин</translation>
+        <translation type="vanished">Mín</translation>
     </message>
     <message>
         <source>Include equals</source>
-        <translation type="vanished">Включая равенства</translation>
+        <translation type="vanished">Incluir iguais</translation>
     </message>
     <message>
         <source>Max</source>
-        <translation type="vanished">Макс</translation>
+        <translation type="vanished">Máx</translation>
     </message>
     <message>
         <source>Keyboard Shortcuts</source>
-        <translation type="vanished">Клавиатурные комбинации</translation>
+        <translation type="vanished">Atalhos do teclado</translation>
     </message>
     <message>
         <source>_Close</source>
-        <translation type="vanished">В_ыход</translation>
+        <translation type="vanished">_Fechar</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation type="vanished">Метка</translation>
+        <translation type="vanished">Etiqueta</translation>
     </message>
     <message>
         <source>Left-click</source>
-        <translation type="vanished">Щелчок левой кнопкой</translation>
+        <translation type="vanished">Botão esquerdo</translation>
     </message>
     <message>
         <source>Right-click</source>
-        <translation type="vanished">Щелчок правой кнопкой</translation>
+        <translation type="vanished">Botão direito</translation>
     </message>
     <message>
         <source>Middle-click</source>
-        <translation type="vanished">Щелчок средней кнопкой</translation>
+        <translation type="vanished">Botão do meio</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="vanished">Сбросить</translation>
-    </message>
-    <message>
-        <source>Button Action</source>
-        <translation type="vanished">Действие клавиши</translation>
+        <translation type="vanished">Redefinir</translation>
     </message>
     <message>
         <source>Value</source>
-        <translation type="vanished">Значение</translation>
+        <translation type="vanished">Valor</translation>
     </message>
     <message>
         <source>Argument name</source>
-        <translation type="vanished">Имя аргумента</translation>
+        <translation type="vanished">Nome do argumento</translation>
     </message>
     <message>
         <source>Calendar Conversion</source>
-        <translation type="vanished">Преобразование календаря</translation>
+        <translation type="vanished">Conversão de calendário</translation>
     </message>
     <message>
         <source>Export CSV File</source>
-        <translation type="vanished">Экспорт в файл типа CSV</translation>
+        <translation type="vanished">Exportar arquivo CSV</translation>
     </message>
     <message>
         <source>Current result</source>
-        <translation type="vanished">Текущий результат</translation>
+        <translation type="vanished">Resultado atual</translation>
     </message>
     <message>
         <source>Matrix/vector variable</source>
-        <translation type="vanished">Матричная/векторная переменная</translation>
+        <translation type="vanished">Variável matriz/vetor</translation>
     </message>
     <message>
         <source>File</source>
-        <translation type="vanished">Файл</translation>
+        <translation type="vanished">Arquivo</translation>
     </message>
     <message>
         <source>Delimiter</source>
-        <translation type="vanished">Разделитель</translation>
+        <translation type="vanished">Delimitador</translation>
     </message>
     <message>
         <source>Comma</source>
-        <translation type="vanished">Запятая</translation>
+        <translation type="vanished">Vírgula</translation>
     </message>
     <message>
         <source>Tabulator</source>
-        <translation type="vanished">Табуляция</translation>
+        <translation type="vanished">Tabulador</translation>
     </message>
     <message>
         <source>Semicolon</source>
-        <translation type="vanished">Точка с запятой</translation>
+        <translation type="vanished">Ponto-e-vírgula</translation>
     </message>
     <message>
         <source>Space</source>
-        <translation type="vanished">Пробел</translation>
+        <translation type="vanished">Espaço</translation>
     </message>
     <message>
         <source>Other</source>
-        <translation type="vanished">Другой</translation>
+        <translation type="vanished">Outro</translation>
     </message>
     <message>
         <source>Import CSV File</source>
-        <translation type="vanished">Загрузить файл формата CSV</translation>
+        <translation type="vanished">Importar arquivo CSV</translation>
     </message>
     <message>
         <source>Do not import the file</source>
-        <translation type="vanished">Не импортировать файл</translation>
+        <translation type="vanished">Não importar o arquivo</translation>
     </message>
     <message>
         <source>Import the file</source>
-        <translation type="vanished">Импортировать файл</translation>
+        <translation type="vanished">Importar o arquivo</translation>
     </message>
     <message>
         <source>Name of the data file to import</source>
-        <translation type="vanished">Имя файла с данными для импорта</translation>
+        <translation type="vanished">Nome do arquivo de dados a ser importado</translation>
     </message>
     <message>
         <source>Select a file</source>
-        <translation type="vanished">Выбрать файл</translation>
+        <translation type="vanished">Selecionar um arquivo</translation>
     </message>
     <message>
         <source>Import as</source>
-        <translation type="vanished">Импортировать как</translation>
+        <translation type="vanished">Importar como</translation>
     </message>
     <message>
         <source>Matrix</source>
-        <translation type="vanished">Матрица</translation>
+        <translation type="vanished">Matriz</translation>
     </message>
     <message>
         <source>If a matrix shall be generated from the contents of the file</source>
-        <translation type="vanished">Если матрица должна быть создана из содержимого файла</translation>
+        <translation type="vanished">Se uma matriz ou vetores devem ser gerados a partir do conteúdo do arquivo</translation>
     </message>
     <message>
         <source>Vectors</source>
-        <translation type="vanished">Векторы</translation>
+        <translation type="vanished">Vetores</translation>
     </message>
     <message>
         <source>If vectors shall be generated from the contents of the file</source>
-        <translation type="vanished">Если векторы должны быть созданы из содержимого файла</translation>
+        <translation type="vanished">Se uma matriz ou vetores devem ser gerados a partir do conteúdo do arquivo</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="vanished">Имя</translation>
+        <translation type="vanished">Nome</translation>
     </message>
     <message>
         <source>Name (or name prefix) used to reference generated variable(s) in expressions</source>
-        <translation type="vanished">Имя (или префикс имени), используемое для ссылки на созданные переменные в выражениях</translation>
+        <translation type="vanished">Nome (ou prefixo do nome) usado para referenciar variáveis geradas em expressões</translation>
     </message>
     <message>
         <source>Descriptive name</source>
-        <translation type="vanished">Кратное описание</translation>
+        <translation type="vanished">Nome descritivo</translation>
     </message>
     <message>
         <source>Title displayed in menus and in variable manager</source>
-        <translation type="vanished">Заголовок отображается в меню и в диспетчере переменных</translation>
+        <translation type="vanished">Título exibido nos menus e no gerenciador de variáveis</translation>
     </message>
     <message>
         <source>Category</source>
-        <translation type="vanished">Категория</translation>
+        <translation type="vanished">Categoria</translation>
     </message>
     <message>
         <source>First row</source>
-        <translation type="vanished">Первая строка</translation>
+        <translation type="vanished">Primeira linha</translation>
     </message>
     <message>
         <source>The first row with data to import in the file</source>
-        <translation type="vanished">Первая строка файла с данными для импорта</translation>
+        <translation type="vanished">A primeira linha com dados a serem importados no arquivo</translation>
     </message>
     <message>
         <source>Includes headings</source>
-        <translation type="vanished">Включает заголовки</translation>
+        <translation type="vanished">Incluir cabeçalhos</translation>
     </message>
     <message>
         <source>If the first row contains column headings</source>
-        <translation type="vanished">Если первая строка содержит заголовки столбцов</translation>
+        <translation type="vanished">Se a primeira linha deve conter cabeçalhos de coluna</translation>
     </message>
     <message>
         <source>Delimiter used to separate columns in the file</source>
-        <translation type="vanished">Разделитель, используемый для разделения столбцов в файле</translation>
+        <translation type="vanished">Delimitador usado para separar colunas no arquivo</translation>
     </message>
     <message>
         <source>Custom delimiter</source>
-        <translation type="vanished">Пользовательский разделитель</translation>
+        <translation type="vanished">Delimitador personalizado</translation>
     </message>
     <message>
         <source>Edit Data Property</source>
-        <translation type="vanished">Изменить свойство данных</translation>
+        <translation type="vanished">Editar propriedades de dados</translation>
     </message>
     <message>
         <source>Do not create/modify this data set</source>
-        <translation type="vanished">Не создавать/не изменять этот набор данных</translation>
+        <translation type="vanished">Não criar/modificar este conjunto de dados</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this data set</source>
-        <translation type="vanished">Принять создание/изменение этого набора данных</translation>
+        <translation type="vanished">Aceitar a criação/modificação deste conjunto de dados</translation>
     </message>
     <message>
         <source>Name used for reference</source>
-        <translation type="vanished">Имя, используемое для ссылки</translation>
+        <translation type="vanished">Nome usado para referência</translation>
     </message>
     <message>
         <source>Properties</source>
-        <translation type="vanished">Свойства</translation>
+        <translation type="vanished">Propriedades</translation>
     </message>
     <message>
         <source>Title displayed in menus and in data set manager</source>
-        <translation type="vanished">Заголовок, отображаемый в меню и в диспетчере наборов данных</translation>
+        <translation type="vanished">Título exibido nos menus e no gerenciador de conjunto de dados</translation>
     </message>
     <message>
         <source>Description</source>
-        <translation type="vanished">Расширенное описание</translation>
+        <translation type="vanished">Descrição</translation>
     </message>
     <message>
         <source>Description of this data property</source>
-        <translation type="vanished">Описание этого свойства данных</translation>
+        <translation type="vanished">Descrição desta propriedade de dados</translation>
     </message>
     <message>
         <source>Value Type</source>
-        <translation type="vanished">Тип значения</translation>
+        <translation type="vanished">Tipo de valor</translation>
     </message>
     <message>
         <source>Text</source>
-        <translation type="vanished">Текст</translation>
+        <translation type="vanished">Texto</translation>
     </message>
     <message>
         <source>Number</source>
-        <translation type="vanished">Число</translation>
+        <translation type="vanished">Número</translation>
     </message>
     <message>
         <source>Expression</source>
-        <translation type="vanished">Выражение</translation>
+        <translation type="vanished">Expressão</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation type="vanished">Скрыть</translation>
+        <translation type="vanished">Ocultar</translation>
     </message>
     <message>
         <source>Use as key</source>
-        <translation type="vanished">Использовать как ключ</translation>
+        <translation type="vanished">Usar como chave</translation>
     </message>
     <message>
         <source>Approximate value</source>
-        <translation type="vanished">Приближённое значение</translation>
+        <translation type="vanished">Valor aproximado</translation>
     </message>
     <message>
         <source>Case sensitive value</source>
-        <translation type="vanished">Значение с учётом регистра</translation>
+        <translation type="vanished">Valor sensível a maiúsculas e minúsculas</translation>
     </message>
     <message>
         <source>Value uses brackets</source>
-        <translation type="vanished">Значение использует скобки</translation>
+        <translation type="vanished">Valor usa colchetes</translation>
     </message>
     <message>
         <source>Unit expression</source>
-        <translation type="vanished">Выражение единицы измерения</translation>
+        <translation type="vanished">Expressão de unidade</translation>
     </message>
     <message>
         <source>Edit Data Set</source>
-        <translation type="vanished">Изменить набор данных</translation>
+        <translation type="vanished">Editar conjunto de dados</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="vanished">Заголовок</translation>
+        <translation type="vanished">Título</translation>
     </message>
     <message>
         <source>Data file</source>
-        <translation type="vanished">Файл данных</translation>
+        <translation type="vanished">Arquivo de dados</translation>
     </message>
     <message>
         <source>Description of this data set</source>
-        <translation type="vanished">Описание этого набора данных</translation>
+        <translation type="vanished">Descrição deste conjunto de dados</translation>
     </message>
     <message>
         <source>Copyright</source>
-        <translation type="vanished">Авторские права</translation>
+        <translation type="vanished">Direitos autorais</translation>
     </message>
     <message>
         <source>General</source>
-        <translation type="vanished">Основное</translation>
+        <translation type="vanished">Geral</translation>
     </message>
     <message>
         <source>Properties:</source>
-        <translation type="vanished">Свойства:</translation>
+        <translation type="vanished">Propriedades:</translation>
     </message>
     <message>
         <source>Definition of the properties of this data set</source>
-        <translation type="vanished">Определение свойств этого набора данных</translation>
+        <translation type="vanished">Definição das propriedades deste conjunto de dados</translation>
     </message>
     <message>
         <source>_New</source>
-        <translation type="vanished">_Новый</translation>
+        <translation type="vanished">_Novo</translation>
     </message>
     <message>
         <source>_Edit</source>
-        <translation type="vanished">_Правка</translation>
+        <translation type="vanished">_Editar</translation>
     </message>
     <message>
         <source>_Delete</source>
-        <translation type="vanished">_Удалить</translation>
+        <translation type="vanished">_Excluir</translation>
     </message>
     <message>
         <source>Name used to invoke the function in expressions</source>
-        <translation type="vanished">Имя, используемое для вызова функции в выражениях</translation>
+        <translation type="vanished">Nome usado para chamar a função em expressões</translation>
     </message>
     <message>
         <source>Object argument name</source>
-        <translation type="vanished">Имя аргумента объекта</translation>
+        <translation type="vanished">Nome do argumento do objeto</translation>
     </message>
     <message>
         <source>Property argument name</source>
-        <translation type="vanished">Имя аргумента свойства</translation>
+        <translation type="vanished">Nome do argumento da propriedade</translation>
     </message>
     <message>
         <source>Default property</source>
-        <translation type="vanished">Свойство по умолчанию</translation>
+        <translation type="vanished">Propriedade padrão</translation>
     </message>
     <message>
         <source>Function</source>
-        <translation type="vanished">Функция</translation>
+        <translation type="vanished">Função</translation>
     </message>
     <message>
         <source>Edit Data Object</source>
-        <translation type="vanished">Изменить объект данных</translation>
+        <translation type="vanished">Editar Objeto de Dados</translation>
     </message>
     <message>
         <source>Do not create/modify this data object</source>
-        <translation type="vanished">Не создавать/не изменять этот объект данных</translation>
+        <translation type="vanished">Não criar/modificar este objeto de dados</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this data object</source>
-        <translation type="vanished">Принять создание/изменение этого объекта данных</translation>
+        <translation type="vanished">Aceitar a criação/modificação deste objeto de dados</translation>
     </message>
     <message>
         <source>Data Sets</source>
         <extracomment>new dataset</extracomment>
-        <translation type="vanished">Наборы данных</translation>
+        <translation type="vanished">Conjuntos de dados</translation>
     </message>
     <message>
         <source>Data Set</source>
-        <translation type="vanished">Набор данных</translation>
+        <translation type="vanished">Conjunto de dados</translation>
     </message>
     <message>
         <source>Create a new data set</source>
-        <translation type="vanished">Создать новый набор данных</translation>
+        <translation type="vanished">Criar um novo conjunto de dados</translation>
     </message>
     <message>
         <source>Edit the selected data set</source>
-        <translation type="vanished">Изменить выбранный набор данных</translation>
+        <translation type="vanished">Editar o conjunto de dados selecionado</translation>
     </message>
     <message>
         <source>Delete the selected data set</source>
-        <translation type="vanished">Удалить выбранный набор данных</translation>
+        <translation type="vanished">Excluir o conjunto de dados selecionado</translation>
     </message>
     <message>
         <source>Objects</source>
-        <translation type="vanished">Объекты</translation>
+        <translation type="vanished">Objetos</translation>
     </message>
     <message>
         <source>Create a new data object</source>
-        <translation type="vanished">Создать новый объект данных</translation>
+        <translation type="vanished">Criar um novo objeto de dados</translation>
     </message>
     <message>
         <source>Edit the selected data object</source>
-        <translation type="vanished">Изменить выбранные данные объекта</translation>
+        <translation type="vanished">Editar o objeto de dados selecionado</translation>
     </message>
     <message>
         <source>Remove the selected data object</source>
-        <translation type="vanished">Удалить выбранный объект данных</translation>
+        <translation type="vanished">Remover o objeto de dados selecionados</translation>
     </message>
     <message>
         <source>Data Set Description</source>
-        <translation type="vanished">Описание набора данных</translation>
+        <translation type="vanished">Descrição do conjunto de dados</translation>
     </message>
     <message>
         <source>Object Attributes</source>
-        <translation type="vanished">Атрибуты объекта</translation>
+        <translation type="vanished">Atributos do objeto</translation>
     </message>
     <message>
         <source>Decimals</source>
-        <translation type="vanished">Десятичные дроби</translation>
+        <translation type="vanished">Decimais</translation>
     </message>
     <message>
         <source>Close this window</source>
-        <translation type="vanished">Закрыть это окно</translation>
+        <translation type="vanished">Fechar esta janela</translation>
     </message>
     <message>
         <source>Min decimals</source>
-        <translation type="vanished">Мин цифр</translation>
+        <translation type="vanished">Decimais mínimos</translation>
     </message>
     <message>
         <source>Max decimals</source>
-        <translation type="vanished">Макс цифр</translation>
+        <translation type="vanished">Decimais máximos</translation>
     </message>
     <message>
         <source>Minimal number of displayed decimals</source>
-        <translation type="vanished">Минимальное количество отображаемых десятичных знаков</translation>
+        <translation type="vanished">Número mínimo de casas decimais exibidas</translation>
     </message>
     <message>
         <source>Maximal number of decimals to display (and round to)</source>
-        <translation type="vanished">Максимальное количество отображаемых десятичных знаков</translation>
+        <translation type="vanished">Número máximo de casas decimais a serem exibidas (e arredondadas)</translation>
     </message>
     <message>
         <source>Floating Point Conversion</source>
-        <translation type="vanished">Преобразование числа с плавающей запятой</translation>
+        <translation type="vanished">Conversão de ponto flutuante</translation>
     </message>
     <message>
         <source>Decimal value</source>
-        <translation type="vanished">Десятичное значение</translation>
+        <translation type="vanished">Valor decimal</translation>
     </message>
     <message>
         <source>Binary value</source>
-        <translation type="vanished">Двоичное значение</translation>
+        <translation type="vanished">Valor binário</translation>
     </message>
     <message>
         <source>Octal value</source>
-        <translation type="vanished">Восьмеричное значение</translation>
+        <translation type="vanished">Valor octal</translation>
     </message>
     <message>
         <source>Hexadecimal representation</source>
-        <translation type="vanished">Шестнадцатеричное представление</translation>
+        <translation type="vanished">Representação hexadecimal</translation>
     </message>
     <message>
         <source>Conversion error</source>
-        <translation type="vanished">Ошибка преобразования</translation>
+        <translation type="vanished">Erro de conversão</translation>
     </message>
     <message>
         <source>Binary representation</source>
-        <translation type="vanished">Двоичное представление</translation>
+        <translation type="vanished">Representação binária</translation>
     </message>
     <message>
         <source>Floating point value</source>
-        <translation type="vanished">Значение числа с плавающей запятой</translation>
+        <translation type="vanished">Valor do ponto flutuante</translation>
     </message>
     <message>
         <source>Format</source>
-        <translation type="vanished">Формат</translation>
+        <translation type="vanished">Formato</translation>
     </message>
     <message>
         <source>16-bit (half precision)</source>
-        <translation type="vanished">128-битное (половинная точность)</translation>
+        <translation type="vanished">16-bit (precisão média)</translation>
     </message>
     <message>
         <source>32-bit (single precision)</source>
-        <translation type="vanished">32-битное (одинарная точность)</translation>
+        <translation type="vanished">32-bit (precisão única)</translation>
     </message>
     <message>
         <source>64-bit (double precision)</source>
-        <translation type="vanished">64-битное (двойная точность)</translation>
+        <translation type="vanished">64-bit (precisão dupla)</translation>
     </message>
     <message>
         <source>80-bit (x86 extended format)</source>
-        <translation type="vanished">80-битное (x86 расширенный формат)</translation>
+        <translation type="vanished">80-bit (formato estendido x86)</translation>
     </message>
     <message>
         <source>128-bit (quadruple precision)</source>
-        <translation type="vanished">128 -битное (четырехкратная точность)</translation>
+        <translation type="vanished">128-bit (precisão quádrupla)</translation>
     </message>
     <message>
         <source>Hexadecimal value</source>
-        <translation type="vanished">Шестнадцатеричное значение</translation>
+        <translation type="vanished">Valor hexadecimal</translation>
     </message>
     <message>
         <source>Edit Function</source>
-        <translation type="vanished">Изменить функцию</translation>
+        <translation type="vanished">Editar Função</translation>
     </message>
     <message>
         <source>_Help</source>
-        <translation type="vanished">_Справка</translation>
+        <translation type="vanished">_Ajuda</translation>
     </message>
     <message>
         <source>Do not create/modify this function</source>
-        <translation type="vanished">Не создавать/не изменять эту функцию</translation>
+        <translation type="vanished">Não criar/modificar esta função</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this function</source>
-        <translation type="vanished">Принять создание/изменение этой функции</translation>
+        <translation type="vanished">Aceitar a criação/modificação desta função</translation>
     </message>
     <message>
         <source>Name used to invoke this function in expressions</source>
-        <translation type="vanished">Имя, используемое для вызова этой функции в выражениях</translation>
+        <translation type="vanished">Nome usado para chamar esta função em expressões</translation>
     </message>
     <message>
         <source>Title displayed in menus and in function manager</source>
-        <translation type="vanished">Заголовок, отображаемый в меню и в диспетчере функций</translation>
+        <translation type="vanished">Título exibido nos menus e no gerenciador de funções</translation>
     </message>
     <message>
         <source>Hide function</source>
-        <translation type="vanished">Скрыть функцию</translation>
+        <translation type="vanished">Ocultar função</translation>
     </message>
     <message>
         <source>If this function shall be hidden in menus</source>
-        <translation type="vanished">Если эта функция должна быть скрыта в меню</translation>
+        <translation type="vanished">Caso a função esteja oculta nos menus</translation>
     </message>
     <message>
         <source>Description of this function</source>
-        <translation type="vanished">Описание этой функции</translation>
+        <translation type="vanished">Descrição desta função</translation>
     </message>
     <message>
         <source>Use \x for the first, \y for the second and \z for the third argument. For more information click the help button.</source>
-        <translation type="vanished">Используйте \x для первого аргумента, \y для второго и \z для третьего.Для получения дополнительной информации нажмите кнопку справки.</translation>
+        <translation type="vanished">Use \x para o primeiro, \y para o segundo e \z para o terceiro argumento. Para mais informações, clique no botão de ajuda.</translation>
     </message>
     <message>
         <source>Condition</source>
-        <translation type="vanished">Условие</translation>
+        <translation type="vanished">Condição</translation>
     </message>
     <message>
         <source>Condition that must be true for the function (e.g. if the second argument must be greater than the first: &quot;\y &gt; \x&quot;)</source>
-        <translation type="vanished">Условие, которое должно выполняться для функции (например, если второй аргумент должен быть больше первого: «\y &gt; \x»)</translation>
+        <translation type="vanished">Condição que deve ser verdadeira para a função (por exemplo, se o segundo argumento deve ser maior que o primeiro: &quot;\y &gt; \x&quot;)</translation>
     </message>
     <message>
         <source>Sub-Functions</source>
-        <translation type="vanished">Подфункции</translation>
+        <translation type="vanished">Subfunções</translation>
     </message>
     <message>
         <source>Arguments:</source>
-        <translation type="vanished">Аргументы:</translation>
+        <translation type="vanished">Argumentos:</translation>
     </message>
     <message>
         <source>Definition of this function&apos;s arguments</source>
-        <translation type="vanished">Определение аргументов этой функции</translation>
+        <translation type="vanished">Definição dos argumentos desta função</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="vanished">Произвольное значение</translation>
+        <translation type="vanished">Livre</translation>
     </message>
     <message>
         <source>Integer</source>
-        <translation type="vanished">Целое</translation>
+        <translation type="vanished">Inteiro</translation>
     </message>
     <message>
         <source>Symbol</source>
-        <translation type="vanished">Символ</translation>
+        <translation type="vanished">Símbolo</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="vanished">Дата</translation>
+        <translation type="vanished">Data</translation>
     </message>
     <message>
         <source>Vector</source>
-        <translation type="vanished">Вектор</translation>
+        <translation type="vanished">Vetor</translation>
     </message>
     <message>
         <source>Positive number</source>
-        <translation type="vanished">Положительное число</translation>
+        <translation type="vanished">Número positivo</translation>
     </message>
     <message>
         <source>Non-zero number</source>
-        <translation type="vanished">Ненулевое число</translation>
+        <translation type="vanished">Número diferente de zero</translation>
     </message>
     <message>
         <source>Non-negative number</source>
-        <translation type="vanished">Неотрицательное число</translation>
+        <translation type="vanished">Número não-negativo</translation>
     </message>
     <message>
         <source>Positive integer</source>
-        <translation type="vanished">Положительное целое</translation>
+        <translation type="vanished">Número inteiro positivo</translation>
     </message>
     <message>
         <source>Non-zero integer</source>
-        <translation type="vanished">Ненулевое целое</translation>
+        <translation type="vanished">Inteiro diferente de zero</translation>
     </message>
     <message>
         <source>Non-negative integer</source>
-        <translation type="vanished">Неотрицательное целое</translation>
+        <translation type="vanished">Inteiro não-negativo</translation>
     </message>
     <message>
         <source>Boolean</source>
-        <translation type="vanished">Логическое</translation>
+        <translation type="vanished">Boleano</translation>
     </message>
     <message>
         <source>Object</source>
-        <translation type="vanished">Объект</translation>
+        <translation type="vanished">Objeto</translation>
     </message>
     <message>
         <source>Unit</source>
-        <translation type="vanished">Единица измерения</translation>
+        <translation type="vanished">Unidade</translation>
     </message>
     <message>
         <source>Variable</source>
-        <translation type="vanished">Переменная</translation>
+        <translation type="vanished">Variável</translation>
     </message>
     <message>
         <source>Angle</source>
-        <translation type="vanished">Угол</translation>
+        <translation type="vanished">Ângulo</translation>
     </message>
     <message>
         <source>Data object</source>
-        <translation type="vanished">Объект данных</translation>
+        <translation type="vanished">Onjeto de dados</translation>
     </message>
     <message>
         <source>Data property</source>
-        <translation type="vanished">Свойство данных</translation>
+        <translation type="vanished">Propriedade de dados</translation>
     </message>
     <message>
         <source>_Add</source>
-        <translation type="vanished">_Добавить</translation>
+        <translation type="vanished">_Adicionar</translation>
     </message>
     <message>
         <source>Add entered argument definition</source>
-        <translation type="vanished">Добавить введённое определение аргумента</translation>
+        <translation type="vanished">Adicionar definição de argumento inserido</translation>
     </message>
     <message>
         <source>_Apply</source>
-        <translation type="vanished">П_рименить</translation>
+        <translation type="vanished">_Aplicar</translation>
     </message>
     <message>
         <source>Modify selected argument</source>
-        <translation type="vanished">Изменить выбранный аргумент</translation>
+        <translation type="vanished">Modificar argumento selecionado</translation>
     </message>
     <message>
         <source>Remove selected argument</source>
-        <translation type="vanished">Удалить выбранный аргумент</translation>
+        <translation type="vanished">Remover argumento selecionado</translation>
     </message>
     <message>
         <source>Rules</source>
-        <translation type="vanished">Правила</translation>
+        <translation type="vanished">Regras</translation>
     </message>
     <message>
         <source>Edit conditions for selected argument</source>
-        <translation type="vanished">Изменить условия для выбранного аргумента</translation>
+        <translation type="vanished">Editar condições para o argumento selecionado</translation>
     </message>
     <message>
         <source>Close this dialog</source>
-        <translation type="vanished">Закройте это диалоговое окно</translation>
+        <translation type="vanished">Fechar este diálogo</translation>
     </message>
     <message>
         <source>Precalculate</source>
-        <translation type="vanished">Предварительно рассчитать</translation>
+        <translation type="vanished">Pré-calcular</translation>
     </message>
     <message>
         <source>Calculate the subfunction only once, before the parent function</source>
-        <translation type="vanished">Вычислить подфункцию только один раз, перед основной.</translation>
+        <translation type="vanished">Calcular a subfunção apenas uma vez, antes da função pai</translation>
     </message>
     <message>
         <source>Add entered subfunction</source>
-        <translation type="vanished">Добавить введённую подфункцию</translation>
+        <translation type="vanished">Adicionar subfunção inserida</translation>
     </message>
     <message>
         <source>Apply changes to the selected subfunction</source>
-        <translation type="vanished">Применить изменения к выбранной подфункции</translation>
+        <translation type="vanished">Aplicar alterações à subfunção selecionada</translation>
     </message>
     <message>
         <source>Remove the selected subfunction</source>
-        <translation type="vanished">Удалить выбранную подфункцию</translation>
+        <translation type="vanished">Remover a subfunção selecionada</translation>
     </message>
     <message>
         <source>Functions</source>
-        <translation type="vanished">Функции</translation>
+        <translation type="vanished">Funções</translation>
     </message>
     <message>
         <source>Create a new function</source>
-        <translation type="vanished">Создать новую функцию</translation>
+        <translation type="vanished">Criar uma nova função</translation>
     </message>
     <message>
         <source>Edit the selected function</source>
-        <translation type="vanished">Изменить выбранную функцию</translation>
+        <translation type="vanished">Editar a função selecionada</translation>
     </message>
     <message>
         <source>_Insert</source>
-        <translation type="vanished">_Вставить</translation>
+        <translation type="vanished">_Inserir</translation>
     </message>
     <message>
         <source>Insert (or execute) the selected function into the expression entry</source>
-        <translation type="vanished">Вставить (или выполнить) выбранную функцию в выражение</translation>
+        <translation type="vanished">Inserir (ou executar) a função selecionada na entrada da expressão</translation>
     </message>
     <message>
         <source>Delete the selected function</source>
-        <translation type="vanished">Удалить выбранную функцию</translation>
+        <translation type="vanished">Excluir a função selecionada</translation>
     </message>
     <message>
         <source>(De)activate the selected function</source>
-        <translation type="vanished">(Де)активировать выбранную функцию</translation>
+        <translation type="vanished">Desativar a função selecionada</translation>
     </message>
     <message>
         <source>Deacti_vate</source>
-        <translation type="vanished">_Деактивировать</translation>
+        <translation type="vanished">Desati_var</translation>
     </message>
     <message>
         <source>Apply the selected function to the current expression</source>
-        <translation type="vanished">Применить выбранную функцию к текущему выражению</translation>
+        <translation type="vanished">Aplicar função selecionada à expressão atual</translation>
     </message>
     <message>
         <source>Categor_y</source>
-        <translation type="vanished">Категори_я</translation>
+        <translation type="vanished">Categor_ia</translation>
     </message>
     <message>
         <source>_Function</source>
-        <translation type="vanished">_Функция</translation>
+        <translation type="vanished">_Função</translation>
     </message>
     <message>
         <source>Descri_ption</source>
-        <translation type="vanished">Описа_ние</translation>
+        <translation type="vanished">Desc_rição</translation>
     </message>
     <message>
         <source>Degrees</source>
-        <translation type="vanished">Градусы</translation>
+        <translation type="vanished">Graus</translation>
     </message>
     <message>
         <source>Radians</source>
-        <translation type="vanished">Радианы</translation>
+        <translation type="vanished">Radianos</translation>
     </message>
     <message>
         <source>Gradians</source>
-        <translation type="vanished">Грады</translation>
+        <translation type="vanished">Grados</translation>
     </message>
     <message>
         <source>Default assumptions</source>
-        <translation type="vanished">Предположения по умолчанию</translation>
+        <translation type="vanished">Suposições padrão</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="vanished">Неизвестное</translation>
+        <translation type="vanished">Desconhecido</translation>
     </message>
     <message>
         <source>Not Matrix</source>
-        <translation type="vanished">Не матрица</translation>
+        <translation type="vanished">Não-matriz</translation>
     </message>
     <message>
         <source>Complex</source>
-        <translation type="vanished">Комплексное</translation>
+        <translation type="vanished">Complexo</translation>
     </message>
     <message>
         <source>Real</source>
-        <translation type="vanished">Вещественное</translation>
+        <translation type="vanished">Real</translation>
     </message>
     <message>
         <source>Rational</source>
-        <translation type="vanished">Рациональное</translation>
+        <translation type="vanished">Racional</translation>
     </message>
     <message>
         <source>Non-Zero</source>
-        <translation type="vanished">Ненулевое</translation>
+        <translation type="vanished">Diferente de zero</translation>
     </message>
     <message>
         <source>Positive</source>
-        <translation type="vanished">Положительное</translation>
+        <translation type="vanished">Positivo</translation>
     </message>
     <message>
         <source>Non-Negative</source>
-        <translation type="vanished">Неотрицательное</translation>
+        <translation type="vanished">Não-negativo</translation>
     </message>
     <message>
         <source>Negative</source>
-        <translation type="vanished">Отрицательное</translation>
+        <translation type="vanished">Negativo</translation>
     </message>
     <message>
         <source>Non-Positive</source>
-        <translation type="vanished">Не положительное</translation>
+        <translation type="vanished">Não-positivo</translation>
     </message>
     <message>
         <source>_File</source>
-        <translation type="vanished">_Файл</translation>
+        <translation type="vanished">_Arquivo</translation>
     </message>
     <message>
         <source>Unknown Variable</source>
-        <translation type="vanished">Переменная неизвестного</translation>
+        <translation type="vanished">Variável desconhecida</translation>
     </message>
     <message>
         <source>Function (simplified)</source>
-        <translation type="vanished">Функция (упрощённая)</translation>
+        <translation type="vanished">Função (simplificada)</translation>
     </message>
     <message>
         <source>Import CSV File…</source>
-        <translation type="vanished">Загрузить CSV файл…</translation>
+        <translation type="vanished">Importar arquivo CSV…</translation>
     </message>
     <message>
         <source>Export CSV File…</source>
-        <translation type="vanished">Экспорт в CSV файл…</translation>
+        <translation type="vanished">Exportar arquivo CSV…</translation>
     </message>
     <message>
         <source>_Store Result…</source>
-        <translation type="vanished">Со_хранить результат…</translation>
+        <translation type="vanished">_Guardar resultado…</translation>
     </message>
     <message>
         <source>Save Result Image…</source>
-        <translation type="vanished">Сохранить изображение с результатом…</translation>
+        <translation type="vanished">Salvar imagem do resultado…</translation>
     </message>
     <message>
         <source>Save local functions, variables and units</source>
-        <translation type="vanished">Сохранить локальные функции, переменные и единицы измерения</translation>
+        <translation type="vanished">Salvar funções, variáveis e unidades</translation>
     </message>
     <message>
         <source>Save Definitions</source>
-        <translation type="vanished">Сохранить определения</translation>
+        <translation type="vanished">Salvar definições</translation>
     </message>
     <message>
         <source>Import Definitions File…</source>
-        <translation type="vanished">Импортировать файл с определениями…</translation>
+        <translation type="vanished">Importar arquivo de definições…</translation>
     </message>
     <message>
         <source>Fetch current exchange rates from the Internet</source>
-        <translation type="vanished">Загрузить текущие курсы валют из Интернета.</translation>
+        <translation type="vanished">Buscar taxas de câmbio atualizadas na Internet</translation>
     </message>
     <message>
         <source>Update Exchange Rates</source>
-        <translation type="vanished">Обновить курсы валют</translation>
+        <translation type="vanished">Atualizar taxas de câmbio</translation>
     </message>
     <message>
         <source>Plot Functions/Data</source>
-        <translation type="vanished">Графики функций/данных</translation>
+        <translation type="vanished">Funções/dados de plotagem</translation>
     </message>
     <message>
         <source>Convert Number Bases</source>
-        <translation type="vanished">Преобразовать между основаниями систем счисления</translation>
+        <translation type="vanished">Converter bases numéricas</translation>
     </message>
     <message>
         <source>Floating Point Conversion (IEEE 754)</source>
-        <translation type="vanished">Преобразование чисел с плавающей запятой (IEEE 754)</translation>
+        <translation type="vanished">Conversão de ponto flutuante (IEEE 754)</translation>
     </message>
     <message>
         <source>Percentage Calculation Tool</source>
-        <translation type="vanished">Инструмент расчёта процентов</translation>
+        <translation type="vanished">Ferramenta de Cálculo de Porcentagem</translation>
     </message>
     <message>
         <source>Periodic Table</source>
-        <translation type="vanished">Периодическая таблица</translation>
+        <translation type="vanished">Tabela Periódica</translation>
     </message>
     <message>
         <source>Minimal Window</source>
-        <translation type="vanished">Минимальное окно</translation>
+        <translation type="vanished">Janela mínima</translation>
     </message>
     <message>
         <source>_Quit</source>
-        <translation type="vanished">В_ыход</translation>
+        <translation type="vanished">_Sair</translation>
     </message>
     <message>
         <source>Manage Variables</source>
-        <translation type="vanished">Управление переменными</translation>
+        <translation type="vanished">Gerenciar Variáveis</translation>
     </message>
     <message>
         <source>Manage Functions</source>
-        <translation type="vanished">Управление функциями</translation>
+        <translation type="vanished">Gerenciar Funções</translation>
     </message>
     <message>
         <source>Manage Units</source>
-        <translation type="vanished">Управление единицами измерения</translation>
+        <translation type="vanished">Gerenciar Unidades</translation>
     </message>
     <message>
         <source>Manage Data Sets</source>
-        <translation type="vanished">Управление наборами данных</translation>
+        <translation type="vanished">Gerenciar Conjuntos de Dados</translation>
     </message>
     <message>
         <source>Factorize</source>
-        <translation type="vanished">Разложить на множители</translation>
+        <translation type="vanished">Fatorar</translation>
     </message>
     <message>
         <source>Expand</source>
-        <translation type="vanished">Раскрывать</translation>
+        <translation type="vanished">Expandir</translation>
     </message>
     <message>
         <source>Apply partial fraction decomposition to the current result.</source>
-        <translation type="vanished">Применить частичное дробное разложение к текущему результату.</translation>
+        <translation type="vanished">Aplicar decomposição de fração parcial ao resultado atual.</translation>
     </message>
     <message>
         <source>Expand Partial Fractions</source>
-        <translation type="vanished">Расширение дробных чисел</translation>
+        <translation type="vanished">Expandir Frações Parciais</translation>
     </message>
     <message>
         <source>Set Unknowns…</source>
-        <translation type="vanished">Установить неизвестные…</translation>
+        <translation type="vanished">Definir Incógnitos…</translation>
     </message>
     <message>
         <source>Convert to Unit</source>
-        <translation type="vanished">Преобразовать к единице измерения</translation>
+        <translation type="vanished">Converter em Unidade</translation>
     </message>
     <message>
         <source>Set Prefix</source>
-        <translation type="vanished">Установить префикс</translation>
+        <translation type="vanished">Definir Prefixo</translation>
     </message>
     <message>
         <source>Convert to Unit Expression…</source>
-        <translation type="vanished">Преобразовать к выражению единиц измерения…</translation>
+        <translation type="vanished">Converter em Expressão de Unidade…</translation>
     </message>
     <message>
         <source>Convert to Base Units</source>
-        <translation type="vanished">Преобразовать в базовые единицы измерения</translation>
+        <translation type="vanished">Converter em Unidades Base</translation>
     </message>
     <message>
         <source>Convert to Optimal Unit</source>
-        <translation type="vanished">Преобразовать в оптимальные единицы измерения</translation>
+        <translation type="vanished">Converter em Unidade Ideal</translation>
     </message>
     <message>
         <source>Insert Date…</source>
-        <translation type="vanished">Вставить дату…</translation>
+        <translation type="vanished">Inserir Data…</translation>
     </message>
     <message>
         <source>Insert Matrix…</source>
-        <translation type="vanished">Вставить матрицу…</translation>
+        <translation type="vanished">Inserir Matriz…</translation>
     </message>
     <message>
         <source>Insert Vector…</source>
-        <translation type="vanished">Вставить вектор…</translation>
+        <translation type="vanished">Inserir Vetor…</translation>
     </message>
     <message>
         <source>_Copy Result</source>
-        <translation type="vanished">С_копировать результат</translation>
+        <translation type="vanished">_Copiar resultado</translation>
     </message>
     <message>
         <source>Customize Keypad Buttons</source>
-        <translation type="vanished">Настроить кнопки клавиатуры</translation>
+        <translation type="vanished">Personalizar botões do teclado</translation>
     </message>
     <message>
         <source>_Preferences</source>
-        <translation type="vanished">_Параметры</translation>
+        <translation type="vanished">_Preferências</translation>
     </message>
     <message>
         <source>_Mode</source>
-        <translation type="vanished">_Режим</translation>
+        <translation type="vanished">_Modo</translation>
     </message>
     <message>
         <source>Number Base</source>
-        <translation type="vanished">Основание системы счисления</translation>
+        <translation type="vanished">Base numérica</translation>
     </message>
     <message>
         <source>Select Result and Expression Base…</source>
-        <translation type="vanished">Выбрать основание системы счисления результата и выражения…</translation>
+        <translation type="vanished">Selecionar resultado e base de expressão…</translation>
     </message>
     <message>
         <source>Binary</source>
-        <translation type="vanished">Двоичное</translation>
+        <translation type="vanished">Binário</translation>
     </message>
     <message>
         <source>Octal</source>
-        <translation type="vanished">Восьмеричное</translation>
+        <translation type="vanished">Octal</translation>
     </message>
     <message>
         <source>Decimal</source>
-        <translation type="vanished">Десятичное</translation>
+        <translation type="vanished">Decimal</translation>
     </message>
     <message>
         <source>Duodecimal</source>
-        <translation type="vanished">Двенадцатеричное</translation>
+        <translation type="vanished">Duodecimal</translation>
     </message>
     <message>
         <source>Hexadecimal</source>
-        <translation type="vanished">Шестнадцатеричное</translation>
+        <translation type="vanished">Hexadecimal</translation>
     </message>
     <message>
         <source>Other…</source>
-        <translation type="vanished">Другое…</translation>
+        <translation type="vanished">Outro…</translation>
     </message>
     <message>
         <source>Sexagesimal</source>
-        <translation type="vanished">Шестидесятеричное</translation>
+        <translation type="vanished">Sexagesimal</translation>
     </message>
     <message>
         <source>Time Format</source>
-        <translation type="vanished">Формат времени</translation>
+        <translation type="vanished">Formato da hora</translation>
     </message>
     <message>
         <source>Roman Numerals</source>
-        <translation type="vanished">Римские цифры</translation>
+        <translation type="vanished">Números romanos</translation>
     </message>
     <message>
         <source>Numerical Display</source>
-        <translation type="vanished">Отображение чисел</translation>
+        <translation type="vanished">Exibição numérica</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="vanished">Обычное</translation>
+        <translation type="vanished">Normal</translation>
     </message>
     <message>
         <source>Engineering</source>
-        <translation type="vanished">Инженерное</translation>
+        <translation type="vanished">Engenharia</translation>
     </message>
     <message>
         <source>Scientific</source>
-        <translation type="vanished">Научное</translation>
+        <translation type="vanished">Científica</translation>
     </message>
     <message>
         <source>Purely Scientific</source>
-        <translation type="vanished">Простое научное</translation>
+        <translation type="vanished">Puramente Científica</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation type="vanished">Простое</translation>
+        <translation type="vanished">Simples</translation>
     </message>
     <message>
         <source>Off: 1/7 ≈ 0.14285714
 On: 1/7 = 0.142857 142857...</source>
-        <translation type="vanished">Выкл.: 1/7 ≈ 0,14285714
-Вкл.: 1/7 = 0.142857 142857...</translation>
+        <translation type="vanished">Desativado: 1/7 ≈ 0.14285714
+Ativado: 1/7 = 0.142857 142857...</translation>
     </message>
     <message>
         <source>Indicate Repeating Decimals</source>
-        <translation type="vanished">Указывать повторяющиеся десятичные дроби</translation>
+        <translation type="vanished">Indicar decimais repetidos</translation>
     </message>
     <message>
         <source>Show Ending Zeroes</source>
-        <translation type="vanished">Показывать конечные нули</translation>
+        <translation type="vanished">Mostrar zeros finais</translation>
     </message>
     <message>
         <source>Off: 2.5 ≈ 3,  1.5 ≈ 2
 On: 2.5 ≈ 2, 1.5 ≈ 2</source>
-        <translation type="vanished">Выкл.: 2,5 ≈ 3, 1,5 ≈ 2
-Вкл.: 2,5 ≈ 2, 1,5 ≈ 2</translation>
+        <translation type="vanished">Desativado: 2.5 ≈ 3,  1.5 ≈ 2
+Ativado: 2.5 ≈ 2, 1.5 ≈ 2</translation>
     </message>
     <message>
         <source>Round Halfway Numbers to Even</source>
-        <translation type="vanished">Округлять половинные числа до ближайшего чётного целого числа.</translation>
+        <translation type="vanished">Arredondar números até a metade</translation>
     </message>
     <message>
         <source>Off: -x + y
 On: y - x</source>
-        <translation type="vanished">Выкл.: -x + y
-Вкл.: y - x</translation>
+        <translation type="vanished">Desativado: -x + y
+Ativado: y - x</translation>
     </message>
     <message>
         <source>Sort Minus Last</source>
-        <translation type="vanished">Сортировать отрицательные последними</translation>
+        <translation type="vanished">Classificar menos último</translation>
     </message>
     <message>
         <source>Complex Rectangular Form</source>
-        <translation type="vanished">Прямоугольная форма комплексных чисел</translation>
+        <translation type="vanished">Forma retangular complexa</translation>
     </message>
     <message>
         <source>Complex Exponential Form</source>
-        <translation type="vanished">Экспоненциальная форма комплексных чисел</translation>
+        <translation type="vanished">Forma exponencial complexa</translation>
     </message>
     <message>
         <source>Complex Polar Form</source>
-        <translation type="vanished">Полярная форма комплексных чисел</translation>
+        <translation type="vanished">Forma polar complexa</translation>
     </message>
     <message>
         <source>Complex Angle/Phasor Notation</source>
-        <translation type="vanished">Обозначение угла/вектора комплексных чисел</translation>
+        <translation type="vanished">Notação complexa de ângulo/fasor</translation>
     </message>
     <message>
         <source>Rational Number Form</source>
-        <translation type="vanished">Форма рационального числа</translation>
+        <translation type="vanished">Forma do número racional</translation>
     </message>
     <message>
         <source>1/3 ≈ 0.33333</source>
-        <translation type="vanished">1/3 ≈ 0,33333</translation>
+        <translation type="vanished">1/3 ≈ 0.33333</translation>
     </message>
     <message>
         <source>Decimal Fractions</source>
-        <translation type="vanished">Десятичные дроби</translation>
+        <translation type="vanished">Frações decimais</translation>
     </message>
     <message>
         <source>3/9 = 1/3
 6/4 = 1.5</source>
         <translation type="vanished">3/9 = 1/3
-6/4 = 1,5</translation>
+6/4 = 1.5</translation>
     </message>
     <message>
         <source>Exact Decimal Fractions</source>
-        <translation type="vanished">Точные десятичные дроби</translation>
+        <translation type="vanished">Frações decimais exatas</translation>
     </message>
     <message>
         <source>6/4 = 3/2</source>
@@ -1130,7 +1126,7 @@ On: y - x</source>
     </message>
     <message>
         <source>Simple Fractions</source>
-        <translation type="vanished">Простые дроби</translation>
+        <translation type="vanished">Frações simples</translation>
     </message>
     <message>
         <source>6/4 = 1+1/2</source>
@@ -1138,545 +1134,536 @@ On: y - x</source>
     </message>
     <message>
         <source>Mixed Fractions</source>
-        <translation type="vanished">Смешанные дроби</translation>
+        <translation type="vanished">Frações mistas</translation>
     </message>
     <message>
         <source>Interval Display</source>
-        <translation type="vanished">Отображение интервалов</translation>
+        <translation type="vanished">Exibição de intervalo</translation>
     </message>
     <message>
         <source>Off: 1/2*pi ≈ 1.5707963
 On: 1/2*pi = 0.5 pi</source>
-        <translation type="vanished">Выкл.: 1/2*pi ≈ 1,5707963
-Вкл.: 1/2*pi = 0,5 pi</translation>
+        <translation type="vanished">Desativado: 1/2*pi ≈ 1.5707963
+Ativado: 1/2*pi = 0.5 pi</translation>
     </message>
     <message>
         <source>Adaptive</source>
-        <translation type="vanished">Адаптивный</translation>
+        <translation type="vanished">Adaptativa</translation>
     </message>
     <message>
         <source>Calculates an interval of possible values and keeps track of precision changes.</source>
-        <translation type="vanished">Рассчитывает интервал возможных значений и отслеживает точные изменения.</translation>
+        <translation type="vanished">Calcula um intervalo de valores possíveis e acompanha mudanças de precisão.</translation>
     </message>
     <message>
         <source>Significant Digits</source>
-        <translation type="vanished">Значимые цифры</translation>
+        <translation type="vanished">Dígitos Significativos</translation>
     </message>
     <message>
         <source>Interval</source>
-        <translation type="vanished">Интервал</translation>
+        <translation type="vanished">Intervalo</translation>
     </message>
     <message>
         <source>Plus/Minus</source>
-        <translation type="vanished">Плюс/минус</translation>
+        <translation type="vanished">Mais/Menos</translation>
     </message>
     <message>
         <source>Midpoint</source>
-        <translation type="vanished">Середина</translation>
+        <translation type="vanished">Ponto médio</translation>
     </message>
     <message>
         <source>Unit Display</source>
-        <translation type="vanished">Отображение единиц измерения</translation>
+        <translation type="vanished">Exibir Unidade</translation>
     </message>
     <message>
         <source>Do not use any prefixes in result</source>
-        <translation type="vanished">Не использовать префиксы в результате</translation>
+        <translation type="vanished">Não usar nenhum prefixo no resultado</translation>
     </message>
     <message>
         <source>Show prefixes for primarily SI and CGS units.</source>
-        <translation type="vanished">Показывать префиксы для преимущественно единиц измерения СИ и СГС.</translation>
+        <translation type="vanished">Mostrar prefixos principalmente para unidades SI e CGS.</translation>
     </message>
     <message>
         <source>Use prefixes for selected units</source>
-        <translation type="vanished">Использовать префиксы для выбранных единиц измерения</translation>
+        <translation type="vanished">Usar prefixos para unidades selecionadas</translation>
     </message>
     <message>
         <source>Use prefixes also for currencies</source>
-        <translation type="vanished">Использовать префиксы также для валют</translation>
+        <translation type="vanished">Usar prefixos também para moedas</translation>
     </message>
     <message>
         <source>Use prefixs for all units</source>
-        <translation type="vanished">Использовать префиксы для всех единиц измерения</translation>
+        <translation type="vanished">Usar prefixos em todas as unidades</translation>
     </message>
     <message>
         <source>Enables automatic use of hekto, deka, deci and centi when prefixes is enabled</source>
-        <translation type="vanished">Включает автоматическое использование гекто, дека, деци и санти, когда префиксы включены</translation>
+        <translation type="vanished">Permite o uso automático de hekto, deka, deci e centi quando os prefixos estão ativados</translation>
     </message>
     <message>
         <source>Enable All SI Prefixes</source>
-        <translation type="vanished">Включить все префиксы СИ</translation>
+        <translation type="vanished">Ativar Todos os Prefixos SI</translation>
     </message>
     <message>
         <source>Enables automatic setting of prefix for denominator in addition to the numerator</source>
-        <translation type="vanished">Включает автоматическую установку префикса для знаменателя в дополнение к числителю</translation>
+        <translation type="vanished">Ativar a configuração automática de prefixo para o denominador, além do numerador</translation>
     </message>
     <message>
         <source>Enable Denominator Prefixes</source>
-        <translation type="vanished">Включить префиксы знаменателя</translation>
+        <translation type="vanished">Ativar Prefixos de Denominador</translation>
     </message>
     <message>
         <source>Off: J / K
 On: J * K^-1</source>
-        <translation type="vanished">Выкл.: Дж / К
-Вкл.: Дж * К^-1</translation>
+        <translation type="vanished">Desativado: J / K
+Ativado: J * K^-1</translation>
     </message>
     <message>
         <source>Negative Exponents</source>
-        <translation type="vanished">Отрицательные степени</translation>
+        <translation type="vanished">Expoentes negativos</translation>
     </message>
     <message>
         <source>Off: (2 m)/s
 On: 2 (m/s)</source>
-        <translation type="vanished">Выкл.: (2 м)/с
-Вкл.: 2 (м/с)</translation>
+        <translation type="vanished">Desativado: (2 m)/s
+Ativado: 2 (m/s)</translation>
     </message>
     <message>
         <source>Place Units Separately</source>
-        <translation type="vanished">Размещать единицы измерения отдельно</translation>
+        <translation type="vanished">Colocar unidades separadamente</translation>
     </message>
     <message>
         <source>No Additional Conversion</source>
-        <translation type="vanished">Без дополнительного преобразования</translation>
+        <translation type="vanished">Nenhuma conversão adicional</translation>
     </message>
     <message>
         <source>Convert to Optimal SI Unit</source>
-        <translation type="vanished">Преобразовать в оптимальные единицы СИ</translation>
+        <translation type="vanished">Converter em unidade SI ideal</translation>
     </message>
     <message>
         <source>If enabled:
 15 in = 1 ft + 3 in
 3.2 h = 3 h + 12 min</source>
-        <translation type="vanished">Если включено:
-15 дюймов = 1 фут + 3 дюйма
-3,2 ч = 3 ч + 12 мин</translation>
+        <translation type="vanished">Se ativado:
+15 in = 1 ft + 3 in
+3,2 h = 3 h + 12 min</translation>
     </message>
     <message>
         <source>Convert to Mixed Units</source>
-        <translation type="vanished">Преобразовать в смешанные единицы</translation>
+        <translation type="vanished">Converter em unidades mistas</translation>
     </message>
     <message>
         <source>Abbreviate Names</source>
-        <translation type="vanished">Сокращённые имена</translation>
+        <translation type="vanished">Abreviar nomes</translation>
     </message>
     <message>
         <source>Enabled Objects</source>
-        <translation type="vanished">Активные объекты</translation>
+        <translation type="vanished">Objetos ativados</translation>
     </message>
     <message>
         <source>Variables</source>
-        <translation type="vanished">Переменные</translation>
+        <translation type="vanished">Variáveis</translation>
     </message>
     <message>
         <source>Units</source>
-        <translation type="vanished">Единицы измерения</translation>
+        <translation type="vanished">Unidades</translation>
     </message>
     <message>
         <source>Unknowns</source>
-        <translation type="vanished">Неизвестные</translation>
+        <translation type="vanished">Desconhecidos</translation>
     </message>
     <message>
         <source>Units in Physical Constants</source>
-        <translation type="vanished">Единицы измерения в физических константах</translation>
+        <translation type="vanished">Unidades em constantes físicas</translation>
     </message>
     <message>
         <source>If not enabled, treats all variables as unknown</source>
-        <translation type="vanished">Если не включено, все переменные рассматриваются как неизвестные.</translation>
+        <translation type="vanished">Se não estiver ativado, trata todas as variáveis como desconhecidas</translation>
     </message>
     <message>
         <source>Calculate Variables</source>
-        <translation type="vanished">Вычислять переменные</translation>
+        <translation type="vanished">Calcular variáveis</translation>
     </message>
     <message>
         <source>Disables/enables complex numbers in result</source>
-        <translation type="vanished">Запретить/разрешить комплексные числа в результате</translation>
+        <translation type="vanished">Desativar/ativar números complexos no resultado</translation>
     </message>
     <message>
         <source>Allow Complex Result</source>
-        <translation type="vanished">Разрешить комплексный результат</translation>
+        <translation type="vanished">Permitir resultado complexo</translation>
     </message>
     <message>
         <source>Disables/enables infinite numbers in result</source>
-        <translation type="vanished">Запретить/разрешить бесконечности в результате</translation>
+        <translation type="vanished">Desativar/ativar números infinitos no resultado</translation>
     </message>
     <message>
         <source>Allow Infinite Result</source>
-        <translation type="vanished">Разрешить бесконечный результат</translation>
+        <translation type="vanished">Permitir resultado infinito</translation>
     </message>
     <message>
         <source>Approximation</source>
-        <translation type="vanished">Приближение</translation>
+        <translation type="vanished">Aproximação</translation>
     </message>
     <message>
         <source>Always Exact</source>
-        <translation type="vanished">Всегда точно</translation>
+        <translation type="vanished">Sempre exato</translation>
     </message>
     <message>
         <source>Try Exact</source>
-        <translation type="vanished">Попробуй точно</translation>
+        <translation type="vanished">Tentar exato</translation>
     </message>
     <message>
         <source>Approximate</source>
-        <translation type="vanished">Приблизительно</translation>
+        <translation type="vanished">Aproximado</translation>
     </message>
     <message>
         <source>Interval Arithmetic</source>
-        <translation type="vanished">Арифметика интервалов</translation>
+        <translation type="vanished">Aritmética de intervalo</translation>
     </message>
     <message>
         <source>Interval Calculation</source>
-        <translation type="vanished">Расчёт интервала</translation>
+        <translation type="vanished">Cálculo de intervalo</translation>
     </message>
     <message>
         <source>Variance Formula</source>
-        <translation type="vanished">Формула дисперсии</translation>
+        <translation type="vanished">Fórmula de variância</translation>
     </message>
     <message>
         <source>Change angle unit used in trigonometric functions</source>
-        <translation type="vanished">Изменять единицы измерения углов, используемые в тригонометрических функциях</translation>
+        <translation type="vanished">Alterar unidade de ângulo usada em funções trigonimétricas</translation>
     </message>
     <message>
         <source>Angle Unit</source>
-        <translation type="vanished">Единица измерения углов</translation>
+        <translation type="vanished">Unidade de ângulo</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="vanished">Никакой</translation>
+        <translation type="vanished">Nenhum</translation>
     </message>
     <message>
         <source>Assumptions</source>
-        <translation type="vanished">Предположения</translation>
+        <translation type="vanished">Suposições</translation>
     </message>
     <message>
         <source>Algebraic Mode</source>
-        <translation type="vanished">Алгебраический режим</translation>
+        <translation type="vanished">Modo Algébrico</translation>
     </message>
     <message>
         <source>Assume that unknown denominators are non-zero</source>
-        <translation type="vanished">Предполагать, что знаменатели ненулевые</translation>
+        <translation type="vanished">Assume que os denominadores incógnitos são diferentes de zero</translation>
     </message>
     <message>
         <source>Non-Zero Denominators</source>
-        <translation type="vanished">Не нулевые знаменатели</translation>
+        <translation type="vanished">Denominadores diferentes de zero</translation>
     </message>
     <message>
         <source>Warn when unknown denominators are assumed non-zero</source>
-        <translation type="vanished">Предупреждать, когда неизвестные знаменатели предполагаются ненулевыми</translation>
+        <translation type="vanished">Avisar quando denominadores incógnitos são assumidos diferentes de zero</translation>
     </message>
     <message>
         <source>Warn About Denominators Assumed Non-Zero</source>
-        <translation type="vanished">Предупреждать о предположениях о  ненулевых знаменателях</translation>
+        <translation type="vanished">Avisar sobre denominadores considerados diferentes de zero</translation>
     </message>
     <message>
         <source>Parsing Mode</source>
-        <translation type="vanished">Режим анализа</translation>
+        <translation type="vanished">Modo de análise</translation>
     </message>
     <message>
         <source>Adaptive Parsing</source>
-        <translation type="vanished">Адаптивный анализ</translation>
+        <translation type="vanished">Análise adaptativa</translation>
     </message>
     <message>
         <source>Parse Implicit Multiplication First</source>
-        <translation type="vanished">Сначала анализировать неявное умножение</translation>
+        <translation type="vanished">Analisar primeiro multiplicação implícita</translation>
     </message>
     <message>
         <source>Conventional Parsing</source>
-        <translation type="vanished">Общепринятый синтаксический анализ</translation>
-    </message>
-    <message>
-        <source>Chain Syntax</source>
-        <translation type="vanished">Цепной синтаксис</translation>
+        <translation type="vanished">Análise convencional</translation>
     </message>
     <message>
         <source>RPN Syntax</source>
-        <translation type="vanished">синтаксис ПОЛИЗ</translation>
+        <translation type="vanished">Sintaxe RPN</translation>
     </message>
     <message>
         <source>Off: xy = x*y
 On: xy != x*y</source>
-        <translation type="vanished">Выкл.: xy = x*y
-Вкл.: xy != x*y</translation>
+        <translation type="vanished">Desativado: xy = x*y
+Ativado: xy != x*y</translation>
     </message>
     <message>
         <source>Limit Implicit Multiplication</source>
-        <translation type="vanished">Ограничить неявное умножение</translation>
+        <translation type="vanished">Limitar multiplicação implícita</translation>
     </message>
     <message>
         <source>Parse decimal numbers as approximate with precision equal to the number of digits.
 
 Off: 1.1 * 1.1 = 1.21
 On: 1.1 * 1.1 ≈ 1.2</source>
-        <translation type="vanished">Анализировать десятичные числа как приблизительные с точностью, равной количеству цифр.
+        <translation type="vanished">Analisa números decimais como aproximados com precisão igual ao número de dígitos.
 
-Выкл.: 1,1 * 1,1 = 1,21
-Вкл.: 1,1 * 1,1 ≈ 1,2</translation>
+Desativado: 1.1 * 1.1 = 1.21
+Ativado: 1.1 * 1.1 ≈ 1.2</translation>
     </message>
     <message>
         <source>Read Precision</source>
-        <translation type="vanished">Точность чтения</translation>
+        <translation type="vanished">Ler precisão</translation>
     </message>
     <message>
         <source>_Precision</source>
-        <translation type="vanished">_Точность</translation>
+        <translation type="vanished">_Precisão</translation>
     </message>
     <message>
         <source>_Decimals</source>
-        <translation type="vanished">_Десятичные дроби</translation>
+        <translation type="vanished">_Decimais</translation>
     </message>
     <message>
         <source>Calculate As You Type</source>
-        <translation type="vanished">Расчёт по мере ввода</translation>
-    </message>
-    <message>
-        <source>Chain Mode</source>
-        <translation type="vanished">Режим «цепь»</translation>
+        <translation type="vanished">Calcular ao digitar</translation>
     </message>
     <message>
         <source>Activate the RPN stack.</source>
-        <translation type="vanished">Активировать стек ПОЛИЗ</translation>
+        <translation type="vanished">Ative a pilha RPN.</translation>
     </message>
     <message>
         <source>RPN Mode</source>
-        <translation type="vanished">Режим ПОЛИЗ</translation>
+        <translation type="vanished">Modo RPN</translation>
     </message>
     <message>
         <source>Meta Modes</source>
-        <translation type="vanished">Мета-режимы</translation>
+        <translation type="vanished">Meta Modos</translation>
     </message>
     <message>
         <source>Save Mode…</source>
-        <translation type="vanished">Сохранить режим…</translation>
+        <translation type="vanished">Salvar modo…</translation>
     </message>
     <message>
         <source>Delete Mode…</source>
-        <translation type="vanished">Удалить режим…</translation>
+        <translation type="vanished">Excluir modo…</translation>
     </message>
     <message>
         <source>Save Default _Mode</source>
-        <translation type="vanished">Сохранить как _режим по умолчанию</translation>
+        <translation type="vanished">Salvar _modo padrão</translation>
     </message>
     <message>
         <source>Fu_nctions</source>
-        <translation type="vanished">Ф_ункции</translation>
+        <translation type="vanished">Fu_nções</translation>
     </message>
     <message>
         <source>_Variables</source>
-        <translation type="vanished">_Переменные</translation>
+        <translation type="vanished">_Variáveis</translation>
     </message>
     <message>
         <source>_Units</source>
-        <translation type="vanished">_Единицы</translation>
+        <translation type="vanished">_Unidades</translation>
     </message>
     <message>
         <source>_Contents</source>
-        <translation type="vanished">_Содержимое</translation>
+        <translation type="vanished">_Conteúdo</translation>
     </message>
     <message>
         <source>Report a Bug</source>
-        <translation type="vanished">Сообщить об ошибке</translation>
+        <translation type="vanished">Reportar um erro</translation>
     </message>
     <message>
         <source>Check for Updates</source>
-        <translation type="vanished">Проверить обновления</translation>
+        <translation type="vanished">Verificar atualizações</translation>
     </message>
     <message>
         <source>_About</source>
-        <translation type="vanished">_О программе</translation>
+        <translation type="vanished">_Sobre</translation>
     </message>
     <message>
         <source>Toggle minimal window</source>
-        <translation type="vanished">Переключить в минимальное окно</translation>
+        <translation type="vanished">Alternar janela mínima</translation>
     </message>
     <message>
         <source>Calculation result</source>
-        <translation type="vanished">Результат расчёта</translation>
+        <translation type="vanished">Resultado do cálculo</translation>
     </message>
     <message>
         <source>_Keypad</source>
-        <translation type="vanished">_Клавиатура</translation>
+        <translation type="vanished">_Teclado</translation>
     </message>
     <message>
         <source>Toggles persistent keypad (makes it possible to show keypad and history simultaneously)</source>
-        <translation type="vanished">В(ы)ключает постоянную клавиатуру (позволяет одновременно отображать и клавиатуру, и историю)</translation>
+        <translation type="vanished">Ativar teclado persistente (permite exibir o teclado e o histórico simultaneamente)</translation>
     </message>
     <message>
         <source>_History</source>
-        <translation type="vanished">_История</translation>
+        <translation type="vanished">_Histórico</translation>
     </message>
     <message>
         <source>C_onversion</source>
-        <translation type="vanished">_Преобразование</translation>
+        <translation type="vanished">C_onversão</translation>
     </message>
     <message>
         <source>RPN Stack</source>
-        <translation type="vanished">Стек ПОЛИЗ</translation>
+        <translation type="vanished">Pilha RPN</translation>
     </message>
     <message>
         <source>Insert the selected value</source>
-        <translation type="vanished">Вставить выбранное значение</translation>
+        <translation type="vanished">Inserir o valor selecionado</translation>
     </message>
     <message>
         <source>Insert the selected text</source>
-        <translation type="vanished">Вставить выбранный текст</translation>
+        <translation type="vanished">Inserir o texto selecionado</translation>
     </message>
     <message>
         <source>Copy the selected text</source>
-        <translation type="vanished">Копировать выбранный текст</translation>
+        <translation type="vanished">Copiar o texto selecionado</translation>
     </message>
     <message>
         <source>Add the selected value(s)</source>
-        <translation type="vanished">Добавить выбранное(ые) значение(я)</translation>
+        <translation type="vanished">Adicionar os valores selecionados</translation>
     </message>
     <message>
         <source>Subtract the selected value(s)</source>
-        <translation type="vanished">Вычесть выбранное(ые) значение(я)</translation>
+        <translation type="vanished">Subtrair os valores selecionados</translation>
     </message>
     <message>
         <source>Multiply the selected value(s)</source>
-        <translation type="vanished">Умножить выбранное(ые) значение(я)</translation>
+        <translation type="vanished">Multiplicar os valores selecionados</translation>
     </message>
     <message>
         <source>Divide the the selected value(s)</source>
-        <translation type="vanished">Разделить выбранное(ые) значение(я)</translation>
+        <translation type="vanished">Dividir os valores selecionados</translation>
     </message>
     <message>
         <source>Raise to the power of the selected value</source>
-        <translation type="vanished">Возвести в степень выбранное значение</translation>
+        <translation type="vanished">Aumentar a potência do valor selecionado</translation>
     </message>
     <message>
         <source>Calculate the square root of the selected value</source>
-        <translation type="vanished">Вычислить квадратный корень из выбранного значения</translation>
+        <translation type="vanished">Calcular a raiz quadrada do valor selecionado</translation>
     </message>
     <message>
         <source>History</source>
-        <translation type="vanished">История</translation>
+        <translation type="vanished">Histórico</translation>
     </message>
     <message>
         <source>Subtract the top value from the second value</source>
-        <translation type="vanished">Вычитает верхнее значение из второго значения</translation>
+        <translation type="vanished">Subtrair o valor superior do segundo valor</translation>
     </message>
     <message>
         <source>Multiply the top two values</source>
-        <translation type="vanished">Умножьте два значения в вершине</translation>
+        <translation type="vanished">Multiplicar os dois principais valores</translation>
     </message>
     <message>
         <source>Divide the second value by the top value</source>
-        <translation type="vanished">Разделите второе значение на значение в вершине</translation>
+        <translation type="vanished">Dividir o segundo valor pelo valor superior</translation>
     </message>
     <message>
         <source>Raise the second value to the power of the top value</source>
-        <translation type="vanished">Возвести второе значение в степень значения в вершине</translation>
+        <translation type="vanished">Aumentar o segundo valor para a potência do valor superior</translation>
     </message>
     <message>
         <source>Negate the top value (Ctrl+-)</source>
-        <translation type="vanished">Изменить знак верхнего значение (Ctrl + -)</translation>
+        <translation type="vanished">Negar o valor superior (Ctrl+-)</translation>
     </message>
     <message>
         <source>Invert the top value</source>
-        <translation type="vanished">Инвертировать верхнее значение</translation>
+        <translation type="vanished">Inverter o valor superior</translation>
     </message>
     <message>
         <source>Calculate the square root of the top value</source>
-        <translation type="vanished">Вычислить квадратный корень из верхнего значения</translation>
+        <translation type="vanished">Calcular a raiz quadrada do valor superior</translation>
     </message>
     <message>
         <source>Calculate the sum of all values</source>
-        <translation type="vanished">Рассчитать сумму всех значений</translation>
+        <translation type="vanished">Calcular a soma de todos os valores</translation>
     </message>
     <message>
         <source>Rotate the stack or move selected register up</source>
-        <translation type="vanished">Повернуть стек или переместить выбранный регистр вверх</translation>
+        <translation type="vanished">Gire a pilha ou mova o registro selecionado para cima</translation>
     </message>
     <message>
         <source>Rotate the stack or move selected register down</source>
-        <translation type="vanished">Повернуть стек или переместить выбранный регистр вниз</translation>
+        <translation type="vanished">Gire a pilha ou mova o registro selecionado para baixo</translation>
     </message>
     <message>
         <source>Swap the two top values or move the selected value to the top of the stack</source>
-        <translation type="vanished">Поменять местами два верхних значения или переместить выбранное значение в вершину стека.</translation>
+        <translation type="vanished">Troque os valores superiores ou mova o valor selecionado para o topo da pilha</translation>
     </message>
     <message>
         <source>Copy the selected or top value to the top of the stack</source>
-        <translation type="vanished">Скопировать выбранное или верхнее значение в вершину стека</translation>
+        <translation type="vanished">Copie o valor selecionado ou superior para o topo da pilha</translation>
     </message>
     <message>
         <source>Enter the top value from before the last numeric operation</source>
-        <translation type="vanished">Введите верхнее значение перед последней числовой операцией</translation>
+        <translation type="vanished">Digite o valor superior antes da última operação numérica</translation>
     </message>
     <message>
         <source>Delete the top or selected value</source>
-        <translation type="vanished">Удалить верхнее или выбранное значение</translation>
+        <translation type="vanished">Excluir o valor selecionado ou superior</translation>
     </message>
     <message>
         <source>Edit the selected value</source>
-        <translation type="vanished">Изменить выбранное значение</translation>
+        <translation type="vanished">Editar o valor selecionado</translation>
     </message>
     <message>
         <source>Clear the RPN stack</source>
-        <translation type="vanished">Очистить стек ПОЛИЗ</translation>
+        <translation type="vanished">Limpar a pilha RPN</translation>
     </message>
     <message>
         <source>Unit(s) and prefix to convert result to</source>
-        <translation type="vanished">Единица(ы) измерения и префикс, к которым надо преобразовать результат</translation>
+        <translation type="vanished">Unidade(s) e prefixo para converter o resultado em</translation>
     </message>
     <message>
         <source>Convert</source>
-        <translation type="vanished">Перевести</translation>
+        <translation type="vanished">Converter</translation>
     </message>
     <message>
         <source>Continuous conversion</source>
-        <translation type="vanished">Непрерывное преобразование</translation>
+        <translation type="vanished">Conversão contínua</translation>
     </message>
     <message>
         <source>Automatically convert result to the current unit expression as long as the conversion box is visible.</source>
-        <translation type="vanished">Автоматически преобразовывать результат в текущее выражение единицы измерения, пока отображается поле преобразования.</translation>
+        <translation type="vanished">Converter automaticamente o resultado na expressão de unidade atual, desde que a caixa de conversão esteja visível.</translation>
     </message>
     <message>
         <source>Add prefix</source>
-        <translation type="vanished">Добавить префикс</translation>
+        <translation type="vanished">Adicionar prefixo</translation>
     </message>
     <message>
         <source>If unit expression does not contain any prefixes, use optimal prefix. 
 
 This can be overridden by prepending the unit expression with &quot;?&quot; or &quot;0&quot;.</source>
-        <translation type="vanished">Если выражение единицы измерения не содержит префиксов, использовать оптимальный префикс.
-
-Это можно изменить, добавив к выражению единицы измерения «?» или «0».</translation>
+        <translation type="vanished">Se a expressão da unidade não contiver nenhum prefixo, use o prefixo ideal. 
+Isso pode ser substituído ao adicionar a expressão da unidade com &quot;?&quot; ou &quot;0&quot;.</translation>
     </message>
     <message>
         <source>Conversion</source>
-        <translation type="vanished">Преобразование</translation>
+        <translation type="vanished">Conversão</translation>
     </message>
     <message>
         <source>Show/hide programming keypad</source>
-        <translation type="vanished">Показать/скрыть клавиатуру программирования</translation>
+        <translation type="vanished">Mostrar/ocultar teclado de programação</translation>
     </message>
     <message>
         <source>Exact</source>
-        <translation type="vanished">Точно</translation>
+        <translation type="vanished">Exato</translation>
     </message>
     <message>
         <source>Fraction</source>
-        <translation type="vanished">Дробь</translation>
+        <translation type="vanished">Fração</translation>
     </message>
     <message>
         <source>Numerical display</source>
-        <translation type="vanished">Отображение чисел</translation>
+        <translation type="vanished">Exibição numérica</translation>
     </message>
     <message>
         <source>Pure</source>
-        <translation type="vanished">Упрощённое научное</translation>
+        <translation type="vanished">Puro</translation>
     </message>
     <message>
         <source>Number base</source>
-        <translation type="vanished">Основание системы счисления</translation>
+        <translation type="vanished">Base numérica</translation>
     </message>
     <message>
         <source>Time format</source>
-        <translation type="vanished">Формат времени</translation>
+        <translation type="vanished">Formato de tempo</translation>
     </message>
     <message>
         <source>Roman</source>
-        <translation type="vanished">Римские</translation>
+        <translation type="vanished">Romano</translation>
     </message>
     <message>
         <source>sin</source>
@@ -1688,7 +1675,7 @@ This can be overridden by prepending the unit expression with &quot;?&quot; or &
     </message>
     <message>
         <source>tan</source>
-        <translation type="vanished">tg</translation>
+        <translation type="vanished">tan</translation>
     </message>
     <message>
         <source>ln</source>
@@ -1696,19 +1683,19 @@ This can be overridden by prepending the unit expression with &quot;?&quot; or &
     </message>
     <message>
         <source>Equals</source>
-        <translation type="vanished">Равенства</translation>
+        <translation type="vanished">Igual a</translation>
     </message>
     <message>
         <source>sqrt</source>
-        <translation type="vanished">√</translation>
+        <translation type="vanished">sqrt</translation>
     </message>
     <message>
         <source>sum</source>
-        <translation type="vanished">∑</translation>
+        <translation type="vanished">sum</translation>
     </message>
     <message>
         <source>Unknown variable</source>
-        <translation type="vanished">Переменная неизвестного</translation>
+        <translation type="vanished">Variável desconhecida</translation>
     </message>
     <message>
         <source>mod</source>
@@ -1716,87 +1703,87 @@ This can be overridden by prepending the unit expression with &quot;?&quot; or &
     </message>
     <message>
         <source>mean</source>
-        <translation type="vanished">Среднее</translation>
+        <translation type="vanished">mean</translation>
     </message>
     <message>
         <source>Store result as a variable</source>
-        <translation type="vanished">Сохранить результат как переменную</translation>
+        <translation type="vanished">Guardar o resultado como uma variável</translation>
     </message>
     <message>
         <source>STO</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
-        <translation type="vanished">СХР</translation>
+        <translation type="vanished">STO</translation>
     </message>
     <message>
         <source>Convert number bases</source>
-        <translation type="vanished">Преобразование между основаниями систем счисления</translation>
+        <translation type="vanished">Converter bases numéricas</translation>
     </message>
     <message>
         <source>Imaginary unit i (√-1)</source>
-        <translation type="vanished">Мнимая единица i (√-1)</translation>
+        <translation type="vanished">Unidade imaginária i (√-1)</translation>
     </message>
     <message>
         <source>Manage units</source>
-        <translation type="vanished">Управление единицами измерения</translation>
+        <translation type="vanished">Gerenciar unidades</translation>
     </message>
     <message>
         <source>Conversion operator</source>
-        <translation type="vanished">Оператор преобразования</translation>
+        <translation type="vanished">Operador de conversão</translation>
     </message>
     <message>
         <source>Kilogram</source>
-        <translation type="vanished">Килограмм</translation>
+        <translation type="vanished">Quilograma</translation>
     </message>
     <message>
         <source>Two&apos;s complement input</source>
-        <translation type="vanished">Дополнительный код для ввода</translation>
+        <translation type="vanished">Entrada do complemento para dois</translation>
     </message>
     <message>
         <source>Two&apos;s complement output</source>
-        <translation type="vanished">Дополнительный код для вывода</translation>
+        <translation type="vanished">Saída do complemento para dois</translation>
     </message>
     <message>
         <source>Bitwise Exclusive OR</source>
-        <translation type="vanished">Побитовое исключающее ИЛИ</translation>
+        <translation type="vanished">OR exclusivo bit-a-bit</translation>
     </message>
     <message>
         <source>Bitwise Left Shift</source>
-        <translation type="vanished">Побитовый сдвиг влево</translation>
+        <translation type="vanished">Deslocamento à esquerda bit-a-bit</translation>
     </message>
     <message>
         <source>Bitwise Right Shift</source>
-        <translation type="vanished">Побитовый сдвиг вправо</translation>
+        <translation type="vanished">Deslocamento à direita bit-a-bit</translation>
     </message>
     <message>
         <source>Floating point conversion</source>
-        <translation type="vanished">Преобразование числа с плавающей запятой</translation>
+        <translation type="vanished">Conversão de ponto flutuante</translation>
     </message>
     <message>
         <source>Show/hide left keypad</source>
-        <translation type="vanished">Показать/скрыть левую клавиатуру</translation>
+        <translation type="vanished">Mostrar/ocultar teclado esquerdo</translation>
     </message>
     <message>
         <source>Show/hide right keypad</source>
-        <translation type="vanished">Показать/скрыть правую клавиатуру</translation>
+        <translation type="vanished">Mostrar/ocultar teclado direito</translation>
     </message>
     <message>
         <source>DEL</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
-        <translation type="vanished">←</translation>
+        <translation type="vanished">DEL</translation>
     </message>
     <message>
         <source>AC</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
-        <translation type="vanished">С</translation>
+        <translation type="vanished">AC</translation>
     </message>
     <message>
         <source>Previous result</source>
-        <translation type="vanished">Предыдущий результат</translation>
+        <translation type="vanished">Resultado anterior</translation>
     </message>
     <message>
         <source>ANS</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
-        <translation type="vanished">ОТВ</translation>
+        <translation type="vanished">ANS</translation>
     </message>
     <message>
         <source>EXP</source>
@@ -1804,1125 +1791,1039 @@ This can be overridden by prepending the unit expression with &quot;?&quot; or &
     </message>
     <message>
         <source>Add to Expression</source>
-        <translation type="vanished">Добавить в выражение</translation>
+        <translation type="vanished">Adicionar à Expressão</translation>
     </message>
     <message>
         <source>Persistent Keypad</source>
-        <translation type="vanished">Постоянная клавиатура</translation>
+        <translation type="vanished">Teclado persistente</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="vanished">Правка</translation>
+        <translation type="vanished">Editar</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="vanished">Удалить</translation>
+        <translation type="vanished">Excluir</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation type="vanished">Обновить</translation>
+        <translation type="vanished">Atualizar</translation>
     </message>
     <message>
         <source>Insert Value</source>
-        <translation type="vanished">Вставить значение</translation>
+        <translation type="vanished">Inserir valor</translation>
     </message>
     <message>
         <source>Insert Text</source>
-        <translation type="vanished">Вставить текст</translation>
+        <translation type="vanished">Inserir texto</translation>
     </message>
     <message>
         <source>Insert Parsed Text</source>
-        <translation type="vanished">Вставить проанализированный текст</translation>
+        <translation type="vanished">Inserir texto analisado</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="vanished">Копировать</translation>
+        <translation type="vanished">Copiar</translation>
     </message>
     <message>
         <source>Copy Full Text</source>
-        <translation type="vanished">Копировать полный текст</translation>
+        <translation type="vanished">Copiar todo o texto</translation>
     </message>
     <message>
         <source>Search…</source>
-        <translation type="vanished">Поиск…</translation>
+        <translation type="vanished">Procurar…</translation>
     </message>
     <message>
         <source>Add Bookmark…</source>
-        <translation type="vanished">Добавить закладку…</translation>
+        <translation type="vanished">Adicionar marcador…</translation>
     </message>
     <message>
         <source>Bookmarks</source>
-        <translation type="vanished">Закладки</translation>
+        <translation type="vanished">Marcador</translation>
     </message>
     <message>
         <source>Protect</source>
-        <translation type="vanished">Защитить</translation>
+        <translation type="vanished">Proteger</translation>
     </message>
     <message>
         <source>Move To Top</source>
-        <translation type="vanished">Передвинуть вверх</translation>
+        <translation type="vanished">Mover para o topo</translation>
     </message>
     <message>
         <source>Remove</source>
-        <translation type="vanished">Удалить</translation>
+        <translation type="vanished">Remover</translation>
     </message>
     <message>
         <source>Clear All</source>
-        <translation type="vanished">Очистить всё</translation>
+        <translation type="vanished">Limpar tudo</translation>
     </message>
     <message>
         <source>_Copy</source>
-        <translation type="vanished">_Копировать</translation>
+        <translation type="vanished">_Copiar</translation>
     </message>
     <message>
         <source>_Store…</source>
-        <translation type="vanished">_Сохранить…</translation>
+        <translation type="vanished">_Armazenar…</translation>
     </message>
     <message>
         <source>Save Image…</source>
-        <translation type="vanished">Сохранить изображение…</translation>
+        <translation type="vanished">Salvar imagem…</translation>
     </message>
     <message>
         <source>_Factorize</source>
-        <translation type="vanished">Разло_жить на множители</translation>
+        <translation type="vanished">_Fatorar</translation>
     </message>
     <message>
         <source>_Expand</source>
-        <translation type="vanished">Р_аскрывать</translation>
+        <translation type="vanished">_Expandir</translation>
     </message>
     <message>
         <source>_Normal</source>
-        <translation type="vanished">Обыч_ное</translation>
+        <translation type="vanished">_Normal</translation>
     </message>
     <message>
         <source>Sc_ientific</source>
-        <translation type="vanished">На_учное</translation>
+        <translation type="vanished">C_ientífica</translation>
     </message>
     <message>
         <source>Purel_y Scientific</source>
-        <translation type="vanished">Просто_е научное</translation>
+        <translation type="vanished">Pura_mente científica</translation>
     </message>
     <message>
         <source>Simp_le</source>
-        <translation type="vanished">Прост_ое</translation>
+        <translation type="vanished">Simp_les</translation>
     </message>
     <message>
         <source>_Binary</source>
-        <translation type="vanished">Д_воичное</translation>
+        <translation type="vanished">_Binária</translation>
     </message>
     <message>
         <source>_Octal</source>
-        <translation type="vanished">В_осьмеричное</translation>
+        <translation type="vanished">_Octal</translation>
     </message>
     <message>
         <source>_Decimal</source>
-        <translation type="vanished">_Десятичное</translation>
+        <translation type="vanished">_Decimal</translation>
     </message>
     <message>
         <source>_Hexadecimal</source>
-        <translation type="vanished">_Шестнадцатеричное</translation>
+        <translation type="vanished">_Hexadecimal</translation>
     </message>
     <message>
         <source>Decimal Fraction</source>
-        <translation type="vanished">Десятичная дробь</translation>
+        <translation type="vanished">Fração decimal</translation>
     </message>
     <message>
         <source>Exact Decimal Fraction</source>
-        <translation type="vanished">Точная десятичная дробь</translation>
+        <translation type="vanished">Fração decimal exata</translation>
     </message>
     <message>
         <source>Simple Fraction</source>
-        <translation type="vanished">Простая дробь</translation>
+        <translation type="vanished">Fração simples</translation>
     </message>
     <message>
         <source>Mixed Fraction</source>
-        <translation type="vanished">Смешанная дробь</translation>
+        <translation type="vanished">Fração mista</translation>
     </message>
     <message>
         <source>_Abbreviate Names</source>
-        <translation type="vanished">Сокр_ащённые имена</translation>
+        <translation type="vanished">_Abreviar nomes</translation>
     </message>
     <message>
         <source>C_onvert…</source>
-        <translation type="vanished">П_еревести…</translation>
+        <translation type="vanished">C_onverter…</translation>
     </message>
     <message>
         <source>Convert to Base _Units</source>
-        <translation type="vanished">Преобразовать в базовую _единицу измерения</translation>
+        <translation type="vanished">Converter em _unidades base</translation>
     </message>
     <message>
         <source>Convert _to Optimal Unit</source>
-        <translation type="vanished">Преобразова_ть в оптимальные единицы измерения</translation>
+        <translation type="vanished">Conver_ter em unidade ideal</translation>
     </message>
     <message>
         <source>Use Optimal Prefix</source>
-        <translation type="vanished">Использовать оптимальный префикс</translation>
+        <translation type="vanished">Usar prefixo ideal</translation>
     </message>
     <message>
         <source>Convert to</source>
-        <translation type="vanished">Преобразовать к</translation>
+        <translation type="vanished">Converter para</translation>
     </message>
     <message>
         <source>Convert to UTC</source>
-        <translation type="vanished">Преобразовать к UTC</translation>
+        <translation type="vanished">Converter para UTC</translation>
     </message>
     <message>
         <source>Convert to Calendars</source>
-        <translation type="vanished">Преобразовать к календарям</translation>
+        <translation type="vanished">Converter em calendários</translation>
     </message>
     <message>
         <source>Use prefixes for all units</source>
-        <translation type="vanished">Использовать префиксы для всех единиц измерения</translation>
+        <translation type="vanished">Usar prefixos em todas as unidades</translation>
     </message>
     <message>
         <source>Enable All SI Prefi_xes</source>
-        <translation type="vanished">Включить все префи_ксы СИ</translation>
+        <translation type="vanished">Ativar Todos os Prefi_xos SI</translation>
     </message>
     <message>
         <source>View/Edit Matrix</source>
-        <translation type="vanished">Просмотр/изменение матрицы</translation>
+        <translation type="vanished">Ver/Editar Matriz</translation>
     </message>
     <message>
         <source>View/Edit Vector</source>
-        <translation type="vanished">Просмотр/изменение вектора</translation>
+        <translation type="vanished">Ver/Editar Vetor</translation>
     </message>
     <message>
         <source>Copy Text</source>
-        <translation type="vanished">Копировать текст</translation>
+        <translation type="vanished">Copiar texto</translation>
     </message>
     <message>
         <source>To Top</source>
-        <translation type="vanished">Вверх</translation>
+        <translation type="vanished">Para cima</translation>
     </message>
     <message>
         <source>Swap</source>
-        <translation type="vanished">Обменять</translation>
+        <translation type="vanished">Trocar</translation>
     </message>
     <message>
         <source>Up</source>
-        <translation type="vanished">Верх</translation>
+        <translation type="vanished">Acima</translation>
     </message>
     <message>
         <source>Down</source>
-        <translation type="vanished">Низ</translation>
+        <translation type="vanished">Abaixo</translation>
     </message>
     <message>
         <source>Negate</source>
-        <translation type="vanished">Изменить знак</translation>
+        <translation type="vanished">Negar</translation>
     </message>
     <message>
         <source>Invert</source>
-        <translation type="vanished">Инвертировать</translation>
+        <translation type="vanished">Inverter</translation>
     </message>
     <message>
         <source>Square</source>
-        <translation type="vanished">Квадрат</translation>
+        <translation type="vanished">Quadrado</translation>
     </message>
     <message>
         <source>Square Root</source>
-        <translation type="vanished">Квадратный корень</translation>
+        <translation type="vanished">Raiz quadrada</translation>
     </message>
     <message>
         <source>Clear Stack</source>
-        <translation type="vanished">Очистить стек</translation>
+        <translation type="vanished">Limpar pilha</translation>
     </message>
     <message>
         <source>Select Number Base…</source>
-        <translation type="vanished">Выбрать основание системы счисления…</translation>
+        <translation type="vanished">Selecionar Base Numérica…</translation>
     </message>
     <message>
         <source>Store result</source>
-        <translation type="vanished">Сохранить результат</translation>
-    </message>
-    <message>
-        <source>Add result</source>
-        <extracomment>Add current result to variable value</extracomment>
-        <translation type="vanished">Добавить результат</translation>
-    </message>
-    <message>
-        <source>Subtract result</source>
-        <extracomment>Subtruct current result from variable value</extracomment>
-        <translation type="vanished">Вычесть результат</translation>
+        <translation type="vanished">Guardar resultado</translation>
     </message>
     <message>
         <source>Insert the matrix/vector into the expression</source>
-        <translation type="vanished">Вставить матрицу/вектор в выражение</translation>
+        <translation type="vanished">Inserir a matriz/vetor na expressão</translation>
     </message>
     <message>
         <source>Rows</source>
-        <translation type="vanished">Строки</translation>
+        <translation type="vanished">Linhas</translation>
     </message>
     <message>
         <source>Number of rows in this matrix (rows displayed for vectors)</source>
-        <translation type="vanished">Количество строк в этой матрице (строки отображаются для векторов)</translation>
+        <translation type="vanished">Número de linhas nesta matriz (linhas exibidas para vetores)</translation>
     </message>
     <message>
         <source>Columns</source>
-        <translation type="vanished">Столбцы</translation>
+        <translation type="vanished">Colunas</translation>
     </message>
     <message>
         <source>Number of columns in this matrix (columns displayed for vectors)</source>
-        <translation type="vanished">Количество столбцов в этой матрице (столбцы отображаются для векторов)</translation>
+        <translation type="vanished">Número de colunas nesta matriz (colunas exibidas para vetores)</translation>
     </message>
     <message>
         <source>If this is a matrix or vector</source>
-        <translation type="vanished">Если это матрица или вектор</translation>
+        <translation type="vanished">Se isso é uma matriz ou vetor</translation>
     </message>
     <message>
         <source>Elements</source>
-        <translation type="vanished">Компоненты</translation>
+        <translation type="vanished">Elementos</translation>
     </message>
     <message>
         <source>Current element:</source>
-        <translation type="vanished">Текущий элемент:</translation>
+        <translation type="vanished">Elemento atual:</translation>
     </message>
     <message>
         <source>Edit Matrix</source>
-        <translation type="vanished">Изменить матрицу</translation>
+        <translation type="vanished">Editar Matriz</translation>
     </message>
     <message>
         <source>Do not create/modify this matrix/vector</source>
-        <translation type="vanished">Не создавать/не изменять эту матрицу/вектор</translation>
+        <translation type="vanished">Não criar/modificar esta matriz/vetor</translation>
     </message>
     <message>
         <source>Create/modify the matrix/vector</source>
-        <translation type="vanished">Создать/изменить матрицу/вектор</translation>
+        <translation type="vanished">Criar/modificar esta matriz/vetor</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this matrix/vector</source>
-        <translation type="vanished">Принять создание/изменение этой матрицы/вектора</translation>
+        <translation type="vanished">Aceitar a criação/modificação desta matriz/vetor</translation>
     </message>
     <message>
         <source>Name used to reference this variable in expressions</source>
-        <translation type="vanished">Имя, используемое для ссылки на эту переменную в выражениях</translation>
+        <translation type="vanished">Nome usado para referenciar esta variável em expressões</translation>
     </message>
     <message>
         <source>Names</source>
-        <translation type="vanished">Имена</translation>
+        <translation type="vanished">Nomes</translation>
     </message>
     <message>
         <source>Add new name</source>
-        <translation type="vanished">Добавить новое имя</translation>
+        <translation type="vanished">Adicionar novo nome</translation>
     </message>
     <message>
         <source>Apply changes to the selected name</source>
-        <translation type="vanished">Применить изменения к выбранному имени</translation>
+        <translation type="vanished">Aplicar alterações ao nome selecionado</translation>
     </message>
     <message>
         <source>Remove the selected name</source>
-        <translation type="vanished">Удалить выбранное имя</translation>
+        <translation type="vanished">Remover o nome selecionado</translation>
     </message>
     <message>
         <source>Abbreviation</source>
-        <translation type="vanished">Сокращение</translation>
+        <translation type="vanished">Abreviação</translation>
     </message>
     <message>
         <source>Unicode</source>
-        <translation type="vanished">Юникод</translation>
+        <translation type="vanished">Unicode</translation>
     </message>
     <message>
         <source>Plural</source>
-        <translation type="vanished">Множественная форма</translation>
+        <translation type="vanished">Plural</translation>
     </message>
     <message>
         <source>Suffix</source>
-        <translation type="vanished">Суффикс</translation>
+        <translation type="vanished">Sufixo</translation>
     </message>
     <message>
         <source>Reference</source>
-        <translation type="vanished">Ссылка</translation>
+        <translation type="vanished">Referência</translation>
     </message>
     <message>
         <source>Avoid input</source>
-        <translation type="vanished">Избегать ввода</translation>
+        <translation type="vanished">Evitar entrada</translation>
     </message>
     <message>
         <source>Case sensitive</source>
-        <translation type="vanished">С учётом регистра</translation>
+        <translation type="vanished">Maiúsc. e Minúsculas</translation>
     </message>
     <message>
         <source>Completion only</source>
-        <translation type="vanished">Только завершение</translation>
+        <translation type="vanished">Apenas conclusão</translation>
     </message>
     <message>
         <source>Number Bases</source>
-        <translation type="vanished">Основания систем счисления</translation>
+        <translation type="vanished">Bases Numéricas</translation>
     </message>
     <message>
         <source>Roman numerals</source>
-        <translation type="vanished">Римские цифры</translation>
+        <translation type="vanished">Números romanos</translation>
     </message>
     <message>
         <source>BIN</source>
-        <translation type="vanished">ДВ</translation>
+        <translation type="vanished">BIN</translation>
     </message>
     <message>
         <source>OCT</source>
-        <translation type="vanished">ВОСМ</translation>
+        <translation type="vanished">OCT</translation>
     </message>
     <message>
         <source>DEC</source>
-        <translation type="vanished">ДЕС</translation>
+        <translation type="vanished">DEC</translation>
     </message>
     <message>
         <source>DUO</source>
-        <translation type="vanished">ДВЕН</translation>
+        <translation type="vanished">DUO</translation>
     </message>
     <message>
         <source>HEX</source>
-        <translation type="vanished">ШЕСТ</translation>
+        <translation type="vanished">HEX</translation>
     </message>
     <message>
         <source>ROM</source>
-        <translation type="vanished">РИМ</translation>
+        <translation type="vanished">ROM</translation>
     </message>
     <message>
         <source>Subtract</source>
-        <translation type="vanished">Вычитание</translation>
+        <translation type="vanished">Subtrair</translation>
     </message>
     <message>
         <source>Multiply</source>
-        <translation type="vanished">Умножение</translation>
+        <translation type="vanished">Multiplicar</translation>
     </message>
     <message>
         <source>Divide</source>
-        <translation type="vanished">Деление</translation>
+        <translation type="vanished">Dividir</translation>
     </message>
     <message>
         <source>Bitwise AND</source>
-        <translation type="vanished">Побитовое И</translation>
+        <translation type="vanished">Bit-a-bit AND</translation>
     </message>
     <message>
         <source>Bitwise OR</source>
-        <translation type="vanished">Побитовое ИЛИ</translation>
+        <translation type="vanished">Bit-a-bit OR</translation>
     </message>
     <message>
         <source>Bitwise NOT</source>
-        <translation type="vanished">Побитовое НЕ</translation>
+        <translation type="vanished">Bit-a-bit NOT</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="vanished">Очистить</translation>
+        <translation type="vanished">Limpar</translation>
     </message>
     <message>
         <source>Enter two values, of which at most one is a percentage, and the others will be calculated for you.</source>
-        <translation type="vanished">Введите два значения, максимум одно из которых является процентом, а остальные будут рассчитаны за вас.</translation>
+        <translation type="vanished">Digite dois valores, dos quais no máximo um é uma porcentagem, e os outros serão calculados para você.</translation>
     </message>
     <message>
         <source>Percentage</source>
-        <translation type="vanished">Проценты</translation>
+        <translation type="vanished">Percentagem</translation>
     </message>
     <message>
         <source>Calculate</source>
-        <translation type="vanished">Рассчитать</translation>
+        <translation type="vanished">Calcular</translation>
     </message>
     <message>
         <source>Value 1</source>
-        <translation type="vanished">Значение 1</translation>
+        <translation type="vanished">Valor 1</translation>
     </message>
     <message>
         <source>2 compared to 1</source>
-        <translation type="vanished">2 по сравнению к 1</translation>
+        <translation type="vanished">2 comparado a 1</translation>
     </message>
     <message>
         <source>Change from 1 to 2</source>
-        <translation type="vanished">Изменение от 1 к 2</translation>
+        <translation type="vanished">Alterar de 1 para 2</translation>
     </message>
     <message>
         <source>Value 2</source>
-        <translation type="vanished">Значение 2</translation>
+        <translation type="vanished">Valor 2</translation>
     </message>
     <message>
         <source>1 compared to 2</source>
-        <translation type="vanished">1 по сравнению к 2</translation>
+        <translation type="vanished">1 comparado a 2</translation>
     </message>
     <message>
         <source>Change from 2 to 1</source>
-        <translation type="vanished">Изменение от 2 к 1</translation>
+        <translation type="vanished">Alterar de 2 para 1</translation>
     </message>
     <message>
         <source>Plot</source>
-        <translation type="vanished">График</translation>
+        <translation type="vanished">Plotagem</translation>
     </message>
     <message>
         <source>_Save</source>
-        <translation type="vanished">_Сохранить</translation>
+        <translation type="vanished">_Salvar</translation>
     </message>
     <message>
         <source>Save as png, svg, postscript, eps, latex or fig</source>
-        <translation type="vanished">Сохранить как png, svg, postscript, eps, latex или fig.</translation>
+        <translation type="vanished">Salvar como png, svg, postscript, eps, latex ou fig</translation>
     </message>
     <message>
         <source>Vector/matrix</source>
-        <translation type="vanished">Вектор/матрица</translation>
+        <translation type="vanished">Vetor/matriz</translation>
     </message>
     <message>
         <source>Paired matrix</source>
-        <translation type="vanished">Парная матрица</translation>
+        <translation type="vanished">Matriz emparelhada</translation>
     </message>
     <message>
         <source>if you want to split matrix in rows instead of columns</source>
-        <translation type="vanished">Если вы хотите разбить матрицу на строки вместо столбцов</translation>
+        <translation type="vanished">se desejar dividir a matriz em linhas em vez de colunas</translation>
     </message>
     <message>
         <source>X variable</source>
-        <translation type="vanished">Переменная X</translation>
+        <translation type="vanished">Variável X</translation>
     </message>
     <message>
         <source>The variable name used in expression</source>
-        <translation type="vanished">Имя переменной, используемое в выражении</translation>
+        <translation type="vanished">O nome da variável usada na expressão</translation>
     </message>
     <message>
         <source>Style</source>
-        <translation type="vanished">Стиль</translation>
+        <translation type="vanished">Estilo</translation>
     </message>
     <message>
         <source>Line</source>
-        <translation type="vanished">Линия</translation>
+        <translation type="vanished">Linha</translation>
     </message>
     <message>
         <source>Points</source>
-        <translation type="vanished">Символы</translation>
+        <translation type="vanished">Pontos</translation>
     </message>
     <message>
         <source>Line with points</source>
-        <translation type="vanished">Линия с символами</translation>
+        <translation type="vanished">Linha com pontos</translation>
     </message>
     <message>
         <source>Boxes/bars</source>
-        <translation type="vanished">Прямоугольники/планки погрешностей</translation>
+        <translation type="vanished">Caixas/barras</translation>
     </message>
     <message>
         <source>Histogram</source>
-        <translation type="vanished">Гистограмма</translation>
+        <translation type="vanished">Histograma</translation>
     </message>
     <message>
         <source>Steps</source>
-        <translation type="vanished">Ступенчатый</translation>
+        <translation type="vanished">Passos</translation>
     </message>
     <message>
         <source>Candlesticks</source>
-        <translation type="vanished">Японские свечи</translation>
+        <translation type="vanished">Castiçais</translation>
     </message>
     <message>
         <source>Dots</source>
-        <translation type="vanished">Точки</translation>
+        <translation type="vanished">Pontilhado</translation>
     </message>
     <message>
         <source>Smoothing</source>
-        <translation type="vanished">Сглаживание</translation>
+        <translation type="vanished">Suavização</translation>
     </message>
     <message>
         <source>Monotonic</source>
-        <translation type="vanished">Монотонное</translation>
+        <translation type="vanished">Monotônica</translation>
     </message>
     <message>
         <source>Natural cubic splines</source>
-        <translation type="vanished">Естественные кубические сплайны</translation>
+        <translation type="vanished">Splines cúbicos naturais</translation>
     </message>
     <message>
         <source>Bezier</source>
-        <translation type="vanished">Безье</translation>
+        <translation type="vanished">Bézier</translation>
     </message>
     <message>
         <source>Bezier (monotonic)</source>
-        <translation type="vanished">Безье (монотонный)</translation>
+        <translation type="vanished">Bézier (monotônica)</translation>
     </message>
     <message>
         <source>Y-axis</source>
-        <translation type="vanished">Ось Y</translation>
+        <translation type="vanished">Eixo Y</translation>
     </message>
     <message>
         <source>Primary</source>
-        <translation type="vanished">Основная</translation>
+        <translation type="vanished">Primário</translation>
     </message>
     <message>
         <source>Secondary</source>
-        <translation type="vanished">Вторичная</translation>
+        <translation type="vanished">Secundário</translation>
     </message>
     <message>
         <source>_Remove</source>
-        <translation type="vanished">_Удалить</translation>
+        <translation type="vanished">_Remover</translation>
     </message>
     <message>
         <source>Data</source>
-        <translation type="vanished">Данные</translation>
+        <translation type="vanished">Dados</translation>
     </message>
     <message>
         <source>Minimum x value</source>
-        <translation type="vanished">Минимальное значение x</translation>
+        <translation type="vanished">Valor mínimo x</translation>
     </message>
     <message>
         <source>Maximum x value</source>
-        <translation type="vanished">Максимальное значение x</translation>
+        <translation type="vanished">Valor máximo x</translation>
     </message>
     <message>
         <source>Sampling rate</source>
-        <translation type="vanished">Частота дискретизации</translation>
+        <translation type="vanished">Taxa de amostragem</translation>
     </message>
     <message>
         <source>Step size</source>
-        <translation type="vanished">Размер шага</translation>
+        <translation type="vanished">Tamanho do passo</translation>
     </message>
     <message>
         <source>Function Range</source>
-        <translation type="vanished">Диапазон функция</translation>
+        <translation type="vanished">Faixa de Funções</translation>
     </message>
     <message>
         <source>Display grid</source>
-        <translation type="vanished">Показать сетку</translation>
+        <translation type="vanished">Exibir grade</translation>
     </message>
     <message>
         <source>Display full border</source>
-        <translation type="vanished">Показать полную рамку</translation>
+        <translation type="vanished">Exibir borda completa</translation>
     </message>
     <message>
         <source>Minimum y value</source>
-        <translation type="vanished">Минимальное значение y</translation>
+        <translation type="vanished">Valor mínimo y</translation>
     </message>
     <message>
         <source>Maximum y value</source>
-        <translation type="vanished">Максимальное значение y</translation>
+        <translation type="vanished">Valor máximo y</translation>
     </message>
     <message>
         <source>Logarithmic x scale</source>
-        <translation type="vanished">Логарифмическая шкала абсцисс x</translation>
+        <translation type="vanished">Escala logarítmica x</translation>
     </message>
     <message>
         <source>Logarithmic y scale</source>
-        <translation type="vanished">Логарифмическая шкала ординат y</translation>
+        <translation type="vanished">Escala logarítmica y</translation>
     </message>
     <message>
         <source>X-axis label</source>
-        <translation type="vanished">Подпись для оси абсцисс X</translation>
+        <translation type="vanished">Etiqueta do eixo X</translation>
     </message>
     <message>
         <source>Y-axis label</source>
-        <translation type="vanished">Подпись для оси ординат Y</translation>
+        <translation type="vanished">Etiqueta do eixo Y</translation>
     </message>
     <message>
         <source>Line width</source>
-        <translation type="vanished">Толщина линии</translation>
+        <translation type="vanished">Espessura da linha</translation>
     </message>
     <message>
         <source>Color display</source>
-        <translation type="vanished">Цветной вывод</translation>
+        <translation type="vanished">Exibição de cores</translation>
     </message>
     <message>
         <source>Color</source>
-        <translation type="vanished">Цветной</translation>
+        <translation type="vanished">Cores</translation>
     </message>
     <message>
         <source>Monochrome</source>
-        <translation type="vanished">Монохромный</translation>
+        <translation type="vanished">Monocromática</translation>
     </message>
     <message>
         <source>Legend placement</source>
-        <translation type="vanished">Размещение легенды</translation>
+        <translation type="vanished">Posição da legenda</translation>
     </message>
     <message>
         <source>Top-left</source>
-        <translation type="vanished">Сверху слева</translation>
+        <translation type="vanished">Superior esquerdo</translation>
     </message>
     <message>
         <source>Top-right</source>
-        <translation type="vanished">Сверху справа</translation>
+        <translation type="vanished">Superior direito</translation>
     </message>
     <message>
         <source>Bottom-left</source>
-        <translation type="vanished">Снизу слева</translation>
+        <translation type="vanished">Inferior esquerdo</translation>
     </message>
     <message>
         <source>Bottom-right</source>
-        <translation type="vanished">Снизу справа</translation>
+        <translation type="vanished">Inferior direito</translation>
     </message>
     <message>
         <source>Below</source>
-        <translation type="vanished">Ниже</translation>
+        <translation type="vanished">Abaixo</translation>
     </message>
     <message>
         <source>Outside</source>
-        <translation type="vanished">Извне</translation>
+        <translation type="vanished">Fora</translation>
     </message>
     <message>
         <source>Appearance</source>
-        <translation type="vanished">Внешний вид</translation>
+        <translation type="vanished">Aparência</translation>
     </message>
     <message>
         <source>Precision</source>
-        <translation type="vanished">Точность</translation>
+        <translation type="vanished">Precisão</translation>
     </message>
     <message>
         <source>_Recalculate</source>
-        <translation type="vanished">Пе_ресчитать</translation>
+        <translation type="vanished">_Recalcular</translation>
     </message>
     <message>
         <source>Recalculate expression</source>
-        <translation type="vanished">Пересчитать выражение</translation>
+        <translation type="vanished">Recalcular expressão</translation>
     </message>
     <message>
         <source>The number of significant digits to display/calculate (simple arithmetics are always calculated exact)</source>
-        <translation type="vanished">Количество значащих цифр для отображения/вычисления (простая арифметика всегда рассчитывается точно)</translation>
+        <translation type="vanished">O número de dígitos significativos a serem exibidos/calculados (aritmética simples é sempre calculada exatamente)</translation>
     </message>
     <message>
         <source>Preferences</source>
-        <translation type="vanished">Параметры</translation>
+        <translation type="vanished">Preferências</translation>
     </message>
     <message>
         <source>Save mode on exit</source>
-        <translation type="vanished">Сохранять режим при выходе</translation>
+        <translation type="vanished">Salvar modo ao sair</translation>
     </message>
     <message>
         <source>If the mode of the calculator shall be restored</source>
-        <translation type="vanished">Если нужно восстанавливать режим калькулятора</translation>
+        <translation type="vanished">Para que o modo da calculadora seja restaurado</translation>
     </message>
     <message>
         <source>Save definitions on exit</source>
-        <translation type="vanished">Сохранять определения при выходе</translation>
+        <translation type="vanished">Salvar definições ao sair</translation>
     </message>
     <message>
         <source>If changes to functions, units and variables shall be saved automatically</source>
-        <translation type="vanished">Если изменения в функциях, единицах измерения и переменных должны сохраняться автоматически.</translation>
+        <translation type="vanished">Para que alterações em funções, unidades e variáveis sejam salvas automaticamente</translation>
     </message>
     <message>
         <source>Clear history on exit</source>
-        <translation type="vanished">Очищать историю при выходе</translation>
+        <translation type="vanished">Limpar histórico ao sair</translation>
     </message>
     <message>
         <source>Allow multiple instances</source>
-        <translation type="vanished">Разрешить несколько экземпляров</translation>
+        <translation type="vanished">Permitir várias instâncias</translation>
     </message>
     <message>
         <source>Allow multiple instances of the Qalculate! main window to be open at the same time. 
 
 Note that only the mode, history and definitions of the last closed instance will be saved.</source>
-        <translation type="vanished">Разрешить одновременное открытие нескольких экземпляров главного окна Qalculate!.
+        <translation type="vanished">Permite que várias instâncias da janela principal do Qalculate! sejam abertas. 
 
-Обратите внимание, что будут сохранены режим, история и определения только последнего закрытого экземпляра.</translation>
+Observe que apenas o modo, histórico e definições da última instância fechada serão salvos.</translation>
     </message>
     <message>
         <source>Notify when a new version is available</source>
-        <translation type="vanished">Уведомлять, когда доступна новая версия</translation>
+        <translation type="vanished">Notificar quando uma nova versão estiver disponível</translation>
     </message>
     <message>
         <source>Use keyboard keys for RPN</source>
-        <translation type="vanished">Использовать клавиатуру для ПОЛИЗ</translation>
+        <translation type="vanished">Usar teclado para RPN</translation>
     </message>
     <message>
         <source>Use keyboard operator keys for RPN operations (+-*/^).</source>
-        <translation type="vanished">Использовать операторные клавиши клавиатуры для операций ПОЛИЗ (+-*/^).</translation>
+        <translation type="vanished">Usar as teclas de operação no teclado para operações RPN (+-*/^).</translation>
     </message>
     <message>
         <source>Use caret for bitwise XOR</source>
-        <translation type="vanished">Использовать карет для побитового исключающего ИЛИ</translation>
+        <translation type="vanished">Usar acento circunflexo para XOR bit-a-bit</translation>
     </message>
     <message>
         <source>Input XOR (⊻) using caret (^) on keyboard (otherwise use Ctrl+^). The exponentiation operator (^) can always be input using Ctrl+*.</source>
-        <translation type="vanished">Вводить исключающее ИЛИ (⊻), используя карет (^) на клавиатуре (в противном случае используйте Ctrl+^). Оператор возведения в степень (^) всегда можно ввести с помощью Ctrl+*.</translation>
-    </message>
-    <message>
-        <source>Add calculate-as-you-type result to history</source>
-        <translation type="vanished">Добавить в историю результат вычисления по мере ввода</translation>
-    </message>
-    <message>
-        <source>Delay:</source>
-        <translation type="vanished">Задержка:</translation>
+        <translation type="vanished">Inserir XOR (⊻) usando circunflexo (^) no teclado (caso contrário, use Ctrl+^). O operador de exponenciação (^) sempre pode ser inserido ao usar Ctrl+*.</translation>
     </message>
     <message>
         <source>Time limit for plot:</source>
-        <translation type="vanished">Ограничение по времени для построения графиков</translation>
+        <translation type="vanished">Tempo limite para plotagem:</translation>
     </message>
     <message>
         <source>Behavior</source>
-        <translation type="vanished">Поведение</translation>
+        <translation type="vanished">Comportamento</translation>
     </message>
     <message>
         <source>Enable Unicode symbols</source>
-        <translation type="vanished">Включить символы Юникода</translation>
+        <translation type="vanished">Ativar símbolos Unicode</translation>
     </message>
     <message>
         <source>Disable this if you have problems with some fancy characters</source>
-        <translation type="vanished">Отключить, если у вас проблемы с некоторыми изящными символами</translation>
+        <translation type="vanished">Desative isso se você tiver problemas com alguns caracteres extravagantes</translation>
     </message>
     <message>
         <source>Ignore system language (requires restart)</source>
-        <translation type="vanished">Игнорировать системный язык (требуется перезапуск)</translation>
-    </message>
-    <message>
-        <source>Use system tray icon</source>
-        <translation type="vanished">Использовать значок для системного лотка</translation>
-    </message>
-    <message>
-        <source>Hides the application in the system tray when the main window is closed</source>
-        <translation type="vanished">Скрывать приложение в системном лотке, когда главное окно закрыто</translation>
-    </message>
-    <message>
-        <source>Hide on startup</source>
-        <translation type="vanished">Скрывать при запуске</translation>
+        <translation type="vanished">Ignorar o idioma do sistema (requer reinício)</translation>
     </message>
     <message>
         <source>Remember window position</source>
-        <translation type="vanished">Запоминать расположение окна</translation>
-    </message>
-    <message>
-        <source>Keep above other windows</source>
-        <translation type="vanished">Поддерживать поверх других окон</translation>
-    </message>
-    <message>
-        <source>Keep the main window above other windows (depending on platform and settings this might not work)</source>
-        <translation type="vanished">Поддерживать главное окно поверх других окон (в зависимости от платформы и настроек это может не работать)</translation>
+        <translation type="vanished">Lembrar posição da janela</translation>
     </message>
     <message>
         <source>Application name</source>
-        <translation type="vanished">Имя приложения</translation>
+        <translation type="vanished">Nome do programa</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="vanished">Результат</translation>
+        <translation type="vanished">Resultado</translation>
     </message>
     <message>
         <source>Application name + result</source>
-        <translation type="vanished">Имя приложения + результат</translation>
+        <translation type="vanished">Nome do programa + resultado</translation>
     </message>
     <message>
         <source>Mode</source>
-        <translation type="vanished">Режим</translation>
+        <translation type="vanished">Modo</translation>
     </message>
     <message>
         <source>Application name + mode</source>
-        <translation type="vanished">Имя приложения + режим</translation>
+        <translation type="vanished">Nome do programa + modo</translation>
     </message>
     <message>
         <source>Window title</source>
-        <translation type="vanished">Заголовок окна</translation>
+        <translation type="vanished">Título da janela</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="vanished">По умолчанию</translation>
-    </message>
-    <message>
-        <source>Light</source>
-        <translation type="vanished">Светлый</translation>
-    </message>
-    <message>
-        <source>Dark</source>
-        <translation type="vanished">Тёмный</translation>
-    </message>
-    <message>
-        <source>High contrast</source>
-        <translation type="vanished">Высококонтрастный</translation>
-    </message>
-    <message>
-        <source>Dark high contrast</source>
-        <translation type="vanished">Тёмный высококонтрастный</translation>
-    </message>
-    <message>
-        <source>Theme</source>
-        <translation type="vanished">Тема</translation>
-    </message>
-    <message>
-        <source>Button padding</source>
-        <translation type="vanished">Цвет фона кнопок</translation>
-    </message>
-    <message>
-        <source>/</source>
-        <translation type="vanished">/</translation>
+        <translation type="vanished">Padrão</translation>
     </message>
     <message>
         <source>Number of expression lines</source>
-        <translation type="vanished">Количество строк для выражения</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation type="vanished">3</translation>
+        <translation type="vanished">Número de linhas de expressão</translation>
     </message>
     <message>
         <source>Display expression status</source>
-        <translation type="vanished">Показывать статус выражения</translation>
+        <translation type="vanished">Exibir status da expressão</translation>
     </message>
     <message>
         <source>If as-you-type expression status shall be displayed below the expression entry</source>
-        <translation type="vanished">Если статус выражения должен отображаться под записью выражения по мере набора</translation>
+        <translation type="vanished">Para que o status da expressão, conforme você digita, seja exibido abaixo da entrada da expressão</translation>
     </message>
     <message>
         <source>Persistent keypad</source>
-        <translation type="vanished">Постоянная клавиатура</translation>
+        <translation type="vanished">Teclado persistente</translation>
     </message>
     <message>
         <source>Look &amp; Feel</source>
-        <translation type="vanished">Внешний вид</translation>
+        <translation type="vanished">Aparência</translation>
     </message>
     <message>
         <source>Binary two&apos;s complement representation</source>
-        <translation type="vanished">Представление двоичных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Representação binária do complemento para dois</translation>
     </message>
     <message>
         <source>If two&apos;s complement representation shall be used for negative binary numbers.</source>
-        <translation type="vanished">Если двоичное дополнение должно использоваться для отрицательных двоичных чисел.</translation>
+        <translation type="vanished">Para que a representação do complemento para dois seja usada para números binários negativos.</translation>
     </message>
     <message>
         <source>Hexadecimal two&apos;s complement representation</source>
-        <translation type="vanished">Представление шестнадцатеричных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Representação hexadecimal do complemento para dois</translation>
     </message>
     <message>
         <source>If two&apos;s complement representation shall be used for negative hexadecimal numbers.</source>
-        <translation type="vanished">Если двоичное дополнение должно использоваться для отрицательных шестнадцатеричных чисел.</translation>
+        <translation type="vanished">Para que a representação do complemento para dois seja usada para números hexadecimais negativos.</translation>
     </message>
     <message>
         <source>Use lower case letters in non-decimal numbers</source>
-        <translation type="vanished">Использовать строчные буквы в недесятичных числах</translation>
+        <translation type="vanished">Usar letras minúsculas em números não-decimais</translation>
     </message>
     <message>
         <source>If lower case letters should be used in numbers with non-decimal base</source>
-        <translation type="vanished">Если в числах с недесятичным основанием следует использовать строчные буквы</translation>
+        <translation type="vanished">Para que letras minúsculas sejam usadas em números com base não-decimal</translation>
     </message>
     <message>
         <source>Alternative base prefixes</source>
-        <translation type="vanished">Альтернативные префиксы основания</translation>
+        <translation type="vanished">Prefixos base alternativos</translation>
     </message>
     <message>
         <source>If hexadecimal numbers shall be displayed with &quot;0x0&quot; and binary numbers with &quot;0b00&quot; as prefixes</source>
-        <translation type="vanished">Если шестнадцатеричные числа должны отображаться с «0x0», а двоичные числа с «0b00» в качестве префиксов</translation>
+        <translation type="vanished">Para que números hexadecimais sejam exibidos com &quot;0x0&quot; e números binários com &quot;0b00&quot; como prefixos</translation>
     </message>
     <message>
         <source>Spell out logical operators</source>
-        <translation type="vanished">Изложить логично логические операции</translation>
+        <translation type="vanished">Soletrar operadores lógicos</translation>
     </message>
     <message>
         <source>If logical and/or shall be displayed as &quot;&amp;&amp;&quot;/&quot;||&quot; or &quot;and&quot;/&quot;or&quot;</source>
-        <translation type="vanished">Если логические И/ИЛИ должны отображаться как «&amp;&amp;»/«||» или «и»/«или»</translation>
+        <translation type="vanished">Para que o lógico and/or seja exibido como &quot;&amp;&amp;&quot;/&quot;||&quot; ou &quot;and&quot;/&quot;or&quot;</translation>
     </message>
     <message>
         <source>If &quot;e&quot; shall be used instead of &quot;E&quot; in numbers</source>
-        <translation type="vanished">Если в числах следует использовать букву «e» вместо «E»</translation>
+        <translation type="vanished">Para que &quot;e&quot; seja usado em vez de &quot;E&quot; em números</translation>
     </message>
     <message>
         <source>Use E-notation instead of 10&lt;sup&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;</source>
-        <translation type="vanished">Использовать E-нотацию вместо 10&lt;sup&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;</translation>
+        <translation type="vanished">Usar notação E em vez de 10&lt;sup&gt;&lt;i&gt;n&lt;/i&gt;&lt;/sup&gt;</translation>
     </message>
     <message>
         <source>Use lower case &quot;e&quot; (as in 1e10)</source>
-        <translation type="vanished">Использовать строчную букву «e» (как в 1e10)</translation>
+        <translation type="vanished">Usar letras minúsculas &quot;e&quot; (como em 1e10)</translation>
     </message>
     <message>
         <source>Use &apos;j&apos; as imaginary unit</source>
-        <translation type="vanished">Использовать «j» для мнимой единицы</translation>
+        <translation type="vanished">Usar &apos;j&apos; como unidade imaginária</translation>
     </message>
     <message>
         <source>Use &apos;j&apos; (instead of &apos;i&apos;) as default symbol for the imaginary unit, and place it in front the imaginary part.</source>
-        <translation type="vanished">Использовать «j» (вместо «i») в качестве символа по умолчанию для мнимой единицы и помещать его перед мнимой частью.</translation>
+        <translation type="vanished">Usar &apos;j&apos; (em vez de &apos;i&apos;) como símbolo padrão para a unidade imaginária e coloque-o na frente da parte imaginária.</translation>
     </message>
     <message>
         <source>Use comma as decimal separator</source>
-        <translation type="vanished">Использовать точку в качестве десятичного разделителя</translation>
+        <translation type="vanished">Usar vírgula como separador decimal</translation>
     </message>
     <message>
         <source>Allow dots, &apos;.&apos;,  to be used as thousands separator instead of as an alternative decimal sign</source>
-        <translation type="vanished">Разрешить использование точек «.» в качестве разделителя тысяч вместо альтернативного десятичного знака</translation>
+        <translation type="vanished">Permite que pontos, &apos;.&apos;,  sejam usados como separador de milhares em vez de como um sinal decimal alternativo</translation>
     </message>
     <message>
         <source>Ignore comma in numbers</source>
-        <translation type="vanished">Игнорировать запятую в числах</translation>
+        <translation type="vanished">Ignorar vírgula em números</translation>
     </message>
     <message>
         <source>Allow commas, &apos;,&apos;,  to be used as thousands separator instead of as an function argument separator</source>
-        <translation type="vanished">Разрешить использование запятых «,» в качестве разделителя тысяч вместо разделителя аргументов функции</translation>
+        <translation type="vanished">Permite que vírgulas, &apos;,&apos;,  sejam usadas como separador de milhares em vez de como separador de argumentos de função</translation>
     </message>
     <message>
         <source>Ignore dots in numbers</source>
-        <translation type="vanished">Игнорировать точки в числах</translation>
+        <translation type="vanished">Ignorar pontos em números</translation>
     </message>
     <message>
         <source>Digit grouping</source>
-        <translation type="vanished">Группировка цифр</translation>
+        <translation type="vanished">Agrupamento de dígitos</translation>
     </message>
     <message>
         <source>off</source>
-        <translation type="vanished">выкл.</translation>
+        <translation type="vanished">desligado</translation>
     </message>
     <message>
         <source>standard</source>
-        <translation type="vanished">стандарт</translation>
+        <translation type="vanished">padrão</translation>
     </message>
     <message>
         <source>local</source>
-        <translation type="vanished">локаль</translation>
+        <translation type="vanished">local</translation>
     </message>
     <message>
         <source>Multiplication sign</source>
-        <translation type="vanished">Знак умножения</translation>
+        <translation type="vanished">Sinal de multiplicação</translation>
     </message>
     <message>
         <source>Division sign</source>
-        <translation type="vanished">Знак деления</translation>
+        <translation type="vanished">Sinal de divisão</translation>
     </message>
     <message>
         <source>Copy digit separator</source>
-        <translation type="vanished">Копировать разделитель цифр</translation>
+        <translation type="vanished">Copiar separador de dígitos</translation>
     </message>
     <message>
         <source>Deactivate to remove digit separator when copying result</source>
-        <translation type="vanished">Деактивировать, чтобы удалять разделитель цифр при копировании результата</translation>
+        <translation type="vanished">Desative para remover o separador de dígitos ao copiar o resultado</translation>
     </message>
     <message>
         <source>Numbers &amp; Operators</source>
-        <translation type="vanished">Числа и операторы</translation>
+        <translation type="vanished">Números e operadores</translation>
     </message>
     <message>
         <source>Use binary prefixes for information units</source>
-        <translation type="vanished">Использовать двоичные префиксы для информационных единиц</translation>
+        <translation type="vanished">Usar prefixos binários para unidades de informações</translation>
     </message>
     <message>
         <source>Use binary, instead of decimal, prefixes by default for information units (e.g. bytes).</source>
-        <translation type="vanished">По умолчанию использовать двоичные префиксы вместо десятичных для информационных единиц (например, байтов).</translation>
+        <translation type="vanished">Usar prefixos binários, em vez de decimais, como padrão para unidades de informação (ex. bytes).</translation>
     </message>
     <message>
         <source>Conversion to local currency</source>
-        <translation type="vanished">Преобразование в местную валюту</translation>
+        <translation type="vanished">Conversão para moeda local</translation>
     </message>
     <message>
         <source>Automatically convert to the local currency when optimal unit conversion is activated.</source>
-        <translation type="vanished">Автоматическое преобразование в местную валюту при включении оптимального преобразования единиц измерения.</translation>
+        <translation type="vanished">Converter automaticamente para a moeda local quando a conversão ideal de unidades estiver ativada.</translation>
     </message>
     <message>
         <source>Update exchange rates on start</source>
-        <translation type="vanished">Обновлять курсы валют при запуске</translation>
+        <translation type="vanished">Atualizar taxas de câmbio ao inicializar</translation>
     </message>
     <message>
         <source>If current exchange rates shall be downloaded from the internet at program start</source>
-        <translation type="vanished">Если текущие курсы валют должны быть загружены из Интернета при запуске программы</translation>
+        <translation type="vanished">Para que as taxas de câmbio sejam baixadas da internet no início do programa</translation>
     </message>
     <message>
         <source>Exchange rates updates</source>
-        <translation type="vanished">Обновления курсов валют</translation>
-    </message>
-    <message>
-        <source>Temperature calculation mode:</source>
-        <translation type="vanished">Режим расчёта температуры</translation>
-    </message>
-    <message>
-        <source>Absolute</source>
-        <translation type="vanished">Абсолютный</translation>
-    </message>
-    <message>
-        <source>Relative</source>
-        <translation type="vanished">Относительный</translation>
-    </message>
-    <message>
-        <source>Hybrid</source>
-        <translation type="vanished">Гибридный</translation>
+        <translation type="vanished">Atualizações das taxas de câmbio</translation>
     </message>
     <message>
         <source>Units &amp; Currencies</source>
-        <translation type="vanished">Единицы измерения и валюты</translation>
+        <translation type="vanished">Unidades e moedas</translation>
     </message>
     <message>
         <source>Show expression completion suggestions</source>
-        <translation type="vanished">Показать варианты завершения выражения</translation>
+        <translation type="vanished">Mostrar sugestões de conclusão de expressão</translation>
     </message>
     <message>
         <source>Search titles and countries</source>
-        <translation type="vanished">Искать в заголовках и странах</translation>
+        <translation type="vanished">Pesquisar títulos e países</translation>
     </message>
     <message>
         <source>Minimum characters</source>
-        <translation type="vanished">Минимальное количество символов</translation>
+        <translation type="vanished">Caracteres mínimos</translation>
     </message>
     <message>
         <source>Popup delay (ms)</source>
-        <translation type="vanished">Задержка всплывающего окна (мс)</translation>
+        <translation type="vanished">Atraso da janela pop-up (ms)</translation>
     </message>
     <message>
         <source>Completion</source>
-        <translation type="vanished">Завершение</translation>
+        <translation type="vanished">Conclusão</translation>
     </message>
     <message>
         <source>Status warning color</source>
-        <translation type="vanished">Цвет состояния предупреждения</translation>
+        <translation type="vanished">Cor do status de erro</translation>
     </message>
     <message>
         <source>Status error color</source>
-        <translation type="vanished">Цвет состояния ошибки</translation>
+        <translation type="vanished">Cor do status de erro</translation>
     </message>
     <message>
         <source>Custom status font</source>
-        <translation type="vanished">Шрифт состояния</translation>
+        <translation type="vanished">Fonte de status personalizada</translation>
     </message>
     <message>
         <source>If you want to use a font other than the default in the status display below the expression entry</source>
-        <translation type="vanished">Если вы хотите использовать шрифт, отличный от шрифта по умолчанию, в отображении состояния под записью выражения</translation>
+        <translation type="vanished">Se você desejar usar uma fonte diferente da padrão na exibição de status abaixo da entrada da expressão</translation>
     </message>
     <message>
         <source>Custom expression font</source>
-        <translation type="vanished">Шрифт выражения</translation>
+        <translation type="vanished">Fonte da expressão personalizada</translation>
     </message>
     <message>
         <source>If you want to use a font other than the default in the expression entry</source>
-        <translation type="vanished">Если вы хотите использовать шрифт, отличный от шрифта по умолчанию, в записи выражения</translation>
+        <translation type="vanished">Se você desejar usar uma fonte diferente da padrão na entrada da expressão</translation>
     </message>
     <message>
         <source>Custom result font</source>
-        <translation type="vanished">Шрифт результатов</translation>
+        <translation type="vanished">Fonte do resultado personalizada</translation>
     </message>
     <message>
         <source>If you want to use a font other than the default in the result display</source>
-        <translation type="vanished">Если вы хотите использовать шрифт, отличный от шрифта по умолчанию, в отображении результатов</translation>
+        <translation type="vanished">Se você desejar usar uma fonte diferente da padrão na exibição do resultado</translation>
     </message>
     <message>
         <source>Custom keypad font</source>
-        <translation type="vanished">Шрифт клавиатуры</translation>
+        <translation type="vanished">Fonte do teclado personalizada</translation>
     </message>
     <message>
         <source>If you want to use a font other than the default in the keypad</source>
-        <translation type="vanished">Если вы хотите использовать шрифт, отличный от шрифта по умолчанию на клавиатуре</translation>
+        <translation type="vanished">Se você desejar usar uma fonte diferente da padrão no teclado</translation>
     </message>
     <message>
         <source>Custom application font</source>
-        <translation type="vanished">Шрифт приложения</translation>
+        <translation type="vanished">Fonte do programa personalizada</translation>
     </message>
     <message>
         <source>If you want to use a font other than the default for the whole application</source>
-        <translation type="vanished">Если вы хотите использовать шрифт, отличный от шрифта по умолчанию для всего приложения</translation>
+        <translation type="vanished">Se você desejar usar uma fonte diferente da padrão em todo o programa</translation>
     </message>
     <message>
         <source>Text color</source>
-        <translation type="vanished">Цвет текста</translation>
+        <translation type="vanished">Cor do texto</translation>
     </message>
     <message>
         <source>Fonts &amp; Colors</source>
-        <translation type="vanished">Шрифты и цвета</translation>
+        <translation type="vanished">Fontes e cores</translation>
     </message>
     <message>
         <source>Other:</source>
-        <translation type="vanished">Другое:</translation>
+        <translation type="vanished">Outra:</translation>
     </message>
     <message>
         <source>Bijective base-26</source>
-        <translation type="vanished">Биективное основание-26</translation>
+        <translation type="vanished">Base bijetiva-26</translation>
     </message>
     <message>
         <source>&lt;b&gt;Result Base&lt;/b&gt;</source>
-        <translation type="vanished">&lt;b&gt;Основание результата&lt;/b&gt;</translation>
+        <translation type="vanished">&lt;b&gt;Resultado da Base&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Expression Base&lt;/b&gt;</source>
-        <translation type="vanished">&lt;b&gt;Основание выражения&lt;/b&gt;</translation>
+        <translation type="vanished">&lt;b&gt;Base de Expressão&lt;/b&gt;</translation>
     </message>
     <message>
         <source>New Keyboard Shortcut</source>
-        <translation type="vanished">Новая клавиатурная комбинация</translation>
+        <translation type="vanished">Novo atalho de teclado</translation>
     </message>
     <message>
         <source>Edit Variable</source>
-        <translation type="vanished">Изменить переменную</translation>
+        <translation type="vanished">Editar Variável</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="vanished">Дополнительно</translation>
+        <translation type="vanished">Avançado</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this variable</source>
-        <translation type="vanished">Принять создание/изменение этой переменной</translation>
+        <translation type="vanished">Aceitar a criação/modificação desta variável</translation>
     </message>
     <message>
         <source>x, y, z</source>
@@ -2930,7 +2831,7 @@ Note that only the mode, history and definitions of the last closed instance wil
     </message>
     <message>
         <source>Use x, y and z for 1st, 2nd and 3rd function argument, respectively.</source>
-        <translation type="vanished">Используйте x, y и z для 1-го, 2-го и 3-го аргумента функции соответственно.</translation>
+        <translation type="vanished">Use x, y e z para o 1º, 2º e 3º argumento da função, respectivamente.</translation>
     </message>
     <message>
         <source>\x, \y, \z</source>
@@ -2938,171 +2839,163 @@ Note that only the mode, history and definitions of the last closed instance wil
     </message>
     <message>
         <source>Use \x, \y and \z for 1st, 2nd and 3rd function argument, respectively. This avoids potential conflicts with variables, functions and units.</source>
-        <translation type="vanished">Используйте \x, \y и \z для 1-го, 2-го и 3-го аргумента функции соответственно. Это позволяет избежать потенциальных конфликтов с переменными, функциями и единицами измерения.</translation>
+        <translation type="vanished">Use \x, \y and \z for 1st, 2nd and 3rd function argument, respectively. Isso evita possíveis conflitos com variáveis, funções e unidades.</translation>
     </message>
     <message>
         <source>Edit Unit</source>
-        <translation type="vanished">Изменить единицу измерения</translation>
+        <translation type="vanished">Editar Unidade</translation>
     </message>
     <message>
         <source>Do not create/modify this unit</source>
-        <translation type="vanished">Не создавать/не изменять эту единицу измерения</translation>
+        <translation type="vanished">Não criar/modificar esta unidade</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this unit</source>
-        <translation type="vanished">Принять создание/изменение этой единицы измерения</translation>
+        <translation type="vanished">Aceitar a criação/modificação desta unidade</translation>
     </message>
     <message>
         <source>Singular form of this unit&apos;s name</source>
-        <translation type="vanished">Форма единственного числа в названии этой единицы измерения</translation>
+        <translation type="vanished">Forma singular do nome desta unidade</translation>
     </message>
     <message>
         <source>Title displayed in menus and in unit manager</source>
-        <translation type="vanished">Заголовок, отображаемый в меню и в диспетчере единиц измерения</translation>
+        <translation type="vanished">Título exibido nos menus e no gerenciador de unidades</translation>
     </message>
     <message>
         <source>System</source>
-        <translation type="vanished">Система</translation>
+        <translation type="vanished">Sistema</translation>
     </message>
     <message>
         <source>Imperial</source>
-        <translation type="vanished">Имперская/Британская</translation>
+        <translation type="vanished">Imperial</translation>
     </message>
     <message>
         <source>US Survey</source>
-        <translation type="vanished">Американская геодезическая</translation>
+        <translation type="vanished">US Survey</translation>
     </message>
     <message>
         <source>Hide unit</source>
-        <translation type="vanished">Скрыть единицу измерения</translation>
+        <translation type="vanished">Ocultar unidade</translation>
     </message>
     <message>
         <source>If this unit shall be hidden in menus</source>
-        <translation type="vanished">Если эта единица измерения должна быть скрыта в меню</translation>
+        <translation type="vanished">Caso a unidade esteja oculta nos menus</translation>
     </message>
     <message>
         <source>Class</source>
-        <translation type="vanished">Класс</translation>
-    </message>
-    <message>
-        <source>The class that this unit belongs to. Named derived units are defined in relation to a single other unit, with an optional exponent, while (unnamed) derived units are defined by a unit expression with one or multiple units.</source>
-        <translation type="vanished">Класс, к которому принадлежит эта единица измерения. Именованные производные единицы измерения определяются по отношению к другой единице измерения с необязательным показателем, в то время как безымянные производные единицы измерения определяются выражением через одну или несколько единиц измерения.</translation>
+        <translation type="vanished">Classe</translation>
     </message>
     <message>
         <source>Base unit</source>
-        <translation type="vanished">Основная единица измерения</translation>
+        <translation type="vanished">Unidade base</translation>
     </message>
     <message>
         <source>Named derived unit</source>
-        <translation type="vanished">Именованная производная единица измерения</translation>
+        <translation type="vanished">Unidade derivada nomeada</translation>
     </message>
     <message>
         <source>Derived unit</source>
-        <translation type="vanished">Производная единица измерения</translation>
+        <translation type="vanished">Unidade derivada</translation>
     </message>
     <message>
         <source>Base unit(s)</source>
-        <translation type="vanished">Основная(ые) единица(ы) измерения</translation>
-    </message>
-    <message>
-        <source>Unit (for named derived unit) or unit expression (for unnamed derived unit) that this unit as defined in relation to</source>
-        <translation type="vanished">Единица измерения (для именованной производной единицы измерения) или выражение единицы измерения (для безымянной производной единицы измерения), в отношении которой определена редактируемая единица измерения</translation>
+        <translation type="vanished">Unidade(s) base</translation>
     </message>
     <message>
         <source>Exponent</source>
-        <translation type="vanished">Показатель</translation>
+        <translation type="vanished">Expoente</translation>
     </message>
     <message>
         <source>Exponent of the base unit</source>
-        <translation type="vanished">Показатель базовой единицы измерения</translation>
+        <translation type="vanished">Exponent of the base unit</translation>
     </message>
     <message>
         <source>Relation</source>
-        <translation type="vanished">Отношение</translation>
+        <translation type="vanished">Relação</translation>
     </message>
     <message>
         <source>Relation to the base unit. For linear relations this should just be a number.
 
 For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
-        <translation type="vanished">Отношение к основной единице измерения. Для линейных отношений это должно быть просто число.
+        <translation type="vanished">Relação com a unidade base. Para relações lineares, isso deve ser apenas um número.
 
-Для нелинейных отношений используйте \ x для множителя и \ y для показателя степени (например, «\x + 273,15» для отношения между градусами Цельсия и Кельвина).</translation>
+Para relações não-lineares, use \x para o fator e \y para o expoente (por exemplo, &quot;\x + 273.15&quot; para a relação entre graus Celsius e Kelvin).</translation>
     </message>
     <message>
         <source>Relation is exact</source>
-        <translation type="vanished">Отношение точно</translation>
+        <translation type="vanished">Relação é exata</translation>
     </message>
     <message>
         <source>If the relation is precise</source>
-        <translation type="vanished">Если отношение точное</translation>
+        <translation type="vanished">Se a relação é precisa</translation>
     </message>
     <message>
         <source>Inverse relation</source>
-        <translation type="vanished">Обратное отношение</translation>
+        <translation type="vanished">Relação inversa</translation>
     </message>
     <message>
         <source>Specify for non-linear relation, for conversion back to the base unit.</source>
-        <translation type="vanished">Указать для нелинейного отношения, чтобы обратно преобразовать в базовую единицу измерения.</translation>
+        <translation type="vanished">Específica para relação não-linear, para converter de volta para a unidade base.</translation>
     </message>
     <message>
         <source>Mix with base unit</source>
-        <translation type="vanished">Смешивать с базовой единицей измерения</translation>
+        <translation type="vanished">Mesclar com a unidade base</translation>
     </message>
     <message>
         <source>- Decides which units the base unit is mixed with if multple options exist.
 - The original unit will not be mixed with units with lower priority.
 - A lower value means higher priority.</source>
-        <translation type="vanished">- Решает, с какими единицами смешивается базовая единица измерения, если существует несколько вариантов.
-- Исходный объект не будет смешиваться с объектами с более низким приоритетом.
-- Меньшее значение означает более высокий приоритет.</translation>
+        <translation type="vanished">- Decide com quais unidades a unidade base é mesclada se existirem várias opções.
+- A unidade original não será mesclada com unidades de menor prioridade.
+- Um valor mais baixo significa prioridade mais alta.</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation type="vanished">Приоритет</translation>
+        <translation type="vanished">Prioridade</translation>
     </message>
     <message>
         <source>Minimum base unit number</source>
-        <translation type="vanished">Минимальное количество базовой единицы измерения</translation>
+        <translation type="vanished">Número mínimo da unidade base</translation>
     </message>
     <message>
         <source>Use with prefixes by default</source>
-        <translation type="vanished">По умолчанию использовать с префиксами</translation>
+        <translation type="vanished">Use com prefixos por padrão</translation>
     </message>
     <message>
         <source>Create a new unit</source>
-        <translation type="vanished">Создать новую единицу измерения</translation>
+        <translation type="vanished">Criar uma nova unidade</translation>
     </message>
     <message>
         <source>Edit the selected unit</source>
-        <translation type="vanished">Изменить выбранную единицу измерения</translation>
+        <translation type="vanished">Editar a unidade selecionada</translation>
     </message>
     <message>
         <source>Insert the selected unit into the expression entry</source>
-        <translation type="vanished">Вставить выбранную единицу измерения в выражение</translation>
+        <translation type="vanished">Inserir a unidade selecionada na entrada da expressão</translation>
     </message>
     <message>
         <source>C_onvert</source>
-        <translation type="vanished">П_еревести</translation>
+        <translation type="vanished">C_onverter</translation>
     </message>
     <message>
         <source>Convert the result to the selected unit</source>
-        <translation type="vanished">Преобразуйте результат в выбранную единицу измерения</translation>
+        <translation type="vanished">Converter o resultado na unidade selecionada</translation>
     </message>
     <message>
         <source>Delete the selected unit</source>
-        <translation type="vanished">Удалить выбранную единицу измерения</translation>
+        <translation type="vanished">Excluir a unidade selecionada</translation>
     </message>
     <message>
         <source>(De)activate the selected unit</source>
-        <translation type="vanished">(Де)активировать выбранную единицу измерения</translation>
+        <translation type="vanished">Desativar a unidade selecionada</translation>
     </message>
     <message>
         <source>_Unit</source>
-        <translation type="vanished">_Единица измерения</translation>
+        <translation type="vanished">_Unidade</translation>
     </message>
     <message>
         <source>Convert between units</source>
-        <translation type="vanished">Преобразовать между единицами измерения</translation>
+        <translation type="vanished">Converter entre unidades</translation>
     </message>
     <message>
         <source>=</source>
@@ -3110,181 +3003,173 @@ For non-linear relations use \x for the factor and \y for the exponent (e.g. &qu
     </message>
     <message>
         <source>Conver_sion</source>
-        <translation type="vanished">_Преобразование</translation>
+        <translation type="vanished">Conver_são</translation>
     </message>
     <message>
         <source>Converted value</source>
-        <translation type="vanished">Преобразованное значение</translation>
+        <translation type="vanished">Valor convertido</translation>
     </message>
     <message>
         <source>Value to convert from</source>
-        <translation type="vanished">Значение, которое нужно преобразовать</translation>
+        <translation type="vanished">Valor para converter</translation>
     </message>
     <message>
         <source>Type anywhere</source>
-        <translation type="vanished">Печатать где угодно</translation>
+        <translation type="vanished">Digitar em qualquer lugar</translation>
     </message>
     <message>
         <source>Edit Unknown Variable</source>
-        <translation type="vanished">Изменить переменную неизвестного</translation>
+        <translation type="vanished">Editar Variável Desconhecida</translation>
     </message>
     <message>
         <source>Do not create/modify this unknown variable</source>
-        <translation type="vanished">Не создавать/не изменять эту переменную неизвестного</translation>
+        <translation type="vanished">Não criar/modificar esta variável desconhecida</translation>
     </message>
     <message>
         <source>Accept the creation/modification of this unknown variable</source>
-        <translation type="vanished">Принять создание/изменение этой переменной неизвестного</translation>
+        <translation type="vanished">Aceitar a criação/modificação desta variável desconhecida</translation>
     </message>
     <message>
         <source>Name used to reference this unknown variable in expressions</source>
-        <translation type="vanished">Имя, используемое для ссылки на эту переменную неизвестного в выражениях</translation>
+        <translation type="vanished">Nome usado para referenciar esta variável desconhecida em expressões</translation>
     </message>
     <message>
         <source>Use custom assumptions</source>
-        <translation type="vanished">Использовать собственные предположения</translation>
+        <translation type="vanished">Usar suposições personalizadas</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="vanished">Тип</translation>
+        <translation type="vanished">Tipo</translation>
     </message>
     <message>
         <source>Real Number</source>
-        <translation type="vanished">Действительное число</translation>
+        <translation type="vanished">Número real</translation>
     </message>
     <message>
         <source>Rational Number</source>
-        <translation type="vanished">Рациональное число</translation>
+        <translation type="vanished">Número racional</translation>
     </message>
     <message>
         <source>Sign</source>
-        <translation type="vanished">Знак</translation>
+        <translation type="vanished">Sinal</translation>
     </message>
     <message>
         <source>The category this unknown variable belongs to</source>
-        <translation type="vanished">Категория, к которой принадлежит эта переменная неизвестного</translation>
+        <translation type="vanished">A categoria à qual essa variável pertence</translation>
     </message>
     <message>
         <source>Value of this variable (expression)</source>
-        <translation type="vanished">Значение этой переменной (выражение)</translation>
+        <translation type="vanished">Valor desta variável (expressão)</translation>
     </message>
     <message>
         <source>value is exact</source>
-        <translation type="vanished">значение точное</translation>
+        <translation type="vanished">valor é exato</translation>
     </message>
     <message>
         <source>If the value is precise</source>
-        <translation type="vanished">Если значение точное</translation>
+        <translation type="vanished">Se o valor for preciso</translation>
     </message>
     <message>
         <source>The category this variable belongs to</source>
-        <translation type="vanished">Категория, к которой принадлежит эта переменная</translation>
+        <translation type="vanished">A categoria à qual essa variável pretence</translation>
     </message>
     <message>
         <source>Create a new variable</source>
-        <translation type="vanished">Создать новую переменную</translation>
+        <translation type="vanished">Criar uma nova variável</translation>
     </message>
     <message>
         <source>Edit the selected variable</source>
-        <translation type="vanished">Изменить выбранную переменную</translation>
+        <translation type="vanished">Editar a variável selecionada</translation>
     </message>
     <message>
         <source>Insert the selected variable into the expression entry</source>
-        <translation type="vanished">Вставить выбранную переменную в выражение</translation>
+        <translation type="vanished">Insira a variável selecionada na entrada da expressão</translation>
     </message>
     <message>
         <source>Delete the selected variable</source>
-        <translation type="vanished">Удалить выбранную переменную</translation>
+        <translation type="vanished">Excluir a variável selecionada</translation>
     </message>
     <message>
         <source>(De)activate the selected variable</source>
-        <translation type="vanished">(Де)активировать выбранную переменную</translation>
+        <translation type="vanished">Desativar a variável selecionada</translation>
     </message>
     <message>
         <source>E_xport</source>
-        <translation type="vanished">_Экспортировать</translation>
+        <translation type="vanished">E_xportar</translation>
     </message>
     <message>
         <source>_Variable</source>
-        <translation type="vanished">_Переменная</translation>
-    </message>
-    <message>
-        <source>Execute expressions and commands from a file</source>
-        <translation type="vanished">Выполнить выражения и команды из файла</translation>
+        <translation type="vanished">_Variável</translation>
     </message>
     <message>
         <source>Start a new instance of the application</source>
-        <translation type="vanished">Запустить новый экземпляр приложения</translation>
+        <translation type="vanished">Iniciar uma nova instância do programa</translation>
     </message>
     <message>
         <source>Display the application version</source>
-        <translation type="vanished">Показать версию приложения</translation>
+        <translation type="vanished">Exibir a versão do programa</translation>
     </message>
     <message>
         <source>Specify the window title</source>
-        <translation type="vanished">Укажите заголовок окна</translation>
+        <translation type="vanished">Especifica o título da janela</translation>
     </message>
     <message>
         <source>TITLE</source>
-        <translation type="vanished">НАЗВАНИЕ</translation>
+        <translation type="vanished">TITLE</translation>
     </message>
     <message>
         <source>Expression to calculate</source>
-        <translation type="vanished">Выражение для вычисления</translation>
+        <translation type="vanished">Expressão para calcular</translation>
     </message>
     <message>
         <source>[EXPRESSION]</source>
-        <translation type="vanished">[ВЫРАЖЕНИЕ]</translation>
+        <translation type="vanished">[EXPRESSION]</translation>
     </message>
     <message>
         <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;,
 and press the enter key.</source>
-        <translation type="vanished">Введите математическое выражение выше, например «5 + 2 / 3»,
-и нажмите клавишу ВВОД (Enter).</translation>
+        <translation type="vanished">Digite a expressão matemática acima, ex. &quot;5 + 2 / 3&quot;
+e pressione a tecla Enter.</translation>
     </message>
     <message>
         <source>ans</source>
-        <translation type="vanished">отв</translation>
+        <translation type="vanished">ans</translation>
     </message>
     <message>
         <source>Last Answer</source>
-        <translation type="vanished">Последний ответ</translation>
+        <translation type="vanished">Última resposta</translation>
     </message>
     <message>
         <source>answer</source>
-        <translation type="vanished">ответ</translation>
+        <translation type="vanished">resposta</translation>
     </message>
     <message>
         <source>Answer 2</source>
-        <translation type="vanished">Ответ 2</translation>
+        <translation type="vanished">Resposta 2</translation>
     </message>
     <message>
         <source>Answer 3</source>
-        <translation type="vanished">Ответ 3</translation>
+        <translation type="vanished">Resposta 3</translation>
     </message>
     <message>
         <source>Answer 4</source>
-        <translation type="vanished">Ответ 4</translation>
+        <translation type="vanished">Resposta 4</translation>
     </message>
     <message>
         <source>Answer 5</source>
-        <translation type="vanished">Ответ 5</translation>
-    </message>
-    <message>
-        <source>Memory</source>
-        <translation type="vanished">Память</translation>
+        <translation type="vanished">Resposta 5</translation>
     </message>
     <message>
         <source>Failed to load global definitions!
 </source>
-        <translation type="vanished">Не удалось загрузить глобальные определения!
+        <translation type="vanished">Falha ao carregar definições globais!
 </translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>All</source>
         <extracomment>if no category has been selected (previously selected has been renamed/deleted), select &quot;All&quot;</extracomment>
-        <translation type="vanished">Все</translation>
+        <translation type="vanished">Todas</translation>
     </message>
     <message>
         <source>By default, only one instance (one main window) of %s is allowed.
@@ -3292,1524 +3177,1414 @@ and press the enter key.</source>
 If multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.
 
 Do you, despite this, want to change the default bahvior and allow multiple simultaneous instances?</source>
-        <translation type="vanished">По умолчанию разрешён только один экземпляр (одно главное окно) %s.
+        <translation type="vanished">Por padrão, apenas uma instância (uma janela principal) de %s é permitida.
 
-Если несколько экземпляров открыты одновременно, будут сохранены только определения (переменные, функции и т. д.), режим, настройки и история последнего закрытого окна.
+Se várias instâncias forem abertas simultaneamente, apenas as definições (variáveis, funções, etc.), modo, preferências e histórico da última janela serão salvas.
 
-Вы, несмотря на это, хотите изменить поведение по умолчанию и разрешить одновременную работу нескольких экземпляров?</translation>
+Mesmo assim, você deseja alterar o comportamento padrão e permitir várias instâncias simultaneamente?</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Right-click/long press: %s</source>
-        <translation type="vanished">Щелчок правой кнопкой/долгое нажатие: %s</translation>
+        <translation type="vanished">Botão direito/pressionar e segurar: %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Right-click: %s</source>
-        <translation type="vanished">Щелчок правой кнопкой: %s</translation>
+        <translation type="vanished">Botão direito: %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Middle-click: %s</source>
-        <translation type="vanished">Щелчок средней кнопкой: %s</translation>
+        <translation type="vanished">Botão do meio: %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Cycle through previous expression</source>
-        <translation type="vanished">Цикл через предыдущее выражение</translation>
+        <translation type="vanished">Percorrer pela expressão anterior</translation>
     </message>
     <message>
         <source>Move cursor left or right</source>
-        <translation type="vanished">Перемещать курсор влево или вправо</translation>
+        <translation type="vanished">Mover cursor para esquerda ou direita</translation>
     </message>
     <message>
         <source>Move cursor to beginning or end</source>
-        <translation type="vanished">Переместить курсор в начало или конец</translation>
+        <translation type="vanished">Mover cursor para o início ou fim</translation>
     </message>
     <message>
         <source>Uncertainty/interval</source>
-        <translation type="vanished">Неопределённость/интервал</translation>
+        <translation type="vanished">Incerteza/intervalo</translation>
     </message>
     <message>
         <source>Relative error</source>
-        <translation type="vanished">Относительная ошибка</translation>
+        <translation type="vanished">Erro relativo</translation>
     </message>
     <message>
         <source>Argument separator</source>
-        <translation type="vanished">Разделитель аргументов</translation>
+        <translation type="vanished">Separador de argumentos</translation>
     </message>
     <message>
         <source>Blank space</source>
-        <translation type="vanished">Пустой пробел</translation>
+        <translation type="vanished">Espaço em branco</translation>
     </message>
     <message>
         <source>New line</source>
-        <translation type="vanished">Новая строка</translation>
+        <translation type="vanished">Nova linha</translation>
     </message>
     <message>
         <source>Smart parentheses</source>
-        <translation type="vanished">Умные скобки</translation>
+        <translation type="vanished">Parênteses inteligentes</translation>
     </message>
     <message>
         <source>Vector brackets</source>
-        <translation type="vanished">Векторные скобки</translation>
+        <translation type="vanished">Colchetes para vetores</translation>
     </message>
     <message>
         <source>Left parenthesis</source>
-        <translation type="vanished">Левая скобка</translation>
+        <translation type="vanished">Parêntese esquerdo</translation>
     </message>
     <message>
         <source>Left vector bracket</source>
-        <translation type="vanished">Левая векторная скобка</translation>
+        <translation type="vanished">Parêntese esquerdo do vetor</translation>
     </message>
     <message>
         <source>Right parenthesis</source>
-        <translation type="vanished">Правая скобка</translation>
+        <translation type="vanished">Parêntese direito</translation>
     </message>
     <message>
         <source>Right vector bracket</source>
-        <translation type="vanished">Правая векторная скобка</translation>
+        <translation type="vanished">Parêntese direito do vetor</translation>
     </message>
     <message>
         <source>Decimal point</source>
-        <translation type="vanished">Десятичная точка</translation>
+        <translation type="vanished">Ponto decimal</translation>
     </message>
     <message>
         <source>Raise (Ctrl+*)</source>
-        <translation type="vanished">Возведение в степень (Ctrl+*)</translation>
+        <translation type="vanished">Aumentar (Ctrl+*)</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="vanished">Сложение</translation>
-    </message>
-    <message>
-        <source>M+ (memory plus)</source>
-        <translation type="vanished">M+ (прибавить к значению в памяти)</translation>
-    </message>
-    <message>
-        <source>MC (memory clear)</source>
-        <translation type="vanished">MC (отчистить память)</translation>
+        <translation type="vanished">Adicionar</translation>
     </message>
     <message>
         <source>Backspace</source>
-        <translation type="vanished">Обратное перемещение</translation>
-    </message>
-    <message>
-        <source>M− (memory minus)</source>
-        <translation type="vanished">M− (отнять от значения в памяти)</translation>
+        <translation type="vanished">Backspace</translation>
     </message>
     <message>
         <source>Previous result (static)</source>
-        <translation type="vanished">Предыдущий результат (статический)</translation>
+        <translation type="vanished">Resultado anterior (estático)</translation>
     </message>
     <message>
         <source>Calculate expression</source>
-        <translation type="vanished">Вычислить выражение</translation>
-    </message>
-    <message>
-        <source>MR (memory recall)</source>
-        <translation type="vanished">MR (вызвать из памяти)</translation>
-    </message>
-    <message>
-        <source>MS (memory store)</source>
-        <translation type="vanished">MS (сохранить в памяти)</translation>
+        <translation type="vanished">Calcular expressão</translation>
     </message>
     <message>
         <source>Set unknowns</source>
-        <translation type="vanished">Установить неизвестные</translation>
+        <translation type="vanished">Definir incógnitos</translation>
     </message>
     <message>
         <source>more</source>
         <extracomment>Show further items in a submenu</extracomment>
-        <translation type="vanished">ещё</translation>
+        <translation type="vanished">mais</translation>
     </message>
     <message>
         <source>Logical AND</source>
-        <translation type="vanished">Логическое И</translation>
+        <translation type="vanished">Lógico AND</translation>
     </message>
     <message>
         <source>Logical OR</source>
-        <translation type="vanished">Логическое ИЛИ</translation>
+        <translation type="vanished">Lógico OR</translation>
     </message>
     <message>
         <source>Logical NOT</source>
-        <translation type="vanished">Логическое НЕ</translation>
+        <translation type="vanished">Lógico NOT</translation>
     </message>
     <message>
         <source>Toggle Result Base</source>
-        <translation type="vanished">В(ы)ключить основание результата</translation>
+        <translation type="vanished">Alternar base de resultados</translation>
     </message>
     <message>
         <source>Open menu with stored variables</source>
-        <translation type="vanished">Открыть меню с сохранёнными переменными</translation>
+        <translation type="vanished">Abrir menu com variáveis armazenadas</translation>
     </message>
     <message>
         <source>Index</source>
-        <translation type="vanished">Индекс</translation>
-    </message>
-    <message>
-        <source>ENTER</source>
-        <extracomment>RPN Enter (calculate and add to stack)</extracomment>
-        <translation type="vanished">ВВОД</translation>
+        <translation type="vanished">Índice</translation>
     </message>
     <message>
         <source>Calculate expression and add to stack</source>
-        <translation type="vanished">Вычислить выражение и добавить в стек</translation>
+        <translation type="vanished">Calcular expressão e adicionar à pilha</translation>
     </message>
     <message>
         <source>Flag</source>
-        <translation type="vanished">Флаг</translation>
+        <translation type="vanished">Bandeira</translation>
     </message>
     <message>
         <source>Matrices</source>
-        <translation type="vanished">Матрицы</translation>
+        <translation type="vanished">Matrizes</translation>
     </message>
     <message>
         <source>Gregorian</source>
-        <translation type="vanished">Григорианский</translation>
+        <translation type="vanished">Gregoriano</translation>
     </message>
     <message>
         <source>Revised Julian (Milanković)</source>
-        <translation type="vanished">Пересмотренный юлианский (циклы Миланковича)</translation>
+        <translation type="vanished">Juliano revisado (Milanković)</translation>
     </message>
     <message>
         <source>Julian</source>
-        <translation type="vanished">Юлианский</translation>
+        <translation type="vanished">Juliano</translation>
     </message>
     <message>
         <source>Islamic (Hijri)</source>
-        <translation type="vanished">Исламский (от Хиджры)</translation>
+        <translation type="vanished">Islâmico (Hijri)</translation>
     </message>
     <message>
         <source>Hebrew</source>
-        <translation type="vanished">Еврейский</translation>
+        <translation type="vanished">Hebreu</translation>
     </message>
     <message>
         <source>Chinese</source>
-        <translation type="vanished">Китайский</translation>
+        <translation type="vanished">Chinês</translation>
     </message>
     <message>
         <source>Persian (Solar Hijri)</source>
-        <translation type="vanished">Иранский (Солнечная хиджра)</translation>
+        <translation type="vanished">Persa (Hijri Solar)</translation>
     </message>
     <message>
         <source>Coptic</source>
-        <translation type="vanished">Коптский</translation>
+        <translation type="vanished">Cóptico</translation>
     </message>
     <message>
         <source>Ethiopian</source>
-        <translation type="vanished">Эфиопский</translation>
+        <translation type="vanished">Etíope</translation>
     </message>
     <message>
         <source>Indian (National)</source>
-        <translation type="vanished">Индийский (национальный)</translation>
+        <translation type="vanished">Indiano (Nacional)</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation type="vanished">Действие</translation>
+        <translation type="vanished">Ação</translation>
     </message>
     <message>
         <source>Key combination</source>
-        <translation type="vanished">Комбинация клавиш</translation>
+        <translation type="vanished">Combinação de teclas</translation>
     </message>
     <message>
         <source>Raise</source>
-        <translation type="vanished">Возведение в степень</translation>
+        <translation type="vanished">Aumentar</translation>
     </message>
     <message>
         <source>History Answer Value</source>
-        <translation type="vanished">Значение ответа в истории</translation>
+        <translation type="vanished">Valor da resposta do histórico</translation>
     </message>
     <message>
         <source>History Index(es)</source>
-        <translation type="vanished">Индекс(ы) истории</translation>
+        <translation type="vanished">Índice(s) do histórico</translation>
     </message>
     <message>
         <source>History index %s does not exist.</source>
-        <translation type="vanished">Индекс истории %s не существует.</translation>
+        <translation type="vanished">O índice do histórico %s não existe.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>expression</source>
-        <translation type="vanished">выражение</translation>
+        <translation type="vanished">expressão</translation>
     </message>
     <message>
         <source>History Parsed Expression</source>
-        <translation type="vanished">Анализированное выражения в истории</translation>
+        <translation type="vanished">Expressão analisada historicamente</translation>
     </message>
     <message>
         <source>Set Window Title</source>
-        <translation type="vanished">Установить заголовок окна</translation>
+        <translation type="vanished">Definir título da janela</translation>
     </message>
     <message>
         <source>Failed to open %s.
 %s</source>
-        <translation type="vanished">Не удалось открыть %s.
+        <translation type="vanished">Falha ao abrir %s.
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Could not display help for Qalculate!.</source>
-        <translation type="vanished">Не удалось отобразить справку по Qalculate!.</translation>
+        <translation type="vanished">Não foi possível exibir a ajuda do Qalculate!.</translation>
     </message>
     <message>
         <source>Could not display help for Qalculate!.
 %s</source>
-        <translation type="vanished">Не удалось отобразить справку по Qalculate!.
+        <translation type="vanished">Não foi possível exibir a ajuda do Qalculate!.
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>approx.</source>
-        <translation type="vanished">прибл.</translation>
+        <translation type="vanished">aprox.</translation>
     </message>
     <message>
         <source>Stop process</source>
-        <translation type="vanished">Остановить процесс</translation>
+        <translation type="vanished">Parar processo</translation>
     </message>
     <message>
         <source>Clear expression</source>
-        <translation type="vanished">Отчистить выражение</translation>
+        <translation type="vanished">Limpar expressão</translation>
     </message>
     <message>
         <source>EXACT</source>
-        <translation type="vanished">ТОЧНО</translation>
+        <translation type="vanished">EXACT</translation>
     </message>
     <message>
         <source>APPROX</source>
-        <translation type="vanished">ПРИБЛ</translation>
+        <translation type="vanished">APPROX</translation>
     </message>
     <message>
         <source>RPN</source>
-        <translation type="vanished">ПОЛИЗ</translation>
-    </message>
-    <message>
-        <source>CHN</source>
-        <extracomment>Chain mode</extracomment>
-        <translation type="vanished">ЦЕПЬ</translation>
+        <translation type="vanished">RPN</translation>
     </message>
     <message>
         <source>ROMAN</source>
-        <translation type="vanished">РИМСКИЕ</translation>
+        <translation type="vanished">ROMAN</translation>
     </message>
     <message>
         <source>DEG</source>
-        <translation type="vanished">ГРД</translation>
+        <translation type="vanished">DEG</translation>
     </message>
     <message>
         <source>RAD</source>
-        <translation type="vanished">РАД</translation>
+        <translation type="vanished">RAD</translation>
     </message>
     <message>
         <source>GRA</source>
-        <translation type="vanished">ГРА</translation>
+        <translation type="vanished">GRA</translation>
     </message>
     <message>
         <source>PREC</source>
-        <translation type="vanished">ТОЧН</translation>
+        <translation type="vanished">VAR</translation>
     </message>
     <message>
         <source>FUNC</source>
-        <translation type="vanished">ФУНК</translation>
+        <translation type="vanished">FUNC</translation>
     </message>
     <message>
         <source>UNIT</source>
-        <translation type="vanished">ЕД. ИЗМ</translation>
+        <translation type="vanished">UNIT</translation>
     </message>
     <message>
         <source>VAR</source>
-        <translation type="vanished">ПЕР</translation>
+        <translation type="vanished">VAR</translation>
     </message>
     <message>
         <source>INF</source>
-        <translation type="vanished">БЕСК</translation>
+        <translation type="vanished">INF</translation>
     </message>
     <message>
         <source>CPLX</source>
-        <translation type="vanished">КМКС</translation>
+        <translation type="vanished">CPLX</translation>
     </message>
     <message>
         <source>Do you wish to update the exchange rates now?</source>
-        <translation type="vanished">Вы хотите обновить курсы обмена сейчас?</translation>
+        <translation type="vanished">Deseja atualizar as taxas de câmbio agora?</translation>
     </message>
     <message numerus="yes">
         <source>It has been %s day since the exchange rates last were updated.</source>
         <translation type="vanished">
-            <numerusform>Прошёл %s день с момента последнего обновления курсов обмена.</numerusform>
-            <numerusform>Прошло %s дня с момента последнего обновления курсов обмена.</numerusform>
-            <numerusform>Прошло %s дней с момента последнего обновления курсов обмена.</numerusform>
+            <numerusform>Faz %s dia desde a última atualização das taxas de câmbio.</numerusform>
+            <numerusform>Faz %s dias desde a última atualização das taxas de câmbio.</numerusform>
         </translation>
         <extra-po-flags>c-format</extra-po-flags>
         <extra-po-msgid_plural>It has been %s days since the exchange rates last were updated.</extra-po-msgid_plural>
     </message>
     <message>
         <source>Do not ask again</source>
-        <translation type="vanished">Не спрашивать снова</translation>
+        <translation type="vanished">Não perguntar novamente</translation>
     </message>
     <message>
         <source>It took too long to generate the plot data.</source>
-        <translation type="vanished">Создание графика для данных заняло слишком много времени.</translation>
+        <translation type="vanished">Demorou muito para gerar os dados da plotagem.</translation>
     </message>
     <message>
         <source>It took too long to generate the plot data. Please decrease the sampling rate or increase the time limit in preferences.</source>
-        <translation type="vanished">Создание графика для данных заняло слишком много времени. Уменьшите частоту дискретизации или увеличьте ограничение по времени в настройках.</translation>
+        <translation type="vanished">Demorou muito para gerar os dados da plotagem. Diminua a taxa de amostragem ou aumente o limite de tempo nas preferências.</translation>
     </message>
     <message>
         <source>When errors, warnings and other information are generated during calculation, the icon in the upper right corner of the expression entry changes to reflect this. If you hold the pointer over or click the icon, the message will be shown.</source>
-        <translation type="vanished">Если во время расчёта генерируются ошибки, предупреждения и другая информация, значок в правом верхнем углу записи выражения изменяется, чтобы отразить это. Если удерживать указатель мыши или щелкнуть на значок, будет показано сообщение.</translation>
+        <translation type="vanished">Quando erros, avisos e outras informações são geradas durante o cálculo, o ícone à direita da entrada da expressão é alterado para exibir isso. Ao segurar o ponteiro do mouse ou clicar no ícone, a mensagem será mostrada.</translation>
     </message>
     <message>
         <source>Path of executable not found.</source>
-        <translation type="vanished">Путь к исполняемому файлу не найден.</translation>
+        <translation type="vanished">Caminho do executável não encontrado.</translation>
     </message>
     <message>
         <source>curl not found.</source>
-        <translation type="vanished">Программа curl не найдена.</translation>
+        <translation type="vanished">curl não encontrado.</translation>
     </message>
     <message>
         <source>Failed to run update script.
 %s</source>
-        <translation type="vanished">Не удалось запустить скрипт обновления.
+        <translation type="vanished">Falha ao executar o script de atualização.
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Failed to check for updates.</source>
-        <translation type="vanished">Не удалось проверить наличие обновлений.</translation>
+        <translation type="vanished">Falha ao verificar por atualizações.</translation>
     </message>
     <message>
         <source>No updates found.</source>
-        <translation type="vanished">Обновлений не найдено.</translation>
+        <translation type="vanished">Nenhuma atualização encontrada.</translation>
     </message>
     <message>
         <source>A new version of %s is available at %s.
 
 Do you wish to update to version %s.</source>
-        <translation type="vanished">Новая версия %s доступна на %s.
+        <translation type="vanished">Uma nova versão do %s está disponível em %s.
 
-Вы хотите обновиться до версии %s?</translation>
+Deseja atualizar para a versão %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>A new version of %s is available.
 
 You can get version %s at %s.</source>
-        <translation type="vanished">Доступна новая версия %s.
+        <translation type="vanished">Uma nova versão do %s está disponível.
 
-Вы можете получить версию %s на %s.</translation>
+Você pode obter a versão %s em %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Too many arguments for %s().</source>
-        <translation type="vanished">Слишком много аргументов для %s().</translation>
+        <translation type="vanished">Argumentos em excesso para %s().</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>argument</source>
-        <translation type="vanished">аргумент</translation>
-    </message>
-    <message>
-        <source>Temperature Calculation Mode</source>
-        <translation type="vanished">Режим расчёта температуры</translation>
-    </message>
-    <message>
-        <source>The expression is ambiguous.
-Please select temperature calculation mode
-(the mode can later be changed in preferences).</source>
-        <translation type="vanished">Выражение неоднозначное.
-Выберите режим расчёта температуры
-(режим позже можно изменить в настройках).</translation>
-    </message>
-    <message>
-        <source>Interpretation of dots</source>
-        <translation type="vanished">Использование точки</translation>
-    </message>
-    <message>
-        <source>Please select interpretation of dots (&quot;.&quot;)
-(this can later be changed in preferences).</source>
-        <translation type="vanished">Выберите использование точки («.»)
-(позже это можно изменить в настройках).</translation>
-    </message>
-    <message>
-        <source>Both dot and comma as decimal separators</source>
-        <translation type="vanished">Точка и запятая в качестве десятичных разделителей</translation>
-    </message>
-    <message>
-        <source>Dot as thousands separator</source>
-        <translation type="vanished">Точка как разделитель тысяч</translation>
-    </message>
-    <message>
-        <source>Only dot as decimal separator</source>
-        <translation type="vanished">Только точка в качестве десятичного разделителя</translation>
+        <translation type="vanished">argumento</translation>
     </message>
     <message>
         <source>Uncategorized</source>
-        <translation type="vanished">Без категорий</translation>
+        <translation type="vanished">Sem categoria</translation>
     </message>
     <message>
         <source>hexadecimal</source>
-        <translation type="vanished">шестнадцатеричное</translation>
+        <translation type="vanished">hexadecimal</translation>
     </message>
     <message>
         <source>octal</source>
-        <translation type="vanished">восьмеричное</translation>
+        <translation type="vanished">octal</translation>
     </message>
     <message>
         <source>decimal</source>
-        <translation type="vanished">десятеричное</translation>
+        <translation type="vanished">decimal</translation>
     </message>
     <message>
         <source>duodecimal</source>
-        <translation type="vanished">двенадцатеричное</translation>
+        <translation type="vanished">duodecimal</translation>
     </message>
     <message>
         <source>binary</source>
-        <translation type="vanished">двоичное</translation>
+        <translation type="vanished">binário</translation>
     </message>
     <message>
         <source>roman</source>
-        <translation type="vanished">римское число</translation>
+        <translation type="vanished">romanos</translation>
     </message>
     <message>
         <source>bijective</source>
-        <translation type="vanished">биективное</translation>
+        <translation type="vanished">bijetivo</translation>
     </message>
     <message>
         <source>sexagesimal</source>
-        <translation type="vanished">шестидесятеричное</translation>
-    </message>
-    <message>
-        <source>latitude</source>
-        <translation type="vanished">широта</translation>
-    </message>
-    <message>
-        <source>longitude</source>
-        <translation type="vanished">долгота</translation>
+        <translation type="vanished">sexagesimal</translation>
     </message>
     <message>
         <source>time</source>
-        <translation type="vanished">время</translation>
+        <translation type="vanished">hora</translation>
     </message>
     <message>
         <source>bases</source>
-        <translation type="vanished">основания</translation>
+        <translation type="vanished">bases</translation>
     </message>
     <message>
         <source>calendars</source>
-        <translation type="vanished">календари</translation>
+        <translation type="vanished">calendários</translation>
     </message>
     <message>
         <source>rectangular</source>
-        <translation type="vanished">прямоугоная</translation>
+        <translation type="vanished">retangular</translation>
     </message>
     <message>
         <source>cartesian</source>
-        <translation type="vanished">декартова</translation>
+        <translation type="vanished">cartesiano</translation>
     </message>
     <message>
         <source>exponential</source>
-        <translation type="vanished">экспоненциальная</translation>
+        <translation type="vanished">exponencial</translation>
     </message>
     <message>
         <source>polar</source>
-        <translation type="vanished">полярная</translation>
+        <translation type="vanished">polar</translation>
     </message>
     <message>
         <source>angle</source>
-        <translation type="vanished">угловая</translation>
+        <translation type="vanished">ângulo</translation>
     </message>
     <message>
         <source>phasor</source>
-        <translation type="vanished">фазовая</translation>
+        <translation type="vanished">fasor</translation>
     </message>
     <message>
         <source>optimal</source>
-        <translation type="vanished">оптимально</translation>
+        <translation type="vanished">ideal</translation>
     </message>
     <message>
         <source>base</source>
-        <translation type="vanished">основание</translation>
+        <translation type="vanished">base</translation>
     </message>
     <message>
         <source>mixed</source>
-        <translation type="vanished">смешано</translation>
+        <translation type="vanished">mesclado</translation>
     </message>
     <message>
         <source>fraction</source>
-        <translation type="vanished">дробь</translation>
+        <translation type="vanished">fração</translation>
     </message>
     <message>
         <source>factors</source>
-        <translation type="vanished">множители</translation>
+        <translation type="vanished">fatores</translation>
     </message>
     <message>
         <source>partial fraction</source>
-        <translation type="vanished">частичная дробь</translation>
+        <translation type="vanished">fração parcial</translation>
     </message>
     <message>
         <source>factorize</source>
-        <translation type="vanished">разложить на множители</translation>
+        <translation type="vanished">fatorar</translation>
     </message>
     <message>
         <source>expand</source>
-        <translation type="vanished">раскрывать</translation>
+        <translation type="vanished">expandir</translation>
     </message>
     <message>
         <source>hexadecimal number</source>
-        <translation type="vanished">шестнадцатеричное число</translation>
+        <translation type="vanished">número hexadecimal</translation>
     </message>
     <message>
         <source>octal number</source>
-        <translation type="vanished">восьмеричное число</translation>
+        <translation type="vanished">número octal</translation>
     </message>
     <message>
         <source>decimal number</source>
-        <translation type="vanished">десятичное число</translation>
+        <translation type="vanished">número decimal</translation>
     </message>
     <message>
         <source>duodecimal number</source>
-        <translation type="vanished">двенадцатеричное число</translation>
+        <translation type="vanished">número duodecimal</translation>
     </message>
     <message>
         <source>binary number</source>
-        <translation type="vanished">двоичное число</translation>
+        <translation type="vanished">número binário</translation>
     </message>
     <message>
         <source>roman numerals</source>
-        <translation type="vanished">римские цифры</translation>
+        <translation type="vanished">numerais romanos</translation>
     </message>
     <message>
         <source>bijective base-26</source>
-        <translation type="vanished">биективное основание-26</translation>
+        <translation type="vanished">base bijetiva-26</translation>
     </message>
     <message>
         <source>sexagesimal number</source>
-        <translation type="vanished">шестидесятеричное число</translation>
+        <translation type="vanished">número sexagesimal</translation>
     </message>
     <message>
         <source>32-bit floating point</source>
-        <translation type="vanished">32-битное с плавающей запятой</translation>
+        <translation type="vanished">ponto flutuante de 32-bit</translation>
     </message>
     <message>
         <source>64-bit floating point</source>
-        <translation type="vanished">64-битное с плавающей запятой</translation>
+        <translation type="vanished">ponto flutuante de 64-bit</translation>
     </message>
     <message>
         <source>16-bit floating point</source>
-        <translation type="vanished">16-битное с плавающей запятой</translation>
+        <translation type="vanished">ponto flutuante de 16-bit</translation>
     </message>
     <message>
         <source>80-bit (x86) floating point</source>
-        <translation type="vanished">80-битное (x86) с плавающей запятой</translation>
+        <translation type="vanished">ponto flutuante de 80-bit (x86)</translation>
     </message>
     <message>
         <source>128-bit floating point</source>
-        <translation type="vanished">128-битное с плавающей запятой</translation>
+        <translation type="vanished">ponto flutuante de 128-bit</translation>
     </message>
     <message>
         <source>time format</source>
-        <translation type="vanished">формат времени</translation>
+        <translation type="vanished">formato de hora</translation>
     </message>
     <message>
         <source>number bases</source>
-        <translation type="vanished">основания систем счисления</translation>
+        <translation type="vanished">bases numéricas</translation>
     </message>
     <message>
         <source>optimal unit</source>
-        <translation type="vanished">оптимальные единицы измерения</translation>
+        <translation type="vanished">unidade ideal</translation>
     </message>
     <message>
         <source>base units</source>
-        <translation type="vanished">основные единицы измерения</translation>
+        <translation type="vanished">unidades de base</translation>
     </message>
     <message>
         <source>mixed units</source>
-        <translation type="vanished">смешанные единицы</translation>
+        <translation type="vanished">unidades mescladas</translation>
     </message>
     <message>
         <source>expanded partial fractions</source>
-        <translation type="vanished">расширенные дробные числа</translation>
+        <translation type="vanished">frações parciais expandidas</translation>
     </message>
     <message>
         <source>complex rectangular form</source>
-        <translation type="vanished">прямоугольная форма комплексных чисел</translation>
+        <translation type="vanished">forma retangular complexa</translation>
     </message>
     <message>
         <source>complex exponential form</source>
-        <translation type="vanished">экспоненциальная форма комплексных чисел</translation>
+        <translation type="vanished">forma exponencial complexa</translation>
     </message>
     <message>
         <source>complex polar form</source>
-        <translation type="vanished">полярная форма комплексных чисел</translation>
+        <translation type="vanished">forma polar complexa</translation>
     </message>
     <message>
         <source>complex cis form</source>
-        <translation type="vanished">сисоидная форма комплексных чисел</translation>
+        <translation type="vanished">forma cis complexa</translation>
     </message>
     <message>
         <source>complex angle notation</source>
-        <translation type="vanished">комплексные числа в обозначении угла</translation>
+        <translation type="vanished">notação complexa de ângulo</translation>
     </message>
     <message>
         <source>complex phasor notation</source>
-        <translation type="vanished">Комплексные числа в обозначении вектора</translation>
+        <translation type="vanished">notação complexa de fasor</translation>
     </message>
     <message>
         <source>UTC time zone</source>
-        <translation type="vanished">Часовой пояс UTC</translation>
+        <translation type="vanished">Fuso horário UTC</translation>
     </message>
     <message>
         <source>number base %s</source>
-        <translation type="vanished">основание системы счисления %s</translation>
+        <translation type="vanished">número base %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Inactive</source>
-        <translation type="vanished">Неактивный</translation>
+        <translation type="vanished">Inativo</translation>
     </message>
     <message>
         <source>Retrieves data from the %s data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation type="vanished">Извлекает данные из набора данных %s для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
+        <translation type="vanished">Recupera dados do conjunto de dados %s para um determinado objeto e propriedade. Se &quot;info&quot; for digitado como propriedade, uma janela de diálogo será exibida com todas as propriedades do objeto.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Example:</source>
-        <translation type="vanished">Пример:</translation>
+        <translation type="vanished">Exemplo:</translation>
     </message>
     <message>
         <source>Arguments</source>
-        <translation type="vanished">Аргументы</translation>
+        <translation type="vanished">Argumentos</translation>
     </message>
     <message>
         <source>optional</source>
         <extracomment>optional argument</extracomment>
-        <translation type="vanished">необязательный</translation>
+        <translation type="vanished">opcional</translation>
     </message>
     <message>
         <source>default: </source>
         <extracomment>argument default, in description</extracomment>
-        <translation type="vanished">по умолчанию: </translation>
+        <translation type="vanished">padrão: </translation>
     </message>
     <message>
         <source>Requirement</source>
-        <translation type="vanished">Требование</translation>
+        <translation type="vanished">Requerimento</translation>
     </message>
     <message>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
-        <translation type="vanished">ключ</translation>
+        <translation type="vanished">chave</translation>
     </message>
     <message>
         <source>Acti_vate</source>
-        <translation type="vanished">Акти_вировать</translation>
+        <translation type="vanished">Ati_var</translation>
     </message>
     <message>
         <source>a previous result</source>
-        <translation type="vanished">предыдущий результат</translation>
+        <translation type="vanished">um resultado anterior</translation>
     </message>
     <message>
         <source>matrix</source>
-        <translation type="vanished">матрица</translation>
+        <translation type="vanished">matriz</translation>
     </message>
     <message>
         <source>vector</source>
-        <translation type="vanished">вектор</translation>
+        <translation type="vanished">vetor</translation>
     </message>
     <message>
         <source>positive</source>
-        <translation type="vanished">положительное</translation>
+        <translation type="vanished">positivo</translation>
     </message>
     <message>
         <source>non-positive</source>
-        <translation type="vanished">не положительное</translation>
+        <translation type="vanished">não-positivo</translation>
     </message>
     <message>
         <source>negative</source>
-        <translation type="vanished">отрицательное</translation>
+        <translation type="vanished">negativo</translation>
     </message>
     <message>
         <source>non-negative</source>
-        <translation type="vanished">неотрицательное</translation>
+        <translation type="vanished">não-negativo</translation>
     </message>
     <message>
         <source>non-zero</source>
-        <translation type="vanished">ненулевое</translation>
+        <translation type="vanished">diferente de zero</translation>
     </message>
     <message>
         <source>boolean</source>
-        <translation type="vanished">логическое</translation>
+        <translation type="vanished">boleano</translation>
     </message>
     <message>
         <source>integer</source>
-        <translation type="vanished">целое</translation>
+        <translation type="vanished">inteiro</translation>
     </message>
     <message>
         <source>rational</source>
-        <translation type="vanished">рациональное</translation>
+        <translation type="vanished">racional</translation>
     </message>
     <message>
         <source>real</source>
-        <translation type="vanished">вещественное</translation>
+        <translation type="vanished">real</translation>
     </message>
     <message>
         <source>complex</source>
-        <translation type="vanished">комплексное</translation>
+        <translation type="vanished">complexo</translation>
     </message>
     <message>
         <source>number</source>
-        <translation type="vanished">число</translation>
+        <translation type="vanished">número</translation>
     </message>
     <message>
         <source>(not matrix)</source>
-        <translation type="vanished">(не матрица)</translation>
+        <translation type="vanished">(não matriz)</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation type="vanished">неизвестное</translation>
+        <translation type="vanished">desconhecido</translation>
     </message>
     <message>
         <source>default assumptions</source>
-        <translation type="vanished">предположения по умолчанию</translation>
+        <translation type="vanished">suposições padrão</translation>
     </message>
     <message>
         <source>Variable does not exist anymore.</source>
-        <translation type="vanished">Переменной больше не существует.</translation>
+        <translation type="vanished">A variável não existe mais.</translation>
     </message>
     <message>
         <source>Data Retrieval Function</source>
-        <translation type="vanished">Функция поиска данных</translation>
+        <translation type="vanished">Função de Recuperação de Dados</translation>
     </message>
     <message>
         <source>Insert function</source>
-        <translation type="vanished">Вставить функцию</translation>
+        <translation type="vanished">Inserir função</translation>
     </message>
     <message>
         <source>Insert function (dialog)</source>
-        <translation type="vanished">Вставить функцию (диаорг)</translation>
+        <translation type="vanished">Inserir função (diálogo)</translation>
     </message>
     <message>
         <source>Insert variable</source>
-        <translation type="vanished">Вставить переменную</translation>
+        <translation type="vanished">Inserir variável</translation>
     </message>
     <message>
         <source>Insert unit</source>
-        <translation type="vanished">Вставить единицу измерения</translation>
+        <translation type="vanished">Inserir unidade</translation>
     </message>
     <message>
         <source>Insert text</source>
-        <translation type="vanished">Вставить текст</translation>
+        <translation type="vanished">Inserir texto</translation>
     </message>
     <message>
         <source>Insert date</source>
-        <translation type="vanished">Вставить дату</translation>
+        <translation type="vanished">Inserir data</translation>
     </message>
     <message>
         <source>Insert vector</source>
-        <translation type="vanished">Вставить вектор</translation>
+        <translation type="vanished">Inserir vetor</translation>
     </message>
     <message>
         <source>Insert matrix</source>
-        <translation type="vanished">Вставить матрицу</translation>
+        <translation type="vanished">Inserir matriz</translation>
     </message>
     <message>
         <source>Insert smart parentheses</source>
-        <translation type="vanished">Вставить умные скобки</translation>
+        <translation type="vanished">Inserir parênteses inteligentes</translation>
     </message>
     <message>
         <source>Convert to unit</source>
-        <translation type="vanished">Преобразовать к единице измерения</translation>
+        <translation type="vanished">Converter em unidade</translation>
     </message>
     <message>
         <source>Convert to unit (entry)</source>
-        <translation type="vanished">Преобразовать к единице измерения (запись)</translation>
+        <translation type="vanished">Converter em unidade (entrada)</translation>
     </message>
     <message>
         <source>Convert to optimal unit</source>
-        <translation type="vanished">Преобразовать в оптимальную единицу измерения</translation>
+        <translation type="vanished">Converter em unidade ideal</translation>
     </message>
     <message>
         <source>Convert to base units</source>
-        <translation type="vanished">Преобразовать в базовые единицы измерения</translation>
+        <translation type="vanished">Converter em unidades base</translation>
     </message>
     <message>
         <source>Convert to optimal prefix</source>
-        <translation type="vanished">Преобразовать в оптимальный префикс</translation>
+        <translation type="vanished">Converter em prefixo ideal</translation>
     </message>
     <message>
         <source>Convert to number base</source>
-        <translation type="vanished">Преобразовать к основанию систем счисления</translation>
+        <translation type="vanished">Converter em número base</translation>
     </message>
     <message>
         <source>Factorize result</source>
-        <translation type="vanished">Разложить результат на множители</translation>
+        <translation type="vanished">Fatorar resultado</translation>
     </message>
     <message>
         <source>Expand result</source>
-        <translation type="vanished">Развернуть результат</translation>
+        <translation type="vanished">Expandir resultado</translation>
     </message>
     <message>
         <source>Expand partial fractions</source>
-        <translation type="vanished">Развернуть частичные дроби</translation>
+        <translation type="vanished">Expandir frações parciais</translation>
     </message>
     <message>
         <source>RPN: down</source>
-        <translation type="vanished">ПОЛИЗ: вниз</translation>
+        <translation type="vanished">RPN: para baixo</translation>
     </message>
     <message>
         <source>RPN: up</source>
-        <translation type="vanished">ПОЛИЗ: вверх</translation>
+        <translation type="vanished">RPN: para cima</translation>
     </message>
     <message>
         <source>RPN: swap</source>
-        <translation type="vanished">ПОЛИЗ: обменять</translation>
+        <translation type="vanished">RPN: trocar</translation>
     </message>
     <message>
         <source>RPN: copy</source>
-        <translation type="vanished">ПОЛИЗ: копировать</translation>
+        <translation type="vanished">RPN: copiar</translation>
     </message>
     <message>
         <source>RPN: lastx</source>
-        <translation type="vanished">ПОЛИЗ: последний x</translation>
+        <translation type="vanished">RPN: lastx</translation>
     </message>
     <message>
         <source>RPN: delete register</source>
-        <translation type="vanished">ПОЛИЗ: удалить</translation>
+        <translation type="vanished">RPN: excluir registro</translation>
     </message>
     <message>
         <source>RPN: clear stack</source>
-        <translation type="vanished">ПОЛИЗ: очистить стек</translation>
+        <translation type="vanished">RPN: limpar pilha</translation>
     </message>
     <message>
         <source>Load meta mode</source>
-        <translation type="vanished">Загрузить мета-режим</translation>
+        <translation type="vanished">Carregar modo meta</translation>
     </message>
     <message>
         <source>Set expression base</source>
-        <translation type="vanished">Установить основание для выражения</translation>
+        <translation type="vanished">Definir base de expressão</translation>
     </message>
     <message>
         <source>Set result base</source>
-        <translation type="vanished">Установить основание для результата</translation>
+        <translation type="vanished">Definir base de resultados</translation>
     </message>
     <message>
         <source>Toggle exact mode</source>
-        <translation type="vanished">В(ы)ключить точный режим</translation>
+        <translation type="vanished">Alternar modo exato</translation>
     </message>
     <message>
         <source>Set angle unit to degrees</source>
-        <translation type="vanished">Установить угловую единицу измерения в градусы</translation>
+        <translation type="vanished">Definir unidade de ângulo em graus</translation>
     </message>
     <message>
         <source>Set angle unit to radians</source>
-        <translation type="vanished">Установить угловую единицу измерения в радианы</translation>
+        <translation type="vanished">Definir unidade de ângulo em radianos</translation>
     </message>
     <message>
         <source>Set angle unit to gradians</source>
-        <translation type="vanished">Установить угловую единицу измерения в грады</translation>
+        <translation type="vanished">Definir unidade de ângulo em gradianos</translation>
     </message>
     <message>
         <source>Toggle simple fractions</source>
-        <translation type="vanished">В(ы)ключить простые дроби</translation>
+        <translation type="vanished">Alternar frações simples</translation>
     </message>
     <message>
         <source>Toggle mixed fractions</source>
-        <translation type="vanished">В(ы)ключить смешанные дроби</translation>
+        <translation type="vanished">Alternar frações mescladas</translation>
     </message>
     <message>
         <source>Toggle scientific notation</source>
-        <translation type="vanished">В(ы)ключить научную запись</translation>
+        <translation type="vanished">Alternar notação científica</translation>
     </message>
     <message>
         <source>Toggle simple notation</source>
-        <translation type="vanished">В(ы)ключить простую запись</translation>
+        <translation type="vanished">Alternar notação simples</translation>
     </message>
     <message>
         <source>Toggle RPN mode</source>
-        <translation type="vanished">В(ы)ключить режим ПОЛИЗ</translation>
+        <translation type="vanished">Alternar modo RPN</translation>
     </message>
     <message>
         <source>Toggle calculate as you type</source>
-        <translation type="vanished">В(ы)ключить режим расчёта по мере ввода</translation>
+        <translation type="vanished">Alternar para calcular ao digitar</translation>
     </message>
     <message>
         <source>Toggle programming keypad</source>
-        <translation type="vanished">В(ы)ключить клавиатуру программирования</translation>
+        <translation type="vanished">Alternar teclado de programação</translation>
     </message>
     <message>
         <source>Show keypad</source>
-        <translation type="vanished">Показать клавиатура</translation>
+        <translation type="vanished">Mostrar teclado</translation>
     </message>
     <message>
         <source>Show history</source>
-        <translation type="vanished">Показать историю</translation>
+        <translation type="vanished">Mostrar histórico</translation>
     </message>
     <message>
         <source>Search history</source>
-        <translation type="vanished">Искать в истории</translation>
+        <translation type="vanished">Pesquisar no histórico</translation>
     </message>
     <message>
         <source>Show conversion</source>
-        <translation type="vanished">Показать панель преобразования</translation>
+        <translation type="vanished">Mostrar conversão</translation>
     </message>
     <message>
         <source>Show RPN stack</source>
-        <translation type="vanished">Показать стек ПОЛИЗ</translation>
+        <translation type="vanished">Mostrar pilha RPN</translation>
     </message>
     <message>
         <source>Manage variables</source>
-        <translation type="vanished">Управление переменными</translation>
+        <translation type="vanished">Gerenciar variáveis</translation>
     </message>
     <message>
         <source>Manage functions</source>
-        <translation type="vanished">Управление функциями</translation>
+        <translation type="vanished">Gerenciar funções</translation>
     </message>
     <message>
         <source>Manage data sets</source>
-        <translation type="vanished">Управление наборами данных</translation>
+        <translation type="vanished">Gerenciar conjuntos de dados</translation>
     </message>
     <message>
         <source>New variable</source>
-        <translation type="vanished">Новая переменная</translation>
+        <translation type="vanished">Nova variável</translation>
     </message>
     <message>
         <source>New function</source>
-        <translation type="vanished">Новая функция</translation>
+        <translation type="vanished">Nova função</translation>
     </message>
     <message>
         <source>Open plot functions/data</source>
-        <translation type="vanished">Открыть график функций/данных</translation>
+        <translation type="vanished">Abrir funções/dados de plotagem</translation>
     </message>
     <message>
         <source>Open convert number bases</source>
-        <translation type="vanished">Открыть преобразование между основаниями систем счисления</translation>
+        <translation type="vanished">Abrir números base convertidos</translation>
     </message>
     <message>
         <source>Open floating point conversion</source>
-        <translation type="vanished">Открыть окно преобразования чисел с плавающей запятой</translation>
+        <translation type="vanished">Abrir conversão de ponto flutuante</translation>
     </message>
     <message>
         <source>Open calender conversion</source>
-        <translation type="vanished">Открыть окно преобразования календарей</translation>
+        <translation type="vanished">Abrir conversão de calendário</translation>
     </message>
     <message>
         <source>Open percentage calculation tool</source>
-        <translation type="vanished">Открыть окно инструмента расчёта процентов</translation>
+        <translation type="vanished">Abrir ferramenta de cálculo de porcentagem</translation>
     </message>
     <message>
         <source>Open periodic table</source>
-        <translation type="vanished">Открыть окно с периодической таблицей</translation>
+        <translation type="vanished">Abrir tabela periódica</translation>
     </message>
     <message>
         <source>Update exchange rates</source>
-        <translation type="vanished">Обновить курсы валют</translation>
+        <translation type="vanished">Atualizar taxas de câmbio</translation>
     </message>
     <message>
         <source>Copy result</source>
-        <translation type="vanished">Скопировать результат</translation>
-    </message>
-    <message>
-        <source>Insert result</source>
-        <translation type="vanished">Вставить результат</translation>
+        <translation type="vanished">Copiar resultado</translation>
     </message>
     <message>
         <source>Save result image</source>
-        <translation type="vanished">Сохранить изображение с результатом</translation>
+        <translation type="vanished">Salvar imagem do resultado</translation>
     </message>
     <message>
         <source>Help</source>
-        <translation type="vanished">Справка</translation>
+        <translation type="vanished">Ajuda</translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="vanished">В_ыход</translation>
-    </message>
-    <message>
-        <source>Toggle chain mode</source>
-        <translation type="vanished">В(ы)ключить режим цепочки</translation>
-    </message>
-    <message>
-        <source>Toggle keep above</source>
-        <translation type="vanished">Поддерживать поверх других</translation>
-    </message>
-    <message>
-        <source>Show/hide completion</source>
-        <translation type="vanished">Показать/скрыть завершение</translation>
-    </message>
-    <message>
-        <source>Perform completion (activate first item)</source>
-        <translation type="vanished">Выполнять завершение (активировать первый пункт)</translation>
+        <translation type="vanished">Sair</translation>
     </message>
     <message>
         <source>Prefixes</source>
-        <translation type="vanished">Префиксы</translation>
+        <translation type="vanished">Prefixos</translation>
     </message>
     <message>
         <source>No Prefix</source>
-        <translation type="vanished">Без префикса</translation>
+        <translation type="vanished">Nenhum prefixo</translation>
     </message>
     <message>
         <source>Optimal Prefix</source>
-        <translation type="vanished">Оптимальный префикс</translation>
+        <translation type="vanished">Prefixo ideal</translation>
     </message>
     <message>
         <source>Prefix</source>
-        <translation type="vanished">Префикс</translation>
+        <translation type="vanished">Prefixo</translation>
     </message>
     <message>
         <source>Complex angle/phasor notation</source>
-        <translation type="vanished">Комплексные числа в обозначении угла/вектора</translation>
+        <translation type="vanished">Notação completa de ângulo/fasor</translation>
     </message>
     <message>
         <source>Number bases</source>
-        <translation type="vanished">Основания систем счисления</translation>
+        <translation type="vanished">Bases numéricas</translation>
     </message>
     <message>
         <source>Base units</source>
-        <translation type="vanished">Основные единицы измерения</translation>
+        <translation type="vanished">Unidades base</translation>
     </message>
     <message>
         <source>Binary number</source>
-        <translation type="vanished">Двоичное число</translation>
+        <translation type="vanished">Número binário</translation>
     </message>
     <message>
         <source>Calendars</source>
-        <translation type="vanished">Календари</translation>
+        <translation type="vanished">Calendários</translation>
     </message>
     <message>
         <source>Complex cis form</source>
-        <translation type="vanished">Сисоидная форма комплексных чисел</translation>
+        <translation type="vanished">Forma cis complexa</translation>
     </message>
     <message>
         <source>Decimal number</source>
-        <translation type="vanished">Десятичное число</translation>
+        <translation type="vanished">Número decimal</translation>
     </message>
     <message>
         <source>Duodecimal number</source>
-        <translation type="vanished">Двенадцатеричное число</translation>
+        <translation type="vanished">Número duodecimal</translation>
     </message>
     <message>
         <source>Complex exponential form</source>
-        <translation type="vanished">Экспоненциальная форма комплексных чисел</translation>
+        <translation type="vanished">Forma exponencial complexa</translation>
     </message>
     <message>
         <source>Factors</source>
-        <translation type="vanished">Множители</translation>
+        <translation type="vanished">Fatores</translation>
     </message>
     <message>
         <source>16-bit floating point binary format</source>
-        <translation type="vanished">16-битное в двоичном формате с плавающей запятой</translation>
+        <translation type="vanished">Formato binário de ponto flutuante de 16-bit</translation>
     </message>
     <message>
         <source>32-bit floating point binary format</source>
-        <translation type="vanished">32-битное в двоичном формате с плавающей запятой</translation>
+        <translation type="vanished">Formato binário de ponto flutuante de 32-bit</translation>
     </message>
     <message>
         <source>64-bit floating point binary format</source>
-        <translation type="vanished">64-битное в двоичном формате с плавающей запятой</translation>
+        <translation type="vanished">Formato binário de ponto flutuante de 64-bit</translation>
     </message>
     <message>
         <source>80-bit (x86) floating point binary format</source>
-        <translation type="vanished">80-битное (x86) в двоичном формате с плавающей запятой</translation>
+        <translation type="vanished">Formato binário de ponto flutuante de 80-bit (x86)</translation>
     </message>
     <message>
         <source>128-bit floating point binary format</source>
-        <translation type="vanished">128-битное в двоичном формате с плавающей запятой</translation>
+        <translation type="vanished">Formato binário de ponto flutuante de 128-bit</translation>
     </message>
     <message>
         <source>Hexadecimal number</source>
-        <translation type="vanished">Шестнадцатеричное число</translation>
-    </message>
-    <message>
-        <source>Latitude</source>
-        <translation type="vanished">Широта</translation>
-    </message>
-    <message>
-        <source>Longitude</source>
-        <translation type="vanished">Долгота</translation>
+        <translation type="vanished">Número hexadecimal</translation>
     </message>
     <message>
         <source>Mixed units</source>
-        <translation type="vanished">Смешанные единицы измерения</translation>
+        <translation type="vanished">Unidades mistas</translation>
     </message>
     <message>
         <source>Octal number</source>
-        <translation type="vanished">Восьмеричное число</translation>
+        <translation type="vanished">Número octal</translation>
     </message>
     <message>
         <source>Optimal units</source>
-        <translation type="vanished">Оптимальные единицы измерения</translation>
+        <translation type="vanished">Unidades ideais</translation>
     </message>
     <message>
         <source>Expanded partial fractions</source>
-        <translation type="vanished">Расширенные дробные числа</translation>
+        <translation type="vanished">Frações parciais expandidas</translation>
     </message>
     <message>
         <source>Complex polar form</source>
-        <translation type="vanished">Полярная форма комплексных чисел</translation>
+        <translation type="vanished">Forma polar complexa</translation>
     </message>
     <message>
         <source>Complex rectangular form</source>
-        <translation type="vanished">Прямоугольная форма комплексных чисел</translation>
+        <translation type="vanished">Forma retangular complexa</translation>
     </message>
     <message>
         <source>Sexagesimal number</source>
-        <translation type="vanished">Шестидесятеричное число</translation>
+        <translation type="vanished">Número sexagesimal</translation>
     </message>
     <message>
         <source>and</source>
-        <translation type="vanished">и</translation>
+        <translation type="vanished">e</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="vanished">или</translation>
+        <translation type="vanished">ou</translation>
     </message>
     <message>
         <source>undefined</source>
-        <translation type="vanished">не определено</translation>
+        <translation type="vanished">indefinido</translation>
     </message>
     <message>
         <source>result is too long
 see history</source>
-        <translation type="vanished">результат слишком длинный
-смотрите историю</translation>
+        <translation type="vanished">resultado é muito longo
+ver histórico</translation>
     </message>
     <message>
         <source>calculation was aborted</source>
-        <translation type="vanished">расчёт был прерван</translation>
+        <translation type="vanished">cálculo abortado</translation>
     </message>
     <message>
         <source>RPN Register Moved</source>
-        <translation type="vanished">Регистр ПОЛИЗ перемещён</translation>
+        <translation type="vanished">Registro RPN Movido</translation>
     </message>
     <message>
         <source>RPN Operation</source>
-        <translation type="vanished">ПОЛИЗ операция</translation>
+        <translation type="vanished">Operação RPN</translation>
     </message>
     <message>
         <source>Processing…</source>
-        <translation type="vanished">Обработка…</translation>
+        <translation type="vanished">Processando…</translation>
     </message>
     <message>
         <source>result processing was aborted</source>
-        <translation type="vanished">обработка результатов была прервана</translation>
+        <translation type="vanished">processamento de resultado abortado</translation>
     </message>
     <message>
         <source>Factorizing…</source>
-        <translation type="vanished">Факторизация…</translation>
+        <translation type="vanished">Fatorando…</translation>
     </message>
     <message>
         <source>Expanding partial fractions…</source>
-        <translation type="vanished">Расширение дробных чисел…</translation>
+        <translation type="vanished">Expandindo frações parciais…</translation>
     </message>
     <message>
         <source>Expanding…</source>
-        <translation type="vanished">Расширение…</translation>
+        <translation type="vanished">Expandindo…</translation>
     </message>
     <message>
         <source>Calculating…</source>
-        <translation type="vanished">Расчёт…</translation>
+        <translation type="vanished">Calculando…</translation>
     </message>
     <message>
         <source>Converting…</source>
-        <translation type="vanished">Преобразование…</translation>
+        <translation type="vanished">Convertendo…</translation>
     </message>
     <message>
         <source>Fetching exchange rates.</source>
-        <translation type="vanished">Получение курсов валют.</translation>
+        <translation type="vanished">Buscando taxas de câmbio.</translation>
     </message>
     <message>
         <source>Time zone parsing failed.</source>
-        <translation type="vanished">Не удалось выполнить синтаксический анализ часового пояса.</translation>
+        <translation type="vanished">Falha na análise do fuso horário.</translation>
     </message>
     <message>
         <source>Keep open</source>
-        <translation type="vanished">Держать открытым</translation>
+        <translation type="vanished">Manter aberto</translation>
     </message>
     <message>
         <source>Enter</source>
         <extracomment>RPN Enter (calculate and add to stack)</extracomment>
-        <translation type="vanished">Ввод</translation>
+        <translation type="vanished">Enter</translation>
     </message>
     <message>
         <source>C_alculate</source>
-        <translation type="vanished">_Рассчитать</translation>
+        <translation type="vanished">C_alcular</translation>
     </message>
     <message>
         <source>Apply to Stack</source>
-        <translation type="vanished">Применить к стеку</translation>
+        <translation type="vanished">Aplicar à pilha</translation>
     </message>
     <message>
         <source>Argument</source>
-        <translation type="vanished">Аргумент</translation>
+        <translation type="vanished">Argumento</translation>
     </message>
     <message>
         <source>True</source>
-        <translation type="vanished">Истина</translation>
+        <translation type="vanished">Verdadeiro</translation>
     </message>
     <message>
         <source>False</source>
-        <translation type="vanished">Ложь</translation>
+        <translation type="vanished">Falso</translation>
     </message>
     <message>
         <source>Info</source>
-        <translation type="vanished">Инфо</translation>
+        <translation type="vanished">Informação</translation>
     </message>
     <message>
         <source>Edit Unit (global)</source>
-        <translation type="vanished">Изменить единицу измерения (глобальную)</translation>
+        <translation type="vanished">Editar unidade (global)</translation>
     </message>
     <message>
         <source>New Unit</source>
-        <translation type="vanished">Новая единица измерения</translation>
+        <translation type="vanished">Nova unidade</translation>
     </message>
     <message>
         <source>Empty name field.</source>
-        <translation type="vanished">Введите имя поля</translation>
+        <translation type="vanished">Campo de nome vazio.</translation>
     </message>
     <message>
         <source>A variable or unit with the same name already exists.
 Do you want to overwrite it?</source>
         <extracomment>unit with the same name exists -- overwrite or open the dialog again</extracomment>
-        <translation type="vanished">Переменная или единица измерения с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="vanished">Uma variável ou unidade com o mesmo nome já existe.
+Deseja sobrescrevê-la?</translation>
     </message>
     <message>
         <source>Base unit does not exist.</source>
-        <translation type="vanished">Основная единица измерения не существует</translation>
+        <translation type="vanished">A unidade base não existe.</translation>
     </message>
     <message>
         <source>Edit Function (global)</source>
-        <translation type="vanished">Изменить функцию (глобальную)</translation>
+        <translation type="vanished">Editar Função (global)</translation>
     </message>
     <message>
         <source>New Function</source>
-        <translation type="vanished">Новая функция</translation>
+        <translation type="vanished">Nova Função</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="vanished">Да</translation>
+        <translation type="vanished">Sim</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="vanished">Нет</translation>
+        <translation type="vanished">Não</translation>
     </message>
     <message>
         <source>Empty expression field.</source>
-        <translation type="vanished">Пустое поле выражения.</translation>
+        <translation type="vanished">Campo de expressão vazio.</translation>
     </message>
     <message>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
         <extracomment>function with the same name exists -- overwrite or open the dialog againdataset with the same name exists -- overwrite or open the dialog again</extracomment>
-        <translation type="vanished">Функция с таким именем уже существует.
-Хотите перезаписать функцию?</translation>
+        <translation type="vanished">Uma função com o mesmo nome já existe.
+Deseja sobrescrever a função?</translation>
     </message>
     <message>
         <source>Unit does not exist</source>
-        <translation type="vanished">Единица измерения не существует</translation>
+        <translation type="vanished">A unidade não existe</translation>
     </message>
     <message>
         <source>Edit Unknown Variable (global)</source>
-        <translation type="vanished">Изменить переменную неизвестного (глобальную)</translation>
+        <translation type="vanished">Editar Variável Desconhecida (global)</translation>
     </message>
     <message>
         <source>New Unknown Variable</source>
-        <translation type="vanished">Новая переменная неизвестного</translation>
+        <translation type="vanished">Nova variável desconhecida</translation>
     </message>
     <message>
         <source>An unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <extracomment>unknown with the same name exists -- overwrite or open dialog againvariable with the same name exists -- overwrite or open dialog again</extracomment>
-        <translation type="vanished">Единица измерения или переменная или  с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="vanished">Uma unidade ou variável com o mesmo nome já existe.
+Deseja sobrescrevê-la?</translation>
     </message>
     <message>
         <source>Edit Variable (global)</source>
-        <translation type="vanished">Изменить переменную (глобальную)</translation>
+        <translation type="vanished">Editar Variáveis (global)</translation>
     </message>
     <message>
         <source>New Variable</source>
-        <translation type="vanished">Новая переменная</translation>
+        <translation type="vanished">Nova Variável</translation>
     </message>
     <message>
         <source>Empty value field.</source>
-        <translation type="vanished">Пустое поле значения.</translation>
+        <translation type="vanished">Campo de valor vazio.</translation>
     </message>
     <message>
         <source>Edit Vector</source>
-        <translation type="vanished">Изменить вектор</translation>
+        <translation type="vanished">Editar Vetor</translation>
     </message>
     <message>
         <source>Edit Vector (global)</source>
-        <translation type="vanished">Изменить вектор (глобальный)</translation>
+        <translation type="vanished">Editar Vetor (global)</translation>
     </message>
     <message>
         <source>New Vector</source>
-        <translation type="vanished">Новый вектор</translation>
+        <translation type="vanished">Novo Vetor</translation>
     </message>
     <message>
         <source>Edit Matrix (global)</source>
-        <translation type="vanished">Изменить матрицу (глобальную)</translation>
+        <translation type="vanished">Editar Matriz (global)</translation>
     </message>
     <message>
         <source>New Matrix</source>
-        <translation type="vanished">Новая матрица</translation>
+        <translation type="vanished">Nova Matriz</translation>
     </message>
     <message>
         <source>Vector Result</source>
-        <translation type="vanished">Векторный результат</translation>
+        <translation type="vanished">Resultado do Vetor</translation>
     </message>
     <message>
         <source>Matrix Result</source>
-        <translation type="vanished">Матричный результат</translation>
+        <translation type="vanished">Resultado da Matriz</translation>
     </message>
     <message>
         <source>New Data Object</source>
-        <translation type="vanished">Новый объект данных</translation>
+        <translation type="vanished">Novo Objeto de Dados</translation>
     </message>
     <message>
         <source>text</source>
-        <translation type="vanished">текст</translation>
+        <translation type="vanished">texto</translation>
     </message>
     <message>
         <source>approximate</source>
-        <translation type="vanished">приблизительно</translation>
+        <translation type="vanished">aproximado</translation>
     </message>
     <message>
         <source>Edit Data Set (global)</source>
-        <translation type="vanished">Изменить набор данных (глобальный)</translation>
+        <translation type="vanished">Editar Conjunto de Dados (global)</translation>
     </message>
     <message>
         <source>New Data Set</source>
-        <translation type="vanished">Новый набор данных</translation>
+        <translation type="vanished">Novo conjunto de dados</translation>
     </message>
     <message>
         <source>info</source>
-        <translation type="vanished">инфо</translation>
+        <translation type="vanished">info</translation>
     </message>
     <message>
         <source>Property</source>
-        <translation type="vanished">Свойство</translation>
+        <translation type="vanished">Propriedade</translation>
     </message>
     <message>
         <source>No file name entered.</source>
-        <translation type="vanished">Имя файла не введено.</translation>
+        <translation type="vanished">Nenhum nome de arquivo digitado.</translation>
     </message>
     <message>
         <source>No delimiter selected.</source>
-        <translation type="vanished">Разделитель не выбран.</translation>
+        <translation type="vanished">Nenhum delimitador selecionado.</translation>
     </message>
     <message>
         <source>Could not import from file 
 %s</source>
-        <translation type="vanished">Не удалось импортировать из файла 
+        <translation type="vanished">Não foi possível importar do arquivo 
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>No variable name entered.</source>
-        <translation type="vanished">Имя переменной не введено.</translation>
+        <translation type="vanished">Nenhum nome de variável digitado.</translation>
     </message>
     <message>
         <source>No known variable with entered name found.</source>
-        <translation type="vanished">Не найдено известных переменных с указанным именем.</translation>
+        <translation type="vanished">Nenhuma variável conhecida com o nome digitado encontrada.</translation>
     </message>
     <message>
         <source>Could not export to file 
 %s</source>
-        <translation type="vanished">Не удалось экспортировать в файл 
+        <translation type="vanished">Não foi possível exportar para o arquivo 
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>My Variables</source>
-        <translation type="vanished">Мои переменные</translation>
+        <translation type="vanished">Minhas Variáveis</translation>
     </message>
     <message>
         <source>Couldn&apos;t write definitions</source>
-        <translation type="vanished">Не удалось записать определения</translation>
+        <translation type="vanished">Não foi possível gravar definições</translation>
     </message>
     <message>
         <source>Preset</source>
-        <translation type="vanished">Предустановка</translation>
+        <translation type="vanished">Predefinição</translation>
     </message>
     <message>
         <source>Abort</source>
-        <translation type="vanished">Прервать</translation>
+        <translation type="vanished">Abortar</translation>
     </message>
     <message>
         <source>Undo</source>
-        <translation type="vanished">Отменить</translation>
+        <translation type="vanished">Desfazer</translation>
     </message>
     <message>
         <source>Redo</source>
-        <translation type="vanished">Повторить</translation>
+        <translation type="vanished">Refazer</translation>
     </message>
     <message>
         <source>Completion Mode</source>
-        <translation type="vanished">Режим завершения</translation>
+        <translation type="vanished">Modo de conclusão</translation>
     </message>
     <message>
         <source>Limited strict completion</source>
-        <translation type="vanished">Ограниченное строгое завершение</translation>
+        <translation type="vanished">Conclusão estrita limitada</translation>
     </message>
     <message>
         <source>Strict completion</source>
-        <translation type="vanished">Строгое завершение</translation>
+        <translation type="vanished">Conclusão estrita</translation>
     </message>
     <message>
         <source>Limited full completion</source>
-        <translation type="vanished">Ограниченное полное завершение</translation>
+        <translation type="vanished">Conclusão completa limitada</translation>
     </message>
     <message>
         <source>Full completion</source>
-        <translation type="vanished">Полное завершение</translation>
+        <translation type="vanished">Conclusão completa</translation>
     </message>
     <message>
         <source>No completion</source>
-        <translation type="vanished">Без завершения</translation>
-    </message>
-    <message>
-        <source>Delayed completion</source>
-        <translation type="vanished">Отложенное завершение</translation>
-    </message>
-    <message>
-        <source>Customize completion…</source>
-        <translation type="vanished">Настроить завершение…</translation>
+        <translation type="vanished">Sem conclusão</translation>
     </message>
     <message>
         <source>Save Mode</source>
-        <translation type="vanished">Сохранить режим</translation>
+        <translation type="vanished">Salvar modo</translation>
     </message>
     <message>
         <source>Preset mode cannot be overwritten.</source>
-        <translation type="vanished">Предустановленный режим нельзя перезаписать.</translation>
+        <translation type="vanished">O modo predefinido não pode ser substituído.</translation>
     </message>
     <message>
         <source>Delete Mode</source>
-        <translation type="vanished">Удалить режим</translation>
+        <translation type="vanished">Excluir modo</translation>
     </message>
     <message>
         <source>Couldn&apos;t write preferences to
 %s</source>
-        <translation type="vanished">Не удалось записать настройки в
+        <translation type="vanished">Não foi possível gravar preferências em
 %s</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>never</source>
-        <translation type="vanished">никогда</translation>
+        <translation type="vanished">nunca</translation>
     </message>
     <message>
         <source>ask</source>
-        <translation type="vanished">спросить</translation>
+        <translation type="vanished">perguntar</translation>
     </message>
     <message numerus="yes">
         <source>%i day</source>
         <translation type="vanished">
-            <numerusform>%i день</numerusform>
-            <numerusform>%i дня</numerusform>
-            <numerusform>%i дней</numerusform>
+            <numerusform>%i dia</numerusform>
+            <numerusform>%i dias</numerusform>
         </translation>
         <extra-po-flags>c-format</extra-po-flags>
         <extra-po-msgid_plural>%i days</extra-po-msgid_plural>
@@ -4817,290 +4592,411 @@ Do you want to overwrite it?</source>
     <message>
         <source>Copied</source>
         <extracomment>Result was copied</extracomment>
-        <translation type="vanished">Скопировано</translation>
+        <translation type="vanished">Copiado</translation>
     </message>
     <message>
         <source>log10 function not found.</source>
-        <translation type="vanished">Функция log10 не найдена.</translation>
+        <translation type="vanished">função log10 não encontrada.</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="vanished">Поиск</translation>
+        <translation type="vanished">Pesquisar</translation>
     </message>
     <message>
         <source>_Search</source>
-        <translation type="vanished">Пои_ск</translation>
+        <translation type="vanished">_Pesquisar</translation>
     </message>
     <message>
         <source>Remove Bookmark</source>
-        <translation type="vanished">Удалить закладку</translation>
+        <translation type="vanished">Remover marcador</translation>
     </message>
     <message>
         <source>Add Bookmark</source>
-        <translation type="vanished">Добавить закладку</translation>
+        <translation type="vanished">Adicionar marcador</translation>
     </message>
     <message>
         <source>A bookmark with the selected name already exists.
 Do you want to overwrite it?</source>
-        <translation type="vanished">Закладка с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="vanished">Um marcador com o nome selecionado já existe.
+Você deseja sobrescrevê-lo?</translation>
     </message>
     <message>
         <source>No items found</source>
-        <translation type="vanished">Ничего не найдено</translation>
+        <translation type="vanished">Nenhum item encontrado</translation>
     </message>
     <message>
         <source>Select date</source>
-        <translation type="vanished">Выберать дату</translation>
+        <translation type="vanished">Selecionar data</translation>
     </message>
     <message>
         <source>Rectangular form</source>
-        <translation type="vanished">Прямоугольная форма</translation>
+        <translation type="vanished">Forma retangular</translation>
     </message>
     <message>
         <source>Exponential form</source>
-        <translation type="vanished">Экспоненциальная форма</translation>
+        <translation type="vanished">Forma exponencial</translation>
     </message>
     <message>
         <source>Polar form</source>
-        <translation type="vanished">Полярная форма</translation>
+        <translation type="vanished">Forma polar</translation>
     </message>
     <message>
         <source>Angle/phasor notation</source>
-        <translation type="vanished">В обозначении угла/вектора</translation>
+        <translation type="vanished">Notação de ângulo/fasor</translation>
     </message>
     <message>
         <source>Optimal unit</source>
-        <translation type="vanished">Оптимальная единица измерения</translation>
+        <translation type="vanished">Unidade ideal</translation>
     </message>
     <message>
         <source>Optimal prefix</source>
-        <translation type="vanished">Оптимальный префикс</translation>
+        <translation type="vanished">Prefixo ideal</translation>
     </message>
     <message>
         <source>All functions</source>
-        <translation type="vanished">Все функции</translation>
+        <translation type="vanished">Todas as funções</translation>
     </message>
     <message>
         <source>All variables</source>
-        <translation type="vanished">Все переменные</translation>
+        <translation type="vanished">Todas as variáveis</translation>
     </message>
     <message>
         <source>Select definitions file</source>
-        <translation type="vanished">Выбрать файл определений</translation>
+        <translation type="vanished">Selecionar arquivo de definições</translation>
     </message>
     <message>
         <source>_Import</source>
-        <translation type="vanished">_Импорт</translation>
+        <translation type="vanished">_Importar</translation>
     </message>
     <message>
         <source>Could not copy %s to %s.</source>
-        <translation type="vanished">С удалось скопировать %s в %s.</translation>
+        <translation type="vanished">Não foi possível copiar %s para %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Could not read %s.</source>
-        <translation type="vanished">С удалось прочитать %s.</translation>
+        <translation type="vanished">Não foi possível ler %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Could not copy file to %s.</source>
-        <translation type="vanished">С удалось скопировать файл в %s.</translation>
+        <translation type="vanished">Não foi possível copiar o arquivo para %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Unsupported base.</source>
-        <translation type="vanished">Неподдерживаемое основание.</translation>
+        <translation type="vanished">Base não suportada.</translation>
     </message>
     <message>
         <source>The selected Chinese year does not exist.</source>
-        <translation type="vanished">Выбранный китайский год не существует.</translation>
+        <translation type="vanished">O ano chinês selecionado não existe.</translation>
     </message>
     <message>
         <source>Conversion to Gregorian calendar failed.</source>
-        <translation type="vanished">Преобразование в григорианский календарь не удалось.</translation>
+        <translation type="vanished">A conversão para o calendário gregoriano falhou.</translation>
     </message>
     <message>
         <source>Calendar conversion failed for: %s.</source>
-        <translation type="vanished">Ошибка преобразования календаря для: %s.</translation>
+        <translation type="vanished">Falha na conversão do calendário para: %s.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Gnuplot was not found.</source>
-        <translation type="vanished">Программа Gnuplot не найдена.</translation>
+        <translation type="vanished">Gnuplot não encontrado.</translation>
     </message>
     <message>
         <source>%s (%s) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
-        <translation type="vanished">%s (%s) должен быть установлен отдельно и находиться по переменной окружения PATH, чтобы график работал.</translation>
+        <translation type="vanished">%s (%s) precisa ser instalado separadamente e localizado no caminho de pesquisa do executável para que a plotagem funcione.</translation>
         <extra-po-flags>c-format</extra-po-flags>
     </message>
     <message>
         <source>Select file to save PNG image to</source>
-        <translation type="vanished">Выбрать файл для сохранения изображения в формате PNG</translation>
+        <translation type="vanished">Selecione o arquivo para salvar a imagem PNG</translation>
     </message>
     <message>
         <source>Allowed File Types</source>
-        <translation type="vanished">Разрешить все типы файлов</translation>
+        <translation type="vanished">Tipos de arquivo permitidos</translation>
     </message>
     <message>
         <source>All Files</source>
-        <translation type="vanished">Все файлы</translation>
+        <translation type="vanished">Todos os arquivos</translation>
     </message>
     <message>
         <source>Cannot delete unit as it is needed by other units.</source>
         <extracomment>do not delete units that are used by other units</extracomment>
-        <translation type="vanished">Невозможно удалить объект, так как он нужен другим объектам.</translation>
+        <translation type="vanished">Não é possível excluir a unidade, pois ela é necessária para outras unidades.</translation>
     </message>
     <message>
         <source>none</source>
-        <translation type="vanished">ничто</translation>
+        <translation type="vanished">nenhum</translation>
     </message>
     <message>
         <source>result is too long</source>
-        <translation type="vanished">результат слишком длинный</translation>
+        <translation type="vanished">resultado é muito longo</translation>
     </message>
     <message>
         <source>translator-credits</source>
-        <translation type="vanished">Damir Islamov &lt;damir@secretlaboratory.ru&gt;</translation>
+        <translation type="vanished">Fúlvio Alves &lt;fga.fulvio@gmail.com&gt;</translation>
     </message>
     <message>
         <source>Mode not found.</source>
-        <translation type="vanished">Режим не найден.</translation>
+        <translation type="vanished">Modo não encontrado.</translation>
     </message>
     <message>
         <source>Elements (in horizontal order)</source>
-        <translation type="vanished">Компоненты (в горизонтальном порядке)</translation>
+        <translation type="vanished">Elementos (em ordem horizontal)</translation>
     </message>
     <message>
         <source>Select file to import</source>
-        <translation type="vanished">Выбрать файл для импорта</translation>
+        <translation type="vanished">Selecionar arquivo para importar</translation>
     </message>
     <message>
         <source>_Open</source>
-        <translation type="vanished">_Открыть</translation>
+        <translation type="vanished">_Abrir</translation>
     </message>
     <message>
         <source>Select file to export to</source>
-        <translation type="vanished">Выбрать файл, в который экспортировать</translation>
+        <translation type="vanished">Selecionar o arquivo para o qual exportar</translation>
     </message>
     <message>
         <source>A conflicting object with the same name exists. If you proceed and save changes, the conflicting object will be overwritten or deactivated.
 Do you want to proceed?</source>
-        <translation type="vanished">Существует конфликтующий объект с таким же именем. Если вы продолжите и сохраните изменения, конфликтующий объект будет перезаписан или деактивирован.
-Хотите продолжить?</translation>
+        <translation type="vanished">Existe um objeto conflitante com o mesmo nome. Se você continuar e salvar as alterações, o objeto conflitante será substituído ou desativado.
+Você quer continuar?</translation>
     </message>
     <message>
         <source>Set key combination</source>
-        <translation type="vanished">Назначить комбинацию клавиш</translation>
+        <translation type="vanished">Definir combinação de teclas</translation>
     </message>
     <message>
         <source>Press the key combination you wish to use for the action
 (press Escape to cancel).</source>
         <extracomment>Make the line reasonably long, but not to short (at least around 40 characters)</extracomment>
-        <translation type="vanished">Нажмите комбинацию клавиш, которую хотите использовать для действия
-(нажмите Escape для отмены).</translation>
+        <translation type="vanished">Pressione a combinação de teclas que deseja usar para a ação
+(pressione Escape para cancelar).</translation>
     </message>
     <message>
         <source>No keys</source>
-        <translation type="vanished">Нет</translation>
+        <translation type="vanished">Sem teclas</translation>
     </message>
     <message>
         <source>Empty value.</source>
-        <translation type="vanished">Пустое значение.</translation>
+        <translation type="vanished">Valor vazio.</translation>
     </message>
     <message>
         <source>Function not found.</source>
-        <translation type="vanished">Функция не найдена.</translation>
+        <translation type="vanished">Função não encontrada.</translation>
     </message>
     <message>
         <source>Variable not found.</source>
-        <translation type="vanished">Переменная не найдена.</translation>
+        <translation type="vanished">Variável não encontrada.</translation>
     </message>
     <message>
         <source>Unit not found.</source>
-        <translation type="vanished">Единица измерения не найдена.</translation>
+        <translation type="vanished">Unidade não encontrada.</translation>
     </message>
     <message>
         <source>The key combination is already in use.
 Do you wish to replace the current action?</source>
-        <translation type="vanished">Комбинация клавиш уже используется.
-Вы хотите заменить текущее действие?</translation>
+        <translation type="vanished">A combinação de teclas já está em uso.
+Deseja substituir a ação atual?</translation>
     </message>
     <message>
         <source>Select file to export</source>
-        <translation type="vanished">Выберите файл для экспорта</translation>
+        <translation type="vanished">Selecionar arquivo para exportar</translation>
     </message>
     <message>
         <source>Empty expression.</source>
-        <translation type="vanished">Пустое выражение.</translation>
+        <translation type="vanished">Expressão vazia.</translation>
     </message>
     <message>
         <source>Empty x variable.</source>
-        <translation type="vanished">Пустая переменная x.</translation>
+        <translation type="vanished">Variável x vazia.</translation>
     </message>
     <message>
         <source>Element Data</source>
-        <translation type="vanished">Данные элемента</translation>
+        <translation type="vanished">Dados do elemento</translation>
     </message>
     <message>
         <source>Classification</source>
-        <translation type="vanished">Классификация</translation>
+        <translation type="vanished">Classificação</translation>
     </message>
     <message>
         <source>Alkali Metal</source>
-        <translation type="vanished">Щелочной металл</translation>
+        <translation type="vanished">Metal alcalino</translation>
     </message>
     <message>
         <source>Alkaline-Earth Metal</source>
-        <translation type="vanished">Щелочноземельный металл</translation>
+        <translation type="vanished">Metal alcalino-terroso</translation>
     </message>
     <message>
         <source>Lanthanide</source>
-        <translation type="vanished">Лантаноид</translation>
+        <translation type="vanished">Lantanídeo</translation>
     </message>
     <message>
         <source>Actinide</source>
-        <translation type="vanished">Актиноид</translation>
+        <translation type="vanished">Actinídeo</translation>
     </message>
     <message>
         <source>Transition Metal</source>
-        <translation type="vanished">Переходный металл</translation>
+        <translation type="vanished">Metal de transição</translation>
     </message>
     <message>
         <source>Metal</source>
-        <translation type="vanished">Металл</translation>
+        <translation type="vanished">Metal</translation>
     </message>
     <message>
         <source>Metalloid</source>
-        <translation type="vanished">Металлоид</translation>
+        <translation type="vanished">Metaloide</translation>
     </message>
     <message>
         <source>Polyatomic Non-Metal</source>
-        <translation type="vanished">Многоатомный неметалл</translation>
+        <translation type="vanished">Não-metal poliatômico</translation>
     </message>
     <message>
         <source>Diatomic Non-Metal</source>
-        <translation type="vanished">Двухатомный неметалл</translation>
+        <translation type="vanished">Não-metal diatômico</translation>
     </message>
     <message>
         <source>Noble Gas</source>
-        <translation type="vanished">Благородный газ</translation>
+        <translation type="vanished">Gás nobre</translation>
     </message>
     <message>
         <source>Unknown chemical properties</source>
-        <translation type="vanished">Неизвестные химические свойства</translation>
+        <translation type="vanished">Propriedades químicas desconhecidas</translation>
     </message>
     <message>
         <source>No unknowns in result.</source>
-        <translation type="vanished">В результате нет неизвестных.</translation>
+        <translation type="vanished">Não há incógnitas no resultado.</translation>
     </message>
     <message>
         <source>Set Unknowns</source>
-        <translation type="vanished">Установить неизвестные</translation>
+        <translation type="vanished">Definir incógnitas</translation>
     </message>
     <message>
         <source>Copy result to clipboard</source>
-        <translation type="vanished">Скопировать результат в буфер обмена</translation>
+        <translation type="vanished">Copiar resultado</translation>
+    </message>
+    <message>
+        <source>x</source>
+        <translation type="vanished">x</translation>
+    </message>
+    <message>
+        <source>If a matrix or vectors shall be generated from the contents of the file </source>
+        <translation type="vanished">Se uma matriz ou vetores devem ser gerados a partir do conteúdo do arquivo </translation>
+    </message>
+    <message>
+        <source>Use dark theme</source>
+        <translation type="vanished">Usar tema escuro</translation>
+    </message>
+    <message>
+        <source>Add the two top values</source>
+        <comment>Keypad</comment>
+        <translation type="vanished">Adicionar os dois principais valores</translation>
+    </message>
+    <message>
+        <source>u</source>
+        <comment>Manage units button</comment>
+        <translation type="vanished">u</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <comment>Button for convert to operator</comment>
+        <translation type="vanished">em</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <comment>Keypad</comment>
+        <translation type="vanished">Adicionar</translation>
+    </message>
+    <message>
+        <source>Base Unit</source>
+        <translation type="vanished">Unidade base</translation>
+    </message>
+    <message>
+        <source>Alias</source>
+        <translation type="vanished">Alias</translation>
+    </message>
+    <message>
+        <source>Composite Unit</source>
+        <translation type="vanished">Unidade composta</translation>
+    </message>
+    <message>
+        <source>Fonts</source>
+        <translation type="vanished">Fontes</translation>
+    </message>
+    <message>
+        <source>Chain Calculation</source>
+        <translation type="vanished">Cálculo de intervalo</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Name&lt;/b&gt;</source>
+        <translation type="vanished">&lt;b&gt;Nome&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Type&lt;/b&gt;</source>
+        <translation type="vanished">&lt;b&gt;Tipo&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Relation&lt;/b&gt;</source>
+        <translation type="vanished">&lt;b&gt;Relação&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>1/2x = 1/(2*x)
+1/2 x = (1/2)*x
+1 m / 1 m/s = (1 m)/(1 m/s)</source>
+        <translation type="vanished">1/2x = 1/(2*x)
+1/2 x = (1/2)*x
+1 m / 1 m/s = (1 m)/(1 m/s)</translation>
+    </message>
+    <message>
+        <source>1/2 x = 1/(2*x)</source>
+        <translation type="vanished">1/2 x = 1/(2*x)</translation>
+    </message>
+    <message>
+        <source>1/2x = 1/2*x</source>
+        <translation type="vanished">1/2x = 1/2*x</translation>
+    </message>
+    <message>
+        <source>%i seconds</source>
+        <translation type="vanished">%i segundos</translation>
+        <extra-po-flags>c-format</extra-po-flags>
+    </message>
+    <message>
+        <source>Ent</source>
+        <translation type="vanished">Ent</translation>
+    </message>
+    <message>
+        <source>Defaults</source>
+        <translation type="vanished">Padrões</translation>
+    </message>
+    <message>
+        <source>Customize Buttons</source>
+        <translation type="vanished">Fonte de status personalizada</translation>
+    </message>
+    <message>
+        <source>Names details</source>
+        <translation type="vanished">Detalhes dos nomes</translation>
+    </message>
+    <message>
+        <source>Rational number form</source>
+        <translation type="vanished">Forma do número racional</translation>
+    </message>
+    <message>
+        <source>Decimal fractions</source>
+        <translation type="vanished">Frações decimais</translation>
+    </message>
+    <message>
+        <source>Exact decimal fractions</source>
+        <translation type="vanished">Frações decimais exatas</translation>
+    </message>
+    <message>
+        <source>Simple fractions</source>
+        <translation type="vanished">Frações simples</translation>
+    </message>
+    <message>
+        <source>Mixed fractions</source>
+        <translation type="vanished">Frações mistas</translation>
     </message>
 </context>
 <context>
@@ -5108,77 +5004,77 @@ Do you wish to replace the current action?</source>
     <message>
         <location filename="../src/csvdialog.cpp" line="40"/>
         <source>Current result</source>
-        <translation type="unfinished">Текущий результат</translation>
+        <translation type="unfinished">Resultado atual</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="43"/>
         <source>Matrix/vector variable:</source>
-        <translation type="unfinished">Матричная/векторная переменная:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="55"/>
         <source>File:</source>
-        <translation type="unfinished">Файл:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="62"/>
         <source>Import as</source>
-        <translation type="unfinished">Импортировать как</translation>
+        <translation type="unfinished">Importar como</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="66"/>
         <source>matrix</source>
-        <translation type="unfinished">матрица</translation>
+        <translation type="unfinished">matriz</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="68"/>
         <source>vectors</source>
-        <translation type="unfinished">векторы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="71"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="74"/>
         <source>First row:</source>
-        <translation type="unfinished">Первая строка:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="78"/>
         <source>Includes headings</source>
-        <translation type="unfinished">Включает заголовки</translation>
+        <translation type="unfinished">Incluir cabeçalhos</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="81"/>
         <source>Delimiter:</source>
-        <translation type="unfinished">Разделитель:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="83"/>
         <source>Comma</source>
-        <translation type="unfinished">Запятая</translation>
+        <translation type="unfinished">Vírgula</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="84"/>
         <source>Tabulator</source>
-        <translation type="unfinished">Табуляция</translation>
+        <translation type="unfinished">Tabulador</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="85"/>
         <source>Semicolon</source>
-        <translation type="unfinished">Точка с запятой</translation>
+        <translation type="unfinished">Ponto-e-vírgula</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="86"/>
         <source>Space</source>
-        <translation type="unfinished">Пробел</translation>
+        <translation type="unfinished">Espaço</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="87"/>
         <source>Other</source>
-        <translation type="unfinished">Другой</translation>
+        <translation type="unfinished">Outro</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="143"/>
@@ -5189,14 +5085,7 @@ Do you wish to replace the current action?</source>
         <location filename="../src/csvdialog.cpp" line="143"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished">Единица измерения или переменная или  с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
-    </message>
-    <message>
-        <source>An unit or variable with the same name already exists.
-Do you want to overwrite it?</source>
-        <translation type="obsolete">Единица измерения или переменная или  с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="149"/>
@@ -5209,8 +5098,7 @@ Do you want to overwrite it?</source>
         <location filename="../src/csvdialog.cpp" line="149"/>
         <source>Could not import from file 
 %1</source>
-        <translation type="unfinished">Не удалось импортировать из файла 
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="163"/>
@@ -5221,8 +5109,7 @@ Do you want to overwrite it?</source>
         <location filename="../src/csvdialog.cpp" line="171"/>
         <source>Could not export to file 
 %1</source>
-        <translation type="unfinished">Не удалось экспортировать в файл 
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5230,67 +5117,67 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="27"/>
         <source>Calendar Conversion</source>
-        <translation type="unfinished">Преобразование календаря</translation>
+        <translation type="unfinished">Conversão de calendário</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="33"/>
         <location filename="../src/calendarconversiondialog.cpp" line="130"/>
         <source>Gregorian</source>
-        <translation type="unfinished">Григорианский</translation>
+        <translation type="unfinished">Gregoriano</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="34"/>
         <location filename="../src/calendarconversiondialog.cpp" line="131"/>
         <source>Hebrew</source>
-        <translation type="unfinished">Еврейский</translation>
+        <translation type="unfinished">Hebreu</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="35"/>
         <location filename="../src/calendarconversiondialog.cpp" line="132"/>
         <source>Islamic (Hijri)</source>
-        <translation type="unfinished">Исламский (от Хиджры)</translation>
+        <translation type="unfinished">Islâmico (Hijri)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="36"/>
         <location filename="../src/calendarconversiondialog.cpp" line="133"/>
         <source>Persian (Solar Hijri)</source>
-        <translation type="unfinished">Иранский (Солнечная хиджра)</translation>
+        <translation type="unfinished">Persa (Hijri Solar)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="37"/>
         <location filename="../src/calendarconversiondialog.cpp" line="134"/>
         <source>Indian (National)</source>
-        <translation type="unfinished">Индийский (национальный)</translation>
+        <translation type="unfinished">Indiano (Nacional)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="38"/>
         <location filename="../src/calendarconversiondialog.cpp" line="135"/>
         <source>Chinese</source>
-        <translation type="unfinished">Китайский</translation>
+        <translation type="unfinished">Chinês</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="39"/>
         <location filename="../src/calendarconversiondialog.cpp" line="136"/>
         <source>Julian</source>
-        <translation type="unfinished">Юлианский</translation>
+        <translation type="unfinished">Juliano</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="40"/>
         <location filename="../src/calendarconversiondialog.cpp" line="137"/>
         <source>Revised Julian (Milanković)</source>
-        <translation type="unfinished">Пересмотренный юлианский (циклы Миланковича)</translation>
+        <translation type="unfinished">Juliano revisado (Milanković)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="41"/>
         <location filename="../src/calendarconversiondialog.cpp" line="138"/>
         <source>Coptic</source>
-        <translation type="unfinished">Коптский</translation>
+        <translation type="unfinished">Cóptico</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="42"/>
         <location filename="../src/calendarconversiondialog.cpp" line="139"/>
         <source>Ethiopian</source>
-        <translation type="unfinished">Эфиопский</translation>
+        <translation type="unfinished">Etíope</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="86"/>
@@ -5302,17 +5189,17 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="86"/>
         <source>The selected Chinese year does not exist.</source>
-        <translation type="unfinished">Выбранный китайский год не существует.</translation>
+        <translation type="unfinished">O ano chinês selecionado não existe.</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="98"/>
         <source>Conversion to Gregorian calendar failed.</source>
-        <translation type="unfinished">Преобразование в григорианский календарь не удалось.</translation>
+        <translation type="unfinished">A conversão para o calendário gregoriano falhou.</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="143"/>
         <source>Calendar conversion failed for: %1.</source>
-        <translation type="unfinished">Ошибка преобразования календаря для: %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5320,362 +5207,253 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="846"/>
         <source>matrix</source>
-        <translation>матрица</translation>
+        <translation type="unfinished">matriz</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="848"/>
         <source>vector</source>
-        <translation>вектор</translation>
+        <translation type="unfinished">vetor</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="859"/>
         <source>positive</source>
-        <translation>положительное</translation>
+        <translation type="unfinished">positivo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="860"/>
         <source>non-positive</source>
-        <translation>не положительное</translation>
+        <translation type="unfinished">não-positivo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="861"/>
         <source>negative</source>
-        <translation>отрицательное</translation>
+        <translation type="unfinished">negativo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="862"/>
         <source>non-negative</source>
-        <translation>неотрицательное</translation>
+        <translation type="unfinished">não-negativo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="863"/>
         <source>non-zero</source>
-        <translation>ненулевое</translation>
+        <translation type="unfinished">diferente de zero</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="868"/>
         <source>boolean</source>
-        <translation>логическое</translation>
+        <translation type="unfinished">boleano</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="869"/>
         <source>integer</source>
-        <translation>целое</translation>
+        <translation type="unfinished">inteiro</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="870"/>
         <source>rational</source>
-        <translation>рациональное</translation>
+        <translation type="unfinished">racional</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="871"/>
         <source>real</source>
-        <translation>вещественное</translation>
+        <translation type="unfinished">real</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="872"/>
         <source>complex</source>
-        <translation>комплексное</translation>
+        <translation type="unfinished">complexo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="873"/>
         <source>number</source>
-        <translation>число</translation>
+        <translation type="unfinished">número</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="874"/>
         <source>(not matrix)</source>
-        <translation>(не матрица)</translation>
+        <translation type="unfinished">(não matriz)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="877"/>
         <source>unknown</source>
-        <translation>неизвестное</translation>
+        <translation type="unfinished">desconhecido</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="879"/>
         <source>default assumptions</source>
-        <translation>предположения по умолчанию</translation>
+        <translation type="unfinished">suposições padrão</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="994"/>
         <source>Prefix:</source>
-        <translation type="unfinished">Префикс:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Complex angle/phasor notation</source>
-        <translation type="obsolete">Комплексные числа в обозначении угла/вектора</translation>
+        <location filename="../src/expressionedit.cpp" line="1048"/>
+        <source>Complex Angle/Phasor Notation</source>
+        <translation type="unfinished">Notação complexa de ângulo/fasor</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1052"/>
         <source>Base units</source>
-        <translation type="unfinished">Основные единицы измерения</translation>
+        <translation type="unfinished">Unidades base</translation>
     </message>
     <message>
-        <source>Number base</source>
-        <translation type="obsolete">Основание системы счисления</translation>
+        <location filename="../src/expressionedit.cpp" line="1054"/>
+        <source>Number Base</source>
+        <translation type="unfinished">Base numérica</translation>
     </message>
     <message>
-        <source>Bijective base-26</source>
-        <translation type="obsolete">Биективное основание-26</translation>
+        <location filename="../src/expressionedit.cpp" line="1056"/>
+        <source>Bijective Base-26</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Binary number</source>
-        <translation type="obsolete">Двоичное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1058"/>
+        <source>Binary Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1060"/>
         <source>Calendars</source>
-        <translation type="unfinished">Календари</translation>
+        <translation type="unfinished">Calendários</translation>
     </message>
     <message>
-        <source>Complex cis form</source>
-        <translation type="obsolete">Сисоидная форма комплексных чисел</translation>
+        <location filename="../src/expressionedit.cpp" line="1062"/>
+        <source>Complex cis Form</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Decimal number</source>
-        <translation type="obsolete">Десятичное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1064"/>
+        <source>Decimal Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Duodecimal number</source>
-        <translation type="obsolete">Двенадцатеричное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1066"/>
+        <source>Duodecimal Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Complex exponential form</source>
-        <translation type="obsolete">Экспоненциальная форма комплексных чисел</translation>
+        <location filename="../src/expressionedit.cpp" line="1068"/>
+        <source>Complex Exponential Form</source>
+        <translation type="unfinished">Forma exponencial complexa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1070"/>
         <source>Factors</source>
-        <translation type="unfinished">Множители</translation>
+        <translation type="unfinished">Fatores</translation>
     </message>
     <message>
-        <source>16-bit floating point binary format</source>
-        <translation type="obsolete">16-битное в двоичном формате с плавающей запятой</translation>
+        <location filename="../src/expressionedit.cpp" line="1072"/>
+        <source>16-bit Floating Point Binary Format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>32-bit floating point binary format</source>
-        <translation type="obsolete">32-битное в двоичном формате с плавающей запятой</translation>
+        <location filename="../src/expressionedit.cpp" line="1074"/>
+        <source>32-bit Floating Point Binary Format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>64-bit floating point binary format</source>
-        <translation type="obsolete">64-битное в двоичном формате с плавающей запятой</translation>
+        <location filename="../src/expressionedit.cpp" line="1076"/>
+        <source>64-bit Floating Point Binary Format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>80-bit (x86) floating point binary format</source>
-        <translation type="obsolete">80-битное (x86) в двоичном формате с плавающей запятой</translation>
+        <location filename="../src/expressionedit.cpp" line="1078"/>
+        <source>80-bit (x86) Floating Point Binary Format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>128-bit floating point binary format</source>
-        <translation type="obsolete">128-битное в двоичном формате с плавающей запятой</translation>
+        <location filename="../src/expressionedit.cpp" line="1080"/>
+        <source>128-bit Floating Point Binary Format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1082"/>
         <source>Fraction</source>
-        <translation type="unfinished">Дробь</translation>
+        <translation type="unfinished">Fração</translation>
     </message>
     <message>
-        <source>Hexadecimal number</source>
-        <translation type="obsolete">Шестнадцатеричное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1084"/>
+        <source>Hexadecimal Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1086"/>
         <source>Latitude</source>
-        <translation type="unfinished">Широта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1088"/>
         <source>Longitude</source>
-        <translation type="unfinished">Долгота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mixed units</source>
-        <translation type="obsolete">Смешанные единицы измерения</translation>
+        <location filename="../src/expressionedit.cpp" line="1090"/>
+        <source>Mixed Units</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Octal number</source>
-        <translation type="obsolete">Восьмеричное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1092"/>
+        <source>Octal Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Optimal units</source>
-        <translation type="obsolete">Оптимальные единицы измерения</translation>
+        <location filename="../src/expressionedit.cpp" line="1094"/>
+        <source>Optimal Unit</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Expanded partial fractions</source>
-        <translation type="obsolete">Расширенные дробные числа</translation>
+        <location filename="../src/expressionedit.cpp" line="1096"/>
+        <source>Expanded Partial Fractions</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Complex polar form</source>
-        <translation type="obsolete">Полярная форма комплексных чисел</translation>
+        <location filename="../src/expressionedit.cpp" line="1098"/>
+        <source>Complex Polar Form</source>
+        <translation type="unfinished">Forma polar complexa</translation>
     </message>
     <message>
-        <source>Complex rectangular form</source>
-        <translation type="obsolete">Прямоугольная форма комплексных чисел</translation>
+        <location filename="../src/expressionedit.cpp" line="1100"/>
+        <source>Complex Rectangular Form</source>
+        <translation type="unfinished">Forma retangular complexa</translation>
     </message>
     <message>
-        <source>Roman numerals</source>
-        <translation type="obsolete">Римские цифры</translation>
+        <location filename="../src/expressionedit.cpp" line="1102"/>
+        <source>Roman Numerals</source>
+        <translation type="unfinished">Números romanos</translation>
     </message>
     <message>
-        <source>Sexagesimal number</source>
-        <translation type="obsolete">Шестидесятеричное число</translation>
+        <location filename="../src/expressionedit.cpp" line="1104"/>
+        <source>Sexagesimal Number</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Time format</source>
-        <translation type="obsolete">Формат времени</translation>
+        <location filename="../src/expressionedit.cpp" line="1106"/>
+        <source>Time Format</source>
+        <translation type="unfinished">Formato da hora</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1108"/>
         <location filename="../src/expressionedit.cpp" line="1888"/>
         <source>Unicode</source>
-        <translation type="unfinished">Юникод</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1918"/>
-        <source>UTC time zone</source>
-        <translation type="unfinished">Часовой пояс UTC</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1378"/>
-        <source>Undo</source>
-        <translation type="unfinished">Отменить</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1048"/>
-        <source>Complex Angle/Phasor Notation</source>
-        <translation type="unfinished">Обозначение угла/вектора комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1054"/>
-        <source>Number Base</source>
-        <translation type="unfinished">Основание системы счисления</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1056"/>
-        <source>Bijective Base-26</source>
-        <translation type="unfinished">Биективное основание-26</translation>
-    </message>
-    <message>
-        <source>Binary Bumber</source>
-        <translation type="obsolete">Двоичное число</translation>
-    </message>
-    <message>
-        <source>Complex Cis Form</source>
-        <translation type="obsolete">Сисоидная форма комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1058"/>
-        <source>Binary Number</source>
-        <translation type="unfinished">Двоичное число</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1062"/>
-        <source>Complex cis Form</source>
-        <translation type="unfinished">Сисоидная форма комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1064"/>
-        <source>Decimal Number</source>
-        <translation type="unfinished">Десятичное число</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1066"/>
-        <source>Duodecimal Number</source>
-        <translation type="unfinished">Двенадцатеричное число</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1068"/>
-        <source>Complex Exponential Form</source>
-        <translation type="unfinished">Экспоненциальная форма комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1072"/>
-        <source>16-bit Floating Point Binary Format</source>
-        <translation type="unfinished">16-битное в двоичном формате с плавающей запятой</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1074"/>
-        <source>32-bit Floating Point Binary Format</source>
-        <translation type="unfinished">32-битное в двоичном формате с плавающей запятой</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1076"/>
-        <source>64-bit Floating Point Binary Format</source>
-        <translation type="unfinished">64-битное в двоичном формате с плавающей запятой</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1078"/>
-        <source>80-bit (x86) Floating Point Binary Format</source>
-        <translation type="unfinished">80-битное (x86) в двоичном формате с плавающей запятой</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1080"/>
-        <source>128-bit Floating Point Binary Format</source>
-        <translation type="unfinished">128-битное в двоичном формате с плавающей запятой</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1084"/>
-        <source>Hexadecimal Number</source>
-        <translation type="unfinished">Шестнадцатеричное число</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1090"/>
-        <source>Mixed Units</source>
-        <translation type="unfinished">Смешанные единицы измерения</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1092"/>
-        <source>Octal Number</source>
-        <translation type="unfinished">Восьмеричное число</translation>
-    </message>
-    <message>
-        <source>Optimal Units</source>
-        <translation type="obsolete">Оптимальные единицы измерения</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1094"/>
-        <source>Optimal Unit</source>
-        <translation type="unfinished">Оптимальная единица измерения</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1096"/>
-        <source>Expanded Partial Fractions</source>
-        <translation type="unfinished">Расширенные дробные числа</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1098"/>
-        <source>Complex Polar Form</source>
-        <translation type="unfinished">Полярная форма комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1100"/>
-        <source>Complex Rectangular Form</source>
-        <translation type="unfinished">Прямоугольная форма комплексных чисел</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1102"/>
-        <source>Roman Numerals</source>
-        <translation type="unfinished">Римские цифры</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1104"/>
-        <source>Sexagesimal Number</source>
-        <translation type="unfinished">Шестидесятеричное число</translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="1106"/>
-        <source>Time Format</source>
-        <translation type="unfinished">Формат времени</translation>
+        <translation type="unfinished">Unicode</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1110"/>
         <source>UTC Time Zone</source>
-        <translation type="unfinished">Часовой пояс UTC</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="1378"/>
+        <source>Undo</source>
+        <translation type="unfinished">Desfazer</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1381"/>
         <source>Redo</source>
-        <translation type="unfinished">Повторить</translation>
+        <translation type="unfinished">Refazer</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1385"/>
@@ -5685,7 +5463,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1388"/>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation type="unfinished">Copiar</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1391"/>
@@ -5695,17 +5473,17 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1394"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="unfinished">Excluir</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1398"/>
         <source>Insert Date…</source>
-        <translation type="unfinished">Вставить дату…</translation>
+        <translation type="unfinished">Inserir Data…</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1399"/>
         <source>Insert Matrix…</source>
-        <translation type="unfinished">Вставить матрицу…</translation>
+        <translation type="unfinished">Inserir Matriz…</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1401"/>
@@ -5715,42 +5493,42 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1404"/>
         <source>Clear</source>
-        <translation type="unfinished">Очистить</translation>
+        <translation type="unfinished">Limpar</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1408"/>
         <source>Completion</source>
-        <translation type="unfinished">Завершение</translation>
+        <translation type="unfinished">Conclusão</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1420"/>
         <source>No completion</source>
-        <translation type="unfinished">Без завершения</translation>
+        <translation type="unfinished">Sem conclusão</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1421"/>
         <source>Limited strict completion</source>
-        <translation type="unfinished">Ограниченное строгое завершение</translation>
+        <translation type="unfinished">Conclusão estrita limitada</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1422"/>
         <source>Strict completion</source>
-        <translation type="unfinished">Строгое завершение</translation>
+        <translation type="unfinished">Conclusão estrita</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1423"/>
         <source>Limited full completion</source>
-        <translation type="unfinished">Ограниченное полное завершение</translation>
+        <translation type="unfinished">Conclusão completa limitada</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1424"/>
         <source>Full completion</source>
-        <translation type="unfinished">Полное завершение</translation>
+        <translation type="unfinished">Conclusão completa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1426"/>
         <source>Delayed completion</source>
-        <translation type="unfinished">Отложенное завершение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1427"/>
@@ -5760,322 +5538,327 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1459"/>
         <source>Matrix</source>
-        <translation type="unfinished">Матрица</translation>
+        <translation type="unfinished">Matriz</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1586"/>
         <source>Too many arguments for %1().</source>
-        <translation type="unfinished">Слишком много аргументов для %1().</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1611"/>
         <source>argument</source>
-        <translation type="unfinished">аргумент</translation>
+        <translation type="unfinished">argumento</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1628"/>
         <source>%1:</source>
-        <translation type="unfinished">%1:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1681"/>
         <source>MC (memory clear)</source>
-        <translation type="unfinished">MC (отчистить память)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1684"/>
         <source>MS (memory store)</source>
-        <translation type="unfinished">MS (сохранить в памяти)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1687"/>
         <source>M+ (memory plus)</source>
-        <translation type="unfinished">M+ (прибавить к значению в памяти)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1690"/>
         <source>M− (memory minus)</source>
-        <translation type="unfinished">M− (отнять от значения в памяти)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1698"/>
         <location filename="../src/expressionedit.cpp" line="1700"/>
         <source>factorize</source>
-        <translation type="unfinished">разложить на множители</translation>
+        <translation type="unfinished">fatorar</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1701"/>
         <location filename="../src/expressionedit.cpp" line="1703"/>
         <source>expand</source>
-        <translation type="unfinished">раскрывать</translation>
+        <translation type="unfinished">expandir</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1855"/>
         <source>hexadecimal</source>
-        <translation type="unfinished">шестнадцатеричное</translation>
+        <translation type="unfinished">hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1856"/>
         <location filename="../src/expressionedit.cpp" line="1966"/>
         <source>hexadecimal number</source>
-        <translation type="unfinished">шестнадцатеричное число</translation>
+        <translation type="unfinished">número hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1857"/>
         <source>octal</source>
-        <translation type="unfinished">восьмеричное</translation>
+        <translation type="unfinished">octal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1858"/>
         <source>octal number</source>
-        <translation type="unfinished">восьмеричное число</translation>
+        <translation type="unfinished">número octal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1859"/>
         <source>decimal</source>
-        <translation type="unfinished">десятеричное</translation>
+        <translation type="unfinished">decimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1860"/>
         <source>decimal number</source>
-        <translation type="unfinished">десятичное число</translation>
+        <translation type="unfinished">número decimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1861"/>
         <source>duodecimal</source>
-        <translation type="unfinished">двенадцатеричное</translation>
+        <translation type="unfinished">duodecimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1862"/>
         <source>duodecimal number</source>
-        <translation type="unfinished">двенадцатеричное число</translation>
+        <translation type="unfinished">número duodecimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1863"/>
         <source>binary</source>
-        <translation type="unfinished">двоичное</translation>
+        <translation type="unfinished">binário</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1864"/>
         <location filename="../src/expressionedit.cpp" line="1960"/>
         <source>binary number</source>
-        <translation type="unfinished">двоичное число</translation>
+        <translation type="unfinished">número binário</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1865"/>
         <source>roman</source>
-        <translation type="unfinished">римское число</translation>
+        <translation type="unfinished">romanos</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1866"/>
         <source>roman numerals</source>
-        <translation type="unfinished">римские цифры</translation>
+        <translation type="unfinished">numerais romanos</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1867"/>
         <source>bijective</source>
-        <translation type="unfinished">биективное</translation>
+        <translation type="unfinished">bijetivo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1868"/>
         <source>bijective base-26</source>
-        <translation type="unfinished">биективное основание-26</translation>
+        <translation type="unfinished">base bijetiva-26</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1869"/>
         <source>sexagesimal</source>
-        <translation type="unfinished">шестидесятеричное</translation>
+        <translation type="unfinished">sexagesimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1870"/>
         <source>sexagesimal number</source>
-        <translation type="unfinished">шестидесятеричное число</translation>
+        <translation type="unfinished">número sexagesimal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1871"/>
         <location filename="../src/expressionedit.cpp" line="1872"/>
         <source>latitude</source>
-        <translation type="unfinished">широта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1873"/>
         <location filename="../src/expressionedit.cpp" line="1874"/>
         <source>longitude</source>
-        <translation type="unfinished">долгота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1876"/>
         <source>32-bit floating point</source>
-        <translation type="unfinished">32-битное с плавающей запятой</translation>
+        <translation type="unfinished">ponto flutuante de 32-bit</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1878"/>
         <source>64-bit floating point</source>
-        <translation type="unfinished">64-битное с плавающей запятой</translation>
+        <translation type="unfinished">ponto flutuante de 64-bit</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1880"/>
         <source>16-bit floating point</source>
-        <translation type="unfinished">16-битное с плавающей запятой</translation>
+        <translation type="unfinished">ponto flutuante de 16-bit</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1882"/>
         <source>80-bit (x86) floating point</source>
-        <translation type="unfinished">80-битное (x86) с плавающей запятой</translation>
+        <translation type="unfinished">ponto flutuante de 80-bit (x86)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1884"/>
         <source>128-bit floating point</source>
-        <translation type="unfinished">128-битное с плавающей запятой</translation>
+        <translation type="unfinished">ponto flutuante de 128-bit</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1885"/>
         <source>time</source>
-        <translation type="unfinished">время</translation>
+        <translation type="unfinished">hora</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1886"/>
         <source>time format</source>
-        <translation type="unfinished">формат времени</translation>
+        <translation type="unfinished">formato de hora</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1889"/>
         <source>bases</source>
-        <translation type="unfinished">основания</translation>
+        <translation type="unfinished">bases</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1890"/>
         <source>number bases</source>
-        <translation type="unfinished">основания систем счисления</translation>
+        <translation type="unfinished">bases numéricas</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1891"/>
         <location filename="../src/expressionedit.cpp" line="1892"/>
         <source>calendars</source>
-        <translation type="unfinished">календари</translation>
+        <translation type="unfinished">calendários</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1893"/>
         <source>optimal</source>
-        <translation type="unfinished">оптимально</translation>
+        <translation type="unfinished">ideal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1894"/>
         <source>optimal unit</source>
-        <translation type="unfinished">оптимальные единицы измерения</translation>
+        <translation type="unfinished">unidade ideal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1895"/>
         <location filename="../src/expressionedit.cpp" line="1970"/>
         <source>base</source>
-        <translation type="unfinished">основание</translation>
+        <translation type="unfinished">base</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1896"/>
         <source>base units</source>
-        <translation type="unfinished">основные единицы измерения</translation>
+        <translation type="unfinished">unidades de base</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1897"/>
         <source>mixed</source>
-        <translation type="unfinished">смешано</translation>
+        <translation type="unfinished">mesclado</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1898"/>
         <source>mixed units</source>
-        <translation type="unfinished">смешанные единицы</translation>
+        <translation type="unfinished">unidades mescladas</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1899"/>
         <location filename="../src/expressionedit.cpp" line="1900"/>
         <source>fraction</source>
-        <translation type="unfinished">дробь</translation>
+        <translation type="unfinished">fração</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1901"/>
         <location filename="../src/expressionedit.cpp" line="1902"/>
         <source>factors</source>
-        <translation type="unfinished">множители</translation>
+        <translation type="unfinished">fatores</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1903"/>
         <source>partial fraction</source>
-        <translation type="unfinished">частичная дробь</translation>
+        <translation type="unfinished">fração parcial</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1904"/>
         <source>expanded partial fractions</source>
-        <translation type="unfinished">расширенные дробные числа</translation>
+        <translation type="unfinished">frações parciais expandidas</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1905"/>
         <source>rectangular</source>
-        <translation type="unfinished">прямоугоная</translation>
+        <translation type="unfinished">retangular</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1905"/>
         <source>cartesian</source>
-        <translation type="unfinished">декартова</translation>
+        <translation type="unfinished">cartesiano</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1906"/>
         <source>complex rectangular form</source>
-        <translation type="unfinished">прямоугольная форма комплексных чисел</translation>
+        <translation type="unfinished">forma retangular complexa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1907"/>
         <source>exponential</source>
-        <translation type="unfinished">экспоненциальная</translation>
+        <translation type="unfinished">exponencial</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1908"/>
         <source>complex exponential form</source>
-        <translation type="unfinished">экспоненциальная форма комплексных чисел</translation>
+        <translation type="unfinished">forma exponencial complexa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1909"/>
         <source>polar</source>
-        <translation type="unfinished">полярная</translation>
+        <translation type="unfinished">polar</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1910"/>
         <source>complex polar form</source>
-        <translation type="unfinished">полярная форма комплексных чисел</translation>
+        <translation type="unfinished">forma polar complexa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1912"/>
         <source>complex cis form</source>
-        <translation type="unfinished">сисоидная форма комплексных чисел</translation>
+        <translation type="unfinished">forma cis complexa</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1913"/>
         <source>angle</source>
-        <translation type="unfinished">угловая</translation>
+        <translation type="unfinished">ângulo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1914"/>
         <source>complex angle notation</source>
-        <translation type="unfinished">комплексные числа в обозначении угла</translation>
+        <translation type="unfinished">notação complexa de ângulo</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1915"/>
         <source>phasor</source>
-        <translation type="unfinished">фазовая</translation>
+        <translation type="unfinished">fasor</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1916"/>
         <source>complex phasor notation</source>
-        <translation type="unfinished">Комплексные числа в обозначении вектора</translation>
+        <translation type="unfinished">notação complexa de fasor</translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="1918"/>
+        <source>UTC time zone</source>
+        <translation type="unfinished">Fuso horário UTC</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1971"/>
         <source>number base %1</source>
-        <translation type="unfinished">основание системы счисления %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2236"/>
         <source>Data object</source>
-        <translation type="unfinished">Объект данных</translation>
+        <translation type="unfinished">Onjeto de dados</translation>
     </message>
 </context>
 <context>
@@ -6083,62 +5866,62 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="28"/>
         <source>Floating Point Conversion (IEEE 754)</source>
-        <translation type="unfinished">Преобразование чисел с плавающей запятой (IEEE 754)</translation>
+        <translation type="unfinished">Conversão de ponto flutuante (IEEE 754)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="31"/>
         <source>Format</source>
-        <translation type="unfinished">Формат</translation>
+        <translation type="unfinished">Formato</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="33"/>
         <source>16-bit (half precision)</source>
-        <translation type="unfinished">128-битное (половинная точность)</translation>
+        <translation type="unfinished">16-bit (precisão média)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="34"/>
         <source>32-bit (single precision)</source>
-        <translation type="unfinished">32-битное (одинарная точность)</translation>
+        <translation type="unfinished">32-bit (precisão única)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="35"/>
         <source>64-bit (double precision)</source>
-        <translation type="unfinished">64-битное (двойная точность)</translation>
+        <translation type="unfinished">64-bit (precisão dupla)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="36"/>
         <source>80-bit (x86 extended format)</source>
-        <translation type="unfinished">80-битное (x86 расширенный формат)</translation>
+        <translation type="unfinished">80-bit (formato estendido x86)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="37"/>
         <source>128-bit (quadruple precision)</source>
-        <translation type="unfinished">128 -битное (четырехкратная точность)</translation>
+        <translation type="unfinished">128-bit (precisão quádrupla)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="39"/>
         <source>Decimal value</source>
-        <translation type="unfinished">Десятичное значение</translation>
+        <translation type="unfinished">Valor decimal</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="41"/>
         <source>Binary representation</source>
-        <translation type="unfinished">Двоичное представление</translation>
+        <translation type="unfinished">Representação binária</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="54"/>
         <source>Hexadecimal representation</source>
-        <translation type="unfinished">Шестнадцатеричное представление</translation>
+        <translation type="unfinished">Representação hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="56"/>
         <source>Floating point value</source>
-        <translation type="unfinished">Значение числа с плавающей запятой</translation>
+        <translation type="unfinished">Valor do ponto flutuante</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="59"/>
         <source>Conversion error</source>
-        <translation type="unfinished">Ошибка преобразования</translation>
+        <translation type="unfinished">Erro de conversão</translation>
     </message>
 </context>
 <context>
@@ -6146,12 +5929,12 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="78"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="81"/>
         <source>Expression:</source>
-        <translation type="unfinished">Выражение:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="86"/>
@@ -6166,7 +5949,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="89"/>
         <source>\x, \y, \z, \a, \b, …</source>
-        <translation type="unfinished">\x, \y, \z, \a, \b, …</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="107"/>
@@ -6179,18 +5962,18 @@ Do you want to overwrite it?</source>
         <location filename="../src/functioneditdialog.cpp" line="139"/>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
-        <translation type="unfinished">Функция с таким именем уже существует.
-Хотите перезаписать функцию?</translation>
+        <translation type="unfinished">Uma função com o mesmo nome já existe.
+Deseja sobrescrever a função?</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="211"/>
         <source>Edit Function</source>
-        <translation type="unfinished">Изменить функцию</translation>
+        <translation type="unfinished">Editar Função</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="224"/>
         <source>New Function</source>
-        <translation type="unfinished">Новая функция</translation>
+        <translation type="unfinished">Nova Função</translation>
     </message>
 </context>
 <context>
@@ -6198,125 +5981,125 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/functionsdialog.cpp" line="33"/>
         <source>Functions</source>
-        <translation type="unfinished">Функции</translation>
+        <translation type="unfinished">Funções</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="42"/>
         <source>Category</source>
-        <translation type="unfinished">Категория</translation>
+        <translation type="unfinished">Categoria</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="57"/>
         <location filename="../src/functionsdialog.cpp" line="462"/>
         <source>Function</source>
-        <translation type="unfinished">Функция</translation>
+        <translation type="unfinished">Função</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="74"/>
         <source>New…</source>
-        <translation type="unfinished">Новый…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="75"/>
         <source>Edit…</source>
-        <translation type="unfinished">Правка…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="76"/>
         <location filename="../src/functionsdialog.cpp" line="394"/>
         <location filename="../src/functionsdialog.cpp" line="397"/>
         <source>Deactivate</source>
-        <translation type="unfinished">Деактивировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="77"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="unfinished">Excluir</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="79"/>
         <source>Calculate…</source>
-        <translation type="unfinished">Рассчитать…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="81"/>
         <source>Apply</source>
-        <translation type="unfinished">Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="82"/>
         <source>Insert</source>
-        <translation type="unfinished">Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="274"/>
         <source>argument</source>
-        <translation type="unfinished">аргумент</translation>
+        <translation type="unfinished">argumento</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="297"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation type="unfinished">Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="307"/>
         <source>Example:</source>
-        <translation type="unfinished">Пример:</translation>
+        <translation type="unfinished">Exemplo:</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="319"/>
         <source>Arguments</source>
-        <translation type="unfinished">Аргументы</translation>
+        <translation type="unfinished">Argumentos</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="336"/>
         <source>optional</source>
         <comment>optional argument</comment>
-        <translation type="unfinished">необязательный</translation>
+        <translation type="unfinished">opcional</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="339"/>
         <source>default:</source>
         <comment>argument default</comment>
-        <translation type="unfinished">по умолчанию:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="351"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
-        <translation type="unfinished">Требование:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="359"/>
         <source>Properties</source>
-        <translation type="unfinished">Свойства</translation>
+        <translation type="unfinished">Propriedades</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="366"/>
         <source>%1:</source>
-        <translation type="unfinished">%1:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="376"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
-        <translation type="unfinished">ключ</translation>
+        <translation type="unfinished">chave</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="399"/>
         <source>Activate</source>
-        <translation type="unfinished">Активировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="519"/>
         <source>All</source>
         <comment>All functions</comment>
-        <translation type="unfinished">Все</translation>
+        <translation type="unfinished">Todas</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="562"/>
         <source>Uncategorized</source>
-        <translation type="unfinished">Без категорий</translation>
+        <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="568"/>
@@ -6326,7 +6109,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/functionsdialog.cpp" line="575"/>
         <source>Inactive</source>
-        <translation type="unfinished">Неактивный</translation>
+        <translation type="unfinished">Inativo</translation>
     </message>
 </context>
 <context>
@@ -6334,7 +6117,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/historyview.cpp" line="300"/>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation type="unfinished">Copiar</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="303"/>
@@ -6349,7 +6132,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/historyview.cpp" line="307"/>
         <source>Clear</source>
-        <translation type="unfinished">Очистить</translation>
+        <translation type="unfinished">Limpar</translation>
     </message>
 </context>
 <context>
@@ -6357,17 +6140,17 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="499"/>
         <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Щелчок правой кнопкой/долгое нажатие&lt;/i&gt;: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="500"/>
         <source>&lt;i&gt;Right-click&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Щелчок правой кнопкой&lt;/i&gt;: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="504"/>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6410,17 +6193,17 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="224"/>
         <source>Uncertainty/interval</source>
-        <translation type="unfinished">Неопределённость/интервал</translation>
+        <translation type="unfinished">Incerteza/intervalo</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="224"/>
         <source>Relative error</source>
-        <translation type="unfinished">Относительная ошибка</translation>
+        <translation type="unfinished">Erro relativo</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="224"/>
         <source>Interval</source>
-        <translation type="unfinished">Интервал</translation>
+        <translation type="unfinished">Intervalo</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="226"/>
@@ -6445,59 +6228,59 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="240"/>
         <source>Left parenthesis</source>
-        <translation type="unfinished">Левая скобка</translation>
+        <translation type="unfinished">Parêntese esquerdo</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="240"/>
         <source>Left vector bracket</source>
-        <translation type="unfinished">Левая векторная скобка</translation>
+        <translation type="unfinished">Parêntese esquerdo do vetor</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="242"/>
         <source>Right parenthesis</source>
-        <translation type="unfinished">Правая скобка</translation>
+        <translation type="unfinished">Parêntese direito</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="242"/>
         <source>Right vector bracket</source>
-        <translation type="unfinished">Правая векторная скобка</translation>
+        <translation type="unfinished">Parêntese direito do vetor</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="244"/>
         <source>Smart parentheses</source>
-        <translation type="unfinished">Умные скобки</translation>
+        <translation type="unfinished">Parênteses inteligentes</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="244"/>
         <source>Vector brackets</source>
-        <translation type="unfinished">Векторные скобки</translation>
+        <translation type="unfinished">Colchetes para vetores</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="250"/>
         <source>Argument separator</source>
-        <translation type="unfinished">Разделитель аргументов</translation>
+        <translation type="unfinished">Separador de argumentos</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="250"/>
         <location filename="../src/keypadwidget.cpp" line="269"/>
         <source>Blank space</source>
-        <translation type="unfinished">Пустой пробел</translation>
+        <translation type="unfinished">Espaço em branco</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="250"/>
         <location filename="../src/keypadwidget.cpp" line="269"/>
         <source>New line</source>
-        <translation type="unfinished">Новая строка</translation>
+        <translation type="unfinished">Nova linha</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="269"/>
         <source>Decimal point</source>
-        <translation type="unfinished">Десятичная точка</translation>
+        <translation type="unfinished">Ponto decimal</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="297"/>
         <source>Previous result (static)</source>
-        <translation type="unfinished">Предыдущий результат (статический)</translation>
+        <translation type="unfinished">Resultado anterior (estático)</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="303"/>
@@ -6507,7 +6290,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="303"/>
         <source>Bitwise AND</source>
-        <translation type="unfinished">Побитовое И</translation>
+        <translation type="unfinished">Bit-a-bit AND</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="303"/>
@@ -6517,12 +6300,12 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="308"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="unfinished">Excluir</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="308"/>
         <source>Backspace</source>
-        <translation type="unfinished">Обратное перемещение</translation>
+        <translation type="unfinished">Backspace</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="311"/>
@@ -6554,22 +6337,22 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="323"/>
         <source>Bitwise OR</source>
-        <translation type="unfinished">Побитовое ИЛИ</translation>
+        <translation type="unfinished">Bit-a-bit OR</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="323"/>
         <source>Bitwise NOT</source>
-        <translation type="unfinished">Побитовое НЕ</translation>
+        <translation type="unfinished">Bit-a-bit NOT</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="325"/>
         <source>Clear expression</source>
-        <translation type="unfinished">Отчистить выражение</translation>
+        <translation type="unfinished">Limpar expressão</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="331"/>
         <source>Calculate expression</source>
-        <translation type="unfinished">Вычислить выражение</translation>
+        <translation type="unfinished">Calcular expressão</translation>
     </message>
 </context>
 <context>
@@ -6577,296 +6360,292 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/plotdialog.cpp" line="45"/>
         <source>Plot</source>
-        <translation type="unfinished">График</translation>
+        <translation type="unfinished">Plotagem</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="54"/>
         <source>Data</source>
-        <translation type="unfinished">Данные</translation>
+        <translation type="unfinished">Dados</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="56"/>
         <location filename="../src/plotdialog.cpp" line="151"/>
         <source>Title:</source>
-        <translation type="unfinished">Заголовок:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="58"/>
         <source>Expression:</source>
-        <translation type="unfinished">Выражение:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="64"/>
         <source>Function</source>
-        <translation type="unfinished">Функция</translation>
+        <translation type="unfinished">Função</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="65"/>
         <source>Vector/matrix</source>
-        <translation type="unfinished">Вектор/матрица</translation>
+        <translation type="unfinished">Vetor/matriz</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="66"/>
         <source>Paired matrix</source>
-        <translation type="unfinished">Парная матрица</translation>
+        <translation type="unfinished">Matriz emparelhada</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="69"/>
         <source>Rows</source>
-        <translation type="unfinished">Строки</translation>
+        <translation type="unfinished">Linhas</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="70"/>
         <source>X variable:</source>
-        <translation type="unfinished">Переменная X:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="75"/>
         <source>Style:</source>
-        <translation type="unfinished">Стиль:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="77"/>
         <source>Line</source>
-        <translation type="unfinished">Линия</translation>
+        <translation type="unfinished">Linha</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="78"/>
         <source>Points</source>
-        <translation type="unfinished">Символы</translation>
+        <translation type="unfinished">Pontos</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="79"/>
         <source>Line with points</source>
-        <translation type="unfinished">Линия с символами</translation>
+        <translation type="unfinished">Linha com pontos</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="80"/>
         <source>Boxes/bars</source>
-        <translation type="unfinished">Прямоугольники/планки погрешностей</translation>
+        <translation type="unfinished">Caixas/barras</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="81"/>
         <source>Histogram</source>
-        <translation type="unfinished">Гистограмма</translation>
+        <translation type="unfinished">Histograma</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="82"/>
         <source>Steps</source>
-        <translation type="unfinished">Ступенчатый</translation>
+        <translation type="unfinished">Passos</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="83"/>
         <source>Candlesticks</source>
-        <translation type="unfinished">Японские свечи</translation>
+        <translation type="unfinished">Castiçais</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="84"/>
         <source>Dots</source>
-        <translation type="unfinished">Точки</translation>
+        <translation type="unfinished">Pontilhado</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="86"/>
         <source>Smoothing:</source>
-        <translation type="unfinished">Сглаживание:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="88"/>
         <location filename="../src/plotdialog.cpp" line="186"/>
         <source>None</source>
-        <translation type="unfinished">Никакой</translation>
+        <translation type="unfinished">Nenhum</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="89"/>
         <source>Monotonic</source>
-        <translation type="unfinished">Монотонное</translation>
+        <translation type="unfinished">Monotônica</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="90"/>
         <source>Natural cubic splines</source>
-        <translation type="unfinished">Естественные кубические сплайны</translation>
+        <translation type="unfinished">Splines cúbicos naturais</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="91"/>
         <source>Bezier</source>
-        <translation type="unfinished">Безье</translation>
+        <translation type="unfinished">Bézier</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="92"/>
         <source>Bezier (monotonic)</source>
-        <translation type="unfinished">Безье (монотонный)</translation>
+        <translation type="unfinished">Bézier (monotônica)</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="94"/>
         <source>Y-axis:</source>
-        <translation type="unfinished">Ось Y:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="96"/>
         <source>Primary</source>
-        <translation type="unfinished">Основная</translation>
+        <translation type="unfinished">Primário</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="97"/>
         <source>Secondary</source>
-        <translation type="unfinished">Вторичная</translation>
+        <translation type="unfinished">Secundário</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="102"/>
         <source>Add</source>
-        <translation type="unfinished">Сложение</translation>
+        <translation type="unfinished">Adicionar</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="105"/>
         <location filename="../src/plotdialog.cpp" line="144"/>
         <location filename="../src/plotdialog.cpp" line="194"/>
         <source>Apply</source>
-        <translation type="unfinished">Применить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="108"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation type="obsolete">Категория</translation>
+        <translation type="unfinished">Remover</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="115"/>
         <source>Title</source>
-        <translation type="unfinished">Заголовок</translation>
+        <translation type="unfinished">Título</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="115"/>
         <source>Expression</source>
-        <translation type="unfinished">Выражение</translation>
+        <translation type="unfinished">Expressão</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="121"/>
         <source>Function Range</source>
-        <translation type="unfinished">Диапазон функция</translation>
+        <translation type="unfinished">Faixa de Funções</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="123"/>
         <source>Minimum x value:</source>
-        <translation type="unfinished">Минимальное значение x:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="127"/>
         <source>Maximum x value:</source>
-        <translation type="unfinished">Максимальное значение x:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="132"/>
         <source>Sampling rate:</source>
-        <translation type="unfinished">Частота дискретизации:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="137"/>
         <source>Step size:</source>
-        <translation type="unfinished">Размер шага:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="149"/>
         <source>Appearance</source>
-        <translation type="unfinished">Внешний вид</translation>
+        <translation type="unfinished">Aparência</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="153"/>
         <source>Display grid</source>
-        <translation type="unfinished">Показать сетку</translation>
+        <translation type="unfinished">Exibir grade</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="155"/>
         <source>Display full border</source>
-        <translation type="unfinished">Показать полную рамку</translation>
+        <translation type="unfinished">Exibir borda completa</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="157"/>
         <source>Minimum y value:</source>
-        <translation type="unfinished">Минимальное значение y:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="162"/>
         <source>Maximum y value:</source>
-        <translation type="unfinished">Максимальное значение y:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="167"/>
         <source>Logarithmic x scale:</source>
-        <translation type="unfinished">Логарифмическая шкала абсцисс x:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="172"/>
         <source>Logarithmic y scale:</source>
-        <translation type="unfinished">Логарифмическая шкала ординат y:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="177"/>
         <source>X-axis label:</source>
-        <translation type="unfinished">Подпись для оси абсцисс X:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="179"/>
         <source>Y-axis label:</source>
-        <translation type="unfinished">Подпись для оси ординат Y:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="181"/>
         <source>Line width:</source>
-        <translation type="unfinished">Толщина линии:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="184"/>
         <source>Legend placement:</source>
-        <translation type="unfinished">Размещение легенды:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="187"/>
         <source>Top-left</source>
-        <translation type="unfinished">Сверху слева</translation>
+        <translation type="unfinished">Superior esquerdo</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="188"/>
         <source>Top-right</source>
-        <translation type="unfinished">Сверху справа</translation>
+        <translation type="unfinished">Superior direito</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="189"/>
         <source>Bottom-left</source>
-        <translation type="unfinished">Снизу слева</translation>
+        <translation type="unfinished">Inferior esquerdo</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="190"/>
         <source>Bottom-right</source>
-        <translation type="unfinished">Снизу справа</translation>
+        <translation type="unfinished">Inferior direito</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="191"/>
         <source>Below</source>
-        <translation type="unfinished">Ниже</translation>
+        <translation type="unfinished">Abaixo</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="192"/>
         <source>Outside</source>
-        <translation type="unfinished">Извне</translation>
+        <translation type="unfinished">Fora</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="354"/>
         <source>Calculating…</source>
-        <translation type="unfinished">Расчёт…</translation>
+        <translation type="unfinished">Calculando…</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="354"/>
         <location filename="../src/plotdialog.cpp" line="500"/>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="500"/>
         <source>Processing…</source>
-        <translation type="unfinished">Обработка…</translation>
+        <translation type="unfinished">Processando…</translation>
     </message>
 </context>
 <context>
@@ -6874,17 +6653,17 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="53"/>
         <source>Look &amp;&amp; Feel</source>
-        <translation type="unfinished">Внешний вид</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="54"/>
         <source>Numbers &amp;&amp; Operators</source>
-        <translation type="unfinished">Числа и операторы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="55"/>
         <source>Units &amp;&amp; Currencies</source>
-        <translation type="unfinished">Единицы измерения и валюты</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="56"/>
@@ -6894,37 +6673,37 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="60"/>
         <source>Ignore system language (requires restart)</source>
-        <translation type="unfinished">Игнорировать системный язык (требуется перезапуск)</translation>
+        <translation type="unfinished">Ignorar o idioma do sistema (requer reinício)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="61"/>
         <source>Keep above other windows</source>
-        <translation type="unfinished">Поддерживать поверх других окон</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="62"/>
         <source>Window title:</source>
-        <translation type="unfinished">Заголовок окна:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="64"/>
         <source>Application name</source>
-        <translation type="unfinished">Имя приложения</translation>
+        <translation type="unfinished">Nome do programa</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="65"/>
         <source>Result</source>
-        <translation type="unfinished">Результат</translation>
+        <translation type="unfinished">Resultado</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="66"/>
         <source>Application name + result</source>
-        <translation type="unfinished">Имя приложения + результат</translation>
+        <translation type="unfinished">Nome do programa + resultado</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="70"/>
         <source>Style:</source>
-        <translation type="unfinished">Стиль:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="73"/>
@@ -6945,27 +6724,27 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="80"/>
         <source>Custom result font</source>
-        <translation type="unfinished">Шрифт результатов</translation>
+        <translation type="unfinished">Fonte do resultado personalizada</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="83"/>
         <source>Custom expression font</source>
-        <translation type="unfinished">Шрифт выражения</translation>
+        <translation type="unfinished">Fonte da expressão personalizada</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="86"/>
         <source>Custom keypad font</source>
-        <translation type="unfinished">Шрифт клавиатуры</translation>
+        <translation type="unfinished">Fonte do teclado personalizada</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="89"/>
         <source>Custom application font</source>
-        <translation type="unfinished">Шрифт приложения</translation>
+        <translation type="unfinished">Fonte do programa personalizada</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="95"/>
         <source>Display expression status</source>
-        <translation type="unfinished">Показывать статус выражения</translation>
+        <translation type="unfinished">Exibir status da expressão</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="96"/>
@@ -6980,7 +6759,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="99"/>
         <source>Clear expression</source>
-        <translation type="unfinished">Отчистить выражение</translation>
+        <translation type="unfinished">Limpar expressão</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="100"/>
@@ -6995,18 +6774,18 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="105"/>
         <source>Use keyboard keys for RPN</source>
-        <translation type="unfinished">Использовать клавиатуру для ПОЛИЗ</translation>
+        <translation type="unfinished">Usar teclado para RPN</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="106"/>
         <source>Parsing mode:</source>
-        <translation type="unfinished">Режим анализа:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="108"/>
         <location filename="../src/preferencesdialog.cpp" line="152"/>
         <source>Adaptive</source>
-        <translation type="unfinished">Адаптивный</translation>
+        <translation type="unfinished">Adaptativa</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="109"/>
@@ -7026,97 +6805,97 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="112"/>
         <source>RPN</source>
-        <translation type="unfinished">ПОЛИЗ</translation>
+        <translation type="unfinished">RPN</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="116"/>
         <source>Read precision</source>
-        <translation type="unfinished">Точность чтения</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="117"/>
         <source>Limit implicit multiplication</source>
-        <translation type="unfinished">Ограничить неявное умножение</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="118"/>
         <source>Interval calculation:</source>
-        <translation type="unfinished">Расчёт интервала:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="120"/>
         <source>Variance formula</source>
-        <translation type="unfinished">Формула дисперсии</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="121"/>
         <source>Interval arithmetic</source>
-        <translation type="unfinished">Арифметика интервалов</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="125"/>
         <source>Factorize result</source>
-        <translation type="unfinished">Разложить результат на множители</translation>
+        <translation type="unfinished">Fatorar resultado</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="128"/>
         <source>Binary two&apos;s complement representation</source>
-        <translation type="unfinished">Представление двоичных чисел с дополнительным кодом</translation>
+        <translation type="unfinished">Representação binária do complemento para dois</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="129"/>
         <source>Hexadecimal two&apos;s complement representation</source>
-        <translation type="unfinished">Представление шестнадцатеричных чисел с дополнительным кодом</translation>
+        <translation type="unfinished">Representação hexadecimal do complemento para dois</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Use lower case letters in non-decimal numbers</source>
-        <translation type="unfinished">Использовать строчные буквы в недесятичных числах</translation>
+        <translation type="unfinished">Usar letras minúsculas em números não-decimais</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="131"/>
         <source>Spell out logical operators</source>
-        <translation type="unfinished">Изложить логично логические операции</translation>
+        <translation type="unfinished">Soletrar operadores lógicos</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Use E-notation instead of 10^x</source>
-        <translation type="unfinished">Использовать E-нотацию вместо 10^x</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
-        <translation type="unfinished">Использовать «j» для мнимой единицы</translation>
+        <translation type="unfinished">Usar &apos;j&apos; como unidade imaginária</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="134"/>
         <source>Use comma as decimal separator</source>
-        <translation type="unfinished">Использовать точку в качестве десятичного разделителя</translation>
+        <translation type="unfinished">Usar vírgula como separador decimal</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="135"/>
         <source>Ignore comma in numbers</source>
-        <translation type="unfinished">Игнорировать запятую в числах</translation>
+        <translation type="unfinished">Ignorar vírgula em números</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="136"/>
         <source>Ignore dots in numbers</source>
-        <translation type="unfinished">Игнорировать точки в числах</translation>
+        <translation type="unfinished">Ignorar pontos em números</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="137"/>
         <source>Round halfway numbers to even</source>
-        <translation type="unfinished">Округлять половинные числа до ближайшего чётного целого числа</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="142"/>
         <source>Digit grouping:</source>
-        <translation type="unfinished">Группировка цифр:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>None</source>
-        <translation type="unfinished">Никакой</translation>
+        <translation type="unfinished">Nenhum</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="145"/>
@@ -7131,27 +6910,27 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="150"/>
         <source>Interval display:</source>
-        <translation type="unfinished">Отображение интервалов:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="153"/>
         <source>Significant digits</source>
-        <translation type="unfinished">Значимые цифры</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="154"/>
         <source>Interval</source>
-        <translation type="unfinished">Интервал</translation>
+        <translation type="unfinished">Intervalo</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="155"/>
         <source>Plus/minus</source>
-        <translation type="unfinished">Плюс/минус</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="156"/>
         <source>Midpoint</source>
-        <translation type="unfinished">Середина</translation>
+        <translation type="unfinished">Ponto médio</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="157"/>
@@ -7191,7 +6970,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="176"/>
         <source>Use binary prefixes for information units</source>
-        <translation type="unfinished">Использовать двоичные префиксы для информационных единиц</translation>
+        <translation type="unfinished">Usar prefixos binários para unidades de informações</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="177"/>
@@ -7206,12 +6985,12 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="180"/>
         <source>Base units</source>
-        <translation type="unfinished">Основные единицы измерения</translation>
+        <translation type="unfinished">Unidades base</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Optimal units</source>
-        <translation type="unfinished">Оптимальные единицы измерения</translation>
+        <translation type="unfinished">Unidades ideais</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="182"/>
@@ -7221,7 +7000,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="186"/>
         <source>Convert to mixed units</source>
-        <translation type="unfinished">Преобразовать в смешанные единицы</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="187"/>
@@ -7231,7 +7010,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="189"/>
         <source>Default</source>
-        <translation type="unfinished">По умолчанию</translation>
+        <translation type="unfinished">Padrão</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="190"/>
@@ -7276,22 +7055,22 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="206"/>
         <source>Absolute</source>
-        <translation type="unfinished">Абсолютный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="207"/>
         <source>Relative</source>
-        <translation type="unfinished">Относительный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="208"/>
         <source>Hybrid</source>
-        <translation type="unfinished">Гибридный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="212"/>
         <source>Exchange rates updates:</source>
-        <translation type="unfinished">Обновления курсов валют:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="213"/>
@@ -7304,7 +7083,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/main.cpp" line="63"/>
         <source>Execute expressions and commands from a file</source>
-        <translation type="unfinished">Выполнить выражения и команды из файла</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="63"/>
@@ -7314,43 +7093,43 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/main.cpp" line="65"/>
         <source>Start a new instance of the application</source>
-        <translation type="unfinished">Запустить новый экземпляр приложения</translation>
+        <translation type="unfinished">Iniciar uma nova instância do programa</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="67"/>
         <source>Specify the window title</source>
-        <translation type="unfinished">Укажите заголовок окна</translation>
+        <translation type="unfinished">Especifica o título da janela</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="67"/>
         <source>TITLE</source>
-        <translation type="unfinished">НАЗВАНИЕ</translation>
+        <translation type="unfinished">TITLE</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="69"/>
         <source>Display the application version</source>
-        <translation type="unfinished">Показать версию приложения</translation>
+        <translation type="unfinished">Exibir a versão do programa</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="71"/>
         <source>Expression to calculate</source>
-        <translation>Выражение для вычисления</translation>
+        <translation type="unfinished">Expressão para calcular</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="71"/>
         <source>[EXPRESSION]</source>
-        <translation type="unfinished">[ВЫРАЖЕНИЕ]</translation>
+        <translation type="unfinished">[EXPRESSION]</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="86"/>
         <source>%1 is already running.</source>
-        <translation>%1 уже исполняется.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="123"/>
         <source>Failed to load global definitions!
 </source>
-        <translation>Не удалось загрузить глобальные определения!
+        <translation type="unfinished">Falha ao carregar definições globais!
 </translation>
     </message>
     <message>
@@ -7358,52 +7137,52 @@ Do you want to overwrite the function?</source>
         <location filename="../src/qalculateqtsettings.cpp" line="51"/>
         <location filename="../src/qalculateqtsettings.cpp" line="628"/>
         <source>answer</source>
-        <translation>ответ</translation>
+        <translation type="unfinished">resposta</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="50"/>
         <source>History Answer Value</source>
-        <translation type="unfinished">Значение ответа в истории</translation>
+        <translation type="unfinished">Valor da resposta do histórico</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="52"/>
         <source>History Index(es)</source>
-        <translation type="unfinished">Индекс(ы) истории</translation>
+        <translation type="unfinished">Índice(s) do histórico</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="63"/>
         <source>History index %s does not exist.</source>
-        <translation type="unfinished">Индекс истории %s не существует.</translation>
+        <translation type="unfinished">O índice do histórico %s não existe.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="627"/>
         <source>Last Answer</source>
-        <translation>Последний ответ</translation>
+        <translation type="unfinished">Última resposta</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="630"/>
         <source>Answer 2</source>
-        <translation>Ответ 2</translation>
+        <translation type="unfinished">Resposta 2</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="631"/>
         <source>Answer 3</source>
-        <translation>Ответ 3</translation>
+        <translation type="unfinished">Resposta 3</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="632"/>
         <source>Answer 4</source>
-        <translation>Ответ 4</translation>
+        <translation type="unfinished">Resposta 4</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="633"/>
         <source>Answer 5</source>
-        <translation>Ответ 5</translation>
+        <translation type="unfinished">Resposta 5</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="634"/>
         <source>Memory</source>
-        <translation>Память</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="708"/>
@@ -7414,8 +7193,7 @@ Do you want to overwrite the function?</source>
         <location filename="../src/qalculateqtsettings.cpp" line="708"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
-        <translation type="unfinished">Не удалось записать настройки в
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7431,19 +7209,18 @@ Do you want to overwrite the function?</source>
 
 Do you wish to update the exchange rates now?</source>
         <translation type="unfinished">
-            <numerusform>Прошёл %n день с момента последнего обновления курсов обмена.\n\nВы хотите обновить курсы обмена сейчас?</numerusform>
-            <numerusform>Прошло %n дня с момента последнего обновления курсов обмена.\n\nВы хотите обновить курсы обмена сейчас?</numerusform>
-            <numerusform>Прошло %n дней с момента последнего обновления курсов обмена.\n\nВы хотите обновить курсы обмена сейчас?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Fetching exchange rates.</source>
-        <translation type="obsolete">Получение курсов валют.</translation>
+        <translation type="obsolete">Buscando taxas de câmbio.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="952"/>
         <source>Fetching exchange rates…</source>
-        <translation type="unfinished">Получение курсов валют…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="983"/>
@@ -7467,47 +7244,42 @@ Do you wish to update the exchange rates now?</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="996"/>
         <source>Path of executable not found.</source>
-        <translation type="unfinished">Путь к исполняемому файлу не найден.</translation>
+        <translation type="unfinished">Caminho do executável não encontrado.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1005"/>
         <source>curl not found.</source>
-        <translation type="unfinished">Программа curl не найдена.</translation>
+        <translation type="unfinished">curl não encontrado.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1056"/>
         <source>Failed to run update script.
 %1</source>
-        <translation type="unfinished">Не удалось запустить скрипт обновления.
-%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1079"/>
         <source>Failed to check for updates.</source>
-        <translation type="unfinished">Не удалось проверить наличие обновлений.</translation>
+        <translation type="unfinished">Falha ao verificar por atualizações.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1080"/>
         <source>No updates found.</source>
-        <translation type="unfinished">Обновлений не найдено.</translation>
+        <translation type="unfinished">Nenhuma atualização encontrada.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1086"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
-        <translation type="unfinished">Новая версия %1 доступна на %2.
-
-Вы хотите обновиться до версии %3?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1090"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
-        <translation type="unfinished">Доступна новая версия %1.
-
-Вы можете получить версию %3 на %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7522,7 +7294,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/main.cpp" line="172"/>
         <source>Cancel</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
-        <translation type="unfinished">Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="174"/>
@@ -7589,12 +7361,12 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="289"/>
         <source>New</source>
-        <translation type="unfinished">Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="290"/>
         <source>Function…</source>
-        <translation type="unfinished">Функция…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="291"/>
@@ -7604,28 +7376,28 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="292"/>
         <source>Unknown Variable…</source>
-        <translation type="unfinished">Переменная неизвестного…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="293"/>
         <source>Matrix…</source>
-        <translation type="unfinished">Матрица…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="296"/>
         <source>Import CSV File…</source>
-        <translation type="unfinished">Загрузить CSV файл…</translation>
+        <translation type="unfinished">Importar arquivo CSV…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="297"/>
         <source>Export CSV File…</source>
-        <translation type="unfinished">Экспорт в CSV файл…</translation>
+        <translation type="unfinished">Exportar arquivo CSV…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="299"/>
         <location filename="../src/qalculatewindow.cpp" line="543"/>
         <source>Functions</source>
-        <translation type="unfinished">Функции</translation>
+        <translation type="unfinished">Funções</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="300"/>
@@ -7635,27 +7407,27 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="301"/>
         <source>Units</source>
-        <translation type="unfinished">Единицы измерения</translation>
+        <translation type="unfinished">Unidades</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="303"/>
         <source>Plot Functions/Data</source>
-        <translation type="unfinished">Графики функций/данных</translation>
+        <translation type="unfinished">Funções/dados de plotagem</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="304"/>
         <source>Floating Point Conversion (IEEE 754)</source>
-        <translation type="unfinished">Преобразование чисел с плавающей запятой (IEEE 754)</translation>
+        <translation type="unfinished">Conversão de ponto flutuante (IEEE 754)</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="305"/>
         <source>Calendar Conversion</source>
-        <translation type="unfinished">Преобразование календаря</translation>
+        <translation type="unfinished">Conversão de calendário</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="307"/>
         <source>Update Exchange Rates</source>
-        <translation type="unfinished">Обновить курсы валют</translation>
+        <translation type="unfinished">Atualizar taxas de câmbio</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="310"/>
@@ -7665,27 +7437,27 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="315"/>
         <source>RPN Mode</source>
-        <translation type="unfinished">Режим ПОЛИЗ</translation>
+        <translation type="unfinished">Modo RPN</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="316"/>
         <source>Chain Mode</source>
-        <translation type="unfinished">Режим «цепь»</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="318"/>
         <source>Preferences</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation type="unfinished">Preferências</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="320"/>
         <source>Report a Bug</source>
-        <translation type="unfinished">Сообщить об ошибке</translation>
+        <translation type="unfinished">Reportar um erro</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="321"/>
         <source>Check for Updates</source>
-        <translation type="unfinished">Проверить обновления</translation>
+        <translation type="unfinished">Verificar atualizações</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="322"/>
@@ -7696,12 +7468,12 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="324"/>
         <source>Quit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation type="unfinished">Sair</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="327"/>
         <source>Mode</source>
-        <translation type="unfinished">Режим</translation>
+        <translation type="unfinished">Modo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="332"/>
@@ -7712,49 +7484,49 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="337"/>
         <source>Normal</source>
-        <translation type="unfinished">Обычное</translation>
+        <translation type="unfinished">Normal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="340"/>
         <source>Scientific</source>
-        <translation type="unfinished">Научное</translation>
+        <translation type="unfinished">Científica</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="343"/>
         <source>Engineering</source>
-        <translation type="unfinished">Инженерное</translation>
+        <translation type="unfinished">Engenharia</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="346"/>
         <source>Simple</source>
-        <translation type="unfinished">Простое</translation>
+        <translation type="unfinished">Simples</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="350"/>
         <location filename="../src/qalculatewindow.cpp" line="351"/>
         <source>Angle Unit</source>
-        <translation type="unfinished">Единица измерения углов</translation>
+        <translation type="unfinished">Unidade de ângulo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="353"/>
         <source>Radians</source>
-        <translation type="unfinished">Радианы</translation>
+        <translation type="unfinished">Radianos</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="355"/>
         <source>Degrees</source>
-        <translation type="unfinished">Градусы</translation>
+        <translation type="unfinished">Graus</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="357"/>
         <source>Gradians</source>
-        <translation type="unfinished">Грады</translation>
+        <translation type="unfinished">Grados</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="360"/>
         <location filename="../src/qalculatewindow.cpp" line="361"/>
         <source>Approximation</source>
-        <translation type="unfinished">Приближение</translation>
+        <translation type="unfinished">Aproximação</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="363"/>
@@ -7772,85 +7544,85 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="367"/>
         <source>Exact</source>
         <comment>Exact approximation</comment>
-        <translation type="unfinished">Точно</translation>
+        <translation type="unfinished">Exato</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="369"/>
         <source>Approximate</source>
-        <translation type="unfinished">Приблизительно</translation>
+        <translation type="unfinished">Aproximado</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="374"/>
         <source>Assumptions</source>
-        <translation type="unfinished">Предположения</translation>
+        <translation type="unfinished">Suposições</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="375"/>
         <source>Type</source>
         <comment>Assumptions type</comment>
-        <translation type="unfinished">Тип</translation>
+        <translation type="unfinished">Tipo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="377"/>
         <source>Number</source>
-        <translation type="unfinished">Число</translation>
+        <translation type="unfinished">Número</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="379"/>
         <source>Real</source>
-        <translation type="unfinished">Вещественное</translation>
+        <translation type="unfinished">Real</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="381"/>
         <source>Rational</source>
-        <translation type="unfinished">Рациональное</translation>
+        <translation type="unfinished">Racional</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="383"/>
         <source>Integer</source>
-        <translation type="unfinished">Целое</translation>
+        <translation type="unfinished">Inteiro</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="385"/>
         <source>Boolean</source>
-        <translation type="unfinished">Логическое</translation>
+        <translation type="unfinished">Boleano</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="387"/>
         <source>Sign</source>
         <comment>Assumptions sign</comment>
-        <translation type="unfinished">Знак</translation>
+        <translation type="unfinished">Sinal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="389"/>
         <source>Unknown</source>
         <comment>Unknown assumptions sign</comment>
-        <translation type="unfinished">Неизвестное</translation>
+        <translation type="unfinished">Desconhecido</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="391"/>
         <source>Non-zero</source>
-        <translation type="unfinished">Ненулевое</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="393"/>
         <source>Positive</source>
-        <translation type="unfinished">Положительное</translation>
+        <translation type="unfinished">Positivo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="395"/>
         <source>Non-negative</source>
-        <translation type="unfinished">Неотрицательное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="397"/>
         <source>Negative</source>
-        <translation type="unfinished">Отрицательное</translation>
+        <translation type="unfinished">Negativo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="399"/>
         <source>Non-positive</source>
-        <translation type="unfinished">Не положительное</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="403"/>
@@ -7862,65 +7634,65 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="407"/>
         <location filename="../src/qalculatewindow.cpp" line="462"/>
         <source>Binary</source>
-        <translation type="unfinished">Двоичное</translation>
+        <translation type="unfinished">Binário</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="409"/>
         <location filename="../src/qalculatewindow.cpp" line="464"/>
         <source>Octal</source>
-        <translation type="unfinished">Восьмеричное</translation>
+        <translation type="unfinished">Octal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="411"/>
         <location filename="../src/qalculatewindow.cpp" line="466"/>
         <source>Decimal</source>
-        <translation type="unfinished">Десятичное</translation>
+        <translation type="unfinished">Decimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="413"/>
         <location filename="../src/qalculatewindow.cpp" line="468"/>
         <source>Hexadecimal</source>
-        <translation type="unfinished">Шестнадцатеричное</translation>
+        <translation type="unfinished">Hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="416"/>
         <location filename="../src/qalculatewindow.cpp" line="471"/>
         <source>Other</source>
-        <translation type="unfinished">Другой</translation>
+        <translation type="unfinished">Outro</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="417"/>
         <location filename="../src/qalculatewindow.cpp" line="472"/>
         <source>Duodecimal</source>
-        <translation type="unfinished">Двенадцатеричное</translation>
+        <translation type="unfinished">Duodecimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="419"/>
         <source>Sexagesimal</source>
-        <translation type="unfinished">Шестидесятеричное</translation>
+        <translation type="unfinished">Sexagesimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="421"/>
         <source>Time format</source>
-        <translation type="unfinished">Формат времени</translation>
+        <translation type="unfinished">Formato de tempo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="423"/>
         <location filename="../src/qalculatewindow.cpp" line="474"/>
         <source>Roman numerals</source>
-        <translation type="unfinished">Римские цифры</translation>
+        <translation type="unfinished">Números romanos</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="425"/>
         <location filename="../src/qalculatewindow.cpp" line="476"/>
         <source>Unicode</source>
-        <translation type="unfinished">Юникод</translation>
+        <translation type="unfinished">Unicode</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="427"/>
         <location filename="../src/qalculatewindow.cpp" line="478"/>
         <source>Bijective base-26</source>
-        <translation type="unfinished">Биективное основание-26</translation>
+        <translation type="unfinished">Base bijetiva-26</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="443"/>
@@ -7938,110 +7710,110 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="510"/>
         <source>Precision:</source>
-        <translation type="unfinished">Точность:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="517"/>
         <source>Min decimals:</source>
-        <translation type="unfinished">Мин цифр:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="524"/>
         <source>Max decimals:</source>
-        <translation type="unfinished">Макс цифр:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="527"/>
         <source>off</source>
         <comment>Max decimals</comment>
-        <translation type="unfinished">выкл.</translation>
+        <translation type="unfinished">desligado</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="537"/>
         <source>Convert</source>
-        <translation type="unfinished">Перевести</translation>
+        <translation type="unfinished">Converter</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="540"/>
         <source>Store</source>
-        <translation type="unfinished">Сохранить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="546"/>
         <location filename="../src/qalculatewindow.cpp" line="619"/>
         <source>Keypad</source>
-        <translation type="unfinished">Клавиатура</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="550"/>
         <location filename="../src/qalculatewindow.cpp" line="575"/>
         <source>Number bases</source>
-        <translation type="unfinished">Основания систем счисления</translation>
+        <translation type="unfinished">Bases numéricas</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="579"/>
         <source>Binary:</source>
-        <translation type="unfinished">Двоичное:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="581"/>
         <source>Octal:</source>
-        <translation type="unfinished">Восьмеричное:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="583"/>
         <source>Decimal:</source>
-        <translation type="unfinished">Десятичное:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="585"/>
         <source>Hexadecimal:</source>
-        <translation type="unfinished">Шестнадцатеричное:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="626"/>
         <source>RPN Stack</source>
-        <translation type="unfinished">Стек ПОЛИЗ</translation>
+        <translation type="unfinished">Pilha RPN</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="645"/>
         <source>Rotate the stack or move the selected register up (%1)</source>
-        <translation type="unfinished">Повернуть стек или переместить выбранный регистр вверх (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="648"/>
         <source>Rotate the stack or move the selected register down (%1)</source>
-        <translation type="unfinished">Повернуть стек или переместить выбранный регистр вниз (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="651"/>
         <source>Swap the top two values or move the selected value to the top of the stack (%1)</source>
-        <translation type="unfinished">Поменять местами два верхних значения или переместить выбранное значение в вершину стека. (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="654"/>
         <source>Copy the selected or top value to the top of the stack (%1)</source>
-        <translation type="unfinished">Скопировать выбранное или верхнее значение в вершину стека (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="657"/>
         <source>Enter the top value from before the last numeric operation (%1)</source>
-        <translation type="unfinished">Введите верхнее значение перед последней числовой операцией (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="660"/>
         <source>Delete the top or selected value (%1)</source>
-        <translation type="unfinished">Удалить верхнее или выбранное значение (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="663"/>
         <source>Clear the RPN stack (%1)</source>
-        <translation type="unfinished">Очистить стек ПОЛИЗ (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="871"/>
         <source>Powerful and easy to use calculator</source>
-        <translation type="unfinished">Мощный и простой в использовании калькулятор</translation>
+        <translation type="unfinished">Calculadora potente e fácil de usar</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="871"/>
@@ -8056,351 +7828,347 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2164"/>
         <source>Couldn&apos;t write definitions</source>
-        <translation type="unfinished">Не удалось записать определения</translation>
+        <translation type="unfinished">Não foi possível gravar definições</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2667"/>
         <source>hexadecimal</source>
-        <translation>шестнадцатеричное</translation>
+        <translation type="unfinished">hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2670"/>
         <source>octal</source>
-        <translation>восьмеричное</translation>
+        <translation type="unfinished">octal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2673"/>
         <source>decimal</source>
-        <translation>десятеричное</translation>
+        <translation type="unfinished">decimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2676"/>
         <source>duodecimal</source>
-        <translation>двенадцатеричное</translation>
+        <translation type="unfinished">duodecimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2679"/>
         <source>binary</source>
-        <translation>двоичное</translation>
+        <translation type="unfinished">binário</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2682"/>
         <source>roman</source>
-        <translation>римское число</translation>
+        <translation type="unfinished">romanos</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2685"/>
         <source>bijective</source>
-        <translation>биективное</translation>
+        <translation type="unfinished">bijetivo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2688"/>
         <location filename="../src/qalculatewindow.cpp" line="2691"/>
         <location filename="../src/qalculatewindow.cpp" line="2694"/>
         <source>sexagesimal</source>
-        <translation>шестидесятеричное</translation>
+        <translation type="unfinished">sexagesimal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2697"/>
         <location filename="../src/qalculatewindow.cpp" line="2700"/>
         <source>latitude</source>
-        <translation>широта</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2703"/>
         <location filename="../src/qalculatewindow.cpp" line="2706"/>
         <source>longitude</source>
-        <translation>долгота</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2724"/>
         <source>time</source>
-        <translation>время</translation>
+        <translation type="unfinished">hora</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2775"/>
         <source>Time zone parsing failed.</source>
-        <translation>Не удалось выполнить синтаксический анализ часового пояса.</translation>
+        <translation type="unfinished">Falha na análise do fuso horário.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2798"/>
         <source>bases</source>
-        <translation>основания</translation>
+        <translation type="unfinished">bases</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2807"/>
         <source>calendars</source>
-        <translation>календари</translation>
+        <translation type="unfinished">calendários</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2816"/>
         <source>rectangular</source>
-        <translation>прямоугоная</translation>
+        <translation type="unfinished">retangular</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2816"/>
         <source>cartesian</source>
-        <translation>декартова</translation>
+        <translation type="unfinished">cartesiano</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2827"/>
         <source>exponential</source>
-        <translation>экспоненциальная</translation>
+        <translation type="unfinished">exponencial</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2838"/>
         <source>polar</source>
-        <translation>полярная</translation>
+        <translation type="unfinished">polar</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2862"/>
         <source>phasor</source>
-        <translation>фазовая</translation>
+        <translation type="unfinished">fasor</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2862"/>
         <source>angle</source>
-        <translation>угловая</translation>
+        <translation type="unfinished">ângulo</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2873"/>
         <source>optimal</source>
-        <translation>оптимально</translation>
+        <translation type="unfinished">ideal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2884"/>
         <location filename="../src/qalculatewindow.cpp" line="2930"/>
         <source>base</source>
-        <translation>основание</translation>
+        <translation type="unfinished">base</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2895"/>
         <source>mixed</source>
-        <translation type="unfinished">смешано</translation>
+        <translation type="unfinished">mesclado</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2909"/>
         <source>fraction</source>
-        <translation>дробь</translation>
+        <translation type="unfinished">fração</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2912"/>
         <source>factors</source>
-        <translation>множители</translation>
+        <translation type="unfinished">fatores</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2921"/>
         <source>partial fraction</source>
-        <translation>частичная дробь</translation>
+        <translation type="unfinished">fração parcial</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2971"/>
         <source>factorize</source>
-        <translation>разложить на множители</translation>
+        <translation type="unfinished">fatorar</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2974"/>
         <source>expand</source>
-        <translation>раскрывать</translation>
+        <translation type="unfinished">expandir</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3137"/>
         <location filename="../src/qalculatewindow.cpp" line="3138"/>
         <location filename="../src/qalculatewindow.cpp" line="3511"/>
         <source>Calculating…</source>
-        <translation type="unfinished">Расчёт…</translation>
+        <translation type="unfinished">Calculando…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3138"/>
         <location filename="../src/qalculatewindow.cpp" line="3520"/>
         <location filename="../src/qalculatewindow.cpp" line="3942"/>
         <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3190"/>
         <location filename="../src/qalculatewindow.cpp" line="3805"/>
         <source>RPN Operation</source>
-        <translation>ПОЛИЗ операция</translation>
+        <translation type="unfinished">Operação RPN</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3499"/>
         <source>Factorizing…</source>
-        <translation type="unfinished">Факторизация…</translation>
+        <translation type="unfinished">Fatorando…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3503"/>
         <source>Expanding partial fractions…</source>
-        <translation type="unfinished">Расширение дробных чисел…</translation>
+        <translation type="unfinished">Expandindo frações parciais…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3507"/>
         <source>Expanding…</source>
-        <translation type="unfinished">Расширение…</translation>
+        <translation type="unfinished">Expandindo…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3515"/>
         <source>Converting…</source>
-        <translation type="unfinished">Преобразование…</translation>
+        <translation type="unfinished">Convertendo…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3801"/>
         <source>RPN Register Moved</source>
-        <translation>Регистр ПОЛИЗ перемещён</translation>
+        <translation type="unfinished">Registro RPN Movido</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="3941"/>
         <location filename="../src/qalculatewindow.cpp" line="3942"/>
         <source>Processing…</source>
-        <translation type="unfinished">Обработка…</translation>
+        <translation type="unfinished">Processando…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4043"/>
         <location filename="../src/qalculatewindow.cpp" line="5258"/>
         <source>Matrix</source>
-        <translation type="unfinished">Матрица</translation>
+        <translation type="unfinished">Matriz</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4144"/>
         <source>Temperature Calculation Mode</source>
-        <translation type="unfinished">Режим расчёта температуры</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4150"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
-        <translation type="unfinished">Выражение неоднозначное.
-Выберите режим расчёта температуры
-(режим позже можно изменить в настройках).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4153"/>
         <source>Absolute</source>
-        <translation type="unfinished">Абсолютный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4157"/>
         <source>Relative</source>
-        <translation type="unfinished">Относительный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4161"/>
         <source>Hybrid</source>
-        <translation type="unfinished">Гибридный</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4201"/>
         <source>Interpretation of dots</source>
-        <translation type="unfinished">Использование точки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4207"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
-        <translation type="unfinished">Выберите использование точки («.»)
-(позже это можно изменить в настройках).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4210"/>
         <source>Both dot and comma as decimal separators</source>
-        <translation type="unfinished">Точка и запятая в качестве десятичных разделителей</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4214"/>
         <source>Dot as thousands separator</source>
-        <translation type="unfinished">Точка как разделитель тысяч</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4218"/>
         <source>Only dot as decimal separator</source>
-        <translation type="unfinished">Только точка в качестве десятичного разделителя</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4722"/>
         <source>Gnuplot was not found</source>
-        <translation type="unfinished">Программа Gnuplot не найдена</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4722"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
-        <translation type="unfinished">%1 (%2) должен быть установлен отдельно и находиться по переменной окружения PATH, чтобы график работал.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4906"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
-        <translation type="unfinished">Пример:</translation>
+        <translation type="unfinished">Exemplo:</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4937"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
-        <translation type="unfinished">Ввод</translation>
+        <translation type="unfinished">Enter</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4937"/>
         <source>Calculate</source>
-        <translation type="unfinished">Рассчитать</translation>
+        <translation type="unfinished">Calcular</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4938"/>
         <source>Apply to Stack</source>
-        <translation type="unfinished">Применить к стеку</translation>
+        <translation type="unfinished">Aplicar à pilha</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4938"/>
         <source>Insert</source>
-        <translation type="unfinished">Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4940"/>
         <source>Keep open</source>
-        <translation type="unfinished">Держать открытым</translation>
+        <translation type="unfinished">Manter aberto</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4961"/>
         <source>Value</source>
-        <translation type="unfinished">Значение</translation>
+        <translation type="unfinished">Valor</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4963"/>
         <source>Argument</source>
-        <translation type="unfinished">Аргумент</translation>
+        <translation type="unfinished">Argumento</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4976"/>
         <source>%1:</source>
-        <translation type="unfinished">%1:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5038"/>
         <source>True</source>
-        <translation type="unfinished">Истина</translation>
+        <translation type="unfinished">Verdadeiro</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5041"/>
         <source>False</source>
-        <translation type="unfinished">Ложь</translation>
+        <translation type="unfinished">Falso</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5070"/>
         <source>Info</source>
-        <translation type="unfinished">Инфо</translation>
+        <translation type="unfinished">Informação</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5108"/>
         <location filename="../src/qalculatewindow.cpp" line="5118"/>
         <source>optional</source>
         <comment>optional argument</comment>
-        <translation type="unfinished">необязательный</translation>
+        <translation type="unfinished">opcional</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5447"/>
         <source>Failed to open %1.
 %2</source>
-        <translation type="unfinished">Не удалось открыть %1.
-%2</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8408,66 +8176,66 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/unitsdialog.cpp" line="36"/>
         <source>Units</source>
-        <translation type="unfinished">Единицы измерения</translation>
+        <translation type="unfinished">Unidades</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="45"/>
         <source>Category</source>
-        <translation type="unfinished">Категория</translation>
+        <translation type="unfinished">Categoria</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="60"/>
         <location filename="../src/unitsdialog.cpp" line="504"/>
         <source>Unit</source>
-        <translation type="unfinished">Единица измерения</translation>
+        <translation type="unfinished">Unidade</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="77"/>
         <source>New…</source>
-        <translation type="unfinished">Новый…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="79"/>
         <source>Edit…</source>
-        <translation type="unfinished">Правка…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="80"/>
         <location filename="../src/unitsdialog.cpp" line="389"/>
         <location filename="../src/unitsdialog.cpp" line="392"/>
         <source>Deactivate</source>
-        <translation type="unfinished">Деактивировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="81"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="unfinished">Excluir</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="83"/>
         <source>Convert</source>
-        <translation type="unfinished">Перевести</translation>
+        <translation type="unfinished">Converter</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="84"/>
         <source>Insert</source>
-        <translation type="unfinished">Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="394"/>
         <source>Activate</source>
-        <translation type="unfinished">Активировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="580"/>
         <source>All</source>
         <comment>All units</comment>
-        <translation type="unfinished">Все</translation>
+        <translation type="unfinished">Todas</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="623"/>
         <source>Uncategorized</source>
-        <translation type="unfinished">Без категорий</translation>
+        <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="629"/>
@@ -8477,7 +8245,7 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/unitsdialog.cpp" line="636"/>
         <source>Inactive</source>
-        <translation type="unfinished">Неактивный</translation>
+        <translation type="unfinished">Inativo</translation>
     </message>
 </context>
 <context>
@@ -8485,7 +8253,7 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="30"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="33"/>
@@ -8495,12 +8263,12 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="36"/>
         <source>Type:</source>
-        <translation type="unfinished">Тип:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="44"/>
         <source>Sign:</source>
-        <translation type="unfinished">Знак:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="95"/>
@@ -8513,18 +8281,17 @@ Please select temperature calculation mode
         <location filename="../src/unknowneditdialog.cpp" line="127"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished">Единица измерения или переменная или  с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="169"/>
         <source>Edit Unknown Variable</source>
-        <translation type="unfinished">Изменить переменную неизвестного</translation>
+        <translation type="unfinished">Editar Variável Desconhecida</translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="182"/>
         <source>New Unknown Variable</source>
-        <translation type="unfinished">Новая переменная неизвестного</translation>
+        <translation type="unfinished">Nova variável desconhecida</translation>
     </message>
 </context>
 <context>
@@ -8532,7 +8299,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="30"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="33"/>
@@ -8542,12 +8309,12 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="45"/>
         <source>Value:</source>
-        <translation type="unfinished">Значение:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="48"/>
         <source>current result</source>
-        <translation type="unfinished">текущий результат</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="75"/>
@@ -8560,19 +8327,18 @@ Do you want to overwrite it?</source>
         <location filename="../src/variableeditdialog.cpp" line="107"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished">Единица измерения или переменная или  с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="180"/>
         <source>Edit Variable</source>
-        <translation type="unfinished">Изменить переменную</translation>
+        <translation type="unfinished">Editar Variável</translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="194"/>
         <location filename="../src/variableeditdialog.cpp" line="228"/>
         <source>New Variable</source>
-        <translation type="unfinished">Новая переменная</translation>
+        <translation type="unfinished">Nova Variável</translation>
     </message>
 </context>
 <context>
@@ -8580,23 +8346,23 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variablesdialog.cpp" line="36"/>
         <source>Variables</source>
-        <translation type="unfinished">Переменные</translation>
+        <translation type="unfinished">Variáveis</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="45"/>
         <source>Category</source>
-        <translation type="unfinished">Категория</translation>
+        <translation type="unfinished">Categoria</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="60"/>
         <location filename="../src/variablesdialog.cpp" line="401"/>
         <source>Variable</source>
-        <translation type="unfinished">Переменная</translation>
+        <translation type="unfinished">Variável</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="77"/>
         <source>New</source>
-        <translation type="unfinished">Новый</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="79"/>
@@ -8606,39 +8372,39 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variablesdialog.cpp" line="80"/>
         <source>Unknown Variable…</source>
-        <translation type="unfinished">Переменная неизвестного…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="81"/>
         <source>Matrix…</source>
-        <translation type="unfinished">Матрица…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="83"/>
         <source>Edit…</source>
-        <translation type="unfinished">Правка…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="84"/>
         <source>Export…</source>
-        <translation type="unfinished">Экспортировать…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="85"/>
         <location filename="../src/variablesdialog.cpp" line="335"/>
         <location filename="../src/variablesdialog.cpp" line="338"/>
         <source>Deactivate</source>
-        <translation type="unfinished">Деактивировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="86"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation type="unfinished">Excluir</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="88"/>
         <source>Insert</source>
-        <translation type="unfinished">Вставить</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="286"/>
@@ -8653,88 +8419,88 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variablesdialog.cpp" line="306"/>
         <source>positive</source>
-        <translation type="unfinished">положительное</translation>
+        <translation type="unfinished">positivo</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="307"/>
         <source>non-positive</source>
-        <translation type="unfinished">не положительное</translation>
+        <translation type="unfinished">não-positivo</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="308"/>
         <source>negative</source>
-        <translation type="unfinished">отрицательное</translation>
+        <translation type="unfinished">negativo</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="309"/>
         <source>non-negative</source>
-        <translation type="unfinished">неотрицательное</translation>
+        <translation type="unfinished">não-negativo</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="310"/>
         <source>non-zero</source>
-        <translation type="unfinished">ненулевое</translation>
+        <translation type="unfinished">diferente de zero</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="316"/>
         <source>integer</source>
-        <translation type="unfinished">целое</translation>
+        <translation type="unfinished">inteiro</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="317"/>
         <source>boolean</source>
-        <translation type="unfinished">логическое</translation>
+        <translation type="unfinished">boleano</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="318"/>
         <source>rational</source>
-        <translation type="unfinished">рациональное</translation>
+        <translation type="unfinished">racional</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="319"/>
         <source>real</source>
-        <translation type="unfinished">вещественное</translation>
+        <translation type="unfinished">real</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="320"/>
         <source>complex</source>
-        <translation type="unfinished">комплексное</translation>
+        <translation type="unfinished">complexo</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="321"/>
         <source>number</source>
-        <translation type="unfinished">число</translation>
+        <translation type="unfinished">número</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="322"/>
         <source>not matrix</source>
-        <translation type="unfinished">не матрица</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="325"/>
         <source>unknown</source>
-        <translation type="unfinished">неизвестное</translation>
+        <translation type="unfinished">desconhecido</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="328"/>
         <source>Default assumptions</source>
-        <translation type="unfinished">Предположения по умолчанию</translation>
+        <translation type="unfinished">Suposições padrão</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="340"/>
         <source>Activate</source>
-        <translation type="unfinished">Активировать</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="458"/>
         <source>All</source>
         <comment>All variables</comment>
-        <translation type="unfinished">Все</translation>
+        <translation type="unfinished">Todas</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="501"/>
         <source>Uncategorized</source>
-        <translation type="unfinished">Без категорий</translation>
+        <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="507"/>
@@ -8744,7 +8510,7 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variablesdialog.cpp" line="514"/>
         <source>Inactive</source>
-        <translation type="unfinished">Неактивный</translation>
+        <translation type="unfinished">Inativo</translation>
     </message>
 </context>
 </TS>

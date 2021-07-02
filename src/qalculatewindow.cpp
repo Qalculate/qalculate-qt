@@ -2381,28 +2381,35 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(scom, "rpn")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
 				remove_blank_ends(str);
-				/*if(equalsIgnoreCase(str, "syntax")) {
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_mode")), FALSE);
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_syntax")), TRUE);
+				if(equalsIgnoreCase(str, "syntax")) {
+					settings->evalops.parse_options.parsing_mode = PARSING_MODE_RPN;
+					QAction *w = findChild<QAction*>("action_normalmode");
+					if(w) w->setChecked(true);
+					expressionFormatUpdated(false);
 				} else if(equalsIgnoreCase(str, "stack")) {
 					if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN) {
-						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_adaptive_parsing")), TRUE);
+						settings->evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
 					}
-					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_mode")), TRUE);
+					QAction *w = findChild<QAction*>("action_rpnmode");
+					if(w) w->setChecked(true);
 				} else {
 					int v = s2b(str);
 					if(v < 0) {
 						CALCULATOR->error(true, "Illegal value: %s.", str.c_str(), NULL);
 					} else if(v) {
-						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_syntax")), TRUE);
-						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_mode")), TRUE);
+						QAction *w = findChild<QAction*>("action_rpnmode");
+						if(w) w->setChecked(true);
+						settings->evalops.parse_options.parsing_mode = PARSING_MODE_RPN;
+						expressionFormatUpdated(false);
 					} else {
 						if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN) {
-							gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_adaptive_parsing")), TRUE);
+							settings->evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
 						}
-						gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(gtk_builder_get_object(main_builder, "menu_item_rpn_mode")), FALSE);
+						QAction *w = findChild<QAction*>("action_normalmode");
+						if(w) w->setChecked(true);
+						expressionFormatUpdated(false);
 					}
-				}*/
+				}
 			} else if(equalsIgnoreCase(str, "exrates")) {
 				if(current_expr) setPreviousExpression();
 				fetchExchangeRates();
@@ -2410,10 +2417,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				rpnDock->show();
 				rpnDock->raise();
 			} else if(equalsIgnoreCase(str, "swap")) {
-				/*if(CALCULATOR->RPNStackSize() > 1) {
-					gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-					on_button_registerswap_clicked(NULL, NULL);
-				}*/
+				if(CALCULATOR->RPNStackSize() > 1) {
+					rpnView->selectionModel()->clear();
+					registerSwap();
+				}
 			} else if(equalsIgnoreCase(scom, "swap")) {
 				if(CALCULATOR->RPNStackSize() > 1) {
 					int index1 = 0, index2 = 0;
@@ -2438,39 +2445,39 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						CALCULATOR->error(true, "Unsupported command: %s.", str.c_str(), NULL);
 					} else if(index1 != index2) {
 						if(index1 == 1) index1 = index2;
-						/*GtkTreeIter iter;
-						if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, index1 - 1)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)), &iter);
-							on_button_registerswap_clicked(NULL, NULL);
-							gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-						}*/
+						QTableWidgetItem *item = rpnView->item(index1 - 1, 0);
+						if(item) {
+							rpnView->selectionModel()->clear();
+							item->setSelected(true);
+							registerSwap();
+						}
 					}
 				}
 			} else if(equalsIgnoreCase(scom, "move")) {
 				CALCULATOR->error(true, "Unsupported command: %s.", scom.c_str(), NULL);
 			} else if(equalsIgnoreCase(str, "rotate")) {
 				if(CALCULATOR->RPNStackSize() > 1) {
-					/*gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-					on_button_registerdown_clicked(NULL, NULL);*/
+					rpnView->selectionModel()->clear();
+					registerDown();
 				}
 			} else if(equalsIgnoreCase(scom, "rotate")) {
 				if(CALCULATOR->RPNStackSize() > 1) {
 					str = str.substr(ispace + 1, slen - (ispace + 1));
 					remove_blank_ends(str);
-					/*if(equalsIgnoreCase(str, "up")) {
-						gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-						on_button_registerup_clicked(NULL, NULL);
+					if(equalsIgnoreCase(str, "up")) {
+						rpnView->selectionModel()->clear();
+						registerUp();
 					} else if(equalsIgnoreCase(str, "down")) {
-						gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-						on_button_registerdown_clicked(NULL, NULL);
+						rpnView->selectionModel()->clear();
+						registerDown();
 					} else {
 						CALCULATOR->error(true, "Illegal value: %s.", str.c_str(), NULL);
-					}*/
+					}
 				}
 			} else if(equalsIgnoreCase(str, "copy")) {
 				if(CALCULATOR->RPNStackSize() > 0) {
-					/*gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-					on_button_copyregister_clicked(NULL, NULL);*/
+					rpnView->selectionModel()->clear();
+					copyRegister();
 				}
 			} else if(equalsIgnoreCase(scom, "copy")) {
 				if(CALCULATOR->RPNStackSize() > 0) {
@@ -2481,20 +2488,20 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(index1 <= 0 || index1 > (int) CALCULATOR->RPNStackSize()) {
 						CALCULATOR->error(true, "Missing stack index: %s.", i2s(index1).c_str(), NULL);
 					} else {
-						/*GtkTreeIter iter;
-						if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, index1 - 1)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)), &iter);
-							on_button_copyregister_clicked(NULL, NULL);
-							gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-						}*/
+						QTableWidgetItem *item = rpnView->item(index1 - 1, 0);
+						if(item) {
+							rpnView->selectionModel()->clear();
+							item->setSelected(true);
+							copyRegister();
+						}
 					}
 				}
 			} else if(equalsIgnoreCase(str, "clear stack")) {
-				//if(CALCULATOR->RPNStackSize() > 0) on_button_clearstack_clicked(NULL, NULL);
+				if(CALCULATOR->RPNStackSize() > 0) clearStack();
 			} else if(equalsIgnoreCase(str, "pop")) {
 				if(CALCULATOR->RPNStackSize() > 0) {
-					/*gtk_tree_selection_unselect_all(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)));
-					on_button_deleteregister_clicked(NULL, NULL);*/
+					rpnView->selectionModel()->clear();
+					deleteRegister();
 				}
 			} else if(equalsIgnoreCase(scom, "pop")) {
 				if(CALCULATOR->RPNStackSize() > 0) {
@@ -2504,11 +2511,12 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(index1 <= 0 || index1 > (int) CALCULATOR->RPNStackSize()) {
 						CALCULATOR->error(true, "Missing stack index: %s.", i2s(index1).c_str(), NULL);
 					} else {
-						/*GtkTreeIter iter;
-						if(gtk_tree_model_iter_nth_child(GTK_TREE_MODEL(stackstore), &iter, NULL, index1 - 1)) {
-							gtk_tree_selection_select_iter(gtk_tree_view_get_selection(GTK_TREE_VIEW(stackview)), &iter);
-							on_button_deleteregister_clicked(NULL, NULL);
-						}*/
+						QTableWidgetItem *item = rpnView->item(index1 - 1, 0);
+						if(item) {
+							rpnView->selectionModel()->clear();
+							item->setSelected(true);
+							deleteRegister();
+						}
 					}
 				}
 			} else if(equalsIgnoreCase(str, "factor")) {

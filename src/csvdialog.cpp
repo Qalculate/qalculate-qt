@@ -140,7 +140,7 @@ bool CSVDialog::importExport() {
 	std::string namestr = nameEdit->text().trimmed().toStdString();
 	if(b_import) {
 		if(CALCULATOR->variableNameTaken(namestr)) {
-			if(QMessageBox::question(this, tr("Question"), tr("An unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+			if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 				nameEdit->setFocus();
 				return false;
 			}

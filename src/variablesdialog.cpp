@@ -319,7 +319,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 						case ASSUMPTION_TYPE_REAL: {value += tr("real"); break;}
 						case ASSUMPTION_TYPE_COMPLEX: {value += tr("complex"); break;}
 						case ASSUMPTION_TYPE_NUMBER: {value += tr("number"); break;}
-						case ASSUMPTION_TYPE_NONMATRIX: {value += tr("non-matrix"); break;}
+						case ASSUMPTION_TYPE_NONMATRIX: {value += tr("not matrix"); break;}
 						default: {}
 					}
 					if(value.isEmpty()) value = tr("unknown");

@@ -671,9 +671,16 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 	completionView->setItemDelegateForColumn(0, delegate);
 	completionView->setItemDelegateForColumn(1, delegate);
 	completer->setPopup(completionView);
-	completionTimer = new QTimer(this);
-	completionTimer->setSingleShot(true);
-	connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
+	if(settings->completion_delay > 0) {
+		completionTimer = new QTimer(this);
+		completionTimer->setSingleShot(true);
+		connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
+	} else {
+		completionTimer = NULL;
+	}
+	toolTipTimer = new QTimer(this);
+	toolTipTimer->setSingleShot(true);
+	connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
 	connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 	connect(completer, SIGNAL(activated(const QModelIndex&)), this, SLOT(onCompletionActivated(const QModelIndex&)));
@@ -1048,7 +1055,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_CONVERT_STRING("bijective")
 	COMPLETION_APPEND(str1, tr("Bijective Base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Binary Bumber"), 202, NULL)
+	COMPLETION_APPEND(str1, tr("Binary Number"), 202, NULL)
 	COMPLETION_CONVERT_STRING("calendars")
 	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
@@ -1084,7 +1091,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_CONVERT_STRING("octal") str1 += " <i>"; str1 += "oct"; str1 += "</i>";
 	COMPLETION_APPEND(str1, tr("Octal Number"), 208, NULL)
 	COMPLETION_CONVERT_STRING("optimal")
-	COMPLETION_APPEND(str1, tr("Optimal Units"), 100, NULL)
+	COMPLETION_APPEND(str1, tr("Optimal Unit"), 100, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
 	COMPLETION_APPEND(str1, tr("Expanded Partial Fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
@@ -1109,7 +1116,9 @@ void ExpressionEdit::setExpression(std::string str) {
 void ExpressionEdit::setExpression(const QString &str) {
 	block_add_to_undo++;
 	setCursorWidth(0);
+	block_text_change++;
 	clear();
+	block_text_change--;
 	block_add_to_undo--;
 	insertPlainText(str);
 	setCursorWidth(1);
@@ -1520,8 +1529,13 @@ void ExpressionEdit::enableIM() {
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 }
 void ExpressionEdit::blockCompletion(bool b) {
-	if(b) {completionTimer->stop(); completionView->hide(); completion_blocked++;}
-	else completion_blocked--;
+	if(b) {
+		if(completionTimer) completionTimer->stop();
+		completionView->hide();
+		completion_blocked++;
+	} else {
+		completion_blocked--;
+	}
 }
 void ExpressionEdit::blockParseStatus(bool b) {
 	if(b) {QToolTip::hideText(); parse_blocked++;}
@@ -1531,16 +1545,28 @@ void ExpressionEdit::blockUndo(bool b) {
 	if(b) block_add_to_undo++;
 	else block_add_to_undo--;
 }
-void ExpressionEdit::setStatusText(QString text) {
-	if(completionView->isVisible() || text.isEmpty()) {
+void ExpressionEdit::showCurrentStatus() {
+	if(!expression_has_changed || completionView->isVisible() || current_status_text.isEmpty()) {
+		QToolTip::hideText();
+	} else {
+		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), current_status_text);
+	}
+}
+void ExpressionEdit::setStatusText(const QString &text) {
+	if(toolTipTimer) toolTipTimer->stop();
+	if(text.isEmpty()) {
 		QToolTip::hideText();
 	} else if(settings->display_expression_status) {
+		QToolTip::hideText();
 		if(text.length() >= 30) {
-			text.replace("\n", "<br>");
-			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text.length() >= 60 ? ("<font size=\"-1\">" + text + "</font>") : ("<font size=\"+0\">" + text + "</font>"));
+			current_status_text = "<font size=\"-1\">";
+			current_status_text += text;
+			current_status_text += "</font>";
+			current_status_text.replace("\n", "<br>");
 		} else {
-			QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), text);
+			current_status_text = text;
 		}
+		toolTipTimer->start(500);
 	}
 }
 
@@ -1621,26 +1647,29 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	setStatusText(str);
 	return true;
 }
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(parse_blocked) return;
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
 	if(block_display_parse) return;
-	QString qtext = toPlainText();
-	std::string text = qtext.toStdString(), str_f;
-	if(text.empty()) {
+	if(document()->isEmpty()) {
 		setStatusText("");
 		prev_parsed_expression = "";
 		expression_has_changed2 = false;
 		return;
 	}
-	std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options);
-	if(!to_str.empty() && text.empty()) {
-		text = CALCULATOR->f_message->referenceName();
-		text += "(";
-		text += to_str;
-		text += ")";
+	QString qtext = toPlainText();
+	std::string text = qtext.toStdString(), str_f;
+	if(text.find("#") != std::string::npos) {
+		std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options);
+		if(!to_str.empty() && text.empty()) {
+			text = CALCULATOR->f_message->referenceName();
+			text += "(";
+			text += to_str;
+			text += ")";
+		}
 	}
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
@@ -1839,9 +1868,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("bijective base-26").toStdString();
 				} else if(equalsIgnoreCase(str_u, "sexa") || equalsIgnoreCase(str_u, "sexa2") || equalsIgnoreCase(str_u, "sexa3") || equalsIgnoreCase(str_u, "sexagesimal") || equalsIgnoreCase(str_u, tr("sexagesimal").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "sexagesimal", tr("sexagesimal"), "2") || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "sexagesimal", tr("sexagesimal"), "3")) {
 					parsed_expression += tr("sexagesimal number").toStdString();
-				} else if(equalsIgnoreCase(str_u, "latitude") || equalsIgnoreCase(str_u, tr("latitude").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "latitude", tr("latitude"), "2")) {
+				} else if(equalsIgnoreCase(str_u, "latitude") || equalsIgnoreCase(str_u, tr("latitude").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "latitude", tr("latitude"), "2")) {
 					parsed_expression += tr("latitude").toStdString();
-				} else if(equalsIgnoreCase(str_u, "longitude") || equalsIgnoreCase(str_u, tr("longitude").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(to_str, "longitude", tr("longitude"), "2")) {
+				} else if(equalsIgnoreCase(str_u, "longitude") || equalsIgnoreCase(str_u, tr("longitude").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "longitude", tr("longitude"), "2")) {
 					parsed_expression += tr("longitude").toStdString();
 				} else if(equalsIgnoreCase(str_u, "fp32") || equalsIgnoreCase(str_u, "binary32") || equalsIgnoreCase(str_u, "float")) {
 					parsed_expression += tr("32-bit floating point").toStdString();
@@ -2025,7 +2054,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 }
 
 void ExpressionEdit::onTextChanged() {
-	completionTimer->stop();
+	if(completionTimer) completionTimer->stop();
 	if(block_text_change) return;
 	QString str = toPlainText();
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
@@ -2060,6 +2089,11 @@ void ExpressionEdit::onTextChanged() {
 			CALCULATOR->separateToExpression(str_from, str_to, settings->evalops, true, true);
 			if(str_to.empty()) b2 = true;
 		}
+		if(!completionTimer) {
+			completionTimer = new QTimer(this);
+			completionTimer->setSingleShot(true);
+			connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
+		}
 		if(b2) complete();
 		else completionTimer->start(settings->completion_delay);
 	} else {
@@ -2080,7 +2114,7 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 }
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
-	completionTimer->stop();
+	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
 	if(mstruct_from) {
@@ -2292,7 +2326,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 }
 
 void ExpressionEdit::onCursorPositionChanged() {
-	completionTimer->stop();
+	if(completionTimer) completionTimer->stop();
 	if(block_text_change) return;
 	cursor_has_moved = true;
 	int epos = toPlainText().length() - textCursor().position();
@@ -2303,6 +2337,7 @@ void ExpressionEdit::onCursorPositionChanged() {
 	displayParseStatus();
 }
 void ExpressionEdit::highlightParentheses() {
+	if(document()->isEmpty()) return;
 	if(parentheses_highlighted) {
 		block_text_change++;
 		QTextCursor cur = textCursor();

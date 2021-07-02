@@ -111,7 +111,6 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	graphsTable = new QTreeWidget(this); grid->addWidget(graphsTable, r, 0, 1, 2);
 	grid->setRowStretch(r, 1); r++;
 	graphsTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	graphsTable->headerItem()->setText(0, tr("Category"));
 	graphsTable->setColumnCount(2);
 	QStringList list; list << tr("Title"); list << tr("Expression");
 	graphsTable->setHeaderLabels(list);
