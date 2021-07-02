@@ -1038,69 +1038,69 @@ void ExpressionEdit::updateCompletion() {
 #define COMPLETION_CONVERT_STRING(x) str1 = tr(x); if(str1 != x) {str1 += " <i>"; str1 += x; str1 += "</i>";}
 #define COMPLETION_CONVERT_STRING2(x, y) str1 = tr(x); if(str1 != x) {str1 += " <i>"; str1 += x; str1 += "</i>";} str2 = tr(y); str1 += " <i>"; str1 += str2; str1 += "</i>"; if(str2 != y) {str1 += " <i>"; str1 += y; str1 += "</i>";}
 	COMPLETION_CONVERT_STRING2("angle", "phasor")
-	COMPLETION_APPEND(str1, tr("Complex angle/phasor notation"), 400, NULL)
+	COMPLETION_APPEND(str1, tr("Complex Angle/Phasor Notation"), 400, NULL)
 	/*COMPLETION_CONVERT_STRING("bases")
 	COMPLETION_APPEND(str1, tr("Number bases"), 201, NULL)*/
 	COMPLETION_CONVERT_STRING("base")
 	COMPLETION_APPEND(str1, tr("Base units"), 101, NULL)
 	COMPLETION_CONVERT_STRING("base ")
-	COMPLETION_APPEND(str1, tr("Number base"), 200, NULL)
+	COMPLETION_APPEND(str1, tr("Number Base"), 200, NULL)
 	COMPLETION_CONVERT_STRING("bijective")
-	COMPLETION_APPEND(str1, tr("Bijective base-26"), 290, NULL)
+	COMPLETION_APPEND(str1, tr("Bijective Base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Binary number"), 202, NULL)
+	COMPLETION_APPEND(str1, tr("Binary Bumber"), 202, NULL)
 	COMPLETION_CONVERT_STRING("calendars")
 	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
-	COMPLETION_APPEND(str1, tr("Complex cis form"), 401, NULL)
+	COMPLETION_APPEND(str1, tr("Complex cis Form"), 401, NULL)
 	COMPLETION_CONVERT_STRING("decimal") str1 += " <i>"; str1 += "dec"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Decimal number"), 210, NULL)
+	COMPLETION_APPEND(str1, tr("Decimal Number"), 210, NULL)
 	COMPLETION_CONVERT_STRING("duodecimal") str1 += " <i>"; str1 += "duo"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Duodecimal number"), 212, NULL)
+	COMPLETION_APPEND(str1, tr("Duodecimal Number"), 212, NULL)
 	COMPLETION_CONVERT_STRING("exponential")
-	COMPLETION_APPEND(str1, tr("Complex exponential form"), 402, NULL)
+	COMPLETION_APPEND(str1, tr("Complex Exponential Form"), 402, NULL)
 	COMPLETION_CONVERT_STRING("factors")
 	COMPLETION_APPEND(str1, tr("Factors"), 600, NULL)
 	COMPLETION_CONVERT_STRING("fp16") str1 += " <i>"; str1 += "binary16"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("16-bit floating point binary format"), 310, NULL)
+	COMPLETION_APPEND(str1, tr("16-bit Floating Point Binary Format"), 310, NULL)
 	COMPLETION_CONVERT_STRING("fp32") str1 += " <i>"; str1 += "binary32"; str1 += "</i>"; str1 += " <i>"; str1 += "float"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("32-bit floating point binary format"), 311, NULL)
+	COMPLETION_APPEND(str1, tr("32-bit Floating Point Binary Format"), 311, NULL)
 	COMPLETION_CONVERT_STRING("fp64") str1 += " <i>"; str1 += "binary64"; str1 += "</i>"; str1 += " <i>"; str1 += "double"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("64-bit floating point binary format"), 312, NULL)
+	COMPLETION_APPEND(str1, tr("64-bit Floating Point Binary Format"), 312, NULL)
 	COMPLETION_CONVERT_STRING("fp80");
-	COMPLETION_APPEND(str1, tr("80-bit (x86) floating point binary format"), 313, NULL)
+	COMPLETION_APPEND(str1, tr("80-bit (x86) Floating Point Binary Format"), 313, NULL)
 	COMPLETION_CONVERT_STRING("fp128") str1 += " <i>"; str1 += "binary128"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("128-bit floating point binary format"), 314, NULL)
+	COMPLETION_APPEND(str1, tr("128-bit Floating Point Binary Format"), 314, NULL)
 	COMPLETION_CONVERT_STRING("fraction")
 	COMPLETION_APPEND(str1, tr("Fraction"), 300, NULL)
 	COMPLETION_CONVERT_STRING("hexadecimal") str1 += " <i>"; str1 += "hex"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Hexadecimal number"), 216, NULL)
+	COMPLETION_APPEND(str1, tr("Hexadecimal Number"), 216, NULL)
 	COMPLETION_CONVERT_STRING("latitude") str1 += " <i>"; str1 += "latitude2"; str1 += "</i>";
 	COMPLETION_APPEND(str1, tr("Latitude"), 294, NULL)
 	COMPLETION_CONVERT_STRING("longitude") str1 += " <i>"; str1 += "longitude2"; str1 += "</i>";
 	COMPLETION_APPEND(str1, tr("Longitude"), 294, NULL)
 	COMPLETION_CONVERT_STRING("mixed")
-	COMPLETION_APPEND(str1, tr("Mixed units"), 102, NULL)
+	COMPLETION_APPEND(str1, tr("Mixed Units"), 102, NULL)
 	COMPLETION_CONVERT_STRING("octal") str1 += " <i>"; str1 += "oct"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Octal number"), 208, NULL)
+	COMPLETION_APPEND(str1, tr("Octal Number"), 208, NULL)
 	COMPLETION_CONVERT_STRING("optimal")
-	COMPLETION_APPEND(str1, tr("Optimal units"), 100, NULL)
+	COMPLETION_APPEND(str1, tr("Optimal Units"), 100, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
-	COMPLETION_APPEND(str1, tr("Expanded partial fractions"), 601, NULL)
+	COMPLETION_APPEND(str1, tr("Expanded Partial Fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
-	COMPLETION_APPEND(str1, tr("Complex polar form"), 403, NULL)
+	COMPLETION_APPEND(str1, tr("Complex Polar Form"), 403, NULL)
 	COMPLETION_CONVERT_STRING2("rectangular", "cartesian")
-	COMPLETION_APPEND(str1, tr("Complex rectangular form"), 404, NULL)
+	COMPLETION_APPEND(str1, tr("Complex Rectangular Form"), 404, NULL)
 	COMPLETION_CONVERT_STRING("roman")
-	COMPLETION_APPEND(str1, tr("Roman numerals"), 280, NULL)
+	COMPLETION_APPEND(str1, tr("Roman Numerals"), 280, NULL)
 	COMPLETION_CONVERT_STRING("sexagesimal") str += " <i>"; str += "sexa"; str += "</i>"; str += " <i>"; str += "sexa2"; str += "</i>"; str += " <i>"; str += "sexa3"; str += "</i>";
-	COMPLETION_APPEND(str1, tr("Sexagesimal number"), 292, NULL)
+	COMPLETION_APPEND(str1, tr("Sexagesimal Number"), 292, NULL)
 	COMPLETION_CONVERT_STRING("time")
-	COMPLETION_APPEND(str1, tr("Time format"), 293, NULL)
+	COMPLETION_APPEND(str1, tr("Time Format"), 293, NULL)
 	COMPLETION_CONVERT_STRING("unicode")
 	COMPLETION_APPEND(str1, tr("Unicode"), 281, NULL)
 	COMPLETION_CONVERT_STRING("utc")
-	COMPLETION_APPEND(str1, tr("UTC time zone"), 501, NULL)
+	COMPLETION_APPEND(str1, tr("UTC Time Zone"), 501, NULL)
 }
 
 void ExpressionEdit::setExpression(std::string str) {

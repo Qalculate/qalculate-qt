@@ -46,7 +46,7 @@ HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h s
 
 SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
-TRANSLATIONS = translations/qalculate_sv.ts translations/qalculate_de.ts
+TRANSLATIONS = translations/qalculate-qt_sv.ts translations/qalculate-qt_de.ts translations/qalculate-qt_ru.ts
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 

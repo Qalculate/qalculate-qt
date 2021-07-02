@@ -31,7 +31,7 @@
 #include <QDebug>
 #include <locale.h>
 
-#include "libqalculate/qalculate.h"
+#include <libqalculate/qalculate.h>
 #include "qalculatewindow.h"
 #include "qalculateqtsettings.h"
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 	QalculateTranslator eqtr;
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
-		if(translator.load(QLocale(), QLatin1String("qalculate"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+		if(translator.load(QLocale(), QLatin1String("qalculate-qt"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
 		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
 		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
 	}
