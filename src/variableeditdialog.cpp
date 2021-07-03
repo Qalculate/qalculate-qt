@@ -44,7 +44,6 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	} else {
 		grid->addWidget(new QLabel(tr("Value:"), this), 1, 0);
 		valueEdit = new MathLineEdit(this);
-		valueEdit->setAlignment(Qt::AlignRight);
 		if(b_empty) valueEdit->setPlaceholderText(tr("current result"));
 		grid->addWidget(valueEdit, 1, 1);
 		connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));

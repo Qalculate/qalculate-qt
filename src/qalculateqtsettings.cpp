@@ -200,6 +200,7 @@ void QalculateQtSettings::loadPreferences() {
 	completion_delay = 500;
 	always_on_top = false;
 	display_expression_status = true;
+	expression_status_delay = 500;
 	prefixes_default = true;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
@@ -306,6 +307,9 @@ void QalculateQtSettings::loadPreferences() {
 					auto_update_exchange_rates = v;
 				} else if(svar == "display_expression_status") {
 					display_expression_status = v;
+				} else if(svar == "expression_status_delay") {
+					if(v < 0) v = 0;
+					expression_status_delay = v;
 				} else if(svar == "expression_history") {
 					expression_history.push_back(svalue);
 				} else if(svar == "enable_input_method") {
@@ -736,6 +740,7 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	//fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "display_expression_status=%i\n", display_expression_status);
+	fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
 	fprintf(file, "enable_completion2=%i\n", enable_completion2);
 	fprintf(file, "completion_min=%i\n", completion_min);

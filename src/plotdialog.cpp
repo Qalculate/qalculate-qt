@@ -57,7 +57,6 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	titleEdit = new QLineEdit(this); grid->addWidget(titleEdit, r, 1); r++;
 	grid->addWidget(new QLabel(tr("Expression:")), r, 0);
 	expressionEdit = new MathLineEdit(this); grid->addWidget(expressionEdit, r, 1); r++;
-	expressionEdit->setAlignment(Qt::AlignRight);
 	connect(expressionEdit, SIGNAL(textChanged(const QString&)), this, SLOT(enableDisableButtons()));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(onExpressionActivated()));
 	hbox = new QHBoxLayout(); grid->addLayout(hbox, r, 0, 1, 2); r++; hbox->addStretch(1); group = new QButtonGroup(this);
@@ -69,7 +68,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	rowsBox = new QCheckBox(tr("Rows"), this); hbox->addWidget(rowsBox); rowsBox->setChecked(settings->default_plot_rows); rowsBox->setEnabled(settings->default_plot_type > 0);
 	grid->addWidget(new QLabel(tr("X variable:")), r, 0);
 	variableEdit = new QLineEdit(this); grid->addWidget(variableEdit, r, 1); r++;
-	variableEdit->setAlignment(Qt::AlignRight); variableEdit->setText(QString::fromStdString(settings->default_plot_variable));
+	variableEdit->setText(QString::fromStdString(settings->default_plot_variable));
 	variableEdit->setEnabled(settings->default_plot_type == 0);
 	connect(variableEdit, SIGNAL(textChanged(const QString&)), this, SLOT(enableDisableButtons()));
 	grid->addWidget(new QLabel(tr("Style:")), r, 0);
@@ -122,11 +121,9 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	grid = new QGridLayout(tab); r = 0;
 	grid->addWidget(new QLabel(tr("Minimum x value:")), r, 0);
 	minxEdit = new MathLineEdit(this); grid->addWidget(minxEdit, r, 1); r++;
-	minxEdit->setAlignment(Qt::AlignRight);
 	minxEdit->setText(QString::fromStdString(settings->default_plot_min));
 	grid->addWidget(new QLabel(tr("Maximum x value:")), r, 0);
 	maxxEdit = new MathLineEdit(this); grid->addWidget(maxxEdit, r, 1); r++;
-	maxxEdit->setAlignment(Qt::AlignRight);
 	maxxEdit->setText(QString::fromStdString(settings->default_plot_max));
 	group = new QButtonGroup(this);
 	rateButton = new QRadioButton(tr("Sampling rate:"), this); group->addButton(rateButton, 0); grid->addWidget(rateButton, r, 0);
@@ -136,7 +133,6 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	rateSpin->setEnabled(settings->default_plot_use_sampling_rate);
 	stepButton = new QRadioButton(tr("Step size:"), this); group->addButton(stepButton, 1); grid->addWidget(stepButton, r, 0);
 	stepEdit = new MathLineEdit(this); grid->addWidget(stepEdit, r, 1); r++;
-	stepEdit->setAlignment(Qt::AlignRight);
 	stepEdit->setText(QString::fromStdString(settings->default_plot_step));
 	stepButton->setChecked(!settings->default_plot_use_sampling_rate);
 	stepEdit->setEnabled(!settings->default_plot_use_sampling_rate);

@@ -678,9 +678,13 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 	} else {
 		completionTimer = NULL;
 	}
-	toolTipTimer = new QTimer(this);
-	toolTipTimer->setSingleShot(true);
-	connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+	if(settings->expression_status_delay > 0) {
+		toolTipTimer = new QTimer(this);
+		toolTipTimer->setSingleShot(true);
+		connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+	} else {
+		toolTipTimer = NULL;
+	}
 	connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 	connect(completer, SIGNAL(activated(const QModelIndex&)), this, SLOT(onCompletionActivated(const QModelIndex&)));
@@ -1566,7 +1570,16 @@ void ExpressionEdit::setStatusText(const QString &text) {
 		} else {
 			current_status_text = text;
 		}
-		toolTipTimer->start(500);
+		if(settings->expression_status_delay > 0) {
+			if(!toolTipTimer) {
+				toolTipTimer = new QTimer(this);
+				toolTipTimer->setSingleShot(true);
+				connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+			}
+			toolTipTimer->start(500);
+		} else {
+			showCurrentStatus();
+		}
 	}
 }
 

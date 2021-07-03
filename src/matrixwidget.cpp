@@ -30,14 +30,12 @@ MatrixWidget::MatrixWidget(QWidget *parent, int r, int c) : QWidget(parent) {
 	rowsSpin = new QSpinBox(this);
 	rowsSpin->setRange(1, 10000);
 	rowsSpin->setValue(r);
-	rowsSpin->setAlignment(Qt::AlignRight);
 	hbox->addWidget(rowsSpin);
 	connect(rowsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixRowsChanged(int)));
 	hbox->addWidget(new QLabel(SIGN_MULTIPLICATION));
 	columnsSpin = new QSpinBox(this);
 	columnsSpin->setRange(1, 10000);
 	columnsSpin->setValue(c);
-	columnsSpin->setAlignment(Qt::AlignRight);
 	hbox->addWidget(columnsSpin);
 	connect(columnsSpin, SIGNAL(valueChanged(int)), this, SLOT(matrixColumnsChanged(int)));
 	matrixTable = new QTableWidget(this);

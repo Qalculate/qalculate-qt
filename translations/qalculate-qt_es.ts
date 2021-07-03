@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<TS version="2.1" language="es">
 <context>
     <name></name>
     <message>
@@ -5283,107 +5283,107 @@ Do you want to overwrite it?</source>
 <context>
     <name>ExpressionEdit</name>
     <message>
-        <location filename="../src/expressionedit.cpp" line="846"/>
+        <location filename="../src/expressionedit.cpp" line="850"/>
         <source>matrix</source>
         <translation>matriz</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="848"/>
+        <location filename="../src/expressionedit.cpp" line="852"/>
         <source>vector</source>
         <translation>vector</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="859"/>
+        <location filename="../src/expressionedit.cpp" line="863"/>
         <source>positive</source>
         <translation>positivo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="860"/>
+        <location filename="../src/expressionedit.cpp" line="864"/>
         <source>non-positive</source>
         <translation>no positivo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="861"/>
+        <location filename="../src/expressionedit.cpp" line="865"/>
         <source>negative</source>
         <translation>negativo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="862"/>
+        <location filename="../src/expressionedit.cpp" line="866"/>
         <source>non-negative</source>
         <translation>no negativo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="863"/>
+        <location filename="../src/expressionedit.cpp" line="867"/>
         <source>non-zero</source>
         <translation>no cero</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="868"/>
+        <location filename="../src/expressionedit.cpp" line="872"/>
         <source>boolean</source>
         <translation>booleano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="869"/>
+        <location filename="../src/expressionedit.cpp" line="873"/>
         <source>integer</source>
         <translation>entero</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="870"/>
+        <location filename="../src/expressionedit.cpp" line="874"/>
         <source>rational</source>
         <translation>racional</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="871"/>
+        <location filename="../src/expressionedit.cpp" line="875"/>
         <source>real</source>
         <translation>real</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="872"/>
+        <location filename="../src/expressionedit.cpp" line="876"/>
         <source>complex</source>
         <translation>complejo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="873"/>
+        <location filename="../src/expressionedit.cpp" line="877"/>
         <source>number</source>
         <translation>número</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="874"/>
+        <location filename="../src/expressionedit.cpp" line="878"/>
         <source>(not matrix)</source>
         <translation>(no matriz)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="877"/>
+        <location filename="../src/expressionedit.cpp" line="881"/>
         <source>unknown</source>
         <translation>desconocido</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="879"/>
+        <location filename="../src/expressionedit.cpp" line="883"/>
         <source>default assumptions</source>
         <translation>suposiciones predeterminadas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="994"/>
+        <location filename="../src/expressionedit.cpp" line="998"/>
         <source>Prefix:</source>
         <translation>Prefijo:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1048"/>
+        <location filename="../src/expressionedit.cpp" line="1052"/>
         <source>Complex Angle/Phasor Notation</source>
         <translation>Notación compleja de ángulo/fasor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1052"/>
+        <location filename="../src/expressionedit.cpp" line="1056"/>
         <source>Base units</source>
         <translation>Unidades base</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1054"/>
+        <location filename="../src/expressionedit.cpp" line="1058"/>
         <source>Number Base</source>
         <translation>Base numérica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1056"/>
+        <location filename="../src/expressionedit.cpp" line="1060"/>
         <source>Bijective Base-26</source>
         <translation>Base biyectiva 26</translation>
     </message>
@@ -5392,92 +5392,92 @@ Do you want to overwrite it?</source>
         <translation type="obsolete">número binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1058"/>
+        <location filename="../src/expressionedit.cpp" line="1062"/>
         <source>Binary Number</source>
         <translation>Número binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1060"/>
+        <location filename="../src/expressionedit.cpp" line="1064"/>
         <source>Calendars</source>
         <translation>Calendarios</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1062"/>
+        <location filename="../src/expressionedit.cpp" line="1066"/>
         <source>Complex cis Form</source>
         <translation>Forma compleja cis</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1064"/>
+        <location filename="../src/expressionedit.cpp" line="1068"/>
         <source>Decimal Number</source>
         <translation>Número decimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1066"/>
+        <location filename="../src/expressionedit.cpp" line="1070"/>
         <source>Duodecimal Number</source>
         <translation>Número duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1068"/>
+        <location filename="../src/expressionedit.cpp" line="1072"/>
         <source>Complex Exponential Form</source>
         <translation>Forma compleja exponencial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1070"/>
+        <location filename="../src/expressionedit.cpp" line="1074"/>
         <source>Factors</source>
         <translation>Factores</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1072"/>
+        <location filename="../src/expressionedit.cpp" line="1076"/>
         <source>16-bit Floating Point Binary Format</source>
         <translation>Formato binario de punto flotante de 16 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1074"/>
+        <location filename="../src/expressionedit.cpp" line="1078"/>
         <source>32-bit Floating Point Binary Format</source>
         <translation>Formato binario de punto flotante de 32 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1076"/>
+        <location filename="../src/expressionedit.cpp" line="1080"/>
         <source>64-bit Floating Point Binary Format</source>
         <translation>Formato binario de punto flotante de 64 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1078"/>
+        <location filename="../src/expressionedit.cpp" line="1082"/>
         <source>80-bit (x86) Floating Point Binary Format</source>
         <translation>Formato binario de punto flotante de 80 bits (x86)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1080"/>
+        <location filename="../src/expressionedit.cpp" line="1084"/>
         <source>128-bit Floating Point Binary Format</source>
         <translation>Formato binario de punto flotante de 128 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1082"/>
+        <location filename="../src/expressionedit.cpp" line="1086"/>
         <source>Fraction</source>
         <translation>Fracción</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1084"/>
+        <location filename="../src/expressionedit.cpp" line="1088"/>
         <source>Hexadecimal Number</source>
         <translation>Número hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1086"/>
+        <location filename="../src/expressionedit.cpp" line="1090"/>
         <source>Latitude</source>
         <translation type="unfinished">Latitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1088"/>
+        <location filename="../src/expressionedit.cpp" line="1092"/>
         <source>Longitude</source>
         <translation type="unfinished">Longitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1090"/>
+        <location filename="../src/expressionedit.cpp" line="1094"/>
         <source>Mixed Units</source>
         <translation>Unidades mixtas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1092"/>
+        <location filename="../src/expressionedit.cpp" line="1096"/>
         <source>Octal Number</source>
         <translation>Número octal</translation>
     </message>
@@ -5486,463 +5486,463 @@ Do you want to overwrite it?</source>
         <translation type="vanished">Unidades óptimas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1094"/>
+        <location filename="../src/expressionedit.cpp" line="1098"/>
         <source>Optimal Unit</source>
         <translation>Unidad óptima</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1096"/>
+        <location filename="../src/expressionedit.cpp" line="1100"/>
         <source>Expanded Partial Fractions</source>
         <translation>Fracciones parciales expandidas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1098"/>
+        <location filename="../src/expressionedit.cpp" line="1102"/>
         <source>Complex Polar Form</source>
         <translation>Forma compleja polar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1100"/>
+        <location filename="../src/expressionedit.cpp" line="1104"/>
         <source>Complex Rectangular Form</source>
         <translation>Forma compleja rectangular</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1102"/>
+        <location filename="../src/expressionedit.cpp" line="1106"/>
         <source>Roman Numerals</source>
         <translation>Números romanos</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1104"/>
+        <location filename="../src/expressionedit.cpp" line="1108"/>
         <source>Sexagesimal Number</source>
         <translation>Número sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1106"/>
+        <location filename="../src/expressionedit.cpp" line="1110"/>
         <source>Time Format</source>
         <translation>Formato de hora</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1108"/>
-        <location filename="../src/expressionedit.cpp" line="1888"/>
+        <location filename="../src/expressionedit.cpp" line="1112"/>
+        <location filename="../src/expressionedit.cpp" line="1901"/>
         <source>Unicode</source>
         <translation>Unicode</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1110"/>
+        <location filename="../src/expressionedit.cpp" line="1114"/>
         <source>UTC Time Zone</source>
         <translation type="unfinished">Huso horario UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1378"/>
+        <location filename="../src/expressionedit.cpp" line="1382"/>
         <source>Undo</source>
         <translation>Deshacer</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1381"/>
+        <location filename="../src/expressionedit.cpp" line="1385"/>
         <source>Redo</source>
         <translation>Rehacer</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1385"/>
+        <location filename="../src/expressionedit.cpp" line="1389"/>
         <source>Cut</source>
         <translation type="unfinished">Cortar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1388"/>
+        <location filename="../src/expressionedit.cpp" line="1392"/>
         <source>Copy</source>
         <translation>Copiar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1391"/>
+        <location filename="../src/expressionedit.cpp" line="1395"/>
         <source>Paste</source>
         <translation type="unfinished">Pegar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1394"/>
+        <location filename="../src/expressionedit.cpp" line="1398"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1398"/>
+        <location filename="../src/expressionedit.cpp" line="1402"/>
         <source>Insert Date…</source>
         <translation>Insertar fecha…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1399"/>
+        <location filename="../src/expressionedit.cpp" line="1403"/>
         <source>Insert Matrix…</source>
         <translation>Insertar matriz…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1401"/>
+        <location filename="../src/expressionedit.cpp" line="1405"/>
         <source>Select All</source>
         <translation type="unfinished">Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1404"/>
+        <location filename="../src/expressionedit.cpp" line="1408"/>
         <source>Clear</source>
         <translation>Limpiar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1408"/>
+        <location filename="../src/expressionedit.cpp" line="1412"/>
         <source>Completion</source>
         <translation>Completado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1420"/>
+        <location filename="../src/expressionedit.cpp" line="1424"/>
         <source>No completion</source>
         <translation>Sin completado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1421"/>
+        <location filename="../src/expressionedit.cpp" line="1425"/>
         <source>Limited strict completion</source>
         <translation>Completado estricto limitado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1422"/>
+        <location filename="../src/expressionedit.cpp" line="1426"/>
         <source>Strict completion</source>
         <translation>Completado estricto</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1423"/>
+        <location filename="../src/expressionedit.cpp" line="1427"/>
         <source>Limited full completion</source>
         <translation>Completado completo limitado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1424"/>
+        <location filename="../src/expressionedit.cpp" line="1428"/>
         <source>Full completion</source>
         <translation>Completado completo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1426"/>
+        <location filename="../src/expressionedit.cpp" line="1430"/>
         <source>Delayed completion</source>
         <translation type="unfinished">Completado retrasado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1427"/>
+        <location filename="../src/expressionedit.cpp" line="1431"/>
         <source>Enable input method</source>
         <translation type="unfinished">Habilitar método de entrada</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1459"/>
+        <location filename="../src/expressionedit.cpp" line="1463"/>
         <source>Matrix</source>
         <translation>Matriz</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1586"/>
+        <location filename="../src/expressionedit.cpp" line="1599"/>
         <source>Too many arguments for %1().</source>
         <translation>Demasiados argumentos para %1()</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1611"/>
+        <location filename="../src/expressionedit.cpp" line="1624"/>
         <source>argument</source>
         <translation>argumento</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1628"/>
+        <location filename="../src/expressionedit.cpp" line="1641"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1681"/>
+        <location filename="../src/expressionedit.cpp" line="1694"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1684"/>
+        <location filename="../src/expressionedit.cpp" line="1697"/>
         <source>MS (memory store)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1687"/>
+        <location filename="../src/expressionedit.cpp" line="1700"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1690"/>
+        <location filename="../src/expressionedit.cpp" line="1703"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1698"/>
-        <location filename="../src/expressionedit.cpp" line="1700"/>
+        <location filename="../src/expressionedit.cpp" line="1711"/>
+        <location filename="../src/expressionedit.cpp" line="1713"/>
         <source>factorize</source>
         <translation>factorizar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1701"/>
-        <location filename="../src/expressionedit.cpp" line="1703"/>
+        <location filename="../src/expressionedit.cpp" line="1714"/>
+        <location filename="../src/expressionedit.cpp" line="1716"/>
         <source>expand</source>
         <translation>expandir</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1855"/>
+        <location filename="../src/expressionedit.cpp" line="1868"/>
         <source>hexadecimal</source>
         <translation>hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1856"/>
-        <location filename="../src/expressionedit.cpp" line="1966"/>
+        <location filename="../src/expressionedit.cpp" line="1869"/>
+        <location filename="../src/expressionedit.cpp" line="1979"/>
         <source>hexadecimal number</source>
         <translation>número hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1857"/>
+        <location filename="../src/expressionedit.cpp" line="1870"/>
         <source>octal</source>
         <translation>octal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1858"/>
+        <location filename="../src/expressionedit.cpp" line="1871"/>
         <source>octal number</source>
         <translation>número octal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1859"/>
+        <location filename="../src/expressionedit.cpp" line="1872"/>
         <source>decimal</source>
         <translation>decimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1860"/>
+        <location filename="../src/expressionedit.cpp" line="1873"/>
         <source>decimal number</source>
         <translation>número decimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1861"/>
+        <location filename="../src/expressionedit.cpp" line="1874"/>
         <source>duodecimal</source>
         <translation>duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1862"/>
+        <location filename="../src/expressionedit.cpp" line="1875"/>
         <source>duodecimal number</source>
         <translation>número duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1863"/>
+        <location filename="../src/expressionedit.cpp" line="1876"/>
         <source>binary</source>
         <translation>binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1864"/>
-        <location filename="../src/expressionedit.cpp" line="1960"/>
+        <location filename="../src/expressionedit.cpp" line="1877"/>
+        <location filename="../src/expressionedit.cpp" line="1973"/>
         <source>binary number</source>
         <translation>número binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1865"/>
+        <location filename="../src/expressionedit.cpp" line="1878"/>
         <source>roman</source>
         <translation>romano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1866"/>
+        <location filename="../src/expressionedit.cpp" line="1879"/>
         <source>roman numerals</source>
         <translation>números romanos</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1867"/>
+        <location filename="../src/expressionedit.cpp" line="1880"/>
         <source>bijective</source>
         <translation>biyectivo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1868"/>
+        <location filename="../src/expressionedit.cpp" line="1881"/>
         <source>bijective base-26</source>
         <translation>base biyectiva 26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1869"/>
+        <location filename="../src/expressionedit.cpp" line="1882"/>
         <source>sexagesimal</source>
         <translation>sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1870"/>
+        <location filename="../src/expressionedit.cpp" line="1883"/>
         <source>sexagesimal number</source>
         <translation>número sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1871"/>
-        <location filename="../src/expressionedit.cpp" line="1872"/>
+        <location filename="../src/expressionedit.cpp" line="1884"/>
+        <location filename="../src/expressionedit.cpp" line="1885"/>
         <source>latitude</source>
         <translation type="unfinished">latitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1873"/>
-        <location filename="../src/expressionedit.cpp" line="1874"/>
+        <location filename="../src/expressionedit.cpp" line="1886"/>
+        <location filename="../src/expressionedit.cpp" line="1887"/>
         <source>longitude</source>
         <translation type="unfinished">longitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1876"/>
+        <location filename="../src/expressionedit.cpp" line="1889"/>
         <source>32-bit floating point</source>
         <translation>punto flotante de 32 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1878"/>
+        <location filename="../src/expressionedit.cpp" line="1891"/>
         <source>64-bit floating point</source>
         <translation>punto flotante de 64 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1880"/>
+        <location filename="../src/expressionedit.cpp" line="1893"/>
         <source>16-bit floating point</source>
         <translation>punto flotante de 16 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1882"/>
+        <location filename="../src/expressionedit.cpp" line="1895"/>
         <source>80-bit (x86) floating point</source>
         <translation>punto flotante de 80 bits (x86)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1884"/>
+        <location filename="../src/expressionedit.cpp" line="1897"/>
         <source>128-bit floating point</source>
         <translation>punto flotante de 128 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1885"/>
+        <location filename="../src/expressionedit.cpp" line="1898"/>
         <source>time</source>
         <translation>tiempo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1886"/>
+        <location filename="../src/expressionedit.cpp" line="1899"/>
         <source>time format</source>
         <translation>formato de tiempo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1889"/>
+        <location filename="../src/expressionedit.cpp" line="1902"/>
         <source>bases</source>
         <translation>bases</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1890"/>
+        <location filename="../src/expressionedit.cpp" line="1903"/>
         <source>number bases</source>
         <translation>bases numéricas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1891"/>
-        <location filename="../src/expressionedit.cpp" line="1892"/>
+        <location filename="../src/expressionedit.cpp" line="1904"/>
+        <location filename="../src/expressionedit.cpp" line="1905"/>
         <source>calendars</source>
         <translation>calendarios</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1893"/>
+        <location filename="../src/expressionedit.cpp" line="1906"/>
         <source>optimal</source>
         <translation type="unfinished">óptima</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1894"/>
+        <location filename="../src/expressionedit.cpp" line="1907"/>
         <source>optimal unit</source>
         <translation>unidad óptima</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1895"/>
-        <location filename="../src/expressionedit.cpp" line="1970"/>
+        <location filename="../src/expressionedit.cpp" line="1908"/>
+        <location filename="../src/expressionedit.cpp" line="1983"/>
         <source>base</source>
         <translation>base</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1896"/>
+        <location filename="../src/expressionedit.cpp" line="1909"/>
         <source>base units</source>
         <translation>unidades base</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1897"/>
+        <location filename="../src/expressionedit.cpp" line="1910"/>
         <source>mixed</source>
         <translation type="unfinished">mixtas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1898"/>
+        <location filename="../src/expressionedit.cpp" line="1911"/>
         <source>mixed units</source>
         <translation>unidades mixtas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1899"/>
-        <location filename="../src/expressionedit.cpp" line="1900"/>
+        <location filename="../src/expressionedit.cpp" line="1912"/>
+        <location filename="../src/expressionedit.cpp" line="1913"/>
         <source>fraction</source>
         <translation>fracción</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1901"/>
-        <location filename="../src/expressionedit.cpp" line="1902"/>
+        <location filename="../src/expressionedit.cpp" line="1914"/>
+        <location filename="../src/expressionedit.cpp" line="1915"/>
         <source>factors</source>
         <translation>factores</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1903"/>
+        <location filename="../src/expressionedit.cpp" line="1916"/>
         <source>partial fraction</source>
         <translation type="unfinished">fracción parcial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1904"/>
+        <location filename="../src/expressionedit.cpp" line="1917"/>
         <source>expanded partial fractions</source>
         <translation>fracciones parciales expandidas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1905"/>
+        <location filename="../src/expressionedit.cpp" line="1918"/>
         <source>rectangular</source>
         <translation>rectangular</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1905"/>
+        <location filename="../src/expressionedit.cpp" line="1918"/>
         <source>cartesian</source>
         <translation>cartesiano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1906"/>
+        <location filename="../src/expressionedit.cpp" line="1919"/>
         <source>complex rectangular form</source>
         <translation>forma compleja rectangular</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1907"/>
+        <location filename="../src/expressionedit.cpp" line="1920"/>
         <source>exponential</source>
         <translation>exponencial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1908"/>
+        <location filename="../src/expressionedit.cpp" line="1921"/>
         <source>complex exponential form</source>
         <translation>forma compleja exponencial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1909"/>
+        <location filename="../src/expressionedit.cpp" line="1922"/>
         <source>polar</source>
         <translation>polar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1910"/>
+        <location filename="../src/expressionedit.cpp" line="1923"/>
         <source>complex polar form</source>
         <translation>forma compleja polar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1912"/>
+        <location filename="../src/expressionedit.cpp" line="1925"/>
         <source>complex cis form</source>
         <translation>forma compleja cis</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1913"/>
+        <location filename="../src/expressionedit.cpp" line="1926"/>
         <source>angle</source>
         <translation>ángulo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1914"/>
+        <location filename="../src/expressionedit.cpp" line="1927"/>
         <source>complex angle notation</source>
         <translation>Notación compleja de ángulo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1915"/>
+        <location filename="../src/expressionedit.cpp" line="1928"/>
         <source>phasor</source>
         <translation>fasor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1916"/>
+        <location filename="../src/expressionedit.cpp" line="1929"/>
         <source>complex phasor notation</source>
         <translation>notación compleja de fasor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1918"/>
+        <location filename="../src/expressionedit.cpp" line="1931"/>
         <source>UTC time zone</source>
         <translation>huso horario UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1971"/>
+        <location filename="../src/expressionedit.cpp" line="1984"/>
         <source>number base %1</source>
         <translation>base numérica %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2236"/>
+        <location filename="../src/expressionedit.cpp" line="2249"/>
         <source>Data object</source>
         <translation>Objeto de datos</translation>
     </message>
@@ -6455,7 +6455,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="56"/>
-        <location filename="../src/plotdialog.cpp" line="151"/>
+        <location filename="../src/plotdialog.cpp" line="147"/>
         <source>Title:</source>
         <translation>Título:</translation>
     </message>
@@ -6465,135 +6465,135 @@ Do you want to overwrite the function?</source>
         <translation>Expresión:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="64"/>
+        <location filename="../src/plotdialog.cpp" line="63"/>
         <source>Function</source>
         <translation>Función</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="65"/>
+        <location filename="../src/plotdialog.cpp" line="64"/>
         <source>Vector/matrix</source>
         <translation type="unfinished">Vector/matriz</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="66"/>
+        <location filename="../src/plotdialog.cpp" line="65"/>
         <source>Paired matrix</source>
         <translation>Matriz emparejada</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="69"/>
+        <location filename="../src/plotdialog.cpp" line="68"/>
         <source>Rows</source>
         <translation>Filas</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="70"/>
+        <location filename="../src/plotdialog.cpp" line="69"/>
         <source>X variable:</source>
         <translation>Variable X:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="75"/>
+        <location filename="../src/plotdialog.cpp" line="74"/>
         <source>Style:</source>
         <translation>Estilo:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="77"/>
+        <location filename="../src/plotdialog.cpp" line="76"/>
         <source>Line</source>
         <translation>Línea</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="78"/>
+        <location filename="../src/plotdialog.cpp" line="77"/>
         <source>Points</source>
         <translation>Puntos</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="79"/>
+        <location filename="../src/plotdialog.cpp" line="78"/>
         <source>Line with points</source>
         <translation>Linea con puntos</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="80"/>
+        <location filename="../src/plotdialog.cpp" line="79"/>
         <source>Boxes/bars</source>
         <translation type="unfinished">Cajas/barras</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="81"/>
+        <location filename="../src/plotdialog.cpp" line="80"/>
         <source>Histogram</source>
         <translation>Histograma</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="82"/>
+        <location filename="../src/plotdialog.cpp" line="81"/>
         <source>Steps</source>
         <translation>Pasos</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="83"/>
+        <location filename="../src/plotdialog.cpp" line="82"/>
         <source>Candlesticks</source>
         <translation>Candelabros</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="84"/>
+        <location filename="../src/plotdialog.cpp" line="83"/>
         <source>Dots</source>
         <translation>Punteado</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="86"/>
+        <location filename="../src/plotdialog.cpp" line="85"/>
         <source>Smoothing:</source>
         <translation>Suavizado:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="88"/>
-        <location filename="../src/plotdialog.cpp" line="186"/>
+        <location filename="../src/plotdialog.cpp" line="87"/>
+        <location filename="../src/plotdialog.cpp" line="182"/>
         <source>None</source>
         <translation>Ninguna</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="89"/>
+        <location filename="../src/plotdialog.cpp" line="88"/>
         <source>Monotonic</source>
         <translation>Monotónico</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="90"/>
+        <location filename="../src/plotdialog.cpp" line="89"/>
         <source>Natural cubic splines</source>
         <translation>Spline cúbica natural</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="91"/>
+        <location filename="../src/plotdialog.cpp" line="90"/>
         <source>Bezier</source>
         <translation>Bezier</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="92"/>
+        <location filename="../src/plotdialog.cpp" line="91"/>
         <source>Bezier (monotonic)</source>
         <translation>Bezier (monotónico)</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="94"/>
+        <location filename="../src/plotdialog.cpp" line="93"/>
         <source>Y-axis:</source>
         <translation>Eje Y:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="96"/>
+        <location filename="../src/plotdialog.cpp" line="95"/>
         <source>Primary</source>
         <translation>Primario</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="97"/>
+        <location filename="../src/plotdialog.cpp" line="96"/>
         <source>Secondary</source>
         <translation>Secundario</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="102"/>
+        <location filename="../src/plotdialog.cpp" line="101"/>
         <source>Add</source>
         <translation type="unfinished">Añadir</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="105"/>
-        <location filename="../src/plotdialog.cpp" line="144"/>
-        <location filename="../src/plotdialog.cpp" line="194"/>
+        <location filename="../src/plotdialog.cpp" line="104"/>
+        <location filename="../src/plotdialog.cpp" line="140"/>
+        <location filename="../src/plotdialog.cpp" line="190"/>
         <source>Apply</source>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="108"/>
+        <location filename="../src/plotdialog.cpp" line="107"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
@@ -6602,138 +6602,138 @@ Do you want to overwrite the function?</source>
         <translation type="vanished">Categoría</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="115"/>
+        <location filename="../src/plotdialog.cpp" line="114"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="115"/>
+        <location filename="../src/plotdialog.cpp" line="114"/>
         <source>Expression</source>
         <translation>Expresión</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="121"/>
+        <location filename="../src/plotdialog.cpp" line="120"/>
         <source>Function Range</source>
         <translation>Rango de función</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="123"/>
+        <location filename="../src/plotdialog.cpp" line="122"/>
         <source>Minimum x value:</source>
         <translation>Valor mínimo de x:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="127"/>
+        <location filename="../src/plotdialog.cpp" line="125"/>
         <source>Maximum x value:</source>
         <translation>Valor máximo de x:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="132"/>
+        <location filename="../src/plotdialog.cpp" line="129"/>
         <source>Sampling rate:</source>
         <translation>Tasa de muestreo:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="137"/>
+        <location filename="../src/plotdialog.cpp" line="134"/>
         <source>Step size:</source>
         <translation>Tamaño de paso:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="149"/>
+        <location filename="../src/plotdialog.cpp" line="145"/>
         <source>Appearance</source>
         <translation>Apariencia</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="153"/>
+        <location filename="../src/plotdialog.cpp" line="149"/>
         <source>Display grid</source>
         <translation>Mostrar cuadrícula</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="155"/>
+        <location filename="../src/plotdialog.cpp" line="151"/>
         <source>Display full border</source>
         <translation>Mostrar borde completo</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="157"/>
+        <location filename="../src/plotdialog.cpp" line="153"/>
         <source>Minimum y value:</source>
         <translation>Valor mínimo de y:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="162"/>
+        <location filename="../src/plotdialog.cpp" line="158"/>
         <source>Maximum y value:</source>
         <translation>Valor máximo de y:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="167"/>
+        <location filename="../src/plotdialog.cpp" line="163"/>
         <source>Logarithmic x scale:</source>
         <translation>Escala logarítmica de x:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="172"/>
+        <location filename="../src/plotdialog.cpp" line="168"/>
         <source>Logarithmic y scale:</source>
         <translation>Escala logarítmica de y:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="177"/>
+        <location filename="../src/plotdialog.cpp" line="173"/>
         <source>X-axis label:</source>
         <translation>Etiqueta de eje x:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="179"/>
+        <location filename="../src/plotdialog.cpp" line="175"/>
         <source>Y-axis label:</source>
         <translation>Etiqueta de eje y:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="181"/>
+        <location filename="../src/plotdialog.cpp" line="177"/>
         <source>Line width:</source>
         <translation>Ancho de línea:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="184"/>
+        <location filename="../src/plotdialog.cpp" line="180"/>
         <source>Legend placement:</source>
         <translation>Ubicación de leyenda:</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="187"/>
+        <location filename="../src/plotdialog.cpp" line="183"/>
         <source>Top-left</source>
         <translation>Superior izquierda</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="188"/>
+        <location filename="../src/plotdialog.cpp" line="184"/>
         <source>Top-right</source>
         <translation>Superior derecha</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="189"/>
+        <location filename="../src/plotdialog.cpp" line="185"/>
         <source>Bottom-left</source>
         <translation>Inferior izquierda</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="190"/>
+        <location filename="../src/plotdialog.cpp" line="186"/>
         <source>Bottom-right</source>
         <translation>Inferior derecha</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="191"/>
+        <location filename="../src/plotdialog.cpp" line="187"/>
         <source>Below</source>
         <translation>Abajo</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="192"/>
+        <location filename="../src/plotdialog.cpp" line="188"/>
         <source>Outside</source>
         <translation>Afuera</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="354"/>
+        <location filename="../src/plotdialog.cpp" line="350"/>
         <source>Calculating…</source>
         <translation>Calculando…</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="354"/>
-        <location filename="../src/plotdialog.cpp" line="500"/>
+        <location filename="../src/plotdialog.cpp" line="350"/>
+        <location filename="../src/plotdialog.cpp" line="496"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../src/plotdialog.cpp" line="500"/>
+        <location filename="../src/plotdialog.cpp" line="496"/>
         <source>Processing…</source>
         <translation>Procesando…</translation>
     </message>
@@ -6741,429 +6741,444 @@ Do you want to overwrite the function?</source>
 <context>
     <name>PreferencesDialog</name>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="53"/>
+        <location filename="../src/preferencesdialog.cpp" line="54"/>
         <source>Look &amp;&amp; Feel</source>
         <translation type="unfinished">Aparencia</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="54"/>
+        <location filename="../src/preferencesdialog.cpp" line="55"/>
         <source>Numbers &amp;&amp; Operators</source>
         <translation>Números y operadores</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="55"/>
+        <location filename="../src/preferencesdialog.cpp" line="56"/>
         <source>Units &amp;&amp; Currencies</source>
         <translation>Unidades y monedas</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="56"/>
+        <location filename="../src/preferencesdialog.cpp" line="57"/>
         <source>Parsing &amp;&amp; Calculation</source>
         <translation type="unfinished">Cálculo y análisis</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="60"/>
+        <location filename="../src/preferencesdialog.cpp" line="61"/>
         <source>Ignore system language (requires restart)</source>
         <translation>Ignorar idioma del sistema (requiere reinicio)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="61"/>
+        <location filename="../src/preferencesdialog.cpp" line="62"/>
         <source>Keep above other windows</source>
         <translation type="unfinished">Restaurar la ventana</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="62"/>
+        <location filename="../src/preferencesdialog.cpp" line="63"/>
         <source>Window title:</source>
         <translation>Título de ventana:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="64"/>
+        <location filename="../src/preferencesdialog.cpp" line="65"/>
         <source>Application name</source>
         <translation>Nombre de aplicación</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="65"/>
+        <location filename="../src/preferencesdialog.cpp" line="66"/>
         <source>Result</source>
         <translation>Resultado</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="66"/>
+        <location filename="../src/preferencesdialog.cpp" line="67"/>
         <source>Application name + result</source>
         <translation>Nombre de aplicación + resultado</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="70"/>
+        <location filename="../src/preferencesdialog.cpp" line="71"/>
         <source>Style:</source>
         <translation type="unfinished">Estilo:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="73"/>
+        <location filename="../src/preferencesdialog.cpp" line="74"/>
         <source>Default (requires restart)</source>
         <comment>Default style</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="78"/>
+        <location filename="../src/preferencesdialog.cpp" line="79"/>
         <source>Dark mode</source>
         <translation type="unfinished">Modo oscuro</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="79"/>
+        <location filename="../src/preferencesdialog.cpp" line="80"/>
         <source>Colorize result</source>
         <translation type="unfinished">Colorear resultado</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="80"/>
+        <location filename="../src/preferencesdialog.cpp" line="81"/>
         <source>Custom result font</source>
         <translation>Fuente de resultado personalizada</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="83"/>
+        <location filename="../src/preferencesdialog.cpp" line="84"/>
         <source>Custom expression font</source>
         <translation>Fuente de expresión personalizada</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="86"/>
+        <location filename="../src/preferencesdialog.cpp" line="87"/>
         <source>Custom keypad font</source>
         <translation>Fuente de teclado personalizada</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="89"/>
+        <location filename="../src/preferencesdialog.cpp" line="90"/>
         <source>Custom application font</source>
         <translation>Fuente de aplicación personalizada</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="95"/>
+        <location filename="../src/preferencesdialog.cpp" line="96"/>
         <source>Display expression status</source>
         <translation>Mostrar estado de la expresión</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="96"/>
+        <location filename="../src/preferencesdialog.cpp" line="99"/>
+        <source>Delay:</source>
+        <translation type="unfinished">Retraso:</translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="108"/>
         <source>Expression after calculation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="98"/>
+        <location filename="../src/preferencesdialog.cpp" line="110"/>
         <source>Keep expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="99"/>
+        <location filename="../src/preferencesdialog.cpp" line="111"/>
         <source>Clear expression</source>
         <translation type="unfinished">Limpiar expresión</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="100"/>
+        <location filename="../src/preferencesdialog.cpp" line="112"/>
         <source>Replace with result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="101"/>
+        <location filename="../src/preferencesdialog.cpp" line="113"/>
         <source>Replace with result if shorter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="105"/>
+        <location filename="../src/preferencesdialog.cpp" line="117"/>
         <source>Use keyboard keys for RPN</source>
         <translation>Usar teclas del teclado para RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="106"/>
+        <location filename="../src/preferencesdialog.cpp" line="118"/>
         <source>Parsing mode:</source>
         <translation type="unfinished">Modo de análisis:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="108"/>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="120"/>
+        <location filename="../src/preferencesdialog.cpp" line="165"/>
         <source>Adaptive</source>
         <translation type="unfinished">Adaptativo</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="109"/>
+        <location filename="../src/preferencesdialog.cpp" line="121"/>
         <source>Conventional</source>
         <translation type="unfinished">Convencional</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="110"/>
+        <location filename="../src/preferencesdialog.cpp" line="122"/>
         <source>Implicit multiplication first</source>
         <translation type="unfinished">Multiplicación implícita primero</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="111"/>
+        <location filename="../src/preferencesdialog.cpp" line="123"/>
         <source>Chain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="112"/>
+        <location filename="../src/preferencesdialog.cpp" line="124"/>
         <source>RPN</source>
         <translation type="unfinished">RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="116"/>
+        <location filename="../src/preferencesdialog.cpp" line="128"/>
         <source>Read precision</source>
         <translation>Leer precisión</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="117"/>
+        <location filename="../src/preferencesdialog.cpp" line="129"/>
         <source>Limit implicit multiplication</source>
         <translation>Limitar multiplicación implícita</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="118"/>
+        <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Interval calculation:</source>
         <translation>Cálculo de intervalo:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="120"/>
+        <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Variance formula</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="121"/>
+        <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Interval arithmetic</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="125"/>
+        <location filename="../src/preferencesdialog.cpp" line="137"/>
         <source>Factorize result</source>
         <translation>Factorizar resultado</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="128"/>
+        <location filename="../src/preferencesdialog.cpp" line="140"/>
         <source>Binary two&apos;s complement representation</source>
         <translation>Representación binaria de complemento a dos</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="129"/>
+        <location filename="../src/preferencesdialog.cpp" line="141"/>
         <source>Hexadecimal two&apos;s complement representation</source>
         <translation>Representación hexadecimal de complemento a dos</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="130"/>
+        <location filename="../src/preferencesdialog.cpp" line="142"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation>Usar letras minúsculas en números no decimales</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="131"/>
+        <location filename="../src/preferencesdialog.cpp" line="143"/>
         <source>Spell out logical operators</source>
         <translation>Deletrear operadores lógicos</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="132"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Use E-notation instead of 10^x</source>
         <translation>Usar notación E en vez de 10^x</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="133"/>
+        <location filename="../src/preferencesdialog.cpp" line="145"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation>Usar &quot;j&quot; como la unidad imaginaria</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="134"/>
+        <location filename="../src/preferencesdialog.cpp" line="146"/>
         <source>Use comma as decimal separator</source>
         <translation>Usar coma como separador decimal</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="135"/>
+        <location filename="../src/preferencesdialog.cpp" line="147"/>
         <source>Ignore comma in numbers</source>
         <translation>Ignorar comas en números</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="136"/>
+        <location filename="../src/preferencesdialog.cpp" line="148"/>
         <source>Ignore dots in numbers</source>
         <translation>Ignorar puntos en números</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="137"/>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Round halfway numbers to even</source>
         <translation>Redondear números intermedios a pares</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="142"/>
+        <location filename="../src/preferencesdialog.cpp" line="150"/>
+        <source>Indicate repeating decimals</source>
+        <translation>Indicar decimales repetidos</translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="155"/>
         <source>Digit grouping:</source>
         <translation>Agrupamiento de dígitos:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="157"/>
         <source>None</source>
         <translation type="unfinished">Ninguna</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="145"/>
+        <location filename="../src/preferencesdialog.cpp" line="158"/>
         <source>Standard</source>
         <translation type="unfinished">Estándar</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="146"/>
+        <location filename="../src/preferencesdialog.cpp" line="159"/>
         <source>Local</source>
         <translation type="unfinished">Local</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="150"/>
+        <location filename="../src/preferencesdialog.cpp" line="163"/>
         <source>Interval display:</source>
         <translation>Visualización de intervalo:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="153"/>
+        <location filename="../src/preferencesdialog.cpp" line="166"/>
         <source>Significant digits</source>
         <translation>Cifras significativas</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="154"/>
+        <location filename="../src/preferencesdialog.cpp" line="167"/>
         <source>Interval</source>
         <translation>Intervalo</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="155"/>
+        <location filename="../src/preferencesdialog.cpp" line="168"/>
         <source>Plus/minus</source>
         <translation>Más/menos</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="156"/>
+        <location filename="../src/preferencesdialog.cpp" line="169"/>
         <source>Midpoint</source>
         <translation>Punto medio</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="157"/>
+        <location filename="../src/preferencesdialog.cpp" line="170"/>
         <source>Lower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="158"/>
+        <location filename="../src/preferencesdialog.cpp" line="171"/>
         <source>Upper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="163"/>
+        <location filename="../src/preferencesdialog.cpp" line="176"/>
         <source>Complex number form:</source>
         <translation type="unfinished">Forma de número complejo:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="165"/>
+        <location filename="../src/preferencesdialog.cpp" line="178"/>
         <source>Rectangular</source>
         <translation type="unfinished">Rectangular</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="166"/>
+        <location filename="../src/preferencesdialog.cpp" line="179"/>
         <source>Exponential</source>
         <translation type="unfinished">Exponencial</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="167"/>
+        <location filename="../src/preferencesdialog.cpp" line="180"/>
         <source>Polar</source>
         <translation type="unfinished">Polar</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="168"/>
+        <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Angle/phasor</source>
         <translation type="unfinished">Ángulo/fasor</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="176"/>
+        <location filename="../src/preferencesdialog.cpp" line="189"/>
+        <source>Abbreviate names</source>
+        <translation>Abreviar nombres</translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="190"/>
         <source>Use binary prefixes for information units</source>
         <translation>Usar prefijos binarios para unidades de información</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="177"/>
+        <location filename="../src/preferencesdialog.cpp" line="191"/>
         <source>Automatic unit conversion:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="179"/>
+        <location filename="../src/preferencesdialog.cpp" line="193"/>
         <source>No conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="180"/>
+        <location filename="../src/preferencesdialog.cpp" line="194"/>
         <source>Base units</source>
         <translation type="unfinished">Unidades base</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="181"/>
+        <location filename="../src/preferencesdialog.cpp" line="195"/>
         <source>Optimal units</source>
         <translation type="unfinished">Unidades óptimas</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="182"/>
+        <location filename="../src/preferencesdialog.cpp" line="196"/>
         <source>Optimal SI units</source>
         <translation type="unfinished">Unidades del SI óptimas</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="186"/>
+        <location filename="../src/preferencesdialog.cpp" line="200"/>
         <source>Convert to mixed units</source>
         <translation type="unfinished">Convertir a unidades mixtas</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="187"/>
+        <location filename="../src/preferencesdialog.cpp" line="201"/>
         <source>Automatic unit prefixes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="189"/>
+        <location filename="../src/preferencesdialog.cpp" line="203"/>
         <source>Default</source>
         <translation type="unfinished">Predeterminado</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="190"/>
+        <location filename="../src/preferencesdialog.cpp" line="204"/>
         <source>No prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="191"/>
+        <location filename="../src/preferencesdialog.cpp" line="205"/>
         <source>Prefixes for some units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="192"/>
+        <location filename="../src/preferencesdialog.cpp" line="206"/>
         <source>Prefixes also for currencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="193"/>
+        <location filename="../src/preferencesdialog.cpp" line="207"/>
         <source>Prefixes for all units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="201"/>
+        <location filename="../src/preferencesdialog.cpp" line="215"/>
         <source>Enable all SI-prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="202"/>
+        <location filename="../src/preferencesdialog.cpp" line="216"/>
         <source>Enable denominator prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="203"/>
+        <location filename="../src/preferencesdialog.cpp" line="217"/>
         <source>Enable units in physical constants</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="204"/>
+        <location filename="../src/preferencesdialog.cpp" line="218"/>
         <source>Temperature calculation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="206"/>
+        <location filename="../src/preferencesdialog.cpp" line="220"/>
         <source>Absolute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="207"/>
+        <location filename="../src/preferencesdialog.cpp" line="221"/>
         <source>Relative</source>
         <translation type="unfinished">Relación</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="208"/>
+        <location filename="../src/preferencesdialog.cpp" line="222"/>
         <source>Hybrid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="212"/>
+        <location filename="../src/preferencesdialog.cpp" line="226"/>
         <source>Exchange rates updates:</source>
         <translation type="unfinished">Actualizaciones de tasas de cambio:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="213"/>
+        <location filename="../src/preferencesdialog.cpp" line="227"/>
         <source>days</source>
         <translation type="unfinished">días</translation>
     </message>
@@ -7225,7 +7240,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="50"/>
         <location filename="../src/qalculateqtsettings.cpp" line="51"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="628"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="632"/>
         <source>answer</source>
         <translation>respuesta</translation>
     </message>
@@ -7245,42 +7260,42 @@ Do you want to overwrite the function?</source>
         <translation>Índice de historial %s no existe.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="627"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="631"/>
         <source>Last Answer</source>
         <translation>Última respuesta</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="630"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="634"/>
         <source>Answer 2</source>
         <translation>Respuesta 2</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="631"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="635"/>
         <source>Answer 3</source>
         <translation>Respuesta 3</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="632"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="636"/>
         <source>Answer 4</source>
         <translation>Respuesta 4</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="633"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="637"/>
         <source>Answer 5</source>
         <translation>Respuesta 5</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="634"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="638"/>
         <source>Memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="708"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="712"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="708"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="712"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
         <translation>No se pudieron guardar las preferencias en 
@@ -7290,18 +7305,22 @@ Do you want to overwrite the function?</source>
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="924"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="929"/>
         <source>Update exchange rates?</source>
         <translation type="unfinished">¿Actualizar tasas de cambio?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="924"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="929"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
-        <translation>
-            <numerusform>Ha pasado %n día desde la última actualización de las tasas de cambio.\n\n¿Quiere actualizar las tasas de cambio ahora?</numerusform>
-            <numerusform>Han pasado %n días desde la última actualización de las tasas de cambio.\n\n¿Quiere actualizar las tasas de cambio ahora?</numerusform>
+        <translation type="unfinished">
+            <numerusform>Ha pasado %n día desde la última actualización de las tasas de cambio.
+
+¿Quiere actualizar las tasas de cambio ahora?</numerusform>
+            <numerusform>Han pasado %n días desde la última actualización de las tasas de cambio.
+
+¿Quiere actualizar las tasas de cambio ahora?</numerusform>
         </translation>
     </message>
     <message>
@@ -7309,58 +7328,58 @@ Do you wish to update the exchange rates now?</source>
         <translation type="vanished">Buscando tasas de cambio.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="952"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="957"/>
         <source>Fetching exchange rates…</source>
         <translation type="unfinished">Buscando tasas de cambio…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="983"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="996"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1005"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1056"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1079"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="988"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1001"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1010"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1061"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1084"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="984"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="989"/>
         <source>Warning</source>
         <translation type="unfinished">Advertencia</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="985"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="990"/>
         <source>Information</source>
         <translation type="unfinished">Información</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="996"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1001"/>
         <source>Path of executable not found.</source>
         <translation>Ruta de ejecutable no encontrada.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1005"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1010"/>
         <source>curl not found.</source>
         <translation>No se encontró curl.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1056"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1061"/>
         <source>Failed to run update script.
 %1</source>
         <translation>Error al ejecutar el script de actualización.
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1079"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1084"/>
         <source>Failed to check for updates.</source>
         <translation>Fallo al buscar actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1080"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1085"/>
         <source>No updates found.</source>
         <translation>No se encontró ninguna actualización.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1086"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1091"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
@@ -7369,7 +7388,7 @@ Do you wish to update to version %3?</source>
 ¿Quiere actualizar a la versión %3?</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1090"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1095"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
@@ -8410,32 +8429,32 @@ Do you want to overwrite it?</source>
         <translation>Valor:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="48"/>
+        <location filename="../src/variableeditdialog.cpp" line="47"/>
         <source>current result</source>
         <translation>resultado actual</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="75"/>
-        <location filename="../src/variableeditdialog.cpp" line="107"/>
+        <location filename="../src/variableeditdialog.cpp" line="74"/>
+        <location filename="../src/variableeditdialog.cpp" line="106"/>
         <source>Question</source>
         <translation type="unfinished">Pregunta</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="75"/>
-        <location filename="../src/variableeditdialog.cpp" line="107"/>
+        <location filename="../src/variableeditdialog.cpp" line="74"/>
+        <location filename="../src/variableeditdialog.cpp" line="106"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Una unidad o variable con el mismo nombre ya existe.
 ¿Quiere sobreescribirla?</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="180"/>
+        <location filename="../src/variableeditdialog.cpp" line="179"/>
         <source>Edit Variable</source>
         <translation>Editar variable</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="194"/>
-        <location filename="../src/variableeditdialog.cpp" line="228"/>
+        <location filename="../src/variableeditdialog.cpp" line="193"/>
+        <location filename="../src/variableeditdialog.cpp" line="227"/>
         <source>New Variable</source>
         <translation>Nueva variable</translation>
     </message>

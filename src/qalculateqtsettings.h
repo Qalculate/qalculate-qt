@@ -77,7 +77,7 @@ class QalculateQtSettings : QObject {
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
-		int completion_delay;
+		int completion_delay, expression_status_delay;
 		int completion_min, completion_min2;
 		int style, palette;
 		bool enable_completion, enable_completion2;

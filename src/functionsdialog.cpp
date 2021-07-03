@@ -107,6 +107,7 @@ void FunctionsDialog::keyPressEvent(QKeyEvent *event) {
 	}
 	if(event->key() == Qt::Key_Escape && searchEdit->hasFocus()) {
 		searchEdit->clear();
+		searchChanged(QString());
 		functionsView->setFocus();
 		return;
 	}
@@ -391,6 +392,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				gsub("<=", SIGN_LESS_OR_EQUAL, str);
 				gsub("!=", SIGN_NOT_EQUAL, str);
 			}
+			gsub("\n","<br>", str);
 			if(f->isActive() != (deactivateButton->text() == tr("Deactivate"))) {
 				deactivateButton->setMinimumWidth(deactivateButton->width());
 				if(f->isActive()) {
