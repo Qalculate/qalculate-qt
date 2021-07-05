@@ -164,7 +164,7 @@ std::string unhtmlize(std::string str) {
 			} else if(str.substr(i + 1, 3) == "sub") {
 				size_t i3 = str.find("</sub>", i + 4);
 				if(i3 != std::string::npos) {
-					if(i2 - i3 > 16 && str.substr(i2 + 1, 7) == "<small>" && str.substr(i3 - 9, 8) == "</small>") str.erase(i, i3 - i + 6);
+					if(i3 - i2 > 16 && str.substr(i2 + 1, 7) == "<small>" && str.substr(i3 - 8, 8) == "</small>") str.erase(i, i3 - i + 6);
 					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5)));
 					continue;
 				}
@@ -952,7 +952,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	if(do_exec) calculate();
 }
 void QalculateWindow::negate() {
-	onFunctionClicked(CALCULATOR->getActiveFunction("neg"));
+	onFunctionClicked(CALCULATOR->getGlobalFunction("neg"));
 }
 void QalculateWindow::onVariableClicked(Variable *v) {
 	expressionEdit->blockCompletion();
@@ -3021,7 +3021,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					case '<': {CALCULATOR->calculateRPN(OPERATION_LESS, 0, settings->evalops, parsed_mstruct); break;}
 					case '=': {CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct); break;}
 					case '\\': {
-						MathFunction *fdiv = CALCULATOR->getActiveFunction("div");
+						MathFunction *fdiv = CALCULATOR->getGlobalFunction("div");
 						if(fdiv) {
 							CALCULATOR->calculateRPN(fdiv, 0, settings->evalops, parsed_mstruct);
 							break;
@@ -3051,7 +3051,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct);
 					do_mathoperation = true;
 				} else if(str2 == "//") {
-					MathFunction *fdiv = CALCULATOR->getActiveFunction("div");
+					MathFunction *fdiv = CALCULATOR->getGlobalFunction("div");
 					if(fdiv) {
 						CALCULATOR->calculateRPN(fdiv, 0, settings->evalops, parsed_mstruct);
 						do_mathoperation = true;
@@ -3226,7 +3226,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			MathStructure mbak(*mstruct);
 			if(settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) {
 				if(munit->isUnit() && u->referenceName() == "oF") {
-					u = CALCULATOR->getActiveUnit("oC");
+					u = CALCULATOR->getGlobalUnit("oC");
 					if(u) mstruct->set(CALCULATOR->convert(*mstruct, u, settings->evalops, true, false));
 				} else {
 					mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
@@ -4702,6 +4702,7 @@ void QalculateWindow::openFPConversion() {
 		str = expressionEdit->selectedText(true);
 		base = settings->evalops.parse_options.base;
 	}
+	if(base <= BASE_FP16 && base >= BASE_FP80) base = BASE_BINARY;
 	switch(base) {
 		case BASE_BINARY: {
 			fpConversionDialog->setBin(str);

@@ -792,7 +792,7 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "max_deci=%i\n", printops.max_decimals);
 	fprintf(file, "use_max_deci=%i\n", printops.use_max_decimals);
 	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
-	fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
+	//fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
 	fprintf(file, "interval_display=%i\n", adaptive_interval_display ? 0 : printops.interval_display + 1);
 	fprintf(file, "min_exp=%i\n", printops.min_exp);
 	fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);

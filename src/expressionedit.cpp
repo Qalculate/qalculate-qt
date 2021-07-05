@@ -347,7 +347,7 @@ QSize HTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 	QTextDocument doc;
 	doc.setDefaultFont(optionV4.font);
 	doc.setHtml(optionV4.text);
-
+	if(!index.data(Qt::DecorationRole).isNull()) return QSize(doc.idealWidth() + 32, doc.size().height() > 32 ? doc.size().height() : 32);
 	return QSize(doc.idealWidth(), doc.size().height());
 }
 
@@ -374,7 +374,7 @@ ExpressionProxyModel::ExpressionProxyModel(CompletionData *cd, QObject *parent) 
 ExpressionProxyModel::~ExpressionProxyModel() {}
 
 bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const {
-	if(cdata->to_type < 2 && str.empty()) return false;
+	if(!cdata->arg && cdata->to_type < 2 && str.empty()) return false;
 	QModelIndex index = sourceModel()->index(source_row, 0);
 	if(!index.isValid()) return false;
 	int p_type = index.data(TYPE_ROLE).toInt();
@@ -2314,7 +2314,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	}
 	completionModel->setFilter(current_object_text);
 	completionModel->sort(1);
-	if(completionModel->rowCount() > 0 && cdata->highest_match != 1) {
+	if(completionModel->rowCount() > 0) {
 		completionView->resizeColumnsToContents();
 		completionView->resizeRowsToContents();
 		QRect rect;
