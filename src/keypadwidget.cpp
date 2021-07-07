@@ -313,7 +313,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	f = CALCULATOR->getGlobalFunction("neg");
 	if(f) {
 		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL + Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
+		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
 	} else {
 		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
@@ -432,13 +432,17 @@ KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat
 	setFocusPolicy(Qt::TabFocus);
 	if(text.contains("</")) richtext = text;
 	QFontMetrics fm(font());
-	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
+	QSize size = fm.boundingRect("DEL").size();
+	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+	setMinimumSize(size);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QPushButton(icon, QString(), parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
 	setFocusPolicy(Qt::TabFocus);
 	QFontMetrics fm(font());
-	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
+	QSize size = fm.boundingRect("DEL").size();
+	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+	setMinimumSize(size);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::~KeypadButton() {}

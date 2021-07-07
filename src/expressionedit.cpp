@@ -518,7 +518,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					if(qstr.isEmpty()) qstr = index.data(Qt::DisplayRole).toString();
 					qstr.insert(0, "-) </font>");
 					qstr.insert(0, QString::fromStdString(prefix->longName()));
-					qstr.insert(0, "<font size=\"smaller\">(");
+					qstr.insert(0, "<font size=\"-1\">(");
 					sourceModel()->setData(index, qstr, Qt::DisplayRole);
 				}
 			}
@@ -613,8 +613,13 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	return b_match > 0;
 }
 bool ExpressionProxyModel::lessThan(const QModelIndex &index1, const QModelIndex &index2) const {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 	QModelIndex s1 = index1.siblingAtColumn(0);
 	QModelIndex s2 = index2.siblingAtColumn(0);
+#else
+	QModelIndex s1 = index1.sibling(index1.row(), 0);
+	QModelIndex s2 = index2.sibling(index2.row(), 0);
+#endif
 	if(s1.isValid() && s2.isValid()) {
 		int i1 = s1.data(MATCH_ROLE).toInt();
 		int i2 = s2.data(MATCH_ROLE).toInt();
@@ -629,7 +634,9 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 }
 
 ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
+#ifndef _WIN32
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
 	cmenu = NULL;
 	completion_blocked = 0;
 	parse_blocked = 0;
@@ -1134,7 +1141,11 @@ std::string ExpressionEdit::expression() const {
 QSize ExpressionEdit::sizeHint() const {
 	QSize size = QPlainTextEdit::sizeHint();
 	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
+#endif
 	return size;
 }
 void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
@@ -1420,7 +1431,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 				else completion_level = 2;
 			}
 		}
-		QActionGroup *group = new QActionGroup(this); group->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+		QActionGroup *group = new QActionGroup(this);
 		QAction *action = menu->addAction(tr("No completion"), this, SLOT(onCompletionModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); if(completion_level == 0) action->setChecked(true);
 		action = menu->addAction(tr("Limited strict completion"), this, SLOT(onCompletionModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); if(completion_level == 1) action->setChecked(true);
 		action = menu->addAction(tr("Strict completion"), this, SLOT(onCompletionModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); if(completion_level == 2) action->setChecked(true);
@@ -1428,8 +1439,10 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Full completion"), this, SLOT(onCompletionModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); if(completion_level == 4) action->setChecked(true);
 		menu->addSeparator();
 		action = menu->addAction(tr("Delayed completion"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
-		QAction *enableIMAction = cmenu->addAction(tr("Enable input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
+#ifndef _WIN32
+		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
+#endif
 	}
 	bool b_sel = textCursor().hasSelection();
 	bool b_empty = document()->isEmpty();
@@ -1542,8 +1555,13 @@ void ExpressionEdit::blockCompletion(bool b) {
 	}
 }
 void ExpressionEdit::blockParseStatus(bool b) {
-	if(b) {QToolTip::hideText(); parse_blocked++;}
-	else parse_blocked--;
+	if(b) {
+		QToolTip::hideText();
+		if(toolTipTimer) toolTipTimer->stop();
+		parse_blocked++;
+	} else {
+		parse_blocked--;
+	}
 }
 void ExpressionEdit::blockUndo(bool b) {
 	if(b) block_add_to_undo++;
@@ -1553,6 +1571,8 @@ void ExpressionEdit::showCurrentStatus() {
 	if(!expression_has_changed || completionView->isVisible() || current_status_text.isEmpty()) {
 		QToolTip::hideText();
 	} else {
+		// fool QToolTip with zero width space
+		if(current_status_text == QToolTip::text()) current_status_text += "​";
 		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), current_status_text);
 	}
 }
@@ -1561,7 +1581,6 @@ void ExpressionEdit::setStatusText(const QString &text) {
 	if(text.isEmpty()) {
 		QToolTip::hideText();
 	} else if(settings->display_expression_status) {
-		QToolTip::hideText();
 		if(text.length() >= 30) {
 			current_status_text = "<font size=\"-1\">";
 			current_status_text += text;
@@ -1570,13 +1589,15 @@ void ExpressionEdit::setStatusText(const QString &text) {
 		} else {
 			current_status_text = text;
 		}
-		if(settings->expression_status_delay > 0) {
+		// fool QToolTip with zero width space
+		current_status_text += "​";
+		if(settings->expression_status_delay > 0 && !QToolTip::isVisible()) {
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
 				toolTipTimer->setSingleShot(true);
 				connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
 			}
-			toolTipTimer->start(500);
+			toolTipTimer->start(settings->expression_status_delay);
 		} else {
 			showCurrentStatus();
 		}
@@ -1662,6 +1683,7 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 }
 
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
+	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) return;
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
@@ -1718,7 +1740,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			str_f = "";
 		}
 	}
-	bool last_is_op = last_is_operator(text);
 	QTextCursor cursor = textCursor();
 	MathStructure mparse, mfunc;
 	bool full_parsed = false;
@@ -1766,10 +1787,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(!full_parsed) {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
 			last_is_space = is_in(SPACES, str_e[str_e.length() - 1]);
-			bool b = false;
-			if(CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true) && !str_e.empty()) {
-				b = true;
-				if(!cdata->current_from_struct) {
+			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
+			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
+			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
+			if(b_to && !str_e.empty()) {
+				if(!cdata->current_from_struct && !mparse.containsFunction(CALCULATOR->f_save) && !mparse.containsFunction(CALCULATOR->f_plot)) {
 					cdata->current_from_struct = new MathStructure;
 					EvaluationOptions eo = settings->evalops;
 					eo.structuring = STRUCTURING_NONE;
@@ -1777,18 +1799,13 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					eo.auto_post_conversion = POST_CONVERSION_NONE;
 					eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					eo.expand = -2;
-					if(!CALCULATOR->calculate(cdata->current_from_struct, str_e, 50, eo)) cdata->current_from_struct->setAborted();
+					if(!CALCULATOR->calculate(cdata->current_from_struct, str_w.empty() ? str_e : str_e + "/." + str_w, 50, eo)) cdata->current_from_struct->setAborted();
 					cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
 				}
 			} else if(cdata->current_from_struct) {
 				cdata->current_from_struct->unref();
 				cdata->current_from_struct = NULL;
 				cdata->current_from_unit = NULL;
-			}
-			if(CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops)) b = true;
-			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
-			if(b && !cursor.atEnd() && str_e == str_sub && CALCULATOR->message()) {
-				last_is_op = last_is_operator(str_sub);
 			}
 		}
 		PrintOptions po;
@@ -2036,15 +2053,15 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		size_t message_n = 0;
 		while(CALCULATOR->message()) {
 			MessageType mtype = CALCULATOR->message()->type();
-			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-				if(mtype == MESSAGE_ERROR) had_errors = true;
-				else had_warnings = true;
+			if(mtype == MESSAGE_ERROR) {
 				if(message_n > 0) {
 					if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
 					parsed_expression_tooltip += "\n• ";
 				}
 				parsed_expression_tooltip += CALCULATOR->message()->message();
 				message_n++;
+			} else if(mtype == MESSAGE_WARNING) {
+				had_warnings = true;
 			}
 			CALCULATOR->nextMessage();
 		}
@@ -2053,10 +2070,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		gsub("&", "&amp;", parsed_expression);
 		gsub(">", "&gt;", parsed_expression);
 		gsub("<", "&lt;", parsed_expression);
-		if(!last_is_op || (!had_warnings && !had_errors)) {
-			if(had_errors || had_warnings) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
-			else prev_parsed_expression = QString::fromStdString(parsed_expression);
-		}
+		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
+		else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
@@ -2340,6 +2355,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 
 void ExpressionEdit::onCursorPositionChanged() {
 	if(completionTimer) completionTimer->stop();
+	if(toolTipTimer) toolTipTimer->stop();
 	if(block_text_change) return;
 	cursor_has_moved = true;
 	int epos = toPlainText().length() - textCursor().position();
@@ -2632,7 +2648,11 @@ void ExpressionEdit::smartParentheses() {
 }
 void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	if(!index_pre.isValid()) return;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 	QModelIndex index = index_pre.siblingAtColumn(0);
+#else
+	QModelIndex index = index_pre.sibling(index_pre.row(), 0);
+#endif
 	if(!index.isValid()) return;
 	std::string str;
 	ExpressionItem *item = NULL;

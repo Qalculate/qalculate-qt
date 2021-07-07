@@ -25,6 +25,7 @@ class QComboBox;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QTabWidget;
+class QAbstractButton;
 
 class PlotDialog : public QDialog {
 
@@ -63,8 +64,8 @@ class PlotDialog : public QDialog {
 		void onRemoveClicked();
 		void onApply2Clicked();
 		void onApply3Clicked();
-		void onTypeToggled(int, bool);
-		void onRateStepToggled(int, bool);
+		void onTypeToggled(QAbstractButton*, bool);
+		void onRateStepToggled(QAbstractButton*, bool);
 		void onGraphsSelectionChanged();
 		void abort();
 

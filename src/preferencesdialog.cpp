@@ -58,6 +58,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	int r = 0;
 	l2 = new QGridLayout(w1); l2->setSizeConstraint(QLayout::SetFixedSize);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
+	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -74,7 +75,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItems(list);
 	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
-	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(combo, r, 1); r++; styleCombo = combo;
 	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
 	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX_G1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool)); 
@@ -234,6 +235,9 @@ PreferencesDialog::~PreferencesDialog() {}
 
 void PreferencesDialog::ignoreLocaleToggled(bool b) {
 	settings->ignore_locale = b;
+}
+void PreferencesDialog::multipleInstancesToggled(bool b) {
+	settings->allow_multiple_instances = b;
 }
 void PreferencesDialog::keepAboveToggled(bool b) {
 	settings->always_on_top = b;
@@ -484,6 +488,18 @@ void PreferencesDialog::appFontToggled(bool b) {
 void PreferencesDialog::darkModeToggled(bool b) {
 	if(b) settings->palette = 1;
 	else settings->palette = -1;
+#ifdef _WIN32
+	if(b) {
+		if(styleCombo->currentIndex() == 0 || styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
+			for(int i = 1; i < styleCombo->count(); i++) {
+				if(styleCombo->itemText(i).compare("Fusion", Qt::CaseInsensitive) == 0) {
+					styleCombo->setCurrentIndex(i);
+					break;
+				}
+			}
+		}
+	}
+#endif
 	settings->updatePalette();
 }
 void PreferencesDialog::styleChanged(int i) {

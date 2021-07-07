@@ -250,7 +250,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			Argument *arg;
 			Argument default_arg;
 			std::string str;
-			const ExpressionName *ename = &f->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
+			const ExpressionName *ename = &f->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b><i>";
 			str += ename->name;
 			str += "</b>";

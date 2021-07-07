@@ -42,7 +42,7 @@ CSVDialog::CSVDialog(bool do_import, QWidget *parent, MathStructure *current_res
 		grid->addWidget(resultButton, r, 0); r++;
 		variableButton = new QRadioButton(tr("Matrix/vector variable:"), this); group->addButton(variableButton, 1); variableButton->setChecked(!m_result || var);
 		grid->addWidget(variableButton, r, 0);
-		connect(group, SIGNAL(idToggled(int, bool)), this, SLOT(exportTypeToggled(int, bool)));
+		connect(group, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(exportTypeToggled(QAbstractButton*, bool)));
 		nameEdit = new QLineEdit(this);
 		if(var) nameEdit->setText(QString::fromStdString(var->name()));
 		grid->addWidget(nameEdit, r, 1); r++;
@@ -121,9 +121,9 @@ void CSVDialog::onSelectFile() {
 		enableDisableOk();
 	}
 }
-void CSVDialog::exportTypeToggled(int i, bool b) {
+void CSVDialog::exportTypeToggled(QAbstractButton *w, bool b) {
 	if(!b) return;
-	nameEdit->setEnabled(i == 1);
+	nameEdit->setEnabled(w == variableButton);
 	enableDisableOk();
 }
 void CSVDialog::onDelimiterEdited() {

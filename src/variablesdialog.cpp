@@ -269,7 +269,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 		if(CALCULATOR->stillHasVariable(v)) {
 			selected_item = v;
 			std::string str;
-			const ExpressionName *ename = &v->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
+			const ExpressionName *ename = &v->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b>";
 			str += ename->name;
 			str += "</b>";

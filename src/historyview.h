@@ -31,15 +31,15 @@ class HistoryView : public QTextBrowser {
 
 		ExpressionEdit *expressionEdit;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false, const QString &image = QString());
+		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false, const QString &image = QString(), bool initial_load = false, size_t index = 0);
 		void addMessages();
+		void loadInitial();
 
 	protected:
 
 		QString s_text;
 		int i_pos;
 		QImage *paste_image;
-		std::vector<std::string> v_text;
 		QMenu *cmenu;
 		QAction *copyAction, *copyFormattedAction, *selectAllAction, *clearAction;
 		QColor prev_color;

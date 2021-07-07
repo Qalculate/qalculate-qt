@@ -64,7 +64,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	vectorButton = new QRadioButton(tr("Vector/matrix"), this); group->addButton(vectorButton, 1); hbox->addWidget(vectorButton);
 	pairedButton = new QRadioButton(tr("Paired matrix"), this); group->addButton(pairedButton, 2); hbox->addWidget(pairedButton);
 	group->button(settings->default_plot_type)->setChecked(true);
-	connect(group, SIGNAL(idToggled(int, bool)), this, SLOT(onTypeToggled(int, bool)));
+	connect(group, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(onTypeToggled(QAbstractButton*, bool)));
 	rowsBox = new QCheckBox(tr("Rows"), this); hbox->addWidget(rowsBox); rowsBox->setChecked(settings->default_plot_rows); rowsBox->setEnabled(settings->default_plot_type > 0);
 	grid->addWidget(new QLabel(tr("X variable:")), r, 0);
 	variableEdit = new QLineEdit(this); grid->addWidget(variableEdit, r, 1); r++;
@@ -136,7 +136,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	stepEdit->setText(QString::fromStdString(settings->default_plot_step));
 	stepButton->setChecked(!settings->default_plot_use_sampling_rate);
 	stepEdit->setEnabled(!settings->default_plot_use_sampling_rate);
-	connect(group, SIGNAL(idToggled(int, bool)), this, SLOT(onRateStepToggled(int, bool)));
+	connect(group, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(onRateStepToggled(QAbstractButton*, bool)));
 	applyButton2 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton2, r, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
 	grid->setRowStretch(r, 1);
 	connect(applyButton2, SIGNAL(clicked()), this, SLOT(onApply2Clicked()));
@@ -583,17 +583,17 @@ void PlotDialog::onApply2Clicked() {
 void PlotDialog::onApply3Clicked() {
 	updatePlot();
 }
-void PlotDialog::onTypeToggled(int i, bool b) {
+void PlotDialog::onTypeToggled(QAbstractButton *w, bool b) {
 	if(b) {
-		rowsBox->setEnabled(i > 0);
-		variableEdit->setEnabled(i == 0);
+		rowsBox->setEnabled(w != functionButton);
+		variableEdit->setEnabled(w == functionButton);
 		enableDisableButtons();
 	}
 }
-void PlotDialog::onRateStepToggled(int i, bool b) {
+void PlotDialog::onRateStepToggled(QAbstractButton *w, bool b) {
 	if(b) {
-		rateSpin->setEnabled(i == 0);
-		stepEdit->setEnabled(i == 1);
+		rateSpin->setEnabled(w == rateButton);
+		stepEdit->setEnabled(w == stepButton);
 	}
 }
 void PlotDialog::onGraphsSelectionChanged() {

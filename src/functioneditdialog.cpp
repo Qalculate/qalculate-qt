@@ -29,7 +29,9 @@ class MathTextEdit : public QPlainTextEdit {
 	public:
 
 		MathTextEdit(QWidget *parent) : QPlainTextEdit(parent) {
+#ifndef _WIN32
 			setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
 		}
 		~MathTextEdit() {}
 

@@ -75,7 +75,8 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, allow_multiple_instances;
+		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys;
+		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay;
 		int completion_min, completion_min2;
@@ -89,7 +90,8 @@ class QalculateQtSettings : QObject {
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
 		bool keep_function_dialog_open;
-		bool save_defs_on_exit, save_mode_on_exit;
+		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
+		bool rpn_shown;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
@@ -111,6 +113,10 @@ class QalculateQtSettings : QObject {
 		QalculateDateTime last_version_check_date;
 		bool check_version;
 		std::string last_found_version;
+
+		std::vector<std::string> v_expression;
+		std::vector<std::vector<std::string>> v_result;
+		std::vector<std::vector<bool>> v_exact;
 
 };
 

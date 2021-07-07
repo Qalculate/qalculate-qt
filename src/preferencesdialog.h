@@ -18,6 +18,7 @@
 
 class QCheckBox;
 class QSpinBox;
+class QComboBox;
 
 class PreferencesDialog : public QDialog {
 
@@ -27,6 +28,7 @@ class PreferencesDialog : public QDialog {
 
 		QCheckBox *ignoreCommaBox, *ignoreDotBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
+		QComboBox *styleCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -80,6 +82,7 @@ class PreferencesDialog : public QDialog {
 		void factorizeToggled(bool);
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);
+		void multipleInstancesToggled(bool);
 
 	public:
 

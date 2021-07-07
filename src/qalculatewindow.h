@@ -55,6 +55,7 @@ class QalculateWindow : public QMainWindow {
 		bool displayMessages();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
 		void executeFromFile(const QString&);
+		void loadInitialHistory();
 
 	protected:
 
@@ -91,7 +92,7 @@ class QalculateWindow : public QMainWindow {
 		QTableWidget *rpnView;
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnEditAction, *rpnClearAction;
 
-		bool send_event, bases_shown, rpn_shown;
+		bool send_event;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
@@ -194,7 +195,6 @@ class QalculateWindow : public QMainWindow {
 		void clearStack();
 		void registerChanged(int);
 		void calculateRPN(int);
-		void toggleRPNMode();
 
 	public slots:
 
