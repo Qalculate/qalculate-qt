@@ -31,7 +31,7 @@ class HistoryView : public QTextBrowser {
 
 		ExpressionEdit *expressionEdit;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool exact = true, bool dual_approx = false, const QString &image = QString(), bool initial_load = false, size_t index = 0);
+		void addResult(std::vector<std::string> values, std::string expression = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool initial_load = false, size_t index = 0);
 		void addMessages();
 		void loadInitial();
 

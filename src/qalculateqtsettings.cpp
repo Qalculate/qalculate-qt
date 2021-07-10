@@ -282,7 +282,7 @@ void QalculateQtSettings::loadPreferences() {
 				if(svar == "history_expression") {
 					v_expression.push_back(svalue);
 					v_result.push_back(std::vector<std::string>());
-					v_exact.push_back(std::vector<bool>());
+					v_exact.push_back(std::vector<int>());
 				} else if(svar == "history_result") {
 					if(!v_result.empty()) v_result[settings->v_result.size() - 1].push_back(svalue);
 				} else if(svar == "history_exact") {
@@ -889,11 +889,30 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
 	if(!clear_history_on_exit) {
 		fprintf(file, "\n[History]\n");
-		for(size_t i = 0; i < v_expression.size(); i++) {
+		int n = 0;
+		for(size_t i = 0; i < v_expression.size() && n < 300; i++) {
 			fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+			n++;
 			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-				fprintf(file, "history_exact=%i\n", (int) v_exact[i][i2]);
-				fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+				fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
+				if(v_result[i][i2].length() > 6000) {
+					std::string str = unhtmlize(v_result[i][i2]);
+					if(str.length() > 5000) {
+						int index = 50;
+						while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+						gsub("\n", "<br>", str);
+						fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+					} else {
+						fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+						if(v_result[i][i2].length() > 300) {
+							if(v_result[i][i2].length() > 9000) n += 30;
+							else n += v_result[i][i2].length() / 300;
+						}
+					}
+				} else {
+					fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+				}
+				n++;
 			}
 		}
 		for(size_t i = 0; i < expression_history.size(); i++) {

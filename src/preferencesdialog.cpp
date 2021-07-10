@@ -59,6 +59,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2 = new QGridLayout(w1); l2->setSizeConstraint(QLayout::SetFixedSize);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
+	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -141,7 +142,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
-	BOX(tr("Use E-notation instead of 10^x"), settings->printops.lower_case_e, eToggled(bool));
+	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
 	BOX(tr("Ignore comma in numbers"), settings->evalops.parse_options.comma_as_separator, ignoreCommaToggled(bool)); ignoreCommaBox = box;
@@ -239,6 +240,9 @@ void PreferencesDialog::ignoreLocaleToggled(bool b) {
 void PreferencesDialog::multipleInstancesToggled(bool b) {
 	settings->allow_multiple_instances = b;
 }
+void PreferencesDialog::clearHistoryToggled(bool b) {
+	settings->clear_history_on_exit = b;
+}
 void PreferencesDialog::keepAboveToggled(bool b) {
 	settings->always_on_top = b;
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -305,12 +309,12 @@ void PreferencesDialog::decimalCommaToggled(bool b) {
 	emit resultDisplayUpdated();
 	emit symbolsUpdated();
 }
-void PreferencesDialog::ignoreCommaToggled(bool b) {
+void PreferencesDialog::ignoreDotToggled(bool b) {
 	settings->evalops.parse_options.dot_as_separator = b;
 	settings->dot_question_asked = true;
 	emit expressionFormatUpdated(false);
 }
-void PreferencesDialog::ignoreDotToggled(bool b) {
+void PreferencesDialog::ignoreCommaToggled(bool b) {
 	settings->evalops.parse_options.comma_as_separator = b;
 	CALCULATOR->useDecimalPoint(settings->evalops.parse_options.comma_as_separator);
 	settings->dot_question_asked = true;

@@ -30,10 +30,9 @@ isEmpty(MAN_DIR) {
 }
 TEMPLATE = app
 TARGET = qalculate-qt
-INCLUDEPATH += src  
-INCLUDEPATH += /usr/include
-INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/lib -L/usr/local/lib -lqalculate
+INCLUDEPATH += src
+CONFIG += link_pkgconfig
+PKGCONFIG += libqalculate
 CONFIG += qt
 QT += widgets network
 MOC_DIR = build

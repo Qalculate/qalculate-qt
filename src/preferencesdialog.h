@@ -83,6 +83,7 @@ class PreferencesDialog : public QDialog {
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);
 		void multipleInstancesToggled(bool);
+		void clearHistoryToggled(bool);
 
 	public:
 

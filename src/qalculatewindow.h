@@ -229,6 +229,7 @@ class QalculateWindow : public QMainWindow {
 		void negate();
 		void checkVersion();
 		void reportBug();
+		void help();
 
 	signals:
 

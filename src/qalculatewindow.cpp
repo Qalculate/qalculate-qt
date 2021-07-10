@@ -152,7 +152,10 @@ std::string unhtmlize(std::string str) {
 		if(i == std::string::npos) break;
 		i2 = str.find(">", i + 1);
 		if(i2 == std::string::npos) break;
-		if(i2 - i == 4) {
+		if(i2 - i == 3 && str.substr(i + 1, 2) == "<br>") {
+			str.replace(i, i2 - i + 1, "\n");
+			continue;
+		} else if(i2 - i == 4) {
 			if(str.substr(i + 1, 3) == "sup") {
 				size_t i3 = str.find("</sup>", i2 + 1);
 				if(i3 != std::string::npos) {
@@ -277,6 +280,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QAction *action; QActionGroup *group; QMenu *menu, *menu2;
 	int w, w2; QWidgetAction *aw; QWidget *aww; QHBoxLayout *awl;
 
+	QFont appfont;
+	if(settings->use_custom_app_font) appfont.fromString(QString::fromStdString(settings->custom_app_font));
+
 	action = new QAction("Negate", this);
 	action->setShortcut(Qt::CTRL | Qt::Key_Minus); action->setShortcutContext(Qt::ApplicationShortcut);
 	addAction(action);
@@ -314,6 +320,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
 	menu->addSeparator();
+	menu->addAction(tr("Help"), this, SLOT(help()), QKeySequence::HelpContents);
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
 	menu->addAction(tr("Check for Updates"), this, SLOT(checkVersion()));
 	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
@@ -327,7 +334,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	modeAction->setMenu(menu);
 
 	ADD_SECTION(tr("General Display Mode"));
-	QFontMetrics fm1(menu->font());
+	QFontMetrics fm1(settings->use_custom_app_font ? appfont : menu->font());
 	menu->setToolTipsVisible(true);
 	w = fm1.boundingRect(tr("General Display Mode")).width() * 1.5;
 	group = new QActionGroup(this); group->setObjectName("group_general");
@@ -581,12 +588,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(decLabel, 2, 0);
 	hexLabel = new QLabel(tr("Hexadecimal:"));
 	basesGrid->addWidget(hexLabel, 3, 0);
-	binEdit = new QLabel("0000 0000 0000 0000 0000 0000 0000 0000\n0000 0000 0000 0000 0000 0000 0000 0000");
+
+	binEdit = new QLabel();
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	binEdit->setFocusPolicy(Qt::NoFocus);
-	QFontMetrics fm2(binEdit->font());
-	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
-	binEdit->setFixedHeight(fm2.lineSpacing() * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	QFontMetrics fm2(settings->use_custom_app_font ? appfont : binEdit->font());
+	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
+	binEdit->setMinimumHeight(fm2.lineSpacing() * 4 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
@@ -606,6 +614,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	hexEdit->setFocusPolicy(Qt::NoFocus);
 	hexEdit->setMinimumHeight(fm2.lineSpacing());
+	result_bin = "0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000";
+	result_oct = "0";
+	result_dec = "0";
+	result_hex = "00 00 00 00 00 00 00 00";
+	updateResultBases();
 	basesGrid->addWidget(hexEdit, 3, 1);
 	basesGrid->setRowStretch(4, 1);
 	basesDock->setWidget(basesWidget);
@@ -2546,7 +2559,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(str, "mode")) {
 				CALCULATOR->error(true, "Unsupported command: %s.", str.c_str(), NULL);
 			} else if(equalsIgnoreCase(str, "help") || str == "?") {
-				//show_help("index.html", gtk_builder_get_object(main_builder, "main_window"));
+				help();
+				if(current_expr) expressionEdit->clear();
 			} else if(equalsIgnoreCase(str, "list")) {
 				CALCULATOR->error(true, "Unsupported command: %s.", str.c_str(), NULL);
 			} else if(equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) {
@@ -3596,7 +3610,29 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 }
 
 void QalculateWindow::updateResultBases() {
-	binEdit->setText(QString::fromStdString(result_bin));
+	if(result_bin.length() == 79) {
+		QString sbin1 = QString::fromStdString(result_bin.substr(0, 39));
+		sbin1.replace(" ", "&nbsp;</td><td>");
+		sbin1 += "</td></tr><tr>";
+		for(int i = 63; i > 31; i -= 8) {
+			sbin1 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
+			sbin1 += QString::number(i);
+			sbin1 += "</font></td>";
+		}
+		sbin1 += "</tr><tr><td>";
+		QString sbin2 = QString::fromStdString(result_bin.substr(40));
+		sbin2.replace(" ", "&nbsp;</td><td>");
+		sbin2 += "</td></tr><tr>";
+		for(int i = 31; i >= 0; i -= 8) {
+			sbin2 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
+			sbin2 += QString::number(i);
+			sbin2 += "</font></td>";
+		}
+		sbin2 += "</tr><table>";
+		binEdit->setText("<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>" + sbin1 + sbin2);
+	} else {
+		binEdit->setText(QString::fromStdString(result_bin));
+	}
 	octEdit->setText(QString::fromStdString(result_oct));
 	decEdit->setText(QString::fromStdString(result_dec));
 	hexEdit->setText(QString::fromStdString(result_hex));
@@ -3623,7 +3659,6 @@ void set_result_bases(const MathStructure &m) {
 		po.binary_bits = 64;
 		result_bin = nr.print(po);
 		if(result_bin.length() > 80 && result_bin.find("1") >= 80) result_bin.erase(0, 80);
-		if(result_bin.length() >= 40) result_bin.replace(39, 1, "\n");
 		po.base = 8;
 		result_oct = nr.print(po);
 		size_t i = result_oct.find_first_of(NUMBERS);
@@ -3769,6 +3804,45 @@ void ViewThread::run() {
 
 		if(!b_stack) {
 			set_result_bases(*mresult);
+		}
+
+		for(size_t i = 0; i < alt_results.size();) {
+			if(alt_results[i].length() > 50000) alt_results.erase(alt_results.begin() + i);
+			else i++;
+		}
+		if(mresult->isMatrix() && mresult->rows() * mresult->columns() > 500) {
+			if(result_text.length() > 1000000L) {
+				result_text = "matrix ("; result_text += i2s(mresult->rows()); result_text += SIGN_MULTIPLICATION; result_text += i2s(mresult->columns()); result_text += ")";
+			} else {
+				std::string str = unhtmlize(result_text);
+				if(str.length() > 5000) {
+					result_text = str.substr(0, 1000) + " (…) " + str.substr(str.length() - 1000, 1000);
+				}
+			}
+		} else if(result_text.length() > 50000) {
+			if(mstruct->isNumber())	{
+				result_text = result_text.substr(0, 5000) + " (…) " + result_text.substr(result_text.length() - 5000, 5000);
+			} else {
+				std::string str = unhtmlize(result_text);
+				if(str.length() > 20000) {
+					result_text = str.substr(0, 2000) + " (…) " + str.substr(str.length() - 2000, 2000);
+				}
+			}
+		}
+
+		if(mresult->isLogicalOr() && (mresult->getChild(1)->isLogicalAnd() || mresult->getChild(1)->isComparison())) {
+			// add line break before or
+			size_t i = 0;
+			std::string or_str = " ";
+			if(po.spell_out_logical_operators) or_str += CALCULATOR->logicalORString();
+			else or_str += LOGICAL_OR;
+			or_str += " ";
+			while(true) {
+				i = result_text.find(or_str, i);
+				if(i == std::string::npos) break;
+				result_text.replace(i + or_str.length() - 1, 1, "<br>");
+				i += or_str.length();
+			}
 		}
 
 		b_busy--;
@@ -4030,22 +4104,17 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		} else {
 			exact_text = "";
 		}
-		for(size_t i = 0; i < alt_results.size();) {
-			if(alt_results[i].length() > 50000) {alt_results.erase(alt_results.begin() + i); exact_text = "";}
-			else i++;
-		}
-		if(matrix_mstruct.isMatrix() && matrix_mstruct.rows() * matrix_mstruct.columns() > 500) {
-			alt_results.push_back(result_text.substr(0, 1000) + " (…) " + result_text.substr(result_text.length() - 1000, 1000));
-		} else if(result_text.length() > 100000) {
-			alt_results.push_back(result_text.substr(0, 10000) + " (…) " + result_text.substr(result_text.length() - 10000, 10000));
-		} else {
-			alt_results.push_back(result_text);
+		alt_results.push_back(result_text);
+		for(size_t i = 0; i < alt_results.size(); i++) {
+			gsub("\n", "<br>", alt_results[i]);
 		}
 		QString flag;
 		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
 			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
 		}
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate())), update_parse && !mstruct_exact.isUndefined(), flag);
+		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
+		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
+		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, update_parse && !mstruct_exact.isUndefined(), flag);
 	}
 
 	if(do_to) {
@@ -4105,8 +4174,8 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
 		QFontMetrics fm2(QApplication::font());
-		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width());
-		binEdit->setFixedHeight(fm2.lineSpacing() * 2.1);
+		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
+		binEdit->setMinimumHeight(fm2.lineSpacing() * 4 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
 		if(!settings->use_custom_expression_font) {
 			QFont font = QApplication::font();
 			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
@@ -4292,7 +4361,7 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 void QalculateWindow::onToActivated() {
 	QTextCursor cur = expressionEdit->textCursor();
 	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
-	if(!expressionEdit->expressionHasChanged() && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length()) {
+	if(!expressionEdit->expressionHasChanged()) {
 		if(expressionEdit->complete(mstruct, pos)) return;
 	}
 	expressionEdit->blockCompletion();
@@ -5560,6 +5629,9 @@ void QalculateWindow::checkVersion() {
 }
 void QalculateWindow::reportBug() {
 	QDesktopServices::openUrl(QUrl("https://github.com/Qalculate/qalculate-qt/issues"));
+}
+void QalculateWindow::help() {
+	QDesktopServices::openUrl(QUrl("https://qalculate.github.io/manual/index.html"));
 }
 void QalculateWindow::loadInitialHistory() {
 	historyView->loadInitial();

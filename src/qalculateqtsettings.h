@@ -116,7 +116,7 @@ class QalculateQtSettings : QObject {
 
 		std::vector<std::string> v_expression;
 		std::vector<std::vector<std::string>> v_result;
-		std::vector<std::vector<bool>> v_exact;
+		std::vector<std::vector<int>> v_exact;
 
 };
 
