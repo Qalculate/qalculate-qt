@@ -28,8 +28,8 @@
 #include <QIcon>
 #include <QLibraryInfo>
 #include <QLocale>
+#include <QMessageBox>
 #include <QDebug>
-#include <locale.h>
 
 #include <libqalculate/qalculate.h>
 #include "qalculatewindow.h"
@@ -54,9 +54,14 @@ int main(int argc, char **argv) {
 	QalculateTranslator eqtr;
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
-		if(translator.load(QLocale(), QLatin1String("qalculate"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+		if(translator.load(QLocale(), QLatin1String("qalculate-qt"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
+		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
+#else
 		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
 		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::location(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);
+#endif
 	}
 
 	QCommandLineParser *parser = new QCommandLineParser();
@@ -80,31 +85,43 @@ int main(int argc, char **argv) {
 	std::string homedir = getLocalDir();
 	recursiveMakeDir(homedir);
 	QLockFile lockFile(QString::fromStdString(buildPath(homedir, "qalculate-qt.lock")));
-	if(!parser->isSet(nOption) && !lockFile.tryLock(100)) {
+	if(settings->allow_multiple_instances < 1 && !parser->isSet(nOption) && !lockFile.tryLock(100)) {
 		if(lockFile.error() == QLockFile::LockFailedError) {
-			QTextStream outStream(stdout);
-			outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
-			QLocalSocket socket;
-			socket.connectToServer("qalculate-qt");
-			if(socket.waitForConnected()) {
-				QString command;
-				if(!parser->value(fOption).isEmpty()) {
-					command = "f";
-					command += parser->value(fOption);
-				} else {
-					command = "0";
+			if(settings->allow_multiple_instances < 0 && parser->value(fOption).isEmpty() && parser->positionalArguments().isEmpty()) {
+				settings->allow_multiple_instances = (QMessageBox::question(NULL, QString("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
+				QLocalSocket socket;
+				socket.connectToServer("qalculate-qt");
+				if(socket.waitForConnected()) {
+					socket.write(settings->allow_multiple_instances ? "+" : "-");
+					socket.waitForBytesWritten(3000);
+					socket.disconnectFromServer();
 				}
-				QStringList args = parser->positionalArguments();
-				for(int i = 0; i < args.count(); i++) {
-					if(i > 0) command += " ";
-					else if(command == "f") command += ";";
-					command += args.at(i);
-				}
-				socket.write(command.toUtf8());
-				socket.waitForBytesWritten(3000);
-				socket.disconnectFromServer();
 			}
-			return 1;
+			if(!settings->allow_multiple_instances) {
+				QTextStream outStream(stdout);
+				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
+				QLocalSocket socket;
+				socket.connectToServer("qalculate-qt");
+				if(socket.waitForConnected()) {
+					QString command;
+					if(!parser->value(fOption).isEmpty()) {
+						command = "f";
+						command += parser->value(fOption);
+					} else {
+						command = "0";
+					}
+					QStringList args = parser->positionalArguments();
+					for(int i = 0; i < args.count(); i++) {
+						if(i > 0) command += " ";
+						else if(command == "f") command += ";";
+						command += args.at(i);
+					}
+					socket.write(command.toUtf8());
+					socket.waitForBytesWritten(3000);
+					socket.disconnectFromServer();
+				}
+				return 1;
+			}
 		}
 	}
 
@@ -157,6 +174,7 @@ int main(int argc, char **argv) {
 	QColor c = QApplication::palette().base().color();
 	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 	else settings->color = 1;
+	win->loadInitialHistory();
 
 	return app.exec();
 

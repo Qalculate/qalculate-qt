@@ -25,6 +25,7 @@ class QComboBox;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QTabWidget;
+class QAbstractButton;
 
 class PlotDialog : public QDialog {
 
@@ -40,9 +41,10 @@ class PlotDialog : public QDialog {
 		QTreeWidget *graphsTable;
 		QSpinBox *minySpin, *maxySpin, *logxSpin, *logySpin, *rateSpin, *lineSpin;
 		QTabWidget *tabs;
+		Thread *plotThread;
 
 		void generatePlotSeries(MathStructure **x_vector, MathStructure **y_vector, int type, QString str, QString str_x);
-		bool generatePlot(PlotParameters &pp, std::vector<MathStructure> &y_vectors, std::vector<MathStructure> &x_vectors, std::vector<PlotDataParameters*> &pdps);
+		bool generatePlot();
 		void updatePlot();
 		void updateItem(QTreeWidgetItem*);
 
@@ -62,9 +64,10 @@ class PlotDialog : public QDialog {
 		void onRemoveClicked();
 		void onApply2Clicked();
 		void onApply3Clicked();
-		void onTypeToggled(int, bool);
-		void onRateStepToggled(int, bool);
+		void onTypeToggled(QAbstractButton*, bool);
+		void onRateStepToggled(QAbstractButton*, bool);
 		void onGraphsSelectionChanged();
+		void abort();
 
 	public slots:
 

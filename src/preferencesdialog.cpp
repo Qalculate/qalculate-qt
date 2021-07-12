@@ -56,8 +56,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	tabs->addTab(w4, tr("Parsing && Calculation"));
 	QCheckBox *box; QVBoxLayout *l; QGridLayout *l2; QComboBox *combo;
 	int r = 0;
-	l2 = new QGridLayout(w1);
+	l2 = new QGridLayout(w1); l2->setSizeConstraint(QLayout::SetFixedSize);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
+	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
+	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -74,25 +76,36 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItems(list);
 	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
-	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(combo, r, 1); r++; styleCombo = combo;
 	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
 	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
-	BOX_G1(tr("Custom result font"), settings->use_custom_result_font, resultFontToggled(bool)); 
+	BOX_G1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool)); 
 	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX_G1(tr("Custom expression font"), settings->use_custom_expression_font, expressionFontToggled(bool));
+	BOX_G1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_expression_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(expressionFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX_G1(tr("Custom keypad font"), settings->use_custom_keypad_font, keypadFontToggled(bool));
+	BOX_G1(tr("Custom keypad font:"), settings->use_custom_keypad_font, keypadFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_keypad_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX_G1(tr("Custom application font"), settings->use_custom_app_font, appFontToggled(bool));
+	BOX_G1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_app_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	l2->setRowStretch(r, 1);
 	r = 0;
-	l2 = new QGridLayout(w4);
-	BOX_G(tr("Display expression status"), settings->display_expression_status, expressionStatusToggled(bool));
+	l2 = new QGridLayout(w4); l2->setSizeConstraint(QLayout::SetFixedSize);
+	box = new QCheckBox(tr("Display expression status"), this); l2->addWidget(box, r, 0); box->setChecked(settings->display_expression_status); connect(box, SIGNAL(toggled(bool)), this, SLOT(expressionStatusToggled(bool)));
+	QHBoxLayout *hbox = new QHBoxLayout();
+	l2->addLayout(hbox, r, 1); r++;
+	hbox->addWidget(new QLabel(tr("Delay:")));
+	statusDelayWidget = new QSpinBox(this);
+	statusDelayWidget->setRange(0, 10000);
+	statusDelayWidget->setSingleStep(250);
+	statusDelayWidget->setSuffix(" ms");
+	statusDelayWidget->setValue(settings->expression_status_delay); 
+	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
+	hbox->addWidget(statusDelayWidget);
+	hbox->addStretch(1);
 	l2->addWidget(new QLabel(tr("Expression after calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Keep expression"), KEEP_EXPRESSION);
@@ -124,17 +137,18 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	BOX_G(tr("Factorize result"), settings->evalops.structuring == STRUCTURING_FACTORIZE, factorizeToggled(bool));
 	l2->setRowStretch(r, 1);
-	l = new QVBoxLayout(w2);
+	l = new QVBoxLayout(w2); l->setSizeConstraint(QLayout::SetFixedSize);
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
-	BOX(tr("Use E-notation instead of 10^x"), settings->printops.lower_case_e, eToggled(bool));
+	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
 	BOX(tr("Ignore comma in numbers"), settings->evalops.parse_options.comma_as_separator, ignoreCommaToggled(bool)); ignoreCommaBox = box;
 	BOX(tr("Ignore dots in numbers"), settings->evalops.parse_options.dot_as_separator, ignoreDotToggled(bool)); ignoreDotBox = box;
 	BOX(tr("Round halfway numbers to even"), settings->printops.round_halfway_to_even, roundEvenToggled(bool));
+	BOX(tr("Indicate repeating decimals"), settings->printops.indicate_infinite_series, repeatingDecimalsToggled(bool));
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
 	l2 = new QGridLayout();
@@ -171,8 +185,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	l->addLayout(l2);
 	l->addStretch(1);
-	l2 = new QGridLayout(w3);
+	l2 = new QGridLayout(w3); l2->setSizeConstraint(QLayout::SetFixedSize);
 	r = 0;
+	BOX_G(tr("Abbreviate names"), settings->printops.abbreviate_names, abbreviateNamesToggled(bool));
 	BOX_G(tr("Use binary prefixes for information units"), CALCULATOR->usesBinaryPrefixes() > 0, binaryPrefixesToggled(bool));
 	l2->addWidget(new QLabel(tr("Automatic unit conversion:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -210,7 +225,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l2->addWidget(box, r, 0);
-	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days")); spin->setValue(settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); spin->setAlignment(Qt::AlignRight); exratesSpin = spin; r++;
+	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days")); spin->setValue(settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
 	l2->setRowStretch(r, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);
@@ -222,6 +237,12 @@ PreferencesDialog::~PreferencesDialog() {}
 void PreferencesDialog::ignoreLocaleToggled(bool b) {
 	settings->ignore_locale = b;
 }
+void PreferencesDialog::multipleInstancesToggled(bool b) {
+	settings->allow_multiple_instances = b;
+}
+void PreferencesDialog::clearHistoryToggled(bool b) {
+	settings->clear_history_on_exit = b;
+}
 void PreferencesDialog::keepAboveToggled(bool b) {
 	settings->always_on_top = b;
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -231,7 +252,11 @@ void PreferencesDialog::keepAboveToggled(bool b) {
 }
 void PreferencesDialog::expressionStatusToggled(bool b) {
 	settings->display_expression_status = b;
+	statusDelayWidget->setEnabled(b);
 	if(!b) QToolTip::hideText();
+}
+void PreferencesDialog::statusDelayChanged(int v) {
+	settings->expression_status_delay = v;
 }
 void PreferencesDialog::binTwosToggled(bool b) {
 	settings->printops.twos_complement = b;
@@ -284,12 +309,12 @@ void PreferencesDialog::decimalCommaToggled(bool b) {
 	emit resultDisplayUpdated();
 	emit symbolsUpdated();
 }
-void PreferencesDialog::ignoreCommaToggled(bool b) {
+void PreferencesDialog::ignoreDotToggled(bool b) {
 	settings->evalops.parse_options.dot_as_separator = b;
 	settings->dot_question_asked = true;
 	emit expressionFormatUpdated(false);
 }
-void PreferencesDialog::ignoreDotToggled(bool b) {
+void PreferencesDialog::ignoreCommaToggled(bool b) {
 	settings->evalops.parse_options.comma_as_separator = b;
 	CALCULATOR->useDecimalPoint(settings->evalops.parse_options.comma_as_separator);
 	settings->dot_question_asked = true;
@@ -319,6 +344,10 @@ void PreferencesDialog::binaryPrefixesToggled(bool b) {
 	CALCULATOR->useBinaryPrefixes(b ? 1 : 0);
 	emit resultFormatUpdated();
 }
+void PreferencesDialog::abbreviateNamesToggled(bool b) {
+	settings->printops.abbreviate_names = b;
+	emit resultFormatUpdated();
+}
 void PreferencesDialog::readPrecisionToggled(bool b) {
 	if(b) settings->evalops.parse_options.read_precision = READ_PRECISION_WHEN_DECIMALS;
 	else settings->evalops.parse_options.read_precision = DONT_READ_PRECISION;
@@ -338,6 +367,10 @@ void PreferencesDialog::complexFormChanged(int i) {
 }
 void PreferencesDialog::roundEvenToggled(bool b) {
 	settings->printops.round_halfway_to_even = b;
+	emit resultFormatUpdated();
+}
+void PreferencesDialog::repeatingDecimalsToggled(bool b) {
+	settings->printops.indicate_infinite_series = b;
 	emit resultFormatUpdated();
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
@@ -459,6 +492,18 @@ void PreferencesDialog::appFontToggled(bool b) {
 void PreferencesDialog::darkModeToggled(bool b) {
 	if(b) settings->palette = 1;
 	else settings->palette = -1;
+#ifdef _WIN32
+	if(b) {
+		if(styleCombo->currentIndex() == 0 || styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
+			for(int i = 1; i < styleCombo->count(); i++) {
+				if(styleCombo->itemText(i).compare("Fusion", Qt::CaseInsensitive) == 0) {
+					styleCombo->setCurrentIndex(i);
+					break;
+				}
+			}
+		}
+	}
+#endif
 	settings->updatePalette();
 }
 void PreferencesDialog::styleChanged(int i) {

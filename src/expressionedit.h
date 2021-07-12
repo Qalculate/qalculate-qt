@@ -61,7 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QTableView *completionView;
 		QMenu *cmenu;
 		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
-		QTimer *completionTimer;
+		QTimer *completionTimer, *toolTipTimer;
 
 		QStringList expression_undo_buffer;
 		QList<int> expression_undo_pos;
@@ -78,14 +78,14 @@ class ExpressionEdit : public QPlainTextEdit {
 		int do_completion_signal;
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		int block_display_parse;
-		QString prev_parsed_expression, parsed_expression_tooltip;
+		QString prev_parsed_expression, parsed_expression_tooltip, current_status_text;
 		bool expression_has_changed, expression_has_changed2;
 		bool parsed_had_errors, parsed_had_warnings;
 		int previous_epos;
 		bool parentheses_highlighted;
 
 		void setCurrentObject();
-		void setStatusText(QString text);
+		void setStatusText(const QString &text);
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
@@ -117,6 +117,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
+		void showCurrentStatus();
 
 	public slots:
 

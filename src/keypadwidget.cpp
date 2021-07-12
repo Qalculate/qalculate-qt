@@ -191,13 +191,13 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setRichText("x<sup>y</sup>");
 	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true)));
 	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 2);
-	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
+	f = CALCULATOR->getGlobalFunction("log10"); f2 = CALCULATOR->getGlobalFunction("log2");
 	if(f && f2) {
 		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, f2, "ln", c, 1);
 	} else {
 		ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), "ln", c, 1);
 	}
-	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
+	f = CALCULATOR->getGlobalFunction("perm"); f2 = CALCULATOR->getGlobalFunction("comb");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("!", f, f2, c, 0);
 		button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL)->title(true)), QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
@@ -252,7 +252,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	c++;
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
 	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true)));
-	f = CALCULATOR->getActiveFunction("inv");
+	f = CALCULATOR->getGlobalFunction("inv");
 	if(f) {
 		SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
 		button->setToolTip(QString(), "x<sup>1</sup>", "1/x");
@@ -281,7 +281,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(QString(), "x<sup>6</sup>", "1/6");
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("9", "⁹", "⅑", 0, c)
 	button->setToolTip(QString(), "x<sup>9</sup>", "1/9");
-	f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
+	f = CALCULATOR->getGlobalFunction("exp10"); f2 = CALCULATOR->getGlobalFunction("exp2");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("E", f, f2, 3, c);
 		button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
@@ -294,7 +294,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
 	button = new KeypadButton("ANS", this);
 	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
-	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Previous answer (static)"));
+	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Previous result (static)"));
 	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
@@ -310,10 +310,10 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	OPERATOR_SYMBOL_BUTTON("+", "+", 2, c);
 	button->setToolTip(tr("Addition"), tr("Plus"));
 	c++;
-	f = CALCULATOR->getActiveFunction("neg");
+	f = CALCULATOR->getGlobalFunction("neg");
 	if(f) {
 		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL + Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
+		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
 	} else {
 		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
@@ -432,13 +432,17 @@ KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat
 	setFocusPolicy(Qt::TabFocus);
 	if(text.contains("</")) richtext = text;
 	QFontMetrics fm(font());
-	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
+	QSize size = fm.boundingRect("DEL").size();
+	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+	setMinimumSize(size);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QPushButton(icon, QString(), parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
 	setFocusPolicy(Qt::TabFocus);
 	QFontMetrics fm(font());
-	setMinimumSize(fm.boundingRect("DEL").size().grownBy(QMargins(5, 5, 5, 5)));
+	QSize size = fm.boundingRect("DEL").size();
+	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+	setMinimumSize(size);
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::~KeypadButton() {}

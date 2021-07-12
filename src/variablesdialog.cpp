@@ -269,7 +269,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 		if(CALCULATOR->stillHasVariable(v)) {
 			selected_item = v;
 			std::string str;
-			const ExpressionName *ename = &v->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
+			const ExpressionName *ename = &v->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b>";
 			str += ename->name;
 			str += "</b>";
@@ -319,7 +319,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 						case ASSUMPTION_TYPE_REAL: {value += tr("real"); break;}
 						case ASSUMPTION_TYPE_COMPLEX: {value += tr("complex"); break;}
 						case ASSUMPTION_TYPE_NUMBER: {value += tr("number"); break;}
-						case ASSUMPTION_TYPE_NONMATRIX: {value += tr("non-matrix"); break;}
+						case ASSUMPTION_TYPE_NONMATRIX: {value += tr("not matrix"); break;}
 						default: {}
 					}
 					if(value.isEmpty()) value = tr("unknown");

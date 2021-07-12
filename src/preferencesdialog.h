@@ -18,6 +18,7 @@
 
 class QCheckBox;
 class QSpinBox;
+class QComboBox;
 
 class PreferencesDialog : public QDialog {
 
@@ -26,7 +27,8 @@ class PreferencesDialog : public QDialog {
 	protected:
 
 		QCheckBox *ignoreCommaBox, *ignoreDotBox;
-		QSpinBox *exratesSpin;
+		QSpinBox *exratesSpin, *statusDelayWidget;
+		QComboBox *styleCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -35,6 +37,7 @@ class PreferencesDialog : public QDialog {
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
 		void expressionStatusToggled(bool);
+		void statusDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
 		void lowerCaseToggled(bool);
@@ -54,7 +57,9 @@ class PreferencesDialog : public QDialog {
 		void intervalCalculationChanged(int);
 		void complexFormChanged(int);
 		void roundEvenToggled(bool);
+		void repeatingDecimalsToggled(bool);
 		void mixedUnitsToggled(bool);
+		void abbreviateNamesToggled(bool);
 		void conversionChanged(int);
 		void prefixesChanged(int);
 		void allPrefixesToggled(bool);
@@ -77,6 +82,8 @@ class PreferencesDialog : public QDialog {
 		void factorizeToggled(bool);
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);
+		void multipleInstancesToggled(bool);
+		void clearHistoryToggled(bool);
 
 	public:
 

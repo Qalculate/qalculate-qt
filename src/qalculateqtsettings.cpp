@@ -74,18 +74,30 @@ int AnswerFunction::calculate(MathStructure &mstruct, const MathStructure &vargs
 QalculateQtSettings::QalculateQtSettings() {
 	ignore_locale = false;
 	fetch_exchange_rates_at_startup = false;
+	allow_multiple_instances = -1;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	FILE *file = fopen(filename.c_str(), "r");
 	char line[10000];
+	bool b1 = false, b2 = false;
 	std::string stmp;
 	if(file) {
 		while(true) {
 			if(fgets(line, 10000, file) == NULL) break;
 			if(strcmp(line, "ignore_locale=1\n") == 0) {
 				ignore_locale = true;
+				b1 = true; if(b2) break;
 				break;
 			} else if(strcmp(line, "ignore_locale=0\n") == 0) {
+				b1 = true; if(b2) break;
 				break;
+			} else if(strcmp(line, "allow_multiple_instances=1\n") == 0) {
+				allow_multiple_instances = 1;
+				b2 = true; if(b1) break;
+			} else if(strcmp(line, "allow_multiple_instances=0\n") == 0) {
+				allow_multiple_instances = 0;
+				b2 = true; if(b1) break;
+			} else if(strcmp(line, "allow_multiple_instances=-1\n") == 0) {
+				b2 = true; if(b1) break;
 			}
 		}
 		fclose(file);
@@ -187,6 +199,7 @@ void QalculateQtSettings::loadPreferences() {
 	auto_update_exchange_rates = 7;
 	rpn_mode = false;
 	rpn_keys = true;
+	rpn_shown = false;
 	caret_as_xor = false;
 	do_imaginary_j = false;
 	color = 1;
@@ -200,6 +213,7 @@ void QalculateQtSettings::loadPreferences() {
 	completion_delay = 500;
 	always_on_top = false;
 	display_expression_status = true;
+	expression_status_delay = 1000;
 	prefixes_default = true;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
@@ -218,6 +232,7 @@ void QalculateQtSettings::loadPreferences() {
 	replace_expression = KEEP_EXPRESSION;
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
+	clear_history_on_exit = false;
 	keep_function_dialog_open = false;
 #ifdef _WIN32
 	check_version = true;
@@ -264,10 +279,18 @@ void QalculateQtSettings::loadPreferences() {
 				svalue = stmp.substr(i + 1);
 				remove_blank_ends(svalue);
 				v = s2i(svalue);
-				if(svar == "version") {
+				if(svar == "history_expression") {
+					v_expression.push_back(svalue);
+					v_result.push_back(std::vector<std::string>());
+					v_exact.push_back(std::vector<int>());
+				} else if(svar == "history_result") {
+					if(!v_result.empty()) v_result[settings->v_result.size() - 1].push_back(svalue);
+				} else if(svar == "history_exact") {
+					if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
+				} else if(svar == "expression_history") {
+					expression_history.push_back(svalue);
+				} else if(svar == "version") {
 					parse_qalculate_version(svalue, version_numbers);
-				} else if(svar == "allow_multiple_instances") {
-					allow_multiple_instances = v;
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
 				} else if(svar == "keep_function_dialog_open") {
@@ -276,9 +299,9 @@ void QalculateQtSettings::loadPreferences() {
 					save_mode_on_exit = v;
 				} else if(svar == "save_definitions_on_exit") {
 					save_defs_on_exit = v;
-				}/* else if(svar == "clear_history_on_exit") {
+				} else if(svar == "clear_history_on_exit") {
 					clear_history_on_exit = v;
-				}*/ else if(svar == "window_state") {
+				} else if(svar == "window_state") {
 					window_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "replace_expression") {
 					replace_expression = v;
@@ -306,8 +329,9 @@ void QalculateQtSettings::loadPreferences() {
 					auto_update_exchange_rates = v;
 				} else if(svar == "display_expression_status") {
 					display_expression_status = v;
-				} else if(svar == "expression_history") {
-					expression_history.push_back(svalue);
+				} else if(svar == "expression_status_delay") {
+					if(v < 0) v = 0;
+					expression_status_delay = v;
 				} else if(svar == "enable_input_method") {
 					enable_input_method = v;
 				} else if(svar == "enable_completion") {
@@ -554,6 +578,8 @@ void QalculateQtSettings::loadPreferences() {
 					rpn_mode = v;
 				} else if(svar == "rpn_keys") {
 					rpn_keys = v;
+				} else if(svar == "rpn_shown") {
+					rpn_shown = v;
 				} else if(svar == "limit_implicit_multiplication") {
 					evalops.parse_options.limit_implicit_multiplication = v;
 					printops.limit_implicit_multiplication = v;
@@ -661,7 +687,9 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Active, QPalette::AlternateBase, QColor(35, 38, 41));
 		p.setColor(QPalette::Active, QPalette::ToolTipBase, QColor(49, 54, 59));
 		p.setColor(QPalette::Active, QPalette::ToolTipText, QColor(252, 252, 252));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
 		p.setColor(QPalette::Active, QPalette::PlaceholderText, QColor(161, 169, 177));
+#endif
 		p.setColor(QPalette::Active, QPalette::Text, QColor(252, 252, 252));
 		p.setColor(QPalette::Active, QPalette::Button, QColor(49, 54, 59));
 		p.setColor(QPalette::Active, QPalette::ButtonText, QColor(252, 252, 252));
@@ -672,7 +700,9 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Inactive, QPalette::AlternateBase, QColor(35, 38, 41));
 		p.setColor(QPalette::Inactive, QPalette::ToolTipBase, QColor(49, 54, 59));
 		p.setColor(QPalette::Inactive, QPalette::ToolTipText, QColor(252, 252, 252));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
 		p.setColor(QPalette::Inactive, QPalette::PlaceholderText, QColor(161, 169, 177));
+#endif
 		p.setColor(QPalette::Inactive, QPalette::Text, QColor(252, 252, 252));
 		p.setColor(QPalette::Inactive, QPalette::Button, QColor(49, 54, 59));
 		p.setColor(QPalette::Inactive, QPalette::ButtonText, QColor(252, 252, 252));
@@ -683,7 +713,9 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Disabled, QPalette::AlternateBase, QColor(35, 38, 41));
 		p.setColor(QPalette::Disabled, QPalette::ToolTipBase, QColor(49, 54, 59));
 		p.setColor(QPalette::Disabled, QPalette::ToolTipText, QColor(252, 252, 252));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
 		p.setColor(QPalette::Disabled, QPalette::PlaceholderText, QColor(161, 169, 177));
+#endif
 		p.setColor(QPalette::Disabled, QPalette::Text, QColor(101, 101, 101));
 		p.setColor(QPalette::Disabled, QPalette::Button, QColor(47, 52, 56));
 		p.setColor(QPalette::Disabled, QPalette::ButtonText,QColor(101, 101, 101));
@@ -697,7 +729,7 @@ void QalculateQtSettings::updateStyle() {
 	if(style >= 0 && style < QStyleFactory::keys().count()) QApplication::setStyle(QStyleFactory::create(QStyleFactory::keys().at(style)));
 	updatePalette();
 }
-void QalculateQtSettings::savePreferences(bool save_mode) {
+void QalculateQtSettings::savePreferences(bool) {
 
 	FILE *file = NULL;
 	std::string homedir = getLocalDir();
@@ -710,6 +742,7 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	}
 	fprintf(file, "\n[General]\n");
 	fprintf(file, "version=%s\n", VERSION);
+	fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
 	fprintf(file, "ignore_locale=%i\n", ignore_locale);
 	fprintf(file, "check_version=%i\n", check_version);
 	if(check_version) {
@@ -718,6 +751,7 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	}
 	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+	if(rpn_shown) fprintf(file, "rpn_shown=%i\n", rpn_shown);
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
 	if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());
 	if(!functions_vsplitter_state.isEmpty()) fprintf(file, "functions_vsplitter_state=%s\n", functions_vsplitter_state.toBase64().data());
@@ -733,18 +767,15 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
 	fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
 	fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
-	//fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
+	fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 	fprintf(file, "enable_input_method=%i\n", enable_input_method);
 	fprintf(file, "display_expression_status=%i\n", display_expression_status);
+	fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
 	fprintf(file, "enable_completion=%i\n", enable_completion);
 	fprintf(file, "enable_completion2=%i\n", enable_completion2);
 	fprintf(file, "completion_min=%i\n", completion_min);
 	fprintf(file, "completion_min2=%i\n", completion_min2);
 	fprintf(file, "completion_delay=%i\n", completion_delay);
-	for(size_t i = 0; i < expression_history.size(); i++) {
-		gsub("\n", " ", expression_history[i]);
-		fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
-	}
 	fprintf(file, "style=%i\n", style);
 	fprintf(file, "palette=%i\n", palette);
 	fprintf(file, "color=%i\n", colorize_result);
@@ -780,14 +811,13 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 	fprintf(file, "prefixes_default=%i\n", prefixes_default);
-	if(!save_mode) {fclose(file); return;}
 	fprintf(file, "\n[Mode]\n");
 	fprintf(file, "min_deci=%i\n", printops.min_decimals);
 	fprintf(file, "use_min_deci=%i\n", printops.use_min_decimals);
 	fprintf(file, "max_deci=%i\n", printops.max_decimals);
 	fprintf(file, "use_max_deci=%i\n", printops.use_max_decimals);
 	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
-	fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
+	//fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
 	fprintf(file, "interval_display=%i\n", adaptive_interval_display ? 0 : printops.interval_display + 1);
 	fprintf(file, "min_exp=%i\n", printops.min_exp);
 	fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
@@ -857,6 +887,39 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	fprintf(file, "plot_color=%i\n", default_plot_color);
 	fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
 	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
+	if(!clear_history_on_exit) {
+		fprintf(file, "\n[History]\n");
+		int n = 0;
+		for(size_t i = 0; i < v_expression.size() && n < 300; i++) {
+			fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+			n++;
+			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+				fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
+				if(v_result[i][i2].length() > 6000) {
+					std::string str = unhtmlize(v_result[i][i2]);
+					if(str.length() > 5000) {
+						int index = 50;
+						while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+						gsub("\n", "<br>", str);
+						fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+					} else {
+						fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+						if(v_result[i][i2].length() > 300) {
+							if(v_result[i][i2].length() > 9000) n += 30;
+							else n += v_result[i][i2].length() / 300;
+						}
+					}
+				} else {
+					fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+				}
+				n++;
+			}
+		}
+		for(size_t i = 0; i < expression_history.size(); i++) {
+			gsub("\n", " ", expression_history[i]);
+			fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
+		}
+	}
 	fclose(file);
 
 }
@@ -934,22 +997,22 @@ bool QalculateQtSettings::checkExchangeRates(QWidget *parent) {
 	return false;
 }
 class FetchExchangeRatesThread : public Thread {
-protected:
-	virtual void run();
+	protected:
+		void run() {
+			int timeout = 15;
+			int n = -1;
+			if(!read(&timeout)) return;
+			if(!read(&n)) return;
+			CALCULATOR->fetchExchangeRates(timeout, n);
+		}
 };
-void FetchExchangeRatesThread::run() {
-	int timeout = 15;
-	int n = -1;
-	if(!read(&timeout)) return;
-	if(!read(&n)) return;
-	CALCULATOR->fetchExchangeRates(timeout, n);
-}
+
 void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent) {
 	b_busy++;
 	FetchExchangeRatesThread fetch_thread;
 	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
 		if(fetch_thread.running) {
-			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates."), QString(), 0, 0, parent);
+			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates…"), QString(), 0, 0, parent);
 			dialog->setWindowModality(Qt::WindowModal);
 			dialog->setMinimumDuration(200);
 			while(fetch_thread.running) {

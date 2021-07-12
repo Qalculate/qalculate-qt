@@ -320,17 +320,19 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 		if(CALCULATOR->stillHasUnit(u)) {
 			selected_item = u;
 			std::string str;
-			const ExpressionName *ename = &u->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
-			str = "<b>";
-			str += ename->name;
-			str += "</b>";
-			for(size_t i2 = 1; i2 <= u->countNames(); i2++) {
-				if(&u->getName(i2) != ename) {
-					str += ", ";
-					str += u->getName(i2).name;
+			if(u->subtype() != SUBTYPE_COMPOSITE_UNIT) {
+				const ExpressionName *ename = &u->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
+				str = "<b>";
+				str += ename->name;
+				str += "</b>";
+				for(size_t i2 = 1; i2 <= u->countNames(); i2++) {
+					if(&u->getName(i2) != ename) {
+						str += ", ";
+						str += u->getName(i2).name;
+					}
 				}
+				str += "<br><br>";
 			}
-			str += "<br><br>";
 			bool is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.can_display_unicode_string_arg = (void*) descriptionView;
@@ -348,11 +350,12 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 					if(au->expression().find("\\y") != std::string::npos) mexp.set("y");
 					str += "<i>x</i> ";
 					str += u->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).name;
-					str += " ";
 					if(au->expression().find("\\y") != std::string::npos) str += "<sup><i>y</i></sup>";
+					str += " ";
 				}
 				au->convertToFirstBaseUnit(m, mexp);
-				m.multiply(au->firstBaseUnit());
+				if(au->firstBaseUnit()->subtype() == SUBTYPE_COMPOSITE_UNIT) m.multiply(((CompositeUnit*) au->firstBaseUnit())->generateMathStructure());
+				else m.multiply(au->firstBaseUnit());
 				if(!mexp.isOne()) m.last() ^= mexp;
 				if(m.isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
 				else str += "= ";
@@ -364,9 +367,18 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 					if(au->inverseExpression().find("\\y") != std::string::npos) mexp.set("y");
 					else mexp.set(1, 1, 0);
 					str += "<i>x</i> ";
-					str += au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).name;
+					bool b_y = au->inverseExpression().find("\\y") != std::string::npos;
+					if(au->firstBaseUnit()->subtype() == SUBTYPE_COMPOSITE_UNIT) {
+						if(b_y) str += "(";
+						MathStructure m2(((CompositeUnit*) au->firstBaseUnit())->generateMathStructure());
+						m2.format(po);
+						str += m2.print(po, true, false, TAG_TYPE_HTML);
+						if(b_y) str += ")<sup><i>y</i></sup>";
+					} else {
+						str += au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).name;
+						if(b_y) str += "<sup><i>y</i></sup>";
+					}
 					str += " ";
-					if(au->inverseExpression().find("\\y") != std::string::npos) str += "<sup><i>y</i></sup>";
 					au->convertFromFirstBaseUnit(m, mexp);
 					m.multiply(au);
 					if(!mexp.isOne()) m.last() ^= mexp;

@@ -30,10 +30,9 @@ isEmpty(MAN_DIR) {
 }
 TEMPLATE = app
 TARGET = qalculate-qt
-INCLUDEPATH += src  
-INCLUDEPATH += /usr/include
-INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/lib -L/usr/local/lib -lqalculate
+INCLUDEPATH += src
+CONFIG += link_pkgconfig
+PKGCONFIG += libqalculate
 CONFIG += qt
 QT += widgets network
 MOC_DIR = build
@@ -46,7 +45,7 @@ HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h s
 
 SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
-TRANSLATIONS = translations/qalculate_sv.ts translations/qalculate-qt_ru.ts
+TRANSLATIONS = translations/qalculate-qt_ca.ts translations/qalculate-qt_de.ts translations/qalculate-qt_es.ts translations/qalculate-qt_fr.ts translations/qalculate-qt_nl.ts translations/qalculate-qt_pt_BR.ts translations/qalculate-qt_ru.ts translations/qalculate-qt_sl.ts translations/qalculate-qt_sv.ts translations/qalculate-qt_zh_CN.ts
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 

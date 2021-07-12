@@ -22,6 +22,7 @@ class QComboBox;
 class QCheckBox;
 class QSpinBox;
 class QPushButton;
+class QAbstractButton;
 
 class CSVDialog : public QDialog {
 
@@ -53,7 +54,7 @@ class CSVDialog : public QDialog {
 
 		void onNameEdited(const QString&);
 		void enableDisableOk();
-		void exportTypeToggled(int, bool);
+		void exportTypeToggled(QAbstractButton*, bool);
 		void onSelectFile();
 		void onDelimiterEdited();
 		void onFileEdited();

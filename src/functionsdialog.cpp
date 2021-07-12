@@ -107,6 +107,7 @@ void FunctionsDialog::keyPressEvent(QKeyEvent *event) {
 	}
 	if(event->key() == Qt::Key_Escape && searchEdit->hasFocus()) {
 		searchEdit->clear();
+		searchChanged(QString());
 		functionsView->setFocus();
 		return;
 	}
@@ -249,7 +250,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			Argument *arg;
 			Argument default_arg;
 			std::string str;
-			const ExpressionName *ename = &f->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
+			const ExpressionName *ename = &f->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b><i>";
 			str += ename->name;
 			str += "</b>";
@@ -336,7 +337,8 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 						str += tr("optional", "optional argument").toStdString();
 						if(!f->getDefaultValue(i2).empty() && f->getDefaultValue(i2) != "\"\"") {
 							str += ", ";
-							str += tr("default: ", "argument default").toStdString();
+							str += tr("default:", "argument default").toStdString();
+							str += " ";
 							ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 							str += CALCULATOR->localizeExpression(f->getDefaultValue(i2), pa);
 						}
@@ -347,8 +349,8 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			}
 			if(!f->condition().empty()) {
 				str += "<br>";
-				str += tr("Requirement").toStdString();
-				str += ": ";
+				str += tr("Requirement:", "Required condition for function").toStdString();
+				str += " ";
 				str += f->printCondition();
 				str += "<br>";
 			}
@@ -362,8 +364,8 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				while(dp) {
 					if(!dp->isHidden()) {
 						if(!dp->title(false).empty()) {
-							str += dp->title();
-							str += ": ";
+							str += tr("%1:").arg(QString::fromStdString(dp->title())).toStdString();
+							str += " ";
 						}
 						for(size_t i = 1; i <= dp->countNames(); i++) {
 							if(i > 1) str += ", ";
@@ -371,7 +373,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 						}
 						if(dp->isKey()) {
 							str += " (";
-							//indicating that the property is a data set key
+							//: indicating that the property is a data set key
 							str += tr("key").toStdString();
 							str += ")";
 						}
@@ -390,6 +392,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				gsub("<=", SIGN_LESS_OR_EQUAL, str);
 				gsub("!=", SIGN_NOT_EQUAL, str);
 			}
+			gsub("\n","<br>", str);
 			if(f->isActive() != (deactivateButton->text() == tr("Deactivate"))) {
 				deactivateButton->setMinimumWidth(deactivateButton->width());
 				if(f->isActive()) {

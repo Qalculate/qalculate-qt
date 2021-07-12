@@ -29,7 +29,9 @@ class MathTextEdit : public QPlainTextEdit {
 	public:
 
 		MathTextEdit(QWidget *parent) : QPlainTextEdit(parent) {
+#ifndef _WIN32
 			setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
 		}
 		~MathTextEdit() {}
 
@@ -83,7 +85,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(expressionEdit, 2, 0, 1, 2);
 	QHBoxLayout *box = new QHBoxLayout();
 	QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
-	box->addWidget(new QLabel(tr("Parameter references:"), this), 1); 
+	box->addWidget(new QLabel(tr("Argument references:"), this), 1);
 	ref1Button = new QRadioButton(tr("x, y, z"), this); group->addButton(ref1Button, 1); box->addWidget(ref1Button);
 	ref1Button->setChecked(true);
 	ref2Button = new QRadioButton(tr("\\x, \\y, \\z, \\a, \\b, …"), this); group->addButton(ref2Button, 2); box->addWidget(ref2Button);
