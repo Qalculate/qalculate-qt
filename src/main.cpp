@@ -87,17 +87,21 @@ int main(int argc, char **argv) {
 	QLockFile lockFile(QString::fromStdString(buildPath(homedir, "qalculate-qt.lock")));
 	if(settings->allow_multiple_instances < 1 && !parser->isSet(nOption) && !lockFile.tryLock(100)) {
 		if(lockFile.error() == QLockFile::LockFailedError) {
+			bool ami_changed = false;
 			if(settings->allow_multiple_instances < 0 && parser->value(fOption).isEmpty() && parser->positionalArguments().isEmpty()) {
 				settings->allow_multiple_instances = (QMessageBox::question(NULL, QString("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
-				QLocalSocket socket;
-				socket.connectToServer("qalculate-qt");
-				if(socket.waitForConnected()) {
-					socket.write(settings->allow_multiple_instances ? "+" : "-");
-					socket.waitForBytesWritten(3000);
-					socket.disconnectFromServer();
+				ami_changed = true;
+				if(settings->allow_multiple_instances) {
+					QLocalSocket socket;
+					socket.connectToServer("qalculate-qt");
+					if(socket.waitForConnected()) {
+						socket.write("+");
+						socket.waitForBytesWritten(3000);
+						socket.disconnectFromServer();
+					}
 				}
 			}
-			if(!settings->allow_multiple_instances) {
+			if(settings->allow_multiple_instances <= 0) {
 				QTextStream outStream(stdout);
 				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
 				QLocalSocket socket;
@@ -107,6 +111,8 @@ int main(int argc, char **argv) {
 					if(!parser->value(fOption).isEmpty()) {
 						command = "f";
 						command += parser->value(fOption);
+					} else if(ami_changed) {
+						command = "-";
 					} else {
 						command = "0";
 					}

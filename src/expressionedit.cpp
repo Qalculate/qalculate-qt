@@ -1324,8 +1324,9 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					dont_change_index = true;
 					blockCompletion(true);
 					blockParseStatus(true);
-					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
+					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
+					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
@@ -1368,6 +1369,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 				blockParseStatus(false);
 				blockCompletion(false);
+				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
 				return;
 			}
@@ -1572,7 +1574,7 @@ void ExpressionEdit::showCurrentStatus() {
 		QToolTip::hideText();
 	} else {
 		// fool QToolTip with zero width space
-		if(current_status_text == QToolTip::text()) current_status_text += "​";
+		if(current_status_text == QToolTip::text()) current_status_text += QChar(0x200b);
 		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), current_status_text);
 	}
 }
@@ -1590,7 +1592,7 @@ void ExpressionEdit::setStatusText(const QString &text) {
 			current_status_text = text;
 		}
 		// fool QToolTip with zero width space
-		current_status_text += "​";
+		current_status_text += QChar(0x200b);
 		if(settings->expression_status_delay > 0 && !QToolTip::isVisible()) {
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);

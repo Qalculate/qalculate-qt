@@ -225,7 +225,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "\">";
 			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
 			if(!mstr.startsWith("-")) str += "- ";
-			str += mstr;
+			if(settings->printops.use_unicode_signs) {
+				mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
+				mstr.replace("<=", SIGN_LESS_OR_EQUAL);
+				mstr.replace("!=", SIGN_NOT_EQUAL);
+			}
+			str += mstr.toHtmlEscaped();
 			str += "</div>";
 		} while(CALCULATOR->nextMessage());
 		if(str.isEmpty() && values.empty() && expression.empty()) return;

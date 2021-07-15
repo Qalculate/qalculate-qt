@@ -80,6 +80,7 @@ class UnitsDialog : public QDialog {
 		void setSearch(const QString&);
 		void selectCategory(std::string);
 		void unitRemoved(Unit*);
+		bool eventFilter(QObject*, QEvent*) override;
 
 	public slots:
 

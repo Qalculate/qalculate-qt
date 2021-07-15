@@ -71,6 +71,7 @@ class FunctionsDialog : public QDialog {
 		void updateFunctions();
 		void setSearch(const QString&);
 		void selectCategory(std::string);
+		bool eventFilter(QObject*, QEvent*) override;
 
 	public slots:
 

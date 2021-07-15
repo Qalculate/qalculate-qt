@@ -28,6 +28,7 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
 
+std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);

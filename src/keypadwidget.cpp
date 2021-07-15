@@ -191,13 +191,13 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setRichText("x<sup>y</sup>");
 	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true)));
 	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 2);
-	f = CALCULATOR->getGlobalFunction("log10"); f2 = CALCULATOR->getGlobalFunction("log2");
+	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
 	if(f && f2) {
 		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, f2, "ln", c, 1);
 	} else {
 		ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), "ln", c, 1);
 	}
-	f = CALCULATOR->getGlobalFunction("perm"); f2 = CALCULATOR->getGlobalFunction("comb");
+	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("!", f, f2, c, 0);
 		button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL)->title(true)), QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
@@ -252,7 +252,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	c++;
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
 	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true)));
-	f = CALCULATOR->getGlobalFunction("inv");
+	f = CALCULATOR->getActiveFunction("inv");
 	if(f) {
 		SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
 		button->setToolTip(QString(), "x<sup>1</sup>", "1/x");
@@ -281,7 +281,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(QString(), "x<sup>6</sup>", "1/6");
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("9", "⁹", "⅑", 0, c)
 	button->setToolTip(QString(), "x<sup>9</sup>", "1/9");
-	f = CALCULATOR->getGlobalFunction("exp10"); f2 = CALCULATOR->getGlobalFunction("exp2");
+	f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("E", f, f2, 3, c);
 		button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
@@ -310,7 +310,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	OPERATOR_SYMBOL_BUTTON("+", "+", 2, c);
 	button->setToolTip(tr("Addition"), tr("Plus"));
 	c++;
-	f = CALCULATOR->getGlobalFunction("neg");
+	f = CALCULATOR->getActiveFunction("neg");
 	if(f) {
 		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));

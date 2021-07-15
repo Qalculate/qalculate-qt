@@ -28,6 +28,19 @@ bool can_display_unicode_string_function(const char*, void*) {
 	return true;
 }
 
+std::string to_html_escaped(const std::string strpre) {
+	std::string str = strpre;
+	if(settings->printops.use_unicode_signs) {
+		gsub(">=", SIGN_GREATER_OR_EQUAL, str);
+		gsub("<=", SIGN_LESS_OR_EQUAL, str);
+		gsub("!=", SIGN_NOT_EQUAL, str);
+	}
+	gsub("&", "&amp;", str);
+	gsub("<", "&lt;", str);
+	gsub(">", "&gt;", str);
+	gsub("\n","<br>", str);
+	return str;
+}
 bool string_is_less(std::string str1, std::string str2) {
 	size_t i = 0;
 	bool b_uni = false;
@@ -887,10 +900,22 @@ void QalculateQtSettings::savePreferences(bool) {
 	fprintf(file, "plot_color=%i\n", default_plot_color);
 	fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
 	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
-	if(!clear_history_on_exit) {
+	if(!clear_history_on_exit && !v_expression.empty()) {
 		fprintf(file, "\n[History]\n");
-		int n = 0;
-		for(size_t i = 0; i < v_expression.size() && n < 300; i++) {
+		long int n = 0;
+		size_t i = v_expression.size() - 1;
+		while(true) {
+			n++;
+			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+				if(v_result[i][i2].length() > 300 && (v_result[i][i2].length() <= 6000 || unhtmlize(v_result[i][i2]).length() <= 5000)) {
+					n += v_result[i][i2].length() / 300;
+				}
+				n++;
+			}
+			if(n >= 300 || i == 0) break;
+			i--;
+		}
+		for(; i < v_expression.size(); i++) {
 			fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
 			n++;
 			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
@@ -904,15 +929,10 @@ void QalculateQtSettings::savePreferences(bool) {
 						fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
 					} else {
 						fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
-						if(v_result[i][i2].length() > 300) {
-							if(v_result[i][i2].length() > 9000) n += 30;
-							else n += v_result[i][i2].length() / 300;
-						}
 					}
 				} else {
 					fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
 				}
-				n++;
 			}
 		}
 		for(size_t i = 0; i < expression_history.size(); i++) {

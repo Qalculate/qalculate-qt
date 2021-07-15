@@ -23,6 +23,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QComboBox>
+#include <QApplication>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -45,6 +46,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	categoriesView->headerItem()->setText(0, tr("Category"));
 	categoriesView->setColumnCount(2);
 	categoriesView->setColumnHidden(1, true);
+	categoriesView->installEventFilter(this);
 	hsplitter->addWidget(categoriesView);
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *vbox = new QVBoxLayout(w);
@@ -53,6 +55,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	unitsView = new QTreeView(this);
 	unitsView->setSelectionMode(QAbstractItemView::SingleSelection);
 	unitsView->setRootIsDecorated(false);
+	unitsView->installEventFilter(this);
 	unitsModel = new ItemProxyModel(this);
 	sourceModel = new QStandardItemModel(this);
 	unitsModel->setSourceModel(sourceModel);
@@ -63,6 +66,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	vbox->addWidget(unitsView, 1);
 	searchEdit = new QLineEdit(this);
 	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
+	searchEdit->installEventFilter(this);
 	vbox->addWidget(searchEdit, 0);
 	hsplitter->addWidget(w);
 	vsplitter->addWidget(hsplitter);
@@ -115,9 +119,10 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	topbox->addWidget(buttonBox);
 	selected_category = "All";
 	updateUnits();
+	unitsView->setFocus();
 	unitsModel->setFilter("All");
 	toModel->setFilter("All");
-	connect(searchEdit, SIGNAL(textEdited(const QString&)), this, SLOT(searchChanged(const QString&)));
+	connect(searchEdit, SIGNAL(textChanged(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(fromEdit, SIGNAL(textEdited(const QString&)), this, SLOT(fromChanged()));
 	connect(toEdit, SIGNAL(textEdited(const QString&)), this, SLOT(toChanged()));
 	connect(toCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(toUnitChanged()));
@@ -191,6 +196,33 @@ void UnitsDialog::toUnitChanged() {
 void UnitsDialog::fromUnitChanged() {
 	convert(last_from);
 }
+bool UnitsDialog::eventFilter(QObject *o, QEvent *e) {
+	if(e->type() == QEvent::KeyPress) {
+		QKeyEvent *event = static_cast<QKeyEvent*>(e);
+		if(o == searchEdit) {
+			if(event->key() == Qt::Key_Down || event->key() == Qt::Key_Up || event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp) {
+				unitsView->setFocus();
+				QKeyEvent *eventCopy = new QKeyEvent(*event);
+				QApplication::postEvent(unitsView, eventCopy);
+				return true;
+			}
+		} else if(o != fromEdit && o != toEdit && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier)) {
+			if(event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9) {
+				if(fromEdit->isEnabled()) {
+					fromEdit->setFocus();
+					fromEdit->setText(event->text());
+					convert(true);
+				}
+				return true;
+			} else if(!event->text().isEmpty() && event->text()[0].isLetterOrNumber()) {
+				searchEdit->setFocus();
+				searchEdit->setText(event->text());
+				return true;
+			}
+		}
+	}
+	return QDialog::eventFilter(o, e);
+}
 void UnitsDialog::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Find)) {
 		searchEdit->setFocus();
@@ -210,6 +242,14 @@ void UnitsDialog::keyPressEvent(QKeyEvent *event) {
 		QModelIndex index = unitsView->selectionModel()->currentIndex();
 		if(index.isValid()) {
 			onUnitActivated(index);
+			return;
+		}
+	}
+	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+		if(event->key() >= Qt::Key_0 && event->key() <= Qt::Key_9 && fromEdit->isEnabled() && !searchEdit->hasFocus() && !fromEdit->hasFocus() && !toEdit->hasFocus()) {
+			fromEdit->setFocus();
+			fromEdit->setText(event->text());
+			convert(true);
 			return;
 		}
 	}
@@ -235,6 +275,7 @@ void UnitsDialog::reject() {
 void UnitsDialog::searchChanged(const QString &str) {
 	unitsModel->setSecondaryFilter(str.toStdString());
 	unitsView->selectionModel()->setCurrentIndex(unitsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+	if(str.isEmpty()) unitsView->setFocus();
 }
 void UnitsDialog::newClicked() {
 	/*Unit *u = UnitEditDialog::newUnit(this);
@@ -396,7 +437,7 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 			if(!u->description().empty()) {
 				if(u->subtype() != SUBTYPE_BASE_UNIT) str += "<br>";
 				str += "<br>";
-				str += u->description();
+				str += to_html_escaped(u->description());
 			}
 			if(u->isActive() != (deactivateButton->text() == tr("Deactivate"))) {
 				deactivateButton->setMinimumWidth(deactivateButton->width());
@@ -660,7 +701,6 @@ void UnitsDialog::updateUnits() {
 }
 void UnitsDialog::setSearch(const QString &str) {
 	searchEdit->setText(str);
-	searchChanged(str);
 }
 void UnitsDialog::selectCategory(std::string str) {
 	QList<QTreeWidgetItem*> list = categoriesView->findItems((str.empty() || str == "All") ? "All" : "/" + QString::fromStdString(str), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
