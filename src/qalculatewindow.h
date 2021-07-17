@@ -139,6 +139,7 @@ class QalculateWindow : public QMainWindow {
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
 		void onBasesVisibilityChanged(bool);
+		void onRPNVisibilityChanged(bool);
 		void onExpressionChanged();
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);

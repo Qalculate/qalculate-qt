@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 	QalculateTranslator eqtr;
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
-		if(translator.load(QLocale(), QLatin1String("qalculate-qt"), QLatin1String("_"), QLatin1String(TRANSLATIONS_DIR))) app.installTranslator(&translator);
+		if(translator.load(QLocale(), QLatin1String("qalculate-qt"), QLatin1String("_"), QLatin1String(":/translations"))) app.installTranslator(&translator);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 		if(translator_qt.load(QLocale(), QLatin1String("qt"), QLatin1String("_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qt);
 		if(translator_qtbase.load(QLocale(), QLatin1String("qtbase"), QLatin1String("_"), QLibraryInfo::path(QLibraryInfo::TranslationsPath))) app.installTranslator(&translator_qtbase);

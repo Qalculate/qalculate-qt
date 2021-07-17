@@ -19,10 +19,8 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 			ICON_DIR = $$PREFIX/share/icons
 		}
 	}
-	TRANSLATIONS_DIR = ":/translations"
 } else {
 	ICON_DIR = ":/icons"
-	TRANSLATIONS_DIR = ":/translations"
 	DEFINES += RESOURCES_COMPILED=1
 }
 isEmpty(MAN_DIR) {
@@ -31,15 +29,16 @@ isEmpty(MAN_DIR) {
 TEMPLATE = app
 TARGET = qalculate-qt
 INCLUDEPATH += src
-CONFIG += link_pkgconfig
-PKGCONFIG += libqalculate
+win32: {
+	LIBS += -lqalculate -lxml2 -lmpfr -liconv -lintl -lgmp -licuuc -lcurl
+} else {
+	CONFIG += link_pkgconfig
+	PKGCONFIG += libqalculate
+}
 CONFIG += qt
 QT += widgets network
 MOC_DIR = build
 OBJECTS_DIR = build
-DEFINES += TRANSLATIONS_DIR=\\\"$$TRANSLATIONS_DIR\\\"
-DEFINES += ICON_DIR=\\\"$$ICON_DIR\\\"
-DEFINES += VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
 

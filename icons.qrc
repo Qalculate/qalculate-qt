@@ -9,7 +9,9 @@
 	<file alias="actions/scalable/edit-copy.svg">data/scalable/edit-copy.svg</file>
 	<file alias="actions/scalable/edit-delete.svg">data/scalable/edit-delete.svg</file>
 	<file alias="actions/scalable/edit-find.svg">data/scalable/edit-find.svg</file>
-	<file alias="actions/scalable/edit-paste.svg">data/scalable/edit-paste.svg</file>
+	<file alias="actions/12/edit-paste.svg">data/scalable/edit-paste-12.svg</file>
+	<file alias="actions/16/edit-paste.svg">data/scalable/edit-paste-16.svg</file>
+	<file alias="actions/24/edit-paste.svg">data/scalable/edit-paste-24.svg</file>
 	<file alias="actions/scalable/edit-undo.svg">data/scalable/edit-undo.svg</file>
 	<file alias="actions/scalable/go-back.svg">data/scalable/go-back.svg</file>
 	<file alias="actions/scalable/go-down.svg">data/scalable/go-down.svg</file>
@@ -30,7 +32,9 @@
 	<file alias="dark/actions/scalable/edit-copy.svg">data/scalable/edit-copy-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-delete.svg">data/scalable/edit-delete-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-find.svg">data/scalable/edit-find-dark.svg</file>
-	<file alias="dark/actions/scalable/edit-paste.svg">data/scalable/edit-paste-dark.svg</file>
+	<file alias="dark/actions/12/edit-paste.svg">data/scalable/edit-paste-dark-12.svg</file>
+	<file alias="dark/actions/16/edit-paste.svg">data/scalable/edit-paste-dark-16.svg</file>
+	<file alias="dark/actions/24/edit-paste.svg">data/scalable/edit-paste-dark-24.svg</file>
 	<file alias="dark/actions/scalable/edit-undo.svg">data/scalable/edit-undo-dark.svg</file>
 	<file alias="dark/actions/scalable/go-back.svg">data/scalable/go-back-dark.svg</file>
 	<file alias="dark/actions/scalable/go-down.svg">data/scalable/go-down-dark.svg</file>

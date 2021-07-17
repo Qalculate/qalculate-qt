@@ -63,6 +63,9 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	vbox->addWidget(functionsView, 1);
 	searchEdit = new QLineEdit(this);
 	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
+#ifdef _WIN32
+	searchEdit->setTextMargins(22, 0, 0, 0);
+#endif
 	searchEdit->installEventFilter(this);
 	vbox->addWidget(searchEdit, 0);
 	hsplitter->addWidget(w);
@@ -111,7 +114,7 @@ bool FunctionsDialog::eventFilter(QObject *o, QEvent *e) {
 		if(o == searchEdit) {
 			if(event->key() == Qt::Key_Down || event->key() == Qt::Key_Up || event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp) {
 				functionsView->setFocus();
-				QKeyEvent *eventCopy = new QKeyEvent(*event);
+				QKeyEvent *eventCopy = new QKeyEvent(event->type(), event->key(), event->modifiers(), event->text(), event->isAutoRepeat(), event->count());
 				QApplication::postEvent(functionsView, eventCopy);
 				return true;
 			}

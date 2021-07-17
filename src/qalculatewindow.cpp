@@ -719,6 +719,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
+	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
@@ -951,15 +952,15 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	if(settings->chain_mode) {
 		if(!expressionEdit->document()->isEmpty()) {
 			expressionEdit->selectAll();
-			do_exec = true;
+			do_exec = f->minargs() <= 1;
 		}
 	} else if(cur.hasSelection()) {
-		do_exec = cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+		do_exec = f->minargs() <= 1 && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
 		expressionEdit->selectAll();
-		do_exec = true;
+		do_exec = f->minargs() <= 1;
 	}
-	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
+	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
@@ -1120,7 +1121,6 @@ void QalculateWindow::socketReadyRead() {
 	qApp->processEvents();
 	raise();
 	activateWindow();
-	qDebug() << command;
 	if(command.isEmpty()) return;
 	if(command[0] == '-') {
 		settings->allow_multiple_instances = false;
@@ -4901,19 +4901,23 @@ struct FunctionDialog {
 MathSpinBox::MathSpinBox(QWidget *parent) : QSpinBox(parent) {
 	setLineEdit(new MathLineEdit(this));
 	connect(lineEdit(), SIGNAL(returnPressed()), this, SIGNAL(returnPressed()));
+#ifndef _WIN32
+	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
 }
 MathSpinBox::~MathSpinBox() {}
 
 int MathSpinBox::valueFromText(const QString &text) const {
 	if(settings->evalops.parse_options.base != BASE_DECIMAL) return QSpinBox::valueFromText(text);
-	bool b = false;
-	int v = text.toInt(&b);
-	if(b) return v;
+	std::string str = text.toStdString();
+	if(str.find_first_not_of(NUMBERS) == std::string::npos) {
+		return text.toInt();
+	}
 	MathStructure value;
 	CALCULATOR->beginTemporaryStopMessages();
 	EvaluationOptions eo = settings->evalops;
 	eo.parse_options.base = 10;
-	CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(text.toStdString(), eo.parse_options), 100, eo);
+	CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo);
 	CALCULATOR->endTemporaryStopMessages();
 	return value.number().intValue();
 }
@@ -4921,16 +4925,7 @@ QValidator::State MathSpinBox::validate(QString &text, int &pos) const {
 	if(settings->evalops.parse_options.base != BASE_DECIMAL) return QSpinBox::validate(text, pos);
 	std::string str = text.trimmed().toStdString();
 	if(str.empty()) return QValidator::Intermediate;
-	if(str.find_first_not_of(NUMBERS) == std::string::npos) return QValidator::Acceptable;
-	if(last_is_operator(str)) return QValidator::Intermediate;
-	MathStructure value;
-	CALCULATOR->beginTemporaryStopMessages();
-	EvaluationOptions eo = settings->evalops;
-	eo.parse_options.base = 10;
-	CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(text.toStdString(), eo.parse_options), 100, eo);
-	CALCULATOR->endTemporaryStopMessages();
-	if(value.isNumber()) return QValidator::Acceptable;
-	return QValidator::Intermediate;
+	return QValidator::Acceptable;
 }
 QLineEdit *MathSpinBox::entry() const {
 	return lineEdit();
@@ -5054,17 +5049,19 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	fd->w_scrollresult->setFixedHeight(fm.lineSpacing() * 2 + fd->w_scrollresult->frameWidth() * 2 + fd->w_scrollresult->contentsMargins().top() + fd->w_scrollresult->contentsMargins().bottom());
 	box->addWidget(fd->w_scrollresult, Qt::AlignRight);
 
+	QHBoxLayout *hbox = new QHBoxLayout();
+	box->addLayout(hbox);
+	fd->b_keepopen = new QCheckBox(tr("Keep open"));
+	fd->keep_open = settings->keep_function_dialog_open;
+	fd->b_keepopen->setChecked(fd->keep_open);
+	hbox->addWidget(fd->b_keepopen);
+	hbox->addStretch(1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, fd->dialog);
-	box->addWidget(buttonBox);
+	hbox->addWidget(buttonBox);
 	fd->b_cancel = buttonBox->button(QDialogButtonBox::Close);
 	fd->b_exec = buttonBox->addButton(settings->rpn_mode ? tr("Enter", "RPN Enter") : tr("Calculate"), QDialogButtonBox::ApplyRole);
 	fd->b_insert = buttonBox->addButton(settings->rpn_mode ? tr("Apply to Stack") : tr("Insert"), QDialogButtonBox::AcceptRole);
 	if(settings->rpn_mode && CALCULATOR->RPNStackSize() < (f->minargs() <= 0 ? 1 : (size_t) f->minargs())) fd->b_insert->setEnabled(false);
-	fd->b_keepopen = new QCheckBox(tr("Keep open"));
-	fd->keep_open = settings->keep_function_dialog_open;
-	fd->b_keepopen->setChecked(fd->keep_open);
-	buttonBox->addButton(fd->b_keepopen, QDialogButtonBox::ActionRole);
-	box->addWidget(buttonBox);
 
 	fd->label.resize(args, NULL);
 	fd->entry.resize(args, NULL);
@@ -5098,137 +5095,125 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		fd->label[i]->setAlignment(Qt::AlignRight);
 		QWidget *entry = NULL;
 		if(arg) {
-			switch(arg->type()) {
-				case ARGUMENT_TYPE_INTEGER: {
-					IntegerArgument *iarg = (IntegerArgument*) arg;
-					int min = INT_MIN, max = INT_MAX;
-					if(iarg->min()) {
-						min = iarg->min()->intValue();
-					}
-					if(iarg->max()) {
-						max = iarg->max()->intValue();
-					}
-					MathSpinBox *spin = new MathSpinBox();
-					entry = spin;
-					fd->entry[i] = spin->entry();
-					spin->setRange(min, max);
-					if(!defstr.isEmpty()) {
-						spin->setValue(defstr.toInt());
-					} else if(!arg->zeroForbidden() && min <= 0 && max >= 0) {
-						spin->setValue(0);
+			if(arg->type() == ARGUMENT_TYPE_INTEGER) {
+				IntegerArgument *iarg = (IntegerArgument*) arg;
+				int min = INT_MIN, max = INT_MAX;
+				if(iarg->min()) {
+					min = iarg->min()->intValue();
+				}
+				if(iarg->max()) {
+					max = iarg->max()->intValue();
+				}
+				MathSpinBox *spin = new MathSpinBox();
+				entry = spin;
+				fd->entry[i] = spin->entry();
+				spin->setRange(min, max);
+				if(!defstr.isEmpty()) {
+					spin->setValue(defstr.toInt());
+				} else if(!arg->zeroForbidden() && min <= 0 && max >= 0) {
+					spin->setValue(0);
+				} else {
+					if(max < 0) {
+						spin->setValue(max);
+					} else if(min <= 1) {
+						spin->setValue(1);
 					} else {
-						if(max < 0) {
-							spin->setValue(max);
-						} else if(min <= 1) {
-							spin->setValue(1);
-						} else {
-							spin->setValue(min);
-						}
+						spin->setValue(min);
 					}
-					spin->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
-					connect(spin, SIGNAL(textChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
-					connect(spin, SIGNAL(valueChanged(int)), this, SLOT(onInsertFunctionChanged()));
-					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
-					break;
 				}
-				case ARGUMENT_TYPE_DATE: {
-					MathDateTimeEdit *dateEdit = new MathDateTimeEdit();
-					entry = dateEdit;
-					if(defstr == "now") {
-						dateEdit->setDateTime(QDateTime::currentDateTime());
-						dateEdit->setDisplayFormat("yyyy-MM-ddTHH:mm:ss");
-					} else {
-						dateEdit->setDate(QDate::currentDate());
-						dateEdit->setDisplayFormat("yyyy-MM-dd");
-						dateEdit->setCalendarPopup(true);
+				spin->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+				connect(spin, SIGNAL(textChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
+				connect(spin, SIGNAL(valueChanged(int)), this, SLOT(onInsertFunctionChanged()));
+				connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+			} else if(arg->type() == ARGUMENT_TYPE_DATE) {
+				MathDateTimeEdit *dateEdit = new MathDateTimeEdit();
+				entry = dateEdit;
+				if(defstr == "now") {
+					dateEdit->setDateTime(QDateTime::currentDateTime());
+					dateEdit->setDisplayFormat("yyyy-MM-ddTHH:mm:ss");
+				} else {
+					dateEdit->setDate(QDate::currentDate());
+					dateEdit->setDisplayFormat("yyyy-MM-dd");
+					dateEdit->setCalendarPopup(true);
+				}
+				dateEdit->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+				fd->entry[i] = dateEdit->entry();
+				connect(dateEdit, SIGNAL(dateTimeChanged(const QDateTime&)), this, SLOT(onInsertFunctionChanged()));
+				connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+			} else if(arg->type() == ARGUMENT_TYPE_BOOLEAN) {
+				fd->boolean_index[i] = bindex;
+				bindex += 2;
+				fd->entry[i] = new QWidget();
+				hbox = new QHBoxLayout(fd->entry[i]);
+				QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
+				QRadioButton *w = new QRadioButton(tr("True")); group->addButton(w); hbox->addWidget(w);
+				w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+				fd->boolean_buttons.push_back(w);
+				w = new QRadioButton(tr("False")); group->addButton(w); hbox->addWidget(w);
+				w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
+				fd->boolean_buttons.push_back(w); w->setChecked(true);
+				hbox->addStretch(1);
+				connect(fd->boolean_buttons[fd->boolean_buttons.size() - 2], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
+				connect(fd->boolean_buttons[fd->boolean_buttons.size() - 1], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
+			} else if(arg->type() == ARGUMENT_TYPE_DATA_PROPERTY && f->subtype() == SUBTYPE_DATA_SET) {
+					QComboBox *w = new QComboBox();
+					fd->entry[i] = w;
+					DataPropertyIter it;
+					DataSet *ds = (DataSet*) f;
+					DataProperty *dp = ds->getFirstProperty(&it);
+					if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
+						QTableWidgetItem *item = rpnView->item(i, 0);
+						if(item) defstr = item->text();
 					}
-					dateEdit->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
-					fd->entry[i] = dateEdit->entry();
-					connect(dateEdit, SIGNAL(dateTimeChanged(const QDateTime&)), this, SLOT(onInsertFunctionChanged()));
-					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
-					break;
-				}
-				case ARGUMENT_TYPE_BOOLEAN: {
-					fd->boolean_index[i] = bindex;
-					bindex += 2;
-					fd->entry[i] = new QWidget();
-					QHBoxLayout *hbox = new QHBoxLayout(fd->entry[i]);
-					QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
-					QRadioButton *w = new QRadioButton(tr("True")); group->addButton(w); hbox->addWidget(w);
-					w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
-					fd->boolean_buttons.push_back(w);
-					w = new QRadioButton(tr("False")); group->addButton(w); hbox->addWidget(w);
-					w->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
-					fd->boolean_buttons.push_back(w); w->setChecked(true);
-					hbox->addStretch(1);
-					connect(fd->boolean_buttons[fd->boolean_buttons.size() - 2], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
-					connect(fd->boolean_buttons[fd->boolean_buttons.size() - 1], SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionChanged()));
-					break;
-				}
-				case ARGUMENT_TYPE_DATA_PROPERTY: {
-					if(f->subtype() == SUBTYPE_DATA_SET) {
-						QComboBox *w = new QComboBox();
-						fd->entry[i] = w;
-						DataPropertyIter it;
-						DataSet *ds = (DataSet*) f;
-						DataProperty *dp = ds->getFirstProperty(&it);
-						if(fd->rpn && (size_t) i < CALCULATOR->RPNStackSize()) {
-							QTableWidgetItem *item = rpnView->item(i, 0);
-							if(item) defstr = item->text();
-						}
-						int active_index = -1;
-						for(int i2 = 0; dp; i2++) {
-							if(!dp->isHidden()) {
-								w->addItem(QString::fromStdString(dp->title()), QVariant::fromValue((void*) dp));
-								if(active_index < 0 && defstr.toStdString() == dp->getName()) {
-									active_index = i2;
-								}
+					int active_index = -1;
+					for(int i2 = 0; dp; i2++) {
+						if(!dp->isHidden()) {
+							w->addItem(QString::fromStdString(dp->title()), QVariant::fromValue((void*) dp));
+							if(active_index < 0 && defstr.toStdString() == dp->getName()) {
+								active_index = i2;
 							}
-							dp = ds->getNextProperty(&it);
 						}
-						w->addItem(tr("Info"), QVariant::fromValue((void*) NULL));
-						if(active_index < 0) active_index = w->count() - 1;
-						w->setCurrentIndex(active_index);
-						connect(w, SIGNAL(currentTextChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
-						break;
+						dp = ds->getNextProperty(&it);
 					}
+					w->addItem(tr("Info"), QVariant::fromValue((void*) NULL));
+					if(active_index < 0) active_index = w->count() - 1;
+					w->setCurrentIndex(active_index);
+					connect(w, SIGNAL(currentTextChanged(const QString&)), this, SLOT(onInsertFunctionChanged()));
+			} else {
+				typestr = QString::fromStdString(arg->printlong());
+				if(typestr == freetype) typestr = "";
+				if(i == 1 && f == CALCULATOR->f_ascii && arg->type() == ARGUMENT_TYPE_TEXT) {
+					QComboBox *combo = new QComboBox();
+					combo->setEditable(true);
+					combo->addItem("UTF-8");
+					combo->addItem("UTF-16");
+					combo->addItem("UTF-32");
+					fd->entry[i] = combo->lineEdit();
+					entry = combo;
+				} else if(i == 3 && f == CALCULATOR->f_date && arg->type() == ARGUMENT_TYPE_TEXT) {
+					QComboBox *combo = new QComboBox();
+					combo->setEditable(true);
+					combo->addItem("chinese");
+					combo->addItem("coptic");
+					combo->addItem("egyptian");
+					combo->addItem("ethiopian");
+					combo->addItem("gregorian");
+					combo->addItem("hebrew");
+					combo->addItem("indian");
+					combo->addItem("islamic");
+					combo->addItem("julian");
+					combo->addItem("milankovic");
+					combo->addItem("persian");
+					entry = combo;
+					fd->entry[i] = combo->lineEdit();
+				} else {
+					fd->entry[i] = new MathLineEdit();
 				}
-				default: {
-					typestr = QString::fromStdString(arg->printlong());
-					if(typestr == freetype) typestr = "";
-					if(i == 1 && f == CALCULATOR->f_ascii && arg->type() == ARGUMENT_TYPE_TEXT) {
-						QComboBox *combo = new QComboBox();
-						combo->setEditable(true);
-						combo->addItem("UTF-8");
-						combo->addItem("UTF-16");
-						combo->addItem("UTF-32");
-						fd->entry[i] = combo->lineEdit();
-						entry = combo;
-					} else if(i == 3 && f == CALCULATOR->f_date && arg->type() == ARGUMENT_TYPE_TEXT) {
-						QComboBox *combo = new QComboBox();
-						combo->setEditable(true);
-						combo->addItem("chinese");
-						combo->addItem("coptic");
-						combo->addItem("egyptian");
-						combo->addItem("ethiopian");
-						combo->addItem("gregorian");
-						combo->addItem("hebrew");
-						combo->addItem("indian");
-						combo->addItem("islamic");
-						combo->addItem("julian");
-						combo->addItem("milankovic");
-						combo->addItem("persian");
-						entry = combo;
-						fd->entry[i] = combo->lineEdit();
-					} else {
-						fd->entry[i] = new MathLineEdit();
-					}
-					if(i >= f->minargs() && !has_vector) {
-						((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional argument"));
-					}
-					connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));
-					connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
+				if(i >= f->minargs() && !has_vector) {
+					((QLineEdit*) fd->entry[i])->setPlaceholderText(tr("optional", "optional argument"));
 				}
+				connect(fd->entry[i], SIGNAL(textEdited(const QString&)), this, SLOT(onInsertFunctionChanged()));
+				connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
 			}
 		} else {
 			fd->entry[i] = new MathLineEdit();
@@ -5240,11 +5225,17 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		}
 		if(arg && arg->type() == ARGUMENT_TYPE_FILE) {
 			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
+#ifdef _WIN32
+			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
+#endif
 			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
 			typestr = "";
 			connect(action, SIGNAL(triggered()), this, SLOT(onEntrySelectFile()));
 		} else if(arg && arg->type() == ARGUMENT_TYPE_MATRIX) {
 			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("table"), QLineEdit::TrailingPosition);
+#ifdef _WIN32
+			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
+#endif
 			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
 			typestr = "";
 			connect(action, SIGNAL(triggered()), this, SLOT(onEntryEditMatrix()));
@@ -5622,6 +5613,15 @@ void QalculateWindow::normalModeActivated() {
 	CALCULATOR->clearRPNStack();
 	rpnView->clear();
 	rpnView->setRowCount(0);
+}
+void QalculateWindow::onRPNVisibilityChanged(bool b) {
+	if(settings->rpn_mode != b) {
+		rpnModeActivated();
+		if(b) {
+			QAction *w = findChild<QAction*>("action_rpnmode");
+			if(w) w->setChecked(true);
+		}
+	}
 }
 void QalculateWindow::rpnModeActivated() {
 	if(settings->rpn_mode) {

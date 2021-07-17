@@ -144,9 +144,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
 	QGridLayout *grid1 = new QGridLayout();
 	QGridLayout *grid2 = new QGridLayout();
-	box->addLayout(grid1);
+	box->addLayout(grid1, 2);
 	box->addSpacing(box->spacing());
-	box->addLayout(grid2);
+	box->addLayout(grid2, 3);
 	QGridLayout *grid = grid1;
 	KeypadButton *button;
 	MathFunction *f, *f2;

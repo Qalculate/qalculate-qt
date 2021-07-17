@@ -100,7 +100,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		std::string expression() const;
 		QSize sizeHint() const override;
 
-		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false);
+		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false, bool add_comma = false);
 		bool doChainMode(const QString &op);
 		bool expressionHasChanged();
 		void setExpressionHasChanged(bool);
