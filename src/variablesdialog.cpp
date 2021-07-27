@@ -22,6 +22,7 @@
 #include <QLineEdit>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QApplication>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -45,6 +46,7 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	categoriesView->headerItem()->setText(0, tr("Category"));
 	categoriesView->setColumnCount(2);
 	categoriesView->setColumnHidden(1, true);
+	categoriesView->installEventFilter(this);
 	hsplitter->addWidget(categoriesView);
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *vbox = new QVBoxLayout(w);
@@ -53,6 +55,7 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	variablesView = new QTreeView(this);
 	variablesView->setSelectionMode(QAbstractItemView::SingleSelection);
 	variablesView->setRootIsDecorated(false);
+	variablesView->installEventFilter(this);
 	variablesModel = new ItemProxyModel(this);
 	sourceModel = new QStandardItemModel(this);
 	variablesModel->setSourceModel(sourceModel);
@@ -63,6 +66,10 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	vbox->addWidget(variablesView, 1);
 	searchEdit = new QLineEdit(this);
 	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
+#ifdef _WIN32
+	searchEdit->setTextMargins(22, 0, 0, 0);
+#endif
+	searchEdit->installEventFilter(this);
 	vbox->addWidget(searchEdit, 0);
 	hsplitter->addWidget(w);
 	vsplitter->addWidget(hsplitter);
@@ -93,8 +100,9 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	topbox->addWidget(buttonBox);
 	selected_category = "All";
 	updateVariables();
+	variablesView->setFocus();
 	variablesModel->setFilter("All");
-	connect(searchEdit, SIGNAL(textEdited(const QString&)), this, SLOT(searchChanged(const QString&)));
+	connect(searchEdit, SIGNAL(textChanged(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(categoriesView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(variablesView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedVariableChanged(const QModelIndex&, const QModelIndex&)));
@@ -126,6 +134,26 @@ void VariablesDialog::keyPressEvent(QKeyEvent *event) {
 	}
 	QDialog::keyPressEvent(event);
 }
+bool VariablesDialog::eventFilter(QObject *o, QEvent *e) {
+	if(e->type() == QEvent::KeyPress) {
+		QKeyEvent *event = static_cast<QKeyEvent*>(e);
+		if(o == searchEdit) {
+			if(event->key() == Qt::Key_Down || event->key() == Qt::Key_Up || event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp) {
+				variablesView->setFocus();
+				QKeyEvent *eventCopy = new QKeyEvent(event->type(), event->key(), event->modifiers(), event->text(), event->isAutoRepeat(), event->count());
+				QApplication::postEvent(variablesView, eventCopy);
+				return true;
+			}
+		} else if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+			if(!event->text().isEmpty() && event->text()[0].isLetterOrNumber()) {
+				searchEdit->setFocus();
+				searchEdit->setText(event->text());
+				return true;
+			}
+		}
+	}
+	return QDialog::eventFilter(o, e);
+}
 void VariablesDialog::closeEvent(QCloseEvent *e) {
 	settings->variables_geometry = saveGeometry();
 	settings->variables_vsplitter_state = vsplitter->saveState();
@@ -141,6 +169,7 @@ void VariablesDialog::reject() {
 void VariablesDialog::searchChanged(const QString &str) {
 	variablesModel->setSecondaryFilter(str.toStdString());
 	variablesView->selectionModel()->setCurrentIndex(variablesModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+	if(str.isEmpty()) variablesView->setFocus();
 }
 void VariablesDialog::newMatrix() {newVariable(2);}
 void VariablesDialog::newVariable() {newVariable(0);}
@@ -330,7 +359,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 			}
 			if(!v->description().empty()) {
 				str += "<br><br>";
-				str += v->description();
+				str += to_html_escaped(v->description());
 			}
 			if(v->isActive() != (deactivateButton->text() == tr("Deactivate"))) {
 				deactivateButton->setMinimumWidth(deactivateButton->width());
@@ -526,7 +555,6 @@ void VariablesDialog::updateVariables() {
 }
 void VariablesDialog::setSearch(const QString &str) {
 	searchEdit->setText(str);
-	searchChanged(str);
 }
 void VariablesDialog::selectCategory(std::string str) {
 	QList<QTreeWidgetItem*> list = categoriesView->findItems((str.empty() || str == "All") ? "All" : "/" + QString::fromStdString(str), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);

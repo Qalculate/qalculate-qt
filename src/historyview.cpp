@@ -187,11 +187,14 @@ void HistoryView::loadInitial() {
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, int exact, bool dual_approx, const QString &image, bool initial_load, size_t index) {
 	QFontMetrics fm(font());
 	int paste_h = fm.ascent();
+	if(paste_h < 16) paste_h = 12;
+	else if(paste_h < 24) paste_h = 16;
+	else paste_h = 24;
 	QString str;
 	if(!expression.empty()) {
 		str += "<div style=\"text-align:left; line-height:120%\">";
-		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
-		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
+		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
+		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
 		str += THIN_SPACE;
 		str += QString::fromStdString(expression);
 		str += "</div>";
@@ -225,7 +228,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "\">";
 			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
 			if(!mstr.startsWith("-")) str += "- ";
-			str += mstr;
+			if(settings->printops.use_unicode_signs) {
+				mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
+				mstr.replace("<=", SIGN_LESS_OR_EQUAL);
+				mstr.replace("!=", SIGN_NOT_EQUAL);
+			}
+			str += mstr.toHtmlEscaped();
 			str += "</div>";
 		} while(CALCULATOR->nextMessage());
 		if(str.isEmpty() && values.empty() && expression.empty()) return;
@@ -260,11 +268,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(initial_load) str += THIN_SPACE;
 		else str += "<font size=\"+0\">" THIN_SPACE "</font>";
 		if(initial_load) {
-			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
-			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
+			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
+			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 		} else {
-			if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
-			else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/scalable/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
+			if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
+			else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
 		}
 		str += "</div>";
 	}

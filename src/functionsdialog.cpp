@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QKeyEvent>
+#include <QApplication>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -42,6 +43,7 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	categoriesView->headerItem()->setText(0, tr("Category"));
 	categoriesView->setColumnCount(2);
 	categoriesView->setColumnHidden(1, true);
+	categoriesView->installEventFilter(this);
 	hsplitter->addWidget(categoriesView);
 	QWidget *w = new QWidget(this);
 	QVBoxLayout *vbox = new QVBoxLayout(w);
@@ -51,6 +53,7 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	functionsView->setSelectionMode(QAbstractItemView::SingleSelection);
 	functionsView->setRootIsDecorated(false);
 	functionsModel = new ItemProxyModel(this);
+	functionsView->installEventFilter(this);
 	sourceModel = new QStandardItemModel(this);
 	functionsModel->setSourceModel(sourceModel);
 	sourceModel->setColumnCount(1);
@@ -60,6 +63,10 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	vbox->addWidget(functionsView, 1);
 	searchEdit = new QLineEdit(this);
 	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
+#ifdef _WIN32
+	searchEdit->setTextMargins(22, 0, 0, 0);
+#endif
+	searchEdit->installEventFilter(this);
 	vbox->addWidget(searchEdit, 0);
 	hsplitter->addWidget(w);
 	vsplitter->addWidget(hsplitter);
@@ -86,8 +93,9 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	topbox->addWidget(buttonBox);
 	selected_category = "All";
 	updateFunctions();
+	functionsView->setFocus();
 	functionsModel->setFilter("All");
-	connect(searchEdit, SIGNAL(textEdited(const QString&)), this, SLOT(searchChanged(const QString&)));
+	connect(searchEdit, SIGNAL(textChanged(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(categoriesView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(functionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedFunctionChanged(const QModelIndex&, const QModelIndex&)));
@@ -100,6 +108,26 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 }
 FunctionsDialog::~FunctionsDialog() {}
 
+bool FunctionsDialog::eventFilter(QObject *o, QEvent *e) {
+	if(e->type() == QEvent::KeyPress) {
+		QKeyEvent *event = static_cast<QKeyEvent*>(e);
+		if(o == searchEdit) {
+			if(event->key() == Qt::Key_Down || event->key() == Qt::Key_Up || event->key() == Qt::Key_PageDown || event->key() == Qt::Key_PageUp) {
+				functionsView->setFocus();
+				QKeyEvent *eventCopy = new QKeyEvent(event->type(), event->key(), event->modifiers(), event->text(), event->isAutoRepeat(), event->count());
+				QApplication::postEvent(functionsView, eventCopy);
+				return true;
+			}
+		} else if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+			if(!event->text().isEmpty() && event->text()[0].isLetterOrNumber()) {
+				searchEdit->setFocus();
+				searchEdit->setText(event->text());
+				return true;
+			}
+		}
+	}
+	return QDialog::eventFilter(o, e);
+}
 void FunctionsDialog::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Find)) {
 		searchEdit->setFocus();
@@ -107,7 +135,6 @@ void FunctionsDialog::keyPressEvent(QKeyEvent *event) {
 	}
 	if(event->key() == Qt::Key_Escape && searchEdit->hasFocus()) {
 		searchEdit->clear();
-		searchChanged(QString());
 		functionsView->setFocus();
 		return;
 	}
@@ -135,6 +162,7 @@ void FunctionsDialog::reject() {
 void FunctionsDialog::searchChanged(const QString &str) {
 	functionsModel->setSecondaryFilter(str.toStdString());
 	functionsView->selectionModel()->setCurrentIndex(functionsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+	if(str.isEmpty()) functionsView->setFocus();
 }
 void FunctionsDialog::newClicked() {
 	MathFunction *replaced_item = NULL;
@@ -295,24 +323,24 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			str += "</i><br>";
 			if(f->subtype() == SUBTYPE_DATA_SET) {
 				str += "<br>";
-				str += tr("Retrieves data from the %1 data set for a given object and property. If \"info\" is typed as property, a dialog window will pop up with all properties of the object.").arg(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) descriptionView))).toStdString();
+				str += tr("Retrieves data from the %1 data set for a given object and property. If \"info\" is typed as property, a dialog window will pop up with all properties of the object.").arg(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) descriptionView))).toHtmlEscaped().toStdString();
 				str += "<br>";
 			}
 			if(!f->description().empty()) {
 				str += "<br>";
-				str += f->description();
+				str += to_html_escaped(f->description());
 				str += "<br>";
 			}
 			if(!f->example(true).empty()) {
 				str += "<br>";
 				str += tr("Example:").toStdString();
 				str += " ";
-				str += f->example(false, ename->name);
+				str += to_html_escaped(f->example(false, ename->name));
 				str += "<br>";
 			}
 			if(f->subtype() == SUBTYPE_DATA_SET && !((DataSet*) f)->copyright().empty()) {
 				str += "<br>";
-				str += ((DataSet*) f)->copyright();
+				str += to_html_escaped(((DataSet*) f)->copyright());
 				str += "<br>";
 			}
 			if(iargs) {
@@ -328,7 +356,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 					}
 					str += ": <i>";
 					if(arg) {
-						str += arg->printlong();
+						str += to_html_escaped(arg->printlong());
 					} else {
 						str += default_arg.printlong();
 					}
@@ -351,7 +379,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				str += "<br>";
 				str += tr("Requirement:", "Required condition for function").toStdString();
 				str += " ";
-				str += f->printCondition();
+				str += to_html_escaped(f->printCondition());
 				str += "<br>";
 			}
 			if(f->subtype() == SUBTYPE_DATA_SET) {
@@ -380,19 +408,13 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 						str += "<br>";
 						if(!dp->description().empty()) {
 							str += "<i>";
-							str += dp->description();
+							str += to_html_escaped(dp->description());
 							str += "</i><br>";
 						}
 					}
 					dp = ds->getNextProperty(&it);
 				}
 			}
-			if(settings->printops.use_unicode_signs) {
-				gsub(">=", SIGN_GREATER_OR_EQUAL, str);
-				gsub("<=", SIGN_LESS_OR_EQUAL, str);
-				gsub("!=", SIGN_NOT_EQUAL, str);
-			}
-			gsub("\n","<br>", str);
 			if(f->isActive() != (deactivateButton->text() == tr("Deactivate"))) {
 				deactivateButton->setMinimumWidth(deactivateButton->width());
 				if(f->isActive()) {
@@ -589,7 +611,6 @@ void FunctionsDialog::updateFunctions() {
 }
 void FunctionsDialog::setSearch(const QString &str) {
 	searchEdit->setText(str);
-	searchChanged(str);
 }
 void FunctionsDialog::selectCategory(std::string str) {
 	QList<QTreeWidgetItem*> list = categoriesView->findItems((str.empty() || str == "All") ? "All" : "/" + QString::fromStdString(str), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);

@@ -52,7 +52,7 @@ bool last_is_operator(std::string str, bool allow_exp) {
 	} else {
 		if(str.length() >= 3 && str[str.length() - 2] < 0) {
 			str = str.substr(str.length() - 3);
-			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == SIGN_MULTIPLICATION || str == SIGN_DIVISION_SLASH || SIGN_MINUS) {
+			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == SIGN_MULTIPLICATION || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) {
 				return true;
 			}
 		}
@@ -1316,6 +1316,24 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 						return;
 					}
 				}
+				if(history_index + 1 < (int) settings->expression_history.size()) {
+					if(history_index == -1) current_history = toPlainText();
+					history_index++;
+					dont_change_index = true;
+					blockCompletion(true);
+					blockParseStatus(true);
+					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
+					if(history_index == -1) setExpression(current_history);
+					else if(settings->expression_history.empty()) history_index = -1;
+					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
+					blockParseStatus(false);
+					blockCompletion(false);
+					dont_change_index = false;
+				} else {
+					break;
+				}
+				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
+				return;
 			}
 			case Qt::Key_PageUp: {
 				if(history_index + 1 < (int) settings->expression_history.size()) {
@@ -1324,8 +1342,9 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					dont_change_index = true;
 					blockCompletion(true);
 					blockParseStatus(true);
-					if(history_index == -1 && current_history == toPlainText()) history_index = 0;
+					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
+					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
 					blockParseStatus(false);
 					blockCompletion(false);
@@ -1353,6 +1372,22 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 						return;
 					}
 				}
+				if(history_index == -1) current_history = toPlainText();
+				if(history_index >= -1) history_index--;
+				dont_change_index = true;
+				blockCompletion(true);
+				blockParseStatus(true);
+				if(history_index < 0) {
+					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
+					else clear();
+				} else {
+					setExpression(QString::fromStdString(settings->expression_history[history_index]));
+				}
+				blockParseStatus(false);
+				blockCompletion(false);
+				dont_change_index = false;
+				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
+				return;
 			}
 			case Qt::Key_PageDown: {
 				if(history_index == -1) current_history = toPlainText();
@@ -1368,6 +1403,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 				blockParseStatus(false);
 				blockCompletion(false);
+				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
 				return;
 			}
@@ -1572,7 +1608,7 @@ void ExpressionEdit::showCurrentStatus() {
 		QToolTip::hideText();
 	} else {
 		// fool QToolTip with zero width space
-		if(current_status_text == QToolTip::text()) current_status_text += "​";
+		if(current_status_text == QToolTip::text()) current_status_text += QChar(0x200b);
 		QToolTip::showText(mapToGlobal(cursorRect().bottomRight()), current_status_text);
 	}
 }
@@ -1590,7 +1626,7 @@ void ExpressionEdit::setStatusText(const QString &text) {
 			current_status_text = text;
 		}
 		// fool QToolTip with zero width space
-		current_status_text += "​";
+		current_status_text += QChar(0x200b);
 		if(settings->expression_status_delay > 0 && !QToolTip::isVisible()) {
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
@@ -2466,7 +2502,7 @@ void ExpressionEdit::insertBrackets() {
 	cur.endEditBlock();
 	highlightParentheses();
 }
-void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses) {
+void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma) {
 	parse_blocked++;
 	QTextCursor cur = textCursor();
 	if(cur.hasSelection()) {
@@ -2525,8 +2561,13 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			cur.insertText(text + "(");
 			iend += text.length() + 1;
 			cur.setPosition(iend);
-			cur.insertText(")");
-			iend++;
+			if(add_comma) {
+				cur.insertText(QString::fromStdString(CALCULATOR->getComma()) + " )");
+				iend += 3;
+			} else {
+				cur.insertText(")");
+				iend++;
+			}
 			istart++;
 			CALCULATOR->parseSigns(str);
 			if(!str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {

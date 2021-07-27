@@ -22,12 +22,15 @@ class QByteArray;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
+#define VERSION "3.20.0"
+
 #define EQUALS_IGNORECASE_AND_LOCAL(x,y,z)	(equalsIgnoreCase(x, y) || equalsIgnoreCase(x, z.toStdString()))
 #define EQUALS_IGNORECASE_AND_LOCAL_NR(x,y,z,a)	(equalsIgnoreCase(x, y a) || (x.length() == z.length() + strlen(a) && equalsIgnoreCase(x.substr(0, x.length() - strlen(a)), z.toStdString()) && equalsIgnoreCase(x.substr(x.length() - strlen(a)), a)))
 
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
 
+std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);

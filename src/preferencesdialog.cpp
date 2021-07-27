@@ -280,7 +280,7 @@ void PreferencesDialog::eToggled(bool b) {
 }
 void PreferencesDialog::imaginaryJToggled(bool b) {
 	Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
-	if(!v_i || (b != (CALCULATOR->v_i->hasName("j") > 0))) return;
+	if(!v_i || (b == (CALCULATOR->v_i->hasName("j") > 0))) return;
 	if(b) {
 		ExpressionName ename = v_i->getName(1);
 		ename.name = "j";
@@ -382,10 +382,9 @@ void PreferencesDialog::conversionChanged(int i) {
 	settings->evalops.auto_post_conversion = (AutoPostConversion) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit expressionCalculationUpdated(0);
 }
-void PreferencesDialog::prefixesChanged(int index) {
-	int i = qobject_cast<QComboBox*>(sender())->itemData(index).toInt();
+void PreferencesDialog::prefixesChanged(int i) {
 	settings->prefixes_default = (i == 0);
-	settings->printops.use_unit_prefixes = (i == 0 && settings->printops.negative_exponents) || i >= 2;
+	settings->printops.use_unit_prefixes = (i == 0 && (settings->printops.min_exp == EXP_PRECISION || settings->printops.min_exp == EXP_NONE)) || i >= 2;
 	settings->printops.use_prefixes_for_all_units = (i == 4);
 	settings->printops.use_prefixes_for_currencies = (i >= 3);
 	emit resultFormatUpdated();

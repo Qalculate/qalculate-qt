@@ -72,6 +72,7 @@ class VariablesDialog : public QDialog {
 		void setSearch(const QString&);
 		void selectCategory(std::string);
 		void variableRemoved(Variable*);
+		bool eventFilter(QObject*, QEvent*) override;
 
 	public slots:
 

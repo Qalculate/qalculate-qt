@@ -89,10 +89,10 @@ QString MatrixWidget::getMatrixString() const {
 	if(max_r < 0) {max_r = matrixTable->rowCount() - 1; max_c = matrixTable->columnCount() - 1;}
 	str = "[";
 	for(int r = 0; r <= max_r; r++) {
-		if(r > 0) str += ", ";
+		if(r > 0) {QString::fromStdString(CALCULATOR->getComma()); str += " ";}
 		str += "[";
 		for(int c = 0; c <= max_c; c++) {
-			if(c > 0) str += QString::fromStdString(CALCULATOR->getComma());
+			if(c > 0) {QString::fromStdString(CALCULATOR->getComma()); str += " ";}
 			QTableWidgetItem *item = matrixTable->item(r, c);
 			if(!item || item->text().isEmpty()) str += "0";
 			else str += item->text();

@@ -71,12 +71,12 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 	if(replaced_item) *replaced_item = NULL;
 	Variable *var = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		if((!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
 			else *replaced_item = var;
 		}
@@ -103,12 +103,12 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value, ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
-		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		if((!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
 		if(replaced_item) {
-			Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
 			else if(var != v) *replaced_item = var;
 		}

@@ -28,6 +28,19 @@ bool can_display_unicode_string_function(const char*, void*) {
 	return true;
 }
 
+std::string to_html_escaped(const std::string strpre) {
+	std::string str = strpre;
+	if(settings->printops.use_unicode_signs) {
+		gsub(">=", SIGN_GREATER_OR_EQUAL, str);
+		gsub("<=", SIGN_LESS_OR_EQUAL, str);
+		gsub("!=", SIGN_NOT_EQUAL, str);
+	}
+	gsub("&", "&amp;", str);
+	gsub("<", "&lt;", str);
+	gsub(">", "&gt;", str);
+	gsub("\n","<br>", str);
+	return str;
+}
 bool string_is_less(std::string str1, std::string str2) {
 	size_t i = 0;
 	bool b_uni = false;
@@ -726,7 +739,11 @@ void QalculateQtSettings::updatePalette() {
 	QApplication::setPalette(p);
 }
 void QalculateQtSettings::updateStyle() {
-	if(style >= 0 && style < QStyleFactory::keys().count()) QApplication::setStyle(QStyleFactory::create(QStyleFactory::keys().at(style)));
+	if(style >= 0 && style < QStyleFactory::keys().count()) {
+		QStyle *s = QStyleFactory::create(QStyleFactory::keys().at(style));
+		if(!s) return;
+		QApplication::setStyle(s);
+	}
 	updatePalette();
 }
 void QalculateQtSettings::savePreferences(bool) {
@@ -889,30 +906,39 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
 	if(!clear_history_on_exit) {
 		fprintf(file, "\n[History]\n");
-		int n = 0;
-		for(size_t i = 0; i < v_expression.size() && n < 300; i++) {
-			fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
-			n++;
-			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-				fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
-				if(v_result[i][i2].length() > 6000) {
-					std::string str = unhtmlize(v_result[i][i2]);
-					if(str.length() > 5000) {
-						int index = 50;
-						while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
-						gsub("\n", "<br>", str);
-						fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+		if(!v_expression.empty()) {
+			long int n = 0;
+			size_t i = v_expression.size() - 1;
+			while(true) {
+				n++;
+				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+					if(v_result[i][i2].length() > 300 && (v_result[i][i2].length() <= 6000 || unhtmlize(v_result[i][i2]).length() <= 5000)) {
+						n += v_result[i][i2].length() / 300;
+					}
+					n++;
+				}
+				if(n >= 300 || i == 0) break;
+				i--;
+			}
+			for(; i < v_expression.size(); i++) {
+				fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+				n++;
+				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+					fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
+					if(v_result[i][i2].length() > 6000) {
+						std::string str = unhtmlize(v_result[i][i2]);
+						if(str.length() > 5000) {
+							int index = 50;
+							while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+							gsub("\n", "<br>", str);
+							fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+						} else {
+							fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+						}
 					} else {
 						fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
-						if(v_result[i][i2].length() > 300) {
-							if(v_result[i][i2].length() > 9000) n += 30;
-							else n += v_result[i][i2].length() / 300;
-						}
 					}
-				} else {
-					fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
 				}
-				n++;
 			}
 		}
 		for(size_t i = 0; i < expression_history.size(); i++) {
@@ -938,7 +964,11 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
 }
 
-MathLineEdit::MathLineEdit(QWidget *parent) : QLineEdit(parent) {}
+MathLineEdit::MathLineEdit(QWidget *parent) : QLineEdit(parent) {
+#ifndef _WIN32
+	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
+}
 MathLineEdit::~MathLineEdit() {}
 void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
