@@ -86,5 +86,3 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 }
 
 win32: RC_FILE = winicon.rc
-
-TRANSLATIONS = l10n/qalculate-qt_ru.ts
