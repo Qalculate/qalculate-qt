@@ -324,7 +324,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Help"), this, SLOT(help()), QKeySequence::HelpContents);
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
 	menu->addAction(tr("Check for Updates"), this, SLOT(checkVersion()));
-	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
+	menu->addAction(tr("About %1").arg("Qt"), qApp, SLOT(aboutQt()));
+	menu->addAction(tr("About %1").arg("Qalculate!"), this, SLOT(showAbout()));
 	menu->addSeparator();
 	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 	tb->addWidget(menuAction);
@@ -3181,6 +3182,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(CALCULATOR->busy() && !was_busy) {
 		if(updateWindowTitle(tr("Calculating…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(tr("Calculating…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -3566,6 +3568,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		}
 		if(updateWindowTitle(progress_str)) title_set = true;
 		dialog = new QProgressDialog(progress_str, tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(progress_str);
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abortCommand()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -4060,6 +4063,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	if(b_busy && viewThread->running) {
 		if(updateWindowTitle(tr("Processing…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Processing…"), tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(tr("Processing…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -4468,17 +4472,18 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result) {
 	switch(settings->title_type) {
 		case TITLE_RESULT: {
 			if(str.isEmpty()) return false;
+			qApp->setApplicationDisplayName(QString());
 			if(!str.isEmpty()) setWindowTitle(str);
 			break;
 		}
 		case TITLE_APP_RESULT: {
-			if(!str.isEmpty()) setWindowTitle("Qalculate! (" + str + ")");
+			if(!str.isEmpty()) setWindowTitle(str);
 			break;
 		}
 		default: {
 			if(is_result) return false;
-			if(!str.isEmpty()) setWindowTitle("Qalculate! " + str);
-			else setWindowTitle("Qalculate!");
+			if(!str.isEmpty()) setWindowTitle(str);
+			else setWindowTitle(QString());
 		}
 	}
 	return true;

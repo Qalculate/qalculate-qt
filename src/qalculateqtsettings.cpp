@@ -1043,6 +1043,7 @@ void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent
 	if(fetch_thread.start() && fetch_thread.write(timeout) && fetch_thread.write(n)) {
 		if(fetch_thread.running) {
 			QProgressDialog *dialog = new QProgressDialog(tr("Fetching exchange rates…"), QString(), 0, 0, parent);
+			dialog->setWindowTitle(tr("Fetching exchange rates…"));
 			dialog->setWindowModality(Qt::WindowModal);
 			dialog->setMinimumDuration(200);
 			while(fetch_thread.running) {

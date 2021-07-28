@@ -1,0 +1,14 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+<file>translations/qalculate-qt_ca.qm</file>
+<file>translations/qalculate-qt_de.qm</file>
+<file>translations/qalculate-qt_es.qm</file>
+<file>translations/qalculate-qt_fr.qm</file>
+<file>translations/qalculate-qt_nl.qm</file>
+<file>translations/qalculate-qt_pt_BR.qm</file>
+<file>translations/qalculate-qt_ru.qm</file>
+<file>translations/qalculate-qt_sl.qm</file>
+<file>translations/qalculate-qt_sv.qm</file>
+<file>translations/qalculate-qt_zh_CN.qm</file>
+</qresource>
+</RCC>

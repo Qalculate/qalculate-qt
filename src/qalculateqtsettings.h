@@ -22,8 +22,6 @@ class QByteArray;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
-#define VERSION "3.20.0"
-
 #define EQUALS_IGNORECASE_AND_LOCAL(x,y,z)	(equalsIgnoreCase(x, y) || equalsIgnoreCase(x, z.toStdString()))
 #define EQUALS_IGNORECASE_AND_LOCAL_NR(x,y,z,a)	(equalsIgnoreCase(x, y a) || (x.length() == z.length() + strlen(a) && equalsIgnoreCase(x.substr(0, x.length() - strlen(a)), z.toStdString()) && equalsIgnoreCase(x.substr(x.length() - strlen(a)), a)))
 
@@ -118,8 +116,8 @@ class QalculateQtSettings : QObject {
 		std::string last_found_version;
 
 		std::vector<std::string> v_expression;
-		std::vector<std::vector<std::string>> v_result;
-		std::vector<std::vector<int>> v_exact;
+		std::vector<std::vector<std::string> > v_result;
+		std::vector<std::vector<int> > v_exact;
 
 };
 
