@@ -884,7 +884,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockParseStatus(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v3.20.0</b></font><br><font size=+1>%2</font><br><<font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><<font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -3703,8 +3703,10 @@ void set_result_bases(const MathStructure &m) {
 
 bool contains_plot_or_save(const std::string &str) {
 	if(str.find(":=") != std::string::npos) return true;
-	for(size_t i = 1; i <= CALCULATOR->f_plot->countNames(); i++) {
-		if(str.find(CALCULATOR->f_plot->getName(i).name) != std::string::npos) return true;
+	if(CALCULATOR->f_plot) {
+		for(size_t i = 1; i <= CALCULATOR->f_plot->countNames(); i++) {
+			if(str.find(CALCULATOR->f_plot->getName(i).name) != std::string::npos) return true;
+		}
 	}
 	for(size_t i = 1; i <= CALCULATOR->f_save->countNames(); i++) {
 		if(str.find(CALCULATOR->f_save->getName(i).name) != std::string::npos) return true;

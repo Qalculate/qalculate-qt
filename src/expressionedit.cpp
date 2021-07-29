@@ -55,8 +55,9 @@ class ExpressionTipLabel : public QLabel {
 	public:
 
 		QBasicTimer hideTimer, expireTimer;
+		QWidget *widget;
 
-		ExpressionTipLabel(const QString &text, const QPoint &pos);
+		ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w);
 		~ExpressionTipLabel();
 		void adjustTooltipScreen(const QPoint &pos);
 		void updateSize(const QPoint &pos);
@@ -65,7 +66,7 @@ class ExpressionTipLabel : public QLabel {
 		void hideTip();
 		void hideTipImmediately();
 		void restartExpireTimer();
-		void placeTip(const QPoint &pos, QWidget *w);
+		void placeTip(const QPoint &pos);
 
 	protected:
 
@@ -75,10 +76,11 @@ class ExpressionTipLabel : public QLabel {
 
 };
 
-ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget) {
+ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
 	setForegroundRole(QPalette::ToolTipText);
 	setBackgroundRole(QPalette::ToolTipBase);
 	setPalette(QToolTip::palette());
+	setTextFormat(Qt::RichText);
 	ensurePolished();
 	setMargin(1 + style()->pixelMetric(QStyle::PM_ToolTipLabelFrameWidth, 0, this));
 	setFrameStyle(QFrame::NoFrame);
@@ -103,19 +105,27 @@ void  ExpressionTipLabel::updateSize(const QPoint &pos) {
 	QFontMetrics fm(font());
 	QSize extra(1, 0);
 	if(fm.descent() == 2 && fm.ascent() >= 11) ++extra.rheight();
-	setWordWrap(Qt::mightBeRichText(text()));
 	QSize sh = sizeHint();
+	if(pos.x() + sh.width() > widget->mapToGlobal(QPoint(widget->width(), 0)).x()) {
+		setWordWrap(true);
+		sh = sizeHint();
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-	QScreen *screen = QGuiApplication::screenAt(pos);
-	if(!screen) screen = QGuiApplication::primaryScreen();
-	if(screen) {
-		const qreal screenWidth = screen->geometry().width();
-		if(!wordWrap() && sh.width() > screenWidth) {
-			setWordWrap(true);
-			sh = sizeHint();
-		}
-	}
+	} else {
+#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+		QScreen *screen = widget->screen();
+#	else
+		QScreen *screen = QGuiApplication::screenAt(pos);
 #endif
+		if(!screen) screen = QGuiApplication::primaryScreen();
+		if(screen) {
+			const qreal screenWidth = screen->geometry().width();
+			if(sh.width() > screenWidth) {
+				setWordWrap(true);
+				sh = sizeHint();
+			}
+		}
+#endif
+	}
 	resize(sh + extra);
 }
 void ExpressionTipLabel::paintEvent(QPaintEvent *ev) {
@@ -184,10 +194,10 @@ bool ExpressionTipLabel::eventFilter(QObject*, QEvent *e) {
 	}
 	return false;
 }
-void ExpressionTipLabel::placeTip(const QPoint &pos, QWidget *w) {
+void ExpressionTipLabel::placeTip(const QPoint &pos) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	QScreen *scr = w->screen();
+	QScreen *scr = widget->screen();
 #	else
 	QScreen *scr = QGuiApplication::screenAt(pos);
 #	endif
@@ -1774,11 +1784,11 @@ void ExpressionEdit::showCurrentStatus() {
 	} else {
 		if(tipLabel && tipLabel->isVisible()) {
 			tipLabel->reuseTip(current_status_text, mapToGlobal(cursorRect().bottomRight()));
-			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), this);
+			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
 		} else {
 			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(current_status_text, mapToGlobal(cursorRect().bottomRight()));
-			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), this);
+			tipLabel = new ExpressionTipLabel(current_status_text, mapToGlobal(cursorRect().bottomRight()), this);
+			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
 			tipLabel->showNormal();
 		}
 	}
@@ -1788,14 +1798,7 @@ void ExpressionEdit::setStatusText(const QString &text) {
 	if(text.isEmpty()) {
 		HIDE_TOOLTIP
 	} else if(settings->display_expression_status) {
-		if(text.length() >= 30) {
-			current_status_text = "<font size=\"-1\">";
-			current_status_text += text.toHtmlEscaped();
-			current_status_text += "</font>";
-			current_status_text.replace("\n", "<br>");
-		} else {
-			current_status_text = text;
-		}
+		current_status_text = text;
 		if(settings->expression_status_delay > 0 && (!tipLabel || !tipLabel->isVisible())) {
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
@@ -1996,7 +1999,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
-				if(!cdata->current_from_struct && !mparse.containsFunction(CALCULATOR->f_save) && !mparse.containsFunction(CALCULATOR->f_plot)) {
+				if(!cdata->current_from_struct && !mparse.containsFunction(CALCULATOR->f_save) && (!CALCULATOR->f_plot || !mparse.containsFunction(CALCULATOR->f_plot))) {
 					cdata->current_from_struct = new MathStructure;
 					EvaluationOptions eo = settings->evalops;
 					eo.structuring = STRUCTURING_NONE;
@@ -2052,7 +2055,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
-			parsed_expression = mparse.print(po);
+			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_w.empty()) {
@@ -2060,7 +2063,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			parsed_expression += CALCULATOR->localWhereString();
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
-			parsed_expression += mparse.print(po);
+			parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
@@ -2237,7 +2240,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						}
 					}
 					CALCULATOR->beginTemporaryStopMessages();
-					parsed_expression += mparse.print(po);
+					parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 					CALCULATOR->endTemporaryStopMessages();
 					if(had_to_conv && mparse2) {
 						mparse2->unref();
@@ -2250,7 +2253,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 			if(mparse2) {
 				mparse2->format(po);
-				parsed_expression.replace(0, parse_l, mparse2->print(po));
+				parsed_expression.replace(0, parse_l, mparse2->print(po, true, false, TAG_TYPE_HTML));
 				mparse2->unref();
 			}
 		}
@@ -2261,7 +2264,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			if(mtype == MESSAGE_ERROR) {
 				if(message_n > 0) {
 					if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
-					parsed_expression_tooltip += "\n• ";
+					parsed_expression_tooltip += "<br>• ";
 				}
 				parsed_expression_tooltip += CALCULATOR->message()->message();
 				message_n++;
