@@ -755,6 +755,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 		timer->setSingleShot(true);
 		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontChanged()));
 		timer->start(1);
+	} else {
+		expressionEdit->updateCompletion();
 	}
 
 }
@@ -4686,6 +4688,7 @@ void QalculateWindow::onAppFontChanged() {
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
 		else font.setPointSize(font.pointSize() * 1.35);
 		expressionEdit->setFont(font);
+		expressionEdit->updateCompletion();
 	}
 	if(!settings->use_custom_result_font) historyView->setFont(QApplication::font());
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
@@ -5623,9 +5626,23 @@ void QalculateWindow::normalModeActivated() {
 }
 void QalculateWindow::onRPNVisibilityChanged(bool b) {
 	if(settings->rpn_mode != b) {
-		rpnModeActivated();
 		if(b) {
+			settings->rpn_mode = true;
+			settings->chain_mode = false;
+			if(!settings->rpn_shown) {
+				rpnDock->blockSignals(true);
+				rpnDock->hide();
+				rpnDock->setFloating(true);
+				settings->rpn_shown = true;
+				rpnDock->resize(rpnDock->sizeHint());
+				rpnDock->show();
+				rpnDock->blockSignals(false);
+			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
+			if(w) w->setChecked(true);
+		} else {
+			normalModeActivated();
+			QAction *w = findChild<QAction*>("action_normalmode");
 			if(w) w->setChecked(true);
 		}
 	}

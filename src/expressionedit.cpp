@@ -848,7 +848,6 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 	completionView->horizontalHeader()->hide();
 	completionView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 	completionView->setSelectionMode(QAbstractItemView::SingleSelection);
-	updateCompletion();
 	HTMLDelegate* delegate = new HTMLDelegate();
 	completionView->setItemDelegateForColumn(0, delegate);
 	completionView->setItemDelegateForColumn(1, delegate);
@@ -927,7 +926,8 @@ ExpressionEdit::~ExpressionEdit() {}
 						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
 						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
 						items.append(item); \
-						item = new QStandardItem(y + "&nbsp;&nbsp;<img height=\"16\" src=\"" + ":/data/flags/" + QString::fromStdString(u->referenceName()) + "\"/>"); \
+						if(flagheight <= 0) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName()))); \
+						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName()))); \
 						item->setData(ifont, Qt::FontRole); \
 						items.append(item); \
 						sourceModel->appendRow(items);
@@ -939,6 +939,10 @@ void ExpressionEdit::updateCompletion() {
 	QString title;
 	QList<QStandardItem *> items;
 	QFont ifont(completionView->font());
+	QFontMetrics fm(ifont);
+	int flagheight = fm.ascent();
+	if(flagheight >= 32) flagheight = -1;
+	else if(flagheight > 16) flagheight = 16;
 	ifont.setStyle(QFont::StyleItalic);
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
 		if(CALCULATOR->functions[i]->isActive()) {

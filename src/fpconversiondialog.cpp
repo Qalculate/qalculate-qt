@@ -38,7 +38,9 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	formatCombo->setCurrentIndex(1);
 	grid->addWidget(new QLabel(tr("Decimal value"), this), 1, 0, Qt::AlignRight);
 	valueEdit = new MathLineEdit(this); valueEdit->setAlignment(Qt::AlignRight); grid->addWidget(valueEdit, 1, 1);
-	grid->addWidget(new QLabel(tr("Binary representation"), this), 2, 0, Qt::AlignRight | Qt::AlignTop);
+	QLabel *label = new QLabel(tr("Binary representation"), this);
+	label->setMinimumHeight(valueEdit->sizeHint().height());
+	grid->addWidget(label, 2, 0, Qt::AlignRight | Qt::AlignTop);
 	binEdit = new QTextEdit(this); grid->addWidget(binEdit, 2, 1);
 	QFontMetrics fm(binEdit->font());
 	QString str; str.fill('0', 68);
