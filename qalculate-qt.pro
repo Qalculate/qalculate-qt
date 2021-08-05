@@ -1,4 +1,4 @@
-VERSION = 3.20
+VERSION = 3.20.1
 isEmpty(PREFIX) {
 	PREFIX = /usr/local
 }
@@ -8,29 +8,24 @@ isEmpty(DESKTOP_DIR) {
 isEmpty(DESKTOP_ICON_DIR) {
 	DESKTOP_ICON_DIR = $$PREFIX/share/icons
 }
-equals(INSTALL_THEME_ICONS,"no") {
-	DEFINES += LOAD_QALCULATEICONS_FROM_FILE=1
-}
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
-	isEmpty(ICON_DIR) {
-		equals(INSTALL_THEME_ICONS,"no") {
-			ICON_DIR = $$PREFIX/share/qalculate-qt/icons
-		} else {
-			ICON_DIR = $$PREFIX/share/icons
-		}
+	isEmpty(TRANSLATIONS_DIR) {
+		TRANSLATIONS_DIR = $$PREFIX/share/qalculate-qt/translations
 	}
-} else {
-	ICON_DIR = ":/icons"
-	DEFINES += RESOURCES_COMPILED=1
+	DEFINES += TRANSLATIONS_DIR=\\\"$$TRANSLATIONS_DIR\\\"
 }
 isEmpty(MAN_DIR) {
 	MAN_DIR = $$PREFIX/share/man
+}
+isEmpty(APPDATA_DIR) {
+	APPDATA_DIR = $$PREFIX/share/metainfo
 }
 TEMPLATE = app
 TARGET = qalculate-qt
 INCLUDEPATH += src
 win32: {
 	LIBS += -lqalculate -lxml2 -lmpfr -liconv -lintl -lgmp -licuuc -lcurl
+	CONFIG += c++17
 } else {
 	CONFIG += link_pkgconfig
 	PKGCONFIG += libqalculate
@@ -39,6 +34,7 @@ CONFIG += qt
 QT += widgets network
 MOC_DIR = build
 OBJECTS_DIR = build
+DEFINES += VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
 
@@ -48,33 +44,55 @@ TRANSLATIONS = translations/qalculate-qt_ca.ts translations/qalculate-qt_de.ts t
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
+	TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
+			translations/qalculate-qt_de.ts \
+			translations/qalculate-qt_es.ts \
+			translations/qalculate-qt_fr.ts \
+			translations/qalculate-qt_nl.ts \
+			translations/qalculate-qt_pt_BR.ts \
+			translations/qalculate-qt_ru.ts \
+			translations/qalculate-qt_sl.ts \
+			translations/qalculate-qt_sv.ts \
+			translations/qalculate-qt_zh_CN.ts
+
 	target.path = $$PREFIX/bin
+
+	qm.files = 	translations/qalculate-qt_ca.qm \
+			translations/qalculate-qt_de.qm \
+			translations/qalculate-qt_es.qm \
+			translations/qalculate-qt_fr.qm \
+			translations/qalculate-qt_nl.qm \
+			translations/qalculate-qt_pt_BR.qm \
+			translations/qalculate-qt_ru.qm \
+			translations/qalculate-qt_sl.qm \
+			translations/qalculate-qt_sv.qm \
+			translations/qalculate-qt_zh_CN.qm
 		
+	qm.path = $$TRANSLATIONS_DIR
+
 	desktop.files = data/qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 
-	appicon16.files = data/16/qalculate-qt.png
-	appicon16.path = $$ICON_DIR/hicolor/16x16/apps
-	appicon22.files = data/22/qalculate-qt.png
-	appicon22.path = $$ICON_DIR/hicolor/22x22/apps
-	appicon32.files = data/32/qalculate-qt.png
-	appicon32.path = $$ICON_DIR/hicolor/32x32/apps
-	appicon64.files = data/64/qalculate-qt.png
-	appicon64.path = $$ICON_DIR/hicolor/64x64/apps
-	appicon128.files = data/128/qalculate-qt.png
-	appicon128.path = $$ICON_DIR/hicolor/128x128/apps
-	appiconsvg.files = data/scalable/qalculate-qt.svg
-	appiconsvg.path = $$ICON_DIR/hicolor/scalable/apps
+	appdata.files = data/qalculate-qt.appdata.xml
+	appdata.path = $$APPDATA_DIR
 
-	INSTALLS += 	target desktop \ 
+	appicon16.files = data/16/qalculate-qt.png
+	appicon16.path = $$DESKTOP_ICON_DIR/hicolor/16x16/apps
+	appicon22.files = data/22/qalculate-qt.png
+	appicon22.path = $$DESKTOP_ICON_DIR/hicolor/22x22/apps
+	appicon32.files = data/32/qalculate-qt.png
+	appicon32.path = $$DESKTOP_ICON_DIR/hicolor/32x32/apps
+	appicon64.files = data/64/qalculate-qt.png
+	appicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps
+	appicon128.files = data/128/qalculate-qt.png
+	appicon128.path = $$DESKTOP_ICON_DIR/hicolor/128x128/apps
+	appiconsvg.files = data/scalable/qalculate-qt.svg
+	appiconsvg.path = $$DESKTOP_ICON_DIR/hicolor/scalable/apps
+
+	INSTALLS += 	target desktop appdata qm \
 			appicon16 appicon22 appicon32 appicon64 appicon128 appiconsvg
-			
-	!equals($$DESKTOP_ICON_DIR, $$ICON_DIR) {
-		desktopappicon64.files = data/64/qalculate-qt.png
-		desktopappicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps
-		INSTALLS += desktopappicon64
-	}
-	RESOURCES = icons.qrc flags.qrc translations.qrc
+
+	RESOURCES = icons.qrc flags.qrc
 } else {
 	RESOURCES = icons.qrc flags.qrc translations.qrc
 	target.path = $$PREFIX/bin
@@ -83,6 +101,12 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 	appicon64.files = data/64/qalculate-qt.png
 	appicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps
 	INSTALLS += target desktop appicon64
+}
+
+unix:!android:!macx {
+	man.files = data/qalculate-qt.1
+	man.path = $$MAN_DIR/man1
+	INSTALLS += man
 }
 
 win32: RC_FILE = winicon.rc

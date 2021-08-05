@@ -24,6 +24,7 @@ class QTableView;
 class QMenu;
 class QAction;
 class QTimer;
+class ExpressionTipLabel;
 
 struct CompletionData;
 
@@ -62,6 +63,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QMenu *cmenu;
 		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
 		QTimer *completionTimer, *toolTipTimer;
+		ExpressionTipLabel *tipLabel;
 
 		QStringList expression_undo_buffer;
 		QList<int> expression_undo_pos;

@@ -324,7 +324,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Help"), this, SLOT(help()), QKeySequence::HelpContents);
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
 	menu->addAction(tr("Check for Updates"), this, SLOT(checkVersion()));
-	menu->addAction(tr("About %1").arg(qApp->applicationDisplayName()), this, SLOT(showAbout()));
+	menu->addAction(tr("About %1").arg("Qt"), qApp, SLOT(aboutQt()));
+	menu->addAction(tr("About %1").arg("Qalculate!"), this, SLOT(showAbout()));
 	menu->addSeparator();
 	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
 	tb->addWidget(menuAction);
@@ -754,6 +755,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 		timer->setSingleShot(true);
 		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontChanged()));
 		timer->start(1);
+	} else {
+		expressionEdit->updateCompletion();
 	}
 
 }
@@ -883,7 +886,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockParseStatus(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v3.20.0</b></font><br><font size=+1>%2</font><br><<font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><<font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -3181,6 +3184,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(CALCULATOR->busy() && !was_busy) {
 		if(updateWindowTitle(tr("Calculating…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(tr("Calculating…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -3566,6 +3570,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		}
 		if(updateWindowTitle(progress_str)) title_set = true;
 		dialog = new QProgressDialog(progress_str, tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(progress_str);
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abortCommand()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -3700,8 +3705,10 @@ void set_result_bases(const MathStructure &m) {
 
 bool contains_plot_or_save(const std::string &str) {
 	if(str.find(":=") != std::string::npos) return true;
-	for(size_t i = 1; i <= CALCULATOR->f_plot->countNames(); i++) {
-		if(str.find(CALCULATOR->f_plot->getName(i).name) != std::string::npos) return true;
+	if(CALCULATOR->f_plot) {
+		for(size_t i = 1; i <= CALCULATOR->f_plot->countNames(); i++) {
+			if(str.find(CALCULATOR->f_plot->getName(i).name) != std::string::npos) return true;
+		}
 	}
 	for(size_t i = 1; i <= CALCULATOR->f_save->countNames(); i++) {
 		if(str.find(CALCULATOR->f_save->getName(i).name) != std::string::npos) return true;
@@ -4060,6 +4067,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	if(b_busy && viewThread->running) {
 		if(updateWindowTitle(tr("Processing…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Processing…"), tr("Cancel"), 0, 0, this);
+		dialog->setWindowTitle(tr("Processing…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
@@ -4468,17 +4476,18 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result) {
 	switch(settings->title_type) {
 		case TITLE_RESULT: {
 			if(str.isEmpty()) return false;
+			qApp->setApplicationDisplayName(QString());
 			if(!str.isEmpty()) setWindowTitle(str);
 			break;
 		}
 		case TITLE_APP_RESULT: {
-			if(!str.isEmpty()) setWindowTitle("Qalculate! (" + str + ")");
+			if(!str.isEmpty()) setWindowTitle(str);
 			break;
 		}
 		default: {
 			if(is_result) return false;
-			if(!str.isEmpty()) setWindowTitle("Qalculate! " + str);
-			else setWindowTitle("Qalculate!");
+			if(!str.isEmpty()) setWindowTitle(str);
+			else setWindowTitle(QString());
 		}
 	}
 	return true;
@@ -4679,6 +4688,7 @@ void QalculateWindow::onAppFontChanged() {
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
 		else font.setPointSize(font.pointSize() * 1.35);
 		expressionEdit->setFont(font);
+		expressionEdit->updateCompletion();
 	}
 	if(!settings->use_custom_result_font) historyView->setFont(QApplication::font());
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
@@ -5616,9 +5626,23 @@ void QalculateWindow::normalModeActivated() {
 }
 void QalculateWindow::onRPNVisibilityChanged(bool b) {
 	if(settings->rpn_mode != b) {
-		rpnModeActivated();
 		if(b) {
+			settings->rpn_mode = true;
+			settings->chain_mode = false;
+			if(!settings->rpn_shown) {
+				rpnDock->blockSignals(true);
+				rpnDock->hide();
+				rpnDock->setFloating(true);
+				settings->rpn_shown = true;
+				rpnDock->resize(rpnDock->sizeHint());
+				rpnDock->show();
+				rpnDock->blockSignals(false);
+			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
+			if(w) w->setChecked(true);
+		} else {
+			normalModeActivated();
+			QAction *w = findChild<QAction*>("action_normalmode");
 			if(w) w->setChecked(true);
 		}
 	}

@@ -30,6 +30,7 @@
 #include "csvdialog.h"
 
 CSVDialog::CSVDialog(bool do_import, QWidget *parent, MathStructure *current_result, KnownVariable *var) : QDialog(parent), b_import(do_import), o_variable(var), m_result(current_result) {
+	setWindowTitle(do_import ? tr("Import CSV File") : tr("Export CSV File"));
 	if(m_result && !m_result->isVector()) m_result = NULL;
 	QVBoxLayout *box = new QVBoxLayout(this);
 	QGridLayout *grid = new QGridLayout();

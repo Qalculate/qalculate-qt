@@ -42,6 +42,7 @@ QString font_string(std::string str) {
 }
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
+	setWindowTitle(tr("Preferences"));
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	QTabWidget *tabs = new QTabWidget(this);
 	tabs->setUsesScrollButtons(false);

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+ <id>qalculate-gtk.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-2.0+</project_license>
+ <name>Qalculate! (Qt UI)</name>
+ <name xml:lang="ca">Qalculate! (Qt UI)</name>
+ <name xml:lang="de">Qalculate! (Qt UI)</name>
+ <name xml:lang="es">Qalculate! (Qt UI)</name>
+ <name xml:lang="fr">Qalculate! (Qt UI)</name>
+ <name xml:lang="pt_BR">Qalculate! (Qt UI)</name>
+ <name xml:lang="ru">Qalculate! (Интерфейс GTK)</name>
+ <name xml:lang="sl">Qalculate! (vmesnik GTK)</name>
+ <name xml:lang="sv">Qalculate! (Qt UI)</name>
+ <name xml:lang="zh_CN">Qalculate! (Qt UI)</name>
+ <summary>Powerful and easy to use calculator</summary>
+ <summary xml:lang="ca">Calculadora poderosa i fàcil a usar</summary>
+ <summary xml:lang="de">Leistungsstarker und einfach zu bedienender Taschenrechner</summary>
+ <summary xml:lang="es">Calculadora poderosa y fácil de usar</summary>
+ <summary xml:lang="fr">Une calculatrice puissante et facile d'utilisation</summary>
+ <summary xml:lang="nl">Gemakkelijk te gebruiken rekenmachine met veel mogelijkheden</summary>
+ <summary xml:lang="pt_BR">Calculadora potente e fácil de usar</summary>
+ <summary xml:lang="ru">Мощный и простой в использовании калькулятор</summary>
+ <summary xml:lang="sl">Zmogljivo računalo, preprosto za uporabo</summary>
+ <summary xml:lang="sv">Kraftfull och användarvänlig miniräknare</summary>
+ <summary xml:lang="zh_CN">强大而易用的计算器</summary>
+ <description>
+  <p>Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation).</p>
+  <p xml:lang="ca">El Qalculate! és una calculadora d'escriptori per a diverses plataformes i finalitats. És senzill a usar però proporciona poder i versatilitat que normalment es reserva als paquets de matemàtica complicats, així com eines útils per a necessitats diàries (com la conversió de monedes i calculació de percentatge).</p>
+  <p xml:lang="de">Qalculate! ist ein vielseitig einsetzbarer, plattformübergreifender Desktop-Rechner. Er ist einfach zu bedienen, bietet aber Leistung und Vielseitigkeit die normalerweise nur für komplizierte mathematische Pakete vorbehalten sind, sowie nützliche ls auch für den täglichen Bedarf (wie Währungsumrechnung und Prozentrechnung).</p>
+  <p xml:lang="es">Qalculate! es una calculadora para escritorio multiplataforma y multiuso. Es simple de usar pero dispone de poder y versatilidad normalmente reservada para paquetes de matemática complicados, así como herramientas útiles para necesidades diarias (como conversión de monedas y cálculo de porcentajes).</p>
+  <p xml:lang="fr">Qalculate! est une calculatrice de bureau polyvalente et multi-plateforme. Elle est simple d'utilisation mais offre une puissance et une polyvalence normalement réservées aux logiciels de mathématique complexe, ainsi que d'outils utiles au quotidien (tels que la conversion de devises et le calcul de pourcentages).</p>
+  <p xml:lang="pt_BR">Qalculate! é uma calculadora para desktop multiplataforma e multiuso. É simples de usar, mas fornece poder e versatilidade normalmente vistas em pacotes de matemática complicados, além de ferramentas úteis para as necessidades diárias (como conversão de moeda e cálculo de porcentagem).</p>
+  <p xml:lang="ru">Qalculate! - это универсальный кроссплатформенный настольный калькулятор. Он прост в использовании, но обеспечивает мощность и универсальность, обычно присущие сложным математическим программам, а также полезные инструменты для повседневных нужд (таких как конвертация валют и расчёт процентов).</p>
+  <p xml:lang="sl">Qalculate! je večnamensko namizno računalo, ki deluje na več platformah. Je preprosto za uporabo, prinaša pa tako napredna orodja, ponavadi značilna le za kompleksno matematično programje, kot tudi uporabna orodja za vsakodnevne potrebe (npr. pretvorbe valut ali izračun odstotkov).</p>
+  <p xml:lang="zh_CN">Qalculate!是一款多功能的跨平台桌面计算器。它简单易用，但却具有通常复杂的数学软件包所需的强大功能和多样性，以及满足日常所需的实用工具(如货币换算和百分比计算)。</p>
+  <p>Features include a large library of customizable functions, unit calculations and conversion, physical constants, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.</p>
+  <p xml:lang="ca">Les característiques inclouen una biblioteca amplia de funcions personalitzables, calculació i conversió d'unitat, constants físics, càlculs simbòlics (incloent integrals i equacions), precisió arbitrària, propagació d'incertesa, aritmètica d'interval, dibuix i una interfície fàcil d'emprar.</p>
+  <p xml:lang="de">Zu den Leistungsmerkmalen gehören eine große Bibliothek anpassbarer Funktionen, Einheiten-berechnungen und -umrechnungen, physikalische Konstanten, symbolische Berechnungen (einschließlich Integrale und Gleichungen), beliebige Genauigkeit, Unsicherheits-fortpflanzung, Intervallarithmetik, Plotten und eine benutzerfreundliche Oberfläche.</p>
+  <p xml:lang="es">Las características incluyen una gran librería de funciones personalizables, cálculo y conversión de unidades, constantes físicas, cálculos simbólicos (incluyendo integrales y ecuaciones), precisión arbitraria, propagación de incertidumbre, aritmética de intervalos, graficado, y una interfaz amigable.</p>
+  <p xml:lang="fr">Les fonctionnalités incluent une grande bibliothèque de fonctions personnalisables, d'unités de calculs et de conversion, de constantes physiques, de calculs symboliques (y compris les intégrales et équations), de précision arbitraire, de propagation des incertitudes, d'arithmétique d'intervalle, de traçage et une interface facile d'utilisation.</p>
+  <p xml:lang="pt_BR">Os recursos incluem uma grande biblioteca de funções personalizáveis, cálculos e conversão de unidades, constantes físicas, cálculos simbólicos (incluindo integrais e equações), precisão arbitrária, propagação de erros, aritmética de intervalos, plotagem e uma interface amigável.</p>
+  <p xml:lang="ru">Возможности включают большую библиотеку настраиваемых функций, расчёт и преобразование единиц измерения, физические константы, символьные вычисления, включая интегралы и уравнения, произвольную точность, распространение неопределенности, интервальную арифметику, построение графиков и удобный интерфейс.</p>
+  <p xml:lang="sl">Program vsebuje obsežno knjižnjico prilagodljivih funkcij, enot, izračunov in pretvorb, fizikalnih konstant, simbolnih izračunov (tudi integrale in enačbe), poljubno natančnost, statistično negotovost, intervalno aritmetiko, grafe in uporabniku prijazen vmesnik.</p>
+  <p xml:lang="zh_CN">功能包括大量可定制函数库、单位计算与换算、物理常数、符号计算(包括积分和方程)、高精度计算、误差传递、区间运算、绘图和用户友好的界面。</p>
+ </description>
+ <screenshots>
+  <screenshot type="default">
+   <image>https://github.com/Qalculate/qalculate-gtk/raw/master/data/qalculate-qt-appdata-1.png</image>
+   <caption>The main window with keypad visible</caption>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">https://qalculate.github.io</url>
+ <url type="bugtracker">https://github.com/Qalculate/qalculate-qt/issues</url>
+ <url type="help">https://qalculate.github.io/manual/index.html</url>
+ <url type="donation">https://www.paypal.me/HannaKnutsson</url>
+ <url type="translate">https://github.com/Qalculate/libqalculate/blob/master/README.translate</url>
+ <developer_name>Hanna Knutsson</developer_name>
+ <content_rating type="oars-1.0"/>
+ <kudos>
+  <kudo>HiDpiIcon</kudo>
+  <kudo>ModernToolkit</kudo>
+  <kudo>UserDocs</kudo>
+ </kudos>
+ <launchable type="desktop-id">qalculate-qt.desktop</launchable>
+ <provides>
+  <binary>qalculate-qt</binary>
+ </provides>
+ <translation type="qt">qalculate-qt</translation>
+ <releases>
+  <release version="3.20.0" date="2021-07-28">
+   <description>
+    <p>Initial version of the Qt user interface.</p>
+   </description>
+  </release>
+ </releases>
+</component>

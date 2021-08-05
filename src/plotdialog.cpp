@@ -348,6 +348,7 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 		i = 0;
 		if(plot_busy && plotThread->running) {
 			dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
+			dialog->setWindowTitle(tr("Calculating…"));
 			connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
 			dialog->setWindowModality(Qt::WindowModal);
 			dialog->show();

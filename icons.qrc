@@ -19,7 +19,6 @@
 	<file alias="actions/scalable/go-up.svg">data/scalable/go-up.svg</file>
 	<file alias="actions/scalable/function.svg">data/scalable/function.svg</file>
 	<file alias="actions/scalable/keypad.svg">data/scalable/input-dialpad.svg</file>
-	<file alias="actions/scalable/link.svg">data/scalable/link.svg</file>
 	<file alias="actions/scalable/number-bases.svg">data/scalable/number-bases.svg</file>
 	<file alias="actions/scalable/menu.svg">data/scalable/open-menu.svg</file>
 	<file alias="actions/scalable/rpn-swap.svg">data/scalable/rpn-swap.svg</file>
@@ -42,7 +41,6 @@
 	<file alias="dark/actions/scalable/go-up.svg">data/scalable/go-up-dark.svg</file>
 	<file alias="dark/actions/scalable/function.svg">data/scalable/function-dark.svg</file>
 	<file alias="dark/actions/scalable/keypad.svg">data/scalable/input-dialpad-dark.svg</file>
-	<file alias="dark/actions/scalable/link.svg">data/scalable/link-dark.svg</file>
 	<file alias="dark/actions/scalable/number-bases.svg">data/scalable/number-bases-dark.svg</file>
 	<file alias="dark/actions/scalable/menu.svg">data/scalable/open-menu-dark.svg</file>
 	<file alias="dark/actions/scalable/rpn-swap.svg">data/scalable/rpn-swap-dark.svg</file>
