@@ -16,8 +16,8 @@
         <translation type="vanished">Kraftfull och användarvänlig miniräknare</translation>
     </message>
     <message>
-        <source>Qalculate! (GTK UI)</source>
-        <translation type="vanished">Qalculate! (GTK UI)</translation>
+        <source>Qalculate! (Qt UI)</source>
+        <translation type="vanished">Qalculate! (Qt UI)</translation>
     </message>
     <message>
         <source>Argument Rules</source>
