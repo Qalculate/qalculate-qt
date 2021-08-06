@@ -110,4 +110,3 @@ unix:!android:!macx {
 }
 
 win32: RC_FILE = winicon.rc
-

@@ -20,8 +20,8 @@
         <translation type="vanished">calcul;arithmétique;scientifique;financier;</translation>
     </message>
     <message>
-        <source>Qalculate! (GTK UI)</source>
-        <translation type="vanished">Qalculate! (GTK UI)</translation>
+        <source>Qalculate! (Qt UI)</source>
+        <translation type="vanished">Qalculate! (Qt UI)</translation>
     </message>
     <message>
         <source>Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation).</source>

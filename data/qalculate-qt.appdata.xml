@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
- <id>qalculate-gtk.desktop</id>
+ <id>qalculate-qt.desktop</id>
  <metadata_license>CC0-1.0</metadata_license>
  <project_license>GPL-2.0+</project_license>
  <name>Qalculate! (Qt UI)</name>
@@ -9,8 +9,8 @@
  <name xml:lang="es">Qalculate! (Qt UI)</name>
  <name xml:lang="fr">Qalculate! (Qt UI)</name>
  <name xml:lang="pt_BR">Qalculate! (Qt UI)</name>
- <name xml:lang="ru">Qalculate! (Интерфейс GTK)</name>
- <name xml:lang="sl">Qalculate! (vmesnik GTK)</name>
+ <name xml:lang="ru">Qalculate! (Интерфейс Qt)</name>
+ <name xml:lang="sl">Qalculate! (vmesnik Qt)</name>
  <name xml:lang="sv">Qalculate! (Qt UI)</name>
  <name xml:lang="zh_CN">Qalculate! (Qt UI)</name>
  <summary>Powerful and easy to use calculator</summary>
@@ -46,7 +46,7 @@
  </description>
  <screenshots>
   <screenshot type="default">
-   <image>https://github.com/Qalculate/qalculate-gtk/raw/master/data/qalculate-qt-appdata-1.png</image>
+   <image>https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png</image>
    <caption>The main window with keypad visible</caption>
   </screenshot>
  </screenshots>

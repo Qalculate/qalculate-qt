@@ -1107,7 +1107,7 @@ void QalculateQtSettings::autoUpdate(std::string new_version, QWidget *parent) {
 	script += "sleep 1;\n";
 	script += "new_version="; script += new_version; script += ";\n";
 	script += "if cd \""; script += tmpdir; script += "\"; then\n";
-	script += "\tif curl -L -o qalculate-${new_version}-x86_64.tar.xz https://github.com/Qalculate/qalculate-gtk/releases/download/v${new_version}/qalculate-${new_version}-x86_64.tar.xz; then\n";
+	script += "\tif curl -L -o qalculate-${new_version}-x86_64.tar.xz https://github.com/Qalculate/qalculate-qt/releases/download/v${new_version}/qalculate-${new_version}-x86_64.tar.xz; then\n";
 	script += "\t\techo \"Extracting files...\";\n";
 	script += "\t\tif tar -xJf qalculate-${new_version}-x86_64.tar.xz; then\n";
 	script += "\t\t\tcd  qalculate-${new_version};\n";

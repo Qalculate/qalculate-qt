@@ -102,7 +102,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	statusDelayWidget = new QSpinBox(this);
 	statusDelayWidget->setRange(0, 10000);
 	statusDelayWidget->setSingleStep(250);
-	statusDelayWidget->setSuffix(" ms");
+	statusDelayWidget->setSuffix(tr(" ms"));
 	statusDelayWidget->setValue(settings->expression_status_delay); 
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
 	hbox->addWidget(statusDelayWidget);
