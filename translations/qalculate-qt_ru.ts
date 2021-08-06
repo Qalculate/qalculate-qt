@@ -8529,7 +8529,7 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/qalculatewindow.cpp" line="889"/>
         <source>License: GNU General Public License version 2 or later</source>
-        <translation type="unfinished">Лицензия: Стандартная общественная лицензия GNU версии 2 или новее</translation>
+        <translation type="unfinished">Лицензия: GNU General Public License, версия 2 или новее</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2203"/>
