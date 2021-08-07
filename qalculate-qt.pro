@@ -51,7 +51,6 @@ defineReplace(prependAll) {
 TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
 TRANSLATIONS_FILES = 
 qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
-
 	qmfile = $$shadowed($$tsfile)
 	qmfile ~= s,.ts$,.qm,
 	qmdir = $$dirname(qmfile)
@@ -62,8 +61,6 @@ qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
 	system($$command)|error("Failed to run: $$command")
 	TRANSLATIONS_FILES += $$qmfile
 }
-
-
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
