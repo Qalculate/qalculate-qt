@@ -40,7 +40,27 @@ HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h s
 
 SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
-TRANSLATIONS = translations/qalculate-qt_ca.ts translations/qalculate-qt_de.ts translations/qalculate-qt_es.ts translations/qalculate-qt_fr.ts translations/qalculate-qt_nl.ts translations/qalculate-qt_pt_BR.ts translations/qalculate-qt_ru.ts translations/qalculate-qt_sl.ts translations/qalculate-qt_sv.ts translations/qalculate-qt_zh_CN.ts
+LANGUAGES = ca de es fr nl pt_BR ru sl sv zh_CN
+
+#parameters: var, prepend, append
+defineReplace(prependAll) {
+	for(a,$$1):result += $$2$${a}$$3
+	return($$result)
+}
+
+TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
+TRANSLATIONS_FILES = 
+qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
+	qmfile = $$shadowed($$tsfile)
+	qmfile ~= s,.ts$,.qm,
+	qmdir = $$dirname(qmfile)
+	exists($$qmdir) {
+		mkpath($$qmdir)|error("Aborting.")
+	}
+	command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+	system($$command)|error("Failed to run: $$command")
+	TRANSLATIONS_FILES += $$qmfile
+}
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
