@@ -289,6 +289,7 @@ void VariablesDialog::deactivateClicked() {
 	if(v) {
 		v->setActive(!v->isActive());
 		variablesModel->invalidate();
+		updateVariables();
 		emit itemsChanged();
 	}
 }

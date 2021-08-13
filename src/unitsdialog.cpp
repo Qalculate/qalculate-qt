@@ -355,6 +355,7 @@ void UnitsDialog::deactivateClicked() {
 	if(u) {
 		u->setActive(!u->isActive());
 		unitsModel->invalidate();
+		updateUnits();
 		emit itemsChanged();
 	}
 }
