@@ -102,7 +102,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	statusDelayWidget = new QSpinBox(this);
 	statusDelayWidget->setRange(0, 10000);
 	statusDelayWidget->setSingleStep(250);
-	statusDelayWidget->setSuffix(tr(" ms"));
+	statusDelayWidget->setSuffix(" " + tr("ms"));
 	statusDelayWidget->setValue(settings->expression_status_delay); 
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
 	hbox->addWidget(statusDelayWidget);
@@ -226,7 +226,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l2->addWidget(box, r, 0);
-	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days")); spin->setValue(settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
+	int days = settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates;
+	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days", "", days)); spin->setValue(days); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
+	connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),[=](int i){spin->setSuffix(" " + tr("days", "", i));});
 	l2->setRowStretch(r, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);

@@ -267,6 +267,7 @@ void FunctionsDialog::deactivateClicked() {
 	if(f) {
 		f->setActive(!f->isActive());
 		functionsModel->invalidate();
+		updateFunctions();
 		emit itemsChanged();
 	}
 }
