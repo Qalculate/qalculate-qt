@@ -102,6 +102,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	statusDelayWidget = new QSpinBox(this);
 	statusDelayWidget->setRange(0, 10000);
 	statusDelayWidget->setSingleStep(250);
+	//: milliseconds
 	statusDelayWidget->setSuffix(" " + tr("ms"));
 	statusDelayWidget->setValue(settings->expression_status_delay); 
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
@@ -227,8 +228,16 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l2->addWidget(box, r, 0);
 	int days = settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates;
-	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setSuffix(" " + tr("days", "", days)); spin->setValue(days); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
-	connect(spin, QOverload<int>::of(&QSpinBox::valueChanged),[=](int i){spin->setSuffix(" " + tr("days", "", i));});
+	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setValue(days); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l2->addWidget(spin, r, 1); exratesSpin = spin; r++;
+	QString str = tr("%n day(s)", "", days);
+	int index = str.indexOf(QString::number(days));
+	if(index == 0) {
+		str = str.mid(index + QString::number(days).length());
+		if(str == " day(s)") str = (days == 1 ? " day" : " days");
+		exratesSpin->setSuffix(str);
+	} else {
+		exratesSpin->setPrefix(str.right(index));
+	}
 	l2->setRowStretch(r, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);
@@ -342,6 +351,15 @@ void PreferencesDialog::exratesToggled(bool b) {
 }
 void PreferencesDialog::exratesChanged(int i) {
 	settings->auto_update_exchange_rates = i;
+	QString str = tr("%n day(s)", "", i);
+	int index = str.indexOf(QString::number(i));
+	if(index == 0) {
+		str = str.mid(index + QString::number(i).length());
+		if(str == " day(s)") str = (i == 1 ? " day" : " days");
+		exratesSpin->setSuffix(str);
+	} else {
+		exratesSpin->setPrefix(str.right(index));
+	}
 }
 void PreferencesDialog::binaryPrefixesToggled(bool b) {
 	CALCULATOR->useBinaryPrefixes(b ? 1 : 0);

@@ -180,9 +180,18 @@ void VariablesDialog::newVariable(int type) {
 	else if(type == 1) v = UnknownEditDialog::newVariable(this, &replaced_item);
 	else v = VariableEditDialog::newVariable(this, NULL, QString(), &replaced_item);
 	if(v) {
-		if(replaced_item && (replaced_item == v || !item_in_calculator(replaced_item))) {
-			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
-			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+		if(replaced_item) {
+			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
+				emit unitRemoved((Unit*) replaced_item);
+			} else if((replaced_item == v) || !CALCULATOR->stillHasVariable((Variable*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasVariable((Variable*) replaced_item))) {
+				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+			} else if(replaced_item->type() == TYPE_UNIT) {
+				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
+				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+			} else if(!replaced_item->isActive()) {
+				ADD_INACTIVE_CATEGORY
+			}
 		}
 		selected_item = v;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
@@ -211,6 +220,10 @@ void VariablesDialog::variableRemoved(Variable *v) {
 	QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) v), 1, Qt::MatchExactly);
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 }
+void VariablesDialog::variableDeactivated(Variable*) {
+	ADD_INACTIVE_CATEGORY
+	variablesModel->invalidate();
+}
 void VariablesDialog::editClicked() {
 	QModelIndex index = variablesView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
@@ -231,8 +244,11 @@ void VariablesDialog::editClicked() {
 			} else if(!CALCULATOR->stillHasVariable((Variable*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasVariable((Variable*) replaced_item))) {
 				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
-			} else if(replaced_item->type() == TYPE_UNIT && !CALCULATOR->hasUnit((Unit*) replaced_item)) {
-				emit unitRemoved((Unit*) replaced_item);
+			} else if(replaced_item->type() == TYPE_UNIT) {
+				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
+				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+			} else if(!replaced_item->isActive()) {
+				ADD_INACTIVE_CATEGORY
 			}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
@@ -288,8 +304,13 @@ void VariablesDialog::deactivateClicked() {
 	Variable *v = (Variable*) index.data(Qt::UserRole).value<void*>();
 	if(v) {
 		v->setActive(!v->isActive());
-		variablesModel->invalidate();
-		updateVariables();
+		QList<QTreeWidgetItem*> list = categoriesView->findItems(v->isActive() ? "All" : "Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+		if(!list.isEmpty()) {
+			categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		} else if(!v->isActive()) {
+				QStringList l; l << tr("Inactive"); l << "Inactive";
+				categoriesView->setCurrentItem(new QTreeWidgetItem(categoriesView, l), 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		}
 		emit itemsChanged();
 	}
 }

@@ -1005,7 +1005,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="60"/>
-        <location filename="../src/functionsdialog.cpp" line="486"/>
+        <location filename="../src/functionsdialog.cpp" line="487"/>
         <source>Function</source>
         <translation>Функция</translation>
     </message>
@@ -1021,8 +1021,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="83"/>
-        <location filename="../src/functionsdialog.cpp" line="418"/>
-        <location filename="../src/functionsdialog.cpp" line="421"/>
+        <location filename="../src/functionsdialog.cpp" line="419"/>
+        <location filename="../src/functionsdialog.cpp" line="422"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -1047,82 +1047,82 @@ Do you want to overwrite the function?</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="303"/>
+        <location filename="../src/functionsdialog.cpp" line="304"/>
         <source>argument</source>
         <translation>аргумент</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="326"/>
+        <location filename="../src/functionsdialog.cpp" line="327"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="336"/>
+        <location filename="../src/functionsdialog.cpp" line="337"/>
         <source>Example:</source>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="348"/>
+        <location filename="../src/functionsdialog.cpp" line="349"/>
         <source>Arguments</source>
         <translation>Аргументы</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="365"/>
+        <location filename="../src/functionsdialog.cpp" line="366"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="368"/>
+        <location filename="../src/functionsdialog.cpp" line="369"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>по умолчанию:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="380"/>
+        <location filename="../src/functionsdialog.cpp" line="381"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Требование:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="388"/>
+        <location filename="../src/functionsdialog.cpp" line="389"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="395"/>
+        <location filename="../src/functionsdialog.cpp" line="396"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="405"/>
+        <location filename="../src/functionsdialog.cpp" line="406"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>ключ</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="423"/>
+        <location filename="../src/functionsdialog.cpp" line="424"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="543"/>
+        <location filename="../src/functionsdialog.cpp" line="544"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="586"/>
+        <location filename="../src/functionsdialog.cpp" line="587"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="592"/>
+        <location filename="../src/functionsdialog.cpp" line="593"/>
         <source>User functions</source>
         <translation>Пользовательские функции</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="599"/>
+        <location filename="../src/functionsdialog.cpp" line="600"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -1778,113 +1778,113 @@ Do you want to overwrite the function?</source>
         <translation>Задержка:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="110"/>
+        <location filename="../src/preferencesdialog.cpp" line="111"/>
         <source>Expression after calculation:</source>
         <translation>Выражение после расчёта:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="112"/>
+        <location filename="../src/preferencesdialog.cpp" line="113"/>
         <source>Keep expression</source>
         <translation>Сохранить выражение</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="113"/>
+        <location filename="../src/preferencesdialog.cpp" line="114"/>
         <source>Clear expression</source>
         <translation>Отчистить выражение</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="114"/>
+        <location filename="../src/preferencesdialog.cpp" line="115"/>
         <source>Replace with result</source>
         <translation>Заменить на результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="115"/>
+        <location filename="../src/preferencesdialog.cpp" line="116"/>
         <source>Replace with result if shorter</source>
         <translation>Заменить на результат, если он короче</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="119"/>
+        <location filename="../src/preferencesdialog.cpp" line="120"/>
         <source>Use keyboard keys for RPN</source>
         <translation>Использовать клавиатуру для ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="120"/>
+        <location filename="../src/preferencesdialog.cpp" line="121"/>
         <source>Parsing mode:</source>
         <translation>Режим анализа:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="122"/>
-        <location filename="../src/preferencesdialog.cpp" line="167"/>
+        <location filename="../src/preferencesdialog.cpp" line="123"/>
+        <location filename="../src/preferencesdialog.cpp" line="168"/>
         <source>Adaptive</source>
         <translation>Адаптивный</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="123"/>
+        <location filename="../src/preferencesdialog.cpp" line="124"/>
         <source>Conventional</source>
         <translation>Общепринятый</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="124"/>
+        <location filename="../src/preferencesdialog.cpp" line="125"/>
         <source>Implicit multiplication first</source>
         <translation>Неявный первый</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="125"/>
+        <location filename="../src/preferencesdialog.cpp" line="126"/>
         <source>Chain</source>
         <translation>Цепь</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="126"/>
+        <location filename="../src/preferencesdialog.cpp" line="127"/>
         <source>RPN</source>
         <translation>ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="130"/>
+        <location filename="../src/preferencesdialog.cpp" line="131"/>
         <source>Read precision</source>
         <translation>Точность чтения</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="131"/>
+        <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Limit implicit multiplication</source>
         <translation>Ограничить неявное умножение</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="132"/>
+        <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Interval calculation:</source>
         <translation>Расчёт интервала:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="134"/>
+        <location filename="../src/preferencesdialog.cpp" line="135"/>
         <source>Variance formula</source>
         <translation>Формула дисперсии</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="135"/>
+        <location filename="../src/preferencesdialog.cpp" line="136"/>
         <source>Interval arithmetic</source>
         <translation>Арифметика интервалов</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="139"/>
+        <location filename="../src/preferencesdialog.cpp" line="140"/>
         <source>Factorize result</source>
         <translation>Разложить результат на множители</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="142"/>
+        <location filename="../src/preferencesdialog.cpp" line="143"/>
         <source>Binary two&apos;s complement representation</source>
         <translation>Представление двоичных чисел с дополнительным кодом</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="143"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Hexadecimal two&apos;s complement representation</source>
         <translation>Представление шестнадцатеричных чисел с дополнительным кодом</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="145"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation>Использовать строчные буквы в недесятичных числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="145"/>
+        <location filename="../src/preferencesdialog.cpp" line="146"/>
         <source>Spell out logical operators</source>
         <translation>Изложить логично логические операции</translation>
     </message>
@@ -1894,239 +1894,249 @@ Do you want to overwrite the function?</source>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="105"/>
+        <location filename="../src/preferencesdialog.cpp" line="106"/>
         <source>ms</source>
+        <extracomment>milliseconds</extracomment>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="146"/>
+        <location filename="../src/preferencesdialog.cpp" line="147"/>
         <source>Use E-notation instead of 10^n</source>
         <translation>Использовать E-нотацию вместо 10^n</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="147"/>
+        <location filename="../src/preferencesdialog.cpp" line="148"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation>Использовать «j» для мнимой единицы</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Use comma as decimal separator</source>
         <translation>Использовать запятую в качестве десятичного разделителя</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="149"/>
+        <location filename="../src/preferencesdialog.cpp" line="150"/>
         <source>Ignore comma in numbers</source>
         <translation>Игнорировать запятую в числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="150"/>
+        <location filename="../src/preferencesdialog.cpp" line="151"/>
         <source>Ignore dots in numbers</source>
         <translation>Игнорировать точки в числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="151"/>
+        <location filename="../src/preferencesdialog.cpp" line="152"/>
         <source>Round halfway numbers to even</source>
         <translation>Округлять половинные числа до ближайшего чётного целого числа</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="153"/>
         <source>Indicate repeating decimals</source>
         <translation>Указывать повторяющиеся десятичные дроби</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="157"/>
+        <location filename="../src/preferencesdialog.cpp" line="158"/>
         <source>Digit grouping:</source>
         <translation>Группировка цифр:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="159"/>
+        <location filename="../src/preferencesdialog.cpp" line="160"/>
         <source>None</source>
         <translation>Никакой</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="160"/>
+        <location filename="../src/preferencesdialog.cpp" line="161"/>
         <source>Standard</source>
         <translation>Стандарт</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="161"/>
+        <location filename="../src/preferencesdialog.cpp" line="162"/>
         <source>Local</source>
         <translation>Локаль</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="165"/>
+        <location filename="../src/preferencesdialog.cpp" line="166"/>
         <source>Interval display:</source>
         <translation>Отображение интервалов:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="168"/>
+        <location filename="../src/preferencesdialog.cpp" line="169"/>
         <source>Significant digits</source>
         <translation>Значимые цифры</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="169"/>
+        <location filename="../src/preferencesdialog.cpp" line="170"/>
         <source>Interval</source>
         <translation>Интервал</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="170"/>
+        <location filename="../src/preferencesdialog.cpp" line="171"/>
         <source>Plus/minus</source>
         <translation>Плюс/минус</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="171"/>
+        <location filename="../src/preferencesdialog.cpp" line="172"/>
         <source>Midpoint</source>
         <translation>Середина</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="172"/>
+        <location filename="../src/preferencesdialog.cpp" line="173"/>
         <source>Lower</source>
         <translation>Ниже</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="173"/>
+        <location filename="../src/preferencesdialog.cpp" line="174"/>
         <source>Upper</source>
         <translation>Выше</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="178"/>
+        <location filename="../src/preferencesdialog.cpp" line="179"/>
         <source>Complex number form:</source>
         <translation>Комплексная форма:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="180"/>
+        <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Rectangular</source>
         <translation>Прямоугольная</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="181"/>
+        <location filename="../src/preferencesdialog.cpp" line="182"/>
         <source>Exponential</source>
         <translation>Экспоненциальная</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="182"/>
+        <location filename="../src/preferencesdialog.cpp" line="183"/>
         <source>Polar</source>
         <translation>Полярная</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="183"/>
+        <location filename="../src/preferencesdialog.cpp" line="184"/>
         <source>Angle/phasor</source>
         <translation>Угловая/векторная</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="191"/>
+        <location filename="../src/preferencesdialog.cpp" line="192"/>
         <source>Abbreviate names</source>
         <translation>Сокращённые имена</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="192"/>
+        <location filename="../src/preferencesdialog.cpp" line="193"/>
         <source>Use binary prefixes for information units</source>
         <translation>Использовать двоичные префиксы для информационных единиц</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="193"/>
+        <location filename="../src/preferencesdialog.cpp" line="194"/>
         <source>Automatic unit conversion:</source>
         <translation>Автоматическое преобразование единиц:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="195"/>
+        <location filename="../src/preferencesdialog.cpp" line="196"/>
         <source>No conversion</source>
         <translation>Без преобразования</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="196"/>
+        <location filename="../src/preferencesdialog.cpp" line="197"/>
         <source>Base units</source>
         <translation>Основные единицы измерения</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="197"/>
+        <location filename="../src/preferencesdialog.cpp" line="198"/>
         <source>Optimal units</source>
         <translation>Оптимальные единицы измерения</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="198"/>
+        <location filename="../src/preferencesdialog.cpp" line="199"/>
         <source>Optimal SI units</source>
         <translation>Оптимальные единицы СИ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="202"/>
+        <location filename="../src/preferencesdialog.cpp" line="203"/>
         <source>Convert to mixed units</source>
         <translation>Преобразовать в смешанные единицы</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="203"/>
+        <location filename="../src/preferencesdialog.cpp" line="204"/>
         <source>Automatic unit prefixes:</source>
         <translation>Автоматические префиксы единиц:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="205"/>
+        <location filename="../src/preferencesdialog.cpp" line="206"/>
         <source>Default</source>
         <translation>По умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="206"/>
+        <location filename="../src/preferencesdialog.cpp" line="207"/>
         <source>No prefixes</source>
         <translation>Без префиксов</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="207"/>
+        <location filename="../src/preferencesdialog.cpp" line="208"/>
         <source>Prefixes for some units</source>
         <translation>Префиксы для выбранных единиц</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="208"/>
+        <location filename="../src/preferencesdialog.cpp" line="209"/>
         <source>Prefixes also for currencies</source>
         <translation>Префиксы также для валют</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="209"/>
+        <location filename="../src/preferencesdialog.cpp" line="210"/>
         <source>Prefixes for all units</source>
         <translation>Префиксы для всех единиц</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="217"/>
+        <location filename="../src/preferencesdialog.cpp" line="218"/>
         <source>Enable all SI-prefixes</source>
         <translation>Включить все префиксы СИ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <location filename="../src/preferencesdialog.cpp" line="219"/>
         <source>Enable denominator prefixes</source>
         <translation>Включить префиксы знаменателя</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="219"/>
+        <location filename="../src/preferencesdialog.cpp" line="220"/>
         <source>Enable units in physical constants</source>
         <translation>Включить единицы измерения в физических константах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="220"/>
+        <location filename="../src/preferencesdialog.cpp" line="221"/>
         <source>Temperature calculation:</source>
         <translation>Режим расчёта температуры:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="222"/>
+        <location filename="../src/preferencesdialog.cpp" line="223"/>
         <source>Absolute</source>
         <translation>Абсолютный</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="223"/>
+        <location filename="../src/preferencesdialog.cpp" line="224"/>
         <source>Relative</source>
         <translation>Относительный</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="224"/>
+        <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Hybrid</source>
         <translation>Гибридный</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="228"/>
+        <location filename="../src/preferencesdialog.cpp" line="229"/>
         <source>Exchange rates updates:</source>
         <translation>Обновления курсов валют:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/preferencesdialog.cpp" line="229"/>
-        <source>days</source>
+        <location filename="../src/preferencesdialog.cpp" line="232"/>
+        <location filename="../src/preferencesdialog.cpp" line="354"/>
+        <source>%n day(s)</source>
         <translation>
+            <numerusform>%n день</numerusform>
+            <numerusform>%n дня</numerusform>
+            <numerusform>%n дней</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>days</source>
+        <translation type="vanished">
             <numerusform>день</numerusform>
             <numerusform>дня</numerusform>
             <numerusform>дней</numerusform>
@@ -3315,7 +3325,7 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="63"/>
-        <location filename="../src/unitsdialog.cpp" line="560"/>
+        <location filename="../src/unitsdialog.cpp" line="561"/>
         <source>Unit</source>
         <translation>Единица измерения</translation>
     </message>
@@ -3331,8 +3341,8 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="87"/>
-        <location filename="../src/unitsdialog.cpp" line="445"/>
-        <location filename="../src/unitsdialog.cpp" line="448"/>
+        <location filename="../src/unitsdialog.cpp" line="446"/>
+        <location filename="../src/unitsdialog.cpp" line="449"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -3352,28 +3362,28 @@ Please select temperature calculation mode
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="450"/>
+        <location filename="../src/unitsdialog.cpp" line="451"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="636"/>
+        <location filename="../src/unitsdialog.cpp" line="637"/>
         <source>All</source>
         <comment>All units</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="679"/>
+        <location filename="../src/unitsdialog.cpp" line="680"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="685"/>
+        <location filename="../src/unitsdialog.cpp" line="686"/>
         <source>User units</source>
         <translation>Пользовательские единицы</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="692"/>
+        <location filename="../src/unitsdialog.cpp" line="693"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -3487,7 +3497,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="63"/>
-        <location filename="../src/variablesdialog.cpp" line="430"/>
+        <location filename="../src/variablesdialog.cpp" line="431"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
@@ -3524,8 +3534,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="92"/>
-        <location filename="../src/variablesdialog.cpp" line="364"/>
-        <location filename="../src/variablesdialog.cpp" line="367"/>
+        <location filename="../src/variablesdialog.cpp" line="365"/>
+        <location filename="../src/variablesdialog.cpp" line="368"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -3540,108 +3550,108 @@ Do you want to overwrite it?</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="315"/>
+        <location filename="../src/variablesdialog.cpp" line="316"/>
         <source>a matrix</source>
         <translation>матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="317"/>
+        <location filename="../src/variablesdialog.cpp" line="318"/>
         <source>a vector</source>
         <translation>вектор</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="335"/>
+        <location filename="../src/variablesdialog.cpp" line="336"/>
         <source>positive</source>
         <translation>положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="336"/>
+        <location filename="../src/variablesdialog.cpp" line="337"/>
         <source>non-positive</source>
         <translation>не положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="337"/>
+        <location filename="../src/variablesdialog.cpp" line="338"/>
         <source>negative</source>
         <translation>отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="338"/>
+        <location filename="../src/variablesdialog.cpp" line="339"/>
         <source>non-negative</source>
         <translation>неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="339"/>
+        <location filename="../src/variablesdialog.cpp" line="340"/>
         <source>non-zero</source>
         <translation>ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="345"/>
+        <location filename="../src/variablesdialog.cpp" line="346"/>
         <source>integer</source>
         <translation>целое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="346"/>
+        <location filename="../src/variablesdialog.cpp" line="347"/>
         <source>boolean</source>
         <translation>логическое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="347"/>
+        <location filename="../src/variablesdialog.cpp" line="348"/>
         <source>rational</source>
         <translation>рациональное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="348"/>
+        <location filename="../src/variablesdialog.cpp" line="349"/>
         <source>real</source>
         <translation>вещественное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="349"/>
+        <location filename="../src/variablesdialog.cpp" line="350"/>
         <source>complex</source>
         <translation>комплексное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="350"/>
+        <location filename="../src/variablesdialog.cpp" line="351"/>
         <source>number</source>
         <translation>число</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="351"/>
+        <location filename="../src/variablesdialog.cpp" line="352"/>
         <source>not matrix</source>
         <translation>не матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="354"/>
+        <location filename="../src/variablesdialog.cpp" line="355"/>
         <source>unknown</source>
         <translation>неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="357"/>
+        <location filename="../src/variablesdialog.cpp" line="358"/>
         <source>Default assumptions</source>
         <translation>Предположения по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="369"/>
+        <location filename="../src/variablesdialog.cpp" line="370"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="487"/>
+        <location filename="../src/variablesdialog.cpp" line="488"/>
         <source>All</source>
         <comment>All variables</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="530"/>
+        <location filename="../src/variablesdialog.cpp" line="531"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="536"/>
+        <location filename="../src/variablesdialog.cpp" line="537"/>
         <source>User variables</source>
         <translation>Пользовательские переменные</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="543"/>
+        <location filename="../src/variablesdialog.cpp" line="544"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>

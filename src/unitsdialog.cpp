@@ -280,47 +280,16 @@ void UnitsDialog::searchChanged(const QString &str) {
 	unitsView->selectionModel()->setCurrentIndex(unitsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	if(str.isEmpty()) unitsView->setFocus();
 }
-void UnitsDialog::newClicked() {
-	/*Unit *u = UnitEditDialog::newUnit(this);
-	if(u) {
-		selected_item = u;
-		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
-		item->setEditable(false);
-		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
-		sourceModel->appendRow(item);
-		unitsModel->invalidate();
-		QModelIndex index = unitsModel->mapFromSource(item->index());
-		if(index.isValid()) {
-			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-			unitsView->scrollTo(index);
-		}
-		emit itemsChanged();
-	}*/
-}
+void UnitsDialog::newClicked() {}
 void UnitsDialog::unitRemoved(Unit *u) {
 	QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) u), 1, Qt::MatchExactly);
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 }
-void UnitsDialog::editClicked() {
-	/*QModelIndex index = unitsView->selectionModel()->currentIndex();
-	if(!index.isValid()) return;
-	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
-	if(u && UnitEditDialog::editUnit(this, u)) {
-		sourceModel->removeRow(unitsModel->mapToSource(unitsView->selectionModel()->currentIndex()).row());
-		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
-		item->setEditable(false);
-		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
-		sourceModel->appendRow(item);
-		selected_item = u;
-		unitsModel->invalidate();
-		QModelIndex index = unitsModel->mapFromSource(item->index());
-		if(index.isValid()) {
-			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-			unitsView->scrollTo(index);
-		}
-		emit itemsChanged();
-	}*/
+void UnitsDialog::unitDeactivated(Unit*) {
+	ADD_INACTIVE_CATEGORY
+	unitsModel->invalidate();
 }
+void UnitsDialog::editClicked() {}
 void UnitsDialog::delClicked() {
 	QModelIndex index = unitsView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
@@ -354,8 +323,13 @@ void UnitsDialog::deactivateClicked() {
 	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
 	if(u) {
 		u->setActive(!u->isActive());
-		unitsModel->invalidate();
-		updateUnits();
+		QList<QTreeWidgetItem*> list = categoriesView->findItems(u->isActive() ? "All" : "Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+		if(!list.isEmpty()) {
+			categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		} else if(!u->isActive()) {
+				QStringList l; l << tr("Inactive"); l << "Inactive";
+				categoriesView->setCurrentItem(new QTreeWidgetItem(categoriesView, l), 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		}
 		emit itemsChanged();
 	}
 }

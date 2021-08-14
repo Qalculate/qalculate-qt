@@ -4755,7 +4755,9 @@ void QalculateWindow::openFunctions() {
 }
 void QalculateWindow::onUnitRemoved(Unit *u) {
 	if(unitsDialog) unitsDialog->unitRemoved(u);
-	expressionEdit->updateCompletion();
+}
+void QalculateWindow::onUnitDeactivated(Unit *u) {
+	if(unitsDialog) unitsDialog->unitDeactivated(u);
 }
 void QalculateWindow::openVariables() {
 	if(variablesDialog) {
@@ -4769,13 +4771,16 @@ void QalculateWindow::openVariables() {
 	variablesDialog = new VariablesDialog();
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
+	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
 	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
 	if(settings->always_on_top) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	variablesDialog->show();
 }
 void QalculateWindow::onVariableRemoved(Variable *v) {
 	if(variablesDialog) variablesDialog->variableRemoved(v);
-	expressionEdit->updateCompletion();
+}
+void QalculateWindow::onVariableDeactivated(Variable *v) {
+	if(variablesDialog) variablesDialog->variableDeactivated(v);
 }
 void QalculateWindow::openUnits() {
 	Unit *u = NULL;
@@ -4796,6 +4801,7 @@ void QalculateWindow::openUnits() {
 	if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
+	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
 	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
 	connect(unitsDialog, SIGNAL(convertToUnitRequest(Unit*)), this, SLOT(convertToUnit(Unit*)));
 	connect(unitsDialog, SIGNAL(unitActivated(Unit*)), this, SLOT(onUnitActivated(Unit*)));

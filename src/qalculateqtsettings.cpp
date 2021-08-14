@@ -54,9 +54,9 @@ bool string_is_less(std::string str1, std::string str2) {
 }
 bool item_in_calculator(ExpressionItem *item) {
 	if(!CALCULATOR->stillHasVariable((Variable*) item) || !CALCULATOR->stillHasFunction((MathFunction*) item) || !CALCULATOR->stillHasUnit((Unit*) item)) return false;
-	if(item->type() == STRUCT_VARIABLE) return CALCULATOR->hasVariable((Variable*) item);
-	if(item->type() == STRUCT_UNIT) return CALCULATOR->hasUnit((Unit*) item);
-	if(item->type() == STRUCT_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
+	if(item->type() == TYPE_VARIABLE) return CALCULATOR->hasVariable((Variable*) item);
+	if(item->type() == TYPE_UNIT) return CALCULATOR->hasUnit((Unit*) item);
+	if(item->type() == TYPE_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
 	return false;
 }
 

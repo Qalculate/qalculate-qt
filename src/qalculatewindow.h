@@ -184,6 +184,8 @@ class QalculateWindow : public QMainWindow {
 		void onUnitActivated(Unit *u);
 		void onUnitRemoved(Unit*);
 		void onVariableRemoved(Variable*);
+		void onUnitDeactivated(Unit*);
+		void onVariableDeactivated(Variable*);
 		void normalModeActivated();
 		void rpnModeActivated();
 		void chainModeActivated();

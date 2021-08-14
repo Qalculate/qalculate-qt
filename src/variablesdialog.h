@@ -72,6 +72,7 @@ class VariablesDialog : public QDialog {
 		void setSearch(const QString&);
 		void selectCategory(std::string);
 		void variableRemoved(Variable*);
+		void variableDeactivated(Variable*);
 		bool eventFilter(QObject*, QEvent*) override;
 
 	public slots:
@@ -82,6 +83,7 @@ class VariablesDialog : public QDialog {
 
 		void itemsChanged();
 		void unitRemoved(Unit*);
+		void unitDeactivated(Unit*);
 		void applyVariableRequest(Variable*);
 		void insertVariableRequest(Variable*);
 
