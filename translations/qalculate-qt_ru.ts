@@ -1005,7 +1005,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="60"/>
-        <location filename="../src/functionsdialog.cpp" line="487"/>
+        <location filename="../src/functionsdialog.cpp" line="496"/>
         <source>Function</source>
         <translation>Функция</translation>
     </message>
@@ -1021,8 +1021,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="83"/>
-        <location filename="../src/functionsdialog.cpp" line="419"/>
-        <location filename="../src/functionsdialog.cpp" line="422"/>
+        <location filename="../src/functionsdialog.cpp" line="428"/>
+        <location filename="../src/functionsdialog.cpp" line="431"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -1047,82 +1047,83 @@ Do you want to overwrite the function?</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="304"/>
+        <location filename="../src/functionsdialog.cpp" line="313"/>
         <source>argument</source>
         <translation>аргумент</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="327"/>
+        <location filename="../src/functionsdialog.cpp" line="336"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="337"/>
+        <location filename="../src/functionsdialog.cpp" line="346"/>
         <source>Example:</source>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="349"/>
+        <location filename="../src/functionsdialog.cpp" line="358"/>
         <source>Arguments</source>
         <translation>Аргументы</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="366"/>
+        <location filename="../src/functionsdialog.cpp" line="375"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="369"/>
+        <location filename="../src/functionsdialog.cpp" line="378"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>по умолчанию:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="381"/>
+        <location filename="../src/functionsdialog.cpp" line="390"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Требование:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="389"/>
+        <location filename="../src/functionsdialog.cpp" line="398"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="396"/>
+        <location filename="../src/functionsdialog.cpp" line="405"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="406"/>
+        <location filename="../src/functionsdialog.cpp" line="415"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>ключ</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="424"/>
+        <location filename="../src/functionsdialog.cpp" line="433"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="544"/>
+        <location filename="../src/functionsdialog.cpp" line="553"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="587"/>
+        <location filename="../src/functionsdialog.cpp" line="596"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="593"/>
+        <location filename="../src/functionsdialog.cpp" line="602"/>
         <source>User functions</source>
         <translation>Пользовательские функции</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="600"/>
+        <location filename="../src/functionsdialog.cpp" line="277"/>
+        <location filename="../src/functionsdialog.cpp" line="609"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -1194,6 +1195,21 @@ Do you want to overwrite the function?</source>
         <location filename="../src/keypadwidget.cpp" line="173"/>
         <source>Memory subtract</source>
         <translation>Отнять от значения в памяти</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="183"/>
+        <source>sin</source>
+        <translation>sin</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="185"/>
+        <source>cos</source>
+        <translation>cos</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="187"/>
+        <source>tan</source>
+        <translation>tg</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="224"/>
@@ -3154,7 +3170,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4166"/>
-        <location filename="../src/qalculatewindow.cpp" line="5380"/>
+        <location filename="../src/qalculatewindow.cpp" line="5386"/>
         <source>Matrix</source>
         <translation>Матрица</translation>
     </message>
@@ -3215,86 +3231,86 @@ Please select temperature calculation mode
         <translation>Только точка в качестве десятичного разделителя</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>Gnuplot was not found</source>
         <translation>Программа Gnuplot не найдена</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>Для построения графиков %1 (%2) должен быть установлен дополнительно и находиться по переменной окружения PATH.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5034"/>
+        <location filename="../src/qalculatewindow.cpp" line="5040"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>Ввод</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Calculate</source>
         <translation>Рассчитать</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Apply to Stack</source>
         <translation>Применить к стеку</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Insert</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5064"/>
+        <location filename="../src/qalculatewindow.cpp" line="5070"/>
         <source>Keep open</source>
         <translation>Держать открытым</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5089"/>
+        <location filename="../src/qalculatewindow.cpp" line="5095"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5091"/>
+        <location filename="../src/qalculatewindow.cpp" line="5097"/>
         <source>Argument</source>
         <translation>Аргумент</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5104"/>
+        <location filename="../src/qalculatewindow.cpp" line="5110"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5159"/>
+        <location filename="../src/qalculatewindow.cpp" line="5165"/>
         <source>True</source>
         <translation>Истина</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5162"/>
+        <location filename="../src/qalculatewindow.cpp" line="5168"/>
         <source>False</source>
         <translation>Ложь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5188"/>
+        <location filename="../src/qalculatewindow.cpp" line="5194"/>
         <source>Info</source>
         <translation>Инфо</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5223"/>
-        <location filename="../src/qalculatewindow.cpp" line="5231"/>
+        <location filename="../src/qalculatewindow.cpp" line="5229"/>
+        <location filename="../src/qalculatewindow.cpp" line="5237"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5571"/>
+        <location filename="../src/qalculatewindow.cpp" line="5577"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Не удалось открыть %1.
@@ -3325,7 +3341,7 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="63"/>
-        <location filename="../src/unitsdialog.cpp" line="561"/>
+        <location filename="../src/unitsdialog.cpp" line="535"/>
         <source>Unit</source>
         <translation>Единица измерения</translation>
     </message>
@@ -3341,8 +3357,8 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="87"/>
-        <location filename="../src/unitsdialog.cpp" line="446"/>
-        <location filename="../src/unitsdialog.cpp" line="449"/>
+        <location filename="../src/unitsdialog.cpp" line="420"/>
+        <location filename="../src/unitsdialog.cpp" line="423"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -3362,28 +3378,29 @@ Please select temperature calculation mode
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="451"/>
+        <location filename="../src/unitsdialog.cpp" line="425"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="637"/>
+        <location filename="../src/unitsdialog.cpp" line="611"/>
         <source>All</source>
         <comment>All units</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="680"/>
+        <location filename="../src/unitsdialog.cpp" line="654"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="686"/>
+        <location filename="../src/unitsdialog.cpp" line="660"/>
         <source>User units</source>
         <translation>Пользовательские единицы</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="693"/>
+        <location filename="../src/unitsdialog.cpp" line="330"/>
+        <location filename="../src/unitsdialog.cpp" line="667"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -3497,7 +3514,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="63"/>
-        <location filename="../src/variablesdialog.cpp" line="431"/>
+        <location filename="../src/variablesdialog.cpp" line="452"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
@@ -3534,8 +3551,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="92"/>
-        <location filename="../src/variablesdialog.cpp" line="365"/>
-        <location filename="../src/variablesdialog.cpp" line="368"/>
+        <location filename="../src/variablesdialog.cpp" line="386"/>
+        <location filename="../src/variablesdialog.cpp" line="389"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -3550,108 +3567,109 @@ Do you want to overwrite it?</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="316"/>
+        <location filename="../src/variablesdialog.cpp" line="337"/>
         <source>a matrix</source>
         <translation>матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="318"/>
+        <location filename="../src/variablesdialog.cpp" line="339"/>
         <source>a vector</source>
         <translation>вектор</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="336"/>
+        <location filename="../src/variablesdialog.cpp" line="357"/>
         <source>positive</source>
         <translation>положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="337"/>
+        <location filename="../src/variablesdialog.cpp" line="358"/>
         <source>non-positive</source>
         <translation>не положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="338"/>
+        <location filename="../src/variablesdialog.cpp" line="359"/>
         <source>negative</source>
         <translation>отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="339"/>
+        <location filename="../src/variablesdialog.cpp" line="360"/>
         <source>non-negative</source>
         <translation>неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="340"/>
+        <location filename="../src/variablesdialog.cpp" line="361"/>
         <source>non-zero</source>
         <translation>ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="346"/>
+        <location filename="../src/variablesdialog.cpp" line="367"/>
         <source>integer</source>
         <translation>целое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="347"/>
+        <location filename="../src/variablesdialog.cpp" line="368"/>
         <source>boolean</source>
         <translation>логическое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="348"/>
+        <location filename="../src/variablesdialog.cpp" line="369"/>
         <source>rational</source>
         <translation>рациональное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="349"/>
+        <location filename="../src/variablesdialog.cpp" line="370"/>
         <source>real</source>
         <translation>вещественное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="350"/>
+        <location filename="../src/variablesdialog.cpp" line="371"/>
         <source>complex</source>
         <translation>комплексное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="351"/>
+        <location filename="../src/variablesdialog.cpp" line="372"/>
         <source>number</source>
         <translation>число</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="352"/>
+        <location filename="../src/variablesdialog.cpp" line="373"/>
         <source>not matrix</source>
         <translation>не матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="355"/>
+        <location filename="../src/variablesdialog.cpp" line="376"/>
         <source>unknown</source>
         <translation>неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="358"/>
+        <location filename="../src/variablesdialog.cpp" line="379"/>
         <source>Default assumptions</source>
         <translation>Предположения по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="370"/>
+        <location filename="../src/variablesdialog.cpp" line="391"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="488"/>
+        <location filename="../src/variablesdialog.cpp" line="509"/>
         <source>All</source>
         <comment>All variables</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="531"/>
+        <location filename="../src/variablesdialog.cpp" line="552"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="537"/>
+        <location filename="../src/variablesdialog.cpp" line="558"/>
         <source>User variables</source>
         <translation>Пользовательские переменные</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="544"/>
+        <location filename="../src/variablesdialog.cpp" line="311"/>
+        <location filename="../src/variablesdialog.cpp" line="565"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>

@@ -6061,7 +6061,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="60"/>
-        <location filename="../src/functionsdialog.cpp" line="487"/>
+        <location filename="../src/functionsdialog.cpp" line="496"/>
         <source>Function</source>
         <translation type="unfinished">函数</translation>
     </message>
@@ -6077,8 +6077,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="83"/>
-        <location filename="../src/functionsdialog.cpp" line="419"/>
-        <location filename="../src/functionsdialog.cpp" line="422"/>
+        <location filename="../src/functionsdialog.cpp" line="428"/>
+        <location filename="../src/functionsdialog.cpp" line="431"/>
         <source>Deactivate</source>
         <translation type="unfinished">停用</translation>
     </message>
@@ -6103,82 +6103,83 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="304"/>
+        <location filename="../src/functionsdialog.cpp" line="313"/>
         <source>argument</source>
         <translation type="unfinished">参数</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="327"/>
+        <location filename="../src/functionsdialog.cpp" line="336"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation type="unfinished">从 %1 数据集中检索与所给对象和属性相关的数据。若将“info”键入为属性，则会弹出一个包含该对象的所有属性的对话框窗口。</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="337"/>
+        <location filename="../src/functionsdialog.cpp" line="346"/>
         <source>Example:</source>
         <translation type="unfinished">示例:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="349"/>
+        <location filename="../src/functionsdialog.cpp" line="358"/>
         <source>Arguments</source>
         <translation type="unfinished">参数</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="366"/>
+        <location filename="../src/functionsdialog.cpp" line="375"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation type="unfinished">可选</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="369"/>
+        <location filename="../src/functionsdialog.cpp" line="378"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation type="unfinished">默认值:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="381"/>
+        <location filename="../src/functionsdialog.cpp" line="390"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation type="unfinished">要求:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="389"/>
+        <location filename="../src/functionsdialog.cpp" line="398"/>
         <source>Properties</source>
         <translation type="unfinished">属性</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="396"/>
+        <location filename="../src/functionsdialog.cpp" line="405"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="406"/>
+        <location filename="../src/functionsdialog.cpp" line="415"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation type="unfinished">键</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="424"/>
+        <location filename="../src/functionsdialog.cpp" line="433"/>
         <source>Activate</source>
         <translation type="unfinished">激活</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="544"/>
+        <location filename="../src/functionsdialog.cpp" line="553"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation type="unfinished">全部</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="587"/>
+        <location filename="../src/functionsdialog.cpp" line="596"/>
         <source>Uncategorized</source>
         <translation type="unfinished">未分类</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="593"/>
+        <location filename="../src/functionsdialog.cpp" line="602"/>
         <source>User functions</source>
         <translation type="unfinished">用户功能</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="600"/>
+        <location filename="../src/functionsdialog.cpp" line="277"/>
+        <location filename="../src/functionsdialog.cpp" line="609"/>
         <source>Inactive</source>
         <translation type="unfinished">不常用</translation>
     </message>
@@ -6250,6 +6251,21 @@ Do you want to overwrite the function?</source>
         <location filename="../src/keypadwidget.cpp" line="173"/>
         <source>Memory subtract</source>
         <translation type="unfinished">存值减去</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="183"/>
+        <source>sin</source>
+        <translation type="unfinished">sin</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="185"/>
+        <source>cos</source>
+        <translation type="unfinished">cos</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="187"/>
+        <source>tan</source>
+        <translation type="unfinished">tan</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="192"/>
@@ -8229,7 +8245,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4166"/>
-        <location filename="../src/qalculatewindow.cpp" line="5380"/>
+        <location filename="../src/qalculatewindow.cpp" line="5386"/>
         <source>Matrix</source>
         <translation type="unfinished">矩阵</translation>
     </message>
@@ -8289,86 +8305,86 @@ Please select temperature calculation mode
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>Gnuplot was not found</source>
         <translation type="unfinished">未找到gnuplot</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation type="unfinished">%1 (%2) 需要单独安装，并在可执行的搜索路径中找到，才能进行绘图。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5034"/>
+        <location filename="../src/qalculatewindow.cpp" line="5040"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation type="unfinished">示例:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation type="unfinished">开始</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Calculate</source>
         <translation type="unfinished">计算</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Apply to Stack</source>
         <translation type="unfinished">应用于栈</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Insert</source>
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5064"/>
+        <location filename="../src/qalculatewindow.cpp" line="5070"/>
         <source>Keep open</source>
         <translation type="unfinished">保持打开状态</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5089"/>
+        <location filename="../src/qalculatewindow.cpp" line="5095"/>
         <source>Value</source>
         <translation type="unfinished">值</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5091"/>
+        <location filename="../src/qalculatewindow.cpp" line="5097"/>
         <source>Argument</source>
         <translation type="unfinished">参数</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5104"/>
+        <location filename="../src/qalculatewindow.cpp" line="5110"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5159"/>
+        <location filename="../src/qalculatewindow.cpp" line="5165"/>
         <source>True</source>
         <translation type="unfinished">真</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5162"/>
+        <location filename="../src/qalculatewindow.cpp" line="5168"/>
         <source>False</source>
         <translation type="unfinished">假</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5188"/>
+        <location filename="../src/qalculatewindow.cpp" line="5194"/>
         <source>Info</source>
         <translation type="unfinished">信息</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5223"/>
-        <location filename="../src/qalculatewindow.cpp" line="5231"/>
+        <location filename="../src/qalculatewindow.cpp" line="5229"/>
+        <location filename="../src/qalculatewindow.cpp" line="5237"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation type="unfinished">可选</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5571"/>
+        <location filename="../src/qalculatewindow.cpp" line="5577"/>
         <source>Failed to open %1.
 %2</source>
         <translation type="unfinished">无法打开 %1 。
@@ -8389,7 +8405,7 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="63"/>
-        <location filename="../src/unitsdialog.cpp" line="561"/>
+        <location filename="../src/unitsdialog.cpp" line="535"/>
         <source>Unit</source>
         <translation type="unfinished">单位</translation>
     </message>
@@ -8405,8 +8421,8 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="87"/>
-        <location filename="../src/unitsdialog.cpp" line="446"/>
-        <location filename="../src/unitsdialog.cpp" line="449"/>
+        <location filename="../src/unitsdialog.cpp" line="420"/>
+        <location filename="../src/unitsdialog.cpp" line="423"/>
         <source>Deactivate</source>
         <translation type="unfinished">停用</translation>
     </message>
@@ -8426,28 +8442,29 @@ Please select temperature calculation mode
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="451"/>
+        <location filename="../src/unitsdialog.cpp" line="425"/>
         <source>Activate</source>
         <translation type="unfinished">激活</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="637"/>
+        <location filename="../src/unitsdialog.cpp" line="611"/>
         <source>All</source>
         <comment>All units</comment>
         <translation type="unfinished">全部</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="680"/>
+        <location filename="../src/unitsdialog.cpp" line="654"/>
         <source>Uncategorized</source>
         <translation type="unfinished">未分类</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="686"/>
+        <location filename="../src/unitsdialog.cpp" line="660"/>
         <source>User units</source>
         <translation type="unfinished">用户单位</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="693"/>
+        <location filename="../src/unitsdialog.cpp" line="330"/>
+        <location filename="../src/unitsdialog.cpp" line="667"/>
         <source>Inactive</source>
         <translation type="unfinished">不常用</translation>
     </message>
@@ -8561,7 +8578,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="63"/>
-        <location filename="../src/variablesdialog.cpp" line="431"/>
+        <location filename="../src/variablesdialog.cpp" line="452"/>
         <source>Variable</source>
         <translation type="unfinished">变量</translation>
     </message>
@@ -8597,8 +8614,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="92"/>
-        <location filename="../src/variablesdialog.cpp" line="365"/>
-        <location filename="../src/variablesdialog.cpp" line="368"/>
+        <location filename="../src/variablesdialog.cpp" line="386"/>
+        <location filename="../src/variablesdialog.cpp" line="389"/>
         <source>Deactivate</source>
         <translation type="unfinished">停用</translation>
     </message>
@@ -8613,108 +8630,109 @@ Do you want to overwrite it?</source>
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="316"/>
+        <location filename="../src/variablesdialog.cpp" line="337"/>
         <source>a matrix</source>
         <translation type="unfinished">矩阵</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="318"/>
+        <location filename="../src/variablesdialog.cpp" line="339"/>
         <source>a vector</source>
         <translation type="unfinished">向量</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="336"/>
+        <location filename="../src/variablesdialog.cpp" line="357"/>
         <source>positive</source>
         <translation type="unfinished">正数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="337"/>
+        <location filename="../src/variablesdialog.cpp" line="358"/>
         <source>non-positive</source>
         <translation type="unfinished">非正数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="338"/>
+        <location filename="../src/variablesdialog.cpp" line="359"/>
         <source>negative</source>
         <translation type="unfinished">负数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="339"/>
+        <location filename="../src/variablesdialog.cpp" line="360"/>
         <source>non-negative</source>
         <translation type="unfinished">非负数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="340"/>
+        <location filename="../src/variablesdialog.cpp" line="361"/>
         <source>non-zero</source>
         <translation type="unfinished">非零</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="346"/>
+        <location filename="../src/variablesdialog.cpp" line="367"/>
         <source>integer</source>
         <translation type="unfinished">整数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="347"/>
+        <location filename="../src/variablesdialog.cpp" line="368"/>
         <source>boolean</source>
         <translation type="unfinished">布尔值</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="348"/>
+        <location filename="../src/variablesdialog.cpp" line="369"/>
         <source>rational</source>
         <translation type="unfinished">有理数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="349"/>
+        <location filename="../src/variablesdialog.cpp" line="370"/>
         <source>real</source>
         <translation type="unfinished">实数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="350"/>
+        <location filename="../src/variablesdialog.cpp" line="371"/>
         <source>complex</source>
         <translation type="unfinished">复数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="351"/>
+        <location filename="../src/variablesdialog.cpp" line="372"/>
         <source>number</source>
         <translation type="unfinished">数</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="352"/>
+        <location filename="../src/variablesdialog.cpp" line="373"/>
         <source>not matrix</source>
         <translation type="unfinished">非矩阵</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="355"/>
+        <location filename="../src/variablesdialog.cpp" line="376"/>
         <source>unknown</source>
         <translation type="unfinished">未知</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="358"/>
+        <location filename="../src/variablesdialog.cpp" line="379"/>
         <source>Default assumptions</source>
         <translation type="unfinished">默认假设</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="370"/>
+        <location filename="../src/variablesdialog.cpp" line="391"/>
         <source>Activate</source>
         <translation type="unfinished">激活</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="488"/>
+        <location filename="../src/variablesdialog.cpp" line="509"/>
         <source>All</source>
         <comment>All variables</comment>
         <translation type="unfinished">全部</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="531"/>
+        <location filename="../src/variablesdialog.cpp" line="552"/>
         <source>Uncategorized</source>
         <translation type="unfinished">未分类</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="537"/>
+        <location filename="../src/variablesdialog.cpp" line="558"/>
         <source>User variables</source>
         <translation type="unfinished">用户变量</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="544"/>
+        <location filename="../src/variablesdialog.cpp" line="311"/>
+        <location filename="../src/variablesdialog.cpp" line="565"/>
         <source>Inactive</source>
         <translation type="unfinished">不常用</translation>
     </message>

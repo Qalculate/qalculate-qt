@@ -6003,7 +6003,7 @@ Deseja sobrescrever a função?</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="60"/>
-        <location filename="../src/functionsdialog.cpp" line="487"/>
+        <location filename="../src/functionsdialog.cpp" line="496"/>
         <source>Function</source>
         <translation>Função</translation>
     </message>
@@ -6019,8 +6019,8 @@ Deseja sobrescrever a função?</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="83"/>
-        <location filename="../src/functionsdialog.cpp" line="419"/>
-        <location filename="../src/functionsdialog.cpp" line="422"/>
+        <location filename="../src/functionsdialog.cpp" line="428"/>
+        <location filename="../src/functionsdialog.cpp" line="431"/>
         <source>Deactivate</source>
         <translation>Desativar</translation>
     </message>
@@ -6045,82 +6045,83 @@ Deseja sobrescrever a função?</translation>
         <translation>Inserir</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="304"/>
+        <location filename="../src/functionsdialog.cpp" line="313"/>
         <source>argument</source>
         <translation>argumento</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="327"/>
+        <location filename="../src/functionsdialog.cpp" line="336"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation>Recupera dados do conjunto de dados %1 para um determinado objeto e propriedade. Se &quot;info&quot; for digitado como propriedade, uma janela de diálogo será exibida com todas as propriedades do objeto.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="337"/>
+        <location filename="../src/functionsdialog.cpp" line="346"/>
         <source>Example:</source>
         <translation>Exemplo:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="349"/>
+        <location filename="../src/functionsdialog.cpp" line="358"/>
         <source>Arguments</source>
         <translation>Argumentos</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="366"/>
+        <location filename="../src/functionsdialog.cpp" line="375"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>opcional</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="369"/>
+        <location filename="../src/functionsdialog.cpp" line="378"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>padrão:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="381"/>
+        <location filename="../src/functionsdialog.cpp" line="390"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Requerimento:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="389"/>
+        <location filename="../src/functionsdialog.cpp" line="398"/>
         <source>Properties</source>
         <translation>Propriedades</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="396"/>
+        <location filename="../src/functionsdialog.cpp" line="405"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="406"/>
+        <location filename="../src/functionsdialog.cpp" line="415"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>chave</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="424"/>
+        <location filename="../src/functionsdialog.cpp" line="433"/>
         <source>Activate</source>
         <translation>Ativar</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="544"/>
+        <location filename="../src/functionsdialog.cpp" line="553"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation type="unfinished">Todas</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="587"/>
+        <location filename="../src/functionsdialog.cpp" line="596"/>
         <source>Uncategorized</source>
         <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="593"/>
+        <location filename="../src/functionsdialog.cpp" line="602"/>
         <source>User functions</source>
         <translation type="unfinished">Funções de usuário</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="600"/>
+        <location filename="../src/functionsdialog.cpp" line="277"/>
+        <location filename="../src/functionsdialog.cpp" line="609"/>
         <source>Inactive</source>
         <translation type="unfinished">Inativo</translation>
     </message>
@@ -6192,6 +6193,21 @@ Deseja sobrescrever a função?</translation>
         <location filename="../src/keypadwidget.cpp" line="173"/>
         <source>Memory subtract</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="183"/>
+        <source>sin</source>
+        <translation type="unfinished">sin</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="185"/>
+        <source>cos</source>
+        <translation type="unfinished">cos</translation>
+    </message>
+    <message>
+        <location filename="../src/keypadwidget.cpp" line="187"/>
+        <source>tan</source>
+        <translation type="unfinished">tan</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="192"/>
@@ -8181,7 +8197,7 @@ Você pode obter a versão %3 em %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4166"/>
-        <location filename="../src/qalculatewindow.cpp" line="5380"/>
+        <location filename="../src/qalculatewindow.cpp" line="5386"/>
         <source>Matrix</source>
         <translation>Matriz</translation>
     </message>
@@ -8239,86 +8255,86 @@ Please select temperature calculation mode
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>Gnuplot was not found</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4852"/>
+        <location filename="../src/qalculatewindow.cpp" line="4858"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>%1 (%2) precisa ser instalado separadamente e localizado no caminho de pesquisa do executável para que a plotagem funcione.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5034"/>
+        <location filename="../src/qalculatewindow.cpp" line="5040"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Exemplo:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation type="unfinished">Enter</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5072"/>
+        <location filename="../src/qalculatewindow.cpp" line="5078"/>
         <source>Calculate</source>
         <translation>Calcular</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Apply to Stack</source>
         <translation>Aplicar à pilha</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5073"/>
+        <location filename="../src/qalculatewindow.cpp" line="5079"/>
         <source>Insert</source>
         <translation>Inserir</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5064"/>
+        <location filename="../src/qalculatewindow.cpp" line="5070"/>
         <source>Keep open</source>
         <translation>Manter aberto</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5089"/>
+        <location filename="../src/qalculatewindow.cpp" line="5095"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5091"/>
+        <location filename="../src/qalculatewindow.cpp" line="5097"/>
         <source>Argument</source>
         <translation>Argumento</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5104"/>
+        <location filename="../src/qalculatewindow.cpp" line="5110"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5159"/>
+        <location filename="../src/qalculatewindow.cpp" line="5165"/>
         <source>True</source>
         <translation type="unfinished">Verdadeiro</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5162"/>
+        <location filename="../src/qalculatewindow.cpp" line="5168"/>
         <source>False</source>
         <translation type="unfinished">Falso</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5188"/>
+        <location filename="../src/qalculatewindow.cpp" line="5194"/>
         <source>Info</source>
         <translation type="unfinished">Informação</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5223"/>
-        <location filename="../src/qalculatewindow.cpp" line="5231"/>
+        <location filename="../src/qalculatewindow.cpp" line="5229"/>
+        <location filename="../src/qalculatewindow.cpp" line="5237"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>opcional</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5571"/>
+        <location filename="../src/qalculatewindow.cpp" line="5577"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Falha ao abrir %1.
@@ -8339,7 +8355,7 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="63"/>
-        <location filename="../src/unitsdialog.cpp" line="561"/>
+        <location filename="../src/unitsdialog.cpp" line="535"/>
         <source>Unit</source>
         <translation>Unidade</translation>
     </message>
@@ -8355,8 +8371,8 @@ Please select temperature calculation mode
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="87"/>
-        <location filename="../src/unitsdialog.cpp" line="446"/>
-        <location filename="../src/unitsdialog.cpp" line="449"/>
+        <location filename="../src/unitsdialog.cpp" line="420"/>
+        <location filename="../src/unitsdialog.cpp" line="423"/>
         <source>Deactivate</source>
         <translation>Desativar</translation>
     </message>
@@ -8376,28 +8392,29 @@ Please select temperature calculation mode
         <translation>Inserir</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="451"/>
+        <location filename="../src/unitsdialog.cpp" line="425"/>
         <source>Activate</source>
         <translation>Ativar</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="637"/>
+        <location filename="../src/unitsdialog.cpp" line="611"/>
         <source>All</source>
         <comment>All units</comment>
         <translation type="unfinished">Todas</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="680"/>
+        <location filename="../src/unitsdialog.cpp" line="654"/>
         <source>Uncategorized</source>
         <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="686"/>
+        <location filename="../src/unitsdialog.cpp" line="660"/>
         <source>User units</source>
         <translation type="unfinished">Unidades de usuário</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="693"/>
+        <location filename="../src/unitsdialog.cpp" line="330"/>
+        <location filename="../src/unitsdialog.cpp" line="667"/>
         <source>Inactive</source>
         <translation type="unfinished">Inativo</translation>
     </message>
@@ -8511,7 +8528,7 @@ Deseja sobrescrevê-la?</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="63"/>
-        <location filename="../src/variablesdialog.cpp" line="431"/>
+        <location filename="../src/variablesdialog.cpp" line="452"/>
         <source>Variable</source>
         <translation>Variável</translation>
     </message>
@@ -8547,8 +8564,8 @@ Deseja sobrescrevê-la?</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="92"/>
-        <location filename="../src/variablesdialog.cpp" line="365"/>
-        <location filename="../src/variablesdialog.cpp" line="368"/>
+        <location filename="../src/variablesdialog.cpp" line="386"/>
+        <location filename="../src/variablesdialog.cpp" line="389"/>
         <source>Deactivate</source>
         <translation>Desativar</translation>
     </message>
@@ -8563,108 +8580,109 @@ Deseja sobrescrevê-la?</translation>
         <translation>Inserir</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="316"/>
+        <location filename="../src/variablesdialog.cpp" line="337"/>
         <source>a matrix</source>
         <translation type="unfinished">uma matriz</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="318"/>
+        <location filename="../src/variablesdialog.cpp" line="339"/>
         <source>a vector</source>
         <translation type="unfinished">um vetor</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="336"/>
+        <location filename="../src/variablesdialog.cpp" line="357"/>
         <source>positive</source>
         <translation>positivo</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="337"/>
+        <location filename="../src/variablesdialog.cpp" line="358"/>
         <source>non-positive</source>
         <translation>não-positivo</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="338"/>
+        <location filename="../src/variablesdialog.cpp" line="359"/>
         <source>negative</source>
         <translation>negativo</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="339"/>
+        <location filename="../src/variablesdialog.cpp" line="360"/>
         <source>non-negative</source>
         <translation>não-negativo</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="340"/>
+        <location filename="../src/variablesdialog.cpp" line="361"/>
         <source>non-zero</source>
         <translation>diferente de zero</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="346"/>
+        <location filename="../src/variablesdialog.cpp" line="367"/>
         <source>integer</source>
         <translation>inteiro</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="347"/>
+        <location filename="../src/variablesdialog.cpp" line="368"/>
         <source>boolean</source>
         <translation>boleano</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="348"/>
+        <location filename="../src/variablesdialog.cpp" line="369"/>
         <source>rational</source>
         <translation>racional</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="349"/>
+        <location filename="../src/variablesdialog.cpp" line="370"/>
         <source>real</source>
         <translation>real</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="350"/>
+        <location filename="../src/variablesdialog.cpp" line="371"/>
         <source>complex</source>
         <translation>complexo</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="351"/>
+        <location filename="../src/variablesdialog.cpp" line="372"/>
         <source>number</source>
         <translation>número</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="352"/>
+        <location filename="../src/variablesdialog.cpp" line="373"/>
         <source>not matrix</source>
         <translation>não matriz</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="355"/>
+        <location filename="../src/variablesdialog.cpp" line="376"/>
         <source>unknown</source>
         <translation>desconhecido</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="358"/>
+        <location filename="../src/variablesdialog.cpp" line="379"/>
         <source>Default assumptions</source>
         <translation>Suposições padrão</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="370"/>
+        <location filename="../src/variablesdialog.cpp" line="391"/>
         <source>Activate</source>
         <translation>Ativar</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="488"/>
+        <location filename="../src/variablesdialog.cpp" line="509"/>
         <source>All</source>
         <comment>All variables</comment>
         <translation type="unfinished">Todas</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="531"/>
+        <location filename="../src/variablesdialog.cpp" line="552"/>
         <source>Uncategorized</source>
         <translation type="unfinished">Sem categoria</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="537"/>
+        <location filename="../src/variablesdialog.cpp" line="558"/>
         <source>User variables</source>
         <translation type="unfinished">Variáveis de usuário</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="544"/>
+        <location filename="../src/variablesdialog.cpp" line="311"/>
+        <location filename="../src/variablesdialog.cpp" line="565"/>
         <source>Inactive</source>
         <translation type="unfinished">Inativo</translation>
     </message>
