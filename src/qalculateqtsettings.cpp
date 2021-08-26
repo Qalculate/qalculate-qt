@@ -380,6 +380,10 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "custom_application_font") {
 					custom_app_font = svalue;
 					save_custom_app_font = true;
+				} else if(svar == "multiplication_sign") {
+					if(v >= MULTIPLICATION_SIGN_ASTERISK && v <= MULTIPLICATION_SIGN_ALTDOT) {
+						printops.multiplication_sign = (MultiplicationSign) v;
+					}
 				} else if(svar == "plot_legend_placement") {
 					if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
 				} else if(svar == "plot_style") {
@@ -804,6 +808,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
+	if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
 	fprintf(file, "replace_expression=%i\n", replace_expression);
 	fprintf(file, "rpn_keys=%i\n", rpn_keys);
 	/*if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
@@ -948,6 +953,16 @@ void QalculateQtSettings::savePreferences(bool) {
 	}
 	fclose(file);
 
+}
+
+const char *QalculateQtSettings::multiplicationSign() {
+	if(!printops.use_unicode_signs) return "*";
+	switch(printops.multiplication_sign) {
+		case MULTIPLICATION_SIGN_X: {return SIGN_MULTIPLICATION;}
+		case MULTIPLICATION_SIGN_DOT: {return SIGN_MULTIDOT;}
+		case MULTIPLICATION_SIGN_ALTDOT: {return SIGN_MIDDLEDOT;}
+		default: {return "*";}
+	}
 }
 
 void QalculateQtSettings::updateMessagePrintOptions() {

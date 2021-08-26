@@ -299,8 +299,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
 	grid->addWidget(button, 3, c, 1, 1);
-	OPERATOR_BUTTON3(SIGN_MULTIPLICATION, "&", "<<", 1, c);
+	OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
+	multiplicationButton = button;
 	delButton = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
 	connect(delButton, SIGNAL(clicked()), this, SIGNAL(delClicked()));
 	connect(delButton, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
@@ -357,6 +358,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 KeypadWidget::~KeypadWidget() {}
 
 void KeypadWidget::updateSymbols() {
+	multiplicationButton->setText(settings->multiplicationSign());
+	multiplicationButton->setProperty(BUTTON_DATA, settings->multiplicationSign());
 	commaButton->setText(QString::fromStdString(CALCULATOR->getComma()));
 	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
 	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));

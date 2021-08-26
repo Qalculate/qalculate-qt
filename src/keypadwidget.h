@@ -65,7 +65,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton;
 		void changeEvent(QEvent *e);
 
 	protected slots:

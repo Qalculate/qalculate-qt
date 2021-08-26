@@ -73,6 +73,7 @@ class QalculateQtSettings : QObject {
 		bool isAnswerVariable(Variable *v);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
+		const char *multiplicationSign();
 
 		EvaluationOptions evalops;
 		PrintOptions printops;

@@ -925,7 +925,7 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		do_exec = (str == "!") && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 		expressionEdit->wrapSelection(str);
 	} else if(str == "E") {
-		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(SIGN_MULTIPLICATION "10^");
+		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
 		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : str);
 	} else {
 		if(!expressionEdit->doChainMode(str)) expressionEdit->wrapSelection(str);

@@ -143,6 +143,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
+	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
 	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
@@ -281,6 +282,12 @@ void PreferencesDialog::hexTwosToggled(bool b) {
 void PreferencesDialog::lowerCaseToggled(bool b) {
 	settings->printops.lower_case_numbers = b;
 	emit resultDisplayUpdated();
+}
+void PreferencesDialog::multiplicationDotToggled(bool b) {
+	if(b) settings->printops.multiplication_sign = MULTIPLICATION_SIGN_ALTDOT;
+	else settings->printops.multiplication_sign = MULTIPLICATION_SIGN_X;
+	emit resultDisplayUpdated();
+	emit symbolsUpdated();
 }
 void PreferencesDialog::spellOutToggled(bool b) {
 	settings->printops.spell_out_logical_operators = b;

@@ -227,13 +227,13 @@ bool last_is_operator(std::string str, bool allow_exp) {
 	} else {
 		if(str.length() >= 3 && str[str.length() - 2] < 0) {
 			str = str.substr(str.length() - 3);
-			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == SIGN_MULTIPLICATION || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) {
+			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == settings->multiplicationSign() || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) {
 				return true;
 			}
 		}
 		if(str.length() >= 2) {
 			str = str.substr(str.length() - 2);
-			if(str == "¬" || str == SIGN_MULTIPLICATION || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) return true;
+			if(str == "¬" || str == settings->multiplicationSign() || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) return true;
 		}
 	}
 	return false;
@@ -1157,7 +1157,6 @@ void ExpressionEdit::updateCompletion() {
 						if(i_end == std::string::npos) break;
 						i_pow = str.find("^", i_pow + 1);
 					}
-					//if(settings->printops.multiplication_sign == MULTIPLICATION_SIGN_DOT) gsub(saltdot, sdot, str);
 					gsub("_unit", "", str);
 					gsub("_eunit", "<sub>e</sub>", str);
 				}
@@ -1354,8 +1353,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_MULTIPLY);
 					return;
 				}
-				if(doChainMode(SIGN_MULTIPLICATION)) return;
-				wrapSelection(SIGN_MULTIPLICATION);
+				if(doChainMode(settings->multiplicationSign())) return;
+				wrapSelection(settings->multiplicationSign());
 				return;
 			}
 			case Qt::Key_Minus: {
@@ -3309,7 +3308,7 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 			message_n++;
 			CALCULATOR->nextMessage();
 		}
-		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != SIGN_MULTIPLICATION) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
+		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != settings->multiplicationSign()) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
 			str.insert(0, "(");
 			str += ")";
 		}
