@@ -77,7 +77,7 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys;
+		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys;
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay;
@@ -117,7 +117,9 @@ class QalculateQtSettings : QObject {
 		std::string last_found_version;
 
 		std::vector<std::string> v_expression;
+		std::vector<bool> v_delexpression;
 		std::vector<std::vector<std::string> > v_result;
+		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
 
 };

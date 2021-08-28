@@ -126,6 +126,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Chain"), PARSING_MODE_CHAIN);
 	combo->addItem(tr("RPN"), PARSING_MODE_RPN);
 	combo->setCurrentIndex(combo->findData(settings->evalops.parse_options.parsing_mode));
+	parseCombo = combo;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(parsingModeChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
@@ -148,6 +149,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
+	decimalCommaBox = box;
 	BOX(tr("Ignore comma in numbers"), settings->evalops.parse_options.comma_as_separator, ignoreCommaToggled(bool)); ignoreCommaBox = box;
 	BOX(tr("Ignore dots in numbers"), settings->evalops.parse_options.dot_as_separator, ignoreDotToggled(bool)); ignoreDotBox = box;
 	BOX(tr("Round halfway numbers to even"), settings->printops.round_halfway_to_even, roundEvenToggled(bool));
@@ -225,6 +227,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Relative"), TEMPERATURE_CALCULATION_RELATIVE);
 	combo->addItem(tr("Hybrid"), TEMPERATURE_CALCULATION_HYBRID);
 	combo->setCurrentIndex(combo->findData(CALCULATOR->getTemperatureCalculationMode()));
+	tcCombo = combo;
 	l2->addWidget(combo, r, 1); r++;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l2->addWidget(box, r, 0);
@@ -346,6 +349,7 @@ void PreferencesDialog::colorizeToggled(bool b) {
 }
 void PreferencesDialog::parsingModeChanged(int i) {
 	settings->evalops.parse_options.parsing_mode = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	settings->implicit_question_asked = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST);
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::temperatureCalculationChanged(int i) {
@@ -550,3 +554,26 @@ void PreferencesDialog::replaceExpressionChanged(int i) {
 	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 }
 
+void PreferencesDialog::updateDot() {
+	decimalCommaBox->blockSignals(true);
+	ignoreCommaBox->blockSignals(true);
+	ignoreDotBox->blockSignals(true);
+	decimalCommaBox->setChecked(CALCULATOR->getDecimalPoint() == COMMA);
+	ignoreCommaBox->setChecked(settings->evalops.parse_options.comma_as_separator);
+	ignoreDotBox->setChecked(settings->evalops.parse_options.dot_as_separator);
+	decimalCommaBox->blockSignals(false);
+	ignoreCommaBox->blockSignals(false);
+	ignoreDotBox->blockSignals(false);
+	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
+	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
+}
+void PreferencesDialog::updateParsingMode() {
+	parseCombo->blockSignals(true);
+	parseCombo->setCurrentIndex(parseCombo->findData(settings->evalops.parse_options.parsing_mode));
+	parseCombo->blockSignals(false);
+}
+void PreferencesDialog::updateTemperatureCalculation() {
+	tcCombo->blockSignals(true);
+	tcCombo->setCurrentIndex(tcCombo->findData(CALCULATOR->getTemperatureCalculationMode()));
+	tcCombo->blockSignals(false);
+}

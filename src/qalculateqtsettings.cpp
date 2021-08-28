@@ -203,6 +203,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	title_type = TITLE_APP;
 	dot_question_asked = false;
+	implicit_question_asked = false;
 	complex_angle_form = false;
 	decimal_comma = -1;
 	adaptive_interval_display = true;
@@ -294,10 +295,18 @@ void QalculateQtSettings::loadPreferences() {
 				v = s2i(svalue);
 				if(svar == "history_expression") {
 					v_expression.push_back(svalue);
+					v_delexpression.push_back(false);
 					v_result.push_back(std::vector<std::string>());
 					v_exact.push_back(std::vector<int>());
+					v_delresult.push_back(std::vector<bool>());
 				} else if(svar == "history_result") {
-					if(!v_result.empty()) v_result[settings->v_result.size() - 1].push_back(svalue);
+					if(!v_result.empty()) {
+						v_result[settings->v_result.size() - 1].push_back(svalue);
+						v_delresult[settings->v_result.size() - 1].push_back(false);
+						if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
+							v_exact[settings->v_exact.size() - 1].push_back(false);
+						}
+					}
 				} else if(svar == "history_exact") {
 					if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
 				} else if(svar == "expression_history") {
@@ -602,6 +611,9 @@ void QalculateQtSettings::loadPreferences() {
 					printops.limit_implicit_multiplication = v;
 				} else if(svar == "parsing_mode") {
 					evalops.parse_options.parsing_mode = (ParsingMode) v;
+					if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
+				} else if(svar == "implicit_question_asked") {
+					implicit_question_asked = true;
 				} else if(svar == "default_assumption_type") {
 					if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
 						CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
@@ -809,6 +821,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 	if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
+	if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 	fprintf(file, "replace_expression=%i\n", replace_expression);
 	fprintf(file, "rpn_keys=%i\n", rpn_keys);
 	/*if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
@@ -926,22 +939,26 @@ void QalculateQtSettings::savePreferences(bool) {
 				i--;
 			}
 			for(; i < v_expression.size(); i++) {
-				fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
-				n++;
-				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-					fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
-					if(v_result[i][i2].length() > 6000) {
-						std::string str = unhtmlize(v_result[i][i2]);
-						if(str.length() > 5000) {
-							int index = 50;
-							while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
-							gsub("\n", "<br>", str);
-							fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
-						} else {
-							fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+				if(!v_delexpression[i]) {
+					fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+					n++;
+					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+						if(!v_delresult[i][i2]) {
+							fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
+							if(v_result[i][i2].length() > 6000) {
+								std::string str = unhtmlize(v_result[i][i2]);
+								if(str.length() > 5000) {
+									int index = 50;
+									while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+									gsub("\n", "<br>", str);
+									fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+								} else {
+									fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+								}
+							} else {
+								fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+							}
 						}
-					} else {
-						fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
 					}
 				}
 			}
@@ -1077,15 +1094,17 @@ bool QalculateQtSettings::displayMessages(QWidget *parent) {
 	MessageType mtype, mtype_highest = MESSAGE_INFORMATION;
 	while(true) {
 		mtype = CALCULATOR->message()->type();
-		if(index > 0) {
-			if(index == 1) str = "• " + str;
-				str += "\n• ";
+		if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !implicit_question_asked) {
+			if(index > 0) {
+				if(index == 1) str = "• " + str;
+					str += "\n• ";
+			}
+			str += CALCULATOR->message()->message();
+			if(mtype == MESSAGE_ERROR || (mtype_highest != MESSAGE_ERROR && mtype == MESSAGE_WARNING)) {
+				mtype_highest = mtype;
+			}
+			index++;
 		}
-		str += CALCULATOR->message()->message();
-		if(mtype == MESSAGE_ERROR || (mtype_highest != MESSAGE_ERROR && mtype == MESSAGE_WARNING)) {
-			mtype_highest = mtype;
-		}
-		index++;
 		if(!CALCULATOR->nextMessage()) break;
 	}
 	if(!str.empty()) {

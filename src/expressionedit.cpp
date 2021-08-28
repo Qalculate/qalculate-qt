@@ -2263,16 +2263,18 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(po.base == BASE_CUSTOM) CALCULATOR->setCustomOutputBase(nr_base);
 		size_t message_n = 0;
 		while(CALCULATOR->message()) {
-			MessageType mtype = CALCULATOR->message()->type();
-			if(mtype == MESSAGE_ERROR) {
-				if(message_n > 0) {
-					if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
-					parsed_expression_tooltip += "<br>• ";
+			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
+				MessageType mtype = CALCULATOR->message()->type();
+				if(mtype == MESSAGE_ERROR) {
+					if(message_n > 0) {
+						if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
+						parsed_expression_tooltip += "<br>• ";
+					}
+					parsed_expression_tooltip += CALCULATOR->message()->message();
+					message_n++;
+				} else if(mtype == MESSAGE_WARNING) {
+					had_warnings = true;
 				}
-				parsed_expression_tooltip += CALCULATOR->message()->message();
-				message_n++;
-			} else if(mtype == MESSAGE_WARNING) {
-				had_warnings = true;
 			}
 			CALCULATOR->nextMessage();
 		}
@@ -3296,16 +3298,18 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 		std::string warnings;
 		int message_n = 0;
 		while(CALCULATOR->message()) {
-			MessageType mtype = CALCULATOR->message()->type();
-			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-				if(mtype == MESSAGE_ERROR) return false;
-				if(message_n > 0) {
-					if(message_n == 1) warnings.insert(0, "• ");
-					warnings += "\n• ";
+			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
+				MessageType mtype = CALCULATOR->message()->type();
+				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+					if(mtype == MESSAGE_ERROR) return false;
+					if(message_n > 0) {
+						if(message_n == 1) warnings.insert(0, "• ");
+						warnings += "\n• ";
+					}
+					warnings += CALCULATOR->message()->message();
 				}
-				warnings += CALCULATOR->message()->message();
+				message_n++;
 			}
-			message_n++;
 			CALCULATOR->nextMessage();
 		}
 		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != settings->multiplicationSign()) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {

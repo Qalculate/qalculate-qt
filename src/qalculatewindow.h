@@ -100,6 +100,7 @@ class QalculateWindow : public QMainWindow {
 		void changeEvent(QEvent *e) override;
 		bool askTC(MathStructure&);
 		bool askDot(const std::string&);
+		bool askImplicit();
 		void keyPressEvent(QKeyEvent*) override;
 		void closeEvent(QCloseEvent*) override;
 		void setPreviousExpression();
