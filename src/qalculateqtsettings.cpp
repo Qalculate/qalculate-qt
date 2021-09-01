@@ -1219,11 +1219,11 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	if(ret > 0 && (force || new_version != last_found_version)) {
 		last_found_version = new_version;
 #ifdef AUTO_UPDATE
-		if(QMessageBox::question(parent, QString(), tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes)) {
+		if(QMessageBox::question(parent, QString(), tr("<div>A new version of %1 is available at %2.\n\nDo you wish to update to version %3?</div>").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes)) {
 			autoUpdate(new_version);
 		}
 #else
-		QMessageBox::information(parent, QString(), tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"http://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)));
+		QMessageBox::information(parent, QString(), tr("<div>A new version of %1 is available.\n\nYou can get version %3 at %2.</div>").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)));
 #endif
 	}
 	last_version_check_date.setToCurrentDate();
