@@ -42,6 +42,7 @@ class PreferencesDialog : public QDialog {
 		void hexTwosToggled(bool);
 		void lowerCaseToggled(bool);
 		void multiplicationDotToggled(bool);
+		void divisionSlashToggled(bool);
 		void spellOutToggled(bool);
 		void eToggled(bool);
 		void imaginaryJToggled(bool);

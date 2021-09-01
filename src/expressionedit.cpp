@@ -227,13 +227,13 @@ bool last_is_operator(std::string str, bool allow_exp) {
 	} else {
 		if(str.length() >= 3 && str[str.length() - 2] < 0) {
 			str = str.substr(str.length() - 3);
-			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == settings->multiplicationSign() || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) {
+			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == settings->multiplicationSign() || str == settings->divisionSign() || str == SIGN_MINUS) {
 				return true;
 			}
 		}
 		if(str.length() >= 2) {
 			str = str.substr(str.length() - 2);
-			if(str == "¬" || str == settings->multiplicationSign() || str == SIGN_DIVISION_SLASH || str == SIGN_MINUS) return true;
+			if(str == "¬" || str == settings->multiplicationSign() || str == settings->divisionSign() || str == SIGN_MINUS) return true;
 		}
 	}
 	return false;
@@ -1398,8 +1398,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_DIVIDE);
 					return;
 				}
-				if(doChainMode("/")) return;
-				wrapSelection("/");
+				if(doChainMode(settings->divisionSign(false))) return;
+				wrapSelection(settings->divisionSign(false));
 				return;
 			}
 			case Qt::Key_ParenRight: {

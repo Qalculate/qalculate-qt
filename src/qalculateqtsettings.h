@@ -74,6 +74,7 @@ class QalculateQtSettings : QObject {
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
 		const char *multiplicationSign();
+		const char *divisionSign(bool output = true);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;

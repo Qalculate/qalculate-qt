@@ -44,6 +44,10 @@ class MathTextEdit : public QPlainTextEdit {
 						insertPlainText(settings->multiplicationSign());
 						return;
 					}
+					case Qt::Key_Slash: {
+						insertPlainText(settings->divisionSign(false));
+						return;
+					}
 					case Qt::Key_Minus: {
 						insertPlainText(SIGN_MINUS);
 						return;
@@ -130,6 +134,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 		gsub("z", "\\z", str);
 	}
 	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
 	gsub(SIGN_MINUS, "-", str);
 	f = new UserFunction("", nameEdit->text().trimmed().toStdString(), str);
 	CALCULATOR->addFunction(f);
@@ -158,6 +163,7 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 			gsub("z", "\\z", str);
 		}
 		gsub(settings->multiplicationSign(), "*", str);
+		gsub(settings->divisionSign(), "/", str);
 		gsub(SIGN_MINUS, "-", str);
 		((UserFunction*) f)->setFormula(str);
 	}
@@ -170,6 +176,7 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 		expressionEdit->setEnabled(true);
 		std::string str = CALCULATOR->localizeExpression(((UserFunction*) f)->formula(), settings->evalops.parse_options);
 		gsub("*", settings->multiplicationSign(), str);
+		gsub("/", settings->divisionSign(false), str);
 		gsub("-", SIGN_MINUS, str);
 		expressionEdit->setPlainText(QString::fromStdString(str));
 	} else {

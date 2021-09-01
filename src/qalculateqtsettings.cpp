@@ -393,6 +393,8 @@ void QalculateQtSettings::loadPreferences() {
 					if(v >= MULTIPLICATION_SIGN_ASTERISK && v <= MULTIPLICATION_SIGN_ALTDOT) {
 						printops.multiplication_sign = (MultiplicationSign) v;
 					}
+				} else if(svar == "division_sign") {
+					if(v >= DIVISION_SIGN_SLASH && v <= DIVISION_SIGN_DIVISION) printops.division_sign = (DivisionSign) v;
 				} else if(svar == "plot_legend_placement") {
 					if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
 				} else if(svar == "plot_style") {
@@ -821,6 +823,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 	if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
+	if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 	if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 	fprintf(file, "replace_expression=%i\n", replace_expression);
 	fprintf(file, "rpn_keys=%i\n", rpn_keys);
@@ -980,6 +983,11 @@ const char *QalculateQtSettings::multiplicationSign() {
 		case MULTIPLICATION_SIGN_ALTDOT: {return SIGN_MIDDLEDOT;}
 		default: {return "*";}
 	}
+}
+const char *QalculateQtSettings::divisionSign(bool output) {
+	if(printops.division_sign == DIVISION_SIGN_DIVISION && printops.use_unicode_signs) return SIGN_DIVISION;
+	else if(output && printops.division_sign == DIVISION_SIGN_DIVISION_SLASH && printops.use_unicode_signs) return SIGN_DIVISION_SLASH;
+	return "/";
 }
 
 void QalculateQtSettings::updateMessagePrintOptions() {
