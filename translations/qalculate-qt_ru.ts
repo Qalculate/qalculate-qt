@@ -3262,12 +3262,12 @@ Please select interpretation of expressions with implicit multiplication
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4387"/>
         <source>Implicit multiplication first</source>
-        <translation>Неявный первый</translation>
+        <translation>Сначала анализировать неявное умножение</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4392"/>
         <source>Conventional</source>
-        <translation>Общепринятый</translation>
+        <translation>Общепринятый синтаксический анализ</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4397"/>
