@@ -5356,578 +5356,578 @@ Do you want to overwrite it?</source>
         <translation type="unfinished">默认假设</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1183"/>
+        <location filename="../src/expressionedit.cpp" line="1182"/>
         <source>Prefix:</source>
         <translation type="unfinished">前缀:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1237"/>
+        <location filename="../src/expressionedit.cpp" line="1236"/>
         <source>Complex Angle/Phasor Notation</source>
         <translation type="unfinished">复角/相量记号</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1241"/>
+        <location filename="../src/expressionedit.cpp" line="1240"/>
         <source>Base units</source>
         <translation type="unfinished">基本单位</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1243"/>
+        <location filename="../src/expressionedit.cpp" line="1242"/>
         <source>Number Base</source>
         <translation type="unfinished">数字进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1245"/>
+        <location filename="../src/expressionedit.cpp" line="1244"/>
         <source>Bijective Base-26</source>
         <translation type="unfinished">双射基-26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1247"/>
+        <location filename="../src/expressionedit.cpp" line="1246"/>
         <source>Binary Number</source>
         <translation type="unfinished">二进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1249"/>
+        <location filename="../src/expressionedit.cpp" line="1248"/>
         <source>Calendars</source>
         <translation type="unfinished">日历</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1251"/>
+        <location filename="../src/expressionedit.cpp" line="1250"/>
         <source>Complex cis Form</source>
         <translation type="unfinished">复纯虚数指数形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1253"/>
+        <location filename="../src/expressionedit.cpp" line="1252"/>
         <source>Decimal Number</source>
         <translation type="unfinished">十进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1255"/>
+        <location filename="../src/expressionedit.cpp" line="1254"/>
         <source>Duodecimal Number</source>
         <translation type="unfinished">十二进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1257"/>
+        <location filename="../src/expressionedit.cpp" line="1256"/>
         <source>Complex Exponential Form</source>
         <translation type="unfinished">复指数形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1259"/>
+        <location filename="../src/expressionedit.cpp" line="1258"/>
         <source>Factors</source>
         <translation type="unfinished">因子</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1261"/>
+        <location filename="../src/expressionedit.cpp" line="1260"/>
         <source>16-bit Floating Point Binary Format</source>
         <translation type="unfinished">16位浮点二进制格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1263"/>
+        <location filename="../src/expressionedit.cpp" line="1262"/>
         <source>32-bit Floating Point Binary Format</source>
         <translation type="unfinished">32位浮点二进制格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1265"/>
+        <location filename="../src/expressionedit.cpp" line="1264"/>
         <source>64-bit Floating Point Binary Format</source>
         <translation type="unfinished">64位浮点二进制格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1267"/>
+        <location filename="../src/expressionedit.cpp" line="1266"/>
         <source>80-bit (x86) Floating Point Binary Format</source>
         <translation type="unfinished">80位(x86)浮点二进制格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1269"/>
+        <location filename="../src/expressionedit.cpp" line="1268"/>
         <source>128-bit Floating Point Binary Format</source>
         <translation type="unfinished">128位浮点二进制格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1271"/>
+        <location filename="../src/expressionedit.cpp" line="1270"/>
         <source>Fraction</source>
         <translation type="unfinished">分数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1273"/>
+        <location filename="../src/expressionedit.cpp" line="1272"/>
         <source>Hexadecimal Number</source>
         <translation type="unfinished">十六进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1275"/>
+        <location filename="../src/expressionedit.cpp" line="1274"/>
         <source>Latitude</source>
         <translation type="unfinished">纬度</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1277"/>
+        <location filename="../src/expressionedit.cpp" line="1276"/>
         <source>Longitude</source>
         <translation type="unfinished">经度</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1279"/>
+        <location filename="../src/expressionedit.cpp" line="1278"/>
         <source>Mixed Units</source>
         <translation type="unfinished">混合单位</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1281"/>
+        <location filename="../src/expressionedit.cpp" line="1280"/>
         <source>Octal Number</source>
         <translation type="unfinished">八进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1283"/>
+        <location filename="../src/expressionedit.cpp" line="1282"/>
         <source>Optimal Unit</source>
         <translation type="unfinished">最优单位</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1285"/>
+        <location filename="../src/expressionedit.cpp" line="1284"/>
         <source>Expanded Partial Fractions</source>
         <translation type="unfinished">展开部分分式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1287"/>
+        <location filename="../src/expressionedit.cpp" line="1286"/>
         <source>Complex Polar Form</source>
         <translation type="unfinished">复极坐标形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1289"/>
+        <location filename="../src/expressionedit.cpp" line="1288"/>
         <source>Complex Rectangular Form</source>
         <translation type="unfinished">复矩形形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1291"/>
+        <location filename="../src/expressionedit.cpp" line="1290"/>
         <source>Roman Numerals</source>
         <translation type="unfinished">罗马数字</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1293"/>
+        <location filename="../src/expressionedit.cpp" line="1292"/>
         <source>Sexagesimal Number</source>
         <translation type="unfinished">六十进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1295"/>
+        <location filename="../src/expressionedit.cpp" line="1294"/>
         <source>Time Format</source>
         <translation type="unfinished">时间格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1297"/>
-        <location filename="../src/expressionedit.cpp" line="2130"/>
+        <location filename="../src/expressionedit.cpp" line="1296"/>
+        <location filename="../src/expressionedit.cpp" line="2129"/>
         <source>Unicode</source>
         <translation type="unfinished">Unicode</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1299"/>
+        <location filename="../src/expressionedit.cpp" line="1298"/>
         <source>UTC Time Zone</source>
         <translation type="unfinished">UTC时区</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1607"/>
+        <location filename="../src/expressionedit.cpp" line="1606"/>
         <source>Undo</source>
         <translation type="unfinished">撤消</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1610"/>
+        <location filename="../src/expressionedit.cpp" line="1609"/>
         <source>Redo</source>
         <translation type="unfinished">重做</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1614"/>
+        <location filename="../src/expressionedit.cpp" line="1613"/>
         <source>Cut</source>
         <translation type="unfinished">剪切</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1617"/>
+        <location filename="../src/expressionedit.cpp" line="1616"/>
         <source>Copy</source>
         <translation type="unfinished">复制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1620"/>
+        <location filename="../src/expressionedit.cpp" line="1619"/>
         <source>Paste</source>
         <translation type="unfinished">粘贴</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1623"/>
+        <location filename="../src/expressionedit.cpp" line="1622"/>
         <source>Delete</source>
         <translation type="unfinished">删除</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1627"/>
+        <location filename="../src/expressionedit.cpp" line="1626"/>
         <source>Insert Date…</source>
         <translation type="unfinished">插入日期…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1628"/>
+        <location filename="../src/expressionedit.cpp" line="1627"/>
         <source>Insert Matrix…</source>
         <translation type="unfinished">插入矩阵…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1630"/>
+        <location filename="../src/expressionedit.cpp" line="1629"/>
         <source>Select All</source>
         <translation type="unfinished">全选</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1633"/>
+        <location filename="../src/expressionedit.cpp" line="1632"/>
         <source>Clear</source>
         <translation type="unfinished">清除</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1637"/>
+        <location filename="../src/expressionedit.cpp" line="1636"/>
         <source>Completion</source>
         <translation type="unfinished">补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1649"/>
+        <location filename="../src/expressionedit.cpp" line="1648"/>
         <source>No completion</source>
         <translation type="unfinished">无补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1650"/>
+        <location filename="../src/expressionedit.cpp" line="1649"/>
         <source>Limited strict completion</source>
         <translation type="unfinished">有限严格补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1651"/>
+        <location filename="../src/expressionedit.cpp" line="1650"/>
         <source>Strict completion</source>
         <translation type="unfinished">严格补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1652"/>
+        <location filename="../src/expressionedit.cpp" line="1651"/>
         <source>Limited full completion</source>
         <translation type="unfinished">有限全面补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1653"/>
+        <location filename="../src/expressionedit.cpp" line="1652"/>
         <source>Full completion</source>
         <translation type="unfinished">全面补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1655"/>
+        <location filename="../src/expressionedit.cpp" line="1654"/>
         <source>Delayed completion</source>
         <translation type="unfinished">延迟补全</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1657"/>
+        <location filename="../src/expressionedit.cpp" line="1656"/>
         <source>Use input method</source>
         <translation type="unfinished">使用输入法</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1690"/>
+        <location filename="../src/expressionedit.cpp" line="1689"/>
         <source>Matrix</source>
         <translation type="unfinished">矩阵</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1832"/>
+        <location filename="../src/expressionedit.cpp" line="1831"/>
         <source>Too many arguments for %1().</source>
         <translation type="unfinished">%1()的参数太多。</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1857"/>
+        <location filename="../src/expressionedit.cpp" line="1856"/>
         <source>argument</source>
         <translation type="unfinished">参数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1874"/>
+        <location filename="../src/expressionedit.cpp" line="1873"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1928"/>
+        <location filename="../src/expressionedit.cpp" line="1927"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished">MC(存值清除)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1931"/>
+        <location filename="../src/expressionedit.cpp" line="1930"/>
         <source>MS (memory store)</source>
         <translation type="unfinished">MS(存值存入)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1934"/>
+        <location filename="../src/expressionedit.cpp" line="1933"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished">M+(存值加上)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1937"/>
+        <location filename="../src/expressionedit.cpp" line="1936"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished">M−(存值减去)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1945"/>
-        <location filename="../src/expressionedit.cpp" line="1947"/>
+        <location filename="../src/expressionedit.cpp" line="1944"/>
+        <location filename="../src/expressionedit.cpp" line="1946"/>
         <source>factorize</source>
         <translation type="unfinished">分解</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1948"/>
-        <location filename="../src/expressionedit.cpp" line="1950"/>
+        <location filename="../src/expressionedit.cpp" line="1947"/>
+        <location filename="../src/expressionedit.cpp" line="1949"/>
         <source>expand</source>
         <translation type="unfinished">展开</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2097"/>
+        <location filename="../src/expressionedit.cpp" line="2096"/>
         <source>hexadecimal</source>
         <translation type="unfinished">十六进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2098"/>
-        <location filename="../src/expressionedit.cpp" line="2208"/>
+        <location filename="../src/expressionedit.cpp" line="2097"/>
+        <location filename="../src/expressionedit.cpp" line="2207"/>
         <source>hexadecimal number</source>
         <translation type="unfinished">十六进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2099"/>
+        <location filename="../src/expressionedit.cpp" line="2098"/>
         <source>octal</source>
         <translation type="unfinished">八进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2100"/>
+        <location filename="../src/expressionedit.cpp" line="2099"/>
         <source>octal number</source>
         <translation type="unfinished">八进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2101"/>
+        <location filename="../src/expressionedit.cpp" line="2100"/>
         <source>decimal</source>
         <translation type="unfinished">十进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2102"/>
+        <location filename="../src/expressionedit.cpp" line="2101"/>
         <source>decimal number</source>
         <translation type="unfinished">十进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2103"/>
+        <location filename="../src/expressionedit.cpp" line="2102"/>
         <source>duodecimal</source>
         <translation type="unfinished">十二进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2104"/>
+        <location filename="../src/expressionedit.cpp" line="2103"/>
         <source>duodecimal number</source>
         <translation type="unfinished">十二进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2105"/>
+        <location filename="../src/expressionedit.cpp" line="2104"/>
         <source>binary</source>
         <translation type="unfinished">二进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2106"/>
-        <location filename="../src/expressionedit.cpp" line="2202"/>
+        <location filename="../src/expressionedit.cpp" line="2105"/>
+        <location filename="../src/expressionedit.cpp" line="2201"/>
         <source>binary number</source>
         <translation type="unfinished">二进制数</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2107"/>
+        <location filename="../src/expressionedit.cpp" line="2106"/>
         <source>roman</source>
         <translation type="unfinished">罗马</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2108"/>
+        <location filename="../src/expressionedit.cpp" line="2107"/>
         <source>roman numerals</source>
         <translation type="unfinished">罗马数字</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2109"/>
+        <location filename="../src/expressionedit.cpp" line="2108"/>
         <source>bijective</source>
         <translation type="unfinished">双射</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2110"/>
+        <location filename="../src/expressionedit.cpp" line="2109"/>
         <source>bijective base-26</source>
         <translation type="unfinished">双射基-26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2111"/>
+        <location filename="../src/expressionedit.cpp" line="2110"/>
         <source>sexagesimal</source>
         <translation type="unfinished">六十进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2112"/>
+        <location filename="../src/expressionedit.cpp" line="2111"/>
         <source>sexagesimal number</source>
         <translation type="unfinished">六进制数</translation>
     </message>
     <message>
+        <location filename="../src/expressionedit.cpp" line="2112"/>
         <location filename="../src/expressionedit.cpp" line="2113"/>
-        <location filename="../src/expressionedit.cpp" line="2114"/>
         <source>latitude</source>
         <translation type="unfinished">纬度</translation>
     </message>
     <message>
+        <location filename="../src/expressionedit.cpp" line="2114"/>
         <location filename="../src/expressionedit.cpp" line="2115"/>
-        <location filename="../src/expressionedit.cpp" line="2116"/>
         <source>longitude</source>
         <translation type="unfinished">经度</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2118"/>
+        <location filename="../src/expressionedit.cpp" line="2117"/>
         <source>32-bit floating point</source>
         <translation type="unfinished">32位浮点</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2120"/>
+        <location filename="../src/expressionedit.cpp" line="2119"/>
         <source>64-bit floating point</source>
         <translation type="unfinished">64位浮点</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2122"/>
+        <location filename="../src/expressionedit.cpp" line="2121"/>
         <source>16-bit floating point</source>
         <translation type="unfinished">16位浮点</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2124"/>
+        <location filename="../src/expressionedit.cpp" line="2123"/>
         <source>80-bit (x86) floating point</source>
         <translation type="unfinished">80位(x86)浮点</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2126"/>
+        <location filename="../src/expressionedit.cpp" line="2125"/>
         <source>128-bit floating point</source>
         <translation type="unfinished">128位浮点</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2127"/>
+        <location filename="../src/expressionedit.cpp" line="2126"/>
         <source>time</source>
         <translation type="unfinished">时间</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2128"/>
+        <location filename="../src/expressionedit.cpp" line="2127"/>
         <source>time format</source>
         <translation type="unfinished">时间格式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2131"/>
+        <location filename="../src/expressionedit.cpp" line="2130"/>
         <source>bases</source>
         <translation type="unfinished">进制</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2132"/>
+        <location filename="../src/expressionedit.cpp" line="2131"/>
         <source>number bases</source>
         <translation type="unfinished">数字进制</translation>
     </message>
     <message>
+        <location filename="../src/expressionedit.cpp" line="2132"/>
         <location filename="../src/expressionedit.cpp" line="2133"/>
-        <location filename="../src/expressionedit.cpp" line="2134"/>
         <source>calendars</source>
         <translation type="unfinished">日历</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2135"/>
+        <location filename="../src/expressionedit.cpp" line="2134"/>
         <source>optimal</source>
         <translation type="unfinished">最优</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2136"/>
+        <location filename="../src/expressionedit.cpp" line="2135"/>
         <source>optimal unit</source>
         <translation type="unfinished">最优单位</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2137"/>
-        <location filename="../src/expressionedit.cpp" line="2212"/>
+        <location filename="../src/expressionedit.cpp" line="2136"/>
+        <location filename="../src/expressionedit.cpp" line="2211"/>
         <source>base</source>
         <translation type="unfinished">基本</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2138"/>
+        <location filename="../src/expressionedit.cpp" line="2137"/>
         <source>base units</source>
         <translation type="unfinished">基本单位</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2139"/>
+        <location filename="../src/expressionedit.cpp" line="2138"/>
         <source>mixed</source>
         <translation type="unfinished">混合</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2140"/>
+        <location filename="../src/expressionedit.cpp" line="2139"/>
         <source>mixed units</source>
         <translation type="unfinished">混合单位</translation>
     </message>
     <message>
+        <location filename="../src/expressionedit.cpp" line="2140"/>
         <location filename="../src/expressionedit.cpp" line="2141"/>
-        <location filename="../src/expressionedit.cpp" line="2142"/>
         <source>fraction</source>
         <translation type="unfinished">分数</translation>
     </message>
     <message>
+        <location filename="../src/expressionedit.cpp" line="2142"/>
         <location filename="../src/expressionedit.cpp" line="2143"/>
-        <location filename="../src/expressionedit.cpp" line="2144"/>
         <source>factors</source>
         <translation type="unfinished">因子</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2145"/>
+        <location filename="../src/expressionedit.cpp" line="2144"/>
         <source>partial fraction</source>
         <translation type="unfinished">部分分式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2146"/>
+        <location filename="../src/expressionedit.cpp" line="2145"/>
         <source>expanded partial fractions</source>
         <translation type="unfinished">已展开部分分式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2147"/>
+        <location filename="../src/expressionedit.cpp" line="2146"/>
         <source>rectangular</source>
         <translation type="unfinished">矩形</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2147"/>
+        <location filename="../src/expressionedit.cpp" line="2146"/>
         <source>cartesian</source>
         <translation type="unfinished">笛卡尔</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2148"/>
+        <location filename="../src/expressionedit.cpp" line="2147"/>
         <source>complex rectangular form</source>
         <translation type="unfinished">复矩形形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2149"/>
+        <location filename="../src/expressionedit.cpp" line="2148"/>
         <source>exponential</source>
         <translation type="unfinished">指数型</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2150"/>
+        <location filename="../src/expressionedit.cpp" line="2149"/>
         <source>complex exponential form</source>
         <translation type="unfinished">复指数形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2151"/>
+        <location filename="../src/expressionedit.cpp" line="2150"/>
         <source>polar</source>
         <translation type="unfinished">极坐标</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2152"/>
+        <location filename="../src/expressionedit.cpp" line="2151"/>
         <source>complex polar form</source>
         <translation type="unfinished">复极坐标形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2154"/>
+        <location filename="../src/expressionedit.cpp" line="2153"/>
         <source>complex cis form</source>
         <translation type="unfinished">复纯虚数指数(cis)形式</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2155"/>
+        <location filename="../src/expressionedit.cpp" line="2154"/>
         <source>angle</source>
         <translation type="unfinished">角度</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2156"/>
+        <location filename="../src/expressionedit.cpp" line="2155"/>
         <source>complex angle notation</source>
         <translation type="unfinished">复角记号</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2157"/>
+        <location filename="../src/expressionedit.cpp" line="2156"/>
         <source>phasor</source>
         <translation type="unfinished">相量</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2158"/>
+        <location filename="../src/expressionedit.cpp" line="2157"/>
         <source>complex phasor notation</source>
         <translation type="unfinished">复相量记号</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2160"/>
+        <location filename="../src/expressionedit.cpp" line="2159"/>
         <source>UTC time zone</source>
         <translation type="unfinished">UTC时区</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2213"/>
+        <location filename="../src/expressionedit.cpp" line="2212"/>
         <source>number base %1</source>
         <translation type="unfinished">数字进制 %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2473"/>
+        <location filename="../src/expressionedit.cpp" line="2474"/>
         <source>Data object</source>
         <translation type="unfinished">数据对象</translation>
     </message>
@@ -5998,51 +5998,51 @@ Do you want to overwrite it?</source>
 <context>
     <name>FunctionEditDialog</name>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="80"/>
+        <location filename="../src/functioneditdialog.cpp" line="84"/>
         <source>Name:</source>
         <translation type="unfinished">名称:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="83"/>
+        <location filename="../src/functioneditdialog.cpp" line="87"/>
         <source>Expression:</source>
         <translation type="unfinished">表达式:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="88"/>
+        <location filename="../src/functioneditdialog.cpp" line="92"/>
         <source>Argument references:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="89"/>
+        <location filename="../src/functioneditdialog.cpp" line="93"/>
         <source>x, y, z</source>
         <translation type="unfinished">x, y, z</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="91"/>
+        <location filename="../src/functioneditdialog.cpp" line="95"/>
         <source>\x, \y, \z, \a, \b, …</source>
         <translation type="unfinished">\x, \y, \z, \a, \b, …</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="109"/>
-        <location filename="../src/functioneditdialog.cpp" line="141"/>
+        <location filename="../src/functioneditdialog.cpp" line="113"/>
+        <location filename="../src/functioneditdialog.cpp" line="146"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="109"/>
-        <location filename="../src/functioneditdialog.cpp" line="141"/>
+        <location filename="../src/functioneditdialog.cpp" line="113"/>
+        <location filename="../src/functioneditdialog.cpp" line="146"/>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
         <translation type="unfinished">已存在同名函数。 
 是否要覆盖函数？</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="213"/>
+        <location filename="../src/functioneditdialog.cpp" line="220"/>
         <source>Edit Function</source>
         <translation type="unfinished">编辑函数</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="226"/>
+        <location filename="../src/functioneditdialog.cpp" line="233"/>
         <source>New Function</source>
         <translation type="unfinished">新建函数</translation>
     </message>
@@ -6187,22 +6187,27 @@ Do you want to overwrite the function?</source>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="397"/>
+        <location filename="../src/historyview.cpp" line="481"/>
         <source>Copy</source>
         <translation type="unfinished">复制</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="400"/>
+        <location filename="../src/historyview.cpp" line="484"/>
         <source>Copy Formatted Text</source>
         <translation type="unfinished">复制格式化文本</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="401"/>
+        <location filename="../src/historyview.cpp" line="485"/>
         <source>Select All</source>
         <translation type="unfinished">全选</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="404"/>
+        <location filename="../src/historyview.cpp" line="488"/>
+        <source>Remove</source>
+        <translation type="unfinished">移除</translation>
+    </message>
+    <message>
+        <location filename="../src/historyview.cpp" line="489"/>
         <source>Clear</source>
         <translation type="unfinished">清除</translation>
     </message>
@@ -6210,17 +6215,17 @@ Do you want to overwrite the function?</source>
 <context>
     <name>KeypadButton</name>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="503"/>
+        <location filename="../src/keypadwidget.cpp" line="508"/>
         <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
         <translation type="unfinished">&lt;i&gt;右键/长按&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="504"/>
+        <location filename="../src/keypadwidget.cpp" line="509"/>
         <source>&lt;i&gt;Right-click&lt;/i&gt;: %1</source>
         <translation type="unfinished">&lt;i&gt;右键&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="508"/>
+        <location filename="../src/keypadwidget.cpp" line="513"/>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
         <translation type="unfinished">&lt;i&gt;中键&lt;/i&gt;: %1</translation>
     </message>
@@ -6385,59 +6390,59 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="308"/>
+        <location filename="../src/keypadwidget.cpp" line="309"/>
         <source>Delete</source>
         <translation type="unfinished">删除</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="308"/>
+        <location filename="../src/keypadwidget.cpp" line="309"/>
         <source>Backspace</source>
         <translation type="unfinished">退格键</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="311"/>
+        <location filename="../src/keypadwidget.cpp" line="312"/>
         <source>Addition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="311"/>
+        <location filename="../src/keypadwidget.cpp" line="312"/>
         <source>Plus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="316"/>
-        <location filename="../src/keypadwidget.cpp" line="319"/>
+        <location filename="../src/keypadwidget.cpp" line="317"/>
+        <location filename="../src/keypadwidget.cpp" line="320"/>
         <source>Subtraction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="316"/>
-        <location filename="../src/keypadwidget.cpp" line="319"/>
+        <location filename="../src/keypadwidget.cpp" line="317"/>
+        <location filename="../src/keypadwidget.cpp" line="320"/>
         <source>Minus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="323"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Division</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="323"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Bitwise OR</source>
         <translation type="unfinished">按位或</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="323"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Bitwise NOT</source>
         <translation type="unfinished">按位非</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="325"/>
+        <location filename="../src/keypadwidget.cpp" line="326"/>
         <source>Clear expression</source>
         <translation type="unfinished">清除表达式</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="331"/>
+        <location filename="../src/keypadwidget.cpp" line="332"/>
         <source>Calculate expression</source>
         <translation type="unfinished">计算表达式</translation>
     </message>
@@ -6913,7 +6918,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="123"/>
-        <location filename="../src/preferencesdialog.cpp" line="168"/>
+        <location filename="../src/preferencesdialog.cpp" line="172"/>
         <source>Adaptive</source>
         <translation type="unfinished">自适应</translation>
     </message>
@@ -6938,283 +6943,293 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished">RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="131"/>
+        <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Read precision</source>
         <translation type="unfinished">读取精度</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="132"/>
+        <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Limit implicit multiplication</source>
         <translation type="unfinished">限制隐式乘法</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="133"/>
+        <location filename="../src/preferencesdialog.cpp" line="134"/>
         <source>Interval calculation:</source>
         <translation type="unfinished">区间计算:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="135"/>
+        <location filename="../src/preferencesdialog.cpp" line="136"/>
         <source>Variance formula</source>
         <translation type="unfinished">方差公式</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="136"/>
+        <location filename="../src/preferencesdialog.cpp" line="137"/>
         <source>Interval arithmetic</source>
         <translation type="unfinished">区间运算</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="140"/>
+        <location filename="../src/preferencesdialog.cpp" line="141"/>
         <source>Factorize result</source>
         <translation type="unfinished">分解结果</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="143"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Binary two&apos;s complement representation</source>
         <translation type="unfinished">二进制二的补码表示</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="145"/>
         <source>Hexadecimal two&apos;s complement representation</source>
         <translation type="unfinished">十六进制二进制补码表示</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="145"/>
+        <location filename="../src/preferencesdialog.cpp" line="146"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation type="unfinished">非十进制数使用小写</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="146"/>
+        <location filename="../src/preferencesdialog.cpp" line="147"/>
+        <source>Use dot as multiplication sign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <source>Use Unicode division slash in output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Spell out logical operators</source>
         <translation type="unfinished">拼出逻辑运算符</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="147"/>
+        <location filename="../src/preferencesdialog.cpp" line="150"/>
         <source>Use E-notation instead of 10^n</source>
         <translation type="unfinished">使用E符号代替10^n</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <location filename="../src/preferencesdialog.cpp" line="151"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation type="unfinished">用 j 作虚数单位</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="149"/>
+        <location filename="../src/preferencesdialog.cpp" line="152"/>
         <source>Use comma as decimal separator</source>
         <translation type="unfinished">将逗号作为小数分隔符</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="150"/>
+        <location filename="../src/preferencesdialog.cpp" line="154"/>
         <source>Ignore comma in numbers</source>
         <translation type="unfinished">忽略数字中的逗号</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="151"/>
+        <location filename="../src/preferencesdialog.cpp" line="155"/>
         <source>Ignore dots in numbers</source>
         <translation type="unfinished">忽略数字中的点</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="156"/>
         <source>Round halfway numbers to even</source>
         <translation type="unfinished">中数约至偶数</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="153"/>
+        <location filename="../src/preferencesdialog.cpp" line="157"/>
         <source>Indicate repeating decimals</source>
         <translation type="unfinished">指示循环小数</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="158"/>
+        <location filename="../src/preferencesdialog.cpp" line="162"/>
         <source>Digit grouping:</source>
         <translation type="unfinished">数字分节:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="160"/>
+        <location filename="../src/preferencesdialog.cpp" line="164"/>
         <source>None</source>
         <translation type="unfinished">无</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="161"/>
+        <location filename="../src/preferencesdialog.cpp" line="165"/>
         <source>Standard</source>
         <translation type="unfinished">标准</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="162"/>
+        <location filename="../src/preferencesdialog.cpp" line="166"/>
         <source>Local</source>
         <translation type="unfinished">本地</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="166"/>
+        <location filename="../src/preferencesdialog.cpp" line="170"/>
         <source>Interval display:</source>
         <translation type="unfinished">区间显示:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="169"/>
+        <location filename="../src/preferencesdialog.cpp" line="173"/>
         <source>Significant digits</source>
         <translation type="unfinished">有效数字</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="170"/>
+        <location filename="../src/preferencesdialog.cpp" line="174"/>
         <source>Interval</source>
         <translation type="unfinished">区间</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="171"/>
+        <location filename="../src/preferencesdialog.cpp" line="175"/>
         <source>Plus/minus</source>
         <translation type="unfinished">加/减</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="172"/>
+        <location filename="../src/preferencesdialog.cpp" line="176"/>
         <source>Midpoint</source>
         <translation type="unfinished">中点</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="173"/>
+        <location filename="../src/preferencesdialog.cpp" line="177"/>
         <source>Lower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="174"/>
+        <location filename="../src/preferencesdialog.cpp" line="178"/>
         <source>Upper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="179"/>
+        <location filename="../src/preferencesdialog.cpp" line="183"/>
         <source>Complex number form:</source>
         <translation type="unfinished">复数形式:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="181"/>
+        <location filename="../src/preferencesdialog.cpp" line="185"/>
         <source>Rectangular</source>
         <translation type="unfinished">矩形</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="182"/>
+        <location filename="../src/preferencesdialog.cpp" line="186"/>
         <source>Exponential</source>
         <translation type="unfinished">指数型</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="183"/>
+        <location filename="../src/preferencesdialog.cpp" line="187"/>
         <source>Polar</source>
         <translation type="unfinished">极坐标</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="184"/>
+        <location filename="../src/preferencesdialog.cpp" line="188"/>
         <source>Angle/phasor</source>
         <translation type="unfinished">角/相量</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="192"/>
+        <location filename="../src/preferencesdialog.cpp" line="196"/>
         <source>Abbreviate names</source>
         <translation type="unfinished">缩写名称</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="193"/>
+        <location filename="../src/preferencesdialog.cpp" line="197"/>
         <source>Use binary prefixes for information units</source>
         <translation type="unfinished">信息单位使用二进制前缀</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="194"/>
+        <location filename="../src/preferencesdialog.cpp" line="198"/>
         <source>Automatic unit conversion:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="196"/>
+        <location filename="../src/preferencesdialog.cpp" line="200"/>
         <source>No conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="197"/>
+        <location filename="../src/preferencesdialog.cpp" line="201"/>
         <source>Base units</source>
         <translation type="unfinished">基本单位</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="198"/>
+        <location filename="../src/preferencesdialog.cpp" line="202"/>
         <source>Optimal units</source>
         <translation type="unfinished">最优单位</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="199"/>
+        <location filename="../src/preferencesdialog.cpp" line="203"/>
         <source>Optimal SI units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="203"/>
+        <location filename="../src/preferencesdialog.cpp" line="207"/>
         <source>Convert to mixed units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="204"/>
+        <location filename="../src/preferencesdialog.cpp" line="208"/>
         <source>Automatic unit prefixes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="206"/>
+        <location filename="../src/preferencesdialog.cpp" line="210"/>
         <source>Default</source>
         <translation type="unfinished">默认值</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="207"/>
+        <location filename="../src/preferencesdialog.cpp" line="211"/>
         <source>No prefixes</source>
         <translation type="unfinished">无前缀</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="208"/>
+        <location filename="../src/preferencesdialog.cpp" line="212"/>
         <source>Prefixes for some units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="209"/>
+        <location filename="../src/preferencesdialog.cpp" line="213"/>
         <source>Prefixes also for currencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="210"/>
+        <location filename="../src/preferencesdialog.cpp" line="214"/>
         <source>Prefixes for all units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <location filename="../src/preferencesdialog.cpp" line="222"/>
         <source>Enable all SI-prefixes</source>
         <translation type="unfinished">启用所有SI前缀</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="219"/>
+        <location filename="../src/preferencesdialog.cpp" line="223"/>
         <source>Enable denominator prefixes</source>
         <translation type="unfinished">启用分母前缀</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="220"/>
+        <location filename="../src/preferencesdialog.cpp" line="224"/>
         <source>Enable units in physical constants</source>
         <translation type="unfinished">物理常数单位</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="221"/>
+        <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Temperature calculation:</source>
         <translation type="unfinished">温度计算模式:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="223"/>
+        <location filename="../src/preferencesdialog.cpp" line="227"/>
         <source>Absolute</source>
         <translation type="unfinished">绝对</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="224"/>
+        <location filename="../src/preferencesdialog.cpp" line="228"/>
         <source>Relative</source>
         <translation type="unfinished">相对</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="225"/>
+        <location filename="../src/preferencesdialog.cpp" line="229"/>
         <source>Hybrid</source>
         <translation type="unfinished">混合</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="229"/>
+        <location filename="../src/preferencesdialog.cpp" line="234"/>
         <source>Exchange rates updates:</source>
         <translation type="unfinished">汇率更新:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/preferencesdialog.cpp" line="232"/>
-        <location filename="../src/preferencesdialog.cpp" line="354"/>
+        <location filename="../src/preferencesdialog.cpp" line="237"/>
+        <location filename="../src/preferencesdialog.cpp" line="372"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n天</numerusform>
@@ -7296,7 +7311,7 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="63"/>
         <location filename="../src/qalculateqtsettings.cpp" line="64"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="667"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="685"/>
         <source>answer</source>
         <translation type="unfinished">答案</translation>
     </message>
@@ -7316,42 +7331,42 @@ Do you, despite this, want to change the default behavior and allow multiple sim
         <translation type="unfinished">历史索引 %s 不存在。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="666"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="684"/>
         <source>Last Answer</source>
         <translation type="unfinished">上一答案</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="669"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="687"/>
         <source>Answer 2</source>
         <translation type="unfinished">答案二</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="670"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="688"/>
         <source>Answer 3</source>
         <translation type="unfinished">答案三</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="671"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="689"/>
         <source>Answer 4</source>
         <translation type="unfinished">答案四</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="672"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="690"/>
         <source>Answer 5</source>
         <translation type="unfinished">答案五</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="673"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="691"/>
         <source>Memory</source>
         <translation type="unfinished">存值</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="757"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="775"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="757"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="775"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
         <translation type="unfinished">无法将首选项写入 
@@ -7361,12 +7376,12 @@ Do you, despite this, want to change the default behavior and allow multiple sim
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1017"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1057"/>
         <source>Update exchange rates?</source>
         <translation type="unfinished">更新汇率？</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="1017"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1057"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
@@ -7381,72 +7396,84 @@ Do you wish to update the exchange rates now?</source>
         <translation type="obsolete">获取汇率。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1045"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1046"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1085"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1086"/>
         <source>Fetching exchange rates…</source>
         <translation type="unfinished">获取汇率…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1077"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1090"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1099"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1150"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1173"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1119"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1132"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1141"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1192"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1215"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1078"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1120"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1079"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1121"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1090"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1132"/>
         <source>Path of executable not found.</source>
         <translation type="unfinished">未找到可执行文件的路径。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1099"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1141"/>
         <source>curl not found.</source>
         <translation type="unfinished">未找到 curl。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1150"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1192"/>
         <source>Failed to run update script.
 %1</source>
         <translation type="unfinished">运行更新脚本失败。
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1173"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1215"/>
         <source>Failed to check for updates.</source>
         <translation type="unfinished">无法检查更新。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1174"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1216"/>
         <source>No updates found.</source>
         <translation type="unfinished">无更新。</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1180"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1222"/>
+        <source>&lt;div&gt;A new version of %1 is available at %2.
+
+Do you wish to update to version %3?&lt;/div&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qalculateqtsettings.cpp" line="1226"/>
+        <source>&lt;div&gt;A new version of %1 is available.
+
+You can get version %3 at %2.&lt;/div&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
-        <translation type="unfinished">%1 的新版本可在 %2 获得。
+        <translation type="obsolete">%1 的新版本可在 %2 获得。
 
 是否要更新到版本 %3？</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1184"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
-        <translation type="unfinished">%1 有可用的新版本 %3。
+        <translation type="obsolete">%1 有可用的新版本 %3。
 
 您可以在 %2 获取。</translation>
     </message>
@@ -8036,226 +8063,226 @@ You can get version %3 at %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2203"/>
+        <location filename="../src/qalculatewindow.cpp" line="2204"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2203"/>
+        <location filename="../src/qalculatewindow.cpp" line="2204"/>
         <source>Couldn&apos;t write definitions</source>
         <translation type="unfinished">无法写入定义</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2707"/>
+        <location filename="../src/qalculatewindow.cpp" line="2708"/>
         <source>hexadecimal</source>
         <translation type="unfinished">十六进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2710"/>
+        <location filename="../src/qalculatewindow.cpp" line="2711"/>
         <source>octal</source>
         <translation type="unfinished">八进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2713"/>
+        <location filename="../src/qalculatewindow.cpp" line="2714"/>
         <source>decimal</source>
         <translation type="unfinished">十进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2716"/>
+        <location filename="../src/qalculatewindow.cpp" line="2717"/>
         <source>duodecimal</source>
         <translation type="unfinished">十二进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2719"/>
+        <location filename="../src/qalculatewindow.cpp" line="2720"/>
         <source>binary</source>
         <translation type="unfinished">二进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2722"/>
+        <location filename="../src/qalculatewindow.cpp" line="2723"/>
         <source>roman</source>
         <translation type="unfinished">罗马</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2725"/>
+        <location filename="../src/qalculatewindow.cpp" line="2726"/>
         <source>bijective</source>
         <translation type="unfinished">双射</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2728"/>
-        <location filename="../src/qalculatewindow.cpp" line="2731"/>
-        <location filename="../src/qalculatewindow.cpp" line="2734"/>
+        <location filename="../src/qalculatewindow.cpp" line="2729"/>
+        <location filename="../src/qalculatewindow.cpp" line="2732"/>
+        <location filename="../src/qalculatewindow.cpp" line="2735"/>
         <source>sexagesimal</source>
         <translation type="unfinished">六十进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2737"/>
-        <location filename="../src/qalculatewindow.cpp" line="2740"/>
+        <location filename="../src/qalculatewindow.cpp" line="2738"/>
+        <location filename="../src/qalculatewindow.cpp" line="2741"/>
         <source>latitude</source>
         <translation type="unfinished">纬度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2743"/>
-        <location filename="../src/qalculatewindow.cpp" line="2746"/>
+        <location filename="../src/qalculatewindow.cpp" line="2744"/>
+        <location filename="../src/qalculatewindow.cpp" line="2747"/>
         <source>longitude</source>
         <translation type="unfinished">经度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2764"/>
+        <location filename="../src/qalculatewindow.cpp" line="2765"/>
         <source>time</source>
         <translation type="unfinished">时间</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2815"/>
+        <location filename="../src/qalculatewindow.cpp" line="2816"/>
         <source>Time zone parsing failed.</source>
         <translation type="unfinished">时区分析失败。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2838"/>
+        <location filename="../src/qalculatewindow.cpp" line="2839"/>
         <source>bases</source>
         <translation type="unfinished">进制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2847"/>
+        <location filename="../src/qalculatewindow.cpp" line="2848"/>
         <source>calendars</source>
         <translation type="unfinished">日历</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2856"/>
+        <location filename="../src/qalculatewindow.cpp" line="2857"/>
         <source>rectangular</source>
         <translation type="unfinished">矩形</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2856"/>
+        <location filename="../src/qalculatewindow.cpp" line="2857"/>
         <source>cartesian</source>
         <translation type="unfinished">笛卡尔</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2867"/>
+        <location filename="../src/qalculatewindow.cpp" line="2868"/>
         <source>exponential</source>
         <translation type="unfinished">指数型</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2878"/>
+        <location filename="../src/qalculatewindow.cpp" line="2879"/>
         <source>polar</source>
         <translation type="unfinished">极坐标</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2902"/>
+        <location filename="../src/qalculatewindow.cpp" line="2903"/>
         <source>phasor</source>
         <translation type="unfinished">相量</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2902"/>
+        <location filename="../src/qalculatewindow.cpp" line="2903"/>
         <source>angle</source>
         <translation type="unfinished">角度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2913"/>
+        <location filename="../src/qalculatewindow.cpp" line="2914"/>
         <source>optimal</source>
         <translation type="unfinished">最优</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2924"/>
-        <location filename="../src/qalculatewindow.cpp" line="2970"/>
+        <location filename="../src/qalculatewindow.cpp" line="2925"/>
+        <location filename="../src/qalculatewindow.cpp" line="2971"/>
         <source>base</source>
         <translation type="unfinished">基本</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2935"/>
+        <location filename="../src/qalculatewindow.cpp" line="2936"/>
         <source>mixed</source>
         <translation type="unfinished">混合</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2949"/>
+        <location filename="../src/qalculatewindow.cpp" line="2950"/>
         <source>fraction</source>
         <translation type="unfinished">分数</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2952"/>
+        <location filename="../src/qalculatewindow.cpp" line="2953"/>
         <source>factors</source>
         <translation type="unfinished">因子</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2961"/>
+        <location filename="../src/qalculatewindow.cpp" line="2962"/>
         <source>partial fraction</source>
         <translation type="unfinished">部分分式</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3011"/>
+        <location filename="../src/qalculatewindow.cpp" line="3012"/>
         <source>factorize</source>
         <translation type="unfinished">分解</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3014"/>
+        <location filename="../src/qalculatewindow.cpp" line="3015"/>
         <source>expand</source>
         <translation type="unfinished">展开</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3185"/>
         <location filename="../src/qalculatewindow.cpp" line="3186"/>
         <location filename="../src/qalculatewindow.cpp" line="3187"/>
-        <location filename="../src/qalculatewindow.cpp" line="3563"/>
+        <location filename="../src/qalculatewindow.cpp" line="3188"/>
+        <location filename="../src/qalculatewindow.cpp" line="3564"/>
         <source>Calculating…</source>
         <translation type="unfinished">计算中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3186"/>
-        <location filename="../src/qalculatewindow.cpp" line="3572"/>
-        <location filename="../src/qalculatewindow.cpp" line="4069"/>
+        <location filename="../src/qalculatewindow.cpp" line="3187"/>
+        <location filename="../src/qalculatewindow.cpp" line="3573"/>
+        <location filename="../src/qalculatewindow.cpp" line="4070"/>
         <source>Cancel</source>
         <translation type="unfinished">取消</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3239"/>
-        <location filename="../src/qalculatewindow.cpp" line="3932"/>
+        <location filename="../src/qalculatewindow.cpp" line="3240"/>
+        <location filename="../src/qalculatewindow.cpp" line="3933"/>
         <source>RPN Operation</source>
         <translation type="unfinished">RPN操作</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3551"/>
+        <location filename="../src/qalculatewindow.cpp" line="3552"/>
         <source>Factorizing…</source>
         <translation type="unfinished">分解中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3555"/>
+        <location filename="../src/qalculatewindow.cpp" line="3556"/>
         <source>Expanding partial fractions…</source>
         <translation type="unfinished">展开部分分式…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3559"/>
+        <location filename="../src/qalculatewindow.cpp" line="3560"/>
         <source>Expanding…</source>
         <translation type="unfinished">展开中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3567"/>
+        <location filename="../src/qalculatewindow.cpp" line="3568"/>
         <source>Converting…</source>
         <translation type="unfinished">换算中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3928"/>
+        <location filename="../src/qalculatewindow.cpp" line="3929"/>
         <source>RPN Register Moved</source>
         <translation type="unfinished">RPN寄存器已移动</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4068"/>
         <location filename="../src/qalculatewindow.cpp" line="4069"/>
         <location filename="../src/qalculatewindow.cpp" line="4070"/>
+        <location filename="../src/qalculatewindow.cpp" line="4071"/>
         <source>Processing…</source>
         <translation type="unfinished">处理中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4166"/>
-        <location filename="../src/qalculatewindow.cpp" line="5386"/>
+        <location filename="../src/qalculatewindow.cpp" line="4174"/>
+        <location filename="../src/qalculatewindow.cpp" line="5439"/>
         <source>Matrix</source>
         <translation type="unfinished">矩阵</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4267"/>
+        <location filename="../src/qalculatewindow.cpp" line="4275"/>
         <source>Temperature Calculation Mode</source>
         <translation type="unfinished">温度计算模式</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4273"/>
+        <location filename="../src/qalculatewindow.cpp" line="4281"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -8264,127 +8291,154 @@ Please select temperature calculation mode
 (以后可以在偏好设置中更改)。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4276"/>
+        <location filename="../src/qalculatewindow.cpp" line="4284"/>
         <source>Absolute</source>
         <translation type="unfinished">绝对</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4280"/>
+        <location filename="../src/qalculatewindow.cpp" line="4288"/>
         <source>Relative</source>
         <translation type="unfinished">相对</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4284"/>
+        <location filename="../src/qalculatewindow.cpp" line="4292"/>
         <source>Hybrid</source>
         <translation type="unfinished">混合</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4324"/>
+        <location filename="../src/qalculatewindow.cpp" line="4333"/>
         <source>Interpretation of dots</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4330"/>
+        <location filename="../src/qalculatewindow.cpp" line="4339"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4333"/>
+        <location filename="../src/qalculatewindow.cpp" line="4342"/>
         <source>Both dot and comma as decimal separators</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4337"/>
+        <location filename="../src/qalculatewindow.cpp" line="4346"/>
         <source>Dot as thousands separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4341"/>
+        <location filename="../src/qalculatewindow.cpp" line="4350"/>
         <source>Only dot as decimal separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4858"/>
+        <location filename="../src/qalculatewindow.cpp" line="4378"/>
+        <source>Parsing Mode</source>
+        <translation type="unfinished">解析模式</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="4384"/>
+        <source>The expression is ambiguous.
+Please select interpretation of expressions with implicit multiplication
+(this can later be changed in preferences).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="4387"/>
+        <source>Implicit multiplication first</source>
+        <translation type="unfinished">隐式优先</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="4392"/>
+        <source>Conventional</source>
+        <translation type="unfinished">常规</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="4397"/>
+        <source>Adaptive</source>
+        <translation type="unfinished">自适应</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="4911"/>
         <source>Gnuplot was not found</source>
         <translation type="unfinished">未找到gnuplot</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4858"/>
+        <location filename="../src/qalculatewindow.cpp" line="4911"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation type="unfinished">%1 (%2) 需要单独安装，并在可执行的搜索路径中找到，才能进行绘图。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5040"/>
+        <location filename="../src/qalculatewindow.cpp" line="5093"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation type="unfinished">示例:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5078"/>
+        <location filename="../src/qalculatewindow.cpp" line="5131"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation type="unfinished">开始</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5078"/>
+        <location filename="../src/qalculatewindow.cpp" line="5131"/>
         <source>Calculate</source>
         <translation type="unfinished">计算</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5079"/>
+        <location filename="../src/qalculatewindow.cpp" line="5132"/>
         <source>Apply to Stack</source>
         <translation type="unfinished">应用于栈</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5079"/>
+        <location filename="../src/qalculatewindow.cpp" line="5132"/>
         <source>Insert</source>
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5070"/>
+        <location filename="../src/qalculatewindow.cpp" line="5123"/>
         <source>Keep open</source>
         <translation type="unfinished">保持打开状态</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5095"/>
+        <location filename="../src/qalculatewindow.cpp" line="5148"/>
         <source>Value</source>
         <translation type="unfinished">值</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5097"/>
+        <location filename="../src/qalculatewindow.cpp" line="5150"/>
         <source>Argument</source>
         <translation type="unfinished">参数</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5110"/>
+        <location filename="../src/qalculatewindow.cpp" line="5163"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5165"/>
+        <location filename="../src/qalculatewindow.cpp" line="5218"/>
         <source>True</source>
         <translation type="unfinished">真</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5168"/>
+        <location filename="../src/qalculatewindow.cpp" line="5221"/>
         <source>False</source>
         <translation type="unfinished">假</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5194"/>
+        <location filename="../src/qalculatewindow.cpp" line="5247"/>
         <source>Info</source>
         <translation type="unfinished">信息</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5229"/>
-        <location filename="../src/qalculatewindow.cpp" line="5237"/>
+        <location filename="../src/qalculatewindow.cpp" line="5282"/>
+        <location filename="../src/qalculatewindow.cpp" line="5290"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation type="unfinished">可选</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5577"/>
+        <location filename="../src/qalculatewindow.cpp" line="5630"/>
         <source>Failed to open %1.
 %2</source>
         <translation type="unfinished">无法打开 %1 。
