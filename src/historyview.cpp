@@ -18,6 +18,7 @@
 #include <QKeySequence>
 #include <QClipboard>
 #include <QTextDocumentFragment>
+#include <QScrollBar>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -168,7 +169,7 @@ void replace_colors(std::string &str) {
 void HistoryView::loadInitial() {
 	if(!settings->v_expression.empty()) {
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
-			addResult(settings->v_result[i], settings->v_expression[i], true, false, QString(), true, i);
+			addResult(settings->v_result[i], settings->v_expression[i], true, false, QString(), NULL, true, i);
 		}
 		if(!s_text.isEmpty()) {
 			if((settings->color == 2 && s_text.contains("color:#00")) || (settings->color != 2 && s_text.contains("color:#FF"))) {
@@ -184,7 +185,7 @@ void HistoryView::loadInitial() {
 		}
 	}
 }
-void HistoryView::addResult(std::vector<std::string> values, std::string expression, int exact, bool dual_approx, const QString &image, bool initial_load, size_t index) {
+void HistoryView::addResult(std::vector<std::string> values, std::string expression, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
 	QFontMetrics fm(font());
 	int paste_h = fm.ascent();
 	if(paste_h < 16) paste_h = 12;
@@ -200,9 +201,14 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += "</div>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
+			settings->v_delexpression.push_back(false);
 			settings->v_result.push_back(values);
 			settings->v_exact.push_back(std::vector<int>());
-			for(size_t i = 0; i < values.size(); i++) settings->v_exact[settings->v_exact.size() - 1].push_back(exact || i < values.size() - 1);
+			settings->v_delresult.push_back(std::vector<bool>());
+			for(size_t i = 0; i < values.size(); i++) {
+				settings->v_exact[settings->v_exact.size() - 1].push_back(exact || i < values.size() - 1);
+				settings->v_delresult[settings->v_delresult.size() - 1].push_back(false);
+			}
 		}
 	} else if(!initial_load && !settings->v_result.empty()) {
 		for(size_t i = values.size(); i > 0; i--) {
@@ -212,29 +218,33 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	if(!initial_load && CALCULATOR->message()) {
 		do {
-			MessageType mtype = CALCULATOR->message()->type();
-			str += "<div style=\"text-align:left; font-size:normal";
-			if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-				str += "; color:";
-				if(mtype == MESSAGE_ERROR) {
-					if(settings->color == 2) str += "#FFAAAA";
-					else str += "#800000";
-				} else {
-					if(settings->color == 2) str += "#AAAAFF";
-					else str += "#000080";
+			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
+				if(!settings->implicit_question_asked) *implicit_warning = true;
+			} else {
+				MessageType mtype = CALCULATOR->message()->type();
+				str += "<div style=\"text-align:left; font-size:normal";
+				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+					str += "; color:";
+					if(mtype == MESSAGE_ERROR) {
+						if(settings->color == 2) str += "#FFAAAA";
+						else str += "#800000";
+					} else {
+						if(settings->color == 2) str += "#AAAAFF";
+						else str += "#000080";
+					}
+					str += "";
 				}
-				str += "";
+				str += "\">";
+				QString mstr = QString::fromStdString(CALCULATOR->message()->message());
+				if(!mstr.startsWith("-")) str += "- ";
+				if(settings->printops.use_unicode_signs) {
+					mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
+					mstr.replace("<=", SIGN_LESS_OR_EQUAL);
+					mstr.replace("!=", SIGN_NOT_EQUAL);
+				}
+				str += mstr.toHtmlEscaped();
+				str += "</div>";
 			}
-			str += "\">";
-			QString mstr = QString::fromStdString(CALCULATOR->message()->message());
-			if(!mstr.startsWith("-")) str += "- ";
-			if(settings->printops.use_unicode_signs) {
-				mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
-				mstr.replace("<=", SIGN_LESS_OR_EQUAL);
-				mstr.replace("!=", SIGN_NOT_EQUAL);
-			}
-			str += mstr.toHtmlEscaped();
-			str += "</div>";
 		} while(CALCULATOR->nextMessage());
 		if(str.isEmpty() && values.empty() && expression.empty()) return;
 	}
@@ -271,7 +281,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 		} else {
-			if(settings->color == 2) str += QString("<a href=\"#%1\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
+			if(settings->color == 2) str += QString("<a href=\"#%1:%2:%3\"><img src=\":/icons/dark/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
 			else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
 		}
 		str += "</div>";
@@ -350,7 +360,9 @@ void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 	if(!str.isEmpty()) {
 		if(str[0] == '#') {
-			emit insertValueRequested(str.mid(1).toInt());
+			int index = str.indexOf(":");
+			if(index < 0) emit insertValueRequested(str.mid(1).toInt());
+			else emit insertValueRequested(str.mid(1, index - 1).toInt());
 		} else {
 			int index = str.indexOf(":");
 			if(index < 0) {
@@ -391,30 +403,132 @@ void HistoryView::editClear() {
 	settings->v_expression.clear();
 	settings->v_result.clear();
 }
+void HistoryView::editRemove() {
+	int i1 = -1, i2 = -1;
+	QString sref;
+	indexAtPos(context_pos, &i1, &i2, &sref);
+	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
+	if(i2 >= 0 && settings->v_result[i1].size() <= 1) i2 = -1;
+	if(i2 < 0) {
+		sref = QString::number(i1);
+		settings->v_delexpression[i1] = true;
+	} else if(i2 < (int) settings->v_delresult[i1].size()) {
+		settings->v_delresult[i1][i2] = true;
+	}
+	int index = s_text.indexOf("<a href=\"" + sref + "\"");
+	if(index >= 0) {
+		int index2 = s_text.indexOf(i2 < 0 ? "<hr/>" : "</a></div>", index);
+		if(index2 >= 0) index2 += (i2 < 0 ? 5 : 10);
+		int index1 = s_text.lastIndexOf("<div", index);
+		QString new_text;
+		if(index1 > 0) new_text = s_text.left(index1);
+		if(index2 >= 0) new_text += s_text.mid(index2);
+		s_text = new_text;
+	}
+	int vpos = verticalScrollBar()->value();
+	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
+	verticalScrollBar()->setValue(vpos);
+}
+void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, QString *anchorstr) {
+	*expression_index = -1;
+	*result_index = -1;
+	QString sref = anchorAt(pos);
+	if(sref.isEmpty()) {
+		QTextCursor cur = cursorForPosition(pos);
+		while(true) {
+			cur.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+			cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+			QString str = cur.selection().toHtml();
+			int i = str.lastIndexOf("<a href=\"");
+			if(i >= 0) {
+				i += 9;
+				int i2 = str.indexOf("\"", i);
+				if(i2 < 0) return;
+				sref = str.mid(i, i2 - i);
+				if(sref.isEmpty()) return;
+				break;
+			} else if(str.lastIndexOf("text-align:left") > 0) {
+				if(!cur.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor)) return;
+			} else {
+				if(!cur.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor)) return;
+			}
+		}
+	}
+	if(anchorstr) *anchorstr = sref;
+	int i = sref.indexOf(":");
+	if(sref[0] == '#') {
+		if(i < 0) return;
+		int i2 = sref.indexOf(":", i + 1);
+		if(i >= 0) {
+			*expression_index = sref.mid(i + 1, i2 - (i + 1)).toInt();
+			*result_index = sref.mid(i2 + 1).toInt();
+			if(*expression_index >= 0 && *expression_index < (int) settings->v_result.size() && *result_index < (int) settings->v_result[*expression_index].size()) {
+				*result_index = settings->v_result[*expression_index].size() - *result_index - 1;
+			}
+		} else {
+			*expression_index = sref.mid(i + 1).toInt();
+		}
+	} else if(i >= 0) {
+		*expression_index = sref.left(i).toInt();
+		*result_index = sref.mid(i + 1).toInt();
+	} else {
+		*expression_index = sref.toInt();
+	}
+}
 void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	if(!cmenu) {
 		cmenu = new QMenu(this);
 		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
-		copyFormattedAction = cmenu->addAction(tr("Copy Formatted Text"), this, SLOT(copy()));
+		copyFormattedAction = cmenu->addAction(tr("Copy Formatted Text"), this, SLOT(editCopyFormatted()));
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
+		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
-	copyAction->setEnabled(textCursor().hasSelection());
-	copyFormattedAction->setEnabled(textCursor().hasSelection());
+	int i1 = -1, i2 = -1;
+	context_pos = e->pos();
+	indexAtPos(context_pos, &i1, &i2);
+	copyAction->setEnabled(textCursor().hasSelection() || (i1 >= 0 && e->reason() == QContextMenuEvent::Mouse));
+	copyFormattedAction->setEnabled(textCursor().hasSelection() || (i1 >= 0 && e->reason() == QContextMenuEvent::Mouse));
 	selectAllAction->setEnabled(!s_text.isEmpty());
+	delAction->setEnabled(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection());
 	clearAction->setEnabled(!s_text.isEmpty());
 	cmenu->popup(e->globalPos());
 }
+void HistoryView::editCopyFormatted() {
+	if(textCursor().hasSelection()) {
+		copy();
+	} else {
+		int i1 = -1, i2 = -1;
+		indexAtPos(context_pos, &i1, &i2);
+		if(i1 < 0) return;
+		if(i2 < 0) {
+			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(settings->v_expression[i1]));
+		} else {
+			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) QApplication::clipboard()->setText(QString::fromStdString(settings->v_result[i1][i2]));
+		}
+	}
+}
 void HistoryView::editCopy() {
-	QString str = textCursor().selection().toHtml();
-	int i = str.indexOf("<!--StartFragment-->");
-	int i2 = str.indexOf("<!--EndFragment-->", i + 20);
-	if(i >= 0 && i2 >= 0) str = str.mid(i + 20, i2 - i - 20).trimmed();
-	else str = textCursor().selectedText();
-	QApplication::clipboard()->setText(unhtmlize(str));
+	if(textCursor().hasSelection()) {
+		QString str = textCursor().selection().toHtml();
+		int i = str.indexOf("<!--StartFragment-->");
+		int i2 = str.indexOf("<!--EndFragment-->", i + 20);
+		if(i >= 0 && i2 >= 0) str = str.mid(i + 20, i2 - i - 20).trimmed();
+		else str = textCursor().selectedText();
+		QApplication::clipboard()->setText(unhtmlize(str));
+	} else {
+		int i1 = -1, i2 = -1;
+		indexAtPos(context_pos, &i1, &i2);
+		if(i1 < 0) return;
+		if(i2 < 0) {
+			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_expression[i1])));
+		} else {
+			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[i1][i2])));
+		}
+	}
 }
 

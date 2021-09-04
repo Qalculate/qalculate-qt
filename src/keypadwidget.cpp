@@ -299,8 +299,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
 	grid->addWidget(button, 3, c, 1, 1);
-	OPERATOR_BUTTON3(SIGN_MULTIPLICATION, "&", "<<", 1, c);
+	OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
+	multiplicationButton = button;
 	delButton = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
 	connect(delButton, SIGNAL(clicked()), this, SIGNAL(delClicked()));
 	connect(delButton, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
@@ -318,8 +319,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
 	}
-	OPERATOR_BUTTON3(SIGN_DIVISION_SLASH, "|", "~", 1, c);
-	button->setProperty(BUTTON_DATA, "/");
+	OPERATOR_BUTTON3(settings->divisionSign(), "|", "~", 1, c);
+	button->setProperty(BUTTON_DATA, settings->divisionSign());
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
 	acButton = new KeypadButton(LOAD_ICON("edit-clear"), this);
 	acButton->setToolTip(tr("Clear expression"));
@@ -357,6 +358,10 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 KeypadWidget::~KeypadWidget() {}
 
 void KeypadWidget::updateSymbols() {
+	multiplicationButton->setText(settings->multiplicationSign());
+	multiplicationButton->setProperty(BUTTON_DATA, settings->multiplicationSign());
+	multiplicationButton->setText(settings->divisionSign());
+	multiplicationButton->setProperty(BUTTON_DATA, settings->divisionSign());
 	commaButton->setText(QString::fromStdString(CALCULATOR->getComma()));
 	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
 	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));

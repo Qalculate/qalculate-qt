@@ -238,7 +238,7 @@ void FPConversionDialog::updateFields(int base) {
 				sfloat = significand.print(po);
 				if(!subnormal || !significand.isZero()) {
 					sfloat += " ";
-					sfloat += SIGN_MULTIPLICATION;
+					sfloat += settings->multiplicationSign();
 					sfloat += " ";
 					sfloat += "2^";
 					sfloat += exponent.print(po);

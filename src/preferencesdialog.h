@@ -26,9 +26,9 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *ignoreCommaBox, *ignoreDotBox;
+		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo;
+		QComboBox *styleCombo, *parseCombo, *tcCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -41,6 +41,8 @@ class PreferencesDialog : public QDialog {
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
 		void lowerCaseToggled(bool);
+		void multiplicationDotToggled(bool);
+		void divisionSlashToggled(bool);
 		void spellOutToggled(bool);
 		void eToggled(bool);
 		void imaginaryJToggled(bool);
@@ -89,6 +91,10 @@ class PreferencesDialog : public QDialog {
 
 		PreferencesDialog(QWidget *parent = NULL);
 		virtual ~PreferencesDialog();
+
+		void updateDot();
+		void updateParsingMode();
+		void updateTemperatureCalculation();
 
 	signals:
 

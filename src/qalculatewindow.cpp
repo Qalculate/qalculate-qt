@@ -925,7 +925,7 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		do_exec = (str == "!") && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 		expressionEdit->wrapSelection(str);
 	} else if(str == "E") {
-		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(SIGN_MULTIPLICATION "10^");
+		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
 		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : str);
 	} else {
 		if(!expressionEdit->doChainMode(str)) expressionEdit->wrapSelection(str);
@@ -1675,6 +1675,7 @@ void QalculateWindow::setOption(std::string str) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
 			settings->evalops.parse_options.parsing_mode = (ParsingMode) v;
+			settings->implicit_question_asked = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST);
 			expressionFormatUpdated(true);
 		}
 	} else if(equalsIgnoreCase(svar, "update exchange rates") || svar == "upxrates") {
@@ -4114,6 +4115,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		parsed_text = result_text;
 	}
 
+	bool implicit_warning = false;
+
 	if(do_stack) {
 		RPNRegisterChanged(result_text, stack_index);
 	} else {
@@ -4139,7 +4142,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, update_parse && !mstruct_exact.isUndefined(), flag);
+		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, update_parse && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 	}
 
 	if(do_to) {
@@ -4159,6 +4162,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	settings->printops.prefix = NULL;
 
 	b_busy--;
+
+	if(implicit_warning && askImplicit()) {
+		calculateExpression(true);
+		return;
+	}
 
 	if(!supress_dialog && !register_moved && !do_stack && mstruct->isMatrix() && matrix_mstruct.isMatrix()) {
 		QDialog *dialog = new QDialog(this);
@@ -4275,16 +4283,16 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	group->setExclusive(true);
 	QRadioButton *w_abs = new QRadioButton(tr("Absolute"));
 	group->addButton(w_abs);
-	grid->addWidget(w_abs, 1, 0);
-	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 1, 1);
+	grid->addWidget(w_abs, 1, 0, Qt::AlignTop);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K<br>1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K<br>2 °C − 1 °C = 1 K<br>1 °C − 5 °F = 16 K<br>1 °C + 1 K = 2 °C</i>"), 1, 1);
 	QRadioButton *w_relative = new QRadioButton(tr("Relative"));
 	group->addButton(w_relative);
-	grid->addWidget(w_relative, 2, 0);
-	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 2, 1);
+	grid->addWidget(w_relative, 2, 0, Qt::AlignTop);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K<br>1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K<br>2 °C − 1 °C = 1 K<br>1 °C − 5 °F = 16 K<br>1 °C + 1 K = 2 °C</i>"), 2, 1);
 	QRadioButton *w_hybrid = new QRadioButton(tr("Hybrid"));
 	group->addButton(w_hybrid);
-	grid->addWidget(w_hybrid, 3, 0);
-	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 2 °C\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C</i>"), 3, 1);
+	grid->addWidget(w_hybrid, 3, 0, Qt::AlignTop);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 2 °C<br>1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K<br>2 °C − 1 °C = 1 °C<br>1 °C − 5 °F = 16 K<br>1 °C + 1 K = 2 °C</i>"), 3, 1);
 	switch(CALCULATOR->getTemperatureCalculationMode()) {
 		case TEMPERATURE_CALCULATION_ABSOLUTE: {w_abs->setChecked(true); break;}
 		case TEMPERATURE_CALCULATION_RELATIVE: {w_relative->setChecked(true); break;}
@@ -4298,6 +4306,7 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	settings->tc_set = true;
 	if(tc_mode != CALCULATOR->getTemperatureCalculationMode()) {
 		CALCULATOR->setTemperatureCalculationMode(tc_mode);
+		if(preferencesDialog) preferencesDialog->updateTemperatureCalculation();
 		return true;
 	}
 	return false;
@@ -4358,9 +4367,53 @@ bool QalculateWindow::askDot(const std::string &str) {
 	} else {
 		settings->evalops.parse_options.dot_as_separator = false;
 	}
+	if(preferencesDialog) preferencesDialog->updateDot();
 	dialog->deleteLater();
 	return das != settings->evalops.parse_options.dot_as_separator;
 }
+bool QalculateWindow::askImplicit() {
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Parsing Mode"));
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	box->addWidget(buttonBox);
+	grid->addWidget(new QLabel(tr("The expression is ambiguous.\nPlease select interpretation of expressions with implicit multiplication\n(this can later be changed in preferences).")), 0, 0, 1, 2);
+	QButtonGroup *group = new QButtonGroup(dialog);
+	group->setExclusive(true);
+	QRadioButton *w_implicitfirst = new QRadioButton(tr("Implicit multiplication first"));
+	group->addButton(w_implicitfirst);
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) w_implicitfirst->setChecked(true);
+	grid->addWidget(w_implicitfirst, 1, 0);
+	grid->addWidget(new QLabel("<i>1/2x = 1/(2x)</i>"), 1, 1);
+	QRadioButton *w_conventional = new QRadioButton(tr("Conventional"));
+	group->addButton(w_conventional);
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL) w_conventional->setChecked(true);
+	grid->addWidget(w_conventional, 2, 0);
+	grid->addWidget(new QLabel("<i>1/2x = (1/2)x</i>"), 2, 1);
+	QRadioButton *w_adaptive = new QRadioButton(tr("Adaptive"));
+	group->addButton(w_adaptive);
+	grid->addWidget(w_adaptive, 3, 0);
+	grid->addWidget(new QLabel("<i>1/2x = 1/(2x); 1/2 x = (1/2)x</i>"), 3, 1);
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_ADAPTIVE) w_adaptive->setChecked(true);
+	dialog->exec();
+	settings->implicit_question_asked = true;
+	ParsingMode pm_bak = settings->evalops.parse_options.parsing_mode;
+	if(w_implicitfirst->isChecked()) {
+		settings->evalops.parse_options.parsing_mode = PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST;
+	} else if(w_conventional->isChecked()) {
+		settings->evalops.parse_options.parsing_mode = PARSING_MODE_CONVENTIONAL;
+	} else {
+		settings->evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+	}
+	if(preferencesDialog) preferencesDialog->updateParsingMode();
+	dialog->deleteLater();
+	return pm_bak != settings->evalops.parse_options.parsing_mode;
+}
+
 void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 	if(e->matches(QKeySequence::Undo)) {
 		expressionEdit->editUndo();
