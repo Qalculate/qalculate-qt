@@ -19,6 +19,12 @@
 #include <QClipboard>
 #include <QTextDocumentFragment>
 #include <QScrollBar>
+#include <QLineEdit>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QDialog>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -201,6 +207,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += "</div>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
+			settings->v_protected.push_back(false);
 			settings->v_delexpression.push_back(false);
 			settings->v_result.push_back(values);
 			settings->v_exact.push_back(std::vector<int>());
@@ -398,10 +405,22 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 	}
 }
 void HistoryView::editClear() {
-	clear();
-	s_text.clear();
-	settings->v_expression.clear();
-	settings->v_result.clear();
+	for(size_t i1 = 0; i1 < settings->v_protected.size(); i1++) {
+		if(!settings->v_protected[i1]) {
+			settings->v_delexpression[i1] = true;
+			int index = s_text.indexOf("<a href=\"" + QString::number(i1) + "\"");
+			if(index >= 0) {
+				int index2 = s_text.indexOf("<hr/>", index);
+				if(index2 >= 0) index2 += (5);
+				int index1 = s_text.lastIndexOf("<div", index);
+				QString new_text;
+				if(index1 > 0) new_text = s_text.left(index1);
+				if(index2 >= 0) new_text += s_text.mid(index2);
+				s_text = new_text;
+			}
+		}
+	}
+	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
 }
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
@@ -428,6 +447,12 @@ void HistoryView::editRemove() {
 	int vpos = verticalScrollBar()->value();
 	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
 	verticalScrollBar()->setValue(vpos);
+}
+void HistoryView::editProtect() {
+	int i1 = -1, i2 = -1;
+	indexAtPos(context_pos, &i1, &i2);
+	if(i1 < 0 || i1 >= (int) settings->v_protected.size()) return;
+	settings->v_protected[i1] = protectAction->isChecked();
 }
 void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, QString *anchorstr) {
 	*expression_index = -1;
@@ -485,6 +510,13 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
+		findAction = cmenu->addAction(tr("Find…"), this, SLOT(editFind()));
+		findAction->setShortcut(QKeySequence::Find);
+		findAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addSeparator();
+		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
+		protectAction->setCheckable(true);
+		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
@@ -495,8 +527,38 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	copyFormattedAction->setEnabled(textCursor().hasSelection() || (i1 >= 0 && e->reason() == QContextMenuEvent::Mouse));
 	selectAllAction->setEnabled(!s_text.isEmpty());
 	delAction->setEnabled(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection());
+	protectAction->setChecked(i1 >= 0 && i1 < (int) settings->v_protected.size() && settings->v_protected[i1]);
+	protectAction->setEnabled(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection());
 	clearAction->setEnabled(!s_text.isEmpty());
 	cmenu->popup(e->globalPos());
+}
+void HistoryView::doFind() {
+	if(!find(searchEdit->text())) {
+		QTextCursor c = textCursor();
+		QTextCursor cbak = c;
+		c.movePosition(QTextCursor::Start);
+		setTextCursor(c);
+		if(!find(searchEdit->text())) {
+			setTextCursor(cbak);
+		}
+	}
+}
+void HistoryView::editFind() {
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Find"));
+	QGridLayout *grid = new QGridLayout();
+	grid->addWidget(new QLabel(tr("Text:"), this), 0, 0);
+	searchEdit = new QLineEdit(this);
+	grid->addWidget(searchEdit, 0, 1);
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
+	connect(buttonBox->addButton(tr("Search"), QDialogButtonBox::AcceptRole), SIGNAL(clicked()), this, SLOT(doFind()));
+	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), dialog, SLOT(reject()));
+	box->addWidget(buttonBox);
+	dialog->exec();
+	dialog->deleteLater();
 }
 void HistoryView::editCopyFormatted() {
 	if(textCursor().hasSelection()) {

@@ -118,6 +118,7 @@ class QalculateQtSettings : QObject {
 		std::string last_found_version;
 
 		std::vector<std::string> v_expression;
+		std::vector<bool> v_protected;
 		std::vector<bool> v_delexpression;
 		std::vector<std::vector<std::string> > v_result;
 		std::vector<std::vector<bool> > v_delresult;

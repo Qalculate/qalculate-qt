@@ -293,18 +293,19 @@ void QalculateQtSettings::loadPreferences() {
 				svalue = stmp.substr(i + 1);
 				remove_blank_ends(svalue);
 				v = s2i(svalue);
-				if(svar == "history_expression") {
+				if(svar == "history_expression" || svar == "history_expression*") {
 					v_expression.push_back(svalue);
 					v_delexpression.push_back(false);
+					v_protected.push_back(svar[svar.length() - 1] == '*');
 					v_result.push_back(std::vector<std::string>());
 					v_exact.push_back(std::vector<int>());
 					v_delresult.push_back(std::vector<bool>());
-				} else if(svar == "history_result") {
+				} else if(svar == "history_result" || svar == "history_result_approximate") {
 					if(!v_result.empty()) {
 						v_result[settings->v_result.size() - 1].push_back(svalue);
 						v_delresult[settings->v_result.size() - 1].push_back(false);
 						if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
-							v_exact[settings->v_exact.size() - 1].push_back(false);
+							v_exact[settings->v_exact.size() - 1].push_back(svar.length() > 20);
 						}
 					}
 				} else if(svar == "history_exact") {
@@ -941,26 +942,42 @@ void QalculateQtSettings::savePreferences(bool) {
 				if(n >= 300 || i == 0) break;
 				i--;
 			}
-			for(; i < v_expression.size(); i++) {
-				if(!v_delexpression[i]) {
-					fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+			size_t i_first = i;
+			for(i = 0; i < i_first; i++) {
+				if(!v_delexpression[i] && v_protected[i]) {
+					fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
 					n++;
 					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
 						if(!v_delresult[i][i2]) {
-							fprintf(file, "history_exact=%i\n", v_exact[i][i2]);
-							if(v_result[i][i2].length() > 6000) {
+							if(v_exact[i][i2]) fprintf(file, "history_result");
+							else fprintf(file, "history_result_approximate");
+							if(v_result[i][i2].length() > 6000 && !v_protected[i]) {
 								std::string str = unhtmlize(v_result[i][i2]);
 								if(str.length() > 5000) {
 									int index = 50;
 									while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
 									gsub("\n", "<br>", str);
-									fprintf(file, "history_result=%s …\n", str.substr(0, index + 1).c_str());
+									fprintf(file,  "=%s …\n", str.substr(0, index + 1).c_str());
 								} else {
-									fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+									fprintf(file, "=%s\n", v_result[i][i2].c_str());
 								}
 							} else {
-								fprintf(file, "history_result=%s\n", v_result[i][i2].c_str());
+								fprintf(file, "=%s\n", v_result[i][i2].c_str());
 							}
+						}
+					}
+				}
+			}
+			for(i = i_first; i < v_expression.size(); i++) {
+				if(!v_delexpression[i]) {
+					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
+					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+					n++;
+					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+						if(!v_delresult[i][i2]) {
+							if(v_exact[i][i2]) fprintf(file, "history_result");
+							else fprintf(file, "history_result_approximate");
+							fprintf(file, "=%s\n", v_result[i][i2].c_str());
 						}
 					}
 				}
