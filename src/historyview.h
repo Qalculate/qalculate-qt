@@ -43,10 +43,12 @@ class HistoryView : public QTextBrowser {
 		int i_pos;
 		QImage *paste_image;
 		QMenu *cmenu;
-		QAction *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction;
+		QAction *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
+		size_t last_ans;
+		QString last_ref;
 
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
@@ -66,6 +68,7 @@ class HistoryView : public QTextBrowser {
 		void editRemove();
 		void editProtect();
 		void editFind();
+		void editMoveToTop();
 
 	signals:
 

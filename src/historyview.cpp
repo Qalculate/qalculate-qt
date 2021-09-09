@@ -35,6 +35,7 @@
 
 QString unhtmlize(QString str) {
 	int i = 0, i2;
+	str.remove("\n");
 	while(true) {
 		i = str.indexOf("<", i);
 		if(i < 0) break;
@@ -75,9 +76,15 @@ QString unhtmlize(QString str) {
 				str.replace(i, i3 - i, name);
 				continue;
 			}
-		} else if(i2 - i == 3 && str.mid(i + 1, 2) == "<br>") {
+		} else if((i2 - i == 3 && str.mid(i + 1, 2) == "br") || (i2 - i == 4 && str.mid(i + 1, 3) == "/tr")) {
 			str.replace(i, i2 - i + 1, "\n");
 			continue;
+		} else if(i2 - i > 5 && str.mid(i + 1, 4) == "span" && i2 + 1 < str.length() && str[i2 + 1] == '#') {
+			int i3 = str.indexOf("</", i2 + 1);
+			if(i3 >= 0 && str.indexOf("</span></a>") == i3) {
+				str.remove(i, i3 - i);
+				continue;
+			}
 		} else if(i2 - i == 4) {
 			if(str.mid(i + 1, 3) == "sup") {
 				int i3 = str.indexOf("</sup>", i2 + 1);
@@ -115,6 +122,7 @@ QString unhtmlize(QString str) {
 	str.replace("&amp;", "&");
 	str.replace("&gt;", ">");
 	str.replace("&lt;", "<");
+	str.replace("&quot;", "\"");
 	return str;
 }
 
@@ -131,8 +139,9 @@ HistoryView::~HistoryView() {}
 
 void replace_colors(QString &s_text) {
 	if(settings->color == 2) {
-		s_text.replace("color: #800000", "color: #AAAAFF");
-		s_text.replace("color: #000080", "color: #FFAAAA");
+		s_text.replace("color: #585858", "color: #AAAAAA");
+		s_text.replace("color: #800000", "color: #FFAAAA");
+		s_text.replace("color: #000080", "color: #AAAAFF");
 		s_text.replace("color:#005858", "color:#AAFFFF");
 		s_text.replace("color:#585800", "color:#FFFFAA");
 		s_text.replace("color:#580058", "color:#FFAAFF");
@@ -140,8 +149,9 @@ void replace_colors(QString &s_text) {
 		s_text.replace("color:#008000", "color:#BBFFBB");
 		s_text.replace(":/icons/actions", ":/icons/dark/actions");
 	} else {
-		s_text.replace("color: #AAAAFF", "color: #800000");
-		s_text.replace("color: #FFAAAA", "color: #000080");
+		s_text.replace("color: #AAAAAA", "color: #585858");
+		s_text.replace("color: #AAAAFF", "color: #000080");
+		s_text.replace("color: #FFAAAA", "color: #800000");
 		s_text.replace("color:#AAFFFF", "color:#005858");
 		s_text.replace("color:#FFFFAA", "color:#585800");
 		s_text.replace("color:#FFAAFF", "color:#580058");
@@ -152,8 +162,6 @@ void replace_colors(QString &s_text) {
 }
 void replace_colors(std::string &str) {
 	if(settings->color == 2) {
-		gsub("color: #800000", "color: #AAAAFF", str);
-		gsub("color: #000080", "color: #FFAAAA", str);
 		gsub("color:#005858", "color:#AAFFFF", str);
 		gsub("color:#585800", "color:#FFFFAA", str);
 		gsub("color:#580058", "color:#FFAAFF", str);
@@ -161,8 +169,6 @@ void replace_colors(std::string &str) {
 		gsub("color:#008000", "color:#BBFFBB", str);
 		gsub(":/icons/actions", ":/icons/dark/actions", str);
 	} else {
-		gsub("color: #AAAAFF", "color: #800000", str);
-		gsub("color: #FFAAAA", "color: #000080", str);
 		gsub("color:#AAFFFF", "color:#005858", str);
 		gsub("color:#FFFFAA", "color:#585800", str);
 		gsub("color:#FFAAFF", "color:#580058", str);
@@ -172,13 +178,31 @@ void replace_colors(std::string &str) {
 	}
 }
 
+void replace_one(QString &str, const QString &origstr, const QString &newstr, bool b_last = false) {
+	int index = (b_last ? str.lastIndexOf(origstr) : str.indexOf(origstr));
+	if(index > 0) {
+		str.replace(index, origstr.length(), newstr);
+	}
+}
+
+void remove_top_border(QString &s_text) {
+	if(!s_text.isEmpty() && s_text.indexOf("border-top: 0px none") < 0) {
+		replace_one(s_text, "border-top: 1px dashed", "border-top: 0px none");
+		int index_a = s_text.indexOf("padding-top: ") + strlen("padding-top: ");
+		int index_b = s_text.indexOf("px", index_a);
+		if(index_b >= 0) {
+			s_text.replace(index_a, index_b - index_a, "0");
+		}
+	}
+}
+
 void HistoryView::loadInitial() {
 	if(!settings->v_expression.empty()) {
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
 			addResult(settings->v_result[i], settings->v_expression[i], true, false, QString(), NULL, true, i);
 		}
 		if(!s_text.isEmpty()) {
-			if((settings->color == 2 && s_text.contains("color:#00")) || (settings->color != 2 && s_text.contains("color:#FF"))) {
+			if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 				replace_colors(s_text);
 				for(size_t i = 0; i < settings->v_expression.size(); i++) {
 					replace_colors(settings->v_expression[i]);
@@ -187,24 +211,27 @@ void HistoryView::loadInitial() {
 					}
 				}
 			}
-			setHtml("<body style=\"color: " + textColor().name() + "\">" + s_text + "</body>");
+			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 		}
 	}
 }
+
+#define PASTE_H QFontMetrics fm(font()); \
+	int paste_h = fm.ascent(); \
+	if(paste_h < 16) {paste_h = 12;} \
+	else if(paste_h < 24) {paste_h = 16;} \
+	else {paste_h = 24;} \
+
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
-	QFontMetrics fm(font());
-	int paste_h = fm.ascent();
-	if(paste_h < 16) paste_h = 12;
-	else if(paste_h < 24) paste_h = 16;
-	else paste_h = 24;
+	PASTE_H
 	QString str;
 	if(!expression.empty()) {
-		str += "<div style=\"text-align:left; line-height:120%\">";
+		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(textColor().name());
 		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
 		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
 		str += THIN_SPACE;
 		str += QString::fromStdString(expression);
-		str += "</div>";
+		str += "</td></tr>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_protected.push_back(false);
@@ -229,9 +256,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				if(!settings->implicit_question_asked) *implicit_warning = true;
 			} else {
 				MessageType mtype = CALCULATOR->message()->type();
-				str += "<div style=\"text-align:left; font-size:normal";
+				str += "<tr><td colspan=\"2\" style=\"text-align:left; font-size:normal";
 				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-					str += "; color:";
+					str += "; color: ";
 					if(mtype == MESSAGE_ERROR) {
 						if(settings->color == 2) str += "#FFAAAA";
 						else str += "#800000";
@@ -250,7 +277,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 					mstr.replace("!=", SIGN_NOT_EQUAL);
 				}
 				str += mstr.toHtmlEscaped();
-				str += "</div>";
+				str += "</td></tr>";
 			}
 		} while(CALCULATOR->nextMessage());
 		if(str.isEmpty() && values.empty() && expression.empty()) return;
@@ -258,9 +285,26 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
 	if(!expression.empty()) i_pos = str.length();
 	for(size_t i = 0; i < values.size(); i++) {
+		size_t i_answer = -1;
+		if(!initial_load) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
 		QFontMetrics fm(font());
-		int w = fm.boundingRect(unhtmlize(QString::fromStdString(values[i]))).width();
-		str += "<div style=\"text-align:right";
+		int w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
+		str += "<tr><td valign=\"center\">";
+		if(!initial_load && (dual_approx || i == 0)) {
+			if(expression.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
+			QString sref;
+			if(settings->color == 2) {
+				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			} else {
+				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			}
+			str += sref;
+			if(!dual_approx || i == values.size()) {
+				last_ans = i_answer;
+				last_ref = sref;
+			}
+		}
+		str += "</td><td style=\"text-align:right";
 		if(initial_load || w > width() * 2) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 2 > width()) {
@@ -270,6 +314,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "; font-size:x-large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		}
+		if(!expression.empty() && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 2);
 		str += "\">";
 		int b_exact = 1;
 		if(initial_load) {
@@ -288,10 +333,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 		} else {
-			if(settings->color == 2) str += QString("<a href=\"#%1:%2:%3\"><img src=\":/icons/dark/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
-			else str += QString("<a href=\"#%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size()).arg(paste_h);
+			if(settings->color == 2) str += QString("<a href=\"%1:%2\"><img src=\":/icons/dark/actions/%3/edit-paste.svg\" height=\"%3\"/></a>").arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
+			else str += QString("<a href=\"%1:%2\"><img src=\":/icons/actions/%3/edit-paste.svg\" height=\"%3\"/></a>").arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
 		}
-		str += "</div>";
+		str += "</td></tr>";
 	}
 	str.replace("\n", "<br>");
 	int i = 0;
@@ -337,10 +382,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			s_text.remove("; font-size:x-large");
 			s_text.remove("; font-size:large");
 		}
-		if(!s_text.isEmpty()) str += "<hr/>";
+		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
+		replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
 		s_text.insert(0, str);
 	}
-	if(!initial_load) setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
+	if(!initial_load) setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
@@ -353,7 +399,9 @@ void HistoryView::changeEvent(QEvent *e) {
 		}
 		if(!s_text.isEmpty()) {
 			replace_colors(s_text);
-			setHtml("<body style=\"color: " + textColor().name() + "\">" + s_text + "</body>");
+			s_text.replace("1px dashed " + prev_color.name(), "1px dashed " + textColor().name());
+			s_text.replace("0px none " + prev_color.name(), "0px none " + textColor().name());
+			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 		}
 		prev_color = textColor();
 	}
@@ -407,12 +455,12 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 void HistoryView::editClear() {
 	for(size_t i1 = 0; i1 < settings->v_protected.size(); i1++) {
 		if(!settings->v_protected[i1]) {
+			if(i1 == 0) settings->current_result = NULL;
 			settings->v_delexpression[i1] = true;
 			int index = s_text.indexOf("<a href=\"" + QString::number(i1) + "\"");
 			if(index >= 0) {
-				int index2 = s_text.indexOf("<hr/>", index);
-				if(index2 >= 0) index2 += (5);
-				int index1 = s_text.lastIndexOf("<div", index);
+				int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
+				int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
 				QString new_text;
 				if(index1 > 0) new_text = s_text.left(index1);
 				if(index2 >= 0) new_text += s_text.mid(index2);
@@ -420,32 +468,101 @@ void HistoryView::editClear() {
 			}
 		}
 	}
-	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
+	remove_top_border(s_text);
+	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+}
+void HistoryView::editMoveToTop() {
+	int i1 = -1, i2 = -1;
+	indexAtPos(context_pos, &i1, &i2, NULL);
+	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
+	settings->v_delexpression[i1] = true;
+	settings->v_expression.push_back(settings->v_expression[i1]);
+	settings->v_protected.push_back(settings->v_protected[i1]);
+	settings->v_delexpression.push_back(false);
+	settings->v_result.push_back(settings->v_result[i1]);
+	settings->v_exact.push_back(settings->v_exact[i1]);
+	settings->v_delresult.push_back(settings->v_delresult[i1]);
+	int index = s_text.indexOf("<a href=\"" + QString::number(i1) + "\"");
+	if(index >= 0) {
+		int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
+		int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
+		QString new_text = s_text.mid(index1, index2 - index1);
+		int index_a = new_text.indexOf("<a href=\"");
+		bool b_expr = true;
+		while(index_a >= 0 && index_a + 9 < new_text.length() - 1) {
+			index_a += 9;
+			int index_b = -1;
+			if(b_expr) {
+				index_b = new_text.indexOf("\"", index_a);
+			} else {
+				index_b = new_text.indexOf(":", index_a);
+				if(new_text[index_a] == '#') {
+					if(index_b < 0) break;
+					index_a = index_b + 1;
+					index_b = new_text.indexOf(":", index_b + 1);
+				}
+			}
+			if(index_b < 0) break;
+			new_text.replace(index_a, index_b - index_a, QString::number(settings->v_expression.size() - 1));
+			index_a = new_text.indexOf("<a href=\"", index_b + 1);
+			b_expr = false;
+		}
+		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
+		PASTE_H
+		replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+		if(index1 > 0) new_text += s_text.left(index1);
+		if(index2 >= 0) new_text += s_text.mid(index2);
+		s_text = new_text;
+		remove_top_border(s_text);
+	}
+	settings->current_result = NULL;
+	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
 	QString sref;
 	indexAtPos(context_pos, &i1, &i2, &sref);
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
-	if(i2 >= 0 && settings->v_result[i1].size() <= 1) i2 = -1;
+	if(i2 >= 0 && i2 < (int) settings->v_delresult[i1].size()) {
+		settings->v_delresult[i1][i2] = true;
+		bool b = true;
+		for(size_t i = 0; i < settings->v_delresult[i1].size(); i++) {
+			if(!settings->v_delresult[i1][i]) {b = false; break;}
+		}
+		if(b) i2 = -1;
+	}
 	if(i2 < 0) {
 		sref = QString::number(i1);
 		settings->v_delexpression[i1] = true;
-	} else if(i2 < (int) settings->v_delresult[i1].size()) {
-		settings->v_delresult[i1][i2] = true;
 	}
 	int index = s_text.indexOf("<a href=\"" + sref + "\"");
 	if(index >= 0) {
-		int index2 = s_text.indexOf(i2 < 0 ? "<hr/>" : "</a></div>", index);
-		if(index2 >= 0) index2 += (i2 < 0 ? 5 : 10);
-		int index1 = s_text.lastIndexOf("<div", index);
+		int index2 = s_text.indexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "</a></td></tr>", index);
+		if(index2 >= 0) index2 += (i2 < 0 ? 0 : 14);
+		int index1 = s_text.lastIndexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "<tr", index);
 		QString new_text;
 		if(index1 > 0) new_text = s_text.left(index1);
+		if(i2 >= 0) {
+			bool b = true;
+			for(size_t i = i2; i < settings->v_delresult[i1].size(); i++) {
+				if(!settings->v_delresult[i1][i]) {b = false; break;}
+			}
+			if(b) {
+				PASTE_H
+				int index_a = new_text.lastIndexOf("<td style=\"text-align:right") + strlen("<td style=\"text-align:right");
+				index_a = new_text.indexOf("\"", index_a);
+				if(index_a >= 0) new_text.insert(index_a, "; padding-bottom: " + QString::number(paste_h / 2) + "px");
+			}
+		}
 		if(index2 >= 0) new_text += s_text.mid(index2);
 		s_text = new_text;
+		if(i2 < 0) {
+			remove_top_border(s_text);
+		}
 	}
+	if(i1 == 0) settings->current_result = NULL;
 	int vpos = verticalScrollBar()->value();
-	setHtml("<body color=\"" + textColor().name() + "\">" + s_text + "</body>");
+	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 	verticalScrollBar()->setValue(vpos);
 }
 void HistoryView::editProtect() {
@@ -472,10 +589,8 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 				sref = str.mid(i, i2 - i);
 				if(sref.isEmpty()) return;
 				break;
-			} else if(str.lastIndexOf("text-align:left") > 0) {
+			} else if(str.indexOf("text-align:left") < 0) {
 				if(!cur.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor)) return;
-			} else {
-				if(!cur.movePosition(QTextCursor::PreviousBlock, QTextCursor::MoveAnchor)) return;
 			}
 		}
 	}
@@ -516,6 +631,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		cmenu->addSeparator();
 		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
 		protectAction->setCheckable(true);
+		movetotopAction = cmenu->addAction(tr("Move to Top"), this, SLOT(editMoveToTop()));
 		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
@@ -523,12 +639,28 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	int i1 = -1, i2 = -1;
 	context_pos = e->pos();
 	indexAtPos(context_pos, &i1, &i2);
-	copyAction->setEnabled(textCursor().hasSelection() || (i1 >= 0 && e->reason() == QContextMenuEvent::Mouse));
-	copyFormattedAction->setEnabled(textCursor().hasSelection() || (i1 >= 0 && e->reason() == QContextMenuEvent::Mouse));
 	selectAllAction->setEnabled(!s_text.isEmpty());
-	delAction->setEnabled(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection());
 	protectAction->setChecked(i1 >= 0 && i1 < (int) settings->v_protected.size() && settings->v_protected[i1]);
-	protectAction->setEnabled(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection());
+	if(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection()) {
+		copyAction->setEnabled(true);
+		copyFormattedAction->setEnabled(true);
+		delAction->setEnabled(true);
+		protectAction->setEnabled(true);
+		bool b = false;
+		for(size_t i = i1; i < settings->v_delexpression.size(); i++) {
+			if(!settings->v_delexpression[i]) {
+				b = true;
+				break;
+			}
+		}
+		movetotopAction->setEnabled(b);
+	} else {
+		copyAction->setEnabled(textCursor().hasSelection());
+		copyFormattedAction->setEnabled(textCursor().hasSelection());
+		delAction->setEnabled(false);
+		protectAction->setEnabled(false);
+		movetotopAction->setEnabled(false);
+	}
 	clearAction->setEnabled(!s_text.isEmpty());
 	cmenu->popup(e->globalPos());
 }
@@ -578,10 +710,21 @@ void HistoryView::editCopy() {
 	if(textCursor().hasSelection()) {
 		QString str = textCursor().selection().toHtml();
 		int i = str.indexOf("<!--StartFragment-->");
-		int i2 = str.indexOf("<!--EndFragment-->", i + 20);
-		if(i >= 0 && i2 >= 0) str = str.mid(i + 20, i2 - i - 20).trimmed();
-		else str = textCursor().selectedText();
-		QApplication::clipboard()->setText(unhtmlize(str));
+		if(i >= 0) {
+			int i2 = str.indexOf("<!--EndFragment-->", i + 20);
+			if(i2 >= 0) str = str.mid(i + 20, i2 - i - 20).trimmed();
+			str = unhtmlize(str);
+		} else if(str.startsWith("<!DOCTYPE")) {
+			i = str.indexOf("<body>");
+			int i2 = str.indexOf("</body>", i + 6);
+			if(i2 >= 0) str = str.mid(i + 6, i2 - i - 6).trimmed();
+			str = unhtmlize(str).trimmed();
+			str.replace("\n\n", "\n");
+			str.replace("\n ", "\n");
+		} else {
+			str = unhtmlize(textCursor().selectedText());
+		}
+		QApplication::clipboard()->setText(str);
 	} else {
 		int i1 = -1, i2 = -1;
 		indexAtPos(context_pos, &i1, &i2);

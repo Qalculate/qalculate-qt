@@ -152,7 +152,7 @@ std::string unhtmlize(std::string str) {
 		if(i == std::string::npos) break;
 		i2 = str.find(">", i + 1);
 		if(i2 == std::string::npos) break;
-		if(i2 - i == 3 && str.substr(i + 1, 2) == "<br>") {
+		if((i2 - i == 3 && str.substr(i + 1, 2) == "br") || (i2 - i == 4 && str.substr(i + 1, 3) == "/tr")) {
 			str.replace(i, i2 - i + 1, "\n");
 			continue;
 		} else if(i2 - i == 4) {
@@ -193,6 +193,7 @@ std::string unhtmlize(std::string str) {
 	gsub("&amp;", "&", str);
 	gsub("&gt;", ">", str);
 	gsub("&lt;", "<", str);
+	gsub("&quot;", "\"", str);
 	gsub("&hairsp;", "", str);
 	gsub("&thinsp;", THIN_SPACE, str);
 	return str;
@@ -689,7 +690,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(server, SIGNAL(newConnection()), this, SLOT(serverNewConnection()));
 	
 	mstruct = new MathStructure();
-	settings->current_result = mstruct;
+	settings->current_result = NULL;
 	mstruct_exact.setUndefined();
 	prepend_mstruct.setUndefined();
 	parsed_mstruct = new MathStructure();
@@ -2697,6 +2698,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(last_is_space) to_str += " ";
 				CALCULATOR->separateToExpression(to_str, str_left, settings->evalops, true, false);
 				remove_blank_ends(to_str);
+			} else if(!settings->current_result) {
+				b_busy--;
+				if(current_expr) setPreviousExpression();
+				return;
 			}
 			size_t ispace = to_str.find_first_of(SPACES);
 			if(ispace != std::string::npos) {
@@ -3233,6 +3238,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		mstruct = CALCULATOR->getRPNRegister(1);
 		if(!mstruct) mstruct = new MathStructure();
 		else mstruct->ref();
+		settings->current_result = NULL;
 	}
 
 	if(do_stack) {
@@ -3888,7 +3894,9 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(settings->rpn_mode && CALCULATOR->RPNStackSize() == 0) return;
 
-	if(settings->history_answer.empty() && !register_moved && !update_parse && update_history) {
+	if(!settings->rpn_mode) {stack_index = 0; do_stack = false;}
+
+	if(!do_stack && (settings->history_answer.empty() || !settings->current_result) && !register_moved && !update_parse && update_history) {
 		return;
 	}
 
@@ -3901,7 +3909,6 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		parsed_text = "aborted";
 	}
 
-	if(!settings->rpn_mode) {stack_index = 0; do_stack = false;}
 	if(do_stack) {
 		update_history = true;
 		update_parse = false;
@@ -4160,6 +4167,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		settings->printops.restrict_fraction_length = save_restrict_fraction_length;
 	}
 	settings->printops.prefix = NULL;
+
+	settings->current_result = mstruct;
 
 	b_busy--;
 
@@ -4439,7 +4448,7 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 void QalculateWindow::onToActivated() {
 	QTextCursor cur = expressionEdit->textCursor();
 	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
-	if(!expressionEdit->expressionHasChanged()) {
+	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
 		if(expressionEdit->complete(mstruct, pos)) return;
 	}
 	expressionEdit->blockCompletion();

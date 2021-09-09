@@ -943,9 +943,10 @@ void QalculateQtSettings::savePreferences(bool) {
 				i--;
 			}
 			size_t i_first = i;
-			for(i = 0; i < i_first; i++) {
-				if(!v_delexpression[i] && v_protected[i]) {
-					fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
+			for(i = 0; i < v_expression.size(); i++) {
+				if((i >= i_first || v_protected[i]) && !v_delexpression[i]) {
+					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
+					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
 					n++;
 					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
 						if(!v_delresult[i][i2]) {
@@ -964,20 +965,6 @@ void QalculateQtSettings::savePreferences(bool) {
 							} else {
 								fprintf(file, "=%s\n", v_result[i][i2].c_str());
 							}
-						}
-					}
-				}
-			}
-			for(i = i_first; i < v_expression.size(); i++) {
-				if(!v_delexpression[i]) {
-					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
-					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
-					n++;
-					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-						if(!v_delresult[i][i2]) {
-							if(v_exact[i][i2]) fprintf(file, "history_result");
-							else fprintf(file, "history_result_approximate");
-							fprintf(file, "=%s\n", v_result[i][i2].c_str());
 						}
 					}
 				}
