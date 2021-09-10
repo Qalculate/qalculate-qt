@@ -52,7 +52,9 @@ UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(signCombo, 3, 1);
 	typeCombo->setCurrentIndex(typeCombo->findData(CALCULATOR->defaultAssumptions()->type()));
 	signCombo->setCurrentIndex(signCombo->findData(CALCULATOR->defaultAssumptions()->sign()));
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, this);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	box->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));

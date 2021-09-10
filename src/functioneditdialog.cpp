@@ -94,7 +94,9 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	ref1Button->setChecked(true);
 	ref2Button = new QRadioButton(tr("\\x, \\y, \\z, \\a, \\b, …"), this); group->addButton(ref2Button, 2); box->addWidget(ref2Button);
 	grid->addLayout(box, 3, 0, 1, 2);
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, this);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	topbox->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));

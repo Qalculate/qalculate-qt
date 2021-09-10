@@ -95,8 +95,10 @@ CSVDialog::CSVDialog(bool do_import, QWidget *parent, MathStructure *current_res
 	delimiterEdit->setEnabled(false);
 	grid->addWidget(delimiterEdit, r, 1); r++;
 	connect(delimiterEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onDelimiterEdited()));
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
 	box->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));

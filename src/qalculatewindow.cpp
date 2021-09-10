@@ -1081,6 +1081,7 @@ void QalculateWindow::onMSClicked() {
 }
 void QalculateWindow::onMRClicked() {
 	onVariableClicked(settings->v_memory);
+	if(expressionEdit->toPlainText() == QString::fromStdString(settings->v_memory->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name)) calculate();
 }
 void QalculateWindow::onMCClicked() {
 	settings->v_memory->set(m_zero);
@@ -5450,7 +5451,9 @@ void QalculateWindow::onEntryEditMatrix() {
 	MatrixWidget *w = new MatrixWidget(dialog);
 	w->setMatrixString(entry->text());
 	box->addWidget(w);
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
 	box->addWidget(buttonBox);
 	w->setFocus();
 	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));

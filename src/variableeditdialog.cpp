@@ -30,12 +30,6 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
 	grid->addWidget(nameEdit, 0, 1);
-	temporaryBox = new QCheckBox(tr("Temporary"), this);
-	temporaryBox->setChecked(true);
-	grid->addWidget(temporaryBox, 2, 0, 1, 2, Qt::AlignRight);
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-	okButton = buttonBox->button(QDialogButtonBox::Ok);
-	box->addWidget(buttonBox);
 	if(b_matrix) {
 		matrixEdit = new MatrixWidget(this);
 		grid->addWidget(matrixEdit, 1, 0, 1, 2);
@@ -48,6 +42,14 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 		grid->addWidget(valueEdit, 1, 1);
 		connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onValueEdited(const QString&)));
 	}
+	temporaryBox = new QCheckBox(tr("Temporary"), this);
+	temporaryBox->setChecked(true);
+	grid->addWidget(temporaryBox, 2, 0, 1, 2, Qt::AlignRight);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, this);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	okButton = buttonBox->button(QDialogButtonBox::Ok);
+	box->addWidget(buttonBox);
 	nameEdit->setFocus();
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
