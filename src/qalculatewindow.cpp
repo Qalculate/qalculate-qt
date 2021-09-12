@@ -552,16 +552,17 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	functionsAction = new QAction(LOAD_ICON("function"), tr("Functions"), this); functionsAction->setToolTip(tr("Functions (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_F).toString(QKeySequence::NativeText)));
 	connect(functionsAction, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
 	tb->addAction(functionsAction);
-	keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
-	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setShortcutContext(Qt::ApplicationShortcut); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
-	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
-	keypadAction->setCheckable(true);
-	tb->addAction(keypadAction);
 	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
 	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setShortcutContext(Qt::ApplicationShortcut); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
+	keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
+	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setShortcutContext(Qt::ApplicationShortcut); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
+	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
+	keypadAction->setCheckable(true);
+	tb->addAction(keypadAction);
+
 	hLayout->addWidget(tb, 0);
 
 	expressionEdit = new ExpressionEdit(this);
@@ -1080,8 +1081,9 @@ void QalculateWindow::onMSClicked() {
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 }
 void QalculateWindow::onMRClicked() {
+	bool b_exec = !expressionEdit->expressionHasChanged();
 	onVariableClicked(settings->v_memory);
-	if(expressionEdit->toPlainText() == QString::fromStdString(settings->v_memory->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name)) calculate();
+	if(b_exec) calculate();
 }
 void QalculateWindow::onMCClicked() {
 	settings->v_memory->set(m_zero);

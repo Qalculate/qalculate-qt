@@ -177,7 +177,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Lower"), INTERVAL_DISPLAY_LOWER);
 	combo->addItem(tr("Upper"), INTERVAL_DISPLAY_UPPER);
 	if(settings->adaptive_interval_display) combo->setCurrentIndex(0);
-	else combo->setCurrentIndex(combo->findData(settings->evalops.interval_calculation));
+	else combo->setCurrentIndex(combo->findData(settings->printops.interval_display));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalDisplayChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Complex number form:"), this), r, 0);

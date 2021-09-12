@@ -248,6 +248,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		for(size_t i = values.size(); i > 0; i--) {
 			settings->v_result[settings->v_result.size() - 1].insert(settings->v_result[settings->v_result.size() - 1].begin(), values[i - 1]);
 			settings->v_exact[settings->v_exact.size() - 1].insert(settings->v_exact[settings->v_exact.size() - 1].begin(), exact || i < values.size());
+			settings->v_delresult[settings->v_delresult.size() - 1].insert(settings->v_delresult[settings->v_delresult.size() - 1].begin(), false);
 		}
 	}
 	if(!initial_load && CALCULATOR->message()) {
@@ -333,8 +334,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
 		} else {
-			if(settings->color == 2) str += QString("<a href=\"%1:%2\"><img src=\":/icons/dark/actions/%3/edit-paste.svg\" height=\"%3\"/></a>").arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
-			else str += QString("<a href=\"%1:%2\"><img src=\":/icons/actions/%3/edit-paste.svg\" height=\"%3\"/></a>").arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
+			if(settings->color == 2) str += QString("<a href=\"p%1:%2:%3\"><img src=\":/icons/dark/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
+			else str += QString("<a href=\"p%1:%2:%3\"><img src=\":/icons/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
 		}
 		str += "</td></tr>";
 	}
@@ -414,7 +415,22 @@ void HistoryView::addMessages() {
 void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 	if(!str.isEmpty()) {
-		if(str[0] == '#') {
+		if(str[0] == 'p') {
+			int index = str.indexOf(":");
+			if(index < 0) return;
+			str = str.mid(index + 1);
+			index = str.indexOf(":");
+			if(index < 0) {
+				int i = str.toInt();
+				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+			} else {
+				int i1 = str.left(index).toInt();
+				int i2 = str.mid(index + 1).toInt();
+				if(i1 >= 0 && i1 < (int) settings->v_result.size() && i2 < (int) settings->v_result[i1].size()) {
+					emit insertTextRequested(settings->v_result[i1][settings->v_result[i1].size() - i2 - 1]);
+				}
+			}
+		} else if(str[0] == '#') {
 			int index = str.indexOf(":");
 			if(index < 0) emit insertValueRequested(str.mid(1).toInt());
 			else emit insertValueRequested(str.mid(1, index - 1).toInt());
@@ -496,7 +512,7 @@ void HistoryView::editMoveToTop() {
 				index_b = new_text.indexOf("\"", index_a);
 			} else {
 				index_b = new_text.indexOf(":", index_a);
-				if(new_text[index_a] == '#') {
+				if(new_text[index_a] == '#' || new_text[index_a] == 'p') {
 					if(index_b < 0) break;
 					index_a = index_b + 1;
 					index_b = new_text.indexOf(":", index_b + 1);
@@ -596,7 +612,7 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 	}
 	if(anchorstr) *anchorstr = sref;
 	int i = sref.indexOf(":");
-	if(sref[0] == '#') {
+	if(sref[0] == '#' || sref[0] == 'p') {
 		if(i < 0) return;
 		int i2 = sref.indexOf(":", i + 1);
 		if(i >= 0) {
