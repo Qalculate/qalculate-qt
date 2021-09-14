@@ -28,7 +28,12 @@ win32: {
 	CONFIG += c++17
 } else {
 	CONFIG += link_pkgconfig
-	PKGCONFIG += libqalculate
+	macx: {
+		PKGCONFIG += libqalculate gmp mpfr
+		CONFIG += c++11
+	} else {
+		PKGCONFIG += libqalculate
+	}
 }
 CONFIG += qt
 QT += widgets network

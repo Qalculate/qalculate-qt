@@ -19,6 +19,7 @@ class QMenu;
 class QAction;
 class ExpressionEdit;
 class QColor;
+class QLineEdit;
 
 class HistoryView : public QTextBrowser {
 
@@ -42,9 +43,12 @@ class HistoryView : public QTextBrowser {
 		int i_pos;
 		QImage *paste_image;
 		QMenu *cmenu;
-		QAction *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction;
+		QAction *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
+		QLineEdit *searchEdit;
+		size_t last_ans;
+		QString last_ref;
 
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
@@ -52,12 +56,19 @@ class HistoryView : public QTextBrowser {
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void changeEvent(QEvent*) override;
 
+	protected slots:
+
+		void doFind();
+
 	public slots:
 
 		void editCopy();
 		void editCopyFormatted();
 		void editClear();
 		void editRemove();
+		void editProtect();
+		void editFind();
+		void editMoveToTop();
 
 	signals:
 
