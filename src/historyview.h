@@ -35,7 +35,7 @@ class HistoryView : public QTextBrowser {
 		void addResult(std::vector<std::string> values, std::string expression = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
 		void addMessages();
 		void loadInitial();
-		void indexAtPos(const QPoint &pos, int *expression_index,  int *result_index, QString *anchorstr = NULL);
+		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
 
 	protected:
 
@@ -43,13 +43,14 @@ class HistoryView : public QTextBrowser {
 		int i_pos;
 		QImage *paste_image;
 		QMenu *cmenu;
-		QAction *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
 		size_t last_ans;
 		QString last_ref;
 
+		void mouseDoubleClickEvent(QMouseEvent *e) override;
 		void mouseReleaseEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void keyPressEvent(QKeyEvent *e) override;
@@ -62,6 +63,8 @@ class HistoryView : public QTextBrowser {
 
 	public slots:
 
+		void editInsertValue();
+		void editInsertText();
 		void editCopy();
 		void editCopyFormatted();
 		void editClear();

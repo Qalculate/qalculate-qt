@@ -82,7 +82,6 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	hsplitter->setStretchFactor(1, 3);
 	QVBoxLayout *box = new QVBoxLayout();
 	newButton = new QPushButton(tr("New…"), this); box->addWidget(newButton); connect(newButton, SIGNAL(clicked()), this, SLOT(newClicked()));
-	newButton->setEnabled(false);
 	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
@@ -90,6 +89,9 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	convertButton = new QPushButton(tr("Convert"), this); box->addWidget(convertButton); connect(convertButton, SIGNAL(clicked()), this, SLOT(convertClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
+	newButton->hide();
+	editButton->hide();
+	delButton->hide();
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QGridLayout *grid = new QGridLayout();

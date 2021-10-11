@@ -226,12 +226,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	PASTE_H
 	QString str;
 	if(!expression.empty()) {
-		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(textColor().name());
-		if(settings->color == 2) str += QString("<a href=\"%1\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
-		else str += QString("<a href=\"%1\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h);
-		str += THIN_SPACE;
+		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %2 px; padding-top: 0px; border-top: 0px none %3; text-align:left\"><a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h / 4).arg(textColor().name());
 		str += QString::fromStdString(expression);
-		str += "</td></tr>";
+		str += "</a></td></tr>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_protected.push_back(false);
@@ -257,7 +254,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				if(!settings->implicit_question_asked) *implicit_warning = true;
 			} else {
 				MessageType mtype = CALCULATOR->message()->type();
-				str += "<tr><td colspan=\"2\" style=\"text-align:left; font-size:normal";
+				str += "<tr><td class=\"message\" colspan=\"2\" style=\"text-align:left; font-size:normal";
 				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
 					str += "; color: ";
 					if(mtype == MESSAGE_ERROR) {
@@ -324,20 +321,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(exact < 0) b_exact = -1;
 			else if(exact == 0 && i == values.size() - 1) b_exact = 0;
 		}
+		if(initial_load) str += QString("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg((int) index).arg((int) i);
+		else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		if(b_exact > 0) str += "= ";
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
-		if(initial_load) str += THIN_SPACE;
-		else str += "<font size=\"+0\">" THIN_SPACE "</font>";
-		if(initial_load) {
-			if(settings->color == 2) str += QString("<a href=\"%1:%3\"><img src=\":/icons/dark/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
-			else str += QString("<a href=\"%1:%3\"><img src=\":/icons/actions/%2/edit-paste.svg\" height=\"%2\"/></a>").arg((int) index).arg(paste_h).arg((int) i);
-		} else {
-			if(settings->color == 2) str += QString("<a href=\"p%1:%2:%3\"><img src=\":/icons/dark/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
-			else str += QString("<a href=\"p%1:%2:%3\"><img src=\":/icons/actions/%4/edit-paste.svg\" height=\"%4\"/></a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1).arg(paste_h);
-		}
-		str += "</td></tr>";
+		str += "</a></td></tr>";
 	}
 	str.replace("\n", "<br>");
 	int i = 0;
@@ -369,17 +359,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				if(i < i_pos) i_pos -= 17;
 			}
 			i = 0;
-			while(true) {
-				i = s_text.indexOf("<font size=\"+0\">" THIN_SPACE "</font>", i);
-				if(i < 0) break;
-				s_text.replace(i, 24, THIN_SPACE);
-				if(i < i_pos) i_pos -= 23;
-			}
 		}
 		s_text.insert(i_pos, str);
 	} else {
 		if(!initial_load) {
-			s_text.replace("<font size=\"+0\">" THIN_SPACE "</font>", THIN_SPACE);
 			s_text.remove("; font-size:x-large");
 			s_text.remove("; font-size:large");
 		}
@@ -412,9 +395,50 @@ void HistoryView::addMessages() {
 	std::vector<std::string> values;
 	addResult(values, "", true);
 }
+void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
+	QString str = anchorAt(e->pos());
+	if(str.isEmpty() && e->button() == Qt::LeftButton) {
+		int i1 = -1, i2 = -1;
+		indexAtPos(e->pos(), &i1, &i2, NULL, &str);
+		if(i1 >= 0 && str.length() > 0) {
+			if(str[0] == 'p') {
+				int index = str.indexOf(":");
+				if(index < 0) return;
+				str = str.mid(index + 1);
+				index = str.indexOf(":");
+				if(index < 0) {
+					int i = str.toInt();
+					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+				} else {
+					int i1 = str.left(index).toInt();
+					int i2 = str.mid(index + 1).toInt();
+					if(i1 >= 0 && i1 < (int) settings->v_result.size() && i2 < (int) settings->v_result[i1].size()) {
+						emit insertTextRequested(settings->v_result[i1][settings->v_result[i1].size() - i2 - 1]);
+					}
+				}
+			} else if(str[0] == '#') {
+				int index = str.indexOf(":");
+				if(index < 0) emit insertValueRequested(str.mid(1).toInt());
+				else emit insertValueRequested(str.mid(1, index - 1).toInt());
+			} else {
+				int index = str.indexOf(":");
+				if(index < 0) {
+					int i = str.toInt();
+					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+				} else {
+					int i1 = str.left(index).toInt();
+					int i2 = str.mid(index + 1).toInt();
+					if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && i2 >= 0 && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
+				}
+			}
+		}
+	} else {
+		QTextBrowser::mouseDoubleClickEvent(e);
+	}
+}
 void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
-	if(!str.isEmpty()) {
+	if(!str.isEmpty() && e->button() == Qt::LeftButton) {
 		if(str[0] == 'p') {
 			int index = str.indexOf(":");
 			if(index < 0) return;
@@ -463,7 +487,7 @@ void HistoryView::keyPressEvent(QKeyEvent *e) {
 }
 void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 	QTextBrowser::inputMethodEvent(e);
-	if(!e->isAccepted()) {
+	if(!e->isAccepted() && !e->commitString().isEmpty()) {
 		expressionEdit->setFocus();
 		expressionEdit->inputMethodEvent(e);
 	}
@@ -473,7 +497,7 @@ void HistoryView::editClear() {
 		if(!settings->v_protected[i1]) {
 			if(i1 == 0) settings->current_result = NULL;
 			settings->v_delexpression[i1] = true;
-			int index = s_text.indexOf("<a href=\"" + QString::number(i1) + "\"");
+			int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
 			if(index >= 0) {
 				int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
 				int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
@@ -489,7 +513,7 @@ void HistoryView::editClear() {
 }
 void HistoryView::editMoveToTop() {
 	int i1 = -1, i2 = -1;
-	indexAtPos(context_pos, &i1, &i2, NULL);
+	indexAtPos(context_pos, &i1, &i2, NULL, NULL);
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
 	settings->v_delexpression[i1] = true;
 	settings->v_expression.push_back(settings->v_expression[i1]);
@@ -498,12 +522,12 @@ void HistoryView::editMoveToTop() {
 	settings->v_result.push_back(settings->v_result[i1]);
 	settings->v_exact.push_back(settings->v_exact[i1]);
 	settings->v_delresult.push_back(settings->v_delresult[i1]);
-	int index = s_text.indexOf("<a href=\"" + QString::number(i1) + "\"");
+	int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
 	if(index >= 0) {
 		int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
 		int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
 		QString new_text = s_text.mid(index1, index2 - index1);
-		int index_a = new_text.indexOf("<a href=\"");
+		int index_a = new_text.indexOf("<a name=\"");
 		bool b_expr = true;
 		while(index_a >= 0 && index_a + 9 < new_text.length() - 1) {
 			index_a += 9;
@@ -520,7 +544,7 @@ void HistoryView::editMoveToTop() {
 			}
 			if(index_b < 0) break;
 			new_text.replace(index_a, index_b - index_a, QString::number(settings->v_expression.size() - 1));
-			index_a = new_text.indexOf("<a href=\"", index_b + 1);
+			index_a = new_text.indexOf("<a name=\"", index_b + 1);
 			b_expr = false;
 		}
 		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
@@ -537,7 +561,7 @@ void HistoryView::editMoveToTop() {
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
 	QString sref;
-	indexAtPos(context_pos, &i1, &i2, &sref);
+	indexAtPos(context_pos, &i1, &i2, NULL, &sref);
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
 	if(i2 >= 0 && i2 < (int) settings->v_delresult[i1].size()) {
 		settings->v_delresult[i1][i2] = true;
@@ -551,7 +575,7 @@ void HistoryView::editRemove() {
 		sref = QString::number(i1);
 		settings->v_delexpression[i1] = true;
 	}
-	int index = s_text.indexOf("<a href=\"" + sref + "\"");
+	int index = s_text.indexOf("<a name=\"" + sref + "\"");
 	if(index >= 0) {
 		int index2 = s_text.indexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "</a></td></tr>", index);
 		if(index2 >= 0) index2 += (i2 < 0 ? 0 : 14);
@@ -587,40 +611,36 @@ void HistoryView::editProtect() {
 	if(i1 < 0 || i1 >= (int) settings->v_protected.size()) return;
 	settings->v_protected[i1] = protectAction->isChecked();
 }
-void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, QString *anchorstr) {
+void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index, QString *anchorstr) {
 	*expression_index = -1;
 	*result_index = -1;
+	if(value_index) *value_index = -1;
 	QString sref = anchorAt(pos);
 	if(sref.isEmpty()) {
 		QTextCursor cur = cursorForPosition(pos);
-		while(true) {
-			cur.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
-			cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
-			QString str = cur.selection().toHtml();
-			int i = str.lastIndexOf("<a href=\"");
-			if(i >= 0) {
-				i += 9;
-				int i2 = str.indexOf("\"", i);
-				if(i2 < 0) return;
-				sref = str.mid(i, i2 - i);
-				if(sref.isEmpty()) return;
-				break;
-			} else if(str.indexOf("text-align:left") < 0) {
-				if(!cur.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor)) return;
-			}
+		cur.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+		cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+		QString str = cur.selection().toHtml();
+		int i = str.lastIndexOf("<a name=\"");
+		if(i >= 0) {
+			i += 9;
+			int i2 = str.indexOf("\"", i);
+			if(i2 >= 0) sref = str.mid(i, i2 - i);
 		}
 	}
 	if(anchorstr) *anchorstr = sref;
+	if(sref.isEmpty()) return;
 	int i = sref.indexOf(":");
 	if(sref[0] == '#' || sref[0] == 'p') {
 		if(i < 0) return;
 		int i2 = sref.indexOf(":", i + 1);
-		if(i >= 0) {
+		if(i2 >= 0) {
 			*expression_index = sref.mid(i + 1, i2 - (i + 1)).toInt();
 			*result_index = sref.mid(i2 + 1).toInt();
 			if(*expression_index >= 0 && *expression_index < (int) settings->v_result.size() && *result_index < (int) settings->v_result[*expression_index].size()) {
 				*result_index = settings->v_result[*expression_index].size() - *result_index - 1;
 			}
+			if(value_index) *value_index = sref.mid(1, i - 1).toInt();
 		} else {
 			*expression_index = sref.mid(i + 1).toInt();
 		}
@@ -634,6 +654,8 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	if(!cmenu) {
 		cmenu = new QMenu(this);
+		insertValueAction = cmenu->addAction(tr("Insert Value"), this, SLOT(editInsertValue()));
+		insertTextAction = cmenu->addAction(tr("Insert Text"), this, SLOT(editInsertText()));
 		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
@@ -641,7 +663,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
-		findAction = cmenu->addAction(tr("Find…"), this, SLOT(editFind()));
+		findAction = cmenu->addAction(tr("Search…"), this, SLOT(editFind()));
 		findAction->setShortcut(QKeySequence::Find);
 		findAction->setShortcutContext(Qt::WidgetShortcut);
 		cmenu->addSeparator();
@@ -652,12 +674,14 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
-	int i1 = -1, i2 = -1;
+	int i1 = -1, i2 = -1, i3 = -1;
 	context_pos = e->pos();
-	indexAtPos(context_pos, &i1, &i2);
+	indexAtPos(context_pos, &i1, &i2, &i3);
 	selectAllAction->setEnabled(!s_text.isEmpty());
 	protectAction->setChecked(i1 >= 0 && i1 < (int) settings->v_protected.size() && settings->v_protected[i1]);
 	if(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection()) {
+		insertValueAction->setEnabled(i3 >= 0);
+		insertTextAction->setEnabled(true);
 		copyAction->setEnabled(true);
 		copyFormattedAction->setEnabled(true);
 		delAction->setEnabled(true);
@@ -676,6 +700,8 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		delAction->setEnabled(false);
 		protectAction->setEnabled(false);
 		movetotopAction->setEnabled(false);
+		insertValueAction->setEnabled(false);
+		insertTextAction->setEnabled(false);
 	}
 	clearAction->setEnabled(!s_text.isEmpty());
 	cmenu->popup(e->globalPos());
@@ -695,7 +721,7 @@ void HistoryView::editFind() {
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog->setWindowTitle(tr("Find"));
+	dialog->setWindowTitle(tr("Search"));
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Text:"), this), 0, 0);
 	searchEdit = new QLineEdit(this);
@@ -750,6 +776,20 @@ void HistoryView::editCopy() {
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[i1][i2])));
 		}
+	}
+}
+void HistoryView::editInsertValue() {
+	int i1 = -1, i2 = -1, i3 = -1;
+	indexAtPos(context_pos, &i1, &i2, &i3);
+	if(i3 > 0) emit insertValueRequested(i3);
+}
+void HistoryView::editInsertText() {
+	int i1 = -1, i2 = -1;
+	indexAtPos(context_pos, &i1, &i2);
+	if(i2 >= 0) {
+		if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
+	} else {
+		if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i1]);
 	}
 }
 

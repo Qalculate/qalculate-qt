@@ -373,9 +373,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("Dual", "Dual approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_dualappr");
 	action->setData(-2); assumptionTypeActions[0] = action; if(settings->dual_approximation > 0) action->setChecked(true);
 	action = menu->addAction(tr("Exact", "Exact approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(APPROXIMATION_EXACT); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_EXACT) action->setChecked(true); action->setObjectName("action_exact");
+	action->setData(APPROXIMATION_EXACT); assumptionTypeActions[0] = action; if(settings->dual_approximation == 0 && settings->evalops.approximation == APPROXIMATION_EXACT) action->setChecked(true); action->setObjectName("action_exact");
 	action = menu->addAction(tr("Approximate"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(APPROXIMATION_APPROXIMATE); assumptionTypeActions[0] = action; if(settings->evalops.approximation == APPROXIMATION_APPROXIMATE) action->setChecked(true); action->setObjectName("action_approximate");
+	action->setData(APPROXIMATION_TRY_EXACT); assumptionTypeActions[0] = action; if(settings->dual_approximation == 0 && (settings->evalops.approximation == APPROXIMATION_APPROXIMATE || settings->evalops.approximation == APPROXIMATION_TRY_EXACT)) action->setChecked(true); action->setObjectName("action_approximate");
 
 	menu->addSeparator();
 	menu2 = menu;
@@ -882,6 +882,7 @@ void QalculateWindow::registerChanged(int index) {
 void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion();
 	expressionEdit->blockParseStatus();
+	gsub("…", "", str);
 	expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(str)));
 	expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
@@ -4616,6 +4617,7 @@ void QalculateWindow::approximationActivated() {
 	} else {
 		settings->evalops.approximation = (ApproximationMode) v;
 		settings->dual_fraction = 0;
+		settings->dual_approximation = 0;
 	}
 	if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->printops.number_fraction_format = FRACTION_DECIMAL_EXACT;
 	else settings->printops.number_fraction_format = FRACTION_DECIMAL;

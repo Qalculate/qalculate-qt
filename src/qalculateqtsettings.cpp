@@ -276,7 +276,7 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_use_sampling_rate = true;
 	max_plot_time = 5;
 
-	int version_numbers[] = {3, 20, 0};
+	int version_numbers[] = {3, 21, 0};
 
 	if(file) {
 		char line[1000000L];
@@ -305,7 +305,7 @@ void QalculateQtSettings::loadPreferences() {
 						v_result[settings->v_result.size() - 1].push_back(svalue);
 						v_delresult[settings->v_result.size() - 1].push_back(false);
 						if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
-							v_exact[settings->v_exact.size() - 1].push_back(svar.length() > 20);
+							v_exact[settings->v_exact.size() - 1].push_back(svar.length() < 20);
 						}
 					}
 				} else if(svar == "history_exact") {
@@ -590,6 +590,7 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "approximation") {
 					if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
 						evalops.approximation = (ApproximationMode) v;
+						dual_approximation = 0;
 					} else if(v == APPROXIMATION_APPROXIMATE + 1) {
 						evalops.approximation = APPROXIMATION_TRY_EXACT;
 						dual_approximation = 1;
@@ -1223,11 +1224,11 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	if(ret > 0 && (force || new_version != last_found_version)) {
 		last_found_version = new_version;
 #ifdef AUTO_UPDATE
-		if(QMessageBox::question(parent, QString(), tr("<div>A new version of %1 is available at %2.\n\nDo you wish to update to version %3?</div>").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes)) {
+		if(QMessageBox::question(parent, QString(), "<div>" + tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes) + "</div>") {
 			autoUpdate(new_version);
 		}
 #else
-		QMessageBox::information(parent, QString(), tr("<div>A new version of %1 is available.\n\nYou can get version %3 at %2.</div>").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)));
+		QMessageBox::information(parent, QString(), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
 #endif
 	}
 	last_version_check_date.setToCurrentDate();

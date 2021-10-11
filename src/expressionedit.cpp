@@ -204,7 +204,7 @@ void ExpressionTipLabel::placeTip(const QPoint &pos) {
 	if(!scr) scr = QGuiApplication::primaryScreen();
 	QRect screen = scr->geometry();
 #else
-	QRect screen = QApplication::desktop()->screenGeometry(w);
+	QRect screen = QApplication::desktop()->screenGeometry(widget);
 #endif
 	QPoint p = pos;
 	p += QPoint(2, 16);
@@ -2590,7 +2590,7 @@ void ExpressionEdit::highlightParentheses() {
 	if(textCursor().hasSelection()) return;
 	int pos = textCursor().position(), ipar2;
 	QString text = toPlainText();
-	if(pos >= text.length()) pos = text.length() - 1;
+	if(pos > text.length()) pos = text.length();
 	bool b = text.at(pos) == ')';
 	if(!b && pos > 0 && text.at(pos - 1) == ')') {
 		pos--;
@@ -2607,7 +2607,7 @@ void ExpressionEdit::highlightParentheses() {
 		}
 		b = (pars == 0);
 	} else {
-		b = text.at(pos) == '(';
+		b = pos < text.length() && text.at(pos) == '(';
 		if(!b && pos > 0 && text.at(pos - 1) == '(') {
 			pos--;
 			b = true;
@@ -3309,8 +3309,8 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 						warnings += "\n• ";
 					}
 					warnings += CALCULATOR->message()->message();
+					message_n++;
 				}
-				message_n++;
 			}
 			CALCULATOR->nextMessage();
 		}

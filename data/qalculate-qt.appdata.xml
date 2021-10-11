@@ -68,6 +68,37 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="3.21.0" date="2021-10-13">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Show result index in history (click to insert value)</li>
+      <li>Remove paste icons from history</li>
+      <li>Double-click to insert history text</li>
+      <li>Add insert value and insert text to history context menu</li>
+      <li>Option to remove, protect, or move history item to top</li>
+      <li>History search</li>
+      <li>If there is no selection, copy the result/expression at cursor when using context menu</li>
+      <li>Options to use (middle) dot as multiplication sign and regular slash character as division sign</li>
+      <li>Move keypad button to last position in toolbar</li>
+      <li>Ask (once) for correct interpretation of ambiguous implicit multiplication</li>
+      <li>Improved simplification of radical expressions</li>
+      <li>Improved Im(), Re(), and arg() functions</li>
+      <li>Improved output of complex forms (other than the default rectangular) in exact mode</li>
+      <li>Immediately return memory on MR clicked if entire expression was unchanged (or empty)</li>
+      <li>Function for drill bit size conversion</li>
+      <li>Fix crash when using the dock menu to show the RPN dock stack for the first time</li>
+      <li>Fix link in new version dialog</li>
+      <li>Fix parenthesis highlighting when cursor is at end of expression</li>
+      <li>Fix initial value of interval display in preferences dialog</li>
+      <li>Fix saving of approximation mode</li>
+      <li>Fixes for equations with complex inverse trigonometric and hyperbolic functions with no solution</li>
+      <li>Fixes for complex x^(ax)=b</li>
+      <li>Fixes for localization on Windows</li>
+      <li>Minor bug fixes and feature improvements</li>
+     </ul>
+   </description>
+  </release>
   <release version="3.20.0" date="2021-07-28">
    <description>
     <p>Initial version of the Qt user interface.</p>

@@ -183,7 +183,7 @@ void VariablesDialog::newVariable(int type) {
 		if(replaced_item) {
 			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
 				emit unitRemoved((Unit*) replaced_item);
-			} else if((replaced_item == v) || !CALCULATOR->stillHasVariable((Variable*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasVariable((Variable*) replaced_item))) {
+			} else if(replaced_item == v || !CALCULATOR->stillHasVariable((Variable*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasVariable((Variable*) replaced_item))) {
 				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 			} else if(replaced_item->type() == TYPE_UNIT) {
