@@ -915,6 +915,7 @@ ExpressionEdit::~ExpressionEdit() {}
 						items.append(item); \
 						item = new QStandardItem(y); \
 						item->setData(ifont, Qt::FontRole); \
+						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
 						items.append(item); \
 						sourceModel->appendRow(items);
 
