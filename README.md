@@ -6,13 +6,12 @@ Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to
 
 ## Requirements
 * Qt (>= 5.6)
-* libqalculate (>= 3.20.0)
+* libqalculate (>= 3.21.0)
 
 ## Installation
 Instructions and download links for installers, binaries packages, and the source code of released versions of Qalculate! are available at https://qalculate.github.io/downloads.html.
 
 In a terminal window in the top source code directory run
-* `lrelease qalculate-qt.pro` *(not required if using a release source tarball, only if using the git version)*
 * `qmake`
 * `make`
 * `make install` *(as root, e.g. `sudo make install`)*

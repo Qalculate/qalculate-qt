@@ -12,7 +12,7 @@ Qt, and CLI).
 1. Requirements
 
 * Qt (>= 5.6)
-* libqalculate (>= 3.19.0)
+* libqalculate (>= 3.21.0)
 
 2. Installation
 
@@ -23,9 +23,6 @@ https://qalculate.github.io/downloads.html.
 In a terminal window in the top source code directory run
 
 * qmake
-* lrelease qalculate-qt.pro
-  (not required if using a release source tarball, only if using the git
-  version)
 * make
 * make install (as root, e.g. sudo make install)
 
