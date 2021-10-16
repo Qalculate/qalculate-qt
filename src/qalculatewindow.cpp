@@ -59,6 +59,7 @@
 #include "variablesdialog.h"
 #include "unitsdialog.h"
 #include "fpconversiondialog.h"
+#include "percentagecalculationdialog.h"
 #include "plotdialog.h"
 #include "calendarconversiondialog.h"
 #include "matrixwidget.h"
@@ -265,6 +266,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	variablesDialog = NULL;
 	unitsDialog = NULL;
 	fpConversionDialog = NULL;
+	percentageDialog = NULL;
 	plotDialog = NULL;
 	calendarConversionDialog = NULL;
 
@@ -312,6 +314,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
 	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
+	menu->addAction(tr("Percentage Calculation Tool"), this, SLOT(openPercentageCalculation()));
 	menu->addSeparator();
 	menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
@@ -4706,6 +4709,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(percentageDialog) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(plotDialog) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -4715,6 +4719,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(percentageDialog) percentageDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(plotDialog) plotDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -4919,6 +4924,29 @@ void QalculateWindow::openFPConversion() {
 			break;
 		}
 	}
+}
+void QalculateWindow::openPercentageCalculation() {
+	if(percentageDialog) {
+		if(settings->always_on_top) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		percentageDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		percentageDialog->show();
+		qApp->processEvents();
+		percentageDialog->raise();
+		percentageDialog->activateWindow();
+	} else {
+		percentageDialog = new PercentageCalculationDialog(this);
+		if(settings->always_on_top) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		percentageDialog->show();
+	}
+	QString str;
+	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
+		if(mstruct && mstruct->isNumber()) {
+			str = QString::fromStdString(unhtmlize(result_text));
+		}
+	} else {
+		str = expressionEdit->selectedText(true);
+	}
+	percentageDialog->resetValues(str);
 }
 void QalculateWindow::openPlot() {
 	if(!CALCULATOR->canPlot()) {

@@ -37,6 +37,7 @@ class FunctionsDialog;
 class VariablesDialog;
 class UnitsDialog;
 class FPConversionDialog;
+class PercentageCalculationDialog;
 class PlotDialog;
 class CalendarConversionDialog;
 class QTableWidget;
@@ -74,6 +75,7 @@ class QalculateWindow : public QMainWindow {
 		VariablesDialog *variablesDialog;
 		UnitsDialog *unitsDialog;
 		FPConversionDialog *fpConversionDialog;
+		PercentageCalculationDialog *percentageDialog;
 		PlotDialog *plotDialog;
 		CalendarConversionDialog *calendarConversionDialog;
 
@@ -229,6 +231,7 @@ class QalculateWindow : public QMainWindow {
 		void openVariables();
 		void applyFunction(MathFunction*);
 		void openFPConversion();
+		void openPercentageCalculation();
 		void openPlot();
 		void negate();
 		void checkVersion();
