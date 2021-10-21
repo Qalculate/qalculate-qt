@@ -291,6 +291,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	addAction(action);
 	connect(action, SIGNAL(triggered()), this, SLOT(negate()));
 
+	action = new QAction("Approximate", this);
+	action->setShortcuts({Qt::CTRL | Qt::Key_Return, Qt::CTRL | Qt::Key_Enter}); action->setShortcutContext(Qt::ApplicationShortcut);
+	addAction(action);
+	connect(action, SIGNAL(triggered()), this, SLOT(approximateResult()));
+
 	menuAction = new QToolButton(this); menuAction->setIcon(LOAD_ICON("menu")); menuAction->setText(tr("Menu"));
 	menuAction->setShortcut(Qt::Key_F10); menuAction->setToolTip(tr("Menu (%1)").arg(menuAction->shortcut().toString(QKeySequence::NativeText)));
 	menuAction->setPopupMode(QToolButton::InstantPopup);
@@ -2097,6 +2102,22 @@ void QalculateWindow::RPNRegisterChanged(std::string text, int index) {
 		item->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 		rpnView->setItem(index, 0, item);
 	}
+}
+
+void QalculateWindow::approximateResult() {
+	ApproximationMode appr_bak = settings->evalops.approximation;
+	NumberFractionFormat frac_bak = settings->printops.number_fraction_format;
+	int dappr_bak = settings->dual_approximation;
+	int dfrac_bak = settings->dual_fraction;
+	settings->dual_approximation = 0;
+	settings->dual_fraction = 0;
+	settings->printops.number_fraction_format = FRACTION_DECIMAL;
+	settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
+	executeCommand(COMMAND_EVAL);
+	settings->evalops.approximation = appr_bak;
+	settings->printops.number_fraction_format = frac_bak;
+	settings->dual_approximation = dappr_bak;
+	settings->dual_fraction = dfrac_bak;
 }
 
 void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates) {

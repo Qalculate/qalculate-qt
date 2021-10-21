@@ -201,6 +201,7 @@ class QalculateWindow : public QMainWindow {
 		void clearStack();
 		void registerChanged(int);
 		void calculateRPN(int);
+		void approximateResult();
 
 	public slots:
 
