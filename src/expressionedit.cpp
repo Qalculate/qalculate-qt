@@ -148,7 +148,7 @@ void ExpressionTipLabel::hideTip() {
 	if(!hideTimer.isActive()) hideTimer.start(300, this);
 }
 void ExpressionTipLabel::hideTipImmediately() {
-	close();
+	hide();
 }
 void ExpressionTipLabel::timerEvent(QTimerEvent *e) {
 	if(e->timerId() == hideTimer.timerId() || e->timerId() == expireTimer.timerId()) {
