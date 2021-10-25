@@ -126,8 +126,8 @@ QString unhtmlize(QString str) {
 	return str;
 }
 
-HistoryView::HistoryView(QWidget *parent) : QTextBrowser(parent), i_pos(0) {
-	setOpenLinks(false);
+HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
+	setReadOnly(true);
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
 	document()->addResource(QTextDocument::ImageResource, QUrl("data://img1px.png"), QVariant(img1px));
@@ -389,11 +389,17 @@ void HistoryView::changeEvent(QEvent *e) {
 		}
 		prev_color = textColor();
 	}
-	QTextBrowser::changeEvent(e);
+	QTextEdit::changeEvent(e);
 }
 void HistoryView::addMessages() {
 	std::vector<std::string> values;
 	addResult(values, "", true);
+}
+void HistoryView::mouseMoveEvent(QMouseEvent *e) {
+	QString str = anchorAt(e->pos());
+	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
+	else viewport()->setCursor(Qt::PointingHandCursor);
+	QTextEdit::mouseMoveEvent(e);
 }
 void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
@@ -433,7 +439,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 			}
 		}
 	} else {
-		QTextBrowser::mouseDoubleClickEvent(e);
+		QTextEdit::mouseDoubleClickEvent(e);
 	}
 }
 void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
@@ -470,7 +476,7 @@ void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 			}
 		}
 	} else {
-		QTextBrowser::mouseReleaseEvent(e);
+		QTextEdit::mouseReleaseEvent(e);
 	}
 }
 
@@ -479,14 +485,14 @@ void HistoryView::keyPressEvent(QKeyEvent *e) {
 		editCopy();
 		return;
 	}
-	QTextBrowser::keyPressEvent(e);
+	QTextEdit::keyPressEvent(e);
 	if(!e->isAccepted() && (e->key() != Qt::Key_Control && e->key() != Qt::Key_Meta && e->key() != Qt::Key_Alt)) {
 		expressionEdit->setFocus();
 		expressionEdit->keyPressEvent(e);
 	}
 }
 void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
-	QTextBrowser::inputMethodEvent(e);
+	QTextEdit::inputMethodEvent(e);
 	if(!e->isAccepted() && !e->commitString().isEmpty()) {
 		expressionEdit->setFocus();
 		expressionEdit->inputMethodEvent(e);

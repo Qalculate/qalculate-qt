@@ -12,7 +12,7 @@
 #ifndef HISTORY_VIEW_H
 #define HISTORY_VIEW_H
 
-#include <QTextBrowser>
+#include <QTextEdit>
 
 class QImage;
 class QMenu;
@@ -21,7 +21,7 @@ class ExpressionEdit;
 class QColor;
 class QLineEdit;
 
-class HistoryView : public QTextBrowser {
+class HistoryView : public QTextEdit {
 
 	Q_OBJECT
 
@@ -52,6 +52,7 @@ class HistoryView : public QTextBrowser {
 
 		void mouseDoubleClickEvent(QMouseEvent *e) override;
 		void mouseReleaseEvent(QMouseEvent *e) override;
+		void mouseMoveEvent(QMouseEvent *e) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void keyPressEvent(QKeyEvent *e) override;
 		void inputMethodEvent(QInputMethodEvent*) override;
