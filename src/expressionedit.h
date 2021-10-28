@@ -139,7 +139,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editDelete();
 		void insertDate();
 		void insertMatrix();
-		bool complete(MathStructure* = NULL, const QPoint& = QPoint());
+		bool complete(MathStructure* = NULL, const QPoint& = QPoint(), bool = false);
 
 	signals:
 

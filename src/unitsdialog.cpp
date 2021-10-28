@@ -67,7 +67,9 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	searchEdit = new QLineEdit(this);
 	searchEdit->addAction(LOAD_ICON("edit-find"), QLineEdit::LeadingPosition);
 #ifdef _WIN32
+#	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 	searchEdit->setTextMargins(22, 0, 0, 0);
+#	endif
 #endif
 	searchEdit->installEventFilter(this);
 	vbox->addWidget(searchEdit, 0);

@@ -5358,7 +5358,9 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		if(arg && arg->type() == ARGUMENT_TYPE_FILE) {
 			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
+#	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
+#	endif
 #endif
 			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
 			typestr = "";
@@ -5366,7 +5368,9 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		} else if(arg && arg->type() == ARGUMENT_TYPE_MATRIX) {
 			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("table"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
+#	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
+#	endif
 #endif
 			action->setProperty("QALCULATE ENTRY", QVariant::fromValue((void*) fd->entry[i]));
 			typestr = "";

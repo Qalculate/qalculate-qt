@@ -20,6 +20,41 @@ class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
 class QRadioButton;
+class QComboBox;
+class QCheckBox;
+class QTreeView;
+class QStandardItemModel;
+class QStandardItem;
+
+class NamesEditDialog : public QDialog {
+
+	Q_OBJECT
+
+	protected:
+
+		QTreeView *namesView;
+		QStandardItemModel *namesModel;
+		QPushButton *addButton, *editButton, *delButton;
+		ExpressionItem *o_item;
+
+	protected slots:
+
+		void addClicked();
+		void delClicked();
+		void editClicked();
+		void selectedNameChanged(const QModelIndex&, const QModelIndex&);
+		void nameChanged(QStandardItem*);
+
+	public:
+
+		NamesEditDialog(QWidget *parent = NULL, bool = false);
+		virtual ~NamesEditDialog();
+
+		void modifyNames(ExpressionItem*, const QString&);
+		void setNames(ExpressionItem*, const QString&);
+		QString firstName();
+
+};
 
 class FunctionEditDialog : public QDialog {
 
@@ -27,15 +62,32 @@ class FunctionEditDialog : public QDialog {
 
 	protected:
 
-		QLineEdit *nameEdit;
-		QPlainTextEdit *expressionEdit;
-		QPushButton *okButton;
+		QLineEdit *nameEdit, *titleEdit, *conditionEdit, *exampleEdit;
+		QComboBox *categoryEdit;
+		QCheckBox *hideBox;
+		QPlainTextEdit *expressionEdit, *descriptionEdit;
+		QPushButton *okButton, *argDelButton, *argAddButton, *argEditButton, *subDelButton, *subAddButton, *subEditButton;
 		QRadioButton *ref1Button, *ref2Button;
+		QTreeView *subfunctionsView, *argumentsView;
+		QStandardItemModel *subfunctionsModel, *argumentsModel;
+		NamesEditDialog *namesEditDialog;
+		MathFunction *o_function;
+		bool name_edited;
 
 	protected slots:
 
 		void onNameEdited(const QString&);
 		void onExpressionChanged();
+		void subAddClicked();
+		void subEditClicked();
+		void subDelClicked();
+		void argAddClicked();
+		void argEditClicked();
+		void argDelClicked();
+		void selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&);
+		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);
+		void onRejected();
+		void editNames();
 
 	public:
 
@@ -56,3 +108,4 @@ class FunctionEditDialog : public QDialog {
 };
 
 #endif //FUNCTION_EDIT_DIALOG_H
+

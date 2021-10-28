@@ -57,7 +57,9 @@ CSVDialog::CSVDialog(bool do_import, QWidget *parent, MathStructure *current_res
 	fileEdit = new QLineEdit(this);
 	QAction *action = fileEdit->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
+#	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 	fileEdit->setTextMargins(0, 0, 22, 0);
+#	endif
 #endif
 	connect(action, SIGNAL(triggered()), this, SLOT(onSelectFile()));
 	connect(fileEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFileEdited()));

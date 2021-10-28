@@ -2322,23 +2322,33 @@ void ExpressionEdit::onTextChanged() {
 	displayParseStatus();
 	if(completion_blocked || !settings->enable_completion) {
 		hideCompletion();
-	} else if(!b && settings->completion_delay > 0) {
-		bool b2 = false;
-		std::string str_from = str.toStdString();
-		if(CALCULATOR->hasToExpression(str_from, true, settings->evalops)) {
-			std::string str_to;
-			CALCULATOR->separateToExpression(str_from, str_to, settings->evalops, true, true);
-			if(str_to.empty()) b2 = true;
-		}
-		if(!completionTimer) {
-			completionTimer = new QTimer(this);
-			completionTimer->setSingleShot(true);
-			connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
-		}
-		if(b2) complete();
-		else completionTimer->start(settings->completion_delay);
 	} else {
-		complete();
+		if(b && settings->completion_delay > 0) {
+			std::string prev_object_text = current_object_text;
+			setCurrentObject();
+			if(current_object_text.find(prev_object_text) != 0) {
+				hideCompletion();
+				b = false;
+			}
+		}
+		if(!b && settings->completion_delay > 0) {
+			bool b2 = false;
+			std::string str_from = str.toStdString();
+			if(CALCULATOR->hasToExpression(str_from, true, settings->evalops)) {
+				std::string str_to;
+				CALCULATOR->separateToExpression(str_from, str_to, settings->evalops, true, true);
+				if(str_to.empty()) b2 = true;
+			}
+			if(!completionTimer) {
+				completionTimer = new QTimer(this);
+				completionTimer->setSingleShot(true);
+				connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
+			}
+			if(b2) complete();
+			else completionTimer->start(settings->completion_delay);
+		} else {
+			complete(NULL, QPoint(), settings->completion_delay > 0);
+		}
 	}
 	qApp->processEvents();
 	if(b && !completionView->isVisible()) {
@@ -2354,7 +2364,7 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 	expression_has_changed = b;
 }
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
-bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
+bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
@@ -2370,7 +2380,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos) {
 	} else {
 		if(pos.isNull()) do_completion_signal = 0;
 		else do_completion_signal = -1;
-		setCurrentObject();
+		if(!current_object_is_set) setCurrentObject();
 	}
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
