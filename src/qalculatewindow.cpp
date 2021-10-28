@@ -910,10 +910,10 @@ void QalculateWindow::onInsertValueRequested(int i) {
 }
 void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
+	if(!settings->auto_calculate) expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(str);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
+	if(!settings->auto_calculate) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onOperatorClicked(const QString &str) {

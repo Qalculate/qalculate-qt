@@ -1450,7 +1450,17 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(CALCULATOR->busy()) {
 					CALCULATOR->abort();
 				} else if(completionView->isVisible()) {
-					hideCompletion();
+					completionView->hide();
+					if(settings->expression_status_delay > 0) {
+						if(!toolTipTimer) {
+							toolTipTimer = new QTimer(this);
+							toolTipTimer->setSingleShot(true);
+							connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+						}
+						toolTipTimer->start(settings->expression_status_delay);
+					} else {
+						showCurrentStatus();
+					}
 				} else if(document()->isEmpty()) {
 					qApp->closeAllWindows();
 				} else {
@@ -1788,23 +1798,40 @@ void ExpressionEdit::showCurrentStatus() {
 	if(!expression_has_changed || completionView->isVisible() || current_status_text.isEmpty()) {
 		HIDE_TOOLTIP
 	} else {
-		if(tipLabel && tipLabel->isVisible()) {
-			tipLabel->reuseTip(current_status_text, mapToGlobal(cursorRect().bottomRight()));
+		QString str = current_status_text;
+		if(current_status_is_expression && settings->auto_calculate) {
+			bool b_comp = false, is_approximate = false;
+			PrintOptions po = settings->printops;
+			po.is_approximate = &is_approximate;
+			std::string result = CALCULATOR->calculateAndPrint(CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options), 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp);
+			if(result != str.toStdString() && result != CALCULATOR->timedOutString()) {
+				if(is_approximate) str += " " SIGN_ALMOST_EQUAL " ";
+				else str += " = ";
+				if(b_comp) str += "(";
+				str += QString::fromStdString(result);
+				if(b_comp) str += ")";
+			}
+		}
+		if(str == toPlainText()) {
+			HIDE_TOOLTIP
+		} else if(tipLabel && tipLabel->isVisible()) {
+			tipLabel->reuseTip(str, mapToGlobal(cursorRect().bottomRight()));
 			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
 		} else {
 			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(current_status_text, mapToGlobal(cursorRect().bottomRight()), this);
+			tipLabel = new ExpressionTipLabel(str, mapToGlobal(cursorRect().bottomRight()), this);
 			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
 			tipLabel->showNormal();
 		}
 	}
 }
-void ExpressionEdit::setStatusText(const QString &text) {
+void ExpressionEdit::setStatusText(const QString &text, bool is_expression) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(text.isEmpty()) {
 		HIDE_TOOLTIP
 	} else if(settings->display_expression_status) {
 		current_status_text = text;
+		current_status_is_expression = is_expression;
 		if(settings->expression_status_delay > 0 && (!tipLabel || !tipLabel->isVisible())) {
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
@@ -2285,11 +2312,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
 		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
-		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
+		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
-		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression);
+		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
 	}
 	settings->evalops.parse_options.preserve_format = false;
 }

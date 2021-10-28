@@ -202,6 +202,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.interval_calculation = INTERVAL_CALCULATION_VARIANCE_FORMULA;
 
 	title_type = TITLE_APP;
+	auto_calculate = true;
 	dot_question_asked = false;
 	implicit_question_asked = false;
 	complex_angle_form = false;
@@ -602,6 +603,8 @@ void QalculateQtSettings::loadPreferences() {
 					if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 						evalops.interval_calculation = (IntervalCalculation) v;
 					}
+				} else if(svar == "calculate_as_you_type") {
+					auto_calculate = v;
 				} else if(svar == "chain_mode") {
 					chain_mode = v;
 				} else if(svar == "rpn_mode") {
@@ -902,6 +905,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 	else fprintf(file, "approximation=%i\n", evalops.approximation);
 	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
+	fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
 	fprintf(file, "rpn_mode=%i\n", rpn_mode);
 	fprintf(file, "chain_mode=%i\n", chain_mode);
 	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);

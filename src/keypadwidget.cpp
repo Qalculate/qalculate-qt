@@ -320,7 +320,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
 	}
 	OPERATOR_BUTTON3(settings->divisionSign(), "|", "~", 1, c);
-	button->setProperty(BUTTON_DATA, settings->divisionSign());
+	divisionButton = button;
+	button->setProperty(BUTTON_DATA, settings->divisionSign(false));
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
 	acButton = new KeypadButton(LOAD_ICON("edit-clear"), this);
 	acButton->setToolTip(tr("Clear expression"));
@@ -360,8 +361,8 @@ KeypadWidget::~KeypadWidget() {}
 void KeypadWidget::updateSymbols() {
 	multiplicationButton->setText(settings->multiplicationSign());
 	multiplicationButton->setProperty(BUTTON_DATA, settings->multiplicationSign());
-	multiplicationButton->setText(settings->divisionSign());
-	multiplicationButton->setProperty(BUTTON_DATA, settings->divisionSign());
+	divisionButton->setText(settings->divisionSign());
+	divisionButton->setProperty(BUTTON_DATA, settings->divisionSign(false));
 	commaButton->setText(QString::fromStdString(CALCULATOR->getComma()));
 	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
 	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));

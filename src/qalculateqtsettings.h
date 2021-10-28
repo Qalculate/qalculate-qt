@@ -95,6 +95,7 @@ class QalculateQtSettings : QObject {
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;
+		bool auto_calculate;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

@@ -81,13 +81,14 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		int block_display_parse;
 		QString prev_parsed_expression, parsed_expression_tooltip, current_status_text;
+		bool current_status_is_expression;
 		bool expression_has_changed, expression_has_changed2;
 		bool parsed_had_errors, parsed_had_warnings;
 		int previous_epos;
 		bool parentheses_highlighted;
 
 		void setCurrentObject();
-		void setStatusText(const QString &text);
+		void setStatusText(const QString &text, bool is_expression = false);
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
