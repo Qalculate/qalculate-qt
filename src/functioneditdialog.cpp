@@ -27,6 +27,7 @@
 #include <QTreeView>
 #include <QHeaderView>
 #include <QAction>
+#include <QDoubleSpinBox>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -251,6 +252,263 @@ void NamesEditDialog::nameChanged(QStandardItem *item) {
 	}
 }
 
+ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialog(parent) {
+	QVBoxLayout *topbox = new QVBoxLayout(this);
+	QGridLayout *grid = new QGridLayout();
+	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
+	nameEdit = new QLineEdit(this);
+	nameEdit->setReadOnly(read_only);
+	grid->addWidget(nameEdit, 0, 1);
+	grid->addWidget(new QLabel(tr("Type:"), this), 1, 0);
+	typeCombo = new QComboBox(this);
+	typeCombo->setEditable(false);
+	typeCombo->addItem(tr("Free"), ARGUMENT_TYPE_FREE);
+	typeCombo->addItem(tr("Number"), ARGUMENT_TYPE_NUMBER);
+	typeCombo->addItem(tr("Integer"), ARGUMENT_TYPE_INTEGER);
+	typeCombo->addItem(tr("Symbol"), ARGUMENT_TYPE_SYMBOLIC);
+	typeCombo->addItem(tr("Text"), ARGUMENT_TYPE_TEXT);
+	typeCombo->addItem(tr("Date"), ARGUMENT_TYPE_DATE);
+	typeCombo->addItem(tr("Vector"), ARGUMENT_TYPE_VECTOR);
+	typeCombo->addItem(tr("Matrix"), ARGUMENT_TYPE_MATRIX);
+	typeCombo->addItem(tr("Boolean"), ARGUMENT_TYPE_BOOLEAN);
+	typeCombo->addItem(tr("Angle"), ARGUMENT_TYPE_ANGLE);
+	typeCombo->addItem(tr("Object"), ARGUMENT_TYPE_EXPRESSION_ITEM);
+	typeCombo->addItem(tr("Function"), ARGUMENT_TYPE_FUNCTION);
+	typeCombo->addItem(tr("Unit"), ARGUMENT_TYPE_UNIT);
+	typeCombo->addItem(tr("Variable"), ARGUMENT_TYPE_VARIABLE);
+	typeCombo->addItem(tr("File"), ARGUMENT_TYPE_FILE);
+	grid->addWidget(typeCombo, 1, 1);
+	testBox = new QCheckBox(tr("Enable rules and type test"), this);
+	grid->addWidget(testBox, 2, 0, 1, 2);
+	grid->addWidget(new QLabel(tr("Custom condition:"), this), 3, 0);
+	conditionEdit = new MathLineEdit(this);
+	grid->addWidget(conditionEdit, 3, 1);
+	matrixBox = new QCheckBox(tr("Allow Matrix"), this);
+	grid->addWidget(matrixBox, 4, 0, 1, 2);
+	zeroBox = new QCheckBox(tr("Forbid zero"), this);
+	grid->addWidget(zeroBox, 5, 0, 1, 2);
+	vectorBox = new QCheckBox(tr("Handle vector"), this);
+	grid->addWidget(vectorBox, 6, 0, 1, 2);
+	minBox = new QCheckBox(tr("Min"), this);
+	grid->addWidget(minBox, 7, 0);
+	minEdit = new QDoubleSpinBox(this);
+	grid->addWidget(minEdit, 7, 1);
+	includeMinBox = new QCheckBox(tr("Include equals"), this);
+	grid->addWidget(includeMinBox, 8, 1, Qt::AlignRight);
+	maxBox = new QCheckBox(tr("Max"), this);
+	grid->addWidget(maxBox, 9, 0);
+	maxEdit = new QDoubleSpinBox(this);
+	minEdit->setDecimals(8);
+	minEdit->setMinimum(INT_MIN);
+	minEdit->setMaximum(INT_MAX);
+	maxEdit->setDecimals(8);
+	maxEdit->setMinimum(INT_MIN);
+	maxEdit->setMaximum(INT_MAX);
+	grid->addWidget(maxEdit, 9, 1);
+	includeMaxBox = new QCheckBox(tr("Include equals"), this);
+	grid->addWidget(includeMaxBox, 10, 1, Qt::AlignRight);
+	topbox->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
+	buttonBox->button(QDialogButtonBox::Close)->setDefault(true);
+	topbox->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
+	connect(typeCombo, SIGNAL(activated(int)), this, SLOT(typeChanged(int)));
+	connect(minBox, SIGNAL(toggled(bool)), this, SLOT(minToggled(bool)));
+	connect(maxBox, SIGNAL(toggled(bool)), this, SLOT(maxToggled(bool)));
+	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+}
+ArgumentEditDialog::~ArgumentEditDialog() {}
+
+void ArgumentEditDialog::setArgument(Argument *arg) {
+	testBox->setChecked(arg && arg->tests());
+	matrixBox->setChecked(!arg || arg->matrixAllowed() || arg->type() == ARGUMENT_TYPE_FREE || arg->type() == ARGUMENT_TYPE_MATRIX);
+	matrixBox->setEnabled(arg && arg->type() != ARGUMENT_TYPE_FREE && arg->type() != ARGUMENT_TYPE_MATRIX);
+	if(arg) {
+		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+		std::string str = CALCULATOR->localizeExpression(arg->getCustomCondition(), pa);
+		gsub("*", settings->multiplicationSign(), str);
+		gsub("/", settings->divisionSign(false), str);
+		gsub("-", SIGN_MINUS, str);
+		conditionEdit->setText(QString::fromStdString(str));
+	} else {
+		conditionEdit->clear();
+	}
+	nameEdit->setText(arg ? QString::fromStdString(arg->name()) : QString());
+	zeroBox->setChecked(arg && arg->zeroForbidden());
+	vectorBox->setChecked(arg && arg->handlesVector());
+	switch(arg ? arg->type() : ARGUMENT_TYPE_FREE) {
+		case ARGUMENT_TYPE_NUMBER: {
+			NumberArgument *farg = (NumberArgument*) arg;
+			minBox->setEnabled(true);
+			minBox->setChecked(farg->min() != NULL);
+			includeMinBox->setChecked(farg->includeEqualsMin());
+			includeMinBox->setEnabled(true);
+			minEdit->setEnabled(farg->min() != NULL);
+			minEdit->setDecimals(8);
+			if(farg->min()) {
+				minEdit->setValue(farg->min()->floatValue());
+			} else {
+				minEdit->setValue(0.0);
+			}
+			maxBox->setEnabled(true);
+			maxBox->setChecked(farg->max() != NULL);
+			includeMaxBox->setChecked(farg->includeEqualsMax());
+			includeMaxBox->setEnabled(true);
+			maxEdit->setEnabled(farg->max() != NULL);
+			maxEdit->setDecimals(8);
+			if(farg->max()) {
+				maxEdit->setValue(farg->max()->floatValue());
+			} else {
+				maxEdit->setValue(0.0);
+			}
+			break;
+		}
+		case ARGUMENT_TYPE_INTEGER: {
+			NumberArgument *farg = (NumberArgument*) arg;
+			minBox->setEnabled(true);
+			minBox->setChecked(farg->min() != NULL);
+			includeMinBox->setChecked(true);
+			includeMinBox->setEnabled(false);
+			minEdit->setEnabled(farg->min() != NULL);
+			minEdit->setDecimals(0);
+			if(farg->min()) {
+				minEdit->setValue(farg->min()->intValue());
+			} else {
+				minEdit->setValue(0.0);
+			}
+			maxBox->setEnabled(true);
+			maxBox->setChecked(farg->max() != NULL);
+			includeMaxBox->setChecked(true);
+			includeMaxBox->setEnabled(false);
+			maxEdit->setEnabled(farg->max() != NULL);
+			maxEdit->setDecimals(0);
+			if(farg->max()) {
+				maxEdit->setValue(farg->max()->intValue());
+			} else {
+				maxEdit->setValue(0.0);
+			}
+			break;
+		}
+		default: {
+			minBox->setChecked(false);
+			minEdit->setValue(0.0);
+			minEdit->setEnabled(false);
+			includeMinBox->setEnabled(false);
+			includeMinBox->setChecked(true);
+			minBox->setEnabled(false);
+			maxBox->setChecked(false);
+			maxEdit->setValue(0.0);
+			maxEdit->setEnabled(false);
+			includeMaxBox->setEnabled(false);
+			includeMaxBox->setChecked(true);
+			maxBox->setEnabled(false);
+		}
+	}
+	typeCombo->setCurrentIndex(typeCombo->findData(arg ? arg->type() : 0));
+}
+Argument *ArgumentEditDialog::createArgument() {
+	Argument *arg = NULL;
+	switch(typeCombo->currentData().toInt()) {
+		case ARGUMENT_TYPE_NUMBER: {
+			arg = new NumberArgument();
+			if(minBox->isChecked()) {
+				QString str = minEdit->cleanText();
+				int i = str.indexOf(",");
+				if(i > 0) {
+					if(str.indexOf(".", i) > 0) {
+						str.remove(",");
+					} else {
+						str.remove(".");
+						str.replace(",", ".");
+					}
+				}
+				Number nr(str.toStdString());
+				((NumberArgument*) arg)->setMin(&nr);
+				((NumberArgument*) arg)->setIncludeEqualsMin(includeMinBox->isChecked());
+			}
+			if(maxBox->isChecked()) {
+				QString str = minEdit->cleanText();
+				int i = str.indexOf(",");
+				if(i > 0) {
+					if(str.indexOf(".", i) > 0) {
+						str.remove(",");
+					} else {
+						str.remove(".");
+						str.replace(",", ".");
+					}
+				}
+				Number nr(str.toStdString());
+				((NumberArgument*) arg)->setMax(&nr);
+				((NumberArgument*) arg)->setIncludeEqualsMax(includeMaxBox->isChecked());
+			}
+			break;
+		}
+		case ARGUMENT_TYPE_INTEGER: {
+			arg = new IntegerArgument();
+			if(minBox->isChecked()) {
+				QString str = minEdit->cleanText();
+				str.remove(",");
+				str.remove(".");
+				Number nr(str.toStdString());
+				((IntegerArgument*) arg)->setMin(&nr);
+			}
+			if(maxBox->isChecked()) {
+				QString str = maxEdit->cleanText();
+				str.remove(",");
+				str.remove(".");
+				Number nr(str.toStdString());
+				((IntegerArgument*) arg)->setMax(&nr);
+			}
+			break;
+		}
+		default: {
+			arg = new Argument();
+		}
+	}
+	arg->setName(nameEdit->text().trimmed().toStdString());
+	ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+	std::string str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
+	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
+	gsub(SIGN_MINUS, "-", str);
+	arg->setCustomCondition(str);
+	arg->setTests(testBox->isChecked());
+	arg->setAlerts(testBox->isChecked());
+	arg->setZeroForbidden(zeroBox->isChecked());
+	arg->setMatrixAllowed(matrixBox->isChecked());
+	return arg;
+}
+void ArgumentEditDialog::typeChanged(int index) {
+	int i = typeCombo->itemData(index).toInt();
+	minEdit->setValue(0.0);
+	maxEdit->setValue(0.0);
+	minEdit->setEnabled(false);
+	maxEdit->setEnabled(false);
+	minBox->setChecked(false);
+	maxBox->setChecked(false);
+	if(i == ARGUMENT_TYPE_INTEGER) minEdit->setDecimals(0);
+	else if(i == ARGUMENT_TYPE_NUMBER) minEdit->setDecimals(8);
+	if(i == ARGUMENT_TYPE_INTEGER) maxEdit->setDecimals(0);
+	else if(i == ARGUMENT_TYPE_NUMBER) maxEdit->setDecimals(8);
+	includeMaxBox->setChecked(true);
+	includeMinBox->setChecked(true);
+	includeMaxBox->setEnabled(i == ARGUMENT_TYPE_NUMBER);
+	includeMinBox->setEnabled(i == ARGUMENT_TYPE_NUMBER);
+	minBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
+	maxBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
+	vectorBox->setChecked(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
+	matrixBox->setEnabled(i != ARGUMENT_TYPE_FREE && i != ARGUMENT_TYPE_MATRIX);
+	matrixBox->setChecked(i == ARGUMENT_TYPE_FREE || i == ARGUMENT_TYPE_MATRIX);
+}
+void ArgumentEditDialog::minToggled(bool b) {
+	minEdit->setEnabled(b);
+	includeMinBox->setEnabled(typeCombo->currentData().toInt() == ARGUMENT_TYPE_NUMBER);
+}
+void ArgumentEditDialog::maxToggled(bool b) {
+	maxEdit->setEnabled(b);
+	includeMaxBox->setEnabled(typeCombo->currentData().toInt() == ARGUMENT_TYPE_NUMBER);
+}
+
 FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	namesEditDialog = NULL;
 	o_function = NULL;
@@ -310,14 +568,14 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	hideBox = new QCheckBox(tr("Hide function"), this);
 	grid->addWidget(hideBox, 2, 1, Qt::AlignRight);
 	grid->addWidget(new QLabel(tr("Example:"), this), 3, 0);
-	exampleEdit = new QLineEdit(this);
+	exampleEdit = new MathLineEdit(this);
 	grid->addWidget(exampleEdit, 3, 1);
 	grid->addWidget(new QLabel(tr("Description:"), this), 4, 0, 1, 2);
 	descriptionEdit = new QPlainTextEdit(this);
 	grid->addWidget(descriptionEdit, 5, 0, 1, 2);
 	grid = new QGridLayout(w3);
 	grid->addWidget(new QLabel(tr("Condition:"), this), 0, 0);
-	conditionEdit = new QLineEdit(this);
+	conditionEdit = new MathLineEdit(this);
 	grid->addWidget(conditionEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Sub-functions:"), this), 1, 0);
 	subfunctionsView = new SmallTreeView(this);
@@ -365,11 +623,18 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	topbox->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
-	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
+	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionChanged()));
+	connect(descriptionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionChanged()));
+	connect(conditionEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
+	connect(hideBox, SIGNAL(clicked()), this, SLOT(onFunctionChanged()));
+	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
+	connect(exampleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
+	connect(categoryEdit, SIGNAL(activated(int)), this, SLOT(onFunctionChanged()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(subfunctionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedArgumentChanged(const QModelIndex&, const QModelIndex&)));
+	connect(argumentsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(argumentActivated(const QModelIndex&)));
 	connect(this, SIGNAL(rejected()), this, SLOT(onRejected()));
 	okButton->setEnabled(false);
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -384,6 +649,7 @@ void FunctionEditDialog::editNames() {
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
 	name_edited = false;
+	onFunctionChanged();
 }
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
@@ -406,7 +672,37 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 		if(!modifyFunction(f)) return NULL;
 		return f;
 	}
-	std::string str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
+	f = new UserFunction("", nameEdit->text().trimmed().toStdString(), "");
+	std::string str;
+	ParseOptions pa = settings->evalops.parse_options;
+	pa.base = 10;
+	f->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
+	f->setTitle(titleEdit->text().trimmed().toStdString());
+	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
+	f->setHidden(hideBox->isChecked());
+	str = CALCULATOR->unlocalizeExpression(exampleEdit->text().trimmed().toStdString(), pa);
+	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
+	gsub(SIGN_MINUS, "-", str);
+	f->setExample(str);
+	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
+	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
+	gsub(SIGN_MINUS, "-", str);
+	f->setCondition(str);
+	for(int i = 0; i < argumentsModel->rowCount(); i++) {
+		f->setArgumentDefinition(i + 1, (Argument*) argumentsModel->item(i, 0)->data().value<void*>());
+	}
+	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
+		str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
+		gsub(settings->multiplicationSign(), "*", str);
+		gsub(settings->divisionSign(), "/", str);
+		gsub(SIGN_MINUS, "-", str);
+		f->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
+	}
+	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
+	((UserFunction*) f)->setFormula(str);
+	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
 	if(ref1Button->isChecked()) {
 		gsub("x", "\\x", str);
 		gsub("y", "\\y", str);
@@ -415,8 +711,6 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	gsub(settings->multiplicationSign(), "*", str);
 	gsub(settings->divisionSign(), "/", str);
 	gsub(SIGN_MINUS, "-", str);
-	f = new UserFunction("", nameEdit->text().trimmed().toStdString(), str);
-	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	CALCULATOR->addFunction(f);
 	return f;
 }
@@ -439,8 +733,37 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 		if(f->countNames() > 1 && f->getName(1).name != nameEdit->text().trimmed().toStdString()) f->clearNames();
 		f->setName(nameEdit->text().trimmed().toStdString());
 	}
+	ParseOptions pa = settings->evalops.parse_options;
+	pa.base = 10;
+	std::string str;
+	f->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
+	f->setTitle(titleEdit->text().trimmed().toStdString());
+	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
+	f->setHidden(hideBox->isChecked());
+	str = CALCULATOR->unlocalizeExpression(exampleEdit->text().trimmed().toStdString(), pa);
+	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
+	gsub(SIGN_MINUS, "-", str);
+	f->setExample(str);
+	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
+	gsub(settings->multiplicationSign(), "*", str);
+	gsub(settings->divisionSign(), "/", str);
+	gsub(SIGN_MINUS, "-", str);
+	f->setCondition(str);
+	f->clearArgumentDefinitions();
+	for(int i = 0; i < argumentsModel->rowCount(); i++) {
+		f->setArgumentDefinition(i + 1, (Argument*) argumentsModel->item(i, 0)->data().value<void*>());
+	}
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
-		std::string str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
+		((UserFunction*) f)->clearSubfunctions();
+		for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
+			str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
+			gsub(settings->multiplicationSign(), "*", str);
+			gsub(settings->divisionSign(), "/", str);
+			gsub(SIGN_MINUS, "-", str);
+			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
+		}
+		str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
 		if(ref1Button->isChecked()) {
 			gsub("x", "\\x", str);
 			gsub("y", "\\y", str);
@@ -473,12 +796,15 @@ void FunctionEditDialog::subAddClicked() {
 	subfunctionsView->selectionModel()->setCurrentIndex(edit_item->index(), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear | QItemSelectionModel::Rows);
 	subfunctionsView->scrollTo(edit_item->index());
 	subfunctionsView->edit(edit_item->index());
+	onFunctionChanged();
 }
 void FunctionEditDialog::subEditClicked() {
 	subfunctionsView->edit(subfunctionsView->selectionModel()->currentIndex().siblingAtColumn(0));
+	onFunctionChanged();
 }
 void FunctionEditDialog::subDelClicked() {
 	subfunctionsModel->removeRow(subfunctionsView->selectionModel()->currentIndex().row());
+	onFunctionChanged();
 	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 		QStandardItem *item = subfunctionsModel->item(i, 2);
 		if(item) {
@@ -510,12 +836,35 @@ void FunctionEditDialog::argAddClicked() {
 	argumentsModel->appendRow(items);
 	argumentsView->selectionModel()->setCurrentIndex(edit_item->index(), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear | QItemSelectionModel::Rows);
 	argumentsView->scrollTo(edit_item->index());
-	argumentsView->edit(edit_item->index());
+	argEditClicked();
+}
+void FunctionEditDialog::argumentActivated(const QModelIndex &index) {
+	if(!nameEdit->isReadOnly() && index.column() != 0) argEditClicked();
 }
 void FunctionEditDialog::argEditClicked() {
+	int r = argumentsView->selectionModel()->currentIndex().row();
+	QStandardItem *item = argumentsModel->item(r, 0);
+	if(!item) return;
+	Argument *arg = (Argument*) item->data().value<void*>();
+	ArgumentEditDialog *d = new ArgumentEditDialog(this, nameEdit->isReadOnly());
+	d->setArgument(arg);
+	d->exec();
+	if(!nameEdit->isReadOnly()) {
+		if(arg) delete arg;
+		arg = d->createArgument();
+		item->setData(QVariant::fromValue((void*) arg));
+		item->setText(QString::fromStdString(arg->name()));
+		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		item = argumentsModel->item(r, 1);
+		item->setText(QString::fromStdString(arg->printlong()));
+		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		onFunctionChanged();
+	}
+	d->deleteLater();
 }
 void FunctionEditDialog::argDelClicked() {
 	argumentsModel->removeRow(argumentsView->selectionModel()->currentIndex().row());
+	onFunctionChanged();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		QStandardItem *item = argumentsModel->item(i, 2);
 		if(item) {
@@ -552,16 +901,22 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	o_function = f;
 	bool read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
+	ParseOptions pa = settings->evalops.parse_options;
+	pa.base = 10;
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);
-		std::string str = CALCULATOR->localizeExpression(((UserFunction*) f)->formula(), settings->evalops.parse_options);
+		std::string str = CALCULATOR->localizeExpression(((UserFunction*) f)->formula(), pa);
 		gsub("*", settings->multiplicationSign(), str);
 		gsub("/", settings->divisionSign(false), str);
 		gsub("-", SIGN_MINUS, str);
 		expressionEdit->setPlainText(QString::fromStdString(str));
 		for(size_t i = 1; i <= ((UserFunction*) f)->countSubfunctions(); i++) {
 			QList<QStandardItem *> items;
-			QStandardItem *item = new QStandardItem(QString::fromStdString(((UserFunction*) f)->getSubfunction(i)));
+			str = CALCULATOR->localizeExpression(((UserFunction*) f)->getSubfunction(i), pa);
+			gsub("*", settings->multiplicationSign(), str);
+			gsub("/", settings->divisionSign(false), str);
+			gsub("-", SIGN_MINUS, str);
+			QStandardItem *item = new QStandardItem(QString::fromStdString(str));
 			item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
 			item->setEditable(!read_only);
 			items.append(item);
@@ -578,61 +933,67 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 			items.append(item);
 			subfunctionsModel->appendRow(items);
 		}
-		int args = f->maxargs();
-		if(args < 0) {
-			args = f->minargs() + 1;
-		}
-		if((int) f->lastArgumentDefinitionIndex() > args) args = (int) f->lastArgumentDefinitionIndex();
-		for(int i = 1; i <= args; i++) {
-			Argument *arg = f->getArgumentDefinition(i);
-			QString str, str2;
-			if(arg) {
-				if(!read_only) arg = arg->copy();
-				str = QString::fromStdString(arg->printlong());
-				str2 = QString::fromStdString(arg->name());
-			} else {
-				Argument defarg;
-				str = QString::fromStdString(defarg.printlong());
-			}
-			QList<QStandardItem *> items;
-			QStandardItem *item = new QStandardItem(str2);
-			item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
-			item->setData(QVariant::fromValue((void*) arg));
-			item->setEditable(!read_only);
-			items.append(item);
-			item = new QStandardItem(str);
-			item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
-			item->setData(QVariant::fromValue((void*) arg));
-			item->setEditable(false);
-			items.append(item);
-			QString refstr = "\\";
-			if(i <= 3) refstr += 'x' + (i - 1);
-			else refstr += 'a' + (i - 4);
-			item = new QStandardItem(refstr);
-			item->setData(QVariant::fromValue((void*) arg));
-			item->setEditable(false);
-			item->setTextAlignment(Qt::AlignCenter);
-			items.append(item);
-			argumentsModel->appendRow(items);
-		}
 	} else {
 		read_only = true;
 		expressionEdit->setEnabled(false);
 		expressionEdit->clear();
 		subfunctionsView->setEnabled(false);
-		argumentsView->setEnabled(false);
+	}
+	int args = f->maxargs();
+	if(args < 0) {
+		args = f->minargs() + 1;
+	}
+	if((int) f->lastArgumentDefinitionIndex() > args) args = (int) f->lastArgumentDefinitionIndex();
+	for(int i = 1; i <= args; i++) {
+		Argument *arg = f->getArgumentDefinition(i);
+		QString str, str2;
+		if(arg) {
+			if(!read_only) arg = arg->copy();
+			str = QString::fromStdString(arg->printlong());
+			str2 = QString::fromStdString(arg->name());
+		} else {
+			Argument defarg;
+			str = QString::fromStdString(defarg.printlong());
+		}
+		QList<QStandardItem *> items;
+		QStandardItem *item = new QStandardItem(str2);
+		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		item->setData(QVariant::fromValue((void*) arg));
+		item->setEditable(!read_only);
+		items.append(item);
+		item = new QStandardItem(str);
+		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		item->setData(QVariant::fromValue((void*) arg));
+		item->setEditable(false);
+		items.append(item);
+		QString refstr = "\\";
+		if(i <= 3) refstr += 'x' + (i - 1);
+		else refstr += 'a' + (i - 4);
+		item = new QStandardItem(refstr);
+		item->setData(QVariant::fromValue((void*) arg));
+		item->setEditable(false);
+		item->setTextAlignment(Qt::AlignCenter);
+		items.append(item);
+		argumentsModel->appendRow(items);
 	}
 	descriptionEdit->setPlainText(QString::fromStdString(f->description()));
-	exampleEdit->setText(QString::fromStdString(f->example(true)));
+	std::string str = CALCULATOR->localizeExpression(f->example(true), pa);
+	gsub("*", settings->multiplicationSign(), str);
+	gsub("/", settings->divisionSign(false), str);
+	gsub("-", SIGN_MINUS, str);
+	exampleEdit->setText(QString::fromStdString(str));
+	str = CALCULATOR->localizeExpression(f->condition(), pa);
+	gsub("*", settings->multiplicationSign(), str);
+	gsub("/", settings->divisionSign(false), str);
+	gsub("-", SIGN_MINUS, str);
+	conditionEdit->setText(QString::fromStdString(str));
 	titleEdit->setText(QString::fromStdString(f->title()));
 	categoryEdit->setCurrentText(QString::fromStdString(f->category()));
-	categoryEdit->setEnabled(!read_only);
-	hideBox->setEnabled(!read_only);
 	descriptionEdit->setReadOnly(read_only);
 	exampleEdit->setReadOnly(read_only);
 	titleEdit->setReadOnly(read_only);
 	hideBox->setChecked(f->isHidden());
-	okButton->setEnabled(!read_only);
+	okButton->setEnabled(false);
 	nameEdit->setReadOnly(read_only);
 	subEditButton->setEnabled(false);
 	subAddButton->setEnabled(!read_only);
@@ -652,12 +1013,12 @@ void FunctionEditDialog::onNameEdited(const QString &str) {
 	}
 	name_edited = true;
 }
-void FunctionEditDialog::onExpressionChanged() {
-	okButton->setEnabled((!expressionEdit->document()->isEmpty() || !expressionEdit->isEnabled()) && !nameEdit->text().trimmed().isEmpty());
+void FunctionEditDialog::onFunctionChanged() {
+	okButton->setEnabled(!nameEdit->isReadOnly() && (!expressionEdit->document()->isEmpty() || !expressionEdit->isEnabled()) && !nameEdit->text().trimmed().isEmpty());
 }
 void FunctionEditDialog::setExpression(const QString &str) {
 	expressionEdit->setPlainText(str);
-	onExpressionChanged();
+	onFunctionChanged();
 }
 void FunctionEditDialog::setName(const QString &str) {
 	nameEdit->setText(str);

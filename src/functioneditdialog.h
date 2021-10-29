@@ -20,6 +20,7 @@ class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
 class QRadioButton;
+class QDoubleSpinBox;
 class QComboBox;
 class QCheckBox;
 class QTreeView;
@@ -56,6 +57,33 @@ class NamesEditDialog : public QDialog {
 
 };
 
+class ArgumentEditDialog : public QDialog {
+
+	Q_OBJECT
+
+	protected:
+
+		QComboBox *typeCombo;
+		QLineEdit *nameEdit, *conditionEdit;
+		QDoubleSpinBox *minEdit, *maxEdit;
+		QCheckBox *maxBox, *minBox, *vectorBox, *matrixBox, *zeroBox, *includeMinBox, *includeMaxBox, *testBox;
+
+	protected slots:
+
+		void typeChanged(int);
+		void minToggled(bool);
+		void maxToggled(bool);
+
+	public:
+
+		ArgumentEditDialog(QWidget *parent = NULL, bool = false);
+		virtual ~ArgumentEditDialog();
+
+		Argument *createArgument();
+		void setArgument(Argument*);
+
+};
+
 class FunctionEditDialog : public QDialog {
 
 	Q_OBJECT
@@ -77,13 +105,14 @@ class FunctionEditDialog : public QDialog {
 	protected slots:
 
 		void onNameEdited(const QString&);
-		void onExpressionChanged();
+		void onFunctionChanged();
 		void subAddClicked();
 		void subEditClicked();
 		void subDelClicked();
 		void argAddClicked();
 		void argEditClicked();
 		void argDelClicked();
+		void argumentActivated(const QModelIndex&);
 		void selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&);
 		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);
 		void onRejected();

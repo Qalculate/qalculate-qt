@@ -92,7 +92,7 @@ ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, Q
 	reuseTip(text, pos);
 }
 void ExpressionTipLabel::restartExpireTimer() {
-	int time = 10000 + 40 * qMax(0, text().length()-100);
+	int time = 50000 + 40 * qMax(0, text().length()-100);
 	expireTimer.start(time, this);
 	hideTimer.stop();
 }
