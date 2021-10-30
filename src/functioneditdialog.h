@@ -13,6 +13,7 @@
 #define FUNCTION_EDIT_DIALOG_H
 
 #include <QDialog>
+#include <QPlainTextEdit>
 
 #include <libqalculate/qalculate.h>
 
@@ -54,6 +55,36 @@ class NamesEditDialog : public QDialog {
 		void modifyNames(ExpressionItem*, const QString&);
 		void setNames(ExpressionItem*, const QString&);
 		QString firstName();
+
+};
+
+class MathTextEdit : public QPlainTextEdit {
+
+	public:
+
+		MathTextEdit(QWidget *parent);
+		~MathTextEdit();
+
+		QSize sizeHint() const;
+
+	protected:
+
+		void keyPressEvent(QKeyEvent *event) override;
+
+};
+
+class SmallTextEdit : public QPlainTextEdit {
+
+	public:
+
+		SmallTextEdit(int r, QWidget *parent);
+		~SmallTextEdit();
+
+		QSize sizeHint() const;
+
+	protected:
+
+		int i_rows;
 
 };
 
@@ -117,6 +148,7 @@ class FunctionEditDialog : public QDialog {
 		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);
 		void onRejected();
 		void editNames();
+		void ref1Toggled(bool);
 
 	public:
 

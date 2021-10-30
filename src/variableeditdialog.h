@@ -20,6 +20,9 @@ class QLineEdit;
 class QCheckBox;
 class QPushButton;
 class MatrixWidget;
+class QComboBox;
+class QPlainTextEdit;
+class NamesEditDialog;
 
 class VariableEditDialog : public QDialog {
 
@@ -27,18 +30,26 @@ class VariableEditDialog : public QDialog {
 
 	protected:
 
-		QLineEdit *nameEdit, *valueEdit;
-		QCheckBox *temporaryBox;
+		QLineEdit *nameEdit, *titleEdit;
+		QComboBox *categoryEdit;
+		QCheckBox *temporaryBox, *hideBox;
+		QPlainTextEdit *descriptionEdit, *valueEdit;
 		QPushButton *okButton;
 		MatrixWidget *matrixEdit;
-		bool b_empty, b_matrix, b_changed;
+		NamesEditDialog *namesEditDialog;
+		Variable *o_variable;
+		bool b_empty, b_matrix, b_changed, name_edited;
 
 	protected slots:
 
 		void onNameEdited(const QString&);
-		void onValueEdited(const QString&);
+		void onValueEdited();
+		void onVariableChanged();
 		void onMatrixDimensionChanged();
 		void onMatrixChanged();
+		void editNames();
+		void temporaryClicked();
+		void categoryChanged(const QString&);
 
 	public:
 

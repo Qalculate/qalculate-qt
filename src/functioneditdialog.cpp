@@ -10,7 +10,6 @@
 */
 
 #include <QLineEdit>
-#include <QPlainTextEdit>
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
@@ -33,58 +32,75 @@
 #include "qalculateqtsettings.h"
 #include "functioneditdialog.h"
 
-class MathTextEdit : public QPlainTextEdit {
+SmallTextEdit::SmallTextEdit(int r, QWidget *parent) : QPlainTextEdit(parent), i_rows(r) {}
+SmallTextEdit::~SmallTextEdit() {}
 
-	public:
-
-		MathTextEdit(QWidget *parent) : QPlainTextEdit(parent) {
-#ifndef _WIN32
-			setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+QSize SmallTextEdit::sizeHint() const {
+	QSize size = QPlainTextEdit::sizeHint();
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	size.setHeight(fm.lineSpacing() * i_rows + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	size.setHeight(fm.lineSpacing() * i_rows + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
 #endif
-		}
-		~MathTextEdit() {}
+	return size;
+}
 
-	protected:
+MathTextEdit::MathTextEdit(QWidget *parent) : QPlainTextEdit(parent) {
+#ifndef _WIN32
+	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
+#endif
+}
+MathTextEdit::~MathTextEdit() {}
 
-		void keyPressEvent(QKeyEvent *event) override {
-			if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
-				switch(event->key()) {
-					case Qt::Key_Asterisk: {
-						insertPlainText(settings->multiplicationSign());
-						return;
-					}
-					case Qt::Key_Slash: {
-						insertPlainText(settings->divisionSign(false));
-						return;
-					}
-					case Qt::Key_Minus: {
-						insertPlainText(SIGN_MINUS);
-						return;
-					}
-					case Qt::Key_Dead_Circumflex: {
-						insertPlainText(settings->caret_as_xor ? " xor " : "^");
-						return;
-					}
-					case Qt::Key_Dead_Tilde: {
-						insertPlainText("~");
-						return;
-					}
-					case Qt::Key_AsciiCircum: {
-						if(settings->caret_as_xor) {
-							insertPlainText(" xor ");
-							return;
-						}
-						break;
-					}
-				}
-			}
-			if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-				insertPlainText("^");
+QSize MathTextEdit::sizeHint() const {
+	QSize size = QPlainTextEdit::sizeHint();
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
+#endif
+	return size;
+}
+void MathTextEdit::keyPressEvent(QKeyEvent *event) {
+	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+		switch(event->key()) {
+			case Qt::Key_Asterisk: {
+				insertPlainText(settings->multiplicationSign());
 				return;
 			}
-			QPlainTextEdit::keyPressEvent(event);
+			case Qt::Key_Slash: {
+				insertPlainText(settings->divisionSign(false));
+				return;
+			}
+			case Qt::Key_Minus: {
+				insertPlainText(SIGN_MINUS);
+				return;
+			}
+			case Qt::Key_Dead_Circumflex: {
+				insertPlainText(settings->caret_as_xor ? " xor " : "^");
+				return;
+			}
+			case Qt::Key_Dead_Tilde: {
+				insertPlainText("~");
+				return;
+			}
+			case Qt::Key_AsciiCircum: {
+				if(settings->caret_as_xor) {
+					insertPlainText(" xor ");
+					return;
+				}
+				break;
+			}
 		}
-};
+	}
+	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		insertPlainText("^");
+		return;
+	}
+	QPlainTextEdit::keyPressEvent(event);
+}
 
 #include <QProxyStyle>
 #include <QStyleOptionViewItem>
@@ -282,12 +298,14 @@ ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialo
 	grid->addWidget(testBox, 2, 0, 1, 2);
 	grid->addWidget(new QLabel(tr("Custom condition:"), this), 3, 0);
 	conditionEdit = new MathLineEdit(this);
+	conditionEdit->setToolTip(tr("For example if argument is a matrix that must have equal number of rows and columns: rows(\\x) = columns(\\x)"));
 	grid->addWidget(conditionEdit, 3, 1);
 	matrixBox = new QCheckBox(tr("Allow Matrix"), this);
 	grid->addWidget(matrixBox, 4, 0, 1, 2);
 	zeroBox = new QCheckBox(tr("Forbid zero"), this);
 	grid->addWidget(zeroBox, 5, 0, 1, 2);
 	vectorBox = new QCheckBox(tr("Handle vector"), this);
+	vectorBox->setToolTip(tr("Calculate function for each separate element in vector."));
 	grid->addWidget(vectorBox, 6, 0, 1, 2);
 	minBox = new QCheckBox(tr("Min"), this);
 	grid->addWidget(minBox, 7, 0);
@@ -320,7 +338,7 @@ ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialo
 ArgumentEditDialog::~ArgumentEditDialog() {}
 
 void ArgumentEditDialog::setArgument(Argument *arg) {
-	testBox->setChecked(arg && arg->tests());
+	testBox->setChecked(!arg || arg->tests());
 	matrixBox->setChecked(!arg || arg->matrixAllowed() || arg->type() == ARGUMENT_TYPE_FREE || arg->type() == ARGUMENT_TYPE_MATRIX);
 	matrixBox->setEnabled(arg && arg->type() != ARGUMENT_TYPE_FREE && arg->type() != ARGUMENT_TYPE_MATRIX);
 	if(arg) {
@@ -461,6 +479,18 @@ Argument *ArgumentEditDialog::createArgument() {
 			}
 			break;
 		}
+		case ARGUMENT_TYPE_SYMBOLIC: {arg = new SymbolicArgument(); break;}
+		case ARGUMENT_TYPE_TEXT: {arg = new TextArgument(); break;}
+		case ARGUMENT_TYPE_DATE: {arg = new DateArgument(); break;}
+		case ARGUMENT_TYPE_FILE: {arg = new FileArgument(); break;}
+		case ARGUMENT_TYPE_VECTOR: {arg = new VectorArgument(); break;}
+		case ARGUMENT_TYPE_MATRIX: {arg = new MatrixArgument(); break;}
+		case ARGUMENT_TYPE_EXPRESSION_ITEM: {arg = new ExpressionItemArgument(); break;}
+		case ARGUMENT_TYPE_FUNCTION: {arg = new FunctionArgument(); break;}
+		case ARGUMENT_TYPE_UNIT: {arg = new UnitArgument(); break;}
+		case ARGUMENT_TYPE_VARIABLE: {arg = new VariableArgument(); break;}
+		case ARGUMENT_TYPE_BOOLEAN: {arg = new BooleanArgument(); break;}
+		case ARGUMENT_TYPE_ANGLE: {arg = new AngleArgument(); break;}
 		default: {
 			arg = new Argument();
 		}
@@ -629,13 +659,14 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(hideBox, SIGNAL(clicked()), this, SLOT(onFunctionChanged()));
 	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
 	connect(exampleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
-	connect(categoryEdit, SIGNAL(activated(int)), this, SLOT(onFunctionChanged()));
+	connect(categoryEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(onFunctionChanged()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(subfunctionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedArgumentChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(argumentActivated(const QModelIndex&)));
 	connect(this, SIGNAL(rejected()), this, SLOT(onRejected()));
+	connect(ref1Button, SIGNAL(toggled(bool)), this, SLOT(ref1Toggled(bool)));
 	okButton->setEnabled(false);
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 }
@@ -643,7 +674,7 @@ FunctionEditDialog::~FunctionEditDialog() {}
 
 void FunctionEditDialog::editNames() {
 	if(!namesEditDialog) {
-		namesEditDialog = new NamesEditDialog(this, expressionEdit->isReadOnly());
+		namesEditDialog = new NamesEditDialog(this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_function, nameEdit->text());
 	}
 	namesEditDialog->exec();
@@ -651,11 +682,21 @@ void FunctionEditDialog::editNames() {
 	name_edited = false;
 	onFunctionChanged();
 }
+
+#define FIX_EXPRESSION if(ref1Button->isChecked() && str.find("\\x") == std::string::npos) {\
+				gsub("x", "\\x", str);\
+				gsub("y", "\\y", str);\
+				gsub("z", "\\z", str);\
+			}\
+			gsub(settings->multiplicationSign(), "*", str);\
+			gsub(settings->divisionSign(), "/", str);\
+			gsub(SIGN_MINUS, "-", str);\
+
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
-	if(name_edited && CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
+	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
+		if(name_edited && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
@@ -686,38 +727,27 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	gsub(SIGN_MINUS, "-", str);
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	FIX_EXPRESSION
 	f->setCondition(str);
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		f->setArgumentDefinition(i + 1, (Argument*) argumentsModel->item(i, 0)->data().value<void*>());
 	}
 	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 		str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
-		gsub(settings->multiplicationSign(), "*", str);
-		gsub(settings->divisionSign(), "/", str);
-		gsub(SIGN_MINUS, "-", str);
+		FIX_EXPRESSION
 		f->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
-	((UserFunction*) f)->setFormula(str);
 	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
-	if(ref1Button->isChecked()) {
-		gsub("x", "\\x", str);
-		gsub("y", "\\y", str);
-		gsub("z", "\\z", str);
-	}
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	FIX_EXPRESSION
+	((UserFunction*) f)->setFormula(str);
 	CALCULATOR->addFunction(f);
 	return f;
 }
 bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
-	if(name_edited && CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
-		if(QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
+	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
+		if(name_edited && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
@@ -741,14 +771,10 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
 	f->setHidden(hideBox->isChecked());
 	str = CALCULATOR->unlocalizeExpression(exampleEdit->text().trimmed().toStdString(), pa);
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	FIX_EXPRESSION
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	FIX_EXPRESSION
 	f->setCondition(str);
 	f->clearArgumentDefinitions();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
@@ -758,20 +784,11 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 		((UserFunction*) f)->clearSubfunctions();
 		for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 			str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
-			gsub(settings->multiplicationSign(), "*", str);
-			gsub(settings->divisionSign(), "/", str);
-			gsub(SIGN_MINUS, "-", str);
+			FIX_EXPRESSION
 			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
 		}
 		str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
-		if(ref1Button->isChecked()) {
-			gsub("x", "\\x", str);
-			gsub("y", "\\y", str);
-			gsub("z", "\\z", str);
-		}
-		gsub(settings->multiplicationSign(), "*", str);
-		gsub(settings->divisionSign(), "/", str);
-		gsub(SIGN_MINUS, "-", str);
+		FIX_EXPRESSION
 		((UserFunction*) f)->setFormula(str);
 	}
 	return true;
@@ -862,13 +879,26 @@ void FunctionEditDialog::argEditClicked() {
 	}
 	d->deleteLater();
 }
+void FunctionEditDialog::ref1Toggled(bool b) {
+	for(int i = 0; i < argumentsModel->rowCount(); i++) {
+		QStandardItem *item = argumentsModel->item(i, 2);
+		if(item) {
+			QString refstr;
+			if(i > 3 || !b) refstr += "\\";
+			if(i <= 3) refstr += 'x' + (i - 1);
+			else refstr += 'a' + (i - 4);
+			item->setText(refstr);
+		}
+	}
+}
 void FunctionEditDialog::argDelClicked() {
 	argumentsModel->removeRow(argumentsView->selectionModel()->currentIndex().row());
 	onFunctionChanged();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		QStandardItem *item = argumentsModel->item(i, 2);
 		if(item) {
-			QString refstr = "\\";
+			QString refstr;
+			if(i > 3 || ref2Button->isChecked()) refstr += "\\";
 			if(i <= 3) refstr += 'x' + (i - 1);
 			else refstr += 'a' + (i - 4);
 			item->setText(refstr);
@@ -966,7 +996,8 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 		item->setData(QVariant::fromValue((void*) arg));
 		item->setEditable(false);
 		items.append(item);
-		QString refstr = "\\";
+		QString refstr;
+		if(i > 3 || ref2Button->isChecked()) refstr += "\\";
 		if(i <= 3) refstr += 'x' + (i - 1);
 		else refstr += 'a' + (i - 4);
 		item = new QStandardItem(refstr);
@@ -988,7 +1019,9 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	gsub("-", SIGN_MINUS, str);
 	conditionEdit->setText(QString::fromStdString(str));
 	titleEdit->setText(QString::fromStdString(f->title()));
+	categoryEdit->blockSignals(true);
 	categoryEdit->setCurrentText(QString::fromStdString(f->category()));
+	categoryEdit->blockSignals(false);
 	descriptionEdit->setReadOnly(read_only);
 	exampleEdit->setReadOnly(read_only);
 	titleEdit->setReadOnly(read_only);
