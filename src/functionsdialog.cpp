@@ -380,7 +380,11 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 							str += tr("default:", "argument default").toStdString();
 							str += " ";
 							ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-							str += CALCULATOR->localizeExpression(f->getDefaultValue(i2), pa);
+							std::string str2 = CALCULATOR->localizeExpression(f->getDefaultValue(i2), pa);
+							gsub("*", settings->multiplicationSign(), str2);
+							gsub("/", settings->divisionSign(false), str2);
+							gsub("-", SIGN_MINUS, str2);
+							str += str2;
 						}
 						str += ")";
 					}

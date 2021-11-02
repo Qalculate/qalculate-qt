@@ -53,6 +53,7 @@
 #include "keypadwidget.h"
 #include "unknowneditdialog.h"
 #include "variableeditdialog.h"
+#include "uniteditdialog.h"
 #include "functioneditdialog.h"
 #include "preferencesdialog.h"
 #include "functionsdialog.h"
@@ -307,6 +308,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
 	menu->addAction(tr("Unknown Variable…"), this, SLOT(newUnknown()));
 	menu->addAction(tr("Matrix…"), this, SLOT(newMatrix()));
+	menu->addAction(tr("Unit…"), this, SLOT(newUnit()));
 	menu = menu2;
 	menu->addSeparator();
 	menu->addAction(tr("Import CSV File…"), this, SLOT(importCSV()));
@@ -4504,7 +4506,7 @@ void QalculateWindow::exportCSV() {
 	CSVDialog::exportCSVFile(this, mstruct);
 }
 void QalculateWindow::onStoreActivated() {
-	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : (exact_text.empty() ? QString::fromStdString(unhtmlize(result_text)) : QString::fromStdString(exact_text)));
+	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : QString::fromStdString(exact_text));
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
@@ -4535,6 +4537,15 @@ void QalculateWindow::newUnknown() {
 		if(unitsDialog) unitsDialog->updateUnits();
 	}
 }
+void QalculateWindow::newUnit() {
+	Unit *u = UnitEditDialog::newUnit(this);
+	if(u) {
+		expressionEdit->updateCompletion();
+		if(variablesDialog) variablesDialog->updateVariables();
+		if(unitsDialog) unitsDialog->updateUnits();
+	}
+}
+
 void QalculateWindow::newFunction() {
 	MathFunction *f = FunctionEditDialog::newFunction(this);
 	if(f) {

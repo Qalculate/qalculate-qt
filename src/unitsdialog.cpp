@@ -29,7 +29,7 @@
 #include "qalculateqtsettings.h"
 #include "unitsdialog.h"
 #include "itemproxymodel.h"
-//#include "uniteditdialog.h"
+#include "uniteditdialog.h"
 
 UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	last_from = true;
@@ -91,9 +91,6 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	convertButton = new QPushButton(tr("Convert"), this); box->addWidget(convertButton); connect(convertButton, SIGNAL(clicked()), this, SLOT(convertClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
-	newButton->hide();
-	editButton->hide();
-	delButton->hide();
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QGridLayout *grid = new QGridLayout();
@@ -284,7 +281,45 @@ void UnitsDialog::searchChanged(const QString &str) {
 	unitsView->selectionModel()->setCurrentIndex(unitsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	if(str.isEmpty()) unitsView->setFocus();
 }
-void UnitsDialog::newClicked() {}
+void UnitsDialog::newClicked() {
+	ExpressionItem *replaced_item = NULL;
+	Unit *u = UnitEditDialog::newUnit(this, &replaced_item);
+	if(u) {
+		if(replaced_item) {
+			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
+				emit unitRemoved((Unit*) replaced_item);
+			} else if(replaced_item == u || !CALCULATOR->stillHasUnit((Unit*) replaced_item) || (replaced_item->type() == TYPE_UNIT && !CALCULATOR->hasUnit((Unit*) replaced_item))) {
+				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+			} else if(replaced_item->type() == TYPE_UNIT) {
+				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
+				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+			} else if(!replaced_item->isActive()) {
+				ADD_INACTIVE_CATEGORY
+			}
+		}
+		selected_item = u;
+		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true)));
+		item->setEditable(false);
+		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
+		sourceModel->appendRow(item);
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(!list.isEmpty()) {
+				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			}
+		} else {
+			unitsModel->invalidate();
+		}
+		sourceModel->sort(0);
+		QModelIndex index = unitsModel->mapFromSource(item->index());
+		if(index.isValid()) {
+			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			unitsView->scrollTo(index);
+		}
+		emit itemsChanged();
+	}
+}
 void UnitsDialog::unitRemoved(Unit *u) {
 	QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) u), 1, Qt::MatchExactly);
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
@@ -293,7 +328,49 @@ void UnitsDialog::unitDeactivated(Unit*) {
 	ADD_INACTIVE_CATEGORY
 	unitsModel->invalidate();
 }
-void UnitsDialog::editClicked() {}
+void UnitsDialog::editClicked() {
+	QModelIndex index = unitsView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
+	if(!u) return;
+	ExpressionItem *replaced_item = NULL;
+	if(UnitEditDialog::editUnit(this, u, &replaced_item)) {
+		sourceModel->removeRow(unitsModel->mapToSource(unitsView->selectionModel()->currentIndex()).row());
+		if(replaced_item) {
+			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
+				emit unitRemoved((Unit*) replaced_item);
+			} else if(!CALCULATOR->stillHasUnit((Unit*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasUnit((Unit*) replaced_item))) {
+				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+			} else if(replaced_item->type() == TYPE_UNIT) {
+				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
+				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+			} else if(!replaced_item->isActive()) {
+				ADD_INACTIVE_CATEGORY
+			}
+		}
+		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true)));
+		item->setEditable(false);
+		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
+		sourceModel->appendRow(item);
+		selected_item = u;
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(!list.isEmpty()) {
+				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			}
+		} else {
+			unitsModel->invalidate();
+		}
+		sourceModel->sort(0);
+		QModelIndex index = unitsModel->mapFromSource(item->index());
+		if(index.isValid()) {
+			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			unitsView->scrollTo(index);
+		}
+		emit itemsChanged();
+	}
+}
 void UnitsDialog::delClicked() {
 	QModelIndex index = unitsView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
@@ -429,7 +506,7 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 					deactivateButton->setText(tr("Activate"));
 				}
 			}
-			//editButton->setEnabled(!u->isBuiltin());
+			editButton->setEnabled(true);
 			insertButton->setEnabled(u->isActive());
 			convertButton->setEnabled(u->isActive());
 			delButton->setEnabled(u->isLocal());

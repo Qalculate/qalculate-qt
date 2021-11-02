@@ -984,10 +984,10 @@ void QalculateQtSettings::savePreferences(bool) {
 
 }
 
-const char *QalculateQtSettings::multiplicationSign() {
+const char *QalculateQtSettings::multiplicationSign(bool units) {
 	if(!printops.use_unicode_signs) return "*";
 	switch(printops.multiplication_sign) {
-		case MULTIPLICATION_SIGN_X: {return SIGN_MULTIPLICATION;}
+		case MULTIPLICATION_SIGN_X: {if(units) {return SIGN_MIDDLEDOT;} return SIGN_MULTIPLICATION;}
 		case MULTIPLICATION_SIGN_DOT: {return SIGN_MULTIDOT;}
 		case MULTIPLICATION_SIGN_ALTDOT: {return SIGN_MIDDLEDOT;}
 		default: {return "*";}
@@ -997,6 +997,22 @@ const char *QalculateQtSettings::divisionSign(bool output) {
 	if(printops.division_sign == DIVISION_SIGN_DIVISION && printops.use_unicode_signs) return SIGN_DIVISION;
 	else if(output && printops.division_sign == DIVISION_SIGN_DIVISION_SLASH && printops.use_unicode_signs) return SIGN_DIVISION_SLASH;
 	return "/";
+}
+
+std::string QalculateQtSettings::localizeExpression(std::string str, bool unit_expression) {
+	ParseOptions pa = evalops.parse_options; pa.base = 10;
+	str = CALCULATOR->localizeExpression(str, pa);
+	gsub("*", multiplicationSign(unit_expression), str);
+	gsub("/", divisionSign(false), str);
+	gsub("-", SIGN_MINUS, str);
+	return str;
+}
+
+std::string QalculateQtSettings::unlocalizeExpression(std::string str) {
+	ParseOptions pa = evalops.parse_options; pa.base = 10;
+	str = CALCULATOR->localizeExpression(str, pa);
+	CALCULATOR->parseSigns(str);
+	return str;
 }
 
 void QalculateQtSettings::updateMessagePrintOptions() {
@@ -1013,7 +1029,7 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
 }
 
-MathLineEdit::MathLineEdit(QWidget *parent) : QLineEdit(parent) {
+MathLineEdit::MathLineEdit(QWidget *parent, bool unit_expression) : QLineEdit(parent), b_unit(unit_expression) {
 #ifndef _WIN32
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 #endif
@@ -1023,7 +1039,7 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Asterisk: {
-				insert(SIGN_MULTIPLICATION);
+				insert(settings->multiplicationSign(b_unit));
 				return;
 			}
 			case Qt::Key_Minus: {

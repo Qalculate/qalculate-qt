@@ -73,8 +73,10 @@ class QalculateQtSettings : QObject {
 		bool isAnswerVariable(Variable *v);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
-		const char *multiplicationSign();
+		const char *multiplicationSign(bool units = false);
 		const char *divisionSign(bool output = true);
+		std::string localizeExpression(std::string, bool unit_expression = false);
+		std::string unlocalizeExpression(std::string);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
@@ -131,11 +133,12 @@ class MathLineEdit : public QLineEdit {
 
 	public:
 
-		MathLineEdit(QWidget *parent = NULL);
+		MathLineEdit(QWidget *parent = NULL, bool unit_expression = false);
 		virtual ~MathLineEdit();
 
 	protected:
 
+		bool b_unit;
 		void keyPressEvent(QKeyEvent*) override;
 
 };

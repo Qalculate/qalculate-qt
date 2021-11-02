@@ -220,6 +220,7 @@ class QalculateWindow : public QMainWindow {
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
 		void newVariable();
+		void newUnit();
 		void newMatrix();
 		void newUnknown();
 		void newFunction();

@@ -92,7 +92,7 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	grid->addWidget(new QLabel(tr("Descriptive name:"), this), 1, 0);
 	titleEdit = new QLineEdit(this);
 	grid->addWidget(titleEdit, 1, 1);
-	hideBox = new QCheckBox(tr("Hide function"), this);
+	hideBox = new QCheckBox(tr("Hide variable"), this);
 	grid->addWidget(hideBox, 2, 1, Qt::AlignRight);
 	grid->addWidget(new QLabel(tr("Description:"), this), 3, 0, 1, 2);
 	descriptionEdit = new SmallTextEdit(2, this);
@@ -168,22 +168,17 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 	if(var && var->isLocal() && var->isKnown()) {
 		v = (KnownVariable*) var;
 		if(v->countNames() > 1) v->clearNames();
-		v->setHidden(false); v->setDescription(""); v->setTitle("");
 		if(!modifyVariable(v, default_value)) return NULL;
 		return v;
 	}
 	if(default_value && ((!b_matrix && valueEdit->toPlainText().isEmpty()) || !b_changed)) {
 		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), *default_value);
 	} else {
-		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		std::string str;
 		if(b_matrix) {
 			str = matrixEdit->getMatrixString().toStdString();
 		} else {
-			str = CALCULATOR->unlocalizeExpression(valueEdit->toPlainText().toStdString(), pa);
-			gsub(settings->multiplicationSign(), "*", str);
-			gsub(settings->divisionSign(), "/", str);
-			gsub(SIGN_MINUS, "-", str);
+			str = settings->unlocalizeExpression(valueEdit->toPlainText().toStdString());
 		}
 		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), str);
 	}
@@ -219,15 +214,11 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 	if(default_value && ((!b_matrix && valueEdit->toPlainText().isEmpty()) || !b_changed)) {
 		v->set(*default_value);
 	} else {
-		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		std::string str;
 		if(b_matrix) {
 			str = matrixEdit->getMatrixString().toStdString();
 		} else {
-			str = CALCULATOR->unlocalizeExpression(valueEdit->toPlainText().toStdString(), pa);
-			gsub(settings->multiplicationSign(), "*", str);
-			gsub(settings->divisionSign(), "/", str);
-			gsub(SIGN_MINUS, "-", str);
+			str = settings->unlocalizeExpression(valueEdit->toPlainText().toStdString());
 		}
 		v->set(str);
 	}
@@ -241,18 +232,40 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
 	if(!nameEdit->text().isEmpty()) o_variable = v;
 	if(v->isExpression() && !b_matrix) {
-		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		std::string str = CALCULATOR->localizeExpression(v->expression(), pa);
-		gsub(settings->multiplicationSign(), "*", str);
-		gsub(settings->divisionSign(), "/", str);
-		gsub(SIGN_MINUS, "-", str);
-		valueEdit->setPlainText(QString::fromStdString(str));
+		std::string value_str = settings->localizeExpression(v->expression());
+		bool is_relative = false;
+		if((!v->uncertainty(&is_relative).empty() || !v->unit().empty()) && !is_relative && v->expression().find_first_not_of(NUMBER_ELEMENTS) != std::string::npos) {
+			value_str.insert(0, 1, '(');
+			value_str += ')';
+		}
+		if(!v->uncertainty(&is_relative).empty()) {
+			if(is_relative) {
+				value_str.insert(0, "(");
+				value_str.insert(0, CALCULATOR->f_uncertainty->referenceName());
+				value_str += CALCULATOR->getComma();
+				value_str += " ";
+				value_str += settings->localizeExpression(v->uncertainty());
+				value_str += CALCULATOR->getComma();
+				value_str += " 1)";
+			} else {
+				value_str += SIGN_PLUSMINUS;
+				value_str += settings->localizeExpression(v->uncertainty());
+			}
+		}
+		if(!v->unit().empty() && v->unit() != "auto") {
+			value_str += " ";
+			value_str += settings->localizeExpression(v->unit(), true);
+		}
+		valueEdit->setPlainText(QString::fromStdString(value_str));
 	} else if(b_matrix) {
 		matrixEdit->setMatrix(v->get());
 	} else {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
 		po.allow_non_usable = false;
+		po.preserve_precision = true;
+		po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+		if(po.number_fraction_format == FRACTION_DECIMAL) po.number_fraction_format = FRACTION_DECIMAL_EXACT;
 		po.base = 10;
 		valueEdit->setPlainText(QString::fromStdString(CALCULATOR->print(v->get(), 1000, po)));
 	}
@@ -263,7 +276,9 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 		valueEdit->setReadOnly(!v->isLocal());
 	}
 	temporaryBox->setChecked(v->category() == CALCULATOR->temporaryCategory());
+	descriptionEdit->blockSignals(true);
 	descriptionEdit->setPlainText(QString::fromStdString(v->description()));
+	descriptionEdit->blockSignals(false);
 	titleEdit->setText(QString::fromStdString(v->title()));
 	categoryEdit->blockSignals(true);
 	categoryEdit->setCurrentText(QString::fromStdString(v->category()));
@@ -319,13 +334,25 @@ KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *d
 	bool edit_matrix = default_value && default_value->isMatrix() && default_value->rows() * default_value->columns() <= 10000;
 	VariableEditDialog *d = new VariableEditDialog(parent, default_value != NULL && (value_str.isEmpty() || value_str.length() > 1000 || edit_matrix), edit_matrix);
 	d->setWindowTitle(tr("New Variable"));
+	QString vstr = value_str;
 	if(edit_matrix) {
 		KnownVariable v(CALCULATOR->temporaryCategory(), "", *default_value);
 		d->setVariable(&v);
-	} else if(value_str.length() > 1000) {
+	} else if(vstr.length() > 1000) {
 		d->setValue(QString());
 	} else {
-		d->setValue(value_str);
+		if(vstr.isEmpty() && default_value) {
+			PrintOptions po = settings->printops;
+			po.is_approximate = NULL;
+			po.allow_non_usable = false;
+			po.preserve_precision = true;
+			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+			po.show_ending_zeroes = false;
+			if(po.number_fraction_format == FRACTION_DECIMAL) po.number_fraction_format = FRACTION_DECIMAL_EXACT;
+			po.base = 10;
+			vstr = QString::fromStdString(CALCULATOR->print(*default_value, 1000, po));
+		}
+		d->setValue(vstr);
 	}
 	std::string v_name;
 	int i = 1;
@@ -341,7 +368,7 @@ KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *d
 			if(v) break;
 		} else {
 			QString str = d->value().trimmed();
-			if(default_value && str == value_str) d->setValue("");
+			if(default_value && str == vstr) d->setValue("");
 			v = d->createVariable(default_value, replaced_item);
 			if(v) break;
 			d->setValue(str);

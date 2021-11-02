@@ -259,12 +259,14 @@ void NamesEditDialog::nameChanged(QStandardItem *item) {
 		namesModel->blockSignals(false);
 		QMessageBox::warning(this, tr("Warning"), tr("Illegal name"));
 	} else if(o_item->type() == TYPE_FUNCTION && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
-		QMessageBox::warning(this, tr("Warning"), tr("A function with the same name already exists."));
+		MathFunction *f = CALCULATOR->getActiveFunction(item->text().trimmed().toStdString());
+		if(!f || f->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A function with the same name already exists."));
 	} else if(o_item->type() == TYPE_VARIABLE && CALCULATOR->variableNameTaken(item->text().trimmed().toStdString(), (Variable*) o_item)) {
 		Variable *var = CALCULATOR->getActiveVariable(item->text().trimmed().toStdString());
 		if(!var || var->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
 	} else if(o_item->type() == TYPE_UNIT && CALCULATOR->unitNameTaken(item->text().trimmed().toStdString(), (Unit*) o_item)) {
-		QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
+		Unit *u = CALCULATOR->getActiveUnit(item->text().trimmed().toStdString());
+		if(!u || u->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
 	}
 }
 
@@ -298,14 +300,14 @@ ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialo
 	grid->addWidget(testBox, 2, 0, 1, 2);
 	grid->addWidget(new QLabel(tr("Custom condition:"), this), 3, 0);
 	conditionEdit = new MathLineEdit(this);
-	conditionEdit->setToolTip(tr("For example if argument is a matrix that must have equal number of rows and columns: rows(\\x) = columns(\\x)"));
+	conditionEdit->setToolTip("<div>" + tr("For example if argument is a matrix that must have equal number of rows and columns: rows(\\x) = columns(\\x)") + "</div>");
 	grid->addWidget(conditionEdit, 3, 1);
 	matrixBox = new QCheckBox(tr("Allow Matrix"), this);
 	grid->addWidget(matrixBox, 4, 0, 1, 2);
 	zeroBox = new QCheckBox(tr("Forbid zero"), this);
 	grid->addWidget(zeroBox, 5, 0, 1, 2);
 	vectorBox = new QCheckBox(tr("Handle vector"), this);
-	vectorBox->setToolTip(tr("Calculate function for each separate element in vector."));
+	vectorBox->setToolTip("<div>" + tr("Calculate function for each separate element in vector.") + "</div>");
 	grid->addWidget(vectorBox, 6, 0, 1, 2);
 	minBox = new QCheckBox(tr("Min"), this);
 	grid->addWidget(minBox, 7, 0);
@@ -317,11 +319,9 @@ ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialo
 	grid->addWidget(maxBox, 9, 0);
 	maxEdit = new QDoubleSpinBox(this);
 	minEdit->setDecimals(8);
-	minEdit->setMinimum(INT_MIN);
-	minEdit->setMaximum(INT_MAX);
+	minEdit->setRange(INT_MIN, INT_MAX);
 	maxEdit->setDecimals(8);
-	maxEdit->setMinimum(INT_MIN);
-	maxEdit->setMaximum(INT_MAX);
+	maxEdit->setRange(INT_MIN, INT_MAX);
 	grid->addWidget(maxEdit, 9, 1);
 	includeMaxBox = new QCheckBox(tr("Include equals"), this);
 	grid->addWidget(includeMaxBox, 10, 1, Qt::AlignRight);
@@ -342,11 +342,7 @@ void ArgumentEditDialog::setArgument(Argument *arg) {
 	matrixBox->setChecked(!arg || arg->matrixAllowed() || arg->type() == ARGUMENT_TYPE_FREE || arg->type() == ARGUMENT_TYPE_MATRIX);
 	matrixBox->setEnabled(arg && arg->type() != ARGUMENT_TYPE_FREE && arg->type() != ARGUMENT_TYPE_MATRIX);
 	if(arg) {
-		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-		std::string str = CALCULATOR->localizeExpression(arg->getCustomCondition(), pa);
-		gsub("*", settings->multiplicationSign(), str);
-		gsub("/", settings->divisionSign(false), str);
-		gsub("-", SIGN_MINUS, str);
+		std::string str = settings->localizeExpression(arg->getCustomCondition());
 		conditionEdit->setText(QString::fromStdString(str));
 	} else {
 		conditionEdit->clear();
@@ -496,11 +492,7 @@ Argument *ArgumentEditDialog::createArgument() {
 		}
 	}
 	arg->setName(nameEdit->text().trimmed().toStdString());
-	ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
-	std::string str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	std::string str = settings->unlocalizeExpression(conditionEdit->text().trimmed().toStdString());
 	arg->setCustomCondition(str);
 	arg->setTests(testBox->isChecked());
 	arg->setAlerts(testBox->isChecked());
@@ -688,20 +680,18 @@ void FunctionEditDialog::editNames() {
 				gsub("y", "\\y", str);\
 				gsub("z", "\\z", str);\
 			}\
-			gsub(settings->multiplicationSign(), "*", str);\
-			gsub(settings->divisionSign(), "/", str);\
-			gsub(SIGN_MINUS, "-", str);\
+			CALCULATOR->parseSigns(str);
 
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(name_edited && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
+		func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
 			*replaced_item = func;
 		}
 	}
@@ -709,7 +699,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(func && func->isLocal() && func->subtype() == SUBTYPE_USER_FUNCTION) {
 		f = (UserFunction*) func;
 		if(f->countNames() > 1) f->clearNames();
-		f->setHidden(false); f->setApproximate(false); f->setDescription(""); f->setCondition(""); f->setExample(""); f->clearArgumentDefinitions(); f->setTitle("");
+		f->setApproximate(false);
 		if(!modifyFunction(f)) return NULL;
 		return f;
 	}
@@ -721,10 +711,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	f->setTitle(titleEdit->text().trimmed().toStdString());
 	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
 	f->setHidden(hideBox->isChecked());
-	str = CALCULATOR->unlocalizeExpression(exampleEdit->text().trimmed().toStdString(), pa);
-	gsub(settings->multiplicationSign(), "*", str);
-	gsub(settings->divisionSign(), "/", str);
-	gsub(SIGN_MINUS, "-", str);
+	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
 	FIX_EXPRESSION
@@ -747,13 +734,13 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
-		if(name_edited && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
+		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
 		if(replaced_item) {
-			MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
-			if(func != f) *replaced_item = func;
+			*replaced_item = func;
 		}
 	}
 	f->setLocal(true);
@@ -770,8 +757,7 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	f->setTitle(titleEdit->text().trimmed().toStdString());
 	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
 	f->setHidden(hideBox->isChecked());
-	str = CALCULATOR->unlocalizeExpression(exampleEdit->text().trimmed().toStdString(), pa);
-	FIX_EXPRESSION
+	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
 	FIX_EXPRESSION
@@ -931,21 +917,13 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	o_function = f;
 	bool read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
-	ParseOptions pa = settings->evalops.parse_options;
-	pa.base = 10;
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);
-		std::string str = CALCULATOR->localizeExpression(((UserFunction*) f)->formula(), pa);
-		gsub("*", settings->multiplicationSign(), str);
-		gsub("/", settings->divisionSign(false), str);
-		gsub("-", SIGN_MINUS, str);
+		std::string str = settings->localizeExpression(((UserFunction*) f)->formula());
 		expressionEdit->setPlainText(QString::fromStdString(str));
 		for(size_t i = 1; i <= ((UserFunction*) f)->countSubfunctions(); i++) {
 			QList<QStandardItem *> items;
-			str = CALCULATOR->localizeExpression(((UserFunction*) f)->getSubfunction(i), pa);
-			gsub("*", settings->multiplicationSign(), str);
-			gsub("/", settings->divisionSign(false), str);
-			gsub("-", SIGN_MINUS, str);
+			str = settings->localizeExpression(((UserFunction*) f)->getSubfunction(i));
 			QStandardItem *item = new QStandardItem(QString::fromStdString(str));
 			item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
 			item->setEditable(!read_only);
@@ -1007,16 +985,12 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 		items.append(item);
 		argumentsModel->appendRow(items);
 	}
+	descriptionEdit->blockSignals(true);
 	descriptionEdit->setPlainText(QString::fromStdString(f->description()));
-	std::string str = CALCULATOR->localizeExpression(f->example(true), pa);
-	gsub("*", settings->multiplicationSign(), str);
-	gsub("/", settings->divisionSign(false), str);
-	gsub("-", SIGN_MINUS, str);
+	descriptionEdit->blockSignals(false);
+	std::string str = settings->localizeExpression(f->example(true));
 	exampleEdit->setText(QString::fromStdString(str));
-	str = CALCULATOR->localizeExpression(f->condition(), pa);
-	gsub("*", settings->multiplicationSign(), str);
-	gsub("/", settings->divisionSign(false), str);
-	gsub("-", SIGN_MINUS, str);
+	str = settings->localizeExpression(f->condition());
 	conditionEdit->setText(QString::fromStdString(str));
 	titleEdit->setText(QString::fromStdString(f->title()));
 	categoryEdit->blockSignals(true);
