@@ -60,12 +60,12 @@ class UnitEditDialog : public QDialog {
 		virtual ~UnitEditDialog();
 
 		Unit *createUnit(ExpressionItem **replaced_item = NULL);
-		bool modifyUnit(Unit *u, ExpressionItem **replaced_item = NULL);
+		Unit *modifyUnit(Unit *u, ExpressionItem **replaced_item = NULL);
 		void setUnit(Unit *u);
 		void setName(const QString&);
 
-		static bool editUnit(QWidget *parent, Unit *u, ExpressionItem **replaced_item = NULL);
-		static Unit* newUnit(QWidget *parent, ExpressionItem **replaced_item = NULL);
+		static Unit *editUnit(QWidget *parent, Unit *u, ExpressionItem **replaced_item = NULL);
+		static Unit *newUnit(QWidget *parent, ExpressionItem **replaced_item = NULL);
 
 };
 

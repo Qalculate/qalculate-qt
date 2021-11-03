@@ -38,6 +38,7 @@ class NamesEditDialog : public QDialog {
 		QStandardItemModel *namesModel;
 		QPushButton *addButton, *editButton, *delButton;
 		ExpressionItem *o_item;
+		int i_type;
 
 	protected slots:
 
@@ -49,7 +50,7 @@ class NamesEditDialog : public QDialog {
 
 	public:
 
-		NamesEditDialog(QWidget *parent = NULL, bool = false);
+		NamesEditDialog(int type, QWidget *parent = NULL, bool = false);
 		virtual ~NamesEditDialog();
 
 		void modifyNames(ExpressionItem*, const QString&);
@@ -164,7 +165,7 @@ class FunctionEditDialog : public QDialog {
 		void setRefType(int);
 
 		static bool editFunction(QWidget *parent, MathFunction *f, MathFunction **replaced_item = NULL);
-		static UserFunction* newFunction(QWidget *parent, MathFunction **replaced_item = NULL);
+		static UserFunction *newFunction(QWidget *parent, MathFunction **replaced_item = NULL);
 
 };
 

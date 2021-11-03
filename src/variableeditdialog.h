@@ -66,8 +66,8 @@ class VariableEditDialog : public QDialog {
 		void setName(const QString&);
 
 		static bool editVariable(QWidget *parent, KnownVariable *v, ExpressionItem **replaced_item = NULL);
-		static KnownVariable* newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString(), ExpressionItem **replaced_item = NULL);
-		static KnownVariable* newMatrix(QWidget *parent, ExpressionItem **replaced_item = NULL);
+		static KnownVariable *newVariable(QWidget *parent, MathStructure *default_value = NULL, const QString &value_str = QString(), ExpressionItem **replaced_item = NULL);
+		static KnownVariable *newMatrix(QWidget *parent, ExpressionItem **replaced_item = NULL);
 
 };
 

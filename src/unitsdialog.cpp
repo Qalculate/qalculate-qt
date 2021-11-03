@@ -281,25 +281,44 @@ void UnitsDialog::searchChanged(const QString &str) {
 	unitsView->selectionModel()->setCurrentIndex(unitsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	if(str.isEmpty()) unitsView->setFocus();
 }
+#define SET_TO_STR 	if(u->isCurrency()) qstr = QString::fromStdString(u->referenceName());\
+			else qstr = QString::fromStdString(u->print(true, true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) toCombo));\
+			if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {\
+				qstr.replace("^-1", "⁻" SIGN_POWER_1);\
+				qstr.replace("^-2", "⁻" SIGN_POWER_2);\
+				qstr.replace("^-3", "⁻" SIGN_POWER_3);\
+				qstr.replace("^-4", "⁻" SIGN_POWER_4);\
+				qstr.replace("^4", SIGN_POWER_4);\
+				qstr.remove("_unit");\
+			}
+
 void UnitsDialog::newClicked() {
 	ExpressionItem *replaced_item = NULL;
 	Unit *u = UnitEditDialog::newUnit(this, &replaced_item);
 	if(u) {
 		if(replaced_item) {
-			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
-				emit unitRemoved((Unit*) replaced_item);
+			if(!CALCULATOR->stillHasVariable((Variable*) replaced_item)) {
+				emit variableRemoved((Variable*) replaced_item);
 			} else if(replaced_item == u || !CALCULATOR->stillHasUnit((Unit*) replaced_item) || (replaced_item->type() == TYPE_UNIT && !CALCULATOR->hasUnit((Unit*) replaced_item))) {
 				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
-			} else if(replaced_item->type() == TYPE_UNIT) {
-				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
-				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+				list = toSourceModel->match(toSourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+				if(!list.isEmpty()) toSourceModel->removeRow(list[0].row());
+			} else if(replaced_item->type() == TYPE_VARIABLE) {
+				if(!CALCULATOR->hasVariable((Variable*) replaced_item)) emit variableRemoved((Variable*) replaced_item);
+				else if(!replaced_item->isActive()) emit variableDeactivated((Variable*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				ADD_INACTIVE_CATEGORY
 			}
 		}
 		selected_item = u;
-		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true)));
+		QString qstr;
+		SET_TO_STR
+		QStandardItem *item = new QStandardItem(qstr);
+		item->setEditable(false);
+		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
+		toSourceModel->appendRow(item);
+		item = new QStandardItem(QString::fromStdString(u->title(true)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -310,6 +329,7 @@ void UnitsDialog::newClicked() {
 			}
 		} else {
 			unitsModel->invalidate();
+			toModel->invalidate();
 		}
 		sourceModel->sort(0);
 		QModelIndex index = unitsModel->mapFromSource(item->index());
@@ -323,33 +343,47 @@ void UnitsDialog::newClicked() {
 void UnitsDialog::unitRemoved(Unit *u) {
 	QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) u), 1, Qt::MatchExactly);
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
+	list = toSourceModel->match(toSourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) u), 1, Qt::MatchExactly);
+	if(!list.isEmpty()) toSourceModel->removeRow(list[0].row());
 }
 void UnitsDialog::unitDeactivated(Unit*) {
 	ADD_INACTIVE_CATEGORY
 	unitsModel->invalidate();
+	toModel->invalidate();
 }
 void UnitsDialog::editClicked() {
 	QModelIndex index = unitsView->selectionModel()->currentIndex();
 	if(!index.isValid()) return;
-	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
-	if(!u) return;
+	Unit *old_u = (Unit*) index.data(Qt::UserRole).value<void*>();
+	if(!old_u) return;
 	ExpressionItem *replaced_item = NULL;
-	if(UnitEditDialog::editUnit(this, u, &replaced_item)) {
+	Unit *u = UnitEditDialog::editUnit(this, old_u, &replaced_item);
+	if(u) {
 		sourceModel->removeRow(unitsModel->mapToSource(unitsView->selectionModel()->currentIndex()).row());
+		QModelIndexList list = toSourceModel->match(toSourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) old_u), 1, Qt::MatchExactly);
+		if(!list.isEmpty()) toSourceModel->removeRow(list[0].row());
 		if(replaced_item) {
-			if(!CALCULATOR->stillHasUnit((Unit*) replaced_item)) {
-				emit unitRemoved((Unit*) replaced_item);
-			} else if(!CALCULATOR->stillHasUnit((Unit*) replaced_item) || (replaced_item->type() == TYPE_VARIABLE && !CALCULATOR->hasUnit((Unit*) replaced_item))) {
-				QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+			if(!CALCULATOR->stillHasVariable((Variable*) replaced_item)) {
+				emit variableRemoved((Variable*) replaced_item);
+			} else if(!CALCULATOR->stillHasUnit((Unit*) replaced_item) || (replaced_item->type() == TYPE_UNIT && !CALCULATOR->hasUnit((Unit*) replaced_item))) {
+				list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 				if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
-			} else if(replaced_item->type() == TYPE_UNIT) {
-				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
-				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
+				list = toSourceModel->match(toSourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
+				if(!list.isEmpty()) toSourceModel->removeRow(list[0].row());
+			} else if(replaced_item->type() == TYPE_VARIABLE) {
+				if(!CALCULATOR->hasVariable((Variable*) replaced_item)) emit variableRemoved((Variable*) replaced_item);
+				else if(!replaced_item->isActive()) emit variableDeactivated((Variable*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				ADD_INACTIVE_CATEGORY
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true)));
+		QString qstr;
+		SET_TO_STR
+		QStandardItem *item = new QStandardItem(qstr);
+		item->setEditable(false);
+		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
+		toSourceModel->appendRow(item);
+		item = new QStandardItem(QString::fromStdString(u->title(true)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -361,8 +395,10 @@ void UnitsDialog::editClicked() {
 			}
 		} else {
 			unitsModel->invalidate();
+			toModel->invalidate();
 		}
 		sourceModel->sort(0);
+		toSourceModel->sort(0);
 		QModelIndex index = unitsModel->mapFromSource(item->index());
 		if(index.isValid()) {
 			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -377,6 +413,8 @@ void UnitsDialog::delClicked() {
 	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
 	if(u && u->isLocal()) {
 		sourceModel->removeRow(unitsModel->mapToSource(unitsView->selectionModel()->currentIndex()).row());
+		QModelIndexList list = toSourceModel->match(toSourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) u), 1, Qt::MatchExactly);
+		if(!list.isEmpty()) toSourceModel->removeRow(list[0].row());
 		selected_item = NULL;
 		u->destroy();
 		emit itemsChanged();
@@ -539,16 +577,7 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 			toEdit->setEnabled(u->isActive());
 			toCombo->setEnabled(u->isActive());
 			QString qstr;
-			if(u->isCurrency()) qstr = QString::fromStdString(u->referenceName());
-			else qstr = QString::fromStdString(u->print(true, true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) fromLabel));
-			if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
-				qstr.replace("^-1", "⁻" SIGN_POWER_1);
-				qstr.replace("^-2", "⁻" SIGN_POWER_2);
-				qstr.replace("^-3", "⁻" SIGN_POWER_3);
-				qstr.replace("^-4", "⁻" SIGN_POWER_4);
-				qstr.replace("^4", SIGN_POWER_4);
-				qstr.remove("_unit");
-			}
+			SET_TO_STR
 			fromLabel->setText(qstr);
 			fromUnitChanged();
 			return;
@@ -667,16 +696,7 @@ void UnitsDialog::updateUnits() {
 		sourceModel->appendRow(item);
 		if(u == selected_item) unitsView->selectionModel()->setCurrentIndex(unitsModel->mapFromSource(item->index()), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 		
-		if(u->isCurrency()) qstr = QString::fromStdString(u->referenceName());
-		else qstr = QString::fromStdString(u->print(true, true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) toCombo));
-		if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
-			qstr.replace("^-1", "⁻" SIGN_POWER_1);
-			qstr.replace("^-2", "⁻" SIGN_POWER_2);
-			qstr.replace("^-3", "⁻" SIGN_POWER_3);
-			qstr.replace("^-4", "⁻" SIGN_POWER_4);
-			qstr.replace("^4", SIGN_POWER_4);
-			qstr.remove("_unit");
-		}
+		SET_TO_STR
 		item = new QStandardItem(qstr);
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);

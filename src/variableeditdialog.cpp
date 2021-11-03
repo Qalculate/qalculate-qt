@@ -118,7 +118,7 @@ VariableEditDialog::~VariableEditDialog() {}
 
 void VariableEditDialog::editNames() {
 	if(!namesEditDialog) {
-		namesEditDialog = new NamesEditDialog(this, nameEdit->isReadOnly());
+		namesEditDialog = new NamesEditDialog(TYPE_VARIABLE, this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_variable, nameEdit->text());
 	}
 	namesEditDialog->exec();
@@ -204,12 +204,8 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 			else if(var != v) *replaced_item = var;
 		}
 	}
-	if(namesEditDialog) {
-		namesEditDialog->modifyNames(v, nameEdit->text());
-	} else {
-		if(v->countNames() > 1 && v->getName(1).name != nameEdit->text().trimmed().toStdString()) v->clearNames();
-		v->setName(nameEdit->text().trimmed().toStdString());
-	}
+	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
+	else v->setName(nameEdit->text().trimmed().toStdString());
 	v->setApproximate(false); v->setUncertainty(""); v->setUnit("");
 	if(default_value && ((!b_matrix && valueEdit->toPlainText().isEmpty()) || !b_changed)) {
 		v->set(*default_value);
@@ -377,7 +373,7 @@ KnownVariable* VariableEditDialog::newVariable(QWidget *parent, MathStructure *d
 	d->deleteLater();
 	return v;
 }
-KnownVariable* VariableEditDialog::newMatrix(QWidget *parent, ExpressionItem **replaced_item) {
+KnownVariable *VariableEditDialog::newMatrix(QWidget *parent, ExpressionItem **replaced_item) {
 	VariableEditDialog *d = new VariableEditDialog(parent, false, true);
 	d->setWindowTitle(tr("New Variable"));
 	std::string v_name;

@@ -27,6 +27,12 @@
 #include <QHeaderView>
 #include <QAction>
 #include <QDoubleSpinBox>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	include <QScreen>
+#else
+#	include <QDesktopWidget>
+#endif
+#include <QApplication>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -138,7 +144,7 @@ class SmallTreeView : public QTreeView {
 		}
 };
 
-NamesEditDialog::NamesEditDialog(QWidget *parent, bool read_only) : QDialog(parent) {
+NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QDialog(parent), i_type(type) {
 	o_item = NULL;
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	QGridLayout *grid = new QGridLayout();
@@ -161,6 +167,19 @@ NamesEditDialog::NamesEditDialog(QWidget *parent, bool read_only) : QDialog(pare
 	namesView->header()->setStretchLastSection(false);
 	namesView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	namesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	if(i_type != TYPE_UNIT) namesView->header()->hideSection(2);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+	QScreen *scr = screen();
+#	else
+	QScreen *scr = QGuiApplication::screenAt(pos);
+#	endif
+	if(!scr) scr = QGuiApplication::primaryScreen();
+	QRect screen = scr->geometry();
+#else
+	QRect screen = QApplication::desktop()->screenGeometry(widget);
+#endif
+	if(screen.width() > 800) namesView->setMinimumWidth(800);
 	grid->addWidget(namesView, 0, 0);
 	QHBoxLayout *box = new QHBoxLayout();
 	addButton = new QPushButton(tr("Add"), this); box->addWidget(addButton); connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked())); addButton->setEnabled(!read_only);
@@ -252,19 +271,19 @@ void NamesEditDialog::selectedNameChanged(const QModelIndex &index, const QModel
 	}
 }
 void NamesEditDialog::nameChanged(QStandardItem *item) {
-	if(item->column() != 0 && !item->text().trimmed().isEmpty()) return;
-	if((o_item->type() == TYPE_FUNCTION && !CALCULATOR->functionNameIsValid(item->text().trimmed().toStdString())) || (o_item->type() == TYPE_VARIABLE && !CALCULATOR->variableNameIsValid(item->text().trimmed().toStdString())) || (o_item->type() == TYPE_UNIT && !CALCULATOR->unitNameIsValid(item->text().trimmed().toStdString()))) {
+	if(item->column() != 0 || item->text().trimmed().isEmpty()) return;
+	if((i_type == TYPE_FUNCTION && !CALCULATOR->functionNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_VARIABLE && !CALCULATOR->variableNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_UNIT && !CALCULATOR->unitNameIsValid(item->text().trimmed().toStdString()))) {
 		namesModel->blockSignals(true);
 		item->setText(QString());
 		namesModel->blockSignals(false);
 		QMessageBox::warning(this, tr("Warning"), tr("Illegal name"));
-	} else if(o_item->type() == TYPE_FUNCTION && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
+	} else if(i_type == TYPE_FUNCTION && o_item && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
 		MathFunction *f = CALCULATOR->getActiveFunction(item->text().trimmed().toStdString());
 		if(!f || f->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A function with the same name already exists."));
-	} else if(o_item->type() == TYPE_VARIABLE && CALCULATOR->variableNameTaken(item->text().trimmed().toStdString(), (Variable*) o_item)) {
+	} else if(i_type == TYPE_VARIABLE && o_item && CALCULATOR->variableNameTaken(item->text().trimmed().toStdString(), (Variable*) o_item)) {
 		Variable *var = CALCULATOR->getActiveVariable(item->text().trimmed().toStdString());
 		if(!var || var->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
-	} else if(o_item->type() == TYPE_UNIT && CALCULATOR->unitNameTaken(item->text().trimmed().toStdString(), (Unit*) o_item)) {
+	} else if(i_type == TYPE_UNIT && o_item && CALCULATOR->unitNameTaken(item->text().trimmed().toStdString(), (Unit*) o_item)) {
 		Unit *u = CALCULATOR->getActiveUnit(item->text().trimmed().toStdString());
 		if(!u || u->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
 	}
@@ -302,7 +321,7 @@ ArgumentEditDialog::ArgumentEditDialog(QWidget *parent, bool read_only) : QDialo
 	conditionEdit = new MathLineEdit(this);
 	conditionEdit->setToolTip("<div>" + tr("For example if argument is a matrix that must have equal number of rows and columns: rows(\\x) = columns(\\x)") + "</div>");
 	grid->addWidget(conditionEdit, 3, 1);
-	matrixBox = new QCheckBox(tr("Allow Matrix"), this);
+	matrixBox = new QCheckBox(tr("Allow matrix"), this);
 	grid->addWidget(matrixBox, 4, 0, 1, 2);
 	zeroBox = new QCheckBox(tr("Forbid zero"), this);
 	grid->addWidget(zeroBox, 5, 0, 1, 2);
@@ -666,7 +685,7 @@ FunctionEditDialog::~FunctionEditDialog() {}
 
 void FunctionEditDialog::editNames() {
 	if(!namesEditDialog) {
-		namesEditDialog = new NamesEditDialog(this, nameEdit->isReadOnly());
+		namesEditDialog = new NamesEditDialog(TYPE_FUNCTION, this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_function, nameEdit->text());
 	}
 	namesEditDialog->exec();
@@ -744,12 +763,8 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 		}
 	}
 	f->setLocal(true);
-	if(namesEditDialog) {
-		namesEditDialog->modifyNames(f, nameEdit->text());
-	} else {
-		if(f->countNames() > 1 && f->getName(1).name != nameEdit->text().trimmed().toStdString()) f->clearNames();
-		f->setName(nameEdit->text().trimmed().toStdString());
-	}
+	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
+	else f->setName(nameEdit->text().trimmed().toStdString());
 	ParseOptions pa = settings->evalops.parse_options;
 	pa.base = 10;
 	std::string str;
@@ -1052,7 +1067,7 @@ bool FunctionEditDialog::editFunction(QWidget *parent, MathFunction *f, MathFunc
 	d->deleteLater();
 	return false;
 }
-UserFunction* FunctionEditDialog::newFunction(QWidget *parent, MathFunction **replaced_item) {
+UserFunction *FunctionEditDialog::newFunction(QWidget *parent, MathFunction **replaced_item) {
 	FunctionEditDialog *d = new FunctionEditDialog(parent);
 	d->setWindowTitle(tr("New Function"));
 	d->setRefType(1);
