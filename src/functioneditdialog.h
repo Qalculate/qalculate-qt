@@ -54,6 +54,7 @@ class NamesEditDialog : public QDialog {
 		virtual ~NamesEditDialog();
 
 		void modifyNames(ExpressionItem*, const QString&);
+		static void modifyName(ExpressionItem*, const QString&);
 		void setNames(ExpressionItem*, const QString&);
 		QString firstName();
 

@@ -243,7 +243,20 @@ void NamesEditDialog::modifyNames(ExpressionItem *o, const QString &str) {
 			o->addName(ename);
 		}
 	}
-	if(o->countNames() == 0) o->addName(str.toStdString());
+	if(o->countNames() == 0) {
+		ExpressionName ename(str.trimmed().toStdString());
+		ename.reference = true;
+		o->addName(ename);
+	}
+}
+void NamesEditDialog::modifyName(ExpressionItem *o, const QString &str) {
+	if(o->countNames() == 0) {
+		ExpressionName ename(str.trimmed().toStdString());
+		ename.reference = true;
+		o->addName(ename);
+	} else {
+		o->setName(str.trimmed().toStdString());
+	}
 }
 void NamesEditDialog::addClicked() {
 	QList<QStandardItem *> items;
@@ -274,7 +287,9 @@ void NamesEditDialog::nameChanged(QStandardItem *item) {
 	if(item->column() != 0 || item->text().trimmed().isEmpty()) return;
 	if((i_type == TYPE_FUNCTION && !CALCULATOR->functionNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_VARIABLE && !CALCULATOR->variableNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_UNIT && !CALCULATOR->unitNameIsValid(item->text().trimmed().toStdString()))) {
 		namesModel->blockSignals(true);
-		item->setText(QString());
+		if(i_type == TYPE_FUNCTION) item->setText(QString::fromStdString(CALCULATOR->convertToValidFunctionName(item->text().trimmed().toStdString())));
+		else if(i_type == TYPE_VARIABLE) item->setText(QString::fromStdString(CALCULATOR->convertToValidVariableName(item->text().trimmed().toStdString())));
+		else if(i_type == TYPE_UNIT) item->setText(QString::fromStdString(CALCULATOR->convertToValidUnitName(item->text().trimmed().toStdString())));
 		namesModel->blockSignals(false);
 		QMessageBox::warning(this, tr("Warning"), tr("Illegal name"));
 	} else if(i_type == TYPE_FUNCTION && o_item && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
@@ -717,12 +732,12 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	UserFunction *f;
 	if(func && func->isLocal() && func->subtype() == SUBTYPE_USER_FUNCTION) {
 		f = (UserFunction*) func;
-		if(f->countNames() > 1) f->clearNames();
+		f->clearNames();
 		f->setApproximate(false);
 		if(!modifyFunction(f)) return NULL;
 		return f;
 	}
-	f = new UserFunction("", nameEdit->text().trimmed().toStdString(), "");
+	f = new UserFunction("", "", "");
 	std::string str;
 	ParseOptions pa = settings->evalops.parse_options;
 	pa.base = 10;
@@ -744,6 +759,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 		f->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
+	else NamesEditDialog::modifyName(f, nameEdit->text());
 	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
 	FIX_EXPRESSION
 	((UserFunction*) f)->setFormula(str);
@@ -764,7 +780,7 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	}
 	f->setLocal(true);
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
-	else f->setName(nameEdit->text().trimmed().toStdString());
+	else NamesEditDialog::modifyName(f, nameEdit->text());
 	ParseOptions pa = settings->evalops.parse_options;
 	pa.base = 10;
 	std::string str;
@@ -844,8 +860,8 @@ void FunctionEditDialog::argAddClicked() {
 	items.append(item);
 	QString refstr = "\\";
 	int i = argumentsModel->rowCount() + 1;
-	if(i <= 3) refstr += 'x' + (i - 1);
-	else refstr += 'a' + (i - 4);
+	if(i <= 3) refstr += (char) ('x' + (i - 1));
+	else refstr += (char) ('a' + (i - 4));
 	item = new QStandardItem(refstr);
 	item->setData(QVariant::fromValue((void*) NULL));
 	item->setEditable(false);
@@ -886,8 +902,8 @@ void FunctionEditDialog::ref1Toggled(bool b) {
 		if(item) {
 			QString refstr;
 			if(i > 3 || !b) refstr += "\\";
-			if(i <= 3) refstr += 'x' + (i - 1);
-			else refstr += 'a' + (i - 4);
+			if(i <= 3) refstr += (char) ('x' + (i - 1));
+			else refstr += (char) ('a' + (i - 4));
 			item->setText(refstr);
 		}
 	}
@@ -900,8 +916,8 @@ void FunctionEditDialog::argDelClicked() {
 		if(item) {
 			QString refstr;
 			if(i > 3 || ref2Button->isChecked()) refstr += "\\";
-			if(i <= 3) refstr += 'x' + (i - 1);
-			else refstr += 'a' + (i - 4);
+			if(i <= 3) refstr += (char) ('x' + (i - 1));
+			else refstr += (char) ('a' + (i - 4));
 			item->setText(refstr);
 		}
 	}
@@ -991,8 +1007,8 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 		items.append(item);
 		QString refstr;
 		if(i > 3 || ref2Button->isChecked()) refstr += "\\";
-		if(i <= 3) refstr += 'x' + (i - 1);
-		else refstr += 'a' + (i - 4);
+		if(i <= 3) refstr += (char) ('x' + (i - 1));
+		else refstr += (char) ('a' + (i - 4));
 		item = new QStandardItem(refstr);
 		item->setData(QVariant::fromValue((void*) arg));
 		item->setEditable(false);

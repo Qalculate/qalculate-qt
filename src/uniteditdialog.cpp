@@ -43,7 +43,8 @@ UnitEditDialog::UnitEditDialog(QWidget *parent) : QDialog(parent) {
 	QGridLayout *grid = new QGridLayout(w1);
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
-	connect(nameEdit->addAction(LOAD_ICON("configure"), QLineEdit::TrailingPosition), SIGNAL(triggered()), this, SLOT(editNames()));
+	namesAction = nameEdit->addAction(LOAD_ICON("configure"), QLineEdit::TrailingPosition);
+	connect(namesAction, SIGNAL(triggered()), this, SLOT(editNames()));
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			nameEdit->setTextMargins(0, 0, 22, 0);
@@ -203,7 +204,7 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 	}
 	Unit *u = NULL;
 	if(unit && unit->isLocal()) {
-		if(unit->countNames() > 1) unit->clearNames();
+		unit->clearNames();
 		return modifyUnit(unit);
 	}
 	if(typeCombo->currentIndex() == 1) {
@@ -217,8 +218,11 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 	} else {
 		u = new Unit();
 	}
-	if(namesEditDialog) namesEditDialog->modifyNames(u, nameEdit->text());
-	else u->setName(nameEdit->text().trimmed().toStdString());
+	if(namesEditDialog && typeCombo->currentIndex() != 2) {
+		namesEditDialog->modifyNames(u, nameEdit->text());
+	} else {
+		NamesEditDialog::modifyName(u, nameEdit->text());
+	}
 	u->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
 	u->setTitle(titleEdit->text().trimmed().toStdString());
 	u->setCategory(categoryEdit->currentText().trimmed().toStdString());
@@ -292,11 +296,14 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 			break;
 		}
 	}
-	if(namesEditDialog) {
+	if(typeCombo->currentIndex() != 2) {
+		u->clearNames();
+		NamesEditDialog::modifyName(u, nameEdit->text());
+	} else if(namesEditDialog) {
 		namesEditDialog->modifyNames(u, nameEdit->text());
 	} else {
 		if(old_u != u) u->set(old_u);
-		u->setName(nameEdit->text().trimmed().toStdString());
+		NamesEditDialog::modifyName(u, nameEdit->text());
 	}
 	u->setApproximate(false);
 	u->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
@@ -348,7 +355,7 @@ void UnitEditDialog::setUnit(Unit *u) {
 			if(au->uncertainty(&is_relative).empty()) {
 				relationEdit->setText(QString::fromStdString(settings->localizeExpression(au->expression())));
 			} else if(is_relative) {
-				std::string value = CALCULATOR->f_uncertainty->referenceName();
+				std::string value = CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY)->referenceName();
 				value += "(";
 				value += settings->localizeExpression(au->expression());
 				value += CALCULATOR->getComma();
@@ -432,6 +439,7 @@ void UnitEditDialog::typeChanged(int i) {
 	inverseLabel->setEnabled(inverseEdit->isEnabled());
 	priorityLabel->setEnabled(priorityEdit->isEnabled());
 	mbunLabel->setEnabled(mbunEdit->isEnabled());
+	namesAction->setEnabled(i != 2);
 }
 void UnitEditDialog::onUnitChanged() {
 	okButton->setEnabled(!nameEdit->isReadOnly() && !nameEdit->text().trimmed().isEmpty() && (typeCombo->currentIndex() == 0 || (!baseEdit->text().trimmed().isEmpty() && (typeCombo->currentIndex() != 1 || !relationEdit->text().trimmed().isEmpty()))));

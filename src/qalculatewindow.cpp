@@ -56,6 +56,7 @@
 #include "uniteditdialog.h"
 #include "functioneditdialog.h"
 #include "preferencesdialog.h"
+#include "datasetsdialog.h"
 #include "functionsdialog.h"
 #include "variablesdialog.h"
 #include "unitsdialog.h"
@@ -264,6 +265,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rfTimer = NULL;
 	preferencesDialog = NULL;
 	functionsDialog = NULL;
+	datasetsDialog = NULL;
 	variablesDialog = NULL;
 	unitsDialog = NULL;
 	fpConversionDialog = NULL;
@@ -317,6 +319,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Functions"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Units"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Data Sets"), this, SLOT(openDatasets()));
 	menu->addSeparator();
 	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
@@ -2173,7 +2176,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					b_busy--;
 					return;
 				}
-				execute_str = CALCULATOR->f_message->referenceName();
+				execute_str = CALCULATOR->getFunctionById(FUNCTION_ID_MESSAGE)->referenceName();
 				execute_str += "(";
 				execute_str += to_str;
 				execute_str += ")";
@@ -3096,7 +3099,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					case '&': {CALCULATOR->calculateRPN(OPERATION_BITWISE_AND, 0, settings->evalops, parsed_mstruct); break;}
 					case '|': {CALCULATOR->calculateRPN(OPERATION_BITWISE_OR, 0, settings->evalops, parsed_mstruct); break;}
 					case '~': {CALCULATOR->calculateRPNBitwiseNot(0, settings->evalops, parsed_mstruct); break;}
-					case '!': {CALCULATOR->calculateRPN(CALCULATOR->f_factorial, 0, settings->evalops, parsed_mstruct); break;}
+					case '!': {CALCULATOR->calculateRPN(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL), 0, settings->evalops, parsed_mstruct); break;}
 					case '>': {CALCULATOR->calculateRPN(OPERATION_GREATER, 0, settings->evalops, parsed_mstruct); break;}
 					case '<': {CALCULATOR->calculateRPN(OPERATION_LESS, 0, settings->evalops, parsed_mstruct); break;}
 					case '=': {CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct); break;}
@@ -3116,7 +3119,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					CALCULATOR->calculateRPN(OPERATION_RAISE, 0, settings->evalops, parsed_mstruct);
 					do_mathoperation = true;
 				} else if(str2 == "!!") {
-					CALCULATOR->calculateRPN(CALCULATOR->f_factorial2, 0, settings->evalops, parsed_mstruct);
+					CALCULATOR->calculateRPN(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL), 0, settings->evalops, parsed_mstruct);
 					do_mathoperation = true;
 				} else if(str2 == "!=" || str == "=!" || str == "<>") {
 					CALCULATOR->calculateRPN(OPERATION_NOT_EQUALS, 0, settings->evalops, parsed_mstruct);
@@ -3742,13 +3745,13 @@ void set_result_bases(const MathStructure &m) {
 
 bool contains_plot_or_save(const std::string &str) {
 	if(str.find(":=") != std::string::npos) return true;
-	if(CALCULATOR->f_plot) {
-		for(size_t i = 1; i <= CALCULATOR->f_plot->countNames(); i++) {
-			if(str.find(CALCULATOR->f_plot->getName(i).name) != std::string::npos) return true;
-		}
+	MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_PLOT);
+	for(size_t i = 1; f && i <= f->countNames(); i++) {
+		if(str.find(f->getName(i).name) != std::string::npos) return true;
 	}
-	for(size_t i = 1; i <= CALCULATOR->f_save->countNames(); i++) {
-		if(str.find(CALCULATOR->f_save->getName(i).name) != std::string::npos) return true;
+	f = CALCULATOR->getFunctionById(FUNCTION_ID_SAVE);
+	for(size_t i = 1; f && i <= f->countNames(); i++) {
+		if(str.find(f->getName(i).name) != std::string::npos) return true;
 	}
 	return false;
 }
@@ -3948,7 +3951,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		update_parse = false;
 	}
 
-	if(update_parse && parsed_mstruct && parsed_mstruct->isFunction() && (parsed_mstruct->function() == CALCULATOR->f_error || parsed_mstruct->function() == CALCULATOR->f_warning || parsed_mstruct->function() == CALCULATOR->f_message)) {
+	if(update_parse && parsed_mstruct && parsed_mstruct->isFunction() && (parsed_mstruct->function()->id() == FUNCTION_ID_ERROR || parsed_mstruct->function()->id() == FUNCTION_ID_WARNING || parsed_mstruct->function()->id() == FUNCTION_ID_MESSAGE)) {
 		expressionEdit->clear();
 		historyView->addMessages();
 		return;
@@ -3972,8 +3975,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				} else {
 					if(settings->adaptive_interval_display) {
 						QString expression_str = expressionEdit->toPlainText();
-						if((parsed_mstruct && parsed_mstruct->containsFunction(CALCULATOR->f_uncertainty)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-						else if(parsed_mstruct && parsed_mstruct->containsFunction(CALCULATOR->f_interval)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
+						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+						else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
 						else settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
 					}
 				}
@@ -4737,6 +4740,7 @@ void QalculateWindow::assumptionsSignActivated() {
 void QalculateWindow::onAlwaysOnTopChanged() {
 	if(settings->always_on_top) {
 		setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(datasetsDialog) datasetsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(functionsDialog) functionsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -4747,6 +4751,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	} else {
 		setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(datasetsDialog) datasetsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(functionsDialog) functionsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -4820,6 +4825,41 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	preferencesDialog->show();
+}
+void QalculateWindow::onDatasetsChanged() {
+	expressionEdit->updateCompletion();
+	if(functionsDialog) functionsDialog->updateFunctions();
+}
+void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
+	expressionEdit->blockCompletion();
+	expressionEdit->blockParseStatus();
+	DataSet *ds = dp->parentSet();
+	std::string str = ds->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name;
+	str += "(";
+	str += o->getProperty(ds->getPrimaryKeyProperty());
+	str += CALCULATOR->getComma();
+	str += " ";
+	str += dp->getName();
+	str += ")";
+	expressionEdit->insertPlainText(QString::fromStdString(str));
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->blockCompletion(false);
+}
+void QalculateWindow::openDatasets() {
+	if(datasetsDialog) {
+		datasetsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		datasetsDialog->show();
+		qApp->processEvents();
+		datasetsDialog->raise();
+		datasetsDialog->activateWindow();
+		return;
+	}
+	datasetsDialog = new DataSetsDialog();
+	connect(datasetsDialog, SIGNAL(itemsChanged()), this, SLOT(onDatasetsChanged()));
+	connect(datasetsDialog, SIGNAL(insertPropertyRequest(DataObject*, DataProperty*)), this, SLOT(insertProperty(DataObject*, DataProperty*)));
+	if(settings->always_on_top) datasetsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	datasetsDialog->show();
 }
 void QalculateWindow::applyFunction(MathFunction *f) {
 	if(b_busy) return;
@@ -5325,7 +5365,22 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			} else {
 				typestr = QString::fromStdString(arg->printlong());
 				if(typestr == freetype) typestr = "";
-				if(i == 1 && f == CALCULATOR->f_ascii && arg->type() == ARGUMENT_TYPE_TEXT) {
+				if(arg->type() == ARGUMENT_TYPE_DATA_OBJECT && f->subtype() == SUBTYPE_DATA_SET && ((DataSet*) f)->getPrimaryKeyProperty()) {
+					QComboBox *combo = new QComboBox();
+					combo->setEditable(true);
+					DataObjectIter it;
+					DataSet *ds = (DataSet*) f;
+					DataObject *obj = ds->getFirstObject(&it);
+					DataProperty *dp = ds->getProperty("name");
+					if(!dp || !dp->isKey()) dp = ds->getPrimaryKeyProperty();
+					while(obj) {
+						combo->addItem(QString::fromStdString(obj->getPropertyInputString(dp)));
+						obj = ds->getNextObject(&it);
+					}
+					combo->setCurrentText(QString());
+					fd->entry[i] = combo->lineEdit();
+					entry = combo;
+				} else if(i == 1 && f->id() == FUNCTION_ID_ASCII && arg->type() == ARGUMENT_TYPE_TEXT) {
 					QComboBox *combo = new QComboBox();
 					combo->setEditable(true);
 					combo->addItem("UTF-8");
@@ -5333,7 +5388,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 					combo->addItem("UTF-32");
 					fd->entry[i] = combo->lineEdit();
 					entry = combo;
-				} else if(i == 3 && f == CALCULATOR->f_date && arg->type() == ARGUMENT_TYPE_TEXT) {
+				} else if(i == 3 && f->id() == FUNCTION_ID_DATE && arg->type() == ARGUMENT_TYPE_TEXT) {
 					QComboBox *combo = new QComboBox();
 					combo->setEditable(true);
 					combo->addItem("chinese");
@@ -5347,8 +5402,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 					combo->addItem("julian");
 					combo->addItem("milankovic");
 					combo->addItem("persian");
-					entry = combo;
 					fd->entry[i] = combo->lineEdit();
+					entry = combo;
 				} else {
 					fd->entry[i] = new MathLineEdit();
 				}
@@ -5475,7 +5530,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			typestr.replace(">=", SIGN_GREATER_OR_EQUAL);
 			typestr.replace("<=", SIGN_LESS_OR_EQUAL);
 			typestr.replace("!=", SIGN_NOT_EQUAL);
-			QLabel *w = new QLabel("<i>" + typestr.toHtmlEscaped() + THIN_SPACE "</i>");
+			QLabel *w = new QLabel("<i><small>" + typestr.toHtmlEscaped() + THIN_SPACE "</small></i>");
+			w->setWordWrap(true);
 			w->setAlignment(Qt::AlignRight | Qt::AlignTop);
 			table->addWidget(w, r, 1, 1, 1);
 			r++;

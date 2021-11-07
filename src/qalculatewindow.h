@@ -34,6 +34,7 @@ class QToolButton;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
+class DataSetsDialog;
 class VariablesDialog;
 class UnitsDialog;
 class FPConversionDialog;
@@ -71,6 +72,7 @@ class QalculateWindow : public QMainWindow {
 		QSplitter *ehSplitter;
 		QLabel *statusLabel, *statusIconLabel;
 		PreferencesDialog *preferencesDialog;
+		DataSetsDialog *datasetsDialog;
 		FunctionsDialog *functionsDialog;
 		VariablesDialog *variablesDialog;
 		UnitsDialog *unitsDialog;
@@ -228,6 +230,9 @@ class QalculateWindow : public QMainWindow {
 		void importCSV();
 		void exportCSV();
 		void editPreferences();
+		void onDatasetsChanged();
+		void insertProperty(DataObject*, DataProperty*);
+		void openDatasets();
 		void openFunctions();
 		void openUnits();
 		void openVariables();

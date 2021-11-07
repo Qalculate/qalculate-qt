@@ -167,12 +167,12 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 	KnownVariable *v;
 	if(var && var->isLocal() && var->isKnown()) {
 		v = (KnownVariable*) var;
-		if(v->countNames() > 1) v->clearNames();
+		v->clearNames();
 		if(!modifyVariable(v, default_value)) return NULL;
 		return v;
 	}
 	if(default_value && ((!b_matrix && valueEdit->toPlainText().isEmpty()) || !b_changed)) {
-		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), *default_value);
+		v = new KnownVariable("", "", *default_value);
 	} else {
 		std::string str;
 		if(b_matrix) {
@@ -180,9 +180,10 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 		} else {
 			str = settings->unlocalizeExpression(valueEdit->toPlainText().toStdString());
 		}
-		v = new KnownVariable("", nameEdit->text().trimmed().toStdString(), str);
+		v = new KnownVariable("", "", str);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
+	else NamesEditDialog::modifyName(v, nameEdit->text());
 	v->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
 	v->setTitle(titleEdit->text().trimmed().toStdString());
 	v->setCategory(categoryEdit->currentText().trimmed().toStdString());
@@ -205,7 +206,7 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 		}
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
-	else v->setName(nameEdit->text().trimmed().toStdString());
+	else NamesEditDialog::modifyName(v, nameEdit->text());
 	v->setApproximate(false); v->setUncertainty(""); v->setUnit("");
 	if(default_value && ((!b_matrix && valueEdit->toPlainText().isEmpty()) || !b_changed)) {
 		v->set(*default_value);
@@ -237,7 +238,7 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 		if(!v->uncertainty(&is_relative).empty()) {
 			if(is_relative) {
 				value_str.insert(0, "(");
-				value_str.insert(0, CALCULATOR->f_uncertainty->referenceName());
+				value_str.insert(0, CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY)->referenceName());
 				value_str += CALCULATOR->getComma();
 				value_str += " ";
 				value_str += settings->localizeExpression(v->uncertainty());

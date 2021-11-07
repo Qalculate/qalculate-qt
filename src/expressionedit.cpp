@@ -1938,7 +1938,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(text.find("#") != std::string::npos) {
 		std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options);
 		if(!to_str.empty() && text.empty()) {
-			text = CALCULATOR->f_message->referenceName();
+			text = CALCULATOR->getFunctionById(FUNCTION_ID_MESSAGE)->referenceName();
 			text += "(";
 			text += to_str;
 			text += ")";
@@ -2029,7 +2029,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
-				if(!cdata->current_from_struct && !mparse.containsFunction(CALCULATOR->f_save) && (!CALCULATOR->f_plot || !mparse.containsFunction(CALCULATOR->f_plot))) {
+				if(!cdata->current_from_struct && !mparse.containsFunctionId(FUNCTION_ID_SAVE) && !mparse.containsFunctionId(FUNCTION_ID_PLOT)) {
 					cdata->current_from_struct = new MathStructure;
 					EvaluationOptions eo = settings->evalops;
 					eo.structuring = STRUCTURING_NONE;
@@ -2920,7 +2920,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	p = index.data(ITEM_ROLE).value<void*>();
 	i_match = index.data(IMATCH_ROLE).toInt();
 	i_type = index.data(TYPE_ROLE).toULongLong();
-	if(i_type == 3) return;
+	if(i_type == 3 && p) return;
 	if(p_type == 1) item = (ExpressionItem*) p;
 	else if(p_type == 2) prefix = (Prefix*) p;
 	else if(p_type >= 100) p_type = 0;

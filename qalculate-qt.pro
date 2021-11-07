@@ -41,9 +41,9 @@ MOC_DIR = build
 OBJECTS_DIR = build
 DEFINES += VERSION=\\\"$$VERSION\\\"
 
-HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/percentagecalculationdialog.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/uniteditdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
+HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/datasetsdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/percentagecalculationdialog.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/uniteditdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
 
-SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/percentagecalculationdialog.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/uniteditdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
+SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/datasetsdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/percentagecalculationdialog.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/uniteditdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
 LANGUAGES = ca de es fr nl pt_BR ru sl sv zh_CN
 

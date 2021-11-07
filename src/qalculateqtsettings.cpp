@@ -339,6 +339,24 @@ void QalculateQtSettings::loadPreferences() {
 					functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "functions_hsplitter_state") {
 					functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "units_geometry") {
+					units_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "units_vsplitter_state") {
+					units_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "units_hsplitter_state") {
+					units_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "variables_geometry") {
+					variables_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "variables_vsplitter_state") {
+					variables_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "variables_hsplitter_state") {
+					variables_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "datasets_geometry") {
+					datasets_geometry = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "datasets_vsplitter_state") {
+					datasets_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "datasets_hsplitter_state") {
+					datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "style") {
 					style = v;
 				} else if(svar == "palette") {
@@ -803,6 +821,9 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(!variables_geometry.isEmpty()) fprintf(file, "variables_geometry=%s\n", variables_geometry.toBase64().data());
 	if(!variables_vsplitter_state.isEmpty()) fprintf(file, "variables_vsplitter_state=%s\n", variables_vsplitter_state.toBase64().data());
 	if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
+	if(!datasets_geometry.isEmpty()) fprintf(file, "datasets_geometry=%s\n", datasets_geometry.toBase64().data());
+	if(!datasets_vsplitter_state.isEmpty()) fprintf(file, "datasets_vsplitter_state=%s\n", datasets_vsplitter_state.toBase64().data());
+	if(!datasets_hsplitter_state.isEmpty()) fprintf(file, "datasets_hsplitter_state=%s\n", datasets_hsplitter_state.toBase64().data());
 	fprintf(file, "always_on_top=%i\n", always_on_top);
 	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
 	fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);

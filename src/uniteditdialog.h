@@ -25,6 +25,7 @@ class QSpinBox;
 class QLabel;
 class NamesEditDialog;
 class QTabWidget;
+class QAction;
 
 class UnitEditDialog : public QDialog {
 
@@ -39,6 +40,7 @@ class UnitEditDialog : public QDialog {
 		QPlainTextEdit *descriptionEdit;
 		QPushButton *okButton;
 		QTabWidget *tabs;
+		QAction *namesAction;
 		QLabel *relationLabel, *baseLabel, *inverseLabel, *priorityLabel, *mbunLabel, *exponentLabel;
 		NamesEditDialog *namesEditDialog;
 		Unit *o_unit;

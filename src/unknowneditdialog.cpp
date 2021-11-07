@@ -18,17 +18,28 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <QAction>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
 #include "unknowneditdialog.h"
+#include "functioneditdialog.h"
 
 UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
+	o_variable = NULL;
+	name_edited = false;
+	namesEditDialog = NULL;
 	QVBoxLayout *box = new QVBoxLayout(this);
 	QGridLayout *grid = new QGridLayout();
 	box->addLayout(grid);
 	grid->addWidget(new QLabel(tr("Name:"), this), 0, 0);
 	nameEdit = new QLineEdit(this);
+	connect(nameEdit->addAction(LOAD_ICON("configure"), QLineEdit::TrailingPosition), SIGNAL(triggered()), this, SLOT(editNames()));
+#ifdef _WIN32
+#	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
+			nameEdit->setTextMargins(0, 0, 22, 0);
+#	endif
+#endif
 	grid->addWidget(nameEdit, 0, 1);
 	customBox = new QCheckBox(tr("Custom assumptions"), this);
 	customBox->setChecked(true);
@@ -68,6 +79,16 @@ UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
 }
 UnknownEditDialog::~UnknownEditDialog() {}
 
+void UnknownEditDialog::editNames() {
+	if(!namesEditDialog) {
+		namesEditDialog = new NamesEditDialog(TYPE_VARIABLE, this, nameEdit->isReadOnly());
+		namesEditDialog->setNames(o_variable, nameEdit->text());
+	}
+	namesEditDialog->exec();
+	nameEdit->setText(namesEditDialog->firstName());
+	name_edited = false;
+	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
+}
 void UnknownEditDialog::onTypeChanged(int i) {
 	int t = typeCombo->itemData(i).toInt();
 	int s = signCombo->currentData().toInt();
@@ -76,6 +97,7 @@ void UnknownEditDialog::onTypeChanged(int i) {
 		signCombo->setCurrentIndex(signCombo->findData(ASSUMPTION_SIGN_UNKNOWN));
 		signCombo->blockSignals(false);
 	}
+	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
 }
 void UnknownEditDialog::onSignChanged(int i) {
 	int t = typeCombo->currentData().toInt();
@@ -85,21 +107,23 @@ void UnknownEditDialog::onSignChanged(int i) {
 		typeCombo->setCurrentIndex(typeCombo->findData(ASSUMPTION_TYPE_REAL));
 		typeCombo->blockSignals(false);
 	}
+	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
 }
 void UnknownEditDialog::onCustomToggled(bool b) {
 	typeCombo->setEnabled(b);
 	signCombo->setEnabled(b);
+	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
 }
 UnknownVariable *UnknownEditDialog::createVariable(ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	Variable *var = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString())) {
-		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		if(name_edited && (!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
 			else *replaced_item = var;
 		}
@@ -107,18 +131,19 @@ UnknownVariable *UnknownEditDialog::createVariable(ExpressionItem **replaced_ite
 	UnknownVariable *v;
 	if(var && var->isLocal() && !var->isKnown()) {
 		v = (UnknownVariable*) var;
-		if(v->countNames() > 1) v->clearNames();
-		v->setHidden(false); v->setApproximate(false); v->setDescription(""); v->setTitle("");
+		v->clearNames(); v->setHidden(false); v->setApproximate(false); v->setDescription(""); v->setTitle("");
 		if(!modifyVariable(v)) return NULL;
 		return v;
 	}
-	v = new UnknownVariable("", nameEdit->text().trimmed().toStdString());
+	v = new UnknownVariable("", "");
+	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
+	else NamesEditDialog::modifyName(v, nameEdit->text());
+	v->setCategory(CALCULATOR->getVariableById(VARIABLE_ID_X)->category());
 	if(customBox->isChecked()) {
 		v->setAssumptions(new Assumptions());
 		v->assumptions()->setType((AssumptionType) typeCombo->currentData().toInt());
 		v->assumptions()->setSign((AssumptionSign) signCombo->currentData().toInt());
 	}
-	v->setCategory(CALCULATOR->getVariableById(VARIABLE_ID_X)->category());
 	v->setChanged(false);
 	CALCULATOR->addVariable(v);
 	return v;
@@ -126,18 +151,18 @@ UnknownVariable *UnknownEditDialog::createVariable(ExpressionItem **replaced_ite
 bool UnknownEditDialog::modifyVariable(UnknownVariable *v, ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
-		if(QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
+		Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		if(name_edited && (!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
 		if(replaced_item) {
-			Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
 			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
 			else if(var != v) *replaced_item = var;
 		}
 	}
-	if(v->countNames() > 1 && v->getName(1).name != nameEdit->text().trimmed().toStdString()) v->clearNames();
-	v->setName(nameEdit->text().trimmed().toStdString());
+	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
+	else NamesEditDialog::modifyName(v, nameEdit->text());
 	if(!customBox->isChecked()) {
 		v->setAssumptions(NULL);
 	} else {
@@ -148,19 +173,21 @@ bool UnknownEditDialog::modifyVariable(UnknownVariable *v, ExpressionItem **repl
 	return true;
 }
 void UnknownEditDialog::setVariable(UnknownVariable *v) {
+	o_variable = v;
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
 	Assumptions *ass = v->assumptions();
 	customBox->setChecked(ass);
 	if(!ass) ass = CALCULATOR->defaultAssumptions();
 	typeCombo->setCurrentIndex(typeCombo->findData(ass->type()));
 	signCombo->setCurrentIndex(signCombo->findData(ass->sign()));
-	okButton->setEnabled(true);
+	okButton->setEnabled(false);
 }
 void UnknownEditDialog::onNameEdited(const QString &str) {
-	okButton->setEnabled(!str.trimmed().isEmpty());
 	if(!str.trimmed().isEmpty() && !CALCULATOR->variableNameIsValid(str.trimmed().toStdString())) {
 		nameEdit->setText(QString::fromStdString(CALCULATOR->convertToValidVariableName(str.trimmed().toStdString())));
 	}
+	name_edited = true;
+	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
 }
 void UnknownEditDialog::setName(const QString &str) {
 	nameEdit->setText(str);
