@@ -24,6 +24,7 @@
 
 #include "qalculateqtsettings.h"
 #include "datasetsdialog.h"
+#include "dataseteditdialog.h"
 
 DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
 	selected_dataset = NULL;
@@ -46,6 +47,17 @@ DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
 	datasetsView->header()->hide();
 	datasetsView->setColumnCount(1);
 	box->addWidget(datasetsView);
+	QHBoxLayout *hbox = new QHBoxLayout();
+	hbox->addStretch(1);
+	addDSButton = new QPushButton(tr("Add"), this);
+	hbox->addWidget(addDSButton);
+	editDSButton = new QPushButton(tr("Edit"), this);
+	editDSButton->setEnabled(false);
+	hbox->addWidget(editDSButton);
+	delDSButton = new QPushButton(tr("Remove"), this);
+	delDSButton->setEnabled(false);
+	hbox->addWidget(delDSButton);
+	box->addLayout(hbox);
 	w = new QWidget(this);
 	box = new QVBoxLayout(w);
 	vsplitter_l->addWidget(w);
@@ -58,6 +70,18 @@ DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
 	objectsView->header()->hide();
 	objectsView->setColumnCount(1);
 	box->addWidget(objectsView);
+	hbox = new QHBoxLayout();
+	hbox->addStretch(1);
+	addObjButton = new QPushButton(tr("Add"), this);
+	addObjButton->setEnabled(false);
+	hbox->addWidget(addObjButton);
+	editObjButton = new QPushButton(tr("Edit"), this);
+	editObjButton->setEnabled(false);
+	hbox->addWidget(editObjButton);
+	delObjButton = new QPushButton(tr("Remove"), this);
+	delObjButton->setEnabled(false);
+	hbox->addWidget(delObjButton);
+	box->addLayout(hbox);
 	w = new QWidget(this);
 	box = new QVBoxLayout(w);
 	vsplitter_r->addWidget(w);
@@ -85,6 +109,12 @@ DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
 	topbox->addWidget(buttonBox);
 	datasetsView->setFocus();
+	connect(addDSButton, SIGNAL(clicked()), this, SLOT(addDataset()));
+	connect(editDSButton, SIGNAL(clicked()), this, SLOT(editDataset()));
+	connect(delDSButton, SIGNAL(clicked()), this, SLOT(delDataset()));
+	connect(addObjButton, SIGNAL(clicked()), this, SLOT(addObject()));
+	connect(editObjButton, SIGNAL(clicked()), this, SLOT(editObject()));
+	connect(delObjButton, SIGNAL(clicked()), this, SLOT(delObject()));
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(datasetsView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedDatasetChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(objectsView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedObjectChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
@@ -111,6 +141,50 @@ DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
 }
 DataSetsDialog::~DataSetsDialog() {}
 
+void DataSetsDialog::addDataset() {}
+void DataSetsDialog::editDataset() {}
+void DataSetsDialog::delDataset() {}
+void DataSetsDialog::addObject() {
+	if(!selected_dataset) return;
+	DataObject *o = DataObjectEditDialog::newObject(this, selected_dataset);
+	if(o) {
+		selected_object = o;
+		DataPropertyIter pit;
+		DataProperty *dp = selected_object->parentSet()->getFirstProperty(&pit);
+		QTreeWidgetItem *item = new QTreeWidgetItem(objectsView);
+		for(int i = 0; dp; i++) {
+			if(!dp->isHidden() && dp->isKey()) item->setText(i, QString::fromStdString(selected_object->getPropertyDisplayString(dp)));
+			dp = selected_object->parentSet()->getNextProperty(&pit);
+		}
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) selected_object));
+		objectsView->clearSelection();
+		objectsView->setCurrentItem(item);
+		item->setSelected(true);
+		selectedObjectChanged(item, NULL);
+		if(objectsView->columnCount() == 1) objectsView->sortItems(0, Qt::AscendingOrder);
+	}
+}
+void DataSetsDialog::editObject() {
+	if(!selected_object) return;
+	if(DataObjectEditDialog::editObject(this, selected_object)) {
+		DataPropertyIter pit;
+		DataProperty *dp = selected_object->parentSet()->getFirstProperty(&pit);
+		QTreeWidgetItem *item = objectsView->currentItem();
+		if(!item) return;
+		for(int i = 0; dp; i++) {
+			if(!dp->isHidden() && dp->isKey()) item->setText(i, QString::fromStdString(selected_object->getPropertyDisplayString(dp)));
+			dp = selected_object->parentSet()->getNextProperty(&pit);
+		}
+		selectedObjectChanged(item, NULL);
+		if(objectsView->columnCount() == 1) objectsView->sortItems(0, Qt::AscendingOrder);
+	}
+}
+void DataSetsDialog::delObject() {
+	if(!selected_object) return;
+	QTreeWidgetItem *item = objectsView->currentItem();
+	if(item) delete item;
+	selected_object->parentSet()->delObject(selected_object);
+}
 void DataSetsDialog::vsplitterlMoved(int, int) {
 	vsplitter_r->setSizes(vsplitter_l->sizes());
 }
@@ -123,9 +197,15 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 		objectsView->setColumnCount(1);
 		descriptionView->clear();
 		selected_dataset = NULL;
+		addObjButton->setEnabled(false);
+		editDSButton->setEnabled(false);
+		delDSButton->setEnabled(false);
 		return;
 	}
 	DataSet *ds = (DataSet*) item->data(0, Qt::UserRole).value<void*>();
+	addObjButton->setEnabled(ds->isLocal());
+	editDSButton->setEnabled(true);
+	delDSButton->setEnabled(ds->isLocal());
 	selected_dataset = ds;
 	DataObjectIter it;
 	DataPropertyIter pit;
@@ -141,7 +221,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 	objectsView->setColumnCount(n);
 	for(int i = 0; i < n; i++) objectsView->headerItem()->setText(i, QString());
 	n = 0;
-	if(o) selectedObjectChanged(NULL, NULL);
+	if(!o) selectedObjectChanged(NULL, NULL);
 	while(o) {
 		dp = ds->getFirstProperty(&pit);
 		QTreeWidgetItem *item = new QTreeWidgetItem(objectsView);
@@ -152,6 +232,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) o));
 		n++;
 		if(o == selected_object || (n == 1 && !selected_object)) {
+			objectsView->setCurrentItem(item);
 			item->setSelected(true);
 			selectedObjectChanged(item, NULL);
 		}
@@ -256,12 +337,16 @@ void DataSetsDialog::selectedObjectChanged(QTreeWidgetItem *item, QTreeWidgetIte
 	propertiesView->clear();
 	propertiesView->setColumnCount(3);
 	if(!item) {
+		editObjButton->setEnabled(false);
+		delObjButton->setEnabled(false);
 		selected_object = NULL;
 		return;
 	}
 	DataObject *o = (DataObject*) item->data(0, Qt::UserRole).value<void*>();
 	selected_object = o;
 	DataSet *ds = o->parentSet();
+	editObjButton->setEnabled(true);
+	delObjButton->setEnabled(o->isUserModified());
 	DataPropertyIter it;
 	DataProperty *dp = ds->getFirstProperty(&it);
 	QFont bold_font(font());
@@ -298,6 +383,7 @@ void DataSetsDialog::updateDatasets() {
 		QTreeWidgetItem *item = new QTreeWidgetItem(datasetsView, QStringList(QString::fromStdString(ds->title())));
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) ds));
 		if((!ds && i == 1) || ds == selected_dataset) {
+			datasetsView->setCurrentItem(item);
 			item->setSelected(true);
 		}
 	}

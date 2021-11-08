@@ -30,6 +30,7 @@ class DataSetsDialog : public QDialog {
 
 		QTreeWidget *datasetsView, *objectsView, *propertiesView;
 		QTextEdit *descriptionView;
+		QPushButton *addDSButton, *delDSButton, *editDSButton, *addObjButton, *delObjButton, *editObjButton;
 		QSplitter *vsplitter_l, *vsplitter_r, *hsplitter;
 		DataSet *selected_dataset;
 		DataObject *selected_object;
@@ -46,6 +47,12 @@ class DataSetsDialog : public QDialog {
 		void propertyClicked(QTreeWidgetItem*, int);
 		void vsplitterrMoved(int, int);
 		void vsplitterlMoved(int, int);
+		void addDataset();
+		void editDataset();
+		void delDataset();
+		void addObject();
+		void editObject();
+		void delObject();
 
 	public:
 

@@ -1045,11 +1045,11 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	expressionEdit->setReadOnly(read_only);
 }
 void FunctionEditDialog::onNameEdited(const QString &str) {
-	okButton->setEnabled(!str.trimmed().isEmpty() && (!expressionEdit->isEnabled() || !expressionEdit->document()->isEmpty()));
 	if(!str.trimmed().isEmpty() && !CALCULATOR->functionNameIsValid(str.trimmed().toStdString())) {
 		nameEdit->setText(QString::fromStdString(CALCULATOR->convertToValidFunctionName(str.trimmed().toStdString())));
 	}
 	name_edited = true;
+	onFunctionChanged();
 }
 void FunctionEditDialog::onFunctionChanged() {
 	okButton->setEnabled(!nameEdit->isReadOnly() && (!expressionEdit->document()->isEmpty() || !expressionEdit->isEnabled()) && !nameEdit->text().trimmed().isEmpty());
