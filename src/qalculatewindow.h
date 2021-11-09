@@ -231,6 +231,7 @@ class QalculateWindow : public QMainWindow {
 		void exportCSV();
 		void editPreferences();
 		void onDatasetsChanged();
+		void onFunctionsChanged();
 		void insertProperty(DataObject*, DataProperty*);
 		void openDatasets();
 		void openFunctions();

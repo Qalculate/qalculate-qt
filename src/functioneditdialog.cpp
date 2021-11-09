@@ -153,21 +153,27 @@ NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QD
 	namesView->setSelectionMode(QAbstractItemView::SingleSelection);
 	namesView->setRootIsDecorated(false);
 	namesView->setStyle(new CenteredBoxProxy());
-	namesModel->setColumnCount(9);
-	namesModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
-	namesModel->setHorizontalHeaderItem(1, new QStandardItem(tr("Abbreviation")));
-	namesModel->setHorizontalHeaderItem(2, new QStandardItem(tr("Plural")));
-	namesModel->setHorizontalHeaderItem(3, new QStandardItem(tr("Reference")));
-	namesModel->setHorizontalHeaderItem(4, new QStandardItem(tr("Avoid input")));
-	namesModel->setHorizontalHeaderItem(5, new QStandardItem(tr("Unicode")));
-	namesModel->setHorizontalHeaderItem(6, new QStandardItem(tr("Suffix")));
-	namesModel->setHorizontalHeaderItem(7, new QStandardItem(tr("Case sensitive")));
-	namesModel->setHorizontalHeaderItem(8, new QStandardItem(tr("Completion only")));
+	if(i_type < 0) {
+		namesModel->setColumnCount(2);
+		namesModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
+		namesModel->setHorizontalHeaderItem(1, new QStandardItem(tr("Reference")));
+	} else {
+		namesModel->setColumnCount(9);
+		namesModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
+		namesModel->setHorizontalHeaderItem(1, new QStandardItem(tr("Abbreviation")));
+		namesModel->setHorizontalHeaderItem(2, new QStandardItem(tr("Plural")));
+		namesModel->setHorizontalHeaderItem(3, new QStandardItem(tr("Reference")));
+		namesModel->setHorizontalHeaderItem(4, new QStandardItem(tr("Avoid input")));
+		namesModel->setHorizontalHeaderItem(5, new QStandardItem(tr("Unicode")));
+		namesModel->setHorizontalHeaderItem(6, new QStandardItem(tr("Suffix")));
+		namesModel->setHorizontalHeaderItem(7, new QStandardItem(tr("Case sensitive")));
+		namesModel->setHorizontalHeaderItem(8, new QStandardItem(tr("Completion only")));
+		if(i_type != TYPE_UNIT) namesView->header()->hideSection(2);
+	}
 	namesView->setModel(namesModel);
 	namesView->header()->setStretchLastSection(false);
 	namesView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	namesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-	if(i_type != TYPE_UNIT) namesView->header()->hideSection(2);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 	QScreen *scr = screen();
@@ -258,12 +264,50 @@ void NamesEditDialog::modifyName(ExpressionItem *o, const QString &str) {
 		o->setName(str.trimmed().toStdString());
 	}
 }
+void NamesEditDialog::setNames(DataProperty *o, const QString &str) {
+	bool read_only = !addButton->isEnabled();
+	for(size_t i = 1; i == 1 || (o && i <= o->countNames()); i++) {
+		QList<QStandardItem *> items;
+		QStandardItem *item = new QStandardItem(i == 1 && (!o || !str.trimmed().isEmpty()) ? str.trimmed() : QString::fromStdString(o->getName(i)));
+		item->setEditable(!read_only);
+		items.append(item);
+		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState((!o || o->nameIsReference(i)) ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
+		namesModel->appendRow(items);
+	}
+}
+void NamesEditDialog::modifyNames(DataProperty *o, const QString &str) {
+	o->clearNames();
+	for(int i = 0; i < namesModel->rowCount(); i++) {
+		if(i == 0) o->addName(str.trimmed().toStdString(), namesModel->item(i, 1)->checkState() == Qt::Checked);
+		else o->addName(namesModel->item(i, 0)->text().trimmed().toStdString(), namesModel->item(i, 1)->checkState() == Qt::Checked);
+	}
+	if(o->countNames() == 0) {
+		o->addName(str.trimmed().toStdString(), true);
+	}
+}
+void NamesEditDialog::modifyName(DataProperty *o, const QString &str) {
+	if(o->countNames() == 0) {
+		o->addName(str.trimmed().toStdString(), true);
+	} else {
+		std::vector<std::string> names;
+		std::vector<bool> name_refs;
+		for(size_t i = 1; i <= o->countNames(); i++) {
+			if(i == 1) names.push_back(str.trimmed().toStdString());
+			else names.push_back(o->getName(i));
+			name_refs.push_back(o->nameIsReference(i));
+		}
+		o->clearNames();
+		for(size_t i = 0; i < names.size(); i++) {
+			o->addName(names[i], name_refs[i]);
+		}
+	}
+}
 void NamesEditDialog::addClicked() {
 	QList<QStandardItem *> items;
 	QStandardItem *item = new QStandardItem();
 	QStandardItem *edit_item = item;
 	items.append(item);
-	for(int i = 0; i < 8; i++) {
+	for(int i = 1; i < namesModel->columnCount(); i++) {
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(Qt::Unchecked); item->setTextAlignment(Qt::AlignCenter); items.append(item);
 	}
 	namesModel->appendRow(items);
@@ -284,7 +328,7 @@ void NamesEditDialog::selectedNameChanged(const QModelIndex &index, const QModel
 	}
 }
 void NamesEditDialog::nameChanged(QStandardItem *item) {
-	if(item->column() != 0 || item->text().trimmed().isEmpty()) return;
+	if(i_type < 0 || item->column() != 0 || item->text().trimmed().isEmpty()) return;
 	if((i_type == TYPE_FUNCTION && !CALCULATOR->functionNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_VARIABLE && !CALCULATOR->variableNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_UNIT && !CALCULATOR->unitNameIsValid(item->text().trimmed().toStdString()))) {
 		namesModel->blockSignals(true);
 		if(i_type == TYPE_FUNCTION) item->setText(QString::fromStdString(CALCULATOR->convertToValidFunctionName(item->text().trimmed().toStdString())));
@@ -585,7 +629,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(nameEdit->addAction(LOAD_ICON("configure"), QLineEdit::TrailingPosition), SIGNAL(triggered()), this, SLOT(editNames()));
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
-			nameEdit->setTextMargins(0, 0, 22, 0);
+		nameEdit->setTextMargins(0, 0, 22, 0);
 #	endif
 #endif
 	grid->addWidget(nameEdit, 0, 1);
@@ -946,8 +990,10 @@ void FunctionEditDialog::onRejected() {
 }
 void FunctionEditDialog::setFunction(MathFunction *f) {
 	o_function = f;
+	name_edited = false;
 	bool read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
+	if(namesEditDialog) namesEditDialog->setNames(f, nameEdit->text());
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);
 		std::string str = settings->localizeExpression(((UserFunction*) f)->formula());
@@ -1023,7 +1069,7 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	exampleEdit->setText(QString::fromStdString(str));
 	str = settings->localizeExpression(f->condition());
 	conditionEdit->setText(QString::fromStdString(str));
-	titleEdit->setText(QString::fromStdString(f->title()));
+	titleEdit->setText(QString::fromStdString(f->title(false)));
 	categoryEdit->blockSignals(true);
 	categoryEdit->setCurrentText(QString::fromStdString(f->category()));
 	categoryEdit->blockSignals(false);

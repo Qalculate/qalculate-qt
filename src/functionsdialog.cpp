@@ -28,6 +28,7 @@
 #include "functionsdialog.h"
 #include "itemproxymodel.h"
 #include "functioneditdialog.h"
+#include "dataseteditdialog.h"
 
 FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	QVBoxLayout *topbox = new QVBoxLayout(this);
@@ -203,7 +204,7 @@ void FunctionsDialog::editClicked() {
 	if(!index.isValid()) return;
 	MathFunction *replaced_item = NULL;
 	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
-	if(f && FunctionEditDialog::editFunction(this, f, &replaced_item)) {
+	if(f && ((f->subtype() != SUBTYPE_DATA_SET && FunctionEditDialog::editFunction(this, f, &replaced_item)) || (f->subtype() == SUBTYPE_DATA_SET && DataSetEditDialog::editDataset(this, (DataSet*) f, &replaced_item)))) {
 		sourceModel->removeRow(functionsModel->mapToSource(functionsView->selectionModel()->currentIndex()).row());
 		if(replaced_item && !CALCULATOR->hasFunction(replaced_item)) {
 			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);

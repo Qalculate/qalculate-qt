@@ -40,9 +40,7 @@ class DataSetsDialog : public QDialog {
 	protected slots:
 
 		void selectedDatasetChanged(QTreeWidgetItem*, QTreeWidgetItem*);
-		void datasetDoubleClicked(QTreeWidgetItem*, int);
 		void selectedObjectChanged(QTreeWidgetItem*, QTreeWidgetItem*);
-		void objectDoubleClicked(QTreeWidgetItem*, int);
 		void propertyDoubleClicked(QTreeWidgetItem*, int);
 		void propertyClicked(QTreeWidgetItem*, int);
 		void vsplitterrMoved(int, int);

@@ -4830,6 +4830,10 @@ void QalculateWindow::onDatasetsChanged() {
 	expressionEdit->updateCompletion();
 	if(functionsDialog) functionsDialog->updateFunctions();
 }
+void QalculateWindow::onFunctionsChanged() {
+	expressionEdit->updateCompletion();
+	if(datasetsDialog) datasetsDialog->updateDatasets();
+}
 void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	expressionEdit->blockCompletion();
 	expressionEdit->blockParseStatus();
@@ -4890,7 +4894,7 @@ void QalculateWindow::openFunctions() {
 		return;
 	}
 	functionsDialog = new FunctionsDialog();
-	connect(functionsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(functionsDialog, SIGNAL(itemsChanged()), this, SLOT(onFunctionsChanged()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
 	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(onInsertFunctionRequested(MathFunction*)));
 	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));

@@ -47,7 +47,7 @@ UnitEditDialog::UnitEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(namesAction, SIGNAL(triggered()), this, SLOT(editNames()));
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
-			nameEdit->setTextMargins(0, 0, 22, 0);
+		nameEdit->setTextMargins(0, 0, 22, 0);
 #	endif
 #endif
 	grid->addWidget(nameEdit, 0, 1);
@@ -335,7 +335,9 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 	return u;
 }
 void UnitEditDialog::setUnit(Unit *u) {
+	name_edited = false;
 	nameEdit->setText(QString::fromStdString(u->getName(1).name));
+	if(namesEditDialog) namesEditDialog->setNames(u, nameEdit->text());
 	o_unit = u;
 	switch(u->subtype()) {
 		case SUBTYPE_BASE_UNIT: {
@@ -387,7 +389,7 @@ void UnitEditDialog::setUnit(Unit *u) {
 	descriptionEdit->blockSignals(true);
 	descriptionEdit->setPlainText(QString::fromStdString(u->description()));
 	descriptionEdit->blockSignals(false);
-	titleEdit->setText(QString::fromStdString(u->title()));
+	titleEdit->setText(QString::fromStdString(u->title(false)));
 	categoryEdit->setCurrentText(QString::fromStdString(u->category()));
 	systemEdit->blockSignals(true);
 	systemEdit->setCurrentText(QString::fromStdString(u->system()));

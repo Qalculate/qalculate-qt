@@ -227,7 +227,10 @@ bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default
 }
 void VariableEditDialog::setVariable(KnownVariable *v) {
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
+	name_edited = false;
 	if(!nameEdit->text().isEmpty()) o_variable = v;
+	else o_variable = NULL;
+	if(namesEditDialog) namesEditDialog->setNames(o_variable, nameEdit->text());
 	if(v->isExpression() && !b_matrix) {
 		std::string value_str = settings->localizeExpression(v->expression());
 		bool is_relative = false;
@@ -276,7 +279,7 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 	descriptionEdit->blockSignals(true);
 	descriptionEdit->setPlainText(QString::fromStdString(v->description()));
 	descriptionEdit->blockSignals(false);
-	titleEdit->setText(QString::fromStdString(v->title()));
+	titleEdit->setText(QString::fromStdString(v->title(false)));
 	categoryEdit->blockSignals(true);
 	categoryEdit->setCurrentText(QString::fromStdString(v->category()));
 	categoryEdit->blockSignals(false);

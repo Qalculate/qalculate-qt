@@ -23,6 +23,9 @@ class QTabWidget;
 class NamesEditDialog;
 class QPushButton;
 class QComboBox;
+class QCheckBox;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 class DataSetEditDialog : public QDialog {
 
@@ -31,23 +34,72 @@ class DataSetEditDialog : public QDialog {
 	protected:
 
 		QTabWidget *tabs;
-		QLineEdit *nameEdit, *titleEdit, *fileEdit;
+		QLineEdit *nameEdit, *titleEdit, *fileEdit, *arg1Edit, *arg2Edit, *default2Edit;
 		QPlainTextEdit *descriptionEdit, *copyrightEdit;
-		QPushButton *okButton;
+		QTreeWidget *propertiesView;
+		QPushButton *okButton, *addButton, *delButton, *editButton;
 		NamesEditDialog *namesEditDialog;
 		DataSet *o_dataset;
+		std::vector<DataProperty*> tmp_props;
+		std::vector<DataProperty*> tmp_props_orig;
 		bool name_edited;
+		DataProperty *selected_property = NULL;
 
 	protected slots:
 
 		void onDatasetChanged();
 		void onNameEdited(const QString&);
 		void editNames();
+		void addProperty();
+		void editProperty();
+		void delProperty();
+		void selectedPropertyChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 
 	public:
 
 		DataSetEditDialog(QWidget *parent = NULL);
 		virtual ~DataSetEditDialog();
+
+		DataSet *createDataset(MathFunction **replaced_item = NULL);
+		bool modifyDataset(DataSet *ds, MathFunction **replaced_item = NULL);
+		void setDataset(DataSet *ds);
+
+		static bool editDataset(QWidget *parent, DataSet *ds, MathFunction **replaced_item = NULL);
+		static DataSet *newDataset(QWidget *parent, MathFunction **replaced_item = NULL);
+
+};
+
+class DataPropertyEditDialog : public QDialog {
+
+	Q_OBJECT
+
+	protected:
+
+		QPushButton *okButton;
+		QLineEdit *nameEdit, *titleEdit, *unitEdit;
+		QComboBox *typeCombo;
+		QPlainTextEdit *descriptionEdit;
+		QCheckBox *hideBox, *approxBox, *bracketsBox, *keyBox, *caseBox;
+		NamesEditDialog *namesEditDialog;
+		DataProperty *o_property;
+		bool name_edited;
+
+	protected slots:
+
+		void onPropertyChanged();
+		void editNames();
+
+	public:
+
+		DataPropertyEditDialog(QWidget *parent = NULL);
+		virtual ~DataPropertyEditDialog();
+
+		DataProperty *createProperty(DataSet *ds);
+		bool modifyProperty(DataProperty *dp);
+		void setProperty(DataProperty *dp);
+
+		static bool editProperty(QWidget *parent, DataProperty *dp);
+		static DataProperty *newProperty(QWidget *parent, DataSet *ds);
 
 };
 

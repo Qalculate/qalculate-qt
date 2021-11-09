@@ -37,7 +37,7 @@ UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(nameEdit->addAction(LOAD_ICON("configure"), QLineEdit::TrailingPosition), SIGNAL(triggered()), this, SLOT(editNames()));
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
-			nameEdit->setTextMargins(0, 0, 22, 0);
+		nameEdit->setTextMargins(0, 0, 22, 0);
 #	endif
 #endif
 	grid->addWidget(nameEdit, 0, 1);
@@ -174,7 +174,9 @@ bool UnknownEditDialog::modifyVariable(UnknownVariable *v, ExpressionItem **repl
 }
 void UnknownEditDialog::setVariable(UnknownVariable *v) {
 	o_variable = v;
+	name_edited = false;
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
+	if(namesEditDialog) namesEditDialog->setNames(v, nameEdit->text());
 	Assumptions *ass = v->assumptions();
 	customBox->setChecked(ass);
 	if(!ass) ass = CALCULATOR->defaultAssumptions();
