@@ -14,12 +14,6 @@
 
 #include <QSortFilterProxyModel>
 
-#define ADD_INACTIVE_CATEGORY \
-	QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);\
-	if(list.isEmpty()) {\
-		QStringList l; l << tr("Inactive"); l << "Inactive";\
-	}
-
 class ItemProxyModel : public QSortFilterProxyModel {
 
 	Q_OBJECT

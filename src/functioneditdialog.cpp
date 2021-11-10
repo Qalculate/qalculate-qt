@@ -168,24 +168,24 @@ NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QD
 		namesModel->setHorizontalHeaderItem(6, new QStandardItem(tr("Suffix")));
 		namesModel->setHorizontalHeaderItem(7, new QStandardItem(tr("Case sensitive")));
 		namesModel->setHorizontalHeaderItem(8, new QStandardItem(tr("Completion only")));
-		if(i_type != TYPE_UNIT) namesView->header()->hideSection(2);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+		QScreen *scr = screen();
+#	else
+		QScreen *scr = QGuiApplication::screenAt(pos);
+#	endif
+		if(!scr) scr = QGuiApplication::primaryScreen();
+		QRect screen = scr->geometry();
+#else
+		QRect screen = QApplication::desktop()->screenGeometry(widget);
+#endif
+		if(screen.width() > 800) namesView->setMinimumWidth(800);
 	}
 	namesView->setModel(namesModel);
 	namesView->header()->setStretchLastSection(false);
 	namesView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	namesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	QScreen *scr = screen();
-#	else
-	QScreen *scr = QGuiApplication::screenAt(pos);
-#	endif
-	if(!scr) scr = QGuiApplication::primaryScreen();
-	QRect screen = scr->geometry();
-#else
-	QRect screen = QApplication::desktop()->screenGeometry(widget);
-#endif
-	if(screen.width() > 800) namesView->setMinimumWidth(800);
+	if(i_type >= 0 && i_type != TYPE_UNIT) namesView->header()->hideSection(2);
 	grid->addWidget(namesView, 0, 0);
 	QHBoxLayout *box = new QHBoxLayout();
 	addButton = new QPushButton(tr("Add"), this); box->addWidget(addButton); connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked())); addButton->setEnabled(!read_only);

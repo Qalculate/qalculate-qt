@@ -192,7 +192,8 @@ void VariablesDialog::newVariable(int type) {
 				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
 				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
 			} else if(!replaced_item->isActive()) {
-				ADD_INACTIVE_CATEGORY
+				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 			}
 		}
 		selected_item = v;
@@ -223,7 +224,8 @@ void VariablesDialog::variableRemoved(Variable *v) {
 	if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 }
 void VariablesDialog::variableDeactivated(Variable*) {
-	ADD_INACTIVE_CATEGORY
+	QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+	if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 	variablesModel->invalidate();
 }
 void VariablesDialog::editClicked() {
@@ -250,7 +252,8 @@ void VariablesDialog::editClicked() {
 				if(!CALCULATOR->hasUnit((Unit*) replaced_item)) emit unitRemoved((Unit*) replaced_item);
 				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
 			} else if(!replaced_item->isActive()) {
-				ADD_INACTIVE_CATEGORY
+				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 			}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));

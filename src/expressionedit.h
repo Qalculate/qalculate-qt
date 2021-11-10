@@ -120,6 +120,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
+		void onStatusModeChanged();
 		void showCurrentStatus();
 
 	public slots:

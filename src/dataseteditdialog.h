@@ -42,13 +42,17 @@ class DataSetEditDialog : public QDialog {
 		DataSet *o_dataset;
 		std::vector<DataProperty*> tmp_props;
 		std::vector<DataProperty*> tmp_props_orig;
-		bool name_edited;
+		bool name_edited, file_edited;
 		DataProperty *selected_property = NULL;
+
+		void setPropertyItemText(QTreeWidgetItem*, DataProperty*);
 
 	protected slots:
 
 		void onDatasetChanged();
 		void onNameEdited(const QString&);
+		void onTitleEdited(const QString&);
+		void onFileEdited(const QString&);
 		void editNames();
 		void addProperty();
 		void editProperty();
@@ -88,6 +92,7 @@ class DataPropertyEditDialog : public QDialog {
 
 		void onPropertyChanged();
 		void editNames();
+		void typeChanged(int);
 
 	public:
 

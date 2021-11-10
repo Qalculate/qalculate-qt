@@ -175,7 +175,8 @@ void FunctionsDialog::newClicked() {
 			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
-			ADD_INACTIVE_CATEGORY
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 		}
 		selected_item = f;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
@@ -210,7 +211,8 @@ void FunctionsDialog::editClicked() {
 			QModelIndexList list = sourceModel->match(sourceModel->index(0, 0), Qt::UserRole, QVariant::fromValue((void*) replaced_item), 1, Qt::MatchExactly);
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
-			ADD_INACTIVE_CATEGORY
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
 		item->setEditable(false);
@@ -277,8 +279,8 @@ void FunctionsDialog::deactivateClicked() {
 		if(!list.isEmpty()) {
 			categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 		} else if(!f->isActive()) {
-				QStringList l; l << tr("Inactive"); l << "Inactive";
-				categoriesView->setCurrentItem(new QTreeWidgetItem(categoriesView, l), 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			QStringList l; l << tr("Inactive"); l << "Inactive";
+			categoriesView->setCurrentItem(new QTreeWidgetItem(categoriesView, l), 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 		}
 		emit itemsChanged();
 	}

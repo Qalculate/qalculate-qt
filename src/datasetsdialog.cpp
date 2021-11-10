@@ -163,6 +163,7 @@ void DataSetsDialog::delDataset() {
 	if(!selected_dataset) return;
 	selected_dataset->destroy();
 	selected_object = NULL;
+	selected_dataset = NULL;
 	updateDatasets();
 	emit itemsChanged();
 }
@@ -239,6 +240,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 		if(!dp->isHidden() && dp->isKey()) n++;
 		dp = ds->getNextProperty(&pit);
 	}
+	bool no_key = (n == 0);
 	if(n == 0) n = 1;
 	objectsView->setColumnCount(n);
 	for(int i = 0; i < n; i++) objectsView->headerItem()->setText(i, QString());
@@ -248,7 +250,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 		dp = ds->getFirstProperty(&pit);
 		QTreeWidgetItem *item = new QTreeWidgetItem(objectsView);
 		for(int i = 0; dp; i++) {
-			if(!dp->isHidden() && dp->isKey()) item->setText(i, QString::fromStdString(o->getPropertyDisplayString(dp)));
+			if((no_key && i == 0) || (!dp->isHidden() && dp->isKey())) item->setText(i, QString::fromStdString(o->getPropertyDisplayString(dp)));
 			dp = ds->getNextProperty(&pit);
 		}
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) o));
@@ -399,16 +401,17 @@ void DataSetsDialog::propertyClicked(QTreeWidgetItem *item, int c) {
 	emit insertPropertyRequest(selected_object, (DataProperty*) item->data(0, Qt::UserRole).value<void*>());
 }
 void DataSetsDialog::updateDatasets() {
+	DataSet *ds = selected_dataset;
 	datasetsView->clear();
 	datasetsView->header()->hide();
 	datasetsView->setColumnCount(1);
-	DataSet *ds;
+	selected_dataset = ds;
 	for(size_t i = 1; ; i++) {
 		ds = CALCULATOR->getDataSet(i);
 		if(!ds) break;
 		QTreeWidgetItem *item = new QTreeWidgetItem(datasetsView, QStringList(QString::fromStdString(ds->title())));
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) ds));
-		if((!ds && i == 1) || ds == selected_dataset) {
+		if((!selected_dataset && i == 1) || ds == selected_dataset) {
 			datasetsView->setCurrentItem(item);
 			item->setSelected(true);
 		}

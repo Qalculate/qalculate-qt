@@ -1660,6 +1660,11 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Full completion"), this, SLOT(onCompletionModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); if(completion_level == 4) action->setChecked(true);
 		menu->addSeparator();
 		action = menu->addAction(tr("Delayed completion"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
+		menu = cmenu->addMenu(tr("Expression Status"));
+		group = new QActionGroup(this);
+		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); if(!settings->display_expression_status) action->setChecked(true);
+		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); if(settings->display_expression_status && settings->expression_status_delay > 0) action->setChecked(true);
+		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); if(settings->display_expression_status && settings->expression_status_delay == 0) action->setChecked(true);
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
@@ -1726,6 +1731,12 @@ void ExpressionEdit::onCompletionModeChanged() {
 	else settings->completion_min = 2;
 	if(completion_level > 3) settings->completion_min2 = 1;
 	else settings->completion_min2 = 2;
+}
+void ExpressionEdit::onStatusModeChanged() {
+	int i = qobject_cast<QAction*>(sender())->data().toInt();
+	settings->display_expression_status = (i > 0);
+	if(i == 1) settings->expression_status_delay = 1000;
+	else if(i == 2) settings->expression_status_delay = 0;
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;

@@ -70,6 +70,7 @@ DataPropertyEditDialog::DataPropertyEditDialog(QWidget *parent) : QDialog(parent
 	grid->addWidget(approxBox, 8, 0, 1, 2);
 	bracketsBox = new QCheckBox(tr("Value uses brackets"), this);
 	grid->addWidget(bracketsBox, 9, 0, 1, 2);
+	bracketsBox->hide();
 	hideBox = new QCheckBox(tr("Hide"), this);
 	grid->addWidget(hideBox, 10, 0, 1, 2);
 	box->addLayout(grid);
@@ -79,9 +80,18 @@ DataPropertyEditDialog::DataPropertyEditDialog(QWidget *parent) : QDialog(parent
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	box->addWidget(buttonBox);
 	nameEdit->setFocus();
+	typeChanged(0);
+	connect(typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(typeChanged(int)));
+	connect(typeCombo, SIGNAL(activated(int)), this, SLOT(onPropertyChanged()));
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onPropertyChanged()));
 	connect(descriptionEdit, SIGNAL(textChanged()), this, SLOT(onPropertyChanged()));
 	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onPropertyChanged()));
+	connect(unitEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onPropertyChanged()));
+	connect(hideBox, SIGNAL(clicked()), this, SLOT(onPropertyChanged()));
+	connect(caseBox, SIGNAL(clicked()), this, SLOT(onPropertyChanged()));
+	connect(keyBox, SIGNAL(clicked()), this, SLOT(onPropertyChanged()));
+	connect(approxBox, SIGNAL(clicked()), this, SLOT(onPropertyChanged()));
+	connect(bracketsBox, SIGNAL(clicked()), this, SLOT(onPropertyChanged()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	okButton->setEnabled(false);
@@ -89,6 +99,13 @@ DataPropertyEditDialog::DataPropertyEditDialog(QWidget *parent) : QDialog(parent
 }
 DataPropertyEditDialog::~DataPropertyEditDialog() {}
 
+void DataPropertyEditDialog::typeChanged(int i) {
+	keyBox->setEnabled(i != 0);
+	caseBox->setEnabled(i == 2);
+	approxBox->setEnabled(i != 2);
+	bracketsBox->setEnabled(i != 2);
+	unitEdit->setEnabled(i != 2);
+}
 void DataPropertyEditDialog::editNames() {
 	if(!namesEditDialog) {
 		namesEditDialog = new NamesEditDialog(-1, this, nameEdit->isReadOnly());
@@ -110,13 +127,14 @@ DataProperty *DataPropertyEditDialog::createProperty(DataSet *ds) {
 bool DataPropertyEditDialog::modifyProperty(DataProperty *dp) {
 	dp->setUserModified(true);
 	dp->setTitle(titleEdit->text().trimmed().toStdString());
-	dp->setUnit(settings->unlocalizeExpression(titleEdit->text().trimmed().toStdString()));
+	dp->setUnit(settings->unlocalizeExpression(unitEdit->text().trimmed().toStdString()));
 	dp->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
 	dp->setHidden(hideBox->isChecked());
 	dp->setKey(keyBox->isChecked());
 	dp->setApproximate(approxBox->isChecked());
 	dp->setCaseSensitive(caseBox->isChecked());
 	dp->setUsesBrackets(bracketsBox->isChecked());
+	dp->setPropertyType((PropertyType) typeCombo->currentData().toInt());
 	if(namesEditDialog) namesEditDialog->modifyNames(dp, nameEdit->text());
 	else NamesEditDialog::modifyName(dp, nameEdit->text());
 	return true;
@@ -159,7 +177,7 @@ bool DataPropertyEditDialog::editProperty(QWidget *parent, DataProperty *dp) {
 }
 DataProperty *DataPropertyEditDialog::newProperty(QWidget *parent, DataSet *ds) {
 	DataPropertyEditDialog *d = new DataPropertyEditDialog(parent);
-	d->setWindowTitle(tr("New Data Property"));
+	d->setWindowTitle(tr("Edit Data Property"));
 	DataProperty *dp = NULL;
 	while(d->exec() == QDialog::Accepted) {
 		dp = d->createProperty(ds);
@@ -174,6 +192,7 @@ DataSetEditDialog::DataSetEditDialog(QWidget *parent) : QDialog(parent) {
 	o_dataset = NULL;
 	selected_property = NULL;
 	name_edited = false;
+	file_edited = false;
 	namesEditDialog = NULL;
 	QVBoxLayout *box = new QVBoxLayout(this);
 	tabs = new QTabWidget(this);
@@ -208,7 +227,7 @@ DataSetEditDialog::DataSetEditDialog(QWidget *parent) : QDialog(parent) {
 	propertiesView->headerItem()->setText(0, tr("Title"));
 	propertiesView->headerItem()->setText(1, tr("Name"));
 	propertiesView->headerItem()->setText(2, tr("Type"));
-	propertiesView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+	propertiesView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 	propertiesView->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	propertiesView->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 	grid->addWidget(propertiesView, 0, 0);
@@ -239,20 +258,25 @@ DataSetEditDialog::DataSetEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(new QLabel(tr("Property argument name:"), this), 2, 0);
 	arg2Edit = new QLineEdit(this);
 	grid->addWidget(arg2Edit, 2, 1);
-	grid->addWidget(new QLabel(tr("Default property:"), this), 3, 0);
+	grid->addWidget(new QLabel(tr("Default property:"), this), 3, 0, Qt::AlignTop);
 	default2Edit = new QLineEdit(this);
 	default2Edit->setText("info");
-	grid->addWidget(default2Edit, 3, 1);
+	grid->addWidget(default2Edit, 3, 1, Qt::AlignTop);
+	grid->setRowStretch(3, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, this);
 	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	box->addWidget(buttonBox);
-	nameEdit->setFocus();
+	titleEdit->setFocus();
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
+	connect(fileEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFileEdited(const QString&)));
+	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onTitleEdited(const QString&)));
 	connect(descriptionEdit, SIGNAL(textChanged()), this, SLOT(onDatasetChanged()));
 	connect(copyrightEdit, SIGNAL(textChanged()), this, SLOT(onDatasetChanged()));
-	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onDatasetChanged()));
+	connect(arg1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onDatasetChanged()));
+	connect(arg2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onDatasetChanged()));
+	connect(default2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onDatasetChanged()));
 	connect(addButton, SIGNAL(clicked()), this, SLOT(addProperty()));
 	connect(editButton, SIGNAL(clicked()), this, SLOT(editProperty()));
 	connect(delButton, SIGNAL(clicked()), this, SLOT(delProperty()));
@@ -282,48 +306,50 @@ void DataSetEditDialog::selectedPropertyChanged(QTreeWidgetItem *item, QTreeWidg
 	editButton->setEnabled(true);
 	delButton->setEnabled(!nameEdit->isReadOnly());
 }
-#define SET_PROPERTY_SLIST \
-	QString str;\
-	switch(dp->propertyType()) {\
-		case PROPERTY_STRING: {\
-			str += tr("text");\
-			break;\
-		}\
-		case PROPERTY_NUMBER: {\
-			if(dp->isApproximate()) {\
-				str += tr("approximate");\
-				str += " ";\
-			}\
-			str += tr("number");\
-			break;\
-		}\
-		case PROPERTY_EXPRESSION: {\
-			if(dp->isApproximate()) {\
-				str += tr("approximate");\
-				str += " ";\
-			}\
-			str += tr("expression");\
-			break;\
-		}\
-	}\
-	if(dp->isKey()) {\
-		str += " (";\
-		str += tr("key");\
-		str += ")";\
-	}\
-	l << QString::fromStdString(dp->title(false));\
-	l << QString::fromStdString(dp->getName());\
-	l << str;\
-
+void DataSetEditDialog::setPropertyItemText(QTreeWidgetItem *item, DataProperty *dp) {
+	QString str;
+	switch(dp->propertyType()) {
+		case PROPERTY_STRING: {
+			str += tr("text");
+			break;
+		}
+		case PROPERTY_NUMBER: {
+			if(dp->isApproximate()) {
+				str += tr("approximate");
+				str += " ";
+			}
+			str += tr("number");
+			break;
+		}
+		case PROPERTY_EXPRESSION: {
+			if(dp->isApproximate()) {
+				str += tr("approximate");
+				str += " ";
+			}
+			str += tr("expression");
+			break;
+		}
+	}
+	if(dp->isKey()) {
+		str += " (";
+		str += tr("key");
+		str += ")";
+	}
+	item->setText(0, QString::fromStdString(dp->title(false)));
+	item->setText(1, QString::fromStdString(dp->getName()));
+	item->setText(2, str);
+}
 void DataSetEditDialog::addProperty() {
 	DataProperty *dp = DataPropertyEditDialog::newProperty(this, o_dataset);
 	if(dp) {
 		tmp_props.push_back(dp);
 		tmp_props_orig.push_back(NULL);
-		QStringList l;
-		SET_PROPERTY_SLIST
-		QTreeWidgetItem *item = new QTreeWidgetItem(propertiesView, l);
+		QTreeWidgetItem *item = new QTreeWidgetItem(propertiesView);
+		setPropertyItemText(item, dp);
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) dp));
+		propertiesView->clearSelection();
+		propertiesView->setCurrentItem(item);
+		item->setSelected(true);
 		onDatasetChanged();
 	}
 }
@@ -332,11 +358,7 @@ void DataSetEditDialog::editProperty() {
 	DataProperty *dp = selected_property;
 	if(DataPropertyEditDialog::editProperty(this, dp)) {
 		QTreeWidgetItem *item = propertiesView->currentItem();
-		QStringList l;
-		SET_PROPERTY_SLIST
-		for(int i = 0; i < l.size(); i++) {
-			if(item) item->setText(i, l.at(i));
-		}
+		setPropertyItemText(item, dp);
 		onDatasetChanged();
 	}
 }
@@ -351,10 +373,11 @@ void DataSetEditDialog::delProperty() {
 				tmp_props.erase(tmp_props.begin() + i);
 				tmp_props_orig.erase(tmp_props_orig.begin() + i);
 			}
+			QTreeWidgetItem *item = propertiesView->currentItem();
+			if(item) delete item;
+			onDatasetChanged();
 			break;
 		}
-		QTreeWidgetItem *item = propertiesView->currentItem();
-		if(item) delete item;
 	}
 }
 void DataSetEditDialog::editNames() {
@@ -364,7 +387,28 @@ void DataSetEditDialog::editNames() {
 	}
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
+	if(!file_edited) fileEdit->setText(nameEdit->text());
 	name_edited = false;
+	onDatasetChanged();
+}
+void DataSetEditDialog::onFileEdited(const QString&) {
+	file_edited = true;
+	onDatasetChanged();
+}
+void DataSetEditDialog::onTitleEdited(const QString &str) {
+	if(!file_edited) {
+		QString sfile = str.simplified().toLower();
+		sfile.replace(" ", "_");
+		fileEdit->setText(sfile);
+	}
+	if(!name_edited && !namesEditDialog) {
+		QString sname = str.simplified().toLower();
+		sname.replace(" ", "_");
+		if(!sname.trimmed().isEmpty() && !CALCULATOR->functionNameIsValid(sname.trimmed().toStdString())) {
+			sname = QString::fromStdString(CALCULATOR->convertToValidFunctionName(sname.trimmed().toStdString()));
+		}
+		nameEdit->setText(sname);
+	}
 	onDatasetChanged();
 }
 void DataSetEditDialog::onNameEdited(const QString &str) {
@@ -375,7 +419,7 @@ void DataSetEditDialog::onNameEdited(const QString &str) {
 	name_edited = true;
 }
 void DataSetEditDialog::onDatasetChanged() {
-	okButton->setEnabled(!nameEdit->isReadOnly() && !nameEdit->text().trimmed().isEmpty());
+	okButton->setEnabled(!nameEdit->isReadOnly() && !nameEdit->text().trimmed().isEmpty() && !fileEdit->text().trimmed().isEmpty());
 }
 DataSet *DataSetEditDialog::createDataset(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
@@ -511,6 +555,7 @@ void DataSetEditDialog::setDataset(DataSet *ds) {
 	arg2Edit->setReadOnly(read_only);
 	default2Edit->setReadOnly(read_only);
 	fileEdit->setReadOnly(read_only);
+	file_edited = true;
 	titleEdit->setReadOnly(read_only);
 	okButton->setEnabled(false);
 	nameEdit->setReadOnly(read_only);
@@ -518,7 +563,6 @@ void DataSetEditDialog::setDataset(DataSet *ds) {
 	editButton->setEnabled(false);
 	delButton->setEnabled(false);
 	selected_property = NULL;
-	QStringList l;
 	propertiesView->clear();
 	propertiesView->setColumnCount(3);
 	propertiesView->headerItem()->setText(0, tr("Title"));
@@ -527,10 +571,10 @@ void DataSetEditDialog::setDataset(DataSet *ds) {
 	for(size_t i = 0; i < tmp_props.size(); i++) {
 		DataProperty *dp = tmp_props[i];
 		if(dp) {
-			l.clear();
-			SET_PROPERTY_SLIST
-			QTreeWidgetItem *item = new QTreeWidgetItem(propertiesView, l);
+			QTreeWidgetItem *item = new QTreeWidgetItem(propertiesView);
+			setPropertyItemText(item, dp);
 			item->setData(0, Qt::UserRole, QVariant::fromValue((void*) dp));
+			if(i == 0) item->setSelected(true);
 		}
 	}
 }
