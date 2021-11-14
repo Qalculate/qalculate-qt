@@ -55,9 +55,9 @@ class ExpressionTipLabel : public QLabel {
 	public:
 
 		QBasicTimer hideTimer, expireTimer;
-		QWidget *widget;
+		QWidget *widget, *completion;
 
-		ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w);
+		ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w, QWidget *c);
 		~ExpressionTipLabel();
 		void adjustTooltipScreen(const QPoint &pos);
 		void updateSize(const QPoint &pos);
@@ -66,7 +66,7 @@ class ExpressionTipLabel : public QLabel {
 		void hideTip();
 		void hideTipImmediately();
 		void restartExpireTimer();
-		void placeTip(const QPoint &pos);
+		bool placeTip(const QPoint &pos, const QRect &completion_rect = QRect());
 
 	protected:
 
@@ -76,7 +76,7 @@ class ExpressionTipLabel : public QLabel {
 
 };
 
-ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
+ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w, QWidget *c) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w), completion(c) {
 	setForegroundRole(QPalette::ToolTipText);
 	setBackgroundRole(QPalette::ToolTipBase);
 	setPalette(QToolTip::palette());
@@ -161,14 +161,8 @@ void ExpressionTipLabel::timerEvent(QTimerEvent *e) {
 bool ExpressionTipLabel::eventFilter(QObject *o, QEvent *e) {
 	switch(e->type()) {
 		case QEvent::WindowActivate:
-		case QEvent::FocusIn:
-			return false;
 		case QEvent::WindowDeactivate:
 			if(o != this) return false;
-			hideTipImmediately();
-			break;
-		case QEvent::FocusOut:
-			if(reinterpret_cast<QWindow*>(o) != windowHandle()) return false;
 			hideTipImmediately();
 			break;
 #else
@@ -176,8 +170,6 @@ bool ExpressionTipLabel::eventFilter(QObject*, QEvent *e) {
 	switch(e->type()) {
 		case QEvent::WindowActivate:
 		case QEvent::WindowDeactivate:
-		case QEvent::FocusIn:
-		case QEvent::FocusOut:
 #endif
 		case QEvent::Close:
 		case QEvent::MouseButtonPress:
@@ -186,12 +178,15 @@ bool ExpressionTipLabel::eventFilter(QObject*, QEvent *e) {
 		case QEvent::Wheel:
 			hideTipImmediately();
 			break;
+		case QEvent::MouseMove:
+			if(completion && completion->isVisible()) hideTip();
+			break;
 		default:
 			break;
 	}
 	return false;
 }
-void ExpressionTipLabel::placeTip(const QPoint &pos) {
+bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rect) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 	QScreen *scr = widget->screen();
@@ -205,13 +200,32 @@ void ExpressionTipLabel::placeTip(const QPoint &pos) {
 #endif
 	QPoint p = pos;
 	p += QPoint(2, 16);
-	if(p.x() + this->width() > screen.x() + screen.width()) p.rx() -= 4 + this->width();
-	if(p.y() + this->height() > screen.y() + screen.height()) p.ry() -= 24 + this->height();
-	if(p.y() < screen.y()) p.setY(screen.y());
-	if(p.x() + this->width() > screen.x() + screen.width()) p.setX(screen.x() + screen.width() - this->width());
-	if(p.x() < screen.x()) p.setX(screen.x());
-	if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
+	if(!completion_rect.isNull() && completion_rect.intersects(QRect(p, this->size()))) {
+		p.setY(widget->mapToGlobal(QPoint(0, 0)).y() - this->height() - 16);
+		p.setX(widget->mapToGlobal(QPoint(0, 0)).x());
+		if(p.y() < screen.y() || completion_rect.intersects(QRect(p, this->size()))) {
+			p = pos;
+			p += QPoint(2, 16);
+			if(this->width() < widget->pos().x()) {
+				p.setX(widget->mapToGlobal(QPoint(0, 0)).x());
+			} else {
+				p.rx() -= 4 + this->width();
+				if(p.x() < screen.x()) {
+					return false;
+				}
+			}
+			if(completion_rect.intersects(QRect(p, this->size()))) return false;
+		}
+	} else {
+		if(p.x() + this->width() > screen.x() + screen.width()) p.rx() -= 4 + this->width();
+		if(p.y() + this->height() > screen.y() + screen.height()) p.ry() -= 24 + this->height();
+		if(p.y() < screen.y()) p.setY(screen.y());
+		if(p.x() + this->width() > screen.x() + screen.width()) p.setX(screen.x() + screen.width() - this->width());
+		if(p.x() < screen.x()) p.setX(screen.x());
+		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
+	}
 	this->move(p);
+	return true;
 }
 
 bool last_is_operator(std::string str, bool allow_exp) {
@@ -519,7 +533,8 @@ QSize HTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
 	QTextDocument doc;
 	doc.setDefaultFont(optionV4.font);
 	doc.setHtml(optionV4.text);
-	return QSize(doc.idealWidth(), doc.size().height());
+
+	return QSize(doc.idealWidth(), doc.size().height() + 4);
 }
 
 struct CompletionData {
@@ -810,6 +825,8 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 #endif
 	cmenu = NULL;
 	tipLabel = NULL;
+	completionTimer = NULL;
+	toolTipTimer = NULL;
 	completion_blocked = 0;
 	parse_blocked = 0;
 	block_add_to_undo = 0;
@@ -853,19 +870,16 @@ ExpressionEdit::ExpressionEdit(QWidget *parent) : QPlainTextEdit(parent) {
 		completionTimer = new QTimer(this);
 		completionTimer->setSingleShot(true);
 		connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
-	} else {
-		completionTimer = NULL;
 	}
 	if(settings->expression_status_delay > 0) {
 		toolTipTimer = new QTimer(this);
 		toolTipTimer->setSingleShot(true);
 		connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
-	} else {
-		toolTipTimer = NULL;
 	}
 	connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 	connect(completer, SIGNAL(activated(const QModelIndex&)), this, SLOT(onCompletionActivated(const QModelIndex&)));
+	connect(completer, SIGNAL(highlighted(const QModelIndex&)), this, SLOT(onCompletionHighlighted(const QModelIndex&)));
 }
 ExpressionEdit::~ExpressionEdit() {}
 
@@ -1448,15 +1462,17 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					CALCULATOR->abort();
 				} else if(completionView->isVisible()) {
 					completionView->hide();
-					if(settings->expression_status_delay > 0) {
-						if(!toolTipTimer) {
-							toolTipTimer = new QTimer(this);
-							toolTipTimer->setSingleShot(true);
-							connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+					if(!tipLabel || !tipLabel->isVisible()) {
+						if(settings->expression_status_delay > 0) {
+							if(!toolTipTimer) {
+								toolTipTimer = new QTimer(this);
+								toolTipTimer->setSingleShot(true);
+								connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
+							}
+							toolTipTimer->start(settings->expression_status_delay);
+						} else {
+							showCurrentStatus();
 						}
-						toolTipTimer->start(settings->expression_status_delay);
-					} else {
-						showCurrentStatus();
 					}
 				} else if(document()->isEmpty()) {
 					qApp->closeAllWindows();
@@ -1737,6 +1753,7 @@ void ExpressionEdit::onStatusModeChanged() {
 	settings->display_expression_status = (i > 0);
 	if(i == 1) settings->expression_status_delay = 1000;
 	else if(i == 2) settings->expression_status_delay = 0;
+	emit expressionStatusModeChanged();
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;
@@ -1803,7 +1820,7 @@ void ExpressionEdit::blockUndo(bool b) {
 	else block_add_to_undo--;
 }
 void ExpressionEdit::showCurrentStatus() {
-	if(!expression_has_changed || completionView->isVisible() || current_status_text.isEmpty()) {
+	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && completionView->selectionModel()->hasSelection())) {
 		HIDE_TOOLTIP
 	} else {
 		QString str = current_status_text;
@@ -1811,25 +1828,34 @@ void ExpressionEdit::showCurrentStatus() {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
-			std::string result = CALCULATOR->calculateAndPrint(CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options), 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp);
-			if(result != str.toStdString() && result != CALCULATOR->timedOutString()) {
-				if(is_approximate) str += " " SIGN_ALMOST_EQUAL " ";
-				else str += " = ";
-				if(b_comp) str += "(";
-				str += QString::fromStdString(result);
-				if(b_comp) str += ")";
+			std::string result = CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options);
+			if(!contains_plot_or_save(result)) {
+				CALCULATOR->beginTemporaryStopMessages();
+				result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
+				if(!CALCULATOR->endTemporaryStopMessages() && result.length() < 200 && result != str.toStdString() && result != CALCULATOR->timedOutString()) {
+					if(is_approximate) str += " " SIGN_ALMOST_EQUAL " ";
+					else str += " = ";
+					if(b_comp) str += "(";
+					str += QString::fromStdString(result);
+					if(b_comp) str += ")";
+				}
 			}
 		}
 		if(str == toPlainText()) {
 			HIDE_TOOLTIP
 		} else if(tipLabel && tipLabel->isVisible()) {
 			tipLabel->reuseTip(str, mapToGlobal(cursorRect().bottomRight()));
-			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
+			if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+				HIDE_TOOLTIP
+			}
 		} else {
 			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(str, mapToGlobal(cursorRect().bottomRight()), this);
-			tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
-			tipLabel->showNormal();
+			tipLabel = new ExpressionTipLabel(str, mapToGlobal(cursorRect().bottomRight()), this, completionView);
+			if(tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+				tipLabel->showNormal();
+			} else {
+				HIDE_TOOLTIP
+			}
 		}
 	}
 }
@@ -1857,18 +1883,20 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	if(!settings->display_expression_status) return false;
 	if(!f) return false;
 	int iargs = f->maxargs();
-	Argument *arg;
-	Argument default_arg;
-	QString str, str2, str3;
+	if((iargs == 0 && arg_index == 0) || (iargs == 1 && arg_index == 1)) return false;
 	const ExpressionName *ename = &f->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) parent());
 	bool last_is_vctr = f->getArgumentDefinition(iargs) && f->getArgumentDefinition(iargs)->type() == ARGUMENT_TYPE_VECTOR;
-	if(arg_index > iargs && iargs >= 0 && !last_is_vctr) {
-		if(iargs == 1 && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->handlesVector()) {
+	if(iargs == 0 || (arg_index > iargs && iargs >= 0 && (!last_is_vctr || iargs == 1))) {
+		if(last_is_vctr || (iargs == 1 && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->handlesVector())) {
 			return false;
 		}
 		setStatusText(tr("Too many arguments for %1().").arg(QString::fromStdString(ename->name)));
 		return true;
 	}
+	if(arg_index <= 0) arg_index = 1;
+	Argument *arg;
+	Argument default_arg;
+	QString str, str2, str3;
 	str += QString::fromStdString(ename->name);
 	if(iargs < 0) {
 		iargs = f->minargs() + 1;
@@ -2024,7 +2052,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		cdata->current_function = mfunc.function();
 		if(mfunc.countChildren() == 0) {
 			cdata->current_function_index = 1;
-			b_func = displayFunctionHint(mfunc.function(), 1);
+			b_func = displayFunctionHint(mfunc.function(), 0);
 		} else {
 			cdata->current_function_index = mfunc.countChildren();
 			b_func = displayFunctionHint(mfunc.function(), mfunc.countChildren());
@@ -2601,7 +2629,14 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 		completer->complete(rect);
 		completionView->clearSelection();
 		completionView->setCurrentIndex(QModelIndex());
+		if(tipLabel && tipLabel->isVisible()) {
+			if(!pos.isNull()) {HIDE_TOOLTIP}
+			else if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->geometry())) HIDE_TOOLTIP
+		} else if(toolTipTimer && toolTipTimer->isActive()) {
+			toolTipTimer->start(settings->expression_status_delay);
+		}
 	} else {
+		if(tipLabel && tipLabel->isVisible() && completionView->isVisible()) tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()));
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
@@ -2909,6 +2944,10 @@ void ExpressionEdit::smartParentheses() {
 	cur.endEditBlock();
 	setCursorWidth(1);
 	highlightParentheses();
+}
+void ExpressionEdit::onCompletionHighlighted(const QModelIndex&) {
+	if(tipLabel && tipLabel->isVisible()) {HIDE_TOOLTIP}
+	else if(toolTipTimer && toolTipTimer->isActive()) toolTipTimer->start(settings->expression_status_delay);
 }
 void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	if(!index_pre.isValid()) return;

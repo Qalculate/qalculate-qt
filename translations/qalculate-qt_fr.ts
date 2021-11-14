@@ -4668,7 +4668,7 @@ Souhaitez-vous remplacer l&apos;action en cours ?</translation>
     <message>
         <location filename="../src/csvdialog.cpp" line="68"/>
         <source>Import as</source>
-        <translation>Importer comme:</translation>
+        <translation>Importer comme :</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="72"/>
@@ -4698,7 +4698,7 @@ Souhaitez-vous remplacer l&apos;action en cours ?</translation>
     <message>
         <location filename="../src/csvdialog.cpp" line="87"/>
         <source>Delimiter:</source>
-        <translation>Délimiteur:</translation>
+        <translation type="unfinished">Délimiteur :</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="89"/>
@@ -4902,7 +4902,7 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="51"/>
         <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
+        <translation type="unfinished">Description :</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="54"/>
@@ -5956,12 +5956,12 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="636"/>
         <source>Expression:</source>
-        <translation>Expression:</translation>
+        <translation type="unfinished">Expression :</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="641"/>
         <source>Argument references:</source>
-        <translation type="unfinished">Références d&apos;arguments:</translation>
+        <translation type="unfinished">Références d&apos;arguments :</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="642"/>
@@ -5996,7 +5996,7 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="673"/>
         <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
+        <translation type="unfinished">Description :</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="677"/>
@@ -7059,22 +7059,22 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="83"/>
         <source>Custom result font:</source>
-        <translation>Police personnalisée des résultats:</translation>
+        <translation type="unfinished">Police personnalisée des résultats :</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="86"/>
         <source>Custom expression font:</source>
-        <translation>Police d&apos;expression personnalisée:</translation>
+        <translation type="unfinished">Police d&apos;expression personnalisée :</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="89"/>
         <source>Custom keypad font:</source>
-        <translation>Police personnalisée du clavier:</translation>
+        <translation type="unfinished">Police personnalisée du clavier :</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="92"/>
         <source>Custom application font:</source>
-        <translation>Police de l&apos;application personnalisée:</translation>
+        <translation type="unfinished">Police de l&apos;application personnalisée :</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="98"/>
@@ -8713,12 +8713,12 @@ Please select interpretation of expressions with implicit multiplication
     <message>
         <location filename="../src/uniteditdialog.cpp" line="86"/>
         <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
+        <translation type="unfinished">Description :</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="90"/>
         <source>Class:</source>
-        <translation type="unfinished">Classe:</translation>
+        <translation type="unfinished">Classe :</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="92"/>
@@ -8743,7 +8743,7 @@ Please select interpretation of expressions with implicit multiplication
     <message>
         <location filename="../src/uniteditdialog.cpp" line="99"/>
         <source>Base unit(s):</source>
-        <translation type="unfinished">Unité(s) de base:</translation>
+        <translation type="unfinished">Unité(s) de base :</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="102"/>
@@ -9016,7 +9016,7 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="97"/>
         <source>Description:</source>
-        <translation type="unfinished">Description:</translation>
+        <translation type="unfinished">Description :</translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="158"/>

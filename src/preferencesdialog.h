@@ -26,7 +26,7 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox;
+		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
 		QComboBox *styleCombo, *parseCombo, *tcCombo;
 
@@ -95,6 +95,7 @@ class PreferencesDialog : public QDialog {
 		void updateDot();
 		void updateParsingMode();
 		void updateTemperatureCalculation();
+		void updateExpressionStatus();
 
 	signals:
 

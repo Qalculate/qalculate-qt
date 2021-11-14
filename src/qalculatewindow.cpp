@@ -733,6 +733,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
+	connect(expressionEdit, SIGNAL(expressionStatusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
@@ -4801,6 +4802,9 @@ void QalculateWindow::onAppFontChanged() {
 	}
 	if(!settings->use_custom_result_font) historyView->setFont(QApplication::font());
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
+}
+void QalculateWindow::onExpressionStatusModeChanged() {
+	if(preferencesDialog) preferencesDialog->updateExpressionStatus();
 }
 void QalculateWindow::editPreferences() {
 	if(preferencesDialog) {

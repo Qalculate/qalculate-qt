@@ -96,6 +96,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	r = 0;
 	l2 = new QGridLayout(w4); l2->setSizeConstraint(QLayout::SetFixedSize);
 	box = new QCheckBox(tr("Display expression status"), this); l2->addWidget(box, r, 0); box->setChecked(settings->display_expression_status); connect(box, SIGNAL(toggled(bool)), this, SLOT(expressionStatusToggled(bool)));
+	statusBox = box;
 	QHBoxLayout *hbox = new QHBoxLayout();
 	l2->addLayout(hbox, r, 1); r++;
 	hbox->addWidget(new QLabel(tr("Delay:")));
@@ -578,6 +579,15 @@ void PreferencesDialog::updateParsingMode() {
 	parseCombo->blockSignals(true);
 	parseCombo->setCurrentIndex(parseCombo->findData(settings->evalops.parse_options.parsing_mode));
 	parseCombo->blockSignals(false);
+}
+void PreferencesDialog::updateExpressionStatus() {
+	statusDelayWidget->blockSignals(true);
+	statusBox->blockSignals(true);
+	statusDelayWidget->setValue(settings->expression_status_delay);
+	statusBox->setChecked(settings->display_expression_status);
+	statusDelayWidget->setEnabled(settings->display_expression_status);
+	statusDelayWidget->blockSignals(false);
+	statusBox->blockSignals(false);
 }
 void PreferencesDialog::updateTemperatureCalculation() {
 	tcCombo->blockSignals(true);

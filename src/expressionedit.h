@@ -111,12 +111,14 @@ class ExpressionEdit : public QPlainTextEdit {
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void keyPressEvent(QKeyEvent*) override;
 		QString selectedText(bool = false);
+		void onCompleterEvent(QEvent*);
 
 	protected slots:
 
 		void onTextChanged();
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
+		void onCompletionHighlighted(const QModelIndex&);
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
@@ -148,6 +150,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void returnPressed();
 		void toConversionRequested(std::string);
 		void calculateRPNRequest(int);
+		void expressionStatusModeChanged();
 
 };
 
