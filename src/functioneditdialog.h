@@ -14,10 +14,10 @@
 
 #include <QDialog>
 #include <QPlainTextEdit>
+#include <QLineEdit>
 
 #include <libqalculate/qalculate.h>
 
-class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
 class QRadioButton;
@@ -93,6 +93,29 @@ class SmallTextEdit : public QPlainTextEdit {
 
 };
 
+class ExpandingMathLineEdit : public QLineEdit {
+
+	Q_OBJECT
+
+	public:
+		ExpandingMathLineEdit(QWidget *parent);
+
+		void setWidgetOwnsGeometry(bool value);
+
+	protected:
+		void changeEvent(QEvent *e) override;
+		void keyPressEvent(QKeyEvent*) override;
+
+	public slots:
+		void resizeToContents();
+
+	private:
+		void updateMinimumWidth();
+
+		int originalWidth;
+		bool widgetOwnsGeometry;
+};
+
 class ArgumentEditDialog : public QDialog {
 
 	Q_OBJECT
@@ -131,7 +154,6 @@ class FunctionEditDialog : public QDialog {
 		QCheckBox *hideBox;
 		QPlainTextEdit *expressionEdit, *descriptionEdit;
 		QPushButton *okButton, *argDelButton, *argAddButton, *argEditButton, *subDelButton, *subAddButton, *subEditButton;
-		QRadioButton *ref1Button, *ref2Button;
 		QTreeView *subfunctionsView, *argumentsView;
 		QStandardItemModel *subfunctionsModel, *argumentsModel;
 		NamesEditDialog *namesEditDialog;
@@ -153,7 +175,6 @@ class FunctionEditDialog : public QDialog {
 		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);
 		void onRejected();
 		void editNames();
-		void ref1Toggled(bool);
 
 	public:
 
@@ -166,7 +187,6 @@ class FunctionEditDialog : public QDialog {
 		void setExpression(const QString&);
 		QString expression() const;
 		void setName(const QString&);
-		void setRefType(int);
 
 		static bool editFunction(QWidget *parent, MathFunction *f, MathFunction **replaced_item = NULL);
 		static UserFunction *newFunction(QWidget *parent, MathFunction **replaced_item = NULL);

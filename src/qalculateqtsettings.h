@@ -135,12 +135,12 @@ class MathLineEdit : public QLineEdit {
 
 	public:
 
-		MathLineEdit(QWidget *parent = NULL, bool unit_expression = false);
+		MathLineEdit(QWidget *parent = NULL, bool unit_expression = false, bool function_expression = false);
 		virtual ~MathLineEdit();
 
 	protected:
 
-		bool b_unit;
+		bool b_unit, b_function;
 		void keyPressEvent(QKeyEvent*) override;
 
 };

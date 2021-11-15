@@ -1050,7 +1050,7 @@ void QalculateQtSettings::updateMessagePrintOptions() {
 	CALCULATOR->setMessagePrintOptions(message_printoptions);
 }
 
-MathLineEdit::MathLineEdit(QWidget *parent, bool unit_expression) : QLineEdit(parent), b_unit(unit_expression) {
+MathLineEdit::MathLineEdit(QWidget *parent, bool unit_expression, bool function_expression) : QLineEdit(parent), b_unit(unit_expression), b_function(function_expression) {
 #ifndef _WIN32
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 #endif
@@ -1080,6 +1080,14 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 					insert(" xor ");
 					return;
 				}
+				break;
+			}
+			case Qt::Key_BraceLeft: {
+				if(!b_function) {return;}
+				break;
+			}
+			case Qt::Key_BraceRight: {
+				if(!b_function) {return;}
 				break;
 			}
 		}

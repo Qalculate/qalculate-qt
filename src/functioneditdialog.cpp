@@ -23,6 +23,7 @@
 #include <QKeyEvent>
 #include <QVector>
 #include <QStandardItemModel>
+#include <QStyledItemDelegate>
 #include <QTreeView>
 #include <QHeaderView>
 #include <QAction>
@@ -35,8 +36,8 @@
 #include <QApplication>
 #include <QDebug>
 
-#include "qalculateqtsettings.h"
 #include "functioneditdialog.h"
+#include "qalculateqtsettings.h"
 
 SmallTextEdit::SmallTextEdit(int r, QWidget *parent) : QPlainTextEdit(parent), i_rows(r) {}
 SmallTextEdit::~SmallTextEdit() {}
@@ -107,6 +108,112 @@ void MathTextEdit::keyPressEvent(QKeyEvent *event) {
 	}
 	QPlainTextEdit::keyPressEvent(event);
 }
+
+ExpandingMathLineEdit::ExpandingMathLineEdit(QWidget *parent) : QLineEdit(parent), originalWidth(-1), widgetOwnsGeometry(false) {
+	connect(this, SIGNAL(textChanged(QString)), this, SLOT(resizeToContents()));
+	updateMinimumWidth();
+}
+
+void ExpandingMathLineEdit::setWidgetOwnsGeometry(bool value) {
+	widgetOwnsGeometry = value;
+}
+
+void ExpandingMathLineEdit::changeEvent(QEvent *e) {
+	switch(e->type()) {
+		case QEvent::FontChange:
+		case QEvent::StyleChange:
+		case QEvent::ContentsRectChange:
+			updateMinimumWidth();
+			break;
+		default:
+			break;
+	}
+
+	QLineEdit::changeEvent(e);
+}
+
+void ExpandingMathLineEdit::keyPressEvent(QKeyEvent *event) {
+	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
+		switch(event->key()) {
+			case Qt::Key_Asterisk: {
+				insert(settings->multiplicationSign(false));
+				return;
+			}
+			case Qt::Key_Minus: {
+				insert(SIGN_MINUS);
+				return;
+			}
+			case Qt::Key_Dead_Circumflex: {
+				insert(settings->caret_as_xor ? " xor " : "^");
+				return;
+			}
+			case Qt::Key_Dead_Tilde: {
+				insert("~");
+				return;
+			}
+			case Qt::Key_AsciiCircum: {
+				if(settings->caret_as_xor) {
+					insert(" xor ");
+					return;
+				}
+				break;
+			}
+		}
+	}
+	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
+		insert("^");
+		return;
+	}
+	QLineEdit::keyPressEvent(event);
+	if(event->key() == Qt::Key_Return) event->accept();
+}
+
+void ExpandingMathLineEdit::updateMinimumWidth() {
+
+	const QMargins tm = textMargins();
+	const QMargins cm = contentsMargins();
+	const int width = tm.left() + tm.right() + cm.left() + cm.right() + 4;
+
+	QStyleOptionFrame opt;
+	initStyleOption(&opt);
+
+	int minWidth = style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(width, 0), this).width();
+	setMinimumWidth(minWidth);
+}
+
+void ExpandingMathLineEdit::resizeToContents() {
+	int oldWidth = width();
+	if(originalWidth == -1)
+		originalWidth = oldWidth;
+	if(QWidget *parent = parentWidget()) {
+		QPoint position = pos();
+		int hintWidth = minimumWidth() + fontMetrics().horizontalAdvance(displayText());
+		int parentWidth = parent->width();
+		int maxWidth = isRightToLeft() ? position.x() + oldWidth : parentWidth - position.x();
+		int newWidth = qBound(originalWidth, hintWidth, maxWidth);
+		if(widgetOwnsGeometry) setMaximumWidth(newWidth);
+		if(isRightToLeft()) move(position.x() - newWidth + oldWidth, position.y());
+		resize(newWidth, height());
+	}
+}
+
+class SubfunctionDelegate : public QStyledItemDelegate {
+	public:
+		SubfunctionDelegate(QWidget *parent) : QStyledItemDelegate(parent) {}
+		QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem&, const QModelIndex&) const override {
+			return new ExpandingMathLineEdit(parent);
+		}
+		void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+			if(!editor) return;
+			Q_ASSERT(index.isValid());
+			QStyleOptionViewItem opt = option;
+			initStyleOption(&opt, index);
+			opt.showDecorationSelected = editor->style()->styleHint(QStyle::SH_ItemView_ShowDecorationSelected, nullptr, editor);
+			QStyle *style = QApplication::style();
+			QRect geom = style->subElementRect(QStyle::SE_ItemViewItemText, &opt, (QWidget*) parent());
+			editor->setGeometry(geom);
+		}
+};
 
 #include <QProxyStyle>
 #include <QStyleOptionViewItem>
@@ -635,14 +742,10 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(nameEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Expression:"), this), 1, 0, 1, 2);
 	expressionEdit = new MathTextEdit(this);
+	expressionEdit->setToolTip(tr("Use \\x for the first, \\y for the second and \\z for the third argument."));
 	grid->addWidget(expressionEdit, 2, 0, 1, 2);
 	QHBoxLayout *box = new QHBoxLayout();
 	QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
-	box->addWidget(new QLabel(tr("Argument references:"), this), 1);
-	ref1Button = new QRadioButton(tr("x, y, z"), this); group->addButton(ref1Button, 1); box->addWidget(ref1Button);
-	ref1Button->setChecked(true);
-	ref2Button = new QRadioButton(tr("\\x, \\y, \\z, \\a, \\b, …"), this); group->addButton(ref2Button, 2); box->addWidget(ref2Button);
-	grid->addLayout(box, 3, 0, 1, 2);
 	grid = new QGridLayout(w2);
 	grid->addWidget(new QLabel(tr("Category:"), this), 0, 0);
 	categoryEdit = new QComboBox(this);
@@ -676,6 +779,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid = new QGridLayout(w3);
 	grid->addWidget(new QLabel(tr("Condition:"), this), 0, 0);
 	conditionEdit = new MathLineEdit(this);
+	conditionEdit->setToolTip(tr("Condition that must be true for the function (e.g. if the second argument must be greater than the first: \"\\y > \\x\")"));
 	grid->addWidget(conditionEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Sub-functions:"), this), 1, 0);
 	subfunctionsView = new SmallTreeView(this);
@@ -691,6 +795,8 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	subfunctionsView->header()->setStretchLastSection(false);
 	subfunctionsView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 	subfunctionsView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+	SubfunctionDelegate* delegate = new SubfunctionDelegate(subfunctionsView);
+	subfunctionsView->setItemDelegateForColumn(0, delegate);
 	grid->addWidget(subfunctionsView, 2, 0, 1, 2);
 	box = new QHBoxLayout();
 	subAddButton = new QPushButton(tr("Add"), this); box->addWidget(subAddButton); connect(subAddButton, SIGNAL(clicked()), this, SLOT(subAddClicked()));
@@ -735,8 +841,9 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(subfunctionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedArgumentChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(argumentActivated(const QModelIndex&)));
+	connect(argumentsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onFunctionChanged()));
+	connect(subfunctionsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onFunctionChanged()));
 	connect(this, SIGNAL(rejected()), this, SLOT(onRejected()));
-	connect(ref1Button, SIGNAL(toggled(bool)), this, SLOT(ref1Toggled(bool)));
 	okButton->setEnabled(false);
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 }
@@ -753,12 +860,26 @@ void FunctionEditDialog::editNames() {
 	onFunctionChanged();
 }
 
-#define FIX_EXPRESSION if(ref1Button->isChecked() && str.find("\\x") == std::string::npos) {\
-				gsub("x", "\\x", str);\
-				gsub("y", "\\y", str);\
-				gsub("z", "\\z", str);\
-			}\
-			CALCULATOR->parseSigns(str);
+void fix_expression(std::string &str) {
+	if(str.empty()) return;
+	size_t i = 0;
+	bool b = false;
+	while(true) {
+		i = str.find("\\", i);
+		if(i == std::string::npos || i == str.length() - 1) break;
+		if((str[i + 1] >= 'a' && str[i + 1] <= 'z') || (str[i + 1] >= 'A' && str[i + 1] <= 'Z') || (str[i + 1] >= '1' && str[i + 1] <= '9')) {
+			b = true;
+			break;
+		}
+		i++;
+	}
+	if(!b) {
+		gsub("x", "\\x", str);
+		gsub("y", "\\y", str);
+		gsub("z", "\\z", str);
+	}
+	CALCULATOR->parseSigns(str);
+}
 
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
@@ -792,20 +913,21 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
-	FIX_EXPRESSION
+	fix_expression(str);
 	f->setCondition(str);
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
-		f->setArgumentDefinition(i + 1, (Argument*) argumentsModel->item(i, 0)->data().value<void*>());
+		Argument *arg = (Argument*) argumentsModel->item(i, 0)->data().value<void*>();
+		if(arg) f->setArgumentDefinition(i + 1, arg);
 	}
 	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 		str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
-		FIX_EXPRESSION
+		fix_expression(str);
 		f->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	else NamesEditDialog::modifyName(f, nameEdit->text());
 	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
-	FIX_EXPRESSION
+	fix_expression(str);
 	((UserFunction*) f)->setFormula(str);
 	CALCULATOR->addFunction(f);
 	return f;
@@ -835,21 +957,22 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
 	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
-	FIX_EXPRESSION
+	fix_expression(str);
 	f->setCondition(str);
 	f->clearArgumentDefinitions();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
-		f->setArgumentDefinition(i + 1, (Argument*) argumentsModel->item(i, 0)->data().value<void*>());
+		Argument *arg = (Argument*) argumentsModel->item(i, 0)->data().value<void*>();
+		if(arg) f->setArgumentDefinition(i + 1, arg);
 	}
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		((UserFunction*) f)->clearSubfunctions();
 		for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 			str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
-			FIX_EXPRESSION
+			fix_expression(str);
 			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 0)->checkState() == Qt::Checked);
 		}
 		str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
-		FIX_EXPRESSION
+		fix_expression(str);
 		((UserFunction*) f)->setFormula(str);
 	}
 	return true;
@@ -940,26 +1063,13 @@ void FunctionEditDialog::argEditClicked() {
 	}
 	d->deleteLater();
 }
-void FunctionEditDialog::ref1Toggled(bool b) {
-	for(int i = 0; i < argumentsModel->rowCount(); i++) {
-		QStandardItem *item = argumentsModel->item(i, 2);
-		if(item) {
-			QString refstr;
-			if(i > 3 || !b) refstr += "\\";
-			if(i <= 3) refstr += (char) ('x' + (i - 1));
-			else refstr += (char) ('a' + (i - 4));
-			item->setText(refstr);
-		}
-	}
-}
 void FunctionEditDialog::argDelClicked() {
 	argumentsModel->removeRow(argumentsView->selectionModel()->currentIndex().row());
 	onFunctionChanged();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		QStandardItem *item = argumentsModel->item(i, 2);
 		if(item) {
-			QString refstr;
-			if(i > 3 || ref2Button->isChecked()) refstr += "\\";
+			QString refstr = "\\";
 			if(i <= 3) refstr += (char) ('x' + (i - 1));
 			else refstr += (char) ('a' + (i - 4));
 			item->setText(refstr);
@@ -984,7 +1094,7 @@ void FunctionEditDialog::onRejected() {
 		QStandardItem *item = argumentsModel->item(i, 0);
 		if(item) {
 			Argument *arg = (Argument*) item->data(Qt::UserRole).value<void*>();
-			if(arg) delete arg;
+			if(arg && !nameEdit->isReadOnly()) delete arg;
 		}
 	}
 }
@@ -1051,8 +1161,7 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 		item->setData(QVariant::fromValue((void*) arg));
 		item->setEditable(false);
 		items.append(item);
-		QString refstr;
-		if(i > 3 || ref2Button->isChecked()) refstr += "\\";
+		QString refstr = "\\";
 		if(i <= 3) refstr += (char) ('x' + (i - 1));
 		else refstr += (char) ('a' + (i - 4));
 		item = new QStandardItem(refstr);
@@ -1086,8 +1195,6 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	argAddButton->setEnabled(!read_only);
 	argDelButton->setEnabled(false);
 	conditionEdit->setReadOnly(read_only);
-	ref1Button->setEnabled(!read_only);
-	ref2Button->setEnabled(!read_only);
 	expressionEdit->setReadOnly(read_only);
 }
 void FunctionEditDialog::onNameEdited(const QString &str) {
@@ -1111,13 +1218,8 @@ void FunctionEditDialog::setName(const QString &str) {
 QString FunctionEditDialog::expression() const {
 	return expressionEdit->toPlainText();
 }
-void FunctionEditDialog::setRefType(int i) {
-	if(i == 1) ref1Button->setChecked(true);
-	else if(i == 2) ref2Button->setChecked(true);
-}
 bool FunctionEditDialog::editFunction(QWidget *parent, MathFunction *f, MathFunction **replaced_item) {
 	FunctionEditDialog *d = new FunctionEditDialog(parent);
-	d->setRefType(2);
 	d->setWindowTitle(tr("Edit Function"));
 	d->setFunction(f);
 	while(d->exec() == QDialog::Accepted) {
@@ -1132,7 +1234,6 @@ bool FunctionEditDialog::editFunction(QWidget *parent, MathFunction *f, MathFunc
 UserFunction *FunctionEditDialog::newFunction(QWidget *parent, MathFunction **replaced_item) {
 	FunctionEditDialog *d = new FunctionEditDialog(parent);
 	d->setWindowTitle(tr("New Function"));
-	d->setRefType(1);
 	std::string f_name;
 	int i = 1;
 	do {

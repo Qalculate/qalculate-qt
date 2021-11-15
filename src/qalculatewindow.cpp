@@ -578,7 +578,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	hLayout->addWidget(tb, 0);
 
-	expressionEdit = new ExpressionEdit(this);
+	expressionEdit = new ExpressionEdit(this, tb);
 	QFont font = expressionEdit->font();
 	if(font.pixelSize() >= 0) {
 		font.setPixelSize(font.pixelSize() * 1.35);
@@ -895,31 +895,25 @@ void QalculateWindow::registerChanged(int index) {
 
 void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	gsub("…", "", str);
 	expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(str)));
 	expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
-	expressionEdit->blockParseStatus(false);
 }
 void QalculateWindow::showAbout() {
 	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	Number nr(i, 1, 0);
 	expressionEdit->insertPlainText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name)).arg(QString::fromStdString(print_with_evalops(nr))));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion();
-	if(!settings->auto_calculate) expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(str);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	if(!settings->auto_calculate) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onOperatorClicked(const QString &str) {
@@ -933,14 +927,15 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		return;
 	}
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	bool do_exec = false;
 	if(str == "~") {
 		expressionEdit->wrapSelection(str, true, false);
 	} else if(str == "!") {
 		QTextCursor cur = expressionEdit->textCursor();
 		do_exec = (str == "!") && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+		if(do_exec) expressionEdit->blockParseStatus();
 		expressionEdit->wrapSelection(str);
+		if(do_exec) expressionEdit->blockParseStatus(false);
 	} else if(str == "E") {
 		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
 		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : str);
@@ -949,7 +944,6 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) calculate();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 
@@ -966,7 +960,6 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		return;
 	}
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	bool do_exec = false;
 	if(settings->chain_mode) {
@@ -980,9 +973,10 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		expressionEdit->selectAll();
 		do_exec = f->minargs() <= 1;
 	}
+	if(do_exec) expressionEdit->blockParseStatus();
 	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
+	if(do_exec) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 	if(do_exec) calculate();
 }
@@ -991,50 +985,40 @@ void QalculateWindow::negate() {
 }
 void QalculateWindow::onVariableClicked(Variable *v) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onUnitClicked(Unit *u) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 		expressionEdit->insertPlainText(QString::fromStdString(((CompositeUnit*) u)->print(true, settings->printops.abbreviate_names, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) expressionEdit)));
 	} else {
 		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onDelClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	if(cur.atEnd()) cur.deletePreviousChar();
 	else cur.deleteChar();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onBackspaceClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	QTextCursor cur = expressionEdit->textCursor();
 	if(!cur.atStart()) cur.deletePreviousChar();
 	else cur.deleteChar();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onClearClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->clear();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onEqualsClicked() {
@@ -1043,50 +1027,38 @@ void QalculateWindow::onEqualsClicked() {
 }
 void QalculateWindow::onParenthesesClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->smartParentheses();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onBracketsClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->insertBrackets();
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onLeftClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::PreviousCharacter);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onRightClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::NextCharacter);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onStartClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::Start);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onEndClicked() {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::End);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onMSClicked() {
@@ -4840,7 +4812,6 @@ void QalculateWindow::onFunctionsChanged() {
 }
 void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	DataSet *ds = dp->parentSet();
 	std::string str = ds->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name;
 	str += "(";
@@ -4851,7 +4822,6 @@ void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	str += ")";
 	expressionEdit->insertPlainText(QString::fromStdString(str));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::openDatasets() {
@@ -5149,7 +5119,6 @@ void QalculateWindow::onCalculateFunctionRequested(MathFunction *f) {
 }
 void QalculateWindow::onInsertFunctionRequested(MathFunction *f) {
 	expressionEdit->blockCompletion();
-	expressionEdit->blockParseStatus();
 	if(!expressionEdit->expressionHasChanged()) {
 		expressionEdit->blockUndo(true);
 		expressionEdit->clear();
@@ -5158,7 +5127,6 @@ void QalculateWindow::onInsertFunctionRequested(MathFunction *f) {
 	QTextCursor cur = expressionEdit->textCursor();
 	expressionEdit->wrapSelection(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-	expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
@@ -5675,11 +5643,9 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 		str += str2;
 	}
 	str += ")";
-	expressionEdit->blockParseStatus(true);
 	expressionEdit->blockCompletion(true);
 	expressionEdit->insertPlainText(QString::fromStdString(str));
 	expressionEdit->blockCompletion(false);
-	expressionEdit->blockParseStatus(false);
 	//if(fd->add_to_menu) function_inserted(f);
 }
 

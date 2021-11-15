@@ -64,6 +64,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
+		QWidget *tb;
 
 		QStringList expression_undo_buffer;
 		QList<int> expression_undo_pos;
@@ -97,7 +98,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 	public:
 
-		ExpressionEdit(QWidget *parent = NULL);
+		ExpressionEdit(QWidget *parent = NULL, QWidget *toolbar = NULL);
 		virtual ~ExpressionEdit();
 
 		std::string expression() const;
@@ -112,6 +113,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void keyPressEvent(QKeyEvent*) override;
 		QString selectedText(bool = false);
 		void onCompleterEvent(QEvent*);
+		bool eventFilter(QObject*, QEvent*) override;
 
 	protected slots:
 
