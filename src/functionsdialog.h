@@ -27,6 +27,7 @@ class QSplitter;
 class ItemProxyModel;
 class QComboBox;
 class QLabel;
+class QAbstractButton;
 
 class FunctionsDialog : public QDialog {
 
@@ -40,6 +41,7 @@ class FunctionsDialog : public QDialog {
 		ItemProxyModel *functionsModel;
 		QStandardItemModel *sourceModel;
 		QPushButton *deactivateButton, *calculateButton, *insertButton, *delButton, *editButton, *newButton, *applyButton;
+		QAbstractButton *favouriteButton;
 		QLineEdit *searchEdit;
 		QSplitter *vsplitter, *hsplitter;
 
@@ -61,6 +63,7 @@ class FunctionsDialog : public QDialog {
 		void insertClicked();
 		void calculateClicked();
 		void deactivateClicked();
+		void favouriteClicked();
 		void searchChanged(const QString&);
 
 	public:

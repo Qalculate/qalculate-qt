@@ -23,6 +23,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QComboBox>
+#include <QCheckBox>
 #include <QApplication>
 #include <QDebug>
 
@@ -91,6 +92,8 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
 	convertButton = new QPushButton(tr("Convert"), this); box->addWidget(convertButton); connect(convertButton, SIGNAL(clicked()), this, SLOT(convertClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
+	box->addSpacing(24);
+	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QGridLayout *grid = new QGridLayout();
@@ -319,7 +322,7 @@ void UnitsDialog::newClicked() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		toSourceModel->appendRow(item);
-		item = new QStandardItem(QString::fromStdString(u->title(true)));
+		item = new QStandardItem(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) unitsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -338,6 +341,7 @@ void UnitsDialog::newClicked() {
 			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			unitsView->scrollTo(index);
 		}
+		if(u != replaced_item) settings->favourite_units.push_back(u);
 		emit itemsChanged();
 	}
 }
@@ -386,7 +390,7 @@ void UnitsDialog::editClicked() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		toSourceModel->appendRow(item);
-		item = new QStandardItem(QString::fromStdString(u->title(true)));
+		item = new QStandardItem(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) unitsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -409,6 +413,34 @@ void UnitsDialog::editClicked() {
 		}
 		emit itemsChanged();
 	}
+}
+void UnitsDialog::favouriteClicked() {
+	QModelIndex index = unitsView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	Unit *u = (Unit*) index.data(Qt::UserRole).value<void*>();
+	if(!u) return;
+	if(favouriteButton->isChecked()) {
+		settings->favourite_units.push_back(u);
+	} else {
+		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+			if(settings->favourite_units[i] == u) {
+				settings->favourite_units.erase(settings->favourite_units.begin() + i);
+				break;
+			}
+		}
+		if(selected_category == "Favorites") {
+			if(settings->favourite_units.empty()) {
+				QList<QTreeWidgetItem*> list = categoriesView->findItems("All", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				if(!list.isEmpty()) categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			} else {
+				selected_item = NULL;
+				unitsModel->invalidate();
+				selectedUnitChanged(unitsView->selectionModel()->currentIndex(), unitsView->selectionModel()->currentIndex());
+			}
+		}
+	}
+	settings->favourite_units_changed = true;
+	emit itemsChanged();
 }
 void UnitsDialog::delClicked() {
 	QModelIndex index = unitsView->selectionModel()->currentIndex();
@@ -551,6 +583,14 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 			insertButton->setEnabled(u->isActive());
 			convertButton->setEnabled(u->isActive());
 			delButton->setEnabled(u->isLocal());
+			favouriteButton->setEnabled(true);
+			favouriteButton->setChecked(false);
+			for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+				if(settings->favourite_units[i] == u) {
+					favouriteButton->setChecked(true);
+					break;
+				}
+			}
 			deactivateButton->setEnabled(true);
 			descriptionView->setHtml(QString::fromStdString(str));
 			std::string to_filter;
@@ -595,6 +635,8 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 	insertButton->setEnabled(false);
 	convertButton->setEnabled(false);
 	delButton->setEnabled(false);
+	favouriteButton->setEnabled(true);
+	favouriteButton->setChecked(false);
 	deactivateButton->setEnabled(false);
 	descriptionView->clear();
 	selected_item = NULL;
@@ -693,7 +735,7 @@ void UnitsDialog::updateUnits() {
 				has_uncat = true;
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) unitsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -764,6 +806,11 @@ void UnitsDialog::updateUnits() {
 	l.clear(); l << tr("User units"); l << "User items";
 	iter = new QTreeWidgetItem(iter3, l);
 	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(iter3, l);
+	if(selected_category == "Favorites") {
 		iter->setSelected(true);
 	}
 	if(has_inactive) {

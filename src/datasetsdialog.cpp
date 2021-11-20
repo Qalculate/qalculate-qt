@@ -148,6 +148,7 @@ void DataSetsDialog::addDataset() {
 	if(ds) {
 		selected_dataset = ds;
 		updateDatasets();
+		if(ds != replaced_item) settings->favourite_functions.push_back(ds);
 		emit itemsChanged();
 	}
 }
@@ -409,7 +410,7 @@ void DataSetsDialog::updateDatasets() {
 	for(size_t i = 1; ; i++) {
 		ds = CALCULATOR->getDataSet(i);
 		if(!ds) break;
-		QTreeWidgetItem *item = new QTreeWidgetItem(datasetsView, QStringList(QString::fromStdString(ds->title())));
+		QTreeWidgetItem *item = new QTreeWidgetItem(datasetsView, QStringList(QString::fromStdString(ds->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) datasetsView))));
 		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) ds));
 		if((!selected_dataset && i == 1) || ds == selected_dataset) {
 			datasetsView->setCurrentItem(item);

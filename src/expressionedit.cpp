@@ -182,20 +182,14 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 	QPoint p = pos;
 	p += QPoint(2, 16);
 	if(!completion_rect.isNull() && completion_rect.intersects(QRect(p, this->size()))) {
-		p.setY(widget->mapToGlobal(QPoint(0, 0)).y() - this->height() - 2);
-		if(p.x() + this->width() > screen.x() + screen.width()) p.rx() -= 4 + this->width();
-		if(p.y() < screen.y() || completion_rect.intersects(QRect(p, this->size()))) {
-			p = pos;
-			p += QPoint(2, 16);
-			if(this->width() < widget->pos().x()) {
-				p.setX(widget->mapToGlobal(QPoint(0, 0)).x());
-			} else {
-				p.rx() -= 4 + this->width();
-				if(p.x() < screen.x()) {
-					return false;
-				}
+			p.rx() -= 16 + this->width();
+			if(p.x() < screen.x() || completion_rect.intersects(QRect(p, this->size()))) {
+				p = pos;
+				p += QPoint(2, 16);
+				p.setY(widget->window()->mapToGlobal(QPoint(0, 0)).y() - this->height() - 2);
+				if(p.x() + this->width() > screen.x() + screen.width()) p.rx() -= 4 + this->width();
+				if(p.y() < screen.y() || completion_rect.intersects(QRect(p, this->size()))) {
 			}
-			if(completion_rect.intersects(QRect(p, this->size()))) return false;
 		}
 	} else {
 		if(p.x() + this->width() > screen.x() + screen.width()) p.rx() -= 4 + this->width();

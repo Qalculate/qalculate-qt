@@ -274,14 +274,16 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	calendarConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
-	QHBoxLayout *hLayout = new QHBoxLayout();
-	topLayout->addLayout(hLayout);
-	ehSplitter = new QSplitter(Qt::Vertical, this);
-	hLayout->addWidget(ehSplitter, 1);
 
-	tb = new QToolBar(this);
+	tb = addToolBar("Toolbar");
+	tb->setObjectName("Toolbar");
 	tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
-	tb->setOrientation(Qt::Vertical);
+	tb->setFloatable(false);
+	tb->setMovable(false);
+	tb->toggleViewAction()->setVisible(false);
+
+	ehSplitter = new QSplitter(Qt::Vertical, this);
+	topLayout->addWidget(ehSplitter, 1);
 
 	QAction *action; QActionGroup *group; QMenu *menu, *menu2;
 	int w, w2; QWidgetAction *aw; QWidget *aww; QHBoxLayout *awl;
@@ -317,7 +319,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Export CSV File…"), this, SLOT(exportCSV()));
 	menu->addSeparator();
 	menu->addAction(tr("Functions"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
-	menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M)->setShortcutContext(Qt::ApplicationShortcut);
+	variablesAction = menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M);
+	variablesAction->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Units"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
 	menu->addAction(tr("Data Sets"), this, SLOT(openDatasets()));
 	menu->addSeparator();
@@ -342,7 +345,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("About %1").arg("Qalculate!"), this, SLOT(showAbout()));
 	menu->addSeparator();
 	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
-	tb->addWidget(menuAction);
 
 	modeAction = new QToolButton(this); modeAction->setIcon(LOAD_ICON("configure")); modeAction->setText(tr("Mode"));
 	modeAction->setShortcut(Qt::ALT | Qt::Key_M); modeAction->setToolTip(tr("Mode (%1)").arg(modeAction->shortcut().toString(QKeySequence::NativeText)));
@@ -561,10 +563,36 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addAction(toAction);
 	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this); storeAction->setShortcut(QKeySequence::Save); storeAction->setShortcutContext(Qt::ApplicationShortcut); storeAction->setToolTip(tr("Store (%1)").arg(storeAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
+	variablesMenu = new QMenu(this);
+	updateVariablesMenu();
+	storeAction->setMenu(variablesMenu);
 	tb->addAction(storeAction);
 	functionsAction = new QAction(LOAD_ICON("function"), tr("Functions"), this); functionsAction->setToolTip(tr("Functions (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_F).toString(QKeySequence::NativeText)));
 	connect(functionsAction, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
+	functionsMenu = new QMenu(this);
+	updateFunctionsMenu();
+	functionsAction->setMenu(functionsMenu);
 	tb->addAction(functionsAction);
+	unitsAction = new QAction(LOAD_ICON("units"), tr("Units"), this); unitsAction->setToolTip(tr("Units (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_U).toString(QKeySequence::NativeText)));
+	connect(unitsAction, SIGNAL(triggered(bool)), this, SLOT(openUnits()));
+	unitsMenu = new QMenu(this);
+	updateUnitsMenu();
+	unitsAction->setMenu(unitsMenu);
+	tb->addAction(unitsAction);
+	if(CALCULATOR->canPlot()) {
+		plotAction = new QAction(LOAD_ICON("plot"), tr("Plot Functions/Data"), this); plotAction->setToolTip(tr("Plot Functions/Data (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_P).toString(QKeySequence::NativeText)));
+		connect(plotAction, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
+		tb->addAction(plotAction);
+	} else {
+		plotAction = NULL;
+	}
+	fpAction = NULL;
+	calendarsAction = new QAction(LOAD_ICON("calendars"), tr("Calendar Conversion"), this);
+	connect(calendarsAction, SIGNAL(triggered(bool)), this, SLOT(openCalendarConversion()));
+	tb->addAction(calendarsAction);
+	percentageAction = new QAction(LOAD_ICON("percentage"), tr("Percentage Calculation Tool"), this);
+	connect(percentageAction, SIGNAL(triggered(bool)), this, SLOT(openPercentageCalculation()));
+	tb->addAction(percentageAction);
 	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
 	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setShortcutContext(Qt::ApplicationShortcut); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
@@ -575,8 +603,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
 	keypadAction->setCheckable(true);
 	tb->addAction(keypadAction);
-
-	hLayout->addWidget(tb, 0);
+	QWidget *spacer = new QWidget();
+	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	tb->addWidget(spacer);
+	tb->addWidget(menuAction);
 
 	expressionEdit = new ExpressionEdit(this, tb);
 	QFont font = expressionEdit->font();
@@ -778,6 +808,81 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
+bool sort_compare_item(ExpressionItem *o1, ExpressionItem *o2) {
+	return o1->title(true, settings->printops.use_unicode_signs) < o2->title(true, settings->printops.use_unicode_signs);
+}
+void QalculateWindow::updateFunctionsMenu() {
+	functionsMenu->clear();
+	functionsMenu->addAction(tr("New Function…"), this, SLOT(newFunction()));
+	for(size_t i = 0; i < settings->favourite_functions.size();) {
+		if(!CALCULATOR->stillHasFunction(settings->favourite_functions[i]) || !settings->favourite_functions[i]->isActive()) {
+			settings->favourite_functions.erase(settings->favourite_functions.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	if(!settings->favourite_functions.empty()) {
+		functionsMenu->addSeparator();
+		std::sort(settings->favourite_functions.begin(), settings->favourite_functions.end(), sort_compare_item);
+		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+			QAction *action = functionsMenu->addAction(QString::fromStdString(settings->favourite_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+			action->setData(QVariant::fromValue((void*) settings->favourite_functions[i]));
+		}
+	}
+}
+void QalculateWindow::updateUnitsMenu() {
+	unitsMenu->clear();
+	for(size_t i = 0; i < settings->favourite_units.size();) {
+		if(!CALCULATOR->stillHasUnit(settings->favourite_units[i]) || !settings->favourite_units[i]->isActive()) {
+			settings->favourite_units.erase(settings->favourite_units.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	if(!settings->favourite_units.empty()) {
+		std::sort(settings->favourite_units.begin(), settings->favourite_units.end(), sort_compare_item);
+		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+			QAction *action = unitsMenu->addAction(QString::fromStdString(settings->favourite_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+			action->setData(QVariant::fromValue((void*) settings->favourite_units[i]));
+		}
+	}
+}
+void QalculateWindow::updateVariablesMenu() {
+	variablesMenu->clear();
+	variablesMenu->addAction(variablesAction);
+	for(size_t i = 0; i < settings->favourite_variables.size();) {
+		if(!CALCULATOR->stillHasVariable(settings->favourite_variables[i]) || !settings->favourite_variables[i]->isActive()) {
+			settings->favourite_variables.erase(settings->favourite_variables.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	if(!settings->favourite_variables.empty()) {
+		bool b = false;
+		std::sort(settings->favourite_variables.begin(), settings->favourite_variables.end(), sort_compare_item);
+		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+			if(CALCULATOR->stillHasVariable(settings->favourite_variables[i]) && settings->favourite_variables[i]->isActive()) {
+				if(!b) variablesMenu->addSeparator();
+				b = true;
+				QAction *action = variablesMenu->addAction(QString::fromStdString(settings->favourite_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action->setData(QVariant::fromValue((void*) settings->favourite_variables[i]));
+			}
+		}
+	}
+}
+void QalculateWindow::variableActivated() {
+	onVariableClicked((Variable*) ((QAction*) sender())->data().value<void*>());
+}
+void QalculateWindow::unitActivated() {
+	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
+		convertToUnit((Unit*) ((QAction*) sender())->data().value<void*>());
+	} else {
+		onUnitClicked((Unit*) ((QAction*) sender())->data().value<void*>());
+	}
+}
+void QalculateWindow::functionActivated() {
+	insertFunction((MathFunction*) ((QAction*) sender())->data().value<void*>(), this);
+}
 void QalculateWindow::registerUp() {
 	if(CALCULATOR->RPNStackSize() <= 1) return;
 	QList<QTableWidgetItem*> list = rpnView->selectedItems();
@@ -4210,6 +4315,11 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		toAction->setIcon(LOAD_ICON("convert"));
 		storeAction->setIcon(LOAD_ICON("document-save"));
 		functionsAction->setIcon(LOAD_ICON("function"));
+		unitsAction->setIcon(LOAD_ICON("units"));
+		if(plotAction) plotAction->setIcon(LOAD_ICON("plot"));
+		if(fpAction) fpAction->setIcon(LOAD_ICON("floatingpoint"));
+		if(calendarsAction) calendarsAction->setIcon(LOAD_ICON("calendars"));
+		if(percentageAction) percentageAction->setIcon(LOAD_ICON("percentage"));
 		keypadAction->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
 		modeAction->setIcon(LOAD_ICON("configure"));
@@ -4482,51 +4592,69 @@ void QalculateWindow::exportCSV() {
 	CSVDialog::exportCSVFile(this, mstruct);
 }
 void QalculateWindow::onStoreActivated() {
-	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : QString::fromStdString(exact_text));
+	ExpressionItem *replaced_item = NULL;
+	KnownVariable *v = VariableEditDialog::newVariable(this, expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact), expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : QString::fromStdString(exact_text), &replaced_item);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::newVariable() {
-	KnownVariable *v = VariableEditDialog::newVariable(this);
+	ExpressionItem *replaced_item = NULL;
+	KnownVariable *v = VariableEditDialog::newVariable(this, NULL, NULL, &replaced_item);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::newMatrix() {
-	KnownVariable *v = VariableEditDialog::newMatrix(this);
+	ExpressionItem *replaced_item = NULL;
+	KnownVariable *v = VariableEditDialog::newMatrix(this, &replaced_item);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::newUnknown() {
-	UnknownVariable *v = UnknownEditDialog::newVariable(this);
+	ExpressionItem *replaced_item = NULL;
+	UnknownVariable *v = UnknownEditDialog::newVariable(this, &replaced_item);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::newUnit() {
-	Unit *u = UnitEditDialog::newUnit(this);
+	ExpressionItem *replaced_item = NULL;
+	Unit *u = UnitEditDialog::newUnit(this, &replaced_item);
 	if(u) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		if(u != replaced_item) settings->favourite_units.push_back(u);
+		updateUnitsMenu();
 	}
 }
 
 void QalculateWindow::newFunction() {
-	MathFunction *f = FunctionEditDialog::newFunction(this);
+	MathFunction *replaced_item = NULL;
+	MathFunction *f = FunctionEditDialog::newFunction(this, &replaced_item);
 	if(f) {
 		expressionEdit->updateCompletion();
 		if(functionsDialog) functionsDialog->updateFunctions();
+		if(f != replaced_item) settings->favourite_functions.push_back(f);
+		updateFunctionsMenu();
 	}
 }
 void QalculateWindow::onKeypadActivated(bool b) {
@@ -4805,10 +4933,12 @@ void QalculateWindow::editPreferences() {
 void QalculateWindow::onDatasetsChanged() {
 	expressionEdit->updateCompletion();
 	if(functionsDialog) functionsDialog->updateFunctions();
+	updateFunctionsMenu();
 }
 void QalculateWindow::onFunctionsChanged() {
 	expressionEdit->updateCompletion();
 	if(datasetsDialog) datasetsDialog->updateDatasets();
+	updateFunctionsMenu();
 }
 void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	expressionEdit->blockCompletion();
@@ -4892,6 +5022,8 @@ void QalculateWindow::openVariables() {
 	}
 	variablesDialog = new VariablesDialog();
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
 	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
@@ -4922,6 +5054,8 @@ void QalculateWindow::openUnits() {
 	unitsDialog = new UnitsDialog();
 	if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
 	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
 	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
@@ -5157,7 +5291,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	fd->add_to_menu = true;
 	fd->f = f;
 
-	std::string f_title = f->title(true);
+	std::string f_title = f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this);
 	fd->dialog = new QDialog(parent ? parent : this);
 	if(settings->always_on_top) fd->dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	fd->dialog->setWindowTitle(QString::fromStdString(f_title));

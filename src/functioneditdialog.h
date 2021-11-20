@@ -170,6 +170,7 @@ class FunctionEditDialog : public QDialog {
 		void argAddClicked();
 		void argEditClicked();
 		void argDelClicked();
+		void argumentChanged(QStandardItem *item);
 		void argumentActivated(const QModelIndex&);
 		void selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&);
 		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);

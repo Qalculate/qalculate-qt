@@ -314,6 +314,7 @@ void NamesEditDialog::setNames(ExpressionItem *o, const QString &str) {
 	o_item = o;
 	bool read_only = !addButton->isEnabled();
 	ExpressionName estr(str.trimmed().toStdString());
+	estr.reference = true;
 	for(size_t i = 1; i == 1 || (o && i <= o->countNames()); i++) {
 		const ExpressionName *ename;
 		if(o) ename = &o->getName(i);
@@ -742,7 +743,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(nameEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Expression:"), this), 1, 0, 1, 2);
 	expressionEdit = new MathTextEdit(this);
-	expressionEdit->setToolTip(tr("Use \\x for the first, \\y for the second and \\z for the third argument."));
+	expressionEdit->setToolTip(tr("Use x, y, and z (e.g. \"(x+y)/2\"), or\n\\x, \\y, \\z, \\a, \\b, … (e.g. \"(\\x+\\y)/2\")"));
 	grid->addWidget(expressionEdit, 2, 0, 1, 2);
 	QHBoxLayout *box = new QHBoxLayout();
 	QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
@@ -841,7 +842,7 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(subfunctionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedArgumentChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(argumentActivated(const QModelIndex&)));
-	connect(argumentsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onFunctionChanged()));
+	connect(argumentsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(argumentChanged(QStandardItem*)));
 	connect(subfunctionsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onFunctionChanged()));
 	connect(this, SIGNAL(rejected()), this, SLOT(onRejected()));
 	okButton->setEnabled(false);
@@ -1041,6 +1042,17 @@ void FunctionEditDialog::argAddClicked() {
 }
 void FunctionEditDialog::argumentActivated(const QModelIndex &index) {
 	if(!nameEdit->isReadOnly() && index.column() != 0) argEditClicked();
+}
+void FunctionEditDialog::argumentChanged(QStandardItem *item) {
+	if(nameEdit->isReadOnly() || item->column() != 0) return;
+	Argument *arg = (Argument*) item->data().value<void*>();
+	if(arg) {
+		arg->setName(item->text().trimmed().toStdString());
+	} else if(!item->text().trimmed().isEmpty()) {
+		arg = new Argument(item->text().trimmed().toStdString());
+		item->setData(QVariant::fromValue((void*) arg));
+	}
+	onFunctionChanged();
 }
 void FunctionEditDialog::argEditClicked() {
 	int r = argumentsView->selectionModel()->currentIndex().row();

@@ -155,6 +155,8 @@ int main(int argc, char **argv) {
 
 	CALCULATOR->loadLocalDefinitions();
 
+	settings->updateFavourites();
+
 	QalculateWindow *win = new QalculateWindow();
 	if(parser->value(tOption).isEmpty()) {
 		win->updateWindowTitle();

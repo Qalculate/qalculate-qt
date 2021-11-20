@@ -19,6 +19,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QKeyEvent>
 #include <QMenu>
@@ -96,6 +97,8 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
 	box->addSpacing(24);
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
+	box->addSpacing(24);
+	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
@@ -197,7 +200,7 @@ void VariablesDialog::newVariable(int type) {
 			}
 		}
 		selected_item = v;
-		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) v), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -215,6 +218,7 @@ void VariablesDialog::newVariable(int type) {
 			variablesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			variablesView->scrollTo(index);
 		}
+		if(v != replaced_item) settings->favourite_variables.push_back(v);
 		emit itemsChanged();
 	}
 }
@@ -256,7 +260,7 @@ void VariablesDialog::editClicked() {
 				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) v), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -277,6 +281,34 @@ void VariablesDialog::editClicked() {
 		}
 		emit itemsChanged();
 	}
+}
+void VariablesDialog::favouriteClicked() {
+	QModelIndex index = variablesView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	Variable *v = (Variable*) index.data(Qt::UserRole).value<void*>();
+	if(!v) return;
+	if(favouriteButton->isChecked()) {
+		settings->favourite_variables.push_back(v);
+	} else {
+		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+			if(settings->favourite_variables[i] == v) {
+				settings->favourite_variables.erase(settings->favourite_variables.begin() + i);
+				break;
+			}
+		}
+		if(selected_category == "Favorites") {
+			if(settings->favourite_variables.empty()) {
+				QList<QTreeWidgetItem*> list = categoriesView->findItems("All", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				if(!list.isEmpty()) categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			} else {
+				selected_item = NULL;
+				variablesModel->invalidate();
+				selectedVariableChanged(variablesView->selectionModel()->currentIndex(), variablesView->selectionModel()->currentIndex());
+			}
+		}
+	}
+	settings->favourite_variables_changed = true;
+	emit itemsChanged();
 }
 void VariablesDialog::delClicked() {
 	QModelIndex index = variablesView->selectionModel()->currentIndex();
@@ -399,6 +431,14 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 			editButton->setEnabled(!v->isBuiltin());
 			exportButton->setEnabled(v->isKnown() && ((KnownVariable*) v)->get().isVector());
 			insertButton->setEnabled(v->isActive());
+			favouriteButton->setEnabled(true);
+			favouriteButton->setChecked(false);
+			for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+				if(settings->favourite_variables[i] == v) {
+					favouriteButton->setChecked(true);
+					break;
+				}
+			}
 			delButton->setEnabled(v->isLocal());
 			deactivateButton->setEnabled(!settings->isAnswerVariable(v) && v != settings->v_memory);
 			descriptionView->setHtml(QString::fromStdString(str));
@@ -409,6 +449,8 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 	insertButton->setEnabled(false);
 	exportButton->setEnabled(false);
 	delButton->setEnabled(false);
+	favouriteButton->setEnabled(true);
+	favouriteButton->setChecked(false);
 	deactivateButton->setEnabled(false);
 	descriptionView->clear();
 	selected_item = NULL;
@@ -499,7 +541,7 @@ void VariablesDialog::updateVariables() {
 				has_uncat = true;
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) v), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -563,6 +605,11 @@ void VariablesDialog::updateVariables() {
 	l.clear(); l << tr("User variables"); l << "User items";
 	iter = new QTreeWidgetItem(iter3, l);
 	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(iter3, l);
+	if(selected_category == "Favorites") {
 		iter->setSelected(true);
 	}
 	if(has_inactive) {

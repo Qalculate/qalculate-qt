@@ -42,6 +42,7 @@ class PercentageCalculationDialog;
 class PlotDialog;
 class CalendarConversionDialog;
 class QTableWidget;
+class QMenu;
 struct FunctionDialog;
 
 class QalculateWindow : public QMainWindow {
@@ -87,7 +88,8 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
 		QToolButton *menuAction, *modeAction;
-		QAction *toAction, *storeAction, *functionsAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QAction *toAction, *storeAction, *variablesAction, *functionsAction, *unitsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 		QTimer *ecTimer, *rfTimer;
@@ -205,6 +207,12 @@ class QalculateWindow : public QMainWindow {
 		void calculateRPN(int);
 		void approximateResult();
 		void onExpressionStatusModeChanged();
+		void functionActivated();
+		void unitActivated();
+		void variableActivated();
+		void updateFunctionsMenu();
+		void updateUnitsMenu();
+		void updateVariablesMenu();
 
 	public slots:
 

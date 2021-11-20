@@ -68,6 +68,7 @@ class QalculateQtSettings : QObject {
 		void updateStyle();
 		void updatePalette();
 		void updateMessagePrintOptions();
+		void updateFavourites();
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
@@ -128,6 +129,13 @@ class QalculateQtSettings : QObject {
 		std::vector<std::vector<std::string> > v_result;
 		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
+		std::vector<MathFunction*> favourite_functions;
+		std::vector<Variable*> favourite_variables;
+		std::vector<Unit*> favourite_units;
+		std::vector<std::string> favourite_functions_pre;
+		std::vector<std::string> favourite_variables_pre;
+		std::vector<std::string> favourite_units_pre;
+		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;
 
 };
 

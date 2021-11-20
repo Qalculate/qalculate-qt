@@ -27,6 +27,7 @@ class QSplitter;
 class ItemProxyModel;
 class QComboBox;
 class QLabel;
+class QAbstractButton;
 
 class UnitsDialog : public QDialog {
 
@@ -40,6 +41,7 @@ class UnitsDialog : public QDialog {
 		ItemProxyModel *unitsModel, *toModel;
 		QStandardItemModel *sourceModel, *toSourceModel;
 		QPushButton *deactivateButton, *insertButton, *delButton, *editButton, *newButton, *convertButton;
+		QAbstractButton *favouriteButton;
 		QLineEdit *searchEdit, *fromEdit, *toEdit;
 		QSplitter *vsplitter, *hsplitter;
 		QLabel *fromLabel, *equalsLabel;
@@ -69,6 +71,7 @@ class UnitsDialog : public QDialog {
 		void toChanged();
 		void toUnitChanged();
 		void fromUnitChanged();
+		void favouriteClicked();
 		void onUnitActivated(const QModelIndex&);
 
 	public:

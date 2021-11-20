@@ -256,6 +256,10 @@ void QalculateQtSettings::loadPreferences() {
 #endif
 	last_version_check_date.setToCurrentDate();
 
+	favourite_functions_changed = false;
+	favourite_variables_changed = false;
+	favourite_units_changed = false;
+
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	file = fopen(filename.c_str(), "r");
@@ -313,6 +317,15 @@ void QalculateQtSettings::loadPreferences() {
 					if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
 				} else if(svar == "expression_history") {
 					expression_history.push_back(svalue);
+				} else if(svar == "favourite_function") {
+					favourite_functions_pre.push_back(svalue);
+					favourite_functions_changed = true;
+				} else if(svar == "favourite_unit") {
+					favourite_units_pre.push_back(svalue);
+					favourite_units_changed = true;
+				} else if(svar == "favourite_variable") {
+					favourite_variables_pre.push_back(svalue);
+					favourite_variables_changed = true;
 				} else if(svar == "version") {
 					parse_qalculate_version(svalue, version_numbers);
 				} else if(svar == "always_on_top") {
@@ -732,6 +745,50 @@ void QalculateQtSettings::loadPreferences() {
 	else if(palette >= 0) updatePalette();
 
 }
+void QalculateQtSettings::updateFavourites() {
+	if(favourite_functions_pre.empty()) {
+		for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+			if(CALCULATOR->functions[i]->isLocal() && !CALCULATOR->functions[i]->isHidden()) favourite_functions.push_back(CALCULATOR->functions[i]);
+		}
+	} else {
+		for(size_t i = 0; i < favourite_functions_pre.size(); i++) {
+			MathFunction *f = CALCULATOR->getActiveFunction(favourite_functions_pre[i]);
+			if(f) favourite_functions.push_back(f);
+		}
+	}
+	if(favourite_units_pre.empty()) {
+		const char *si_units[] = {"m", "kg_c", "s", "A", "K", "mol", "cd"};
+		for(size_t i = 0; i < 7; i++) {
+			Unit *u = CALCULATOR->getActiveUnit(si_units[i]);
+			if(!u) u = CALCULATOR->getCompositeUnit(si_units[i]);
+			if(u) favourite_units.push_back(u);
+		}
+		for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+			if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isHidden()) favourite_units.push_back(CALCULATOR->units[i]);
+		}
+	} else {
+		for(size_t i = 0; i < favourite_units_pre.size(); i++) {
+			Unit *u = CALCULATOR->getActiveUnit(favourite_units_pre[i]);
+			if(!u) u = CALCULATOR->getCompositeUnit(favourite_units_pre[i]);
+			if(u) favourite_units.push_back(u);
+		}
+	}
+	if(favourite_variables_pre.empty()) {
+		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_PI));
+		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_E));
+		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_EULER));
+		Variable *v = CALCULATOR->getActiveVariable("golden");
+		if(v) favourite_variables.push_back(v);
+		for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+			if(CALCULATOR->variables[i]->isLocal() && !CALCULATOR->variables[i]->isHidden()) favourite_variables.push_back(CALCULATOR->variables[i]);
+		}
+	} else {
+		for(size_t i = 0; i < favourite_variables_pre.size(); i++) {
+			Variable *v = CALCULATOR->getActiveVariable(favourite_variables_pre[i]);
+			if(v) favourite_variables.push_back(v);
+		}
+	}
+}
 void QalculateQtSettings::updatePalette() {
 	QPalette p;
 	if(palette == 1) {
@@ -999,6 +1056,27 @@ void QalculateQtSettings::savePreferences(bool) {
 		for(size_t i = 0; i < expression_history.size(); i++) {
 			gsub("\n", " ", expression_history[i]);
 			fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
+		}
+		if(favourite_functions_changed) {
+			for(size_t i = 0; i < favourite_functions.size(); i++) {
+				if(CALCULATOR->stillHasFunction(favourite_functions[i]) && favourite_functions[i]->isActive() && favourite_functions[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_function=%s\n", favourite_functions[i]->referenceName().c_str());
+				}
+			}
+		}
+		if(favourite_units_changed) {
+			for(size_t i = 0; i < favourite_units.size(); i++) {
+				if(CALCULATOR->stillHasUnit(favourite_units[i]) && favourite_units[i]->isActive() && favourite_units[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_unit=%s\n", favourite_units[i]->referenceName().c_str());
+				}
+			}
+		}
+		if(favourite_variables_changed) {
+			for(size_t i = 0; i < favourite_variables.size(); i++) {
+				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_variable=%s\n", favourite_variables[i]->referenceName().c_str());
+				}
+			}
 		}
 	}
 	fclose(file);

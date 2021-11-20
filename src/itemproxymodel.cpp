@@ -36,6 +36,24 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 		if(!item->isActive() || !item->category().empty() || item->isLocal()) return false;
 	} else if(cat == "User items") {
 		if(!item->isActive() || !item->isLocal()) return false;
+	} else if(cat == "Favorites") {
+		bool b = false;
+		if(item->type() == TYPE_UNIT) {
+			for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+				if(settings->favourite_units[i] == item) {b = true; break;}
+			}
+		}
+		if(item->type() == TYPE_FUNCTION) {
+			for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+				if(settings->favourite_functions[i] == item) {b = true; break;}
+			}
+		}
+		if(item->type() == TYPE_VARIABLE) {
+			for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+				if(settings->favourite_variables[i] == item) {b = true; break;}
+			}
+		}
+		if(!b) return false;
 	} else {
 		if(!item->isActive()) return false;
 		if(!subcat.empty()) {

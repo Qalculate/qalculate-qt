@@ -19,6 +19,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QLineEdit>
 #include <QKeyEvent>
 #include <QApplication>
@@ -90,6 +91,8 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
 	calculateButton->setDefault(true);
 	applyButton = new QPushButton(tr("Apply"), this); box->addWidget(applyButton); connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
+	box->addSpacing(24);
+	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
@@ -179,7 +182,7 @@ void FunctionsDialog::newClicked() {
 			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 		}
 		selected_item = f;
-		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -197,6 +200,7 @@ void FunctionsDialog::newClicked() {
 			functionsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			functionsView->scrollTo(index);
 		}
+		if(f != replaced_item) settings->favourite_functions.push_back(f);
 		emit itemsChanged();
 	}
 }
@@ -214,7 +218,7 @@ void FunctionsDialog::editClicked() {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -235,6 +239,34 @@ void FunctionsDialog::editClicked() {
 		}
 		emit itemsChanged();
 	}
+}
+void FunctionsDialog::favouriteClicked() {
+	QModelIndex index = functionsView->selectionModel()->currentIndex();
+	if(!index.isValid()) return;
+	MathFunction *f = (MathFunction*) index.data(Qt::UserRole).value<void*>();
+	if(!f) return;
+	if(favouriteButton->isChecked()) {
+		settings->favourite_functions.push_back(f);
+	} else {
+		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+			if(settings->favourite_functions[i] == f) {
+				settings->favourite_functions.erase(settings->favourite_functions.begin() + i);
+				break;
+			}
+		}
+		if(selected_category == "Favorites") {
+			if(settings->favourite_functions.empty()) {
+				QList<QTreeWidgetItem*> list = categoriesView->findItems("All", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				if(!list.isEmpty()) categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			} else {
+				selected_item = NULL;
+				functionsModel->invalidate();
+				selectedFunctionChanged(functionsView->selectionModel()->currentIndex(), functionsView->selectionModel()->currentIndex());
+			}
+		}
+	}
+	settings->favourite_functions_changed = true;
+	emit itemsChanged();
 }
 void FunctionsDialog::delClicked() {
 	QModelIndex index = functionsView->selectionModel()->currentIndex();
@@ -446,6 +478,14 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			insertButton->setEnabled(f->isActive());
 			calculateButton->setEnabled(f->isActive());
 			delButton->setEnabled(f->isLocal());
+			favouriteButton->setEnabled(true);
+			favouriteButton->setChecked(false);
+			for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+				if(settings->favourite_functions[i] == f) {
+					favouriteButton->setChecked(true);
+					break;
+				}
+			}
 			deactivateButton->setEnabled(true);
 			applyButton->setEnabled(f->isActive() && (f->minargs() <= 1 || settings->rpn_mode));
 			descriptionView->setHtml(QString::fromStdString(str));
@@ -458,6 +498,8 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 	delButton->setEnabled(false);
 	deactivateButton->setEnabled(false);
 	applyButton->setEnabled(false);
+	favouriteButton->setEnabled(false);
+	favouriteButton->setChecked(false);
 	descriptionView->clear();
 	selected_item = NULL;
 }
@@ -547,7 +589,7 @@ void FunctionsDialog::updateFunctions() {
 				has_uncat = true;
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -611,6 +653,11 @@ void FunctionsDialog::updateFunctions() {
 	l.clear(); l << tr("User functions"); l << "User items";
 	iter = new QTreeWidgetItem(iter3, l);
 	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(iter3, l);
+	if(selected_category == "Favorites") {
 		iter->setSelected(true);
 	}
 	if(has_inactive) {
