@@ -45,7 +45,7 @@ DataPropertyEditDialog::DataPropertyEditDialog(QWidget *parent) : QDialog(parent
 #	endif
 #endif
 	grid->addWidget(nameEdit, 0, 1);
-	grid->addWidget(new QLabel(tr("Title:"), this), 1, 0);
+	grid->addWidget(new QLabel(tr("Descriptive name:"), this), 1, 0);
 	titleEdit = new QLineEdit(this);
 	grid->addWidget(titleEdit, 1, 1);
 	grid->addWidget(new QLabel(tr("Description:"), this), 2, 0, 1, 2);
@@ -205,7 +205,7 @@ DataSetEditDialog::DataSetEditDialog(QWidget *parent) : QDialog(parent) {
 	tabs->addTab(w2, tr("Properties"));
 	tabs->addTab(w3, tr("Function"));
 	QGridLayout *grid = new QGridLayout(w1);
-	grid->addWidget(new QLabel(tr("Title:"), this), 0, 0);
+	grid->addWidget(new QLabel(tr("Descriptive name:"), this), 0, 0);
 	titleEdit = new QLineEdit(this);
 	grid->addWidget(titleEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Data file:"), this), 1, 0);

@@ -32,7 +32,7 @@
 #include "itemproxymodel.h"
 #include "uniteditdialog.h"
 
-UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent) {
+UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	last_from = true;
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	setWindowTitle(tr("Units"));
@@ -341,7 +341,7 @@ void UnitsDialog::newClicked() {
 			unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			unitsView->scrollTo(index);
 		}
-		if(u != replaced_item) settings->favourite_units.push_back(u);
+		if(u != replaced_item && !u->isHidden()) settings->favourite_units.push_back(u);
 		emit itemsChanged();
 	}
 }

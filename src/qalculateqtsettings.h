@@ -122,6 +122,7 @@ class QalculateQtSettings : QObject {
 		QalculateDateTime last_version_check_date;
 		bool check_version;
 		std::string last_found_version;
+		int preferences_version[3];
 
 		std::vector<std::string> v_expression;
 		std::vector<bool> v_protected;

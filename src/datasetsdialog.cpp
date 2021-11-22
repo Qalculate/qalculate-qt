@@ -26,7 +26,7 @@
 #include "datasetsdialog.h"
 #include "dataseteditdialog.h"
 
-DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent) {
+DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	selected_dataset = NULL;
 	selected_object = NULL;
 	QVBoxLayout *topbox = new QVBoxLayout(this);
@@ -148,7 +148,7 @@ void DataSetsDialog::addDataset() {
 	if(ds) {
 		selected_dataset = ds;
 		updateDatasets();
-		if(ds != replaced_item) settings->favourite_functions.push_back(ds);
+		if(ds != replaced_item && !ds->isHidden()) settings->favourite_functions.push_back(ds);
 		emit itemsChanged();
 	}
 }

@@ -40,6 +40,7 @@ class UnitsDialog;
 class FPConversionDialog;
 class PercentageCalculationDialog;
 class PlotDialog;
+class PeriodicTableDialog;
 class CalendarConversionDialog;
 class QTableWidget;
 class QMenu;
@@ -80,6 +81,7 @@ class QalculateWindow : public QMainWindow {
 		FPConversionDialog *fpConversionDialog;
 		PercentageCalculationDialog *percentageDialog;
 		PlotDialog *plotDialog;
+		PeriodicTableDialog *periodicTableDialog;
 		CalendarConversionDialog *calendarConversionDialog;
 
 		KeypadWidget *keypad;
@@ -250,6 +252,7 @@ class QalculateWindow : public QMainWindow {
 		void openFPConversion();
 		void openPercentageCalculation();
 		void openPlot();
+		void openPeriodicTable();
 		void negate();
 		void checkVersion();
 		void reportBug();

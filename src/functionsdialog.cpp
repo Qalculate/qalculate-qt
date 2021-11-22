@@ -31,7 +31,7 @@
 #include "functioneditdialog.h"
 #include "dataseteditdialog.h"
 
-FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent) {
+FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	setWindowTitle(tr("Functions"));
 	QHBoxLayout *hbox = new QHBoxLayout();
@@ -200,7 +200,7 @@ void FunctionsDialog::newClicked() {
 			functionsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			functionsView->scrollTo(index);
 		}
-		if(f != replaced_item) settings->favourite_functions.push_back(f);
+		if(f != replaced_item && !f->isHidden()) settings->favourite_functions.push_back(f);
 		emit itemsChanged();
 	}
 }

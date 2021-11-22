@@ -281,7 +281,9 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_use_sampling_rate = true;
 	max_plot_time = 5;
 
-	int version_numbers[] = {3, 21, 0};
+	preferences_version[0] = 3;
+	preferences_version[1] = 21;
+	preferences_version[2] = 0;
 
 	if(file) {
 		char line[1000000L];
@@ -327,7 +329,7 @@ void QalculateQtSettings::loadPreferences() {
 					favourite_variables_pre.push_back(svalue);
 					favourite_variables_changed = true;
 				} else if(svar == "version") {
-					parse_qalculate_version(svalue, version_numbers);
+					parse_qalculate_version(svalue, preferences_version);
 				} else if(svar == "always_on_top") {
 					always_on_top = v;
 				} else if(svar == "keep_function_dialog_open") {
@@ -864,8 +866,8 @@ void QalculateQtSettings::savePreferences(bool) {
 		fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
 		if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
 	}
-	fprintf(file, "window_state=%s\n", window_state.toBase64().data());
-	fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+	if(!window_state.isEmpty()) fprintf(file, "window_state=%s\n", window_state.toBase64().data());
+	if(!window_geometry.isEmpty()) fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
 	if(rpn_shown) fprintf(file, "rpn_shown=%i\n", rpn_shown);
 	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
 	if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());

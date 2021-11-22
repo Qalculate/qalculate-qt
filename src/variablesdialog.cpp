@@ -33,7 +33,7 @@
 #include "variableeditdialog.h"
 #include "csvdialog.h"
 
-VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent) {
+VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	setWindowTitle(tr("Variables"));
 	QHBoxLayout *hbox = new QHBoxLayout();
@@ -218,7 +218,7 @@ void VariablesDialog::newVariable(int type) {
 			variablesView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 			variablesView->scrollTo(index);
 		}
-		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		emit itemsChanged();
 	}
 }

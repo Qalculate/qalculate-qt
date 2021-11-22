@@ -63,6 +63,7 @@
 #include "fpconversiondialog.h"
 #include "percentagecalculationdialog.h"
 #include "plotdialog.h"
+#include "periodictabledialog.h"
 #include "calendarconversiondialog.h"
 #include "matrixwidget.h"
 #include "csvdialog.h"
@@ -271,6 +272,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	fpConversionDialog = NULL;
 	percentageDialog = NULL;
 	plotDialog = NULL;
+	periodicTableDialog = NULL;
 	calendarConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
@@ -328,6 +330,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
 	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
 	menu->addAction(tr("Percentage Calculation Tool"), this, SLOT(openPercentageCalculation()));
+	menu->addAction(tr("Periodic Table"), this, SLOT(openPeriodicTable()));
 	menu->addSeparator();
 	menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
@@ -587,12 +590,14 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 		plotAction = NULL;
 	}
 	fpAction = NULL;
-	calendarsAction = new QAction(LOAD_ICON("calendars"), tr("Calendar Conversion"), this);
+	calendarsAction = NULL;
+	percentageAction = NULL;
+	/*calendarsAction = new QAction(LOAD_ICON("calendars"), tr("Calendar Conversion"), this);
 	connect(calendarsAction, SIGNAL(triggered(bool)), this, SLOT(openCalendarConversion()));
 	tb->addAction(calendarsAction);
 	percentageAction = new QAction(LOAD_ICON("percentage"), tr("Percentage Calculation Tool"), this);
 	connect(percentageAction, SIGNAL(triggered(bool)), this, SLOT(openPercentageCalculation()));
-	tb->addAction(percentageAction);
+	tb->addAction(percentageAction);*/
 	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
 	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setShortcutContext(Qt::ApplicationShortcut); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
@@ -790,7 +795,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
-	else resize(600, 650);
+	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(600, 700);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
@@ -874,7 +879,7 @@ void QalculateWindow::variableActivated() {
 	onVariableClicked((Variable*) ((QAction*) sender())->data().value<void*>());
 }
 void QalculateWindow::unitActivated() {
-	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
+	if(!expressionEdit->expressionHasChanged() && ((settings->replace_expression == CLEAR_EXPRESSION && expressionEdit->document()->isEmpty()) || (!expressionEdit->document()->isEmpty() && expressionEdit->selectedText() == expressionEdit->toPlainText())) && settings->current_result) {
 		convertToUnit((Unit*) ((QAction*) sender())->data().value<void*>());
 	} else {
 		onUnitClicked((Unit*) ((QAction*) sender())->data().value<void*>());
@@ -4290,7 +4295,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(!supress_dialog && !register_moved && !do_stack && mstruct->isMatrix() && matrix_mstruct.isMatrix()) {
 		QDialog *dialog = new QDialog(this);
-		if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		dialog->setWindowTitle(tr("Matrix"));
 		QVBoxLayout *box = new QVBoxLayout(dialog);
 		MatrixWidget *w = new MatrixWidget(dialog);
@@ -4396,7 +4401,7 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	}
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Temperature Calculation Mode"));
 	QGridLayout *grid = new QGridLayout();
 	box->addLayout(grid);
@@ -4454,7 +4459,7 @@ bool QalculateWindow::askDot(const std::string &str) {
 	if(!b) return false;
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Interpretation of dots"));
 	QGridLayout *grid = new QGridLayout();
 	box->addLayout(grid);
@@ -4499,7 +4504,7 @@ bool QalculateWindow::askDot(const std::string &str) {
 bool QalculateWindow::askImplicit() {
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Parsing Mode"));
 	QGridLayout *grid = new QGridLayout();
 	box->addLayout(grid);
@@ -4552,7 +4557,8 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 }
 void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();
-	settings->window_geometry = saveGeometry();
+	if(height() != 700 || width() != 600) settings->window_geometry = saveGeometry();
+	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
 	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	CALCULATOR->abort();
@@ -4598,7 +4604,7 @@ void QalculateWindow::onStoreActivated() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		updateVariablesMenu();
 	}
 }
@@ -4609,7 +4615,7 @@ void QalculateWindow::newVariable() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		updateVariablesMenu();
 	}
 }
@@ -4620,7 +4626,7 @@ void QalculateWindow::newMatrix() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		updateVariablesMenu();
 	}
 }
@@ -4631,7 +4637,7 @@ void QalculateWindow::newUnknown() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item) settings->favourite_variables.push_back(v);
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		updateVariablesMenu();
 	}
 }
@@ -4642,7 +4648,7 @@ void QalculateWindow::newUnit() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(u != replaced_item) settings->favourite_units.push_back(u);
+		if(u != replaced_item && !u->isHidden()) settings->favourite_units.push_back(u);
 		updateUnitsMenu();
 	}
 }
@@ -4653,7 +4659,7 @@ void QalculateWindow::newFunction() {
 	if(f) {
 		expressionEdit->updateCompletion();
 		if(functionsDialog) functionsDialog->updateFunctions();
-		if(f != replaced_item) settings->favourite_functions.push_back(f);
+		if(f != replaced_item && !f->isHidden()) settings->favourite_functions.push_back(f);
 		updateFunctionsMenu();
 	}
 }
@@ -4841,27 +4847,28 @@ void QalculateWindow::assumptionsSignActivated() {
 void QalculateWindow::onAlwaysOnTopChanged() {
 	if(settings->always_on_top) {
 		setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(datasetsDialog) datasetsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(functionsDialog) functionsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(percentageDialog) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(plotDialog) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(datasetsDialog) datasetsDialog->setWindowFlags(datasetsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(functionsDialog) functionsDialog->setWindowFlags(functionsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(variablesDialog) variablesDialog->setWindowFlags(variablesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(unitsDialog) unitsDialog->setWindowFlags(unitsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(fpConversionDialog) fpConversionDialog->setWindowFlags(fpConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(percentageDialog) percentageDialog->setWindowFlags(percentageDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(plotDialog) plotDialog->setWindowFlags(plotDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(calendarConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(preferencesDialog) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	} else {
 		setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(datasetsDialog) datasetsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(functionsDialog) functionsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(variablesDialog) variablesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(unitsDialog) unitsDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(fpConversionDialog) fpConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(percentageDialog) percentageDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(plotDialog) plotDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
-		if(preferencesDialog) preferencesDialog->setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(datasetsDialog) datasetsDialog->setWindowFlags(datasetsDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(functionsDialog) functionsDialog->setWindowFlags(functionsDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(variablesDialog) variablesDialog->setWindowFlags(variablesDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(unitsDialog) unitsDialog->setWindowFlags(unitsDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(fpConversionDialog) fpConversionDialog->setWindowFlags(fpConversionDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(percentageDialog) percentageDialog->setWindowFlags(percentageDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(plotDialog) plotDialog->setWindowFlags(plotDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(calendarConversionDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(preferencesDialog) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
 	}
+	if(periodicTableDialog) periodicTableDialog->onAlwaysOnTopChanged();
 	show();
 }
 void QalculateWindow::onTitleTypeChanged() {
@@ -4908,7 +4915,7 @@ void QalculateWindow::onExpressionStatusModeChanged() {
 }
 void QalculateWindow::editPreferences() {
 	if(preferencesDialog) {
-		preferencesDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		preferencesDialog->setWindowState((preferencesDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		preferencesDialog->show();
 		qApp->processEvents();
 		preferencesDialog->raise();
@@ -4928,6 +4935,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
+	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();
 }
 void QalculateWindow::onDatasetsChanged() {
@@ -4956,7 +4964,7 @@ void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 }
 void QalculateWindow::openDatasets() {
 	if(datasetsDialog) {
-		datasetsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		datasetsDialog->setWindowState((datasetsDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		datasetsDialog->show();
 		qApp->processEvents();
 		datasetsDialog->raise();
@@ -4966,7 +4974,7 @@ void QalculateWindow::openDatasets() {
 	datasetsDialog = new DataSetsDialog();
 	connect(datasetsDialog, SIGNAL(itemsChanged()), this, SLOT(onDatasetsChanged()));
 	connect(datasetsDialog, SIGNAL(insertPropertyRequest(DataObject*, DataProperty*)), this, SLOT(insertProperty(DataObject*, DataProperty*)));
-	if(settings->always_on_top) datasetsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) datasetsDialog->setWindowFlags(datasetsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	datasetsDialog->show();
 }
 void QalculateWindow::applyFunction(MathFunction *f) {
@@ -4990,7 +4998,7 @@ void QalculateWindow::applyFunction(MathFunction *f) {
 }
 void QalculateWindow::openFunctions() {
 	if(functionsDialog) {
-		functionsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		functionsDialog->setWindowState((functionsDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		functionsDialog->show();
 		qApp->processEvents();
 		functionsDialog->raise();
@@ -5002,7 +5010,7 @@ void QalculateWindow::openFunctions() {
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
 	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(onInsertFunctionRequested(MathFunction*)));
 	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));
-	if(settings->always_on_top) functionsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) functionsDialog->setWindowFlags(functionsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	functionsDialog->show();
 }
 void QalculateWindow::onUnitRemoved(Unit *u) {
@@ -5013,7 +5021,7 @@ void QalculateWindow::onUnitDeactivated(Unit *u) {
 }
 void QalculateWindow::openVariables() {
 	if(variablesDialog) {
-		variablesDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		variablesDialog->setWindowState((variablesDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		variablesDialog->show();
 		qApp->processEvents();
 		variablesDialog->raise();
@@ -5027,7 +5035,7 @@ void QalculateWindow::openVariables() {
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
 	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
-	if(settings->always_on_top) variablesDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) variablesDialog->setWindowFlags(variablesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	variablesDialog->show();
 }
 void QalculateWindow::onVariableRemoved(Variable *v) {
@@ -5044,7 +5052,7 @@ void QalculateWindow::openUnits() {
 	if(unitsDialog) {
 		if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
 		else unitsDialog->selectCategory("All");
-		unitsDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		unitsDialog->setWindowState((unitsDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		unitsDialog->show();
 		qApp->processEvents();
 		unitsDialog->raise();
@@ -5061,7 +5069,7 @@ void QalculateWindow::openUnits() {
 	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
 	connect(unitsDialog, SIGNAL(convertToUnitRequest(Unit*)), this, SLOT(convertToUnit(Unit*)));
 	connect(unitsDialog, SIGNAL(unitActivated(Unit*)), this, SLOT(onUnitActivated(Unit*)));
-	if(settings->always_on_top) unitsDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) unitsDialog->setWindowFlags(unitsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	unitsDialog->show();
 }
 void QalculateWindow::onUnitActivated(Unit *u) {
@@ -5070,15 +5078,14 @@ void QalculateWindow::onUnitActivated(Unit *u) {
 }
 void QalculateWindow::openFPConversion() {
 	if(fpConversionDialog) {
-		if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		fpConversionDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		fpConversionDialog->setWindowState((fpConversionDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		fpConversionDialog->show();
 		qApp->processEvents();
 		fpConversionDialog->raise();
 		fpConversionDialog->activateWindow();
 	} else {
 		fpConversionDialog = new FPConversionDialog(this);
-		if(settings->always_on_top) fpConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(settings->always_on_top) fpConversionDialog->setWindowFlags(fpConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		fpConversionDialog->show();
 	}
 	QString str;
@@ -5111,15 +5118,14 @@ void QalculateWindow::openFPConversion() {
 }
 void QalculateWindow::openPercentageCalculation() {
 	if(percentageDialog) {
-		if(settings->always_on_top) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		percentageDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		percentageDialog->setWindowState((percentageDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		percentageDialog->show();
 		qApp->processEvents();
 		percentageDialog->raise();
 		percentageDialog->activateWindow();
 	} else {
 		percentageDialog = new PercentageCalculationDialog(this);
-		if(settings->always_on_top) percentageDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(settings->always_on_top) percentageDialog->setWindowFlags(percentageDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		percentageDialog->show();
 	}
 	QString str;
@@ -5138,15 +5144,14 @@ void QalculateWindow::openPlot() {
 		return;
 	}
 	if(plotDialog) {
-		if(settings->always_on_top) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-		plotDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		plotDialog->setWindowState((plotDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		plotDialog->show();
 		qApp->processEvents();
 		plotDialog->raise();
 		plotDialog->activateWindow();
 	} else {
 		plotDialog = new PlotDialog(this);
-		if(settings->always_on_top) plotDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+		if(settings->always_on_top) plotDialog->setWindowFlags(plotDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		plotDialog->show();
 	}
 	if(settings->evalops.parse_options.base == 10) {
@@ -5158,11 +5163,24 @@ void QalculateWindow::openPlot() {
 		plotDialog->setExpression(QString());
 	}
 }
+void QalculateWindow::openPeriodicTable() {
+	if(periodicTableDialog) {
+		periodicTableDialog->setWindowState((periodicTableDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		periodicTableDialog->show();
+		qApp->processEvents();
+		periodicTableDialog->raise();
+		periodicTableDialog->activateWindow();
+	} else {
+		periodicTableDialog = new PeriodicTableDialog(this);
+		connect(periodicTableDialog, SIGNAL(insertPropertyRequest(DataObject*, DataProperty*)), this, SLOT(insertProperty(DataObject*, DataProperty*)));
+		if(settings->always_on_top) periodicTableDialog->setWindowFlags(periodicTableDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		periodicTableDialog->show();
+	}
+}
 void QalculateWindow::openCalendarConversion() {
 	if(calendarConversionDialog) {
-		if(settings->always_on_top) calendarConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 		if(mstruct && mstruct->isDateTime()) calendarConversionDialog->setDate(*mstruct->datetime());
-		calendarConversionDialog->setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		calendarConversionDialog->setWindowState((calendarConversionDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 		calendarConversionDialog->show();
 		qApp->processEvents();
 		calendarConversionDialog->raise();
@@ -5170,7 +5188,7 @@ void QalculateWindow::openCalendarConversion() {
 		return;
 	}
 	calendarConversionDialog = new CalendarConversionDialog(this);
-	if(settings->always_on_top) calendarConversionDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) calendarConversionDialog->setWindowFlags(calendarConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	QalculateDateTime dt;
 	if(mstruct && mstruct->isDateTime()) dt.set(*mstruct->datetime());
 	else dt.setToCurrentDate();
@@ -5293,7 +5311,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 
 	std::string f_title = f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this);
 	fd->dialog = new QDialog(parent ? parent : this);
-	if(settings->always_on_top) fd->dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) fd->dialog->setWindowFlags(fd->dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	fd->dialog->setWindowTitle(QString::fromStdString(f_title));
 
 	QVBoxLayout *box = new QVBoxLayout(fd->dialog);
@@ -5597,14 +5615,19 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 				std::string seltext, str2;
 				if(expressionEdit->textCursor().hasSelection()) seltext = expressionEdit->textCursor().selectedText().toStdString();
 				else seltext = expressionEdit->toPlainText().toStdString();
+				bool use_current_result = !expressionEdit->expressionHasChanged() && !settings->history_answer.empty() && settings->current_result && (!expressionEdit->textCursor().hasSelection() || seltext == expressionEdit->toPlainText().toStdString());
 				CALCULATOR->separateToExpression(seltext, str2, settings->evalops, true);
 				remove_blank_ends(seltext);
 				if(!seltext.empty()) {
 					if(arg && arg->type() == ARGUMENT_TYPE_INTEGER) {
 						MathStructure m;
 						CALCULATOR->beginTemporaryStopMessages();
-						CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
-						if(CALCULATOR->endTemporaryStopMessages() && m.isInteger()) {
+						if(use_current_result) {
+							m = *settings->current_result;
+						} else {
+							CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
+						}
+						if(!CALCULATOR->endTemporaryStopMessages() && m.isInteger()) {
 							bool overflow = false;
 							int v = m.number().intValue(&overflow);
 							QSpinBox *spin = (QSpinBox*) entry;
@@ -5613,8 +5636,12 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 					} else if(arg && arg->type() == ARGUMENT_TYPE_DATE) {
 						MathStructure m;
 						CALCULATOR->beginTemporaryStopMessages();
-						CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
-						if(CALCULATOR->endTemporaryStopMessages() && m.isDateTime()) {
+						if(use_current_result) {
+							m = *settings->current_result;
+						} else {
+							CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(seltext, settings->evalops.parse_options), 200, settings->evalops);
+						}
+						if(!CALCULATOR->endTemporaryStopMessages() && m.isDateTime()) {
 							QDateTime d;
 							d.setDate(QDate(m.datetime()->year(), m.datetime()->month(), m.datetime()->day()));
 							Number nr_sec = m.datetime()->second();
@@ -5624,7 +5651,16 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 							((QDateTimeEdit*) entry)->setDateTime(d);
 						}
 					} else {
-						((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(seltext));
+						if(use_current_result) {
+							if(exact_text.empty()) {
+								Number nr(settings->history_answer.size(), 1, 0);
+								((QLineEdit*) fd->entry[i])->setText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).name)).arg(QString::fromStdString(print_with_evalops(nr))));
+							} else {
+								((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(exact_text));
+							}
+						} else {
+							((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(seltext));
+						}
 					}
 				}
 			}
@@ -5679,7 +5715,7 @@ void QalculateWindow::onEntryEditMatrix() {
 	QLineEdit *entry = (QLineEdit*) sender()->property("QALCULATE ENTRY").value<void*>();
 	FunctionDialog *fd = (FunctionDialog*) entry->property("QALCULATE FD").value<void*>();
 	QDialog *dialog = new QDialog(fd->dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Matrix"));
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	MatrixWidget *w = new MatrixWidget(dialog);

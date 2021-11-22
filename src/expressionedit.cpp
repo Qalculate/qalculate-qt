@@ -881,7 +881,11 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 				if(toolTipTimer) toolTipTimer->stop();
 				if(tipLabel) tipLabel->hideTip();
 			}
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+			if(tipLabel && tipLabel->isVisible() && QRect(tb->parentWidget()->mapToGlobal(tb->pos()), tb->size()).contains(((QMouseEvent*) e)->globalPosition().toPoint()) && tipLabel->pos().x() + tipLabel->width() > mapToGlobal(QPoint(width(), 0)).x()) tipLabel->hideTipImmediately();
+#else
 			if(tipLabel && tipLabel->isVisible() && QRect(tb->parentWidget()->mapToGlobal(tb->pos()), tb->size()).contains(((QMouseEvent*) e)->globalPos()) && tipLabel->pos().x() + tipLabel->width() > mapToGlobal(QPoint(width(), 0)).x()) tipLabel->hideTipImmediately();
+#endif
 			break;
 		case QEvent::MouseButtonPress:
 		case QEvent::MouseButtonRelease:
@@ -3005,7 +3009,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	p_type = index.data(TYPE_ROLE).toInt();
 	p = index.data(ITEM_ROLE).value<void*>();
 	i_match = index.data(IMATCH_ROLE).toInt();
-	i_type = index.data(TYPE_ROLE).toULongLong();
+	i_type = index.data(MATCH_ROLE).toULongLong();
 	if(i_type == 3 && p) return;
 	if(p_type == 1) item = (ExpressionItem*) p;
 	else if(p_type == 2) prefix = (Prefix*) p;
