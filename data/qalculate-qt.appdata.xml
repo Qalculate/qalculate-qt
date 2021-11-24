@@ -68,6 +68,31 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="3.22.0" date="2021-11-29">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Unit and data set creation/editing</li>
+      <li>Complete variable and functions editing</li>
+      <li>Percentage calculation dialog</li>
+      <li>Periodic table</li>
+      <li>Show result in expression status tooltip (calculate-as-you-type)</li>
+      <li>Horizontal toolbar with added units and plot buttons</li>
+      <li>Favorite functions, units, and variables (shown in toolbar menus)</li>
+      <li>Ctrl+Enter shortcut for approximation of current result</li>
+      <li>New functions: linearfit(), quadraticfit(), cubicfit(), ramlatency(), parallel()</li>
+      <li>Improved and extended parallel operator (|| is interpreted as parallel if units are used)</li>
+      <li>Allow nested subfunctions</li>
+      <li>Solve x^(x^(-a))=b</li>
+      <li>Improved simplification: Im(-x)=-Im(x), Re(-x)=-Re(x)</li>
+      <li>Fix pearson() and spearman()</li>
+      <li>Fix display of incompletely solved equation with dual approximation in some cases</li>
+      <li>Fix genvector() when step size requires evaluation</li>
+      <li>Fix a%%-b (interpret %% as mod, not percent)</li>
+      <li>Many minor feature enhancements and bug fixes</li>
+     </ul>
+   </description>
+  </release>
   <release version="3.21.0" date="2021-10-13">
    <description>
     <p>Changes:</p>

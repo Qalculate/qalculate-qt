@@ -2712,7 +2712,7 @@ void ExpressionEdit::highlightParentheses() {
 	int pos = textCursor().position(), ipar2;
 	QString text = toPlainText();
 	if(pos > text.length()) pos = text.length();
-	bool b = text.at(pos) == ')';
+	bool b = pos < text.length() && text.at(pos) == ')';
 	if(!b && pos > 0 && text.at(pos - 1) == ')') {
 		pos--;
 		b = true;

@@ -179,7 +179,11 @@ void FunctionsDialog::newClicked() {
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
+		}
+		if(f->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		selected_item = f;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
@@ -216,7 +220,11 @@ void FunctionsDialog::editClicked() {
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
+		}
+		if(f->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
@@ -585,7 +593,7 @@ void FunctionsDialog::updateFunctions() {
 					cat_i_prev = cat_i + 1;
 					cat_i = cat.find("/", cat_i_prev);
 				}
-			} else if(!f->isLocal()) {
+			} else {
 				has_uncat = true;
 			}
 		}
@@ -601,7 +609,17 @@ void FunctionsDialog::updateFunctions() {
 	categoriesView->clear();
 	QTreeWidgetItem *iter, *iter2, *iter3;
 	QStringList l;
-	l << tr("All", "All functions"); l << "All";
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "Favorites") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("User functions"); l << "User items";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("All", "All functions"); l << "All";
 	iter3 = new QTreeWidgetItem(categoriesView, l);
 	tree_struct *item, *item2;
 	function_cats.it = function_cats.items.begin();
@@ -649,16 +667,6 @@ void FunctionsDialog::updateFunctions() {
 		if(selected_category == "Uncategorized") {
 			iter->setSelected(true);
 		}
-	}
-	l.clear(); l << tr("User functions"); l << "User items";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "User items") {
-		iter->setSelected(true);
-	}
-	l.clear(); l << tr("Favorites"); l << "Favorites";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "Favorites") {
-		iter->setSelected(true);
 	}
 	if(has_inactive) {
 		//add "Inactive" category if there are inactive functions

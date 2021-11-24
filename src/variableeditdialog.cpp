@@ -21,6 +21,7 @@
 #include <QPlainTextEdit>
 #include <QTabWidget>
 #include <QAction>
+#include <QMap>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -59,7 +60,9 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	} else {
 		grid->addWidget(new QLabel(tr("Value:"), this), r, 0); r++;
 		valueEdit = new MathTextEdit(this);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 3, 0))
 		if(b_empty) valueEdit->setPlaceholderText(tr("current result"));
+#endif
 		grid->addWidget(valueEdit, r, 0, 1, 2); r++;
 		connect(valueEdit, SIGNAL(textChanged()), this, SLOT(onValueEdited()));
 	}
@@ -73,18 +76,16 @@ VariableEditDialog::VariableEditDialog(QWidget *parent, bool allow_empty_value, 
 	int l = unicode_length(CALCULATOR->temporaryCategory());
 	if(l < 20) l = 20;
 	categoryEdit->setMinimumContentsLength(l);
-	std::unordered_map<std::string, bool> hash;
-	QVector<Variable*> items;
+	QMap<std::string, bool> hash;
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
 		if(!CALCULATOR->variables[i]->category().empty()) {
 			if(hash.find(CALCULATOR->variables[i]->category()) == hash.end()) {
-				items.push_back(CALCULATOR->variables[i]);
 				hash[CALCULATOR->variables[i]->category()] = true;
 			}
 		}
 	}
-	for(int i = 0; i < items.count(); i++) {
-		categoryEdit->addItem(QString::fromStdString(items[i]->category()));
+	for(QMap<std::string, bool>::const_iterator it = hash.constBegin(); it != hash.constEnd(); ++it) {
+		categoryEdit->addItem(QString::fromStdString(it.key()));
 	}
 	categoryEdit->setEditable(true);
 	categoryEdit->setCurrentText(QString::fromStdString(CALCULATOR->temporaryCategory()));

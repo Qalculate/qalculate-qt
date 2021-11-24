@@ -28,7 +28,7 @@ PeriodicTableDialog::PeriodicTableDialog(QWidget *parent) : QDialog(parent, Qt::
 	grid->setSpacing(3);
 	QFontMetrics fm(font());
 	QSize size = fm.boundingRect("AB").size();
-	size.setWidth(size.width() + 12); size.setHeight(size.height() + 12);
+	size.setWidth(size.width() * 2); size.setHeight(size.height() * 2);
 	for(int i = 1; i <= 18; i++) {
 		QLabel *label = new QLabel(QString::number(i), this);
 		label->setMinimumSize(size);
@@ -95,6 +95,8 @@ PeriodicTableDialog::PeriodicTableDialog(QWidget *parent) : QDialog(parent, Qt::
 							default: {}
 						}
 						pal.setColor(QPalette::ButtonText, QColor("#000000"));
+						pal.setColor(QPalette::Text, QColor("#000000"));
+						pal.setColor(QPalette::WindowText, QColor("#000000"));
 						e_button->setAutoFillBackground(true);
 						e_button->setPalette(pal);
 						e_button->update();
@@ -128,6 +130,7 @@ PeriodicTableDialog::PeriodicTableDialog(QWidget *parent) : QDialog(parent, Qt::
 		grid->setRowStretch(i, 1);
 	}
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
+	buttonBox->setFocus();
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	layout()->setSizeConstraint(QLayout::SetFixedSize);

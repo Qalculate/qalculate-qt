@@ -312,8 +312,12 @@ void UnitsDialog::newClicked() {
 				else if(!replaced_item->isActive()) emit variableDeactivated((Variable*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
+		}
+		if(u->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		selected_item = u;
 		QString qstr;
@@ -353,7 +357,7 @@ void UnitsDialog::unitRemoved(Unit *u) {
 }
 void UnitsDialog::unitDeactivated(Unit*) {
 	QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-	if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+	if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 	unitsModel->invalidate();
 	toModel->invalidate();
 }
@@ -381,8 +385,12 @@ void UnitsDialog::editClicked() {
 				else if(!replaced_item->isActive()) emit variableDeactivated((Variable*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
+		}
+		if(u->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		QString qstr;
 		SET_TO_STR
@@ -731,7 +739,7 @@ void UnitsDialog::updateUnits() {
 					cat_i_prev = cat_i + 1;
 					cat_i = cat.find("/", cat_i_prev);
 				}
-			} else if(!u->isLocal()) {
+			} else {
 				has_uncat = true;
 			}
 		}
@@ -754,7 +762,17 @@ void UnitsDialog::updateUnits() {
 	categoriesView->clear();
 	QTreeWidgetItem *iter, *iter2, *iter3;
 	QStringList l;
-	l << tr("All", "All units"); l << "All";
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "Favorites") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("User units"); l << "User items";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("All", "All functions"); l << "All";
 	iter3 = new QTreeWidgetItem(categoriesView, l);
 	tree_struct *item, *item2;
 	unit_cats.it = unit_cats.items.begin();
@@ -802,16 +820,6 @@ void UnitsDialog::updateUnits() {
 		if(selected_category == "Uncategorized") {
 			iter->setSelected(true);
 		}
-	}
-	l.clear(); l << tr("User units"); l << "User items";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "User items") {
-		iter->setSelected(true);
-	}
-	l.clear(); l << tr("Favorites"); l << "Favorites";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "Favorites") {
-		iter->setSelected(true);
 	}
 	if(has_inactive) {
 		//add "Inactive" category if there are inactive units

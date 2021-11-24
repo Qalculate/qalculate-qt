@@ -33,7 +33,7 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 	} else if(cat == "Inactive") {
 		if(item->isActive()) return false;
 	} else if(cat == "Uncategorized") {
-		if(!item->isActive() || !item->category().empty() || item->isLocal()) return false;
+		if(!item->isActive() || !item->category().empty()) return false;
 	} else if(cat == "User items") {
 		if(!item->isActive() || !item->isLocal()) return false;
 	} else if(cat == "Favorites") {

@@ -196,8 +196,12 @@ void VariablesDialog::newVariable(int type) {
 				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
+		}
+		if(v->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		selected_item = v;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
@@ -229,7 +233,7 @@ void VariablesDialog::variableRemoved(Variable *v) {
 }
 void VariablesDialog::variableDeactivated(Variable*) {
 	QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-	if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+	if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 	variablesModel->invalidate();
 }
 void VariablesDialog::editClicked() {
@@ -257,8 +261,12 @@ void VariablesDialog::editClicked() {
 				else if(!replaced_item->isActive()) emit unitDeactivated((Unit*) replaced_item);
 			} else if(!replaced_item->isActive()) {
 				QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive";}
+				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
+		}
+		if(v->category().empty()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
 		item->setEditable(false);
@@ -537,7 +545,7 @@ void VariablesDialog::updateVariables() {
 					cat_i_prev = cat_i + 1;
 					cat_i = cat.find("/", cat_i_prev);
 				}
-			} else if(!v->isLocal()) {
+			} else {
 				has_uncat = true;
 			}
 		}
@@ -553,7 +561,17 @@ void VariablesDialog::updateVariables() {
 	categoriesView->clear();
 	QTreeWidgetItem *iter, *iter2, *iter3;
 	QStringList l;
-	l << tr("All", "All variables"); l << "All";
+	l.clear(); l << tr("Favorites"); l << "Favorites";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "Favorites") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("User variables"); l << "User items";
+	iter = new QTreeWidgetItem(categoriesView, l);
+	if(selected_category == "User items") {
+		iter->setSelected(true);
+	}
+	l.clear(); l << tr("All", "All functions"); l << "All";
 	iter3 = new QTreeWidgetItem(categoriesView, l);
 	tree_struct *item, *item2;
 	variable_cats.it = variable_cats.items.begin();
@@ -601,16 +619,6 @@ void VariablesDialog::updateVariables() {
 		if(selected_category == "Uncategorized") {
 			iter->setSelected(true);
 		}
-	}
-	l.clear(); l << tr("User variables"); l << "User items";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "User items") {
-		iter->setSelected(true);
-	}
-	l.clear(); l << tr("Favorites"); l << "Favorites";
-	iter = new QTreeWidgetItem(iter3, l);
-	if(selected_category == "Favorites") {
-		iter->setSelected(true);
 	}
 	if(has_inactive) {
 		//add "Inactive" category if there are inactive variables

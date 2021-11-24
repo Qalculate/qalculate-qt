@@ -22,6 +22,7 @@
 #include <QCheckBox>
 #include <QKeyEvent>
 #include <QVector>
+#include <QMap>
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QTreeView>
@@ -187,7 +188,11 @@ void ExpandingMathLineEdit::resizeToContents() {
 		originalWidth = oldWidth;
 	if(QWidget *parent = parentWidget()) {
 		QPoint position = pos();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 		int hintWidth = minimumWidth() + fontMetrics().horizontalAdvance(displayText());
+#else
+		int hintWidth = minimumWidth() + fontMetrics().boundingRect(displayText()).width();
+#endif
 		int parentWidth = parent->width();
 		int maxWidth = isRightToLeft() ? position.x() + oldWidth : parentWidth - position.x();
 		int newWidth = qBound(originalWidth, hintWidth, maxWidth);
@@ -284,7 +289,7 @@ NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QD
 		if(!scr) scr = QGuiApplication::primaryScreen();
 		QRect screen = scr->geometry();
 #else
-		QRect screen = QApplication::desktop()->screenGeometry(widget);
+		QRect screen = QApplication::desktop()->screenGeometry(this);
 #endif
 		if(screen.width() > 800) namesView->setMinimumWidth(800);
 	}
@@ -424,7 +429,11 @@ void NamesEditDialog::addClicked() {
 	namesView->edit(edit_item->index());
 }
 void NamesEditDialog::editClicked() {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 	namesView->edit(namesView->selectionModel()->currentIndex().siblingAtColumn(0));
+#else
+	namesView->edit(namesView->selectionModel()->currentIndex().sibling(namesView->selectionModel()->currentIndex().row(), 0));
+#endif
 }
 void NamesEditDialog::delClicked() {
 	namesModel->removeRow(namesView->selectionModel()->currentIndex().row());
@@ -750,18 +759,16 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	grid = new QGridLayout(w2);
 	grid->addWidget(new QLabel(tr("Category:"), this), 0, 0);
 	categoryEdit = new QComboBox(this);
-	std::unordered_map<std::string, bool> hash;
-	QVector<MathFunction*> items;
+	QMap<std::string, bool> hash;
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
 		if(!CALCULATOR->functions[i]->category().empty()) {
 			if(hash.find(CALCULATOR->functions[i]->category()) == hash.end()) {
-				items.push_back(CALCULATOR->functions[i]);
 				hash[CALCULATOR->functions[i]->category()] = true;
 			}
 		}
 	}
-	for(int i = 0; i < items.count(); i++) {
-		categoryEdit->addItem(QString::fromStdString(items[i]->category()));
+	for(QMap<std::string, bool>::const_iterator it = hash.constBegin(); it != hash.constEnd(); ++it) {
+		categoryEdit->addItem(QString::fromStdString(it.key()));
 	}
 	categoryEdit->setEditable(true);
 	categoryEdit->setCurrentText(QString());
@@ -1001,7 +1008,11 @@ void FunctionEditDialog::subAddClicked() {
 	onFunctionChanged();
 }
 void FunctionEditDialog::subEditClicked() {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 	subfunctionsView->edit(subfunctionsView->selectionModel()->currentIndex().siblingAtColumn(0));
+#else
+	subfunctionsView->edit(subfunctionsView->selectionModel()->currentIndex().sibling(subfunctionsView->selectionModel()->currentIndex().row(), 0));
+#endif
 	onFunctionChanged();
 }
 void FunctionEditDialog::subDelClicked() {

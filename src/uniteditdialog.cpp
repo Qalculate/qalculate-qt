@@ -22,6 +22,7 @@
 #include <QPlainTextEdit>
 #include <QTabWidget>
 #include <QAction>
+#include <QMap>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -53,18 +54,16 @@ UnitEditDialog::UnitEditDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(nameEdit, 0, 1);
 	grid->addWidget(new QLabel(tr("Category:"), this), 1, 0);
 	categoryEdit = new QComboBox(this);
-	std::unordered_map<std::string, bool> hash;
-	QVector<Unit*> items;
+	QMap<std::string, bool> hash;
 	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
 		if(!CALCULATOR->units[i]->category().empty()) {
 			if(hash.find(CALCULATOR->units[i]->category()) == hash.end()) {
-				items.push_back(CALCULATOR->units[i]);
 				hash[CALCULATOR->units[i]->category()] = true;
 			}
 		}
 	}
-	for(int i = 0; i < items.count(); i++) {
-		categoryEdit->addItem(QString::fromStdString(items[i]->category()));
+	for(QMap<std::string, bool>::const_iterator it = hash.constBegin(); it != hash.constEnd(); ++it) {
+		categoryEdit->addItem(QString::fromStdString(it.key()));
 	}
 	categoryEdit->setEditable(true);
 	categoryEdit->setCurrentText(QString());

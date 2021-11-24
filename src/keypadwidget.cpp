@@ -215,8 +215,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(QString(), "<i>y</i>", "<i>z</i>");
 	button->setFont(ifont);
 	SYMBOL_BUTTON("=", c, 1);
-	button->setText("x =");
-	button->setFont(ifont);
+	button->setRichText("<i>x</i> =");
 	c++;
 	SYMBOL_BUTTON2("%", "‰", c, 1);
 	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true)));

@@ -89,6 +89,14 @@ enum {
 	COMMAND_EVAL
 };
 
+#ifdef _WIN32
+#	define DEFAULT_HEIGHT 600
+#	define DEFAULT_WIDTH 550
+#else
+#	define DEFAULT_HEIGHT 650
+#	define DEFAULT_WIDTH 600
+#endif
+
 std::vector<std::string> alt_results;
 int b_busy = 0, block_result_update = 0;
 bool exact_comparison, command_aborted;
@@ -276,6 +284,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	calendarConversionDialog = NULL;
 
 	QVBoxLayout *topLayout = new QVBoxLayout(w_top);
+	topLayout->setContentsMargins(0, 0, 0, 0);
 
 	tb = addToolBar("Toolbar");
 	tb->setObjectName("Toolbar");
@@ -561,6 +570,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addWidget(modeAction);
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
+	toAction->setEnabled(false);
 	toAction->setShortcut(Qt::CTRL | Qt::Key_T); toAction->setShortcutContext(Qt::ApplicationShortcut); toAction->setToolTip(tr("Convert (%1)").arg(toAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
 	tb->addAction(toAction);
@@ -795,7 +805,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
-	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(600, 700);
+	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
@@ -879,11 +889,7 @@ void QalculateWindow::variableActivated() {
 	onVariableClicked((Variable*) ((QAction*) sender())->data().value<void*>());
 }
 void QalculateWindow::unitActivated() {
-	if(!expressionEdit->expressionHasChanged() && ((settings->replace_expression == CLEAR_EXPRESSION && expressionEdit->document()->isEmpty()) || (!expressionEdit->document()->isEmpty() && expressionEdit->selectedText() == expressionEdit->toPlainText())) && settings->current_result) {
-		convertToUnit((Unit*) ((QAction*) sender())->data().value<void*>());
-	} else {
-		onUnitClicked((Unit*) ((QAction*) sender())->data().value<void*>());
-	}
+	onUnitActivated((Unit*) ((QAction*) sender())->data().value<void*>());
 }
 void QalculateWindow::functionActivated() {
 	insertFunction((MathFunction*) ((QAction*) sender())->data().value<void*>(), this);
@@ -3607,7 +3613,6 @@ void CommandThread::run() {
 				break;
 			}
 			case COMMAND_EVAL: {
-			
 				((MathStructure*) x)->eval(eo2);
 				if(x2) ((MathStructure*) x2)->eval(eo2);
 				break;
@@ -3642,7 +3647,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		}
 	}
 
-	bool title_set = false, was_busy = false;
+	bool title_set = false, was_busy = false, update_parse = false;
 	QProgressDialog *dialog = NULL;
 
 	int i = 0;
@@ -3650,6 +3655,30 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 	MathStructure *mfactor = new MathStructure(*mstruct);
 	MathStructure *mfactor2 = NULL;
 	if(!mstruct_exact.isUndefined()) mfactor2 = new MathStructure(mstruct_exact);
+	if((command_type == COMMAND_CONVERT_UNIT || command_type == COMMAND_CONVERT_STRING) && !mfactor->containsType(STRUCT_UNIT) && (!mfactor2 || !mfactor2->containsType(STRUCT_UNIT)) && parsed_mstruct) {
+		MathStructure to_struct;
+		if(command_type == COMMAND_CONVERT_UNIT) {
+			to_struct.set(u);
+		} else {
+			CALCULATOR->convert(MathStructure(), ceu_str, settings->evalops, &to_struct);
+		}
+		to_struct.unformat(settings->evalops);
+		to_struct = CALCULATOR->convertToOptimalUnit(to_struct, settings->evalops, true);
+		fix_to_struct(to_struct);
+		if(!to_struct.isZero()) {
+			mfactor->multiply(to_struct);
+			if(mfactor2) mfactor2->multiply(to_struct);
+			PrintOptions po = settings->printops;
+			po.negative_exponents = false;
+			to_struct.format(po);
+			if(to_struct.isMultiplication() && to_struct.size() >= 2) {
+				if(to_struct[0].isOne()) to_struct.delChild(1, true);
+				else if(to_struct[1].isOne()) to_struct.delChild(2, true);
+			}
+			parsed_mstruct->multiply(to_struct);
+			update_parse = true;
+		}
+	}
 
 	rerun_command:
 
@@ -3748,7 +3777,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		if(show_result) {
 			if(!mstruct_exact.isUndefined()) settings->history_answer.push_back(new MathStructure(mstruct_exact));
 			settings->history_answer.push_back(new MathStructure(*mstruct));
-			setResult(NULL, true, false, true, "");
+			setResult(NULL, true, update_parse, true, "");
 		}
 	}
 
@@ -3840,6 +3869,7 @@ bool contains_plot_or_save(const std::string &str) {
 }
 
 void QalculateWindow::onExpressionChanged() {
+	toAction->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
 	if(!expressionEdit->expressionHasChanged() || !basesDock->isVisible()) return;
 	MathStructure m;
 	EvaluationOptions eo = settings->evalops;
@@ -4265,7 +4295,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, update_parse && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
+		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 	}
 
 	if(do_to) {
@@ -4557,7 +4587,7 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 }
 void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->window_state = saveState();
-	if(height() != 700 || width() != 600) settings->window_geometry = saveGeometry();
+	if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
 	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
@@ -5072,9 +5102,42 @@ void QalculateWindow::openUnits() {
 	if(settings->always_on_top) unitsDialog->setWindowFlags(unitsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	unitsDialog->show();
 }
+void remove_nonunits(MathStructure &m) {
+	if(m.isUnit()) {
+		if(m.unit()->referenceName() == "g") m.setPrefix(CALCULATOR->getExactDecimalPrefix(3));
+		else if(m.unit()->referenceName() == "a") m.setPrefix(CALCULATOR->getExactDecimalPrefix(2));
+		else m.setPrefix(NULL);
+	}
+	if(m.size() > 0) {
+		for(size_t i = 0; i < m.size();) {
+			if(!m.isUnit_exp() && !m[i].containsType(STRUCT_UNIT, true)) {
+				m.delChild(i + 1);
+			} else {
+				remove_nonunits(m[i]);
+				i++;
+			}
+		}
+		if(m.size() == 1) m.setToChild(1);
+		else if(m.size() == 0) m.clear();
+	}
+}
 void QalculateWindow::onUnitActivated(Unit *u) {
-	if(expressionEdit->expressionHasChanged() || settings->history_answer.empty()) onUnitClicked(u);
-	else convertToUnit(u);
+	if(expressionEdit->expressionHasChanged() || settings->history_answer.empty() || ((settings->replace_expression != CLEAR_EXPRESSION || !expressionEdit->document()->isEmpty()) && (expressionEdit->document()->isEmpty() || expressionEdit->selectedText() != expressionEdit->toPlainText())) || !mstruct) {
+		onUnitClicked(u);
+	} else {
+		if(!mstruct->containsType(STRUCT_UNIT, true)) {
+			MathStructure m_u(u);
+			m_u.unformat(settings->evalops);
+			MathStructure moptimal(CALCULATOR->convertToOptimalUnit(m_u, settings->evalops, true));
+			remove_nonunits(moptimal);
+			moptimal.unformat(settings->evalops);
+			if(moptimal.compare(m_u) == COMPARISON_RESULT_EQUAL) {
+				onUnitClicked(u);
+				return;
+			}
+		}
+		convertToUnit(u);
+	}
 }
 void QalculateWindow::openFPConversion() {
 	if(fpConversionDialog) {
