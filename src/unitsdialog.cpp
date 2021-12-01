@@ -127,8 +127,6 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	selected_category = "All";
 	updateUnits();
 	unitsView->setFocus();
-	unitsModel->setFilter("All");
-	toModel->setFilter("All");
 	connect(searchEdit, SIGNAL(textChanged(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(fromEdit, SIGNAL(textEdited(const QString&)), this, SLOT(fromChanged()));
 	connect(toEdit, SIGNAL(textEdited(const QString&)), this, SLOT(toChanged()));
@@ -137,7 +135,6 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	connect(categoriesView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(unitsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedUnitChanged(const QModelIndex&, const QModelIndex&)));
 	connect(unitsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(onUnitActivated(const QModelIndex&)));
-	selectedUnitChanged(QModelIndex(), QModelIndex());
 	if(!settings->units_geometry.isEmpty()) restoreGeometry(settings->units_geometry);
 	else resize(900, 800);
 	if(!settings->units_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->units_vsplitter_state);
@@ -315,11 +312,19 @@ void UnitsDialog::newClicked() {
 				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
 		}
+		selected_item = u;
 		if(u->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+		} else if(u->category() != CALCULATOR->temporaryCategory()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {
+				if(selected_category != "All") selected_category = "User items";
+				updateUnits();
+				emit itemsChanged();
+				return;
+			}
 		}
-		selected_item = u;
 		QString qstr;
 		SET_TO_STR
 		QStandardItem *item = new QStandardItem(qstr);
@@ -330,7 +335,7 @@ void UnitsDialog::newClicked() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
-		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category()) {
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category() && (selected_category != "Uncategorized" || !u->category().empty())) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(!list.isEmpty()) {
 				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -388,9 +393,18 @@ void UnitsDialog::editClicked() {
 				if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 			}
 		}
+		selected_item = u;
 		if(u->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+		} else if(u->category() != CALCULATOR->temporaryCategory()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {
+				if(selected_category != "All") selected_category = "User items";
+				updateUnits();
+				emit itemsChanged();
+				return;
+			}
 		}
 		QString qstr;
 		SET_TO_STR
@@ -402,8 +416,7 @@ void UnitsDialog::editClicked() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
-		selected_item = u;
-		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category()) {
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + u->category() && (selected_category != "Uncategorized" || !u->category().empty())) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(!list.isEmpty()) {
 				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -692,7 +705,9 @@ void UnitsDialog::updateUnits() {
 	unit_cats.parent = NULL;
 	bool has_inactive = false, has_uncat = false;
 	std::list<tree_struct>::iterator it;
+	QStandardItem *item_sel = NULL;
 
+	unitsView->selectionModel()->blockSignals(true);
 	sourceModel->clear();
 	sourceModel->setColumnCount(1);
 	sourceModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Unit")));
@@ -747,19 +762,22 @@ void UnitsDialog::updateUnits() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		sourceModel->appendRow(item);
-		if(u == selected_item) unitsView->selectionModel()->setCurrentIndex(unitsModel->mapFromSource(item->index()), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-		
+		if(u == selected_item) item_sel = item;
+
 		SET_TO_STR
 		item = new QStandardItem(qstr);
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) u), Qt::UserRole);
 		toSourceModel->appendRow(item);
 	}
+	unitsView->selectionModel()->blockSignals(false);
 	sourceModel->sort(0);
 	toSourceModel->sort(0);
 	unit_cats.sort();
 
+	categoriesView->blockSignals(true);
 	categoriesView->clear();
+	categoriesView->blockSignals(false);
 	QTreeWidgetItem *iter, *iter2, *iter3;
 	QStringList l;
 	l.clear(); l << tr("Favorites"); l << "Favorites";
@@ -772,7 +790,7 @@ void UnitsDialog::updateUnits() {
 	if(selected_category == "User items") {
 		iter->setSelected(true);
 	}
-	l.clear(); l << tr("All", "All functions"); l << "All";
+	l.clear(); l << tr("All", "All units"); l << "All";
 	iter3 = new QTreeWidgetItem(categoriesView, l);
 	tree_struct *item, *item2;
 	unit_cats.it = unit_cats.items.begin();
@@ -829,12 +847,24 @@ void UnitsDialog::updateUnits() {
 			iter->setSelected(true);
 		}
 	}
+	iter3->setExpanded(true);
 	if(categoriesView->selectedItems().isEmpty()) {
 		//if no category has been selected (previously selected has been renamed/deleted), select "All"
 		selected_category = "All";
-		iter3->setExpanded(true);
 		iter3->setSelected(true);
 	}
+	searchEdit->blockSignals(true);
+	searchEdit->clear();
+	searchEdit->blockSignals(false);
+	unitsModel->setFilter(selected_category);
+	QModelIndex index;
+	if(item_sel) index = unitsModel->mapFromSource(item_sel->index());
+	if(!index.isValid()) index = unitsModel->index(0, 0);
+	if(index.isValid()) {
+		unitsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		unitsView->scrollTo(index);
+	}
+	selectedUnitChanged(index, QModelIndex());
 }
 void UnitsDialog::setSearch(const QString &str) {
 	searchEdit->setText(str);
@@ -845,5 +875,4 @@ void UnitsDialog::selectCategory(std::string str) {
 		categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	}
 }
-
 

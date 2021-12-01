@@ -307,6 +307,7 @@ void VariableEditDialog::onValueEdited() {
 void VariableEditDialog::setValue(const QString &str) {
 	valueEdit->setPlainText(str);
 	if(!b_empty) onValueEdited();
+	b_changed = false;
 }
 void VariableEditDialog::disableValue() {
 	valueEdit->setReadOnly(true);

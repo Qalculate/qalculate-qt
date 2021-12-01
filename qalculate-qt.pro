@@ -64,7 +64,7 @@ TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
 		translations/qalculate-qt_sv.ts \
 		translations/qalculate-qt_zh_CN.ts
 
-!win32: {
+!win32:!macx {
 	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
 	TRANSLATIONS_FILES = 
 	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {

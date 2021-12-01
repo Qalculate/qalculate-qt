@@ -303,10 +303,10 @@ class PlotThread : public Thread {
 						if(plot_rate < 0) {
 							MathStructure m_step = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(plot_step, eo.parse_options), eo);
 							if(!CALCULATOR->aborted()) {
-								y_vector->set(CALCULATOR->expressionToPlotVector(plot_str, min, max, m_step, x_vector, plot_x, eo.parse_options, 0));
+								y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, m_step, x_vector, plot_x, eo.parse_options, 0));
 							}
 						} else if(!CALCULATOR->aborted()) {
-							y_vector->set(CALCULATOR->expressionToPlotVector(plot_str, min, max, plot_rate, x_vector, plot_x, eo.parse_options, 0));
+							y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, plot_rate, x_vector, plot_x, eo.parse_options, 0));
 						}
 					}
 					CALCULATOR->stopControl();
@@ -532,17 +532,59 @@ void PlotDialog::updateItem(QTreeWidgetItem *item) {
 	}
 	MathStructure *x_vector, *y_vector;
 	generatePlotSeries(&x_vector, &y_vector, type, expression, str_x);
-	item->setData(0, TYPE_ROLE, type);
-	item->setData(0, YAXIS2_ROLE, secondaryButton->isChecked());
-	item->setData(0, ROWS_ROLE, rowsBox->isChecked());
-	item->setData(0, SMOOTHING_ROLE, smoothingCombo->currentData());
-	item->setData(0, STYLE_ROLE, styleCombo->currentData());
-	item->setData(0, YVECTOR_ROLE, QVariant::fromValue((void*) y_vector));
-	item->setData(0, XVECTOR_ROLE, QVariant::fromValue((void*) x_vector));
-	item->setData(0, X_ROLE, str_x);
-	item->setText(0, title);
-	item->setText(1, expression);
-	item->setTextAlignment(1, Qt::AlignRight | Qt::AlignVCenter);
+	bool b_multiple = (type != 1 && type != 2 && y_vector->isMatrix() && expression != item->text(1));
+	MathStructure mfunc;
+	if(b_multiple) {
+		EvaluationOptions eo;
+		eo.approximation = APPROXIMATION_APPROXIMATE;
+		eo.parse_options = settings->evalops.parse_options;
+		eo.parse_options.base = 10;
+		eo.parse_options.read_precision = DONT_READ_PRECISION;
+		eo.interval_calculation = INTERVAL_CALCULATION_NONE;
+		mfunc = CALCULATOR->parse(expression.toStdString(), eo.parse_options);
+		if(!mfunc.isVector()) {
+			CALCULATOR->beginTemporaryStopIntervalArithmetic();
+			CALCULATOR->beginTemporaryStopMessages();
+			mfunc.eval(eo);
+			CALCULATOR->endTemporaryStopMessages();
+			CALCULATOR->endTemporaryStopIntervalArithmetic();
+			if(!mfunc.isVector() || mfunc.size() != y_vector->columns()) b_multiple = false;
+		}
+	}
+	PrintOptions po = settings->printops;
+	po.can_display_unicode_string_arg = (void*) expressionEdit;
+	po.base = 10;
+	po.is_approximate = NULL;
+	po.allow_non_usable = false;
+	for(size_t i = 0; ; i++) {
+		if(b_multiple) {
+			MathStructure *m = new MathStructure();
+			y_vector->columnToVector(i + 1, *m);
+			item->setData(0, YVECTOR_ROLE, QVariant::fromValue((void*) m));
+			item->setData(0, XVECTOR_ROLE, QVariant::fromValue((void*) new MathStructure(*x_vector)));
+			QString str = QString::fromStdString(mfunc[i].print(po));
+			item->setText(1, str);
+			if(i == 0) expressionEdit->setText(str);
+		} else {
+			item->setData(0, YVECTOR_ROLE, QVariant::fromValue((void*) y_vector));
+			item->setData(0, XVECTOR_ROLE, QVariant::fromValue((void*) x_vector));
+			item->setText(1, expression);
+		}
+		item->setData(0, TYPE_ROLE, type);
+		item->setData(0, YAXIS2_ROLE, secondaryButton->isChecked());
+		item->setData(0, ROWS_ROLE, rowsBox->isChecked());
+		item->setData(0, SMOOTHING_ROLE, smoothingCombo->currentData());
+		item->setData(0, STYLE_ROLE, styleCombo->currentData());
+		item->setData(0, X_ROLE, str_x);
+		item->setText(0, title);
+		item->setTextAlignment(1, Qt::AlignRight | Qt::AlignVCenter);
+		if(!b_multiple || i + 1 >= y_vector->columns()) break;
+		item = new QTreeWidgetItem(graphsTable);
+	}
+	if(b_multiple) {
+		delete y_vector;
+		delete x_vector;
+	}
 }
 void PlotDialog::onApplyClicked() {
 	QList<QTreeWidgetItem *> list = graphsTable->selectedItems();

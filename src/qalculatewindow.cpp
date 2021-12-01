@@ -303,12 +303,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->use_custom_app_font) appfont.fromString(QString::fromStdString(settings->custom_app_font));
 
 	action = new QAction("Negate", this);
-	action->setShortcut(Qt::CTRL | Qt::Key_Minus); action->setShortcutContext(Qt::ApplicationShortcut);
+	action->setShortcut(Qt::CTRL | Qt::Key_Minus);
 	addAction(action);
 	connect(action, SIGNAL(triggered()), this, SLOT(negate()));
 
 	action = new QAction("Approximate", this);
-	action->setShortcuts({Qt::CTRL | Qt::Key_Return, Qt::CTRL | Qt::Key_Enter}); action->setShortcutContext(Qt::ApplicationShortcut);
+	action->setShortcuts({Qt::CTRL | Qt::Key_Return, Qt::CTRL | Qt::Key_Enter});
 	addAction(action);
 	connect(action, SIGNAL(triggered()), this, SLOT(approximateResult()));
 
@@ -329,13 +329,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Import CSV File…"), this, SLOT(importCSV()));
 	menu->addAction(tr("Export CSV File…"), this, SLOT(exportCSV()));
 	menu->addSeparator();
-	menu->addAction(tr("Functions"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Functions"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F);
 	variablesAction = menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M);
-	variablesAction->setShortcutContext(Qt::ApplicationShortcut);
-	menu->addAction(tr("Units"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Units"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U);
 	menu->addAction(tr("Data Sets"), this, SLOT(openDatasets()));
 	menu->addSeparator();
-	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P)->setShortcutContext(Qt::ApplicationShortcut);
+	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P);
 	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
 	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
 	menu->addAction(tr("Percentage Calculation Tool"), this, SLOT(openPercentageCalculation()));
@@ -345,7 +344,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	group = new QActionGroup(this);
 	action = menu->addAction(tr("Normal Mode"), this, SLOT(normalModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_normalmode"); if(!settings->rpn_mode && !settings->chain_mode) action->setChecked(true);
-	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setShortcutContext(Qt::ApplicationShortcut); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
+	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
 	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true);
 	menu->addSeparator();
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
@@ -571,10 +570,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
 	toAction->setEnabled(false);
-	toAction->setShortcut(Qt::CTRL | Qt::Key_T); toAction->setShortcutContext(Qt::ApplicationShortcut); toAction->setToolTip(tr("Convert (%1)").arg(toAction->shortcut().toString(QKeySequence::NativeText)));
+	toAction->setShortcut(Qt::CTRL | Qt::Key_T); toAction->setToolTip(tr("Convert (%1)").arg(toAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
 	tb->addAction(toAction);
-	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this); storeAction->setShortcut(QKeySequence::Save); storeAction->setShortcutContext(Qt::ApplicationShortcut); storeAction->setToolTip(tr("Store (%1)").arg(storeAction->shortcut().toString(QKeySequence::NativeText)));
+	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this); storeAction->setShortcut(QKeySequence::Save); storeAction->setToolTip(tr("Store (%1)").arg(storeAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
 	updateVariablesMenu();
@@ -609,12 +608,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(percentageAction, SIGNAL(triggered(bool)), this, SLOT(openPercentageCalculation()));
 	tb->addAction(percentageAction);*/
 	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
-	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setShortcutContext(Qt::ApplicationShortcut); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
+	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
 	keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
-	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setShortcutContext(Qt::ApplicationShortcut); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
+	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
 	keypadAction->setCheckable(true);
 	tb->addAction(keypadAction);
@@ -6042,6 +6041,7 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
+			toAction->setEnabled(false);
 		} else {
 			normalModeActivated();
 			QAction *w = findChild<QAction*>("action_normalmode");
@@ -6060,6 +6060,7 @@ void QalculateWindow::rpnModeActivated() {
 		if(!settings->rpn_shown) {rpnDock->setFloating(true); settings->rpn_shown = true;}
 		rpnDock->show();
 		rpnDock->raise();
+		toAction->setEnabled(false);
 	}
 }
 void QalculateWindow::chainModeActivated() {

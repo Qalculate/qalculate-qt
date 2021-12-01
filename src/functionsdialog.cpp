@@ -100,13 +100,11 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	selected_category = "All";
 	updateFunctions();
 	functionsView->setFocus();
-	functionsModel->setFilter("All");
 	connect(searchEdit, SIGNAL(textChanged(const QString&)), this, SLOT(searchChanged(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(categoriesView, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(selectedCategoryChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(functionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedFunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(functionsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(calculateClicked()));
-	selectedFunctionChanged(QModelIndex(), QModelIndex());
 	if(!settings->functions_geometry.isEmpty()) restoreGeometry(settings->functions_geometry);
 	else resize(900, 800);
 	if(!settings->functions_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->functions_vsplitter_state);
@@ -181,16 +179,24 @@ void FunctionsDialog::newClicked() {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 		}
+		selected_item = f;
 		if(f->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+		} else if(f->category() != CALCULATOR->temporaryCategory()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(f->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {
+				if(selected_category != "All") selected_category = "User items";
+				updateFunctions();
+				emit itemsChanged();
+				return;
+			}
 		}
-		selected_item = f;
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
-		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category()) {
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category() && (selected_category != "Uncategorized" || !f->category().empty())) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(!list.isEmpty()) {
 				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -222,16 +228,24 @@ void FunctionsDialog::editClicked() {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
 		}
+		selected_item = f;
 		if(f->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+		} else if(f->category() != CALCULATOR->temporaryCategory()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(f->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			if(list.isEmpty()) {
+				if(selected_category != "All") selected_category = "User items";
+				updateFunctions();
+				emit itemsChanged();
+				return;
+			}
 		}
 		QStandardItem *item = new QStandardItem(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) functionsView)));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
-		selected_item = f;
-		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category()) {
+		if(selected_category != "All" && selected_category != "User items" && selected_category != std::string("/") + f->category() && (selected_category != "Uncategorized" || !f->category().empty())) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(!list.isEmpty()) {
 				categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
@@ -549,7 +563,9 @@ void FunctionsDialog::updateFunctions() {
 	function_cats.parent = NULL;
 	bool has_inactive = false, has_uncat = false;
 	std::list<tree_struct>::iterator it;
+	QStandardItem *item_sel = NULL;
 
+	functionsView->selectionModel()->blockSignals(true);
 	sourceModel->clear();
 	sourceModel->setColumnCount(1);
 	sourceModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Function")));
@@ -601,12 +617,15 @@ void FunctionsDialog::updateFunctions() {
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) f), Qt::UserRole);
 		sourceModel->appendRow(item);
-		if(f == selected_item) functionsView->selectionModel()->setCurrentIndex(functionsModel->mapFromSource(item->index()), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		if(f == selected_item) item_sel = item;
 	}
+	functionsView->selectionModel()->blockSignals(false);
 	sourceModel->sort(0);
 	function_cats.sort();
 
+	categoriesView->blockSignals(true);
 	categoriesView->clear();
+	categoriesView->blockSignals(false);
 	QTreeWidgetItem *iter, *iter2, *iter3;
 	QStringList l;
 	l.clear(); l << tr("Favorites"); l << "Favorites";
@@ -676,12 +695,24 @@ void FunctionsDialog::updateFunctions() {
 			iter->setSelected(true);
 		}
 	}
+	iter3->setExpanded(true);
 	if(categoriesView->selectedItems().isEmpty()) {
 		//if no category has been selected (previously selected has been renamed/deleted), select "All"
 		selected_category = "All";
-		iter3->setExpanded(true);
 		iter3->setSelected(true);
 	}
+	searchEdit->blockSignals(true);
+	searchEdit->clear();
+	searchEdit->blockSignals(false);
+	functionsModel->setFilter(selected_category);
+	QModelIndex index;
+	if(item_sel) index = functionsModel->mapFromSource(item_sel->index());
+	if(!index.isValid()) index = functionsModel->index(0, 0);
+	if(index.isValid()) {
+		functionsView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+		functionsView->scrollTo(index);
+	}
+	selectedFunctionChanged(index, QModelIndex());
 }
 void FunctionsDialog::setSearch(const QString &str) {
 	searchEdit->setText(str);

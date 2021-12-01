@@ -1591,7 +1591,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="62"/>
-        <location filename="../src/functionsdialog.cpp" line="555"/>
+        <location filename="../src/functionsdialog.cpp" line="571"/>
         <source>Function</source>
         <translation>Функция</translation>
     </message>
@@ -1607,8 +1607,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="87"/>
-        <location filename="../src/functionsdialog.cpp" line="477"/>
-        <location filename="../src/functionsdialog.cpp" line="480"/>
+        <location filename="../src/functionsdialog.cpp" line="491"/>
+        <location filename="../src/functionsdialog.cpp" line="494"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -1638,92 +1638,92 @@ Do you want to overwrite the function?</source>
         <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="358"/>
+        <location filename="../src/functionsdialog.cpp" line="372"/>
         <source>argument</source>
         <translation>аргумент</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="381"/>
+        <location filename="../src/functionsdialog.cpp" line="395"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="391"/>
+        <location filename="../src/functionsdialog.cpp" line="405"/>
         <source>Example:</source>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="403"/>
+        <location filename="../src/functionsdialog.cpp" line="417"/>
         <source>Arguments</source>
         <translation>Аргументы</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="420"/>
+        <location filename="../src/functionsdialog.cpp" line="434"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="423"/>
+        <location filename="../src/functionsdialog.cpp" line="437"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>по умолчанию:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="439"/>
+        <location filename="../src/functionsdialog.cpp" line="453"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Требование:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="447"/>
+        <location filename="../src/functionsdialog.cpp" line="461"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="454"/>
+        <location filename="../src/functionsdialog.cpp" line="468"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="464"/>
+        <location filename="../src/functionsdialog.cpp" line="478"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>ключ</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="482"/>
+        <location filename="../src/functionsdialog.cpp" line="496"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="622"/>
+        <location filename="../src/functionsdialog.cpp" line="641"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="186"/>
-        <location filename="../src/functionsdialog.cpp" line="227"/>
-        <location filename="../src/functionsdialog.cpp" line="665"/>
+        <location filename="../src/functionsdialog.cpp" line="185"/>
+        <location filename="../src/functionsdialog.cpp" line="234"/>
+        <location filename="../src/functionsdialog.cpp" line="684"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="617"/>
+        <location filename="../src/functionsdialog.cpp" line="636"/>
         <source>User functions</source>
         <translation>Пользовательские функции</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="612"/>
+        <location filename="../src/functionsdialog.cpp" line="631"/>
         <source>Favorites</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="182"/>
-        <location filename="../src/functionsdialog.cpp" line="223"/>
-        <location filename="../src/functionsdialog.cpp" line="322"/>
-        <location filename="../src/functionsdialog.cpp" line="673"/>
+        <location filename="../src/functionsdialog.cpp" line="180"/>
+        <location filename="../src/functionsdialog.cpp" line="229"/>
+        <location filename="../src/functionsdialog.cpp" line="336"/>
+        <location filename="../src/functionsdialog.cpp" line="692"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -1731,63 +1731,63 @@ Do you want to overwrite the function?</source>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="665"/>
+        <location filename="../src/historyview.cpp" line="666"/>
         <source>Copy</source>
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="668"/>
+        <location filename="../src/historyview.cpp" line="669"/>
         <source>Copy Formatted Text</source>
         <translation>Копировать отформатированный текст</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="669"/>
+        <location filename="../src/historyview.cpp" line="670"/>
         <source>Select All</source>
         <translation>Выделите всё</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="663"/>
+        <location filename="../src/historyview.cpp" line="664"/>
         <source>Insert Value</source>
         <translation>Вставить значение</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="664"/>
+        <location filename="../src/historyview.cpp" line="665"/>
         <source>Insert Text</source>
         <translation>Вставить текст</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="672"/>
+        <location filename="../src/historyview.cpp" line="673"/>
         <source>Search…</source>
         <translation>Поиск…</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="676"/>
+        <location filename="../src/historyview.cpp" line="677"/>
         <source>Protect</source>
         <translation>Защитить</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="678"/>
+        <location filename="../src/historyview.cpp" line="679"/>
         <source>Move to Top</source>
         <translation>Передвинуть наверх</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="680"/>
+        <location filename="../src/historyview.cpp" line="681"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="681"/>
+        <location filename="../src/historyview.cpp" line="682"/>
         <source>Clear</source>
         <translation>Очистить</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="732"/>
+        <location filename="../src/historyview.cpp" line="733"/>
         <source>Text:</source>
         <translation>Текст:</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="730"/>
-        <location filename="../src/historyview.cpp" line="737"/>
+        <location filename="../src/historyview.cpp" line="731"/>
+        <location filename="../src/historyview.cpp" line="738"/>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
@@ -3154,12 +3154,12 @@ Do you, despite this, want to change the default behavior and allow multiple sim
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1191"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1192"/>
         <source>Update exchange rates?</source>
         <translation>Обновить курсы валют?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="1191"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1192"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
@@ -3176,40 +3176,40 @@ Do you wish to update the exchange rates now?</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1219"/>
         <location filename="../src/qalculateqtsettings.cpp" line="1220"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1221"/>
         <source>Fetching exchange rates…</source>
         <translation>Получение курсов валют…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1266"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1267"/>
         <source>Path of executable not found.</source>
         <translation>Путь к исполняемому файлу не найден.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1275"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1276"/>
         <source>curl not found.</source>
         <translation>Программа curl не найдена.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1326"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1327"/>
         <source>Failed to run update script.
 %1</source>
         <translation>Не удалось запустить скрипт обновления.
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1349"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1350"/>
         <source>Failed to check for updates.</source>
         <translation>Не удалось проверить наличие обновлений.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1350"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1351"/>
         <source>No updates found.</source>
         <translation>Обновлений не найдено.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1356"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1357"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
@@ -3218,7 +3218,7 @@ Do you wish to update to version %3?</source>
 Вы хотите обновиться до версии %3?</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1360"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1361"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
@@ -3227,21 +3227,21 @@ You can get version %3 at %2.</source>
 Вы можете получить версию %3: %2.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1253"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1266"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1275"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1326"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1349"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1254"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1267"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1276"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1327"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1350"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1254"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1255"/>
         <source>Warning</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1255"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1256"/>
         <source>Information</source>
         <translation>Информирование</translation>
     </message>
@@ -3364,7 +3364,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="332"/>
-        <location filename="../src/qalculatewindow.cpp" line="583"/>
+        <location filename="../src/qalculatewindow.cpp" line="582"/>
         <source>Functions</source>
         <translation>Функции</translation>
     </message>
@@ -3374,386 +3374,386 @@ You can get version %3 at %2.</source>
         <translation>Переменные и константы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="335"/>
-        <location filename="../src/qalculatewindow.cpp" line="589"/>
+        <location filename="../src/qalculatewindow.cpp" line="334"/>
+        <location filename="../src/qalculatewindow.cpp" line="588"/>
         <source>Units</source>
         <translation>Единицы измерения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="338"/>
-        <location filename="../src/qalculatewindow.cpp" line="596"/>
+        <location filename="../src/qalculatewindow.cpp" line="337"/>
+        <location filename="../src/qalculatewindow.cpp" line="595"/>
         <source>Plot Functions/Data</source>
         <translation>Графики функций/данных</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="339"/>
+        <location filename="../src/qalculatewindow.cpp" line="338"/>
         <source>Floating Point Conversion (IEEE 754)</source>
         <translation>Преобразование чисел с плавающей запятой (IEEE 754)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="340"/>
+        <location filename="../src/qalculatewindow.cpp" line="339"/>
         <source>Calendar Conversion</source>
         <translation>Преобразование календаря</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="344"/>
+        <location filename="../src/qalculatewindow.cpp" line="343"/>
         <source>Update Exchange Rates</source>
         <translation>Обновить курсы валют</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="347"/>
+        <location filename="../src/qalculatewindow.cpp" line="346"/>
         <source>Normal Mode</source>
         <translation>Режим нормальный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="348"/>
+        <location filename="../src/qalculatewindow.cpp" line="347"/>
         <source>RPN Mode</source>
         <translation>Режим ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="349"/>
+        <location filename="../src/qalculatewindow.cpp" line="348"/>
         <source>Chain Mode</source>
         <translation>Режим «цепь»</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="351"/>
+        <location filename="../src/qalculatewindow.cpp" line="350"/>
         <source>Preferences</source>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="353"/>
+        <location filename="../src/qalculatewindow.cpp" line="352"/>
         <source>Help</source>
         <translation>Справка</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="354"/>
+        <location filename="../src/qalculatewindow.cpp" line="353"/>
         <source>Report a Bug</source>
         <translation>Сообщить об ошибке</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="355"/>
+        <location filename="../src/qalculatewindow.cpp" line="354"/>
         <source>Check for Updates</source>
         <translation>Проверить обновления</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="355"/>
         <location filename="../src/qalculatewindow.cpp" line="356"/>
-        <location filename="../src/qalculatewindow.cpp" line="357"/>
-        <location filename="../src/qalculatewindow.cpp" line="1020"/>
+        <location filename="../src/qalculatewindow.cpp" line="1019"/>
         <source>About %1</source>
         <translation>О %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="359"/>
+        <location filename="../src/qalculatewindow.cpp" line="358"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="361"/>
+        <location filename="../src/qalculatewindow.cpp" line="360"/>
         <source>Mode</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="362"/>
+        <location filename="../src/qalculatewindow.cpp" line="361"/>
         <source>Mode (%1)</source>
         <translation>Режим (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="367"/>
-        <location filename="../src/qalculatewindow.cpp" line="370"/>
+        <location filename="../src/qalculatewindow.cpp" line="366"/>
+        <location filename="../src/qalculatewindow.cpp" line="369"/>
         <source>General Display Mode</source>
         <translation>Режим общего отображения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="372"/>
+        <location filename="../src/qalculatewindow.cpp" line="371"/>
         <source>Normal</source>
         <translation>Обычное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="375"/>
+        <location filename="../src/qalculatewindow.cpp" line="374"/>
         <source>Scientific</source>
         <translation>Научное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="378"/>
+        <location filename="../src/qalculatewindow.cpp" line="377"/>
         <source>Engineering</source>
         <translation>Инженерное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="381"/>
+        <location filename="../src/qalculatewindow.cpp" line="380"/>
         <source>Simple</source>
         <translation>Простое</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="384"/>
         <location filename="../src/qalculatewindow.cpp" line="385"/>
-        <location filename="../src/qalculatewindow.cpp" line="386"/>
         <source>Angle Unit</source>
         <translation>Единица измерения углов</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="388"/>
+        <location filename="../src/qalculatewindow.cpp" line="387"/>
         <source>Radians</source>
         <translation>Радианы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="390"/>
+        <location filename="../src/qalculatewindow.cpp" line="389"/>
         <source>Degrees</source>
         <translation>Градусы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="392"/>
+        <location filename="../src/qalculatewindow.cpp" line="391"/>
         <source>Gradians</source>
         <translation>Грады</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="394"/>
         <location filename="../src/qalculatewindow.cpp" line="395"/>
-        <location filename="../src/qalculatewindow.cpp" line="396"/>
         <source>Approximation</source>
         <translation>Приближение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="398"/>
+        <location filename="../src/qalculatewindow.cpp" line="397"/>
         <source>Automatic</source>
         <comment>Automatic approximation</comment>
         <translation>Автоматическое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="400"/>
+        <location filename="../src/qalculatewindow.cpp" line="399"/>
         <source>Dual</source>
         <comment>Dual approximation</comment>
         <translation>Двойное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="402"/>
+        <location filename="../src/qalculatewindow.cpp" line="401"/>
         <source>Exact</source>
         <comment>Exact approximation</comment>
         <translation>Точное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="404"/>
+        <location filename="../src/qalculatewindow.cpp" line="403"/>
         <source>Approximate</source>
         <translation>Приблизительное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="409"/>
+        <location filename="../src/qalculatewindow.cpp" line="408"/>
         <source>Assumptions</source>
         <translation>Предположения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="410"/>
+        <location filename="../src/qalculatewindow.cpp" line="409"/>
         <source>Type</source>
         <comment>Assumptions type</comment>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="412"/>
+        <location filename="../src/qalculatewindow.cpp" line="411"/>
         <source>Number</source>
         <translation>Число</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="414"/>
+        <location filename="../src/qalculatewindow.cpp" line="413"/>
         <source>Real</source>
         <translation>Вещественное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="416"/>
+        <location filename="../src/qalculatewindow.cpp" line="415"/>
         <source>Rational</source>
         <translation>Рациональное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="418"/>
+        <location filename="../src/qalculatewindow.cpp" line="417"/>
         <source>Integer</source>
         <translation>Целое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="420"/>
+        <location filename="../src/qalculatewindow.cpp" line="419"/>
         <source>Boolean</source>
         <translation>Логическое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="422"/>
+        <location filename="../src/qalculatewindow.cpp" line="421"/>
         <source>Sign</source>
         <comment>Assumptions sign</comment>
         <translation>Знак</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="424"/>
+        <location filename="../src/qalculatewindow.cpp" line="423"/>
         <source>Unknown</source>
         <comment>Unknown assumptions sign</comment>
         <translation>Неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="426"/>
+        <location filename="../src/qalculatewindow.cpp" line="425"/>
         <source>Non-zero</source>
         <translation>Ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="428"/>
+        <location filename="../src/qalculatewindow.cpp" line="427"/>
         <source>Positive</source>
         <translation>Положительное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="430"/>
+        <location filename="../src/qalculatewindow.cpp" line="429"/>
         <source>Non-negative</source>
         <translation>Неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="432"/>
+        <location filename="../src/qalculatewindow.cpp" line="431"/>
         <source>Negative</source>
         <translation>Отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="434"/>
+        <location filename="../src/qalculatewindow.cpp" line="433"/>
         <source>Non-positive</source>
         <translation>Не положительное</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="437"/>
         <location filename="../src/qalculatewindow.cpp" line="438"/>
-        <location filename="../src/qalculatewindow.cpp" line="439"/>
         <source>Result Base</source>
         <translation>Основание для результата</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="442"/>
-        <location filename="../src/qalculatewindow.cpp" line="497"/>
+        <location filename="../src/qalculatewindow.cpp" line="441"/>
+        <location filename="../src/qalculatewindow.cpp" line="496"/>
         <source>Binary</source>
         <translation>Двоичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="444"/>
-        <location filename="../src/qalculatewindow.cpp" line="499"/>
+        <location filename="../src/qalculatewindow.cpp" line="443"/>
+        <location filename="../src/qalculatewindow.cpp" line="498"/>
         <source>Octal</source>
         <translation>Восьмеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="446"/>
-        <location filename="../src/qalculatewindow.cpp" line="501"/>
+        <location filename="../src/qalculatewindow.cpp" line="445"/>
+        <location filename="../src/qalculatewindow.cpp" line="500"/>
         <source>Decimal</source>
         <translation>Десятичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="448"/>
-        <location filename="../src/qalculatewindow.cpp" line="503"/>
+        <location filename="../src/qalculatewindow.cpp" line="447"/>
+        <location filename="../src/qalculatewindow.cpp" line="502"/>
         <source>Hexadecimal</source>
         <translation>Шестнадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="451"/>
-        <location filename="../src/qalculatewindow.cpp" line="506"/>
+        <location filename="../src/qalculatewindow.cpp" line="450"/>
+        <location filename="../src/qalculatewindow.cpp" line="505"/>
         <source>Other</source>
         <translation>Другое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="452"/>
-        <location filename="../src/qalculatewindow.cpp" line="507"/>
+        <location filename="../src/qalculatewindow.cpp" line="451"/>
+        <location filename="../src/qalculatewindow.cpp" line="506"/>
         <source>Duodecimal</source>
         <translation>Двенадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="454"/>
+        <location filename="../src/qalculatewindow.cpp" line="453"/>
         <source>Sexagesimal</source>
         <translation>Шестидесятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="456"/>
+        <location filename="../src/qalculatewindow.cpp" line="455"/>
         <source>Time format</source>
         <translation>Формат времени</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="458"/>
-        <location filename="../src/qalculatewindow.cpp" line="509"/>
+        <location filename="../src/qalculatewindow.cpp" line="457"/>
+        <location filename="../src/qalculatewindow.cpp" line="508"/>
         <source>Roman numerals</source>
         <translation>Римские цифры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="460"/>
-        <location filename="../src/qalculatewindow.cpp" line="511"/>
+        <location filename="../src/qalculatewindow.cpp" line="459"/>
+        <location filename="../src/qalculatewindow.cpp" line="510"/>
         <source>Unicode</source>
         <translation>Юникод</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="462"/>
-        <location filename="../src/qalculatewindow.cpp" line="513"/>
+        <location filename="../src/qalculatewindow.cpp" line="461"/>
+        <location filename="../src/qalculatewindow.cpp" line="512"/>
         <source>Bijective base-26</source>
         <translation>Биективное основание-26</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="525"/>
+        <location filename="../src/qalculatewindow.cpp" line="524"/>
         <source>Custom:</source>
         <comment>Number base</comment>
         <translation>Пользовательское:</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="492"/>
         <location filename="../src/qalculatewindow.cpp" line="493"/>
-        <location filename="../src/qalculatewindow.cpp" line="494"/>
         <source>Expression Base</source>
         <translation>Основание для выражения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="478"/>
+        <location filename="../src/qalculatewindow.cpp" line="477"/>
         <source>Other:</source>
         <comment>Number base</comment>
         <translation>Другое:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="545"/>
+        <location filename="../src/qalculatewindow.cpp" line="544"/>
         <source>Precision:</source>
         <translation>Точность:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="552"/>
+        <location filename="../src/qalculatewindow.cpp" line="551"/>
         <source>Min decimals:</source>
         <translation>Минимум цифр:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="559"/>
+        <location filename="../src/qalculatewindow.cpp" line="558"/>
         <source>Max decimals:</source>
         <translation>Максимум цифр:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="562"/>
+        <location filename="../src/qalculatewindow.cpp" line="561"/>
         <source>off</source>
         <comment>Max decimals</comment>
         <translation>выкл</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="572"/>
+        <location filename="../src/qalculatewindow.cpp" line="571"/>
         <source>Convert</source>
         <translation>Перевести</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="574"/>
+        <location filename="../src/qalculatewindow.cpp" line="573"/>
         <source>Convert (%1)</source>
         <translation>Перевести (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="577"/>
+        <location filename="../src/qalculatewindow.cpp" line="576"/>
         <source>Store</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="577"/>
+        <location filename="../src/qalculatewindow.cpp" line="576"/>
         <source>Store (%1)</source>
         <translation>Сохранить (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="583"/>
+        <location filename="../src/qalculatewindow.cpp" line="582"/>
         <source>Functions (%1)</source>
         <translation>Функции (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="616"/>
-        <location filename="../src/qalculatewindow.cpp" line="695"/>
+        <location filename="../src/qalculatewindow.cpp" line="615"/>
+        <location filename="../src/qalculatewindow.cpp" line="694"/>
         <source>Keypad</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="617"/>
+        <location filename="../src/qalculatewindow.cpp" line="616"/>
         <source>Keypad (%1)</source>
         <translation>Клавиатура (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="611"/>
-        <location filename="../src/qalculatewindow.cpp" line="645"/>
+        <location filename="../src/qalculatewindow.cpp" line="610"/>
+        <location filename="../src/qalculatewindow.cpp" line="644"/>
         <source>Number bases</source>
         <translation>Основания систем счисления</translation>
     </message>
@@ -3763,321 +3763,321 @@ You can get version %3 at %2.</source>
         <translation>Единицы измерения…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="336"/>
+        <location filename="../src/qalculatewindow.cpp" line="335"/>
         <source>Data Sets</source>
         <translation>Наборы данных</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="341"/>
+        <location filename="../src/qalculatewindow.cpp" line="340"/>
         <source>Percentage Calculation Tool</source>
         <translation>Инструмент расчёта процентов</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="342"/>
+        <location filename="../src/qalculatewindow.cpp" line="341"/>
         <source>Periodic Table</source>
         <translation>Периодическая таблица</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="589"/>
+        <location filename="../src/qalculatewindow.cpp" line="588"/>
         <source>Units (%1)</source>
         <translation>Единицы измерения (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="596"/>
+        <location filename="../src/qalculatewindow.cpp" line="595"/>
         <source>Plot Functions/Data (%1)</source>
         <translation>Графики функций/данных (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="612"/>
+        <location filename="../src/qalculatewindow.cpp" line="611"/>
         <source>Number Bases (%1)</source>
         <translation>Основания систем счисления (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="649"/>
+        <location filename="../src/qalculatewindow.cpp" line="648"/>
         <source>Binary:</source>
         <translation>Двоичное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="651"/>
+        <location filename="../src/qalculatewindow.cpp" line="650"/>
         <source>Octal:</source>
         <translation>Восьмеричное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="653"/>
+        <location filename="../src/qalculatewindow.cpp" line="652"/>
         <source>Decimal:</source>
         <translation>Десятичное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="655"/>
+        <location filename="../src/qalculatewindow.cpp" line="654"/>
         <source>Hexadecimal:</source>
         <translation>Шестнадцатеричное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="702"/>
+        <location filename="../src/qalculatewindow.cpp" line="701"/>
         <source>RPN Stack</source>
         <translation>Стек ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="721"/>
+        <location filename="../src/qalculatewindow.cpp" line="720"/>
         <source>Rotate the stack or move the selected register up (%1)</source>
         <translation>Повернуть стек или переместить выбранный регистр вверх (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="724"/>
+        <location filename="../src/qalculatewindow.cpp" line="723"/>
         <source>Rotate the stack or move the selected register down (%1)</source>
         <translation>Повернуть стек или переместить выбранный регистр вниз (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="727"/>
+        <location filename="../src/qalculatewindow.cpp" line="726"/>
         <source>Swap the top two values or move the selected value to the top of the stack (%1)</source>
         <translation>Поменять местами два верхних значения или переместить выбранное значение в вершину стека (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="730"/>
+        <location filename="../src/qalculatewindow.cpp" line="729"/>
         <source>Copy the selected or top value to the top of the stack (%1)</source>
         <translation>Скопировать выбранное или верхнее значение в вершину стека (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="733"/>
+        <location filename="../src/qalculatewindow.cpp" line="732"/>
         <source>Enter the top value from before the last numeric operation (%1)</source>
         <translation>Введите верхнее значение перед последней числовой операцией (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="736"/>
+        <location filename="../src/qalculatewindow.cpp" line="735"/>
         <source>Delete the top or selected value (%1)</source>
         <translation>Удалить верхнее или выбранное значение (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="739"/>
+        <location filename="../src/qalculatewindow.cpp" line="738"/>
         <source>Clear the RPN stack (%1)</source>
         <translation>Очистить стек ПОЛИЗ (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="831"/>
+        <location filename="../src/qalculatewindow.cpp" line="830"/>
         <source>New Function…</source>
         <translation>Новая функция…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1020"/>
+        <location filename="../src/qalculatewindow.cpp" line="1019"/>
         <source>Powerful and easy to use calculator</source>
         <translation>Мощный и простой в использовании калькулятор</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2327"/>
+        <location filename="../src/qalculatewindow.cpp" line="2326"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>Не удалось записать определения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2835"/>
+        <location filename="../src/qalculatewindow.cpp" line="2834"/>
         <source>hexadecimal</source>
         <translation>шестнадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2838"/>
+        <location filename="../src/qalculatewindow.cpp" line="2837"/>
         <source>octal</source>
         <translation>восьмеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2841"/>
+        <location filename="../src/qalculatewindow.cpp" line="2840"/>
         <source>decimal</source>
         <translation>десятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2844"/>
+        <location filename="../src/qalculatewindow.cpp" line="2843"/>
         <source>duodecimal</source>
         <translation>двенадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2847"/>
+        <location filename="../src/qalculatewindow.cpp" line="2846"/>
         <source>binary</source>
         <translation>двоичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2850"/>
+        <location filename="../src/qalculatewindow.cpp" line="2849"/>
         <source>roman</source>
         <translation>римское число</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2853"/>
+        <location filename="../src/qalculatewindow.cpp" line="2852"/>
         <source>bijective</source>
         <translation>биективное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2856"/>
-        <location filename="../src/qalculatewindow.cpp" line="2859"/>
-        <location filename="../src/qalculatewindow.cpp" line="2862"/>
+        <location filename="../src/qalculatewindow.cpp" line="2855"/>
+        <location filename="../src/qalculatewindow.cpp" line="2858"/>
+        <location filename="../src/qalculatewindow.cpp" line="2861"/>
         <source>sexagesimal</source>
         <translation>шестидесятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2865"/>
-        <location filename="../src/qalculatewindow.cpp" line="2868"/>
+        <location filename="../src/qalculatewindow.cpp" line="2864"/>
+        <location filename="../src/qalculatewindow.cpp" line="2867"/>
         <source>latitude</source>
         <translation>широта</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2871"/>
-        <location filename="../src/qalculatewindow.cpp" line="2874"/>
+        <location filename="../src/qalculatewindow.cpp" line="2870"/>
+        <location filename="../src/qalculatewindow.cpp" line="2873"/>
         <source>longitude</source>
         <translation>долгота</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2892"/>
+        <location filename="../src/qalculatewindow.cpp" line="2891"/>
         <source>time</source>
         <translation>время</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2943"/>
+        <location filename="../src/qalculatewindow.cpp" line="2942"/>
         <source>Time zone parsing failed.</source>
         <translation>Не удалось выполнить синтаксический анализ часового пояса.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2966"/>
+        <location filename="../src/qalculatewindow.cpp" line="2965"/>
         <source>bases</source>
         <translation>основания</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2975"/>
+        <location filename="../src/qalculatewindow.cpp" line="2974"/>
         <source>calendars</source>
         <translation>календари</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2984"/>
+        <location filename="../src/qalculatewindow.cpp" line="2983"/>
         <source>rectangular</source>
         <translation>прямоугоная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2984"/>
+        <location filename="../src/qalculatewindow.cpp" line="2983"/>
         <source>cartesian</source>
         <translation>декартова</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2995"/>
+        <location filename="../src/qalculatewindow.cpp" line="2994"/>
         <source>exponential</source>
         <translation>экспоненциальная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3006"/>
+        <location filename="../src/qalculatewindow.cpp" line="3005"/>
         <source>polar</source>
         <translation>полярная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3030"/>
+        <location filename="../src/qalculatewindow.cpp" line="3029"/>
         <source>phasor</source>
         <translation>фазовая</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3030"/>
+        <location filename="../src/qalculatewindow.cpp" line="3029"/>
         <source>angle</source>
         <translation>угловая</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3041"/>
+        <location filename="../src/qalculatewindow.cpp" line="3040"/>
         <source>optimal</source>
         <translation>оптимально</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3052"/>
-        <location filename="../src/qalculatewindow.cpp" line="3098"/>
+        <location filename="../src/qalculatewindow.cpp" line="3051"/>
+        <location filename="../src/qalculatewindow.cpp" line="3097"/>
         <source>base</source>
         <translation>основание</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3063"/>
+        <location filename="../src/qalculatewindow.cpp" line="3062"/>
         <source>mixed</source>
         <translation>смешано</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3077"/>
+        <location filename="../src/qalculatewindow.cpp" line="3076"/>
         <source>fraction</source>
         <translation>дробь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3080"/>
+        <location filename="../src/qalculatewindow.cpp" line="3079"/>
         <source>factors</source>
         <translation>множители</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3089"/>
+        <location filename="../src/qalculatewindow.cpp" line="3088"/>
         <source>partial fraction</source>
         <translation>частичная дробь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3139"/>
+        <location filename="../src/qalculatewindow.cpp" line="3138"/>
         <source>factorize</source>
         <translation>разложить на множители</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3142"/>
+        <location filename="../src/qalculatewindow.cpp" line="3141"/>
         <source>expand</source>
         <translation>раскрывать</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="3312"/>
         <location filename="../src/qalculatewindow.cpp" line="3313"/>
         <location filename="../src/qalculatewindow.cpp" line="3314"/>
-        <location filename="../src/qalculatewindow.cpp" line="3315"/>
-        <location filename="../src/qalculatewindow.cpp" line="3715"/>
+        <location filename="../src/qalculatewindow.cpp" line="3714"/>
         <source>Calculating…</source>
         <translation>Расчёт…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3314"/>
-        <location filename="../src/qalculatewindow.cpp" line="3724"/>
-        <location filename="../src/qalculatewindow.cpp" line="4223"/>
+        <location filename="../src/qalculatewindow.cpp" line="3313"/>
+        <location filename="../src/qalculatewindow.cpp" line="3723"/>
+        <location filename="../src/qalculatewindow.cpp" line="4222"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3368"/>
-        <location filename="../src/qalculatewindow.cpp" line="4086"/>
+        <location filename="../src/qalculatewindow.cpp" line="3367"/>
+        <location filename="../src/qalculatewindow.cpp" line="4085"/>
         <source>RPN Operation</source>
         <translation>ПОЛИЗ операция</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3703"/>
+        <location filename="../src/qalculatewindow.cpp" line="3702"/>
         <source>Factorizing…</source>
         <translation>Факторизация…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3707"/>
+        <location filename="../src/qalculatewindow.cpp" line="3706"/>
         <source>Expanding partial fractions…</source>
         <translation>Расширение дробных чисел…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3711"/>
+        <location filename="../src/qalculatewindow.cpp" line="3710"/>
         <source>Expanding…</source>
         <translation>Расширение…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3719"/>
+        <location filename="../src/qalculatewindow.cpp" line="3718"/>
         <source>Converting…</source>
         <translation>Преобразование…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4082"/>
+        <location filename="../src/qalculatewindow.cpp" line="4081"/>
         <source>RPN Register Moved</source>
         <translation>Регистр ПОЛИЗ перемещён</translation>
     </message>
     <message>
+        <location filename="../src/qalculatewindow.cpp" line="4221"/>
         <location filename="../src/qalculatewindow.cpp" line="4222"/>
         <location filename="../src/qalculatewindow.cpp" line="4223"/>
-        <location filename="../src/qalculatewindow.cpp" line="4224"/>
         <source>Processing…</source>
         <translation>Обработка…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4329"/>
-        <location filename="../src/qalculatewindow.cpp" line="5782"/>
+        <location filename="../src/qalculatewindow.cpp" line="4328"/>
+        <location filename="../src/qalculatewindow.cpp" line="5781"/>
         <source>Matrix</source>
         <translation>Матрица</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4435"/>
+        <location filename="../src/qalculatewindow.cpp" line="4434"/>
         <source>Temperature Calculation Mode</source>
         <translation>Режим расчёта температуры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4441"/>
+        <location filename="../src/qalculatewindow.cpp" line="4440"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -4086,54 +4086,54 @@ Please select temperature calculation mode
 (режим позже можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4444"/>
+        <location filename="../src/qalculatewindow.cpp" line="4443"/>
         <source>Absolute</source>
         <translation>Абсолютный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4448"/>
+        <location filename="../src/qalculatewindow.cpp" line="4447"/>
         <source>Relative</source>
         <translation>Относительный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4452"/>
+        <location filename="../src/qalculatewindow.cpp" line="4451"/>
         <source>Hybrid</source>
         <translation>Гибридный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4493"/>
+        <location filename="../src/qalculatewindow.cpp" line="4492"/>
         <source>Interpretation of dots</source>
         <translation>Использование точки</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4499"/>
+        <location filename="../src/qalculatewindow.cpp" line="4498"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>Выберите использование точки («.»)
 (позже это можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4502"/>
+        <location filename="../src/qalculatewindow.cpp" line="4501"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>Точка и запятая в качестве десятичных разделителей</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4506"/>
+        <location filename="../src/qalculatewindow.cpp" line="4505"/>
         <source>Dot as thousands separator</source>
         <translation>Точка как разделитель тысяч</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4510"/>
+        <location filename="../src/qalculatewindow.cpp" line="4509"/>
         <source>Only dot as decimal separator</source>
         <translation>Только точка в качестве десятичного разделителя</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4538"/>
+        <location filename="../src/qalculatewindow.cpp" line="4537"/>
         <source>Parsing Mode</source>
         <translation>Режим анализа</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4544"/>
+        <location filename="../src/qalculatewindow.cpp" line="4543"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -4142,113 +4142,113 @@ Please select interpretation of expressions with implicit multiplication
 (позже это можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4547"/>
+        <location filename="../src/qalculatewindow.cpp" line="4546"/>
         <source>Implicit multiplication first</source>
         <translation>Сначала анализировать неявное умножение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4552"/>
+        <location filename="../src/qalculatewindow.cpp" line="4551"/>
         <source>Conventional</source>
         <translation>Общепринятый синтаксический анализ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4557"/>
+        <location filename="../src/qalculatewindow.cpp" line="4556"/>
         <source>Adaptive</source>
         <translation>Адаптивный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5206"/>
+        <location filename="../src/qalculatewindow.cpp" line="5205"/>
         <source>Gnuplot was not found</source>
         <translation>Программа Gnuplot не найдена</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5206"/>
+        <location filename="../src/qalculatewindow.cpp" line="5205"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>Для построения графиков %1 (%2) должен быть установлен дополнительно и находиться по переменной окружения PATH.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5398"/>
+        <location filename="../src/qalculatewindow.cpp" line="5397"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5436"/>
+        <location filename="../src/qalculatewindow.cpp" line="5435"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>Ввод</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5436"/>
+        <location filename="../src/qalculatewindow.cpp" line="5435"/>
         <source>Calculate</source>
         <translation>Рассчитать</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5437"/>
+        <location filename="../src/qalculatewindow.cpp" line="5436"/>
         <source>Apply to Stack</source>
         <translation>Применить к стеку</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5437"/>
+        <location filename="../src/qalculatewindow.cpp" line="5436"/>
         <source>Insert</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5428"/>
+        <location filename="../src/qalculatewindow.cpp" line="5427"/>
         <source>Keep open</source>
         <translation>Держать открытым</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5453"/>
+        <location filename="../src/qalculatewindow.cpp" line="5452"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5455"/>
+        <location filename="../src/qalculatewindow.cpp" line="5454"/>
         <source>Argument</source>
         <translation>Аргумент</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5468"/>
+        <location filename="../src/qalculatewindow.cpp" line="5467"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5523"/>
+        <location filename="../src/qalculatewindow.cpp" line="5522"/>
         <source>True</source>
         <translation>Истина</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5526"/>
+        <location filename="../src/qalculatewindow.cpp" line="5525"/>
         <source>False</source>
         <translation>Ложь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5552"/>
+        <location filename="../src/qalculatewindow.cpp" line="5551"/>
         <source>Info</source>
         <translation>Инфо</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5602"/>
-        <location filename="../src/qalculatewindow.cpp" line="5610"/>
+        <location filename="../src/qalculatewindow.cpp" line="5601"/>
+        <location filename="../src/qalculatewindow.cpp" line="5609"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5973"/>
+        <location filename="../src/qalculatewindow.cpp" line="5972"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Не удалось открыть %1.
 %2</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1020"/>
+        <location filename="../src/qalculatewindow.cpp" line="1019"/>
         <source>License: GNU General Public License version 2 or later</source>
         <translation>Лицензия: GNU General Public License, версия 2 или новее</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2327"/>
+        <location filename="../src/qalculatewindow.cpp" line="2326"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -4436,7 +4436,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="64"/>
-        <location filename="../src/unitsdialog.cpp" line="698"/>
+        <location filename="../src/unitsdialog.cpp" line="713"/>
         <source>Unit</source>
         <translation>Единица измерения</translation>
     </message>
@@ -4452,8 +4452,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="89"/>
-        <location filename="../src/unitsdialog.cpp" line="582"/>
-        <location filename="../src/unitsdialog.cpp" line="585"/>
+        <location filename="../src/unitsdialog.cpp" line="595"/>
+        <location filename="../src/unitsdialog.cpp" line="598"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -4478,39 +4478,44 @@ Do you want to overwrite it?</source>
         <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="587"/>
+        <location filename="../src/unitsdialog.cpp" line="600"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="775"/>
+        <location filename="../src/unitsdialog.cpp" line="793"/>
         <source>All</source>
-        <comment>All functions</comment>
+        <comment>All units</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="320"/>
-        <location filename="../src/unitsdialog.cpp" line="393"/>
-        <location filename="../src/unitsdialog.cpp" line="818"/>
+        <source>All</source>
+        <comment>All functions</comment>
+        <translation type="vanished">Все</translation>
+    </message>
+    <message>
+        <location filename="../src/unitsdialog.cpp" line="318"/>
+        <location filename="../src/unitsdialog.cpp" line="399"/>
+        <location filename="../src/unitsdialog.cpp" line="836"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="770"/>
+        <location filename="../src/unitsdialog.cpp" line="788"/>
         <source>User units</source>
         <translation>Пользовательские единицы</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="765"/>
+        <location filename="../src/unitsdialog.cpp" line="783"/>
         <source>Favorites</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="315"/>
-        <location filename="../src/unitsdialog.cpp" line="360"/>
-        <location filename="../src/unitsdialog.cpp" line="388"/>
-        <location filename="../src/unitsdialog.cpp" line="492"/>
-        <location filename="../src/unitsdialog.cpp" line="826"/>
+        <location filename="../src/unitsdialog.cpp" line="312"/>
+        <location filename="../src/unitsdialog.cpp" line="365"/>
+        <location filename="../src/unitsdialog.cpp" line="393"/>
+        <location filename="../src/unitsdialog.cpp" line="505"/>
+        <location filename="../src/unitsdialog.cpp" line="844"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -4623,13 +4628,13 @@ Do you want to overwrite it?</source>
 Вы хотите её перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="323"/>
+        <location filename="../src/variableeditdialog.cpp" line="324"/>
         <source>Edit Variable</source>
         <translation>Изменить переменную</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="337"/>
-        <location filename="../src/variableeditdialog.cpp" line="383"/>
+        <location filename="../src/variableeditdialog.cpp" line="338"/>
+        <location filename="../src/variableeditdialog.cpp" line="384"/>
         <source>New Variable</source>
         <translation>Новая переменная</translation>
     </message>
@@ -4654,7 +4659,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="64"/>
-        <location filename="../src/variablesdialog.cpp" line="507"/>
+        <location filename="../src/variablesdialog.cpp" line="523"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
@@ -4691,8 +4696,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="95"/>
-        <location filename="../src/variablesdialog.cpp" line="431"/>
-        <location filename="../src/variablesdialog.cpp" line="434"/>
+        <location filename="../src/variablesdialog.cpp" line="445"/>
+        <location filename="../src/variablesdialog.cpp" line="448"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -4712,119 +4717,124 @@ Do you want to overwrite it?</source>
         <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="382"/>
+        <location filename="../src/variablesdialog.cpp" line="396"/>
         <source>a matrix</source>
         <translation>матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="384"/>
+        <location filename="../src/variablesdialog.cpp" line="398"/>
         <source>a vector</source>
         <translation>вектор</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="402"/>
+        <location filename="../src/variablesdialog.cpp" line="416"/>
         <source>positive</source>
         <translation>положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="403"/>
+        <location filename="../src/variablesdialog.cpp" line="417"/>
         <source>non-positive</source>
         <translation>не положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="404"/>
+        <location filename="../src/variablesdialog.cpp" line="418"/>
         <source>negative</source>
         <translation>отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="405"/>
+        <location filename="../src/variablesdialog.cpp" line="419"/>
         <source>non-negative</source>
         <translation>неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="406"/>
+        <location filename="../src/variablesdialog.cpp" line="420"/>
         <source>non-zero</source>
         <translation>ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="412"/>
+        <location filename="../src/variablesdialog.cpp" line="426"/>
         <source>integer</source>
         <translation>целое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="413"/>
+        <location filename="../src/variablesdialog.cpp" line="427"/>
         <source>boolean</source>
         <translation>логическое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="414"/>
+        <location filename="../src/variablesdialog.cpp" line="428"/>
         <source>rational</source>
         <translation>рациональное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="415"/>
+        <location filename="../src/variablesdialog.cpp" line="429"/>
         <source>real</source>
         <translation>вещественное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="416"/>
+        <location filename="../src/variablesdialog.cpp" line="430"/>
         <source>complex</source>
         <translation>комплексное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="417"/>
+        <location filename="../src/variablesdialog.cpp" line="431"/>
         <source>number</source>
         <translation>число</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="418"/>
+        <location filename="../src/variablesdialog.cpp" line="432"/>
         <source>not matrix</source>
         <translation>не матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="421"/>
+        <location filename="../src/variablesdialog.cpp" line="435"/>
         <source>unknown</source>
         <translation>неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="424"/>
+        <location filename="../src/variablesdialog.cpp" line="438"/>
         <source>Default assumptions</source>
         <translation>Предположения по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="436"/>
+        <location filename="../src/variablesdialog.cpp" line="450"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="574"/>
+        <location filename="../src/variablesdialog.cpp" line="593"/>
         <source>All</source>
-        <comment>All functions</comment>
+        <comment>All variables</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="204"/>
-        <location filename="../src/variablesdialog.cpp" line="269"/>
-        <location filename="../src/variablesdialog.cpp" line="617"/>
+        <source>All</source>
+        <comment>All functions</comment>
+        <translation type="vanished">Все</translation>
+    </message>
+    <message>
+        <location filename="../src/variablesdialog.cpp" line="203"/>
+        <location filename="../src/variablesdialog.cpp" line="276"/>
+        <location filename="../src/variablesdialog.cpp" line="636"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="569"/>
+        <location filename="../src/variablesdialog.cpp" line="588"/>
         <source>User variables</source>
         <translation>Пользовательские переменные</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="564"/>
+        <location filename="../src/variablesdialog.cpp" line="583"/>
         <source>Favorites</source>
         <translation>Избранное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="199"/>
-        <location filename="../src/variablesdialog.cpp" line="236"/>
-        <location filename="../src/variablesdialog.cpp" line="264"/>
-        <location filename="../src/variablesdialog.cpp" line="356"/>
-        <location filename="../src/variablesdialog.cpp" line="625"/>
+        <location filename="../src/variablesdialog.cpp" line="197"/>
+        <location filename="../src/variablesdialog.cpp" line="242"/>
+        <location filename="../src/variablesdialog.cpp" line="270"/>
+        <location filename="../src/variablesdialog.cpp" line="370"/>
+        <location filename="../src/variablesdialog.cpp" line="644"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>

@@ -1111,13 +1111,14 @@ std::string QalculateQtSettings::localizeExpression(std::string str, bool unit_e
 
 std::string QalculateQtSettings::unlocalizeExpression(std::string str) {
 	ParseOptions pa = evalops.parse_options; pa.base = 10;
-	str = CALCULATOR->localizeExpression(str, pa);
+	str = CALCULATOR->unlocalizeExpression(str, pa);
 	CALCULATOR->parseSigns(str);
 	return str;
 }
 
 void QalculateQtSettings::updateMessagePrintOptions() {
 	PrintOptions message_printoptions = printops;
+	message_printoptions.is_approximate = NULL;
 	message_printoptions.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 	message_printoptions.show_ending_zeroes = false;
 	message_printoptions.base = 10;

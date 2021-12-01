@@ -286,8 +286,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		size_t i_answer = -1;
 		if(!initial_load) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
 		QFontMetrics fm(font());
-		int w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
-		str += "<tr><td valign=\"center\">";
+		int w = fm.boundingRect("#9999").width();
+		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w); str += "\">";
+		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
 		if(!initial_load && (dual_approx || i == 0)) {
 			if(expression.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
 			QString sref;
