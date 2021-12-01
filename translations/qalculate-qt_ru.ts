@@ -4,140 +4,140 @@
 <context>
     <name>ArgumentEditDialog</name>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="462"/>
-        <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="466"/>
-        <source>Type:</source>
-        <translation type="unfinished">Тип:</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="469"/>
-        <source>Free</source>
-        <translation type="unfinished">Произвольное значение</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="470"/>
-        <source>Number</source>
-        <translation type="unfinished">Число</translation>
-    </message>
-    <message>
         <location filename="../src/functioneditdialog.cpp" line="471"/>
-        <source>Integer</source>
-        <translation type="unfinished">Целое</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="472"/>
-        <source>Symbol</source>
-        <translation type="unfinished">Символ</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="473"/>
-        <source>Text</source>
-        <translation type="unfinished">Текст</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="474"/>
-        <source>Date</source>
-        <translation type="unfinished">Дата</translation>
+        <source>Name:</source>
+        <translation>Имя:</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="475"/>
-        <source>Vector</source>
-        <translation type="unfinished">Вектор</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="476"/>
-        <source>Matrix</source>
-        <translation type="unfinished">Матрица</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="477"/>
-        <source>Boolean</source>
-        <translation type="unfinished">Логическое</translation>
+        <source>Type:</source>
+        <translation>Тип:</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="478"/>
-        <source>Angle</source>
-        <translation type="unfinished">Угол</translation>
+        <source>Free</source>
+        <translation>Произвольное значение</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="479"/>
-        <source>Object</source>
-        <translation type="unfinished">Объект</translation>
+        <source>Number</source>
+        <translation>Число</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="480"/>
-        <source>Function</source>
-        <translation type="unfinished">Функция</translation>
+        <source>Integer</source>
+        <translation>Целое</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="481"/>
-        <source>Unit</source>
-        <translation type="unfinished">Единица измерения</translation>
+        <source>Symbol</source>
+        <translation>Символ</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="482"/>
-        <source>Variable</source>
-        <translation type="unfinished">Переменная</translation>
+        <source>Text</source>
+        <translation>Текст</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="483"/>
-        <source>File</source>
-        <translation type="unfinished">Файл</translation>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="484"/>
+        <source>Vector</source>
+        <translation>Вектор</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="485"/>
-        <source>Enable rules and type test</source>
-        <translation type="unfinished">Включить правила и проверку типа</translation>
+        <source>Matrix</source>
+        <translation>Матрица</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="486"/>
+        <source>Boolean</source>
+        <translation>Логическое</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="487"/>
-        <source>Custom condition:</source>
-        <translation type="unfinished">Условие:</translation>
+        <source>Angle</source>
+        <translation>Угол</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="488"/>
+        <source>Object</source>
+        <translation>Объект</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="489"/>
-        <source>For example if argument is a matrix that must have equal number of rows and columns: rows(\x) = columns(\x)</source>
-        <translation type="unfinished">Например, если аргумент - это матрица, которая должна иметь равное количество строк и столбцов: строки(\\x) = столбцы(\\x)</translation>
+        <source>Function</source>
+        <translation>Функция</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="490"/>
+        <source>Unit</source>
+        <translation>Единица измерения</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="491"/>
-        <source>Allow matrix</source>
-        <translation type="unfinished">Разрешить матрицы</translation>
+        <source>Variable</source>
+        <translation>Переменная</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="493"/>
-        <source>Forbid zero</source>
-        <translation type="unfinished">Запретить ноль</translation>
+        <location filename="../src/functioneditdialog.cpp" line="492"/>
+        <source>File</source>
+        <translation>Файл</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="495"/>
-        <source>Handle vector</source>
-        <translation type="unfinished">Обращаться с вектором</translation>
+        <location filename="../src/functioneditdialog.cpp" line="494"/>
+        <source>Enable rules and type test</source>
+        <translation>Включить правила и проверку типа</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="496"/>
-        <source>Calculate function for each separate element in vector.</source>
-        <translation type="unfinished">Вычислить функцию для каждого отдельного элемента вектора.</translation>
+        <source>Custom condition:</source>
+        <translation>Условие:</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="498"/>
-        <source>Min</source>
-        <translation type="unfinished">Мин</translation>
+        <source>For example if argument is a matrix that must have equal number of rows and columns: rows(\x) = columns(\x)</source>
+        <translation>Например, если аргумент - это матрица, которая должна иметь равное количество строк и столбцов: строки(\\x) = столбцы(\\x)</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="500"/>
+        <source>Allow matrix</source>
+        <translation>Разрешить матрицы</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="502"/>
-        <location filename="../src/functioneditdialog.cpp" line="512"/>
-        <source>Include equals</source>
-        <translation type="unfinished">Включая равенства</translation>
+        <source>Forbid zero</source>
+        <translation>Запретить ноль</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="504"/>
+        <source>Handle vector</source>
+        <translation>Обращаться с вектором</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="505"/>
+        <source>Calculate function for each separate element in vector.</source>
+        <translation>Вычислить функцию для каждого отдельного элемента вектора.</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="507"/>
+        <source>Min</source>
+        <translation>Мин</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="511"/>
+        <location filename="../src/functioneditdialog.cpp" line="521"/>
+        <source>Include equals</source>
+        <translation>Включая равенства</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="513"/>
         <source>Max</source>
-        <translation type="unfinished">Макс</translation>
+        <translation>Макс</translation>
     </message>
 </context>
 <context>
@@ -361,32 +361,32 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="614"/>
         <source>%1:</source>
-        <translation type="unfinished">%1:</translation>
+        <translation>%1:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="626"/>
         <source>Default</source>
-        <translation type="unfinished">По умолчанию</translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="627"/>
         <source>Approximate</source>
-        <translation type="unfinished">Приблизительное</translation>
+        <translation>Приблизительное</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="628"/>
         <source>Exact</source>
-        <translation type="unfinished">Точное</translation>
+        <translation>Точное</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="710"/>
         <source>Edit Data Object</source>
-        <translation type="unfinished">Изменить объект данных</translation>
+        <translation>Изменить объект данных</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="723"/>
         <source>New Data Object</source>
-        <translation type="unfinished">Новый объект данных</translation>
+        <translation>Новый объект данных</translation>
     </message>
 </context>
 <context>
@@ -394,77 +394,73 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="39"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
-    </message>
-    <message>
-        <source>Title:</source>
-        <translation type="obsolete">Заголовок:</translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="48"/>
         <source>Descriptive name:</source>
-        <translation type="unfinished">Краткое описание:</translation>
+        <translation>Краткое описание:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="51"/>
         <source>Description:</source>
-        <translation type="unfinished">Расширенное описание:</translation>
+        <translation>Расширенное описание:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="54"/>
         <source>Value type:</source>
-        <translation type="unfinished">Тип значения:</translation>
+        <translation>Тип значения:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="57"/>
         <source>Expression</source>
-        <translation type="unfinished">Выражение</translation>
+        <translation>Выражение</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="58"/>
         <source>Number</source>
-        <translation type="unfinished">Число</translation>
+        <translation>Число</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="59"/>
         <source>Text</source>
-        <translation type="unfinished">Текст</translation>
+        <translation>Текст</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="62"/>
         <source>Unit expression:</source>
-        <translation type="unfinished">Выражение единицы измерения:</translation>
+        <translation>Выражение единицы измерения:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="65"/>
         <source>Use as key</source>
-        <translation type="unfinished">Использовать как ключ</translation>
+        <translation>Использовать как ключ</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="67"/>
         <source>Case sensitive value</source>
-        <translation type="unfinished">Значение с учётом регистра</translation>
+        <translation>Значение с учётом регистра</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="69"/>
         <source>Approximate value</source>
-        <translation type="unfinished">Приближённое значение</translation>
+        <translation>Приближённое значение</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="71"/>
         <source>Value uses brackets</source>
-        <translation type="unfinished">Значение использует скобки</translation>
+        <translation>Значение использует скобки</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="74"/>
         <source>Hide</source>
-        <translation type="unfinished">Скрыть</translation>
+        <translation>Скрыть</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="167"/>
         <location filename="../src/dataseteditdialog.cpp" line="180"/>
         <source>Edit Data Property</source>
-        <translation type="unfinished">Изменить свойство данных</translation>
+        <translation>Изменить свойство данных</translation>
     </message>
 </context>
 <context>
@@ -472,161 +468,157 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="204"/>
         <source>General</source>
-        <translation type="unfinished">Основное</translation>
+        <translation>Основное</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="205"/>
         <source>Properties</source>
-        <translation type="unfinished">Свойства</translation>
+        <translation>Свойства</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="206"/>
         <source>Function</source>
-        <translation type="unfinished">Функция</translation>
-    </message>
-    <message>
-        <source>Title:</source>
-        <translation type="obsolete">Заголовок:</translation>
+        <translation>Функция</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="208"/>
         <source>Descriptive name:</source>
-        <translation type="unfinished">Краткое описание:</translation>
+        <translation>Краткое описание:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="211"/>
         <source>Data file:</source>
-        <translation type="unfinished">Файл данных:</translation>
+        <translation>Файл данных:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="214"/>
         <source>Description:</source>
-        <translation type="unfinished">Расширенное описание:</translation>
+        <translation>Расширенное описание:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="217"/>
         <source>Copyright:</source>
-        <translation type="unfinished">Авторские права:</translation>
+        <translation>Авторские права:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="227"/>
         <location filename="../src/dataseteditdialog.cpp" line="568"/>
         <source>Title</source>
-        <translation type="unfinished">Заголовок</translation>
+        <translation>Заголовок</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="228"/>
         <location filename="../src/dataseteditdialog.cpp" line="569"/>
         <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="229"/>
         <location filename="../src/dataseteditdialog.cpp" line="570"/>
         <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <translation>Тип</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="236"/>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Добавить</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="238"/>
         <source>Edit</source>
-        <translation type="unfinished">Правка</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="241"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="246"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Имя:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="255"/>
         <source>Object argument name:</source>
-        <translation type="unfinished">Имя аргумента объекта:</translation>
+        <translation>Имя аргумента объекта:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="258"/>
         <source>Property argument name:</source>
-        <translation type="unfinished">Имя аргумента свойства:</translation>
+        <translation>Имя аргумента свойства:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="261"/>
         <source>Default property:</source>
-        <translation type="unfinished">Свойство по умолчанию:</translation>
+        <translation>Свойство по умолчанию:</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="313"/>
         <source>text</source>
-        <translation type="unfinished">текст</translation>
+        <translation>текст</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="318"/>
         <location filename="../src/dataseteditdialog.cpp" line="326"/>
         <source>approximate</source>
-        <translation type="unfinished">приблизительно</translation>
+        <translation>приблизительно</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="321"/>
         <source>number</source>
-        <translation type="unfinished">число</translation>
+        <translation>число</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="329"/>
         <source>expression</source>
-        <translation type="unfinished">выражение</translation>
+        <translation>выражение</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="335"/>
         <source>key</source>
-        <translation type="unfinished">ключ</translation>
+        <translation>ключ</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="429"/>
         <location filename="../src/dataseteditdialog.cpp" line="478"/>
         <source>Question</source>
-        <translation type="unfinished">Вопрос</translation>
+        <translation>Вопрос</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="429"/>
         <location filename="../src/dataseteditdialog.cpp" line="478"/>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
-        <translation type="unfinished">Функция с таким именем уже существует.
+        <translation>Функция с таким именем уже существует.
 Хотите перезаписать функцию?</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="438"/>
         <source>Data Sets</source>
-        <translation type="unfinished">Наборы данных</translation>
+        <translation>Наборы данных</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="441"/>
         <location filename="../src/dataseteditdialog.cpp" line="491"/>
         <source>Object</source>
-        <translation type="unfinished">Объект</translation>
+        <translation>Объект</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="446"/>
         <location filename="../src/dataseteditdialog.cpp" line="496"/>
         <source>Property</source>
-        <translation type="unfinished">Свойство</translation>
+        <translation>Свойство</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="583"/>
         <source>Edit Data Set</source>
-        <translation type="unfinished">Изменить набор данных</translation>
+        <translation>Изменить набор данных</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="596"/>
         <source>New Data Set</source>
-        <translation type="unfinished">Новый набор данных</translation>
+        <translation>Новый набор данных</translation>
     </message>
 </context>
 <context>
@@ -634,65 +626,65 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="33"/>
         <source>Data Sets</source>
-        <translation type="unfinished">Наборы данных</translation>
+        <translation>Наборы данных</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="43"/>
         <source>Data sets:</source>
-        <translation type="unfinished">Наборы данных:</translation>
+        <translation>Наборы данных:</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="52"/>
         <location filename="../src/datasetsdialog.cpp" line="75"/>
         <source>New…</source>
-        <translation type="unfinished">Новая…</translation>
+        <translation>Новая…</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="54"/>
         <location filename="../src/datasetsdialog.cpp" line="78"/>
         <source>Edit…</source>
-        <translation type="unfinished">Правка…</translation>
+        <translation>Правка…</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="57"/>
         <location filename="../src/datasetsdialog.cpp" line="81"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="64"/>
         <source>Objects:</source>
-        <translation type="unfinished">Объекты:</translation>
+        <translation>Объекты:</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="88"/>
         <source>Data set description:</source>
-        <translation type="unfinished">Описание набора данных:</translation>
+        <translation>Описание набора данных:</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="95"/>
         <source>Object attributes:</source>
-        <translation type="unfinished">Атрибуты объекта:</translation>
+        <translation>Атрибуты объекта:</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="274"/>
         <source>Properties</source>
-        <translation type="unfinished">Свойства</translation>
+        <translation>Свойства</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="290"/>
         <source>key</source>
-        <translation type="unfinished">ключ</translation>
+        <translation>ключ</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="305"/>
         <source>Data Retrieval Function</source>
-        <translation type="unfinished">Функция поиска данных</translation>
+        <translation>Функция поиска данных</translation>
     </message>
     <message>
         <location filename="../src/datasetsdialog.cpp" line="332"/>
         <source>argument</source>
-        <translation type="unfinished">аргумент</translation>
+        <translation>аргумент</translation>
     </message>
 </context>
 <context>
@@ -1031,22 +1023,22 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1697"/>
         <source>Expression Status</source>
-        <translation type="unfinished">Статус выражения</translation>
+        <translation>Статус выражения</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1699"/>
         <source>Off</source>
-        <translation type="unfinished">Выкл</translation>
+        <translation>Выкл</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1700"/>
         <source>With delay</source>
-        <translation type="unfinished"></translation>
+        <translation>С задержкой</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1701"/>
         <source>Without delay</source>
-        <translation type="unfinished"></translation>
+        <translation>Без задержки</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1736"/>
@@ -1440,165 +1432,147 @@ Do you want to overwrite the function?</source>
 <context>
     <name>FunctionEditDialog</name>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="735"/>
+        <location filename="../src/functioneditdialog.cpp" line="744"/>
         <source>Name:</source>
         <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="744"/>
+        <location filename="../src/functioneditdialog.cpp" line="753"/>
         <source>Expression:</source>
         <translation>Выражение:</translation>
     </message>
     <message>
-        <source>x, y, z</source>
-        <translation type="vanished">x, y, z</translation>
-    </message>
-    <message>
-        <source>\x, \y, \z, \a, \b, …</source>
-        <translation type="vanished">\x, \y, \z, \a, \b, …</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="746"/>
+        <location filename="../src/functioneditdialog.cpp" line="755"/>
         <source>Use x, y, and z (e.g. &quot;(x+y)/2&quot;), or
 \x, \y, \z, \a, \b, … (e.g. &quot;(\x+\y)/2&quot;)</source>
-        <translation type="unfinished">Используйте x, y и z (например, «(x+y)/2»),  или
+        <translation>Используйте x, y и z (например, «(x+y)/2»), или
 \x, \y, \z, \a, \b, … (например, «(\x+\y)/2»)</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="751"/>
+        <location filename="../src/functioneditdialog.cpp" line="760"/>
         <source>Category:</source>
-        <translation type="unfinished">Категория:</translation>
+        <translation>Категория:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="769"/>
+        <location filename="../src/functioneditdialog.cpp" line="776"/>
         <source>Descriptive name:</source>
-        <translation type="unfinished">Краткое описание:</translation>
+        <translation>Краткое описание:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="772"/>
+        <location filename="../src/functioneditdialog.cpp" line="779"/>
         <source>Hide function</source>
-        <translation type="unfinished">Скрыть функцию</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="774"/>
-        <source>Example:</source>
-        <translation type="unfinished">Пример:</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="777"/>
-        <source>Description:</source>
-        <translation type="unfinished">Расширенное описание:</translation>
+        <translation>Скрыть функцию</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="781"/>
+        <source>Example:</source>
+        <translation>Пример:</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="784"/>
+        <source>Description:</source>
+        <translation>Расширенное описание:</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="788"/>
         <source>Condition:</source>
-        <translation type="unfinished">Условие:</translation>
+        <translation>Условие:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="783"/>
+        <location filename="../src/functioneditdialog.cpp" line="790"/>
         <source>Condition that must be true for the function (e.g. if the second argument must be greater than the first: &quot;\y &gt; \x&quot;)</source>
-        <translation type="unfinished">Условие, которое должно выполняться для функции (например, если второй аргумент должен быть больше первого: «\\y &gt; \\x»)</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="785"/>
-        <source>Sub-functions:</source>
-        <translation type="unfinished">Подфункции:</translation>
+        <translation>Условие, которое должно выполняться для функции (например, если второй аргумент должен быть больше первого: «\\y &gt; \\x»)</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="792"/>
+        <source>Sub-functions:</source>
+        <translation>Подфункции:</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="799"/>
         <source>Expression</source>
-        <translation type="unfinished">Выражение</translation>
+        <translation>Выражение</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="793"/>
+        <location filename="../src/functioneditdialog.cpp" line="800"/>
         <source>Precalculate</source>
-        <translation type="unfinished">Предварительно рассчитать</translation>
+        <translation>Предварительно рассчитать</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="794"/>
-        <location filename="../src/functioneditdialog.cpp" line="815"/>
+        <location filename="../src/functioneditdialog.cpp" line="801"/>
+        <location filename="../src/functioneditdialog.cpp" line="822"/>
         <source>Reference</source>
-        <translation type="unfinished">Ссылка</translation>
+        <translation>Ссылка</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="803"/>
-        <location filename="../src/functioneditdialog.cpp" line="823"/>
+        <location filename="../src/functioneditdialog.cpp" line="810"/>
+        <location filename="../src/functioneditdialog.cpp" line="830"/>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="804"/>
-        <location filename="../src/functioneditdialog.cpp" line="824"/>
+        <location filename="../src/functioneditdialog.cpp" line="811"/>
+        <location filename="../src/functioneditdialog.cpp" line="831"/>
         <source>Edit</source>
-        <translation type="unfinished">Правка</translation>
+        <translation>Правка</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="805"/>
-        <location filename="../src/functioneditdialog.cpp" line="825"/>
+        <location filename="../src/functioneditdialog.cpp" line="812"/>
+        <location filename="../src/functioneditdialog.cpp" line="832"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="807"/>
-        <source>Arguments:</source>
-        <translation type="unfinished">Аргументы:</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="813"/>
-        <source>Name</source>
-        <translation type="unfinished">Имя</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="814"/>
-        <source>Type</source>
-        <translation type="unfinished">Тип</translation>
+        <source>Arguments:</source>
+        <translation>Аргументы:</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="890"/>
-        <location filename="../src/functioneditdialog.cpp" line="940"/>
+        <location filename="../src/functioneditdialog.cpp" line="820"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="821"/>
+        <source>Type</source>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="897"/>
+        <location filename="../src/functioneditdialog.cpp" line="947"/>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
         <translation>Функция с таким именем уже существует.
 Хотите перезаписать функцию?</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1235"/>
+        <location filename="../src/functioneditdialog.cpp" line="1246"/>
         <source>Edit Function</source>
         <translation>Изменить функцию</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1248"/>
+        <location filename="../src/functioneditdialog.cpp" line="1259"/>
         <source>New Function</source>
         <translation>Новая функция</translation>
     </message>
     <message>
-        <source>Argument references:</source>
-        <translation type="vanished">Ссылки на аргументы:</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="731"/>
+        <location filename="../src/functioneditdialog.cpp" line="740"/>
         <source>Required</source>
-        <translation type="unfinished">Обязательный</translation>
+        <translation>Обязательный</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="732"/>
+        <location filename="../src/functioneditdialog.cpp" line="741"/>
         <source>Details</source>
-        <translation type="unfinished">Детали</translation>
+        <translation>Детали</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="733"/>
+        <location filename="../src/functioneditdialog.cpp" line="742"/>
         <source>Description</source>
-        <translation type="unfinished">Расширенное описание</translation>
+        <translation>Расширенное описание</translation>
     </message>
     <message>
-        <source>x, y, and z (e.g. &quot;(x+y)/2&quot;), or
-\x, \y, \z, \a, \b, … (e.g. &quot;(\x+\y)/2&quot;)</source>
-        <translation type="obsolete">x, y и z (например, &quot;(x+y)/2&quot;),  или
-\x, \y, \z, \a, \b, … (например, &quot;(\x+\y)/2&quot;)</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="890"/>
-        <location filename="../src/functioneditdialog.cpp" line="940"/>
+        <location filename="../src/functioneditdialog.cpp" line="897"/>
+        <location filename="../src/functioneditdialog.cpp" line="947"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
@@ -1617,7 +1591,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="62"/>
-        <location filename="../src/functionsdialog.cpp" line="547"/>
+        <location filename="../src/functionsdialog.cpp" line="555"/>
         <source>Function</source>
         <translation>Функция</translation>
     </message>
@@ -1633,8 +1607,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="87"/>
-        <location filename="../src/functionsdialog.cpp" line="469"/>
-        <location filename="../src/functionsdialog.cpp" line="472"/>
+        <location filename="../src/functionsdialog.cpp" line="477"/>
+        <location filename="../src/functionsdialog.cpp" line="480"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -1661,93 +1635,95 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/functionsdialog.cpp" line="95"/>
         <source>Favorite</source>
-        <translation type="unfinished">Избранный</translation>
+        <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="350"/>
+        <location filename="../src/functionsdialog.cpp" line="358"/>
         <source>argument</source>
         <translation>аргумент</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="373"/>
+        <location filename="../src/functionsdialog.cpp" line="381"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
         <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="383"/>
+        <location filename="../src/functionsdialog.cpp" line="391"/>
         <source>Example:</source>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="395"/>
+        <location filename="../src/functionsdialog.cpp" line="403"/>
         <source>Arguments</source>
         <translation>Аргументы</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="412"/>
+        <location filename="../src/functionsdialog.cpp" line="420"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="415"/>
+        <location filename="../src/functionsdialog.cpp" line="423"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>по умолчанию:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="431"/>
+        <location filename="../src/functionsdialog.cpp" line="439"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Требование:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="439"/>
+        <location filename="../src/functionsdialog.cpp" line="447"/>
         <source>Properties</source>
         <translation>Свойства</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="446"/>
+        <location filename="../src/functionsdialog.cpp" line="454"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="456"/>
+        <location filename="../src/functionsdialog.cpp" line="464"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>ключ</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="474"/>
+        <location filename="../src/functionsdialog.cpp" line="482"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="604"/>
+        <location filename="../src/functionsdialog.cpp" line="622"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="647"/>
+        <location filename="../src/functionsdialog.cpp" line="186"/>
+        <location filename="../src/functionsdialog.cpp" line="227"/>
+        <location filename="../src/functionsdialog.cpp" line="665"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="653"/>
+        <location filename="../src/functionsdialog.cpp" line="617"/>
         <source>User functions</source>
         <translation>Пользовательские функции</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="658"/>
+        <location filename="../src/functionsdialog.cpp" line="612"/>
         <source>Favorites</source>
-        <translation type="unfinished">Избранное</translation>
+        <translation>Избранное</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="182"/>
-        <location filename="../src/functionsdialog.cpp" line="219"/>
-        <location filename="../src/functionsdialog.cpp" line="314"/>
-        <location filename="../src/functionsdialog.cpp" line="665"/>
+        <location filename="../src/functionsdialog.cpp" line="223"/>
+        <location filename="../src/functionsdialog.cpp" line="322"/>
+        <location filename="../src/functionsdialog.cpp" line="673"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -1770,23 +1746,19 @@ Do you want to overwrite the function?</source>
         <translation>Выделите всё</translation>
     </message>
     <message>
-        <source>Find…</source>
-        <translation type="vanished">Найти…</translation>
-    </message>
-    <message>
         <location filename="../src/historyview.cpp" line="663"/>
         <source>Insert Value</source>
-        <translation type="unfinished">Вставить значение</translation>
+        <translation>Вставить значение</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="664"/>
         <source>Insert Text</source>
-        <translation type="unfinished">Вставить текст</translation>
+        <translation>Вставить текст</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="672"/>
         <source>Search…</source>
-        <translation type="unfinished">Поиск…</translation>
+        <translation>Поиск…</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="676"/>
@@ -1809,10 +1781,6 @@ Do you want to overwrite the function?</source>
         <translation>Очистить</translation>
     </message>
     <message>
-        <source>Find</source>
-        <translation type="vanished">Найти</translation>
-    </message>
-    <message>
         <location filename="../src/historyview.cpp" line="732"/>
         <source>Text:</source>
         <translation>Текст:</translation>
@@ -1827,17 +1795,17 @@ Do you want to overwrite the function?</source>
 <context>
     <name>KeypadButton</name>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="509"/>
+        <location filename="../src/keypadwidget.cpp" line="508"/>
         <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;Щелчок правой кнопкой/долгое нажатие&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="510"/>
+        <location filename="../src/keypadwidget.cpp" line="509"/>
         <source>&lt;i&gt;Right-click&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;Щелчок правой кнопкой&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="514"/>
+        <location filename="../src/keypadwidget.cpp" line="513"/>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
     </message>
@@ -1885,129 +1853,129 @@ Do you want to overwrite the function?</source>
         <translation>tg</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="224"/>
+        <location filename="../src/keypadwidget.cpp" line="223"/>
         <source>Uncertainty/interval</source>
         <translation>Неопределённость/интервал</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="224"/>
+        <location filename="../src/keypadwidget.cpp" line="223"/>
         <source>Relative error</source>
         <translation>Относительная ошибка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="224"/>
+        <location filename="../src/keypadwidget.cpp" line="223"/>
         <source>Interval</source>
         <translation>Интервал</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="226"/>
+        <location filename="../src/keypadwidget.cpp" line="225"/>
         <source>Move cursor left</source>
         <translation>Перемещать курсор влево</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="226"/>
+        <location filename="../src/keypadwidget.cpp" line="225"/>
         <source>Move cursor to start</source>
         <translation>Переместить курсор в начало</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="232"/>
+        <location filename="../src/keypadwidget.cpp" line="231"/>
         <source>Move cursor right</source>
         <translation>Перемещать курсор вправо</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="232"/>
+        <location filename="../src/keypadwidget.cpp" line="231"/>
         <source>Move cursor to end</source>
         <translation>Переместить курсор в конец</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="240"/>
+        <location filename="../src/keypadwidget.cpp" line="239"/>
         <source>Left parenthesis</source>
         <translation>Левая скобка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="240"/>
+        <location filename="../src/keypadwidget.cpp" line="239"/>
         <source>Left vector bracket</source>
         <translation>Левая векторная скобка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="242"/>
+        <location filename="../src/keypadwidget.cpp" line="241"/>
         <source>Right parenthesis</source>
         <translation>Правая скобка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="242"/>
+        <location filename="../src/keypadwidget.cpp" line="241"/>
         <source>Right vector bracket</source>
         <translation>Правая векторная скобка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="244"/>
+        <location filename="../src/keypadwidget.cpp" line="243"/>
         <source>Smart parentheses</source>
         <translation>Умные скобки</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="244"/>
+        <location filename="../src/keypadwidget.cpp" line="243"/>
         <source>Vector brackets</source>
         <translation>Векторные скобки</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="250"/>
+        <location filename="../src/keypadwidget.cpp" line="249"/>
         <source>Argument separator</source>
         <translation>Разделитель аргументов</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="250"/>
-        <location filename="../src/keypadwidget.cpp" line="269"/>
+        <location filename="../src/keypadwidget.cpp" line="249"/>
+        <location filename="../src/keypadwidget.cpp" line="268"/>
         <source>Blank space</source>
         <translation>Пустой пробел</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="250"/>
-        <location filename="../src/keypadwidget.cpp" line="269"/>
+        <location filename="../src/keypadwidget.cpp" line="249"/>
+        <location filename="../src/keypadwidget.cpp" line="268"/>
         <source>New line</source>
         <translation>Новая строка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="269"/>
+        <location filename="../src/keypadwidget.cpp" line="268"/>
         <source>Decimal point</source>
         <translation>Десятичная точка</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="297"/>
+        <location filename="../src/keypadwidget.cpp" line="296"/>
         <source>Previous result (static)</source>
         <translation>Предыдущий результат (статический)</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="303"/>
+        <location filename="../src/keypadwidget.cpp" line="302"/>
         <source>Bitwise AND</source>
         <translation>Побитовое И</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="309"/>
+        <location filename="../src/keypadwidget.cpp" line="308"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="309"/>
+        <location filename="../src/keypadwidget.cpp" line="308"/>
         <source>Backspace</source>
         <translation>Обратное перемещение</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="325"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Bitwise OR</source>
         <translation>Побитовое ИЛИ</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="325"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Bitwise NOT</source>
         <translation>Побитовое НЕ</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="327"/>
+        <location filename="../src/keypadwidget.cpp" line="326"/>
         <source>Clear expression</source>
         <translation>Отчистить выражение</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="333"/>
+        <location filename="../src/keypadwidget.cpp" line="332"/>
         <source>Calculate expression</source>
         <translation>Вычислить выражение</translation>
     </message>
@@ -2017,44 +1985,44 @@ Do you want to overwrite the function?</source>
         <translation>Возведение в степень</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="222"/>
+        <location filename="../src/keypadwidget.cpp" line="221"/>
         <source>Percent or remainder</source>
         <translation>Процент или остаток</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="303"/>
+        <location filename="../src/keypadwidget.cpp" line="302"/>
         <source>Multiplication</source>
         <translation>Умножение</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="303"/>
+        <location filename="../src/keypadwidget.cpp" line="302"/>
         <source>Bitwise Shift</source>
         <translation>Побитовый сдвиг</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="312"/>
+        <location filename="../src/keypadwidget.cpp" line="311"/>
         <source>Addition</source>
         <translation>Сложение</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="312"/>
+        <location filename="../src/keypadwidget.cpp" line="311"/>
         <source>Plus</source>
         <translation>Плюс</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="317"/>
-        <location filename="../src/keypadwidget.cpp" line="320"/>
+        <location filename="../src/keypadwidget.cpp" line="316"/>
+        <location filename="../src/keypadwidget.cpp" line="319"/>
         <source>Subtraction</source>
         <translation>Вычитание</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="317"/>
-        <location filename="../src/keypadwidget.cpp" line="320"/>
+        <location filename="../src/keypadwidget.cpp" line="316"/>
+        <location filename="../src/keypadwidget.cpp" line="319"/>
         <source>Minus</source>
         <translation>Минус</translation>
     </message>
     <message>
-        <location filename="../src/keypadwidget.cpp" line="325"/>
+        <location filename="../src/keypadwidget.cpp" line="324"/>
         <source>Division</source>
         <translation>Деление</translation>
     </message>
@@ -2062,90 +2030,90 @@ Do you want to overwrite the function?</source>
 <context>
     <name>NamesEditDialog</name>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="265"/>
-        <location filename="../src/functioneditdialog.cpp" line="269"/>
-        <source>Name</source>
-        <translation type="unfinished">Имя</translation>
-    </message>
-    <message>
         <location filename="../src/functioneditdialog.cpp" line="270"/>
-        <source>Abbreviation</source>
-        <translation type="unfinished">Сокращение</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="271"/>
-        <source>Plural</source>
-        <translation type="unfinished">Множественная форма</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="266"/>
-        <location filename="../src/functioneditdialog.cpp" line="272"/>
-        <source>Reference</source>
-        <translation type="unfinished">Ссылка</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="273"/>
-        <source>Avoid input</source>
-        <translation type="unfinished">Избегать ввода</translation>
-    </message>
-    <message>
         <location filename="../src/functioneditdialog.cpp" line="274"/>
-        <source>Unicode</source>
-        <translation type="unfinished">Юникод</translation>
+        <source>Name</source>
+        <translation>Имя</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="275"/>
-        <source>Suffix</source>
-        <translation type="unfinished">Суффикс</translation>
+        <source>Abbreviation</source>
+        <translation>Сокращение</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="276"/>
-        <source>Case sensitive</source>
-        <translation type="unfinished">С учётом регистра</translation>
+        <source>Plural</source>
+        <translation>Множественная форма</translation>
     </message>
     <message>
+        <location filename="../src/functioneditdialog.cpp" line="271"/>
         <location filename="../src/functioneditdialog.cpp" line="277"/>
+        <source>Reference</source>
+        <translation>Ссылка</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="278"/>
+        <source>Avoid input</source>
+        <translation>Избегать ввода</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="279"/>
+        <source>Unicode</source>
+        <translation>Юникод</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="280"/>
+        <source>Suffix</source>
+        <translation>Суффикс</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="281"/>
+        <source>Case sensitive</source>
+        <translation>С учётом регистра</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="282"/>
         <source>Completion only</source>
-        <translation type="unfinished">Только завершение</translation>
+        <translation>Только завершение</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="298"/>
+        <location filename="../src/functioneditdialog.cpp" line="303"/>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Добавить</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="299"/>
+        <location filename="../src/functioneditdialog.cpp" line="304"/>
         <source>Edit</source>
-        <translation type="unfinished">Правка</translation>
+        <translation>Правка</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="300"/>
+        <location filename="../src/functioneditdialog.cpp" line="305"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="446"/>
-        <location filename="../src/functioneditdialog.cpp" line="449"/>
-        <location filename="../src/functioneditdialog.cpp" line="452"/>
         <location filename="../src/functioneditdialog.cpp" line="455"/>
+        <location filename="../src/functioneditdialog.cpp" line="458"/>
+        <location filename="../src/functioneditdialog.cpp" line="461"/>
+        <location filename="../src/functioneditdialog.cpp" line="464"/>
         <source>Warning</source>
-        <translation type="unfinished">Предупреждение</translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="446"/>
-        <source>Illegal name</source>
-        <translation type="unfinished">Недопустимое имя</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="449"/>
-        <source>A function with the same name already exists.</source>
-        <translation type="unfinished">Функция с таким именем уже существует.</translation>
-    </message>
-    <message>
-        <location filename="../src/functioneditdialog.cpp" line="452"/>
         <location filename="../src/functioneditdialog.cpp" line="455"/>
+        <source>Illegal name</source>
+        <translation>Недопустимое имя</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="458"/>
+        <source>A function with the same name already exists.</source>
+        <translation>Функция с таким именем уже существует.</translation>
+    </message>
+    <message>
+        <location filename="../src/functioneditdialog.cpp" line="461"/>
+        <location filename="../src/functioneditdialog.cpp" line="464"/>
         <source>A unit or variable with the same name already exists.</source>
-        <translation type="unfinished">Единица измерения или переменная с таким именем уже существует.</translation>
+        <translation>Единица измерения или переменная с таким именем уже существует.</translation>
     </message>
 </context>
 <context>
@@ -2153,48 +2121,48 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="26"/>
         <source>Percentage</source>
-        <translation type="unfinished">Проценты</translation>
+        <translation>Проценты</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="29"/>
         <source>Value 1</source>
-        <translation type="unfinished">Значение 1</translation>
+        <translation>Значение 1</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="34"/>
         <source>Value 2</source>
-        <translation type="unfinished">Значение 2</translation>
+        <translation>Значение 2</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="36"/>
         <location filename="../src/percentagecalculationdialog.cpp" line="38"/>
         <source>Change from 1 to 2</source>
-        <translation type="unfinished">Изменение от 1 к 2</translation>
+        <translation>Изменение от 1 к 2</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="41"/>
         <source>Change from 2 to 1</source>
-        <translation type="unfinished">Изменение от 2 к 1</translation>
+        <translation>Изменение от 2 к 1</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="44"/>
         <source>2 compared to 1</source>
-        <translation type="unfinished">2 по сравнению к 1</translation>
+        <translation>2 по сравнению к 1</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="47"/>
         <source>1 compared to 2</source>
-        <translation type="unfinished">1 по сравнению к 2</translation>
+        <translation>1 по сравнению к 2</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="51"/>
         <source>Enter two values, of which at most one is a percentage, and the others will be calculated for you.</source>
-        <translation type="unfinished">Введите два значения, максимум одно из которых является процентом, а остальные будут рассчитаны за вас.</translation>
+        <translation>Введите два значения, максимум одно из которых является процентом, а остальные будут рассчитаны за вас.</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="58"/>
         <source>Clear</source>
-        <translation type="unfinished">Очистить</translation>
+        <translation>Очистить</translation>
     </message>
 </context>
 <context>
@@ -2202,78 +2170,78 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="24"/>
         <source>Periodic Table</source>
-        <translation type="unfinished">Периодическая таблица</translation>
+        <translation>Периодическая таблица</translation>
     </message>
     <message>
-        <location filename="../src/periodictabledialog.cpp" line="163"/>
+        <location filename="../src/periodictabledialog.cpp" line="166"/>
         <source>Element Data</source>
-        <translation type="unfinished">Данные элемента</translation>
-    </message>
-    <message>
-        <location filename="../src/periodictabledialog.cpp" line="175"/>
-        <source>Alkali Metal</source>
-        <translation type="unfinished">Щелочной металл</translation>
-    </message>
-    <message>
-        <location filename="../src/periodictabledialog.cpp" line="176"/>
-        <source>Alkaline-Earth Metal</source>
-        <translation type="unfinished">Щелочноземельный металл</translation>
-    </message>
-    <message>
-        <location filename="../src/periodictabledialog.cpp" line="177"/>
-        <source>Lanthanide</source>
-        <translation type="unfinished">Лантаноид</translation>
+        <translation>Данные элемента</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="178"/>
-        <source>Actinide</source>
-        <translation type="unfinished">Актиноид</translation>
+        <source>Alkali Metal</source>
+        <translation>Щелочной металл</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="179"/>
-        <source>Transition Metal</source>
-        <translation type="unfinished">Переходный металл</translation>
+        <source>Alkaline-Earth Metal</source>
+        <translation>Щелочноземельный металл</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="180"/>
-        <source>Metal</source>
-        <translation type="unfinished">Металл</translation>
+        <source>Lanthanide</source>
+        <translation>Лантаноид</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="181"/>
-        <source>Metalloid</source>
-        <translation type="unfinished">Металлоид</translation>
+        <source>Actinide</source>
+        <translation>Актиноид</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="182"/>
-        <source>Polyatomic Non-Metal</source>
-        <translation type="unfinished">Многоатомный неметалл</translation>
+        <source>Transition Metal</source>
+        <translation>Переходный металл</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="183"/>
-        <source>Diatomic Non-Metal</source>
-        <translation type="unfinished">Двухатомный неметалл</translation>
+        <source>Metal</source>
+        <translation>Металл</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="184"/>
-        <source>Noble Gas</source>
-        <translation type="unfinished">Благородный газ</translation>
+        <source>Metalloid</source>
+        <translation>Металлоид</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="185"/>
-        <source>Unknown chemical properties</source>
-        <translation type="unfinished">Неизвестные химические свойства</translation>
+        <source>Polyatomic Non-Metal</source>
+        <translation>Многоатомный неметалл</translation>
     </message>
     <message>
         <location filename="../src/periodictabledialog.cpp" line="186"/>
-        <source>Unknown</source>
-        <translation type="unfinished">Неизвестное</translation>
+        <source>Diatomic Non-Metal</source>
+        <translation>Двухатомный неметалл</translation>
     </message>
     <message>
-        <location filename="../src/periodictabledialog.cpp" line="191"/>
-        <location filename="../src/periodictabledialog.cpp" line="200"/>
+        <location filename="../src/periodictabledialog.cpp" line="187"/>
+        <source>Noble Gas</source>
+        <translation>Благородный газ</translation>
+    </message>
+    <message>
+        <location filename="../src/periodictabledialog.cpp" line="188"/>
+        <source>Unknown chemical properties</source>
+        <translation>Неизвестные химические свойства</translation>
+    </message>
+    <message>
+        <location filename="../src/periodictabledialog.cpp" line="189"/>
+        <source>Unknown</source>
+        <translation>Неизвестное</translation>
+    </message>
+    <message>
+        <location filename="../src/periodictabledialog.cpp" line="194"/>
+        <location filename="../src/periodictabledialog.cpp" line="203"/>
         <source>%1:</source>
-        <translation type="unfinished">%1:</translation>
+        <translation>%1:</translation>
     </message>
 </context>
 <context>
@@ -2813,7 +2781,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Use Unicode division slash in output</source>
-        <translation type="unfinished">Использовать косую черту деления Юнокода в выводе</translation>
+        <translation>Использовать косую черту деления Юнокода в выводе</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="151"/>
@@ -3050,14 +3018,6 @@ Do you want to overwrite the function?</source>
             <numerusform>%n дней</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>days</source>
-        <translation type="vanished">
-            <numerusform>день</numerusform>
-            <numerusform>дня</numerusform>
-            <numerusform>дней</numerusform>
-        </translation>
-    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -3129,7 +3089,7 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="63"/>
         <location filename="../src/qalculateqtsettings.cpp" line="64"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="721"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="723"/>
         <source>answer</source>
         <translation>ответ</translation>
     </message>
@@ -3149,44 +3109,44 @@ Do you, despite this, want to change the default behavior and allow multiple sim
         <translation>Индекс истории %s не существует.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="720"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="722"/>
         <source>Last Answer</source>
         <translation>Последний ответ</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="723"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="725"/>
         <source>Answer 2</source>
         <translation>Ответ 2</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="724"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="726"/>
         <source>Answer 3</source>
         <translation>Ответ 3</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="725"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="727"/>
         <source>Answer 4</source>
         <translation>Ответ 4</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="726"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="728"/>
         <source>Answer 5</source>
         <translation>Ответ 5</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="727"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="729"/>
         <source>Memory</source>
         <translation>Память</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="855"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="857"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
         <translation>Не удалось записать настройки в
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="855"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="857"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -3194,12 +3154,12 @@ Do you, despite this, want to change the default behavior and allow multiple sim
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1189"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1191"/>
         <source>Update exchange rates?</source>
         <translation>Обновить курсы валют?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="1189"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1191"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
@@ -3216,88 +3176,72 @@ Do you wish to update the exchange rates now?</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1217"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1218"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1219"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1220"/>
         <source>Fetching exchange rates…</source>
         <translation>Получение курсов валют…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1264"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1266"/>
         <source>Path of executable not found.</source>
         <translation>Путь к исполняемому файлу не найден.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1273"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1275"/>
         <source>curl not found.</source>
         <translation>Программа curl не найдена.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1324"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1326"/>
         <source>Failed to run update script.
 %1</source>
         <translation>Не удалось запустить скрипт обновления.
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1347"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1349"/>
         <source>Failed to check for updates.</source>
         <translation>Не удалось проверить наличие обновлений.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1348"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1350"/>
         <source>No updates found.</source>
         <translation>Обновлений не найдено.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1354"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1356"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
-        <translation type="unfinished">Новая версия %1 доступна: %2.
+        <translation>Новая версия %1 доступна: %2.
 
 Вы хотите обновиться до версии %3?</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1358"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1360"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
-        <translation type="unfinished">Доступна новая версия %1.
+        <translation>Доступна новая версия %1.
 
 Вы можете получить версию %3: %2.</translation>
     </message>
     <message>
-        <source>&lt;div&gt;A new version of %1 is available at %2.
-
-Do you wish to update to version %3?&lt;/div&gt;</source>
-        <translation type="vanished">&lt;div&gt;Новая версия %1 доступна: %2.
-
-Вы хотите обновиться до версии %3?&lt;/div&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;div&gt;A new version of %1 is available.
-
-You can get version %3 at %2.&lt;/div&gt;</source>
-        <translation type="vanished">&lt;div&gt;Доступна новая версия %1.
-
-Вы можете получить версию %3: %2.&lt;/div&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1251"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1264"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1273"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1324"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1347"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1253"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1266"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1275"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1326"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1349"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1252"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1254"/>
         <source>Warning</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1253"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1255"/>
         <source>Information</source>
         <translation>Информирование</translation>
     </message>
@@ -3374,766 +3318,766 @@ You can get version %3 at %2.&lt;/div&gt;</source>
 <context>
     <name>QalculateWindow</name>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="306"/>
+        <location filename="../src/qalculatewindow.cpp" line="315"/>
         <source>Menu</source>
         <translation>Меню</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="307"/>
+        <location filename="../src/qalculatewindow.cpp" line="316"/>
         <source>Menu (%1)</source>
         <translation>Меню (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="312"/>
+        <location filename="../src/qalculatewindow.cpp" line="321"/>
         <source>New</source>
         <translation>Новая</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="313"/>
+        <location filename="../src/qalculatewindow.cpp" line="322"/>
         <source>Function…</source>
         <translation>Функция…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="314"/>
+        <location filename="../src/qalculatewindow.cpp" line="323"/>
         <source>Variable/Constant…</source>
         <translation>Переменная/константа…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="315"/>
+        <location filename="../src/qalculatewindow.cpp" line="324"/>
         <source>Unknown Variable…</source>
         <translation>Переменная неизвестного…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="316"/>
+        <location filename="../src/qalculatewindow.cpp" line="325"/>
         <source>Matrix…</source>
         <translation>Матрица…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="320"/>
+        <location filename="../src/qalculatewindow.cpp" line="329"/>
         <source>Import CSV File…</source>
         <translation>Загрузить CSV файл…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="321"/>
+        <location filename="../src/qalculatewindow.cpp" line="330"/>
         <source>Export CSV File…</source>
         <translation>Экспорт в CSV файл…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="323"/>
-        <location filename="../src/qalculatewindow.cpp" line="573"/>
+        <location filename="../src/qalculatewindow.cpp" line="332"/>
+        <location filename="../src/qalculatewindow.cpp" line="583"/>
         <source>Functions</source>
         <translation>Функции</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="324"/>
+        <location filename="../src/qalculatewindow.cpp" line="333"/>
         <source>Variables and Constants</source>
         <translation>Переменные и константы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="326"/>
-        <location filename="../src/qalculatewindow.cpp" line="579"/>
+        <location filename="../src/qalculatewindow.cpp" line="335"/>
+        <location filename="../src/qalculatewindow.cpp" line="589"/>
         <source>Units</source>
         <translation>Единицы измерения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="329"/>
-        <location filename="../src/qalculatewindow.cpp" line="586"/>
+        <location filename="../src/qalculatewindow.cpp" line="338"/>
+        <location filename="../src/qalculatewindow.cpp" line="596"/>
         <source>Plot Functions/Data</source>
         <translation>Графики функций/данных</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="330"/>
+        <location filename="../src/qalculatewindow.cpp" line="339"/>
         <source>Floating Point Conversion (IEEE 754)</source>
         <translation>Преобразование чисел с плавающей запятой (IEEE 754)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="331"/>
+        <location filename="../src/qalculatewindow.cpp" line="340"/>
         <source>Calendar Conversion</source>
         <translation>Преобразование календаря</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="335"/>
+        <location filename="../src/qalculatewindow.cpp" line="344"/>
         <source>Update Exchange Rates</source>
         <translation>Обновить курсы валют</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="338"/>
+        <location filename="../src/qalculatewindow.cpp" line="347"/>
         <source>Normal Mode</source>
         <translation>Режим нормальный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="339"/>
+        <location filename="../src/qalculatewindow.cpp" line="348"/>
         <source>RPN Mode</source>
         <translation>Режим ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="340"/>
+        <location filename="../src/qalculatewindow.cpp" line="349"/>
         <source>Chain Mode</source>
         <translation>Режим «цепь»</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="342"/>
+        <location filename="../src/qalculatewindow.cpp" line="351"/>
         <source>Preferences</source>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="344"/>
+        <location filename="../src/qalculatewindow.cpp" line="353"/>
         <source>Help</source>
         <translation>Справка</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="345"/>
+        <location filename="../src/qalculatewindow.cpp" line="354"/>
         <source>Report a Bug</source>
         <translation>Сообщить об ошибке</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="346"/>
+        <location filename="../src/qalculatewindow.cpp" line="355"/>
         <source>Check for Updates</source>
         <translation>Проверить обновления</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="347"/>
-        <location filename="../src/qalculatewindow.cpp" line="348"/>
-        <location filename="../src/qalculatewindow.cpp" line="1014"/>
+        <location filename="../src/qalculatewindow.cpp" line="356"/>
+        <location filename="../src/qalculatewindow.cpp" line="357"/>
+        <location filename="../src/qalculatewindow.cpp" line="1020"/>
         <source>About %1</source>
         <translation>О %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="350"/>
+        <location filename="../src/qalculatewindow.cpp" line="359"/>
         <source>Quit</source>
         <translation>Выход</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="352"/>
+        <location filename="../src/qalculatewindow.cpp" line="361"/>
         <source>Mode</source>
         <translation>Режим</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="353"/>
+        <location filename="../src/qalculatewindow.cpp" line="362"/>
         <source>Mode (%1)</source>
         <translation>Режим (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="358"/>
-        <location filename="../src/qalculatewindow.cpp" line="361"/>
+        <location filename="../src/qalculatewindow.cpp" line="367"/>
+        <location filename="../src/qalculatewindow.cpp" line="370"/>
         <source>General Display Mode</source>
         <translation>Режим общего отображения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="363"/>
+        <location filename="../src/qalculatewindow.cpp" line="372"/>
         <source>Normal</source>
         <translation>Обычное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="366"/>
+        <location filename="../src/qalculatewindow.cpp" line="375"/>
         <source>Scientific</source>
         <translation>Научное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="369"/>
+        <location filename="../src/qalculatewindow.cpp" line="378"/>
         <source>Engineering</source>
         <translation>Инженерное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="372"/>
+        <location filename="../src/qalculatewindow.cpp" line="381"/>
         <source>Simple</source>
         <translation>Простое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="376"/>
-        <location filename="../src/qalculatewindow.cpp" line="377"/>
+        <location filename="../src/qalculatewindow.cpp" line="385"/>
+        <location filename="../src/qalculatewindow.cpp" line="386"/>
         <source>Angle Unit</source>
         <translation>Единица измерения углов</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="379"/>
+        <location filename="../src/qalculatewindow.cpp" line="388"/>
         <source>Radians</source>
         <translation>Радианы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="381"/>
+        <location filename="../src/qalculatewindow.cpp" line="390"/>
         <source>Degrees</source>
         <translation>Градусы</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="383"/>
+        <location filename="../src/qalculatewindow.cpp" line="392"/>
         <source>Gradians</source>
         <translation>Грады</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="386"/>
-        <location filename="../src/qalculatewindow.cpp" line="387"/>
+        <location filename="../src/qalculatewindow.cpp" line="395"/>
+        <location filename="../src/qalculatewindow.cpp" line="396"/>
         <source>Approximation</source>
         <translation>Приближение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="389"/>
+        <location filename="../src/qalculatewindow.cpp" line="398"/>
         <source>Automatic</source>
         <comment>Automatic approximation</comment>
         <translation>Автоматическое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="391"/>
+        <location filename="../src/qalculatewindow.cpp" line="400"/>
         <source>Dual</source>
         <comment>Dual approximation</comment>
         <translation>Двойное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="393"/>
+        <location filename="../src/qalculatewindow.cpp" line="402"/>
         <source>Exact</source>
         <comment>Exact approximation</comment>
         <translation>Точное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="395"/>
+        <location filename="../src/qalculatewindow.cpp" line="404"/>
         <source>Approximate</source>
         <translation>Приблизительное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="400"/>
+        <location filename="../src/qalculatewindow.cpp" line="409"/>
         <source>Assumptions</source>
         <translation>Предположения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="401"/>
+        <location filename="../src/qalculatewindow.cpp" line="410"/>
         <source>Type</source>
         <comment>Assumptions type</comment>
         <translation>Тип</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="403"/>
+        <location filename="../src/qalculatewindow.cpp" line="412"/>
         <source>Number</source>
         <translation>Число</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="405"/>
+        <location filename="../src/qalculatewindow.cpp" line="414"/>
         <source>Real</source>
         <translation>Вещественное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="407"/>
+        <location filename="../src/qalculatewindow.cpp" line="416"/>
         <source>Rational</source>
         <translation>Рациональное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="409"/>
+        <location filename="../src/qalculatewindow.cpp" line="418"/>
         <source>Integer</source>
         <translation>Целое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="411"/>
+        <location filename="../src/qalculatewindow.cpp" line="420"/>
         <source>Boolean</source>
         <translation>Логическое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="413"/>
+        <location filename="../src/qalculatewindow.cpp" line="422"/>
         <source>Sign</source>
         <comment>Assumptions sign</comment>
         <translation>Знак</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="415"/>
+        <location filename="../src/qalculatewindow.cpp" line="424"/>
         <source>Unknown</source>
         <comment>Unknown assumptions sign</comment>
         <translation>Неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="417"/>
+        <location filename="../src/qalculatewindow.cpp" line="426"/>
         <source>Non-zero</source>
         <translation>Ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="419"/>
+        <location filename="../src/qalculatewindow.cpp" line="428"/>
         <source>Positive</source>
         <translation>Положительное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="421"/>
+        <location filename="../src/qalculatewindow.cpp" line="430"/>
         <source>Non-negative</source>
         <translation>Неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="423"/>
+        <location filename="../src/qalculatewindow.cpp" line="432"/>
         <source>Negative</source>
         <translation>Отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="425"/>
+        <location filename="../src/qalculatewindow.cpp" line="434"/>
         <source>Non-positive</source>
         <translation>Не положительное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="429"/>
-        <location filename="../src/qalculatewindow.cpp" line="430"/>
+        <location filename="../src/qalculatewindow.cpp" line="438"/>
+        <location filename="../src/qalculatewindow.cpp" line="439"/>
         <source>Result Base</source>
         <translation>Основание для результата</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="433"/>
-        <location filename="../src/qalculatewindow.cpp" line="488"/>
+        <location filename="../src/qalculatewindow.cpp" line="442"/>
+        <location filename="../src/qalculatewindow.cpp" line="497"/>
         <source>Binary</source>
         <translation>Двоичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="435"/>
-        <location filename="../src/qalculatewindow.cpp" line="490"/>
+        <location filename="../src/qalculatewindow.cpp" line="444"/>
+        <location filename="../src/qalculatewindow.cpp" line="499"/>
         <source>Octal</source>
         <translation>Восьмеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="437"/>
-        <location filename="../src/qalculatewindow.cpp" line="492"/>
+        <location filename="../src/qalculatewindow.cpp" line="446"/>
+        <location filename="../src/qalculatewindow.cpp" line="501"/>
         <source>Decimal</source>
         <translation>Десятичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="439"/>
-        <location filename="../src/qalculatewindow.cpp" line="494"/>
+        <location filename="../src/qalculatewindow.cpp" line="448"/>
+        <location filename="../src/qalculatewindow.cpp" line="503"/>
         <source>Hexadecimal</source>
         <translation>Шестнадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="442"/>
-        <location filename="../src/qalculatewindow.cpp" line="497"/>
+        <location filename="../src/qalculatewindow.cpp" line="451"/>
+        <location filename="../src/qalculatewindow.cpp" line="506"/>
         <source>Other</source>
         <translation>Другое</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="443"/>
-        <location filename="../src/qalculatewindow.cpp" line="498"/>
+        <location filename="../src/qalculatewindow.cpp" line="452"/>
+        <location filename="../src/qalculatewindow.cpp" line="507"/>
         <source>Duodecimal</source>
         <translation>Двенадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="445"/>
+        <location filename="../src/qalculatewindow.cpp" line="454"/>
         <source>Sexagesimal</source>
         <translation>Шестидесятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="447"/>
+        <location filename="../src/qalculatewindow.cpp" line="456"/>
         <source>Time format</source>
         <translation>Формат времени</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="449"/>
-        <location filename="../src/qalculatewindow.cpp" line="500"/>
+        <location filename="../src/qalculatewindow.cpp" line="458"/>
+        <location filename="../src/qalculatewindow.cpp" line="509"/>
         <source>Roman numerals</source>
         <translation>Римские цифры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="451"/>
-        <location filename="../src/qalculatewindow.cpp" line="502"/>
+        <location filename="../src/qalculatewindow.cpp" line="460"/>
+        <location filename="../src/qalculatewindow.cpp" line="511"/>
         <source>Unicode</source>
         <translation>Юникод</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="453"/>
-        <location filename="../src/qalculatewindow.cpp" line="504"/>
+        <location filename="../src/qalculatewindow.cpp" line="462"/>
+        <location filename="../src/qalculatewindow.cpp" line="513"/>
         <source>Bijective base-26</source>
         <translation>Биективное основание-26</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="516"/>
+        <location filename="../src/qalculatewindow.cpp" line="525"/>
         <source>Custom:</source>
         <comment>Number base</comment>
         <translation>Пользовательское:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="484"/>
-        <location filename="../src/qalculatewindow.cpp" line="485"/>
+        <location filename="../src/qalculatewindow.cpp" line="493"/>
+        <location filename="../src/qalculatewindow.cpp" line="494"/>
         <source>Expression Base</source>
         <translation>Основание для выражения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="469"/>
+        <location filename="../src/qalculatewindow.cpp" line="478"/>
         <source>Other:</source>
         <comment>Number base</comment>
         <translation>Другое:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="536"/>
+        <location filename="../src/qalculatewindow.cpp" line="545"/>
         <source>Precision:</source>
         <translation>Точность:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="543"/>
+        <location filename="../src/qalculatewindow.cpp" line="552"/>
         <source>Min decimals:</source>
         <translation>Минимум цифр:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="550"/>
+        <location filename="../src/qalculatewindow.cpp" line="559"/>
         <source>Max decimals:</source>
         <translation>Максимум цифр:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="553"/>
+        <location filename="../src/qalculatewindow.cpp" line="562"/>
         <source>off</source>
         <comment>Max decimals</comment>
         <translation>выкл</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="563"/>
+        <location filename="../src/qalculatewindow.cpp" line="572"/>
         <source>Convert</source>
         <translation>Перевести</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="564"/>
+        <location filename="../src/qalculatewindow.cpp" line="574"/>
         <source>Convert (%1)</source>
         <translation>Перевести (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="567"/>
+        <location filename="../src/qalculatewindow.cpp" line="577"/>
         <source>Store</source>
         <translation>Сохранить</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="567"/>
+        <location filename="../src/qalculatewindow.cpp" line="577"/>
         <source>Store (%1)</source>
         <translation>Сохранить (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="573"/>
+        <location filename="../src/qalculatewindow.cpp" line="583"/>
         <source>Functions (%1)</source>
         <translation>Функции (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="606"/>
-        <location filename="../src/qalculatewindow.cpp" line="685"/>
+        <location filename="../src/qalculatewindow.cpp" line="616"/>
+        <location filename="../src/qalculatewindow.cpp" line="695"/>
         <source>Keypad</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="607"/>
+        <location filename="../src/qalculatewindow.cpp" line="617"/>
         <source>Keypad (%1)</source>
         <translation>Клавиатура (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="601"/>
-        <location filename="../src/qalculatewindow.cpp" line="635"/>
+        <location filename="../src/qalculatewindow.cpp" line="611"/>
+        <location filename="../src/qalculatewindow.cpp" line="645"/>
         <source>Number bases</source>
         <translation>Основания систем счисления</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="317"/>
+        <location filename="../src/qalculatewindow.cpp" line="326"/>
         <source>Unit…</source>
-        <translation type="unfinished">Единицы измерения…</translation>
+        <translation>Единицы измерения…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="327"/>
+        <location filename="../src/qalculatewindow.cpp" line="336"/>
         <source>Data Sets</source>
-        <translation type="unfinished">Наборы данных</translation>
+        <translation>Наборы данных</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="332"/>
+        <location filename="../src/qalculatewindow.cpp" line="341"/>
         <source>Percentage Calculation Tool</source>
-        <translation type="unfinished">Инструмент расчёта процентов</translation>
+        <translation>Инструмент расчёта процентов</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="333"/>
+        <location filename="../src/qalculatewindow.cpp" line="342"/>
         <source>Periodic Table</source>
-        <translation type="unfinished">Периодическая таблица</translation>
+        <translation>Периодическая таблица</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="579"/>
+        <location filename="../src/qalculatewindow.cpp" line="589"/>
         <source>Units (%1)</source>
-        <translation type="unfinished">Единицы измерения (%1)</translation>
+        <translation>Единицы измерения (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="586"/>
+        <location filename="../src/qalculatewindow.cpp" line="596"/>
         <source>Plot Functions/Data (%1)</source>
-        <translation type="unfinished">Графики функций/данных (%1)</translation>
+        <translation>Графики функций/данных (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="602"/>
+        <location filename="../src/qalculatewindow.cpp" line="612"/>
         <source>Number Bases (%1)</source>
         <translation>Основания систем счисления (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="639"/>
+        <location filename="../src/qalculatewindow.cpp" line="649"/>
         <source>Binary:</source>
         <translation>Двоичное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="641"/>
+        <location filename="../src/qalculatewindow.cpp" line="651"/>
         <source>Octal:</source>
         <translation>Восьмеричное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="643"/>
+        <location filename="../src/qalculatewindow.cpp" line="653"/>
         <source>Decimal:</source>
         <translation>Десятичное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="645"/>
+        <location filename="../src/qalculatewindow.cpp" line="655"/>
         <source>Hexadecimal:</source>
         <translation>Шестнадцатеричное:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="692"/>
+        <location filename="../src/qalculatewindow.cpp" line="702"/>
         <source>RPN Stack</source>
         <translation>Стек ПОЛИЗ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="711"/>
+        <location filename="../src/qalculatewindow.cpp" line="721"/>
         <source>Rotate the stack or move the selected register up (%1)</source>
         <translation>Повернуть стек или переместить выбранный регистр вверх (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="714"/>
+        <location filename="../src/qalculatewindow.cpp" line="724"/>
         <source>Rotate the stack or move the selected register down (%1)</source>
         <translation>Повернуть стек или переместить выбранный регистр вниз (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="717"/>
+        <location filename="../src/qalculatewindow.cpp" line="727"/>
         <source>Swap the top two values or move the selected value to the top of the stack (%1)</source>
         <translation>Поменять местами два верхних значения или переместить выбранное значение в вершину стека (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="720"/>
+        <location filename="../src/qalculatewindow.cpp" line="730"/>
         <source>Copy the selected or top value to the top of the stack (%1)</source>
         <translation>Скопировать выбранное или верхнее значение в вершину стека (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="723"/>
+        <location filename="../src/qalculatewindow.cpp" line="733"/>
         <source>Enter the top value from before the last numeric operation (%1)</source>
         <translation>Введите верхнее значение перед последней числовой операцией (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="726"/>
+        <location filename="../src/qalculatewindow.cpp" line="736"/>
         <source>Delete the top or selected value (%1)</source>
         <translation>Удалить верхнее или выбранное значение (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="729"/>
+        <location filename="../src/qalculatewindow.cpp" line="739"/>
         <source>Clear the RPN stack (%1)</source>
         <translation>Очистить стек ПОЛИЗ (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="821"/>
+        <location filename="../src/qalculatewindow.cpp" line="831"/>
         <source>New Function…</source>
-        <translation type="unfinished">Новая функция…</translation>
+        <translation>Новая функция…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1014"/>
+        <location filename="../src/qalculatewindow.cpp" line="1020"/>
         <source>Powerful and easy to use calculator</source>
         <translation>Мощный и простой в использовании калькулятор</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2321"/>
+        <location filename="../src/qalculatewindow.cpp" line="2327"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>Не удалось записать определения</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2829"/>
+        <location filename="../src/qalculatewindow.cpp" line="2835"/>
         <source>hexadecimal</source>
         <translation>шестнадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2832"/>
+        <location filename="../src/qalculatewindow.cpp" line="2838"/>
         <source>octal</source>
         <translation>восьмеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2835"/>
+        <location filename="../src/qalculatewindow.cpp" line="2841"/>
         <source>decimal</source>
         <translation>десятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2838"/>
+        <location filename="../src/qalculatewindow.cpp" line="2844"/>
         <source>duodecimal</source>
         <translation>двенадцатеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2841"/>
+        <location filename="../src/qalculatewindow.cpp" line="2847"/>
         <source>binary</source>
         <translation>двоичное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2844"/>
+        <location filename="../src/qalculatewindow.cpp" line="2850"/>
         <source>roman</source>
         <translation>римское число</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2847"/>
+        <location filename="../src/qalculatewindow.cpp" line="2853"/>
         <source>bijective</source>
         <translation>биективное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2850"/>
-        <location filename="../src/qalculatewindow.cpp" line="2853"/>
         <location filename="../src/qalculatewindow.cpp" line="2856"/>
+        <location filename="../src/qalculatewindow.cpp" line="2859"/>
+        <location filename="../src/qalculatewindow.cpp" line="2862"/>
         <source>sexagesimal</source>
         <translation>шестидесятеричное</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2859"/>
-        <location filename="../src/qalculatewindow.cpp" line="2862"/>
+        <location filename="../src/qalculatewindow.cpp" line="2865"/>
+        <location filename="../src/qalculatewindow.cpp" line="2868"/>
         <source>latitude</source>
         <translation>широта</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2865"/>
-        <location filename="../src/qalculatewindow.cpp" line="2868"/>
+        <location filename="../src/qalculatewindow.cpp" line="2871"/>
+        <location filename="../src/qalculatewindow.cpp" line="2874"/>
         <source>longitude</source>
         <translation>долгота</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2886"/>
+        <location filename="../src/qalculatewindow.cpp" line="2892"/>
         <source>time</source>
         <translation>время</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2937"/>
+        <location filename="../src/qalculatewindow.cpp" line="2943"/>
         <source>Time zone parsing failed.</source>
         <translation>Не удалось выполнить синтаксический анализ часового пояса.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2960"/>
+        <location filename="../src/qalculatewindow.cpp" line="2966"/>
         <source>bases</source>
         <translation>основания</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2969"/>
+        <location filename="../src/qalculatewindow.cpp" line="2975"/>
         <source>calendars</source>
         <translation>календари</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2978"/>
+        <location filename="../src/qalculatewindow.cpp" line="2984"/>
         <source>rectangular</source>
         <translation>прямоугоная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2978"/>
+        <location filename="../src/qalculatewindow.cpp" line="2984"/>
         <source>cartesian</source>
         <translation>декартова</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2989"/>
+        <location filename="../src/qalculatewindow.cpp" line="2995"/>
         <source>exponential</source>
         <translation>экспоненциальная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3000"/>
+        <location filename="../src/qalculatewindow.cpp" line="3006"/>
         <source>polar</source>
         <translation>полярная</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3024"/>
+        <location filename="../src/qalculatewindow.cpp" line="3030"/>
         <source>phasor</source>
         <translation>фазовая</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3024"/>
+        <location filename="../src/qalculatewindow.cpp" line="3030"/>
         <source>angle</source>
         <translation>угловая</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3035"/>
+        <location filename="../src/qalculatewindow.cpp" line="3041"/>
         <source>optimal</source>
         <translation>оптимально</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3046"/>
-        <location filename="../src/qalculatewindow.cpp" line="3092"/>
+        <location filename="../src/qalculatewindow.cpp" line="3052"/>
+        <location filename="../src/qalculatewindow.cpp" line="3098"/>
         <source>base</source>
         <translation>основание</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3057"/>
+        <location filename="../src/qalculatewindow.cpp" line="3063"/>
         <source>mixed</source>
         <translation>смешано</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3071"/>
+        <location filename="../src/qalculatewindow.cpp" line="3077"/>
         <source>fraction</source>
         <translation>дробь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3074"/>
+        <location filename="../src/qalculatewindow.cpp" line="3080"/>
         <source>factors</source>
         <translation>множители</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3083"/>
+        <location filename="../src/qalculatewindow.cpp" line="3089"/>
         <source>partial fraction</source>
         <translation>частичная дробь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3133"/>
+        <location filename="../src/qalculatewindow.cpp" line="3139"/>
         <source>factorize</source>
         <translation>разложить на множители</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3136"/>
+        <location filename="../src/qalculatewindow.cpp" line="3142"/>
         <source>expand</source>
         <translation>раскрывать</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3307"/>
-        <location filename="../src/qalculatewindow.cpp" line="3308"/>
-        <location filename="../src/qalculatewindow.cpp" line="3309"/>
-        <location filename="../src/qalculatewindow.cpp" line="3686"/>
+        <location filename="../src/qalculatewindow.cpp" line="3313"/>
+        <location filename="../src/qalculatewindow.cpp" line="3314"/>
+        <location filename="../src/qalculatewindow.cpp" line="3315"/>
+        <location filename="../src/qalculatewindow.cpp" line="3715"/>
         <source>Calculating…</source>
         <translation>Расчёт…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3308"/>
-        <location filename="../src/qalculatewindow.cpp" line="3695"/>
-        <location filename="../src/qalculatewindow.cpp" line="4193"/>
+        <location filename="../src/qalculatewindow.cpp" line="3314"/>
+        <location filename="../src/qalculatewindow.cpp" line="3724"/>
+        <location filename="../src/qalculatewindow.cpp" line="4223"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3362"/>
-        <location filename="../src/qalculatewindow.cpp" line="4056"/>
+        <location filename="../src/qalculatewindow.cpp" line="3368"/>
+        <location filename="../src/qalculatewindow.cpp" line="4086"/>
         <source>RPN Operation</source>
         <translation>ПОЛИЗ операция</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3674"/>
+        <location filename="../src/qalculatewindow.cpp" line="3703"/>
         <source>Factorizing…</source>
         <translation>Факторизация…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3678"/>
+        <location filename="../src/qalculatewindow.cpp" line="3707"/>
         <source>Expanding partial fractions…</source>
         <translation>Расширение дробных чисел…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3682"/>
+        <location filename="../src/qalculatewindow.cpp" line="3711"/>
         <source>Expanding…</source>
         <translation>Расширение…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3690"/>
+        <location filename="../src/qalculatewindow.cpp" line="3719"/>
         <source>Converting…</source>
         <translation>Преобразование…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4052"/>
+        <location filename="../src/qalculatewindow.cpp" line="4082"/>
         <source>RPN Register Moved</source>
         <translation>Регистр ПОЛИЗ перемещён</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4192"/>
-        <location filename="../src/qalculatewindow.cpp" line="4193"/>
-        <location filename="../src/qalculatewindow.cpp" line="4194"/>
+        <location filename="../src/qalculatewindow.cpp" line="4222"/>
+        <location filename="../src/qalculatewindow.cpp" line="4223"/>
+        <location filename="../src/qalculatewindow.cpp" line="4224"/>
         <source>Processing…</source>
         <translation>Обработка…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4299"/>
-        <location filename="../src/qalculatewindow.cpp" line="5718"/>
+        <location filename="../src/qalculatewindow.cpp" line="4329"/>
+        <location filename="../src/qalculatewindow.cpp" line="5782"/>
         <source>Matrix</source>
         <translation>Матрица</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4405"/>
+        <location filename="../src/qalculatewindow.cpp" line="4435"/>
         <source>Temperature Calculation Mode</source>
         <translation>Режим расчёта температуры</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4411"/>
+        <location filename="../src/qalculatewindow.cpp" line="4441"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -4142,54 +4086,54 @@ Please select temperature calculation mode
 (режим позже можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4414"/>
+        <location filename="../src/qalculatewindow.cpp" line="4444"/>
         <source>Absolute</source>
         <translation>Абсолютный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4418"/>
+        <location filename="../src/qalculatewindow.cpp" line="4448"/>
         <source>Relative</source>
         <translation>Относительный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4422"/>
+        <location filename="../src/qalculatewindow.cpp" line="4452"/>
         <source>Hybrid</source>
         <translation>Гибридный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4463"/>
+        <location filename="../src/qalculatewindow.cpp" line="4493"/>
         <source>Interpretation of dots</source>
         <translation>Использование точки</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4469"/>
+        <location filename="../src/qalculatewindow.cpp" line="4499"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>Выберите использование точки («.»)
 (позже это можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4472"/>
+        <location filename="../src/qalculatewindow.cpp" line="4502"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>Точка и запятая в качестве десятичных разделителей</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4476"/>
+        <location filename="../src/qalculatewindow.cpp" line="4506"/>
         <source>Dot as thousands separator</source>
         <translation>Точка как разделитель тысяч</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4480"/>
+        <location filename="../src/qalculatewindow.cpp" line="4510"/>
         <source>Only dot as decimal separator</source>
         <translation>Только точка в качестве десятичного разделителя</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4508"/>
+        <location filename="../src/qalculatewindow.cpp" line="4538"/>
         <source>Parsing Mode</source>
         <translation>Режим анализа</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4514"/>
+        <location filename="../src/qalculatewindow.cpp" line="4544"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -4198,113 +4142,113 @@ Please select interpretation of expressions with implicit multiplication
 (позже это можно изменить в настройках).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4517"/>
+        <location filename="../src/qalculatewindow.cpp" line="4547"/>
         <source>Implicit multiplication first</source>
         <translation>Сначала анализировать неявное умножение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4522"/>
+        <location filename="../src/qalculatewindow.cpp" line="4552"/>
         <source>Conventional</source>
         <translation>Общепринятый синтаксический анализ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4527"/>
+        <location filename="../src/qalculatewindow.cpp" line="4557"/>
         <source>Adaptive</source>
         <translation>Адаптивный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5142"/>
+        <location filename="../src/qalculatewindow.cpp" line="5206"/>
         <source>Gnuplot was not found</source>
         <translation>Программа Gnuplot не найдена</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5142"/>
+        <location filename="../src/qalculatewindow.cpp" line="5206"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>Для построения графиков %1 (%2) должен быть установлен дополнительно и находиться по переменной окружения PATH.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5334"/>
+        <location filename="../src/qalculatewindow.cpp" line="5398"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Пример:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5372"/>
+        <location filename="../src/qalculatewindow.cpp" line="5436"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>Ввод</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5372"/>
+        <location filename="../src/qalculatewindow.cpp" line="5436"/>
         <source>Calculate</source>
         <translation>Рассчитать</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5373"/>
+        <location filename="../src/qalculatewindow.cpp" line="5437"/>
         <source>Apply to Stack</source>
         <translation>Применить к стеку</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5373"/>
+        <location filename="../src/qalculatewindow.cpp" line="5437"/>
         <source>Insert</source>
         <translation>Вставить</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5364"/>
+        <location filename="../src/qalculatewindow.cpp" line="5428"/>
         <source>Keep open</source>
         <translation>Держать открытым</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5389"/>
+        <location filename="../src/qalculatewindow.cpp" line="5453"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5391"/>
+        <location filename="../src/qalculatewindow.cpp" line="5455"/>
         <source>Argument</source>
         <translation>Аргумент</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5404"/>
+        <location filename="../src/qalculatewindow.cpp" line="5468"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5459"/>
+        <location filename="../src/qalculatewindow.cpp" line="5523"/>
         <source>True</source>
         <translation>Истина</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5462"/>
+        <location filename="../src/qalculatewindow.cpp" line="5526"/>
         <source>False</source>
         <translation>Ложь</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5488"/>
+        <location filename="../src/qalculatewindow.cpp" line="5552"/>
         <source>Info</source>
         <translation>Инфо</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5538"/>
-        <location filename="../src/qalculatewindow.cpp" line="5546"/>
+        <location filename="../src/qalculatewindow.cpp" line="5602"/>
+        <location filename="../src/qalculatewindow.cpp" line="5610"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>необязательный</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5909"/>
+        <location filename="../src/qalculatewindow.cpp" line="5973"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Не удалось открыть %1.
 %2</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1014"/>
+        <location filename="../src/qalculatewindow.cpp" line="1020"/>
         <source>License: GNU General Public License version 2 or later</source>
         <translation>Лицензия: GNU General Public License, версия 2 или новее</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2321"/>
+        <location filename="../src/qalculatewindow.cpp" line="2327"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -4312,176 +4256,170 @@ Please select interpretation of expressions with implicit multiplication
 <context>
     <name>UnitEditDialog</name>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="41"/>
-        <source>General</source>
-        <translation type="unfinished">Основное</translation>
-    </message>
-    <message>
         <location filename="../src/uniteditdialog.cpp" line="42"/>
+        <source>General</source>
+        <translation>Основное</translation>
+    </message>
+    <message>
+        <location filename="../src/uniteditdialog.cpp" line="43"/>
         <source>Relation</source>
-        <translation type="unfinished">Отношение</translation>
+        <translation>Отношение</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="44"/>
+        <location filename="../src/uniteditdialog.cpp" line="45"/>
         <source>Name:</source>
-        <translation type="unfinished">Имя:</translation>
+        <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="54"/>
+        <location filename="../src/uniteditdialog.cpp" line="55"/>
         <source>Category:</source>
-        <translation type="unfinished">Категория:</translation>
+        <translation>Категория:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="72"/>
+        <location filename="../src/uniteditdialog.cpp" line="71"/>
         <source>Descriptive name:</source>
-        <translation type="unfinished">Краткое описание:</translation>
+        <translation>Краткое описание:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="75"/>
+        <location filename="../src/uniteditdialog.cpp" line="74"/>
         <source>System:</source>
-        <translation type="unfinished">Система:</translation>
+        <translation>Система:</translation>
+    </message>
+    <message>
+        <location filename="../src/uniteditdialog.cpp" line="78"/>
+        <source>Imperial</source>
+        <translation>Имперская/Британская</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="79"/>
-        <source>Imperial</source>
-        <translation type="unfinished">Имперская/Британская</translation>
-    </message>
-    <message>
-        <location filename="../src/uniteditdialog.cpp" line="80"/>
         <source>US Survey</source>
-        <translation type="unfinished">Американская геодезическая</translation>
+        <translation>Американская геодезическая</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="84"/>
+        <location filename="../src/uniteditdialog.cpp" line="83"/>
         <source>Hide unit</source>
-        <translation type="unfinished">Скрыть единицу измерения</translation>
+        <translation>Скрыть единицу измерения</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="86"/>
+        <location filename="../src/uniteditdialog.cpp" line="85"/>
         <source>Description:</source>
-        <translation type="unfinished">Расширенное описание:</translation>
+        <translation>Расширенное описание:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="90"/>
+        <location filename="../src/uniteditdialog.cpp" line="89"/>
         <source>Class:</source>
-        <translation type="unfinished">Класс:</translation>
+        <translation>Класс:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="92"/>
+        <location filename="../src/uniteditdialog.cpp" line="91"/>
         <source>The class that this unit belongs to. Named derived units are defined in relation to a single other unit, with an optional exponent, while (unnamed) derived units are defined by a unit expression with one or multiple units.</source>
-        <translation type="unfinished">Класс, к которому принадлежит эта единица измерения. Именованные производные единицы измерения определяются по отношению к другой единице измерения с необязательным показателем, в то время как безымянные производные единицы измерения определяются выражением через одну или несколько единиц измерения.</translation>
+        <translation>Класс, к которому принадлежит эта единица измерения. Именованные производные единицы измерения определяются по отношению к другой единице измерения с необязательным показателем, в то время как безымянные производные единицы измерения определяются выражением через одну или несколько единиц измерения.</translation>
+    </message>
+    <message>
+        <location filename="../src/uniteditdialog.cpp" line="93"/>
+        <source>Base unit</source>
+        <translation>Основная единица измерения</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="94"/>
-        <source>Base unit</source>
-        <translation type="unfinished">Основная единица измерения</translation>
+        <source>Named derived unit</source>
+        <translation>Именованная производная единица измерения</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="95"/>
-        <source>Named derived unit</source>
-        <translation type="unfinished">Именованная производная единица измерения</translation>
-    </message>
-    <message>
-        <location filename="../src/uniteditdialog.cpp" line="96"/>
         <source>Derived unit</source>
-        <translation type="unfinished">Производная единица измерения</translation>
+        <translation>Производная единица измерения</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="99"/>
+        <location filename="../src/uniteditdialog.cpp" line="98"/>
         <source>Base unit(s):</source>
-        <translation type="unfinished">Основная(ые) единица(ы) измерения:</translation>
+        <translation>Основная(ые) единица(ы) измерения:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="102"/>
+        <location filename="../src/uniteditdialog.cpp" line="101"/>
         <source>Unit (for named derived unit) or unit expression (for unnamed derived unit) that this unit is defined in relation to</source>
-        <translation type="unfinished">Единица измерения (для именованной производной единицы измерения) или выражение единицы измерения (для безымянной производной единицы измерения), в отношении которой определена редактируемая единица измерения</translation>
+        <translation>Единица измерения (для именованной производной единицы измерения) или выражение единицы измерения (для безымянной производной единицы измерения), в отношении которой определена редактируемая единица измерения</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="104"/>
+        <location filename="../src/uniteditdialog.cpp" line="103"/>
         <source>Exponent:</source>
-        <translation type="unfinished">Показатель:</translation>
+        <translation>Показатель:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="110"/>
+        <location filename="../src/uniteditdialog.cpp" line="109"/>
         <source>Relation:</source>
-        <translation type="unfinished">Отношение:</translation>
+        <translation>Отношение:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="113"/>
+        <location filename="../src/uniteditdialog.cpp" line="112"/>
         <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
-        <translation type="unfinished">Отношение к основной единице измерения. Для линейных отношений это должно быть просто число.&lt;br&gt;&lt;br&gt;Для нелинейных отношений используйте \\ x для множителя и \\ y для показателя степени (например, «\\x + 273,15» для отношения между градусами Цельсия и Кельвина).</translation>
+        <translation>Отношение к основной единице измерения. Для линейных отношений это должно быть просто число.&lt;br&gt;&lt;br&gt;Для нелинейных отношений используйте \\ x для множителя и \\ y для показателя степени (например, «\\x + 273,15» для отношения между градусами Цельсия и Кельвина).</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="115"/>
+        <location filename="../src/uniteditdialog.cpp" line="114"/>
         <source>Inverse relation:</source>
-        <translation type="unfinished">Обратное отношение:</translation>
+        <translation>Обратное отношение:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="118"/>
+        <location filename="../src/uniteditdialog.cpp" line="117"/>
         <source>Specify for non-linear relation, for conversion back to the base unit.</source>
-        <translation type="unfinished">Указать для нелинейного отношения, чтобы обратно преобразовать в базовую единицу измерения.</translation>
+        <translation>Указать для нелинейного отношения, чтобы обратно преобразовать в базовую единицу измерения.</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="120"/>
+        <location filename="../src/uniteditdialog.cpp" line="119"/>
         <source>Mix with base unit</source>
-        <translation type="unfinished">Смешивать с базовой единицей измерения</translation>
+        <translation>Смешивать с базовой единицей измерения</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="122"/>
+        <location filename="../src/uniteditdialog.cpp" line="121"/>
         <source>Priority:</source>
-        <translation type="unfinished">Приоритет:</translation>
+        <translation>Приоритет:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="128"/>
+        <location filename="../src/uniteditdialog.cpp" line="127"/>
         <source>Minimum base unit number:</source>
-        <translation type="unfinished">Минимальное количество базовой единицы измерения:</translation>
+        <translation>Минимальное количество базовой единицы измерения:</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="134"/>
+        <location filename="../src/uniteditdialog.cpp" line="133"/>
         <source>Use with prefixes by default</source>
-        <translation type="unfinished">По умолчанию использовать с префиксами</translation>
+        <translation>По умолчанию использовать с префиксами</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="190"/>
-        <location filename="../src/uniteditdialog.cpp" line="247"/>
+        <location filename="../src/uniteditdialog.cpp" line="189"/>
+        <location filename="../src/uniteditdialog.cpp" line="246"/>
         <source>Error</source>
-        <translation type="unfinished">Ошибка</translation>
+        <translation>Ошибка</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="190"/>
-        <location filename="../src/uniteditdialog.cpp" line="247"/>
+        <location filename="../src/uniteditdialog.cpp" line="189"/>
+        <location filename="../src/uniteditdialog.cpp" line="246"/>
         <source>Base unit does not exist.</source>
-        <translation type="unfinished">Основная единица измерения не существует.</translation>
+        <translation>Основная единица измерения не существует.</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="196"/>
-        <location filename="../src/uniteditdialog.cpp" line="253"/>
+        <location filename="../src/uniteditdialog.cpp" line="195"/>
+        <location filename="../src/uniteditdialog.cpp" line="252"/>
         <source>Question</source>
-        <translation type="unfinished">Вопрос</translation>
+        <translation>Вопрос</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="196"/>
-        <location filename="../src/uniteditdialog.cpp" line="253"/>
+        <location filename="../src/uniteditdialog.cpp" line="195"/>
+        <location filename="../src/uniteditdialog.cpp" line="252"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
-        <translation type="unfinished">Единица измерения или переменная с таким именем уже существует.
+        <translation>Единица измерения или переменная с таким именем уже существует.
 Вы хотите её перезаписать?</translation>
     </message>
     <message>
-        <source>A variable or unit with the same name already exists.
-Do you want to overwrite it?</source>
-        <translation type="obsolete">Единица измерения или переменная с таким именем уже существует.
-Вы хотите её перезаписать?</translation>
-    </message>
-    <message>
-        <location filename="../src/uniteditdialog.cpp" line="466"/>
+        <location filename="../src/uniteditdialog.cpp" line="465"/>
         <source>Edit Unit</source>
-        <translation type="unfinished">Изменить единицу измерения</translation>
+        <translation>Изменить единицу измерения</translation>
     </message>
     <message>
-        <location filename="../src/uniteditdialog.cpp" line="480"/>
+        <location filename="../src/uniteditdialog.cpp" line="479"/>
         <source>New Unit</source>
-        <translation type="unfinished">Новая единица измерения</translation>
+        <translation>Новая единица измерения</translation>
     </message>
 </context>
 <context>
@@ -4498,7 +4436,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="64"/>
-        <location filename="../src/unitsdialog.cpp" line="690"/>
+        <location filename="../src/unitsdialog.cpp" line="698"/>
         <source>Unit</source>
         <translation>Единица измерения</translation>
     </message>
@@ -4514,8 +4452,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="89"/>
-        <location filename="../src/unitsdialog.cpp" line="574"/>
-        <location filename="../src/unitsdialog.cpp" line="577"/>
+        <location filename="../src/unitsdialog.cpp" line="582"/>
+        <location filename="../src/unitsdialog.cpp" line="585"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -4537,40 +4475,42 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/unitsdialog.cpp" line="96"/>
         <source>Favorite</source>
-        <translation type="unfinished">Избранный</translation>
+        <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="579"/>
+        <location filename="../src/unitsdialog.cpp" line="587"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="757"/>
+        <location filename="../src/unitsdialog.cpp" line="775"/>
         <source>All</source>
-        <comment>All units</comment>
+        <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="800"/>
+        <location filename="../src/unitsdialog.cpp" line="320"/>
+        <location filename="../src/unitsdialog.cpp" line="393"/>
+        <location filename="../src/unitsdialog.cpp" line="818"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="806"/>
+        <location filename="../src/unitsdialog.cpp" line="770"/>
         <source>User units</source>
         <translation>Пользовательские единицы</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="811"/>
+        <location filename="../src/unitsdialog.cpp" line="765"/>
         <source>Favorites</source>
-        <translation type="unfinished">Избранное</translation>
+        <translation>Избранное</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="315"/>
-        <location filename="../src/unitsdialog.cpp" line="356"/>
-        <location filename="../src/unitsdialog.cpp" line="384"/>
-        <location filename="../src/unitsdialog.cpp" line="484"/>
-        <location filename="../src/unitsdialog.cpp" line="818"/>
+        <location filename="../src/unitsdialog.cpp" line="360"/>
+        <location filename="../src/unitsdialog.cpp" line="388"/>
+        <location filename="../src/unitsdialog.cpp" line="492"/>
+        <location filename="../src/unitsdialog.cpp" line="826"/>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
@@ -4625,77 +4565,77 @@ Do you want to overwrite it?</source>
 <context>
     <name>VariableEditDialog</name>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="44"/>
+        <location filename="../src/variableeditdialog.cpp" line="45"/>
         <source>Name:</source>
         <translation>Имя:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="66"/>
+        <location filename="../src/variableeditdialog.cpp" line="69"/>
         <source>Temporary</source>
         <translation>Временная</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="60"/>
+        <location filename="../src/variableeditdialog.cpp" line="61"/>
         <source>Value:</source>
         <translation>Значение:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="41"/>
-        <source>Required</source>
-        <translation type="unfinished">Обязательный</translation>
-    </message>
-    <message>
         <location filename="../src/variableeditdialog.cpp" line="42"/>
-        <source>Description</source>
-        <translation type="unfinished">Расширенное описание</translation>
+        <source>Required</source>
+        <translation>Обязательный</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="62"/>
+        <location filename="../src/variableeditdialog.cpp" line="43"/>
+        <source>Description</source>
+        <translation>Расширенное описание</translation>
+    </message>
+    <message>
+        <location filename="../src/variableeditdialog.cpp" line="64"/>
         <source>current result</source>
         <translation>текущий результат</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="70"/>
+        <location filename="../src/variableeditdialog.cpp" line="73"/>
         <source>Category:</source>
-        <translation type="unfinished">Категория:</translation>
+        <translation>Категория:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="92"/>
+        <location filename="../src/variableeditdialog.cpp" line="93"/>
         <source>Descriptive name:</source>
-        <translation type="unfinished">Краткое описание:</translation>
+        <translation>Краткое описание:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="95"/>
+        <location filename="../src/variableeditdialog.cpp" line="96"/>
         <source>Hide variable</source>
-        <translation type="unfinished">Скрыть переменную</translation>
+        <translation>Скрыть переменную</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="97"/>
+        <location filename="../src/variableeditdialog.cpp" line="98"/>
         <source>Description:</source>
-        <translation type="unfinished">Расширенное описание:</translation>
+        <translation>Расширенное описание:</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="158"/>
-        <location filename="../src/variableeditdialog.cpp" line="199"/>
+        <location filename="../src/variableeditdialog.cpp" line="159"/>
+        <location filename="../src/variableeditdialog.cpp" line="200"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Единица измерения или переменная с таким именем уже существует.
 Вы хотите её перезаписать?</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="322"/>
+        <location filename="../src/variableeditdialog.cpp" line="323"/>
         <source>Edit Variable</source>
         <translation>Изменить переменную</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="336"/>
-        <location filename="../src/variableeditdialog.cpp" line="382"/>
+        <location filename="../src/variableeditdialog.cpp" line="337"/>
+        <location filename="../src/variableeditdialog.cpp" line="383"/>
         <source>New Variable</source>
         <translation>Новая переменная</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="158"/>
-        <location filename="../src/variableeditdialog.cpp" line="199"/>
+        <location filename="../src/variableeditdialog.cpp" line="159"/>
+        <location filename="../src/variableeditdialog.cpp" line="200"/>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
@@ -4714,7 +4654,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="64"/>
-        <location filename="../src/variablesdialog.cpp" line="499"/>
+        <location filename="../src/variablesdialog.cpp" line="507"/>
         <source>Variable</source>
         <translation>Переменная</translation>
     </message>
@@ -4751,8 +4691,8 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="95"/>
-        <location filename="../src/variablesdialog.cpp" line="423"/>
-        <location filename="../src/variablesdialog.cpp" line="426"/>
+        <location filename="../src/variablesdialog.cpp" line="431"/>
+        <location filename="../src/variablesdialog.cpp" line="434"/>
         <source>Deactivate</source>
         <translation>Деактивировать</translation>
     </message>
@@ -4769,122 +4709,124 @@ Do you want to overwrite it?</source>
     <message>
         <location filename="../src/variablesdialog.cpp" line="101"/>
         <source>Favorite</source>
-        <translation type="unfinished">Избранный</translation>
+        <translation>Избранный</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="374"/>
+        <location filename="../src/variablesdialog.cpp" line="382"/>
         <source>a matrix</source>
         <translation>матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="376"/>
+        <location filename="../src/variablesdialog.cpp" line="384"/>
         <source>a vector</source>
         <translation>вектор</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="394"/>
+        <location filename="../src/variablesdialog.cpp" line="402"/>
         <source>positive</source>
         <translation>положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="395"/>
+        <location filename="../src/variablesdialog.cpp" line="403"/>
         <source>non-positive</source>
         <translation>не положительное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="396"/>
+        <location filename="../src/variablesdialog.cpp" line="404"/>
         <source>negative</source>
         <translation>отрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="397"/>
+        <location filename="../src/variablesdialog.cpp" line="405"/>
         <source>non-negative</source>
         <translation>неотрицательное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="398"/>
+        <location filename="../src/variablesdialog.cpp" line="406"/>
         <source>non-zero</source>
         <translation>ненулевое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="404"/>
+        <location filename="../src/variablesdialog.cpp" line="412"/>
         <source>integer</source>
         <translation>целое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="405"/>
+        <location filename="../src/variablesdialog.cpp" line="413"/>
         <source>boolean</source>
         <translation>логическое</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="406"/>
+        <location filename="../src/variablesdialog.cpp" line="414"/>
         <source>rational</source>
         <translation>рациональное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="407"/>
+        <location filename="../src/variablesdialog.cpp" line="415"/>
         <source>real</source>
         <translation>вещественное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="408"/>
+        <location filename="../src/variablesdialog.cpp" line="416"/>
         <source>complex</source>
         <translation>комплексное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="409"/>
+        <location filename="../src/variablesdialog.cpp" line="417"/>
         <source>number</source>
         <translation>число</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="410"/>
+        <location filename="../src/variablesdialog.cpp" line="418"/>
         <source>not matrix</source>
         <translation>не матрица</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="413"/>
+        <location filename="../src/variablesdialog.cpp" line="421"/>
         <source>unknown</source>
         <translation>неизвестное</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="416"/>
+        <location filename="../src/variablesdialog.cpp" line="424"/>
         <source>Default assumptions</source>
         <translation>Предположения по умолчанию</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="428"/>
+        <location filename="../src/variablesdialog.cpp" line="436"/>
         <source>Activate</source>
         <translation>Активировать</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="556"/>
+        <location filename="../src/variablesdialog.cpp" line="574"/>
         <source>All</source>
-        <comment>All variables</comment>
+        <comment>All functions</comment>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="599"/>
+        <location filename="../src/variablesdialog.cpp" line="204"/>
+        <location filename="../src/variablesdialog.cpp" line="269"/>
+        <location filename="../src/variablesdialog.cpp" line="617"/>
         <source>Uncategorized</source>
         <translation>Без категорий</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="605"/>
+        <location filename="../src/variablesdialog.cpp" line="569"/>
         <source>User variables</source>
         <translation>Пользовательские переменные</translation>
     </message>
     <message>
-        <location filename="../src/variablesdialog.cpp" line="610"/>
+        <location filename="../src/variablesdialog.cpp" line="564"/>
         <source>Favorites</source>
-        <translation type="unfinished">Избранное</translation>
+        <translation>Избранное</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="199"/>
-        <location filename="../src/variablesdialog.cpp" line="232"/>
-        <location filename="../src/variablesdialog.cpp" line="260"/>
-        <location filename="../src/variablesdialog.cpp" line="348"/>
-        <location filename="../src/variablesdialog.cpp" line="617"/>
+        <location filename="../src/variablesdialog.cpp" line="236"/>
+        <location filename="../src/variablesdialog.cpp" line="264"/>
+        <location filename="../src/variablesdialog.cpp" line="356"/>
+        <location filename="../src/variablesdialog.cpp" line="625"/>
         <source>Inactive</source>
-        <translation type="unfinished">Неактивные</translation>
+        <translation>Неактивные</translation>
     </message>
 </context>
 </TS>
