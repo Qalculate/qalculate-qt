@@ -80,7 +80,7 @@ TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
 	}
 }
 
-unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
+unix:!equals(COMPILE_RESOURCES,"yes"):!android:macx {
 
 	target.path = $$PREFIX/bin
 
