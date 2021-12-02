@@ -64,20 +64,18 @@ TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
 		translations/qalculate-qt_sv.ts \
 		translations/qalculate-qt_zh_CN.ts
 
-!win32:!macx {
-	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
-	TRANSLATIONS_FILES = 
-	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
-		qmfile = $$shadowed($$tsfile)
-		qmfile ~= s,.ts$,.qm,
-		qmdir = $$dirname(qmfile)
-		exists($$qmdir) {
-			mkpath($$qmdir)|error("Aborting.")
-		}
-		command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
-		system($$command)|error("Failed to run: $$command")
-		TRANSLATIONS_FILES += $$qmfile
+TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
+TRANSLATIONS_FILES =
+qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
+	qmfile = $$shadowed($$tsfile)
+	qmfile ~= s,.ts$,.qm,
+	qmdir = $$dirname(qmfile)
+	exists($$qmdir) {
+		mkpath($$qmdir)|error("Aborting.")
 	}
+	command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+	system($$command)|error("Failed to run: $$command")
+	TRANSLATIONS_FILES += $$qmfile
 }
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
