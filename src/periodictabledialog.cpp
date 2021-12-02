@@ -116,6 +116,15 @@ PeriodicTableDialog::PeriodicTableDialog(QWidget *parent) : QDialog(parent, Qt::
 					}
 					e_button->setToolTip(QString::fromStdString(tip));
 					e_button->setProperty("ELEMENT OBJECT", QVariant::fromValue((void*) e));
+					if(i == 1) {
+						QMargins margins = e_button->contentsMargins();
+						if(margins.left() + margins.right() > size.width() / 2 - 3) {
+							size.setWidth(size.width() / 2 + 4 + margins.left() + margins.right());
+						}
+						if(margins.bottom() + margins.top() > size.height() / 2 - 3) {
+							size.setWidth(size.height() / 2 + 4 + margins.bottom() + margins.top());
+						}
+					}
 					e_button->setMinimumSize(size);
 					e_button->setMaximumSize(size);
 					connect(e_button, SIGNAL(clicked()), this, SLOT(elementClicked()));
