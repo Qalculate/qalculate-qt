@@ -1375,6 +1375,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	}
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
+			case Qt::Key_Insert: {
+				if(event->modifiers() != Qt::ShiftModifier) setOverwriteMode(!overwriteMode());
+				break;
+			}
 			case Qt::Key_Asterisk: {
 				if(settings->rpn_mode && settings->rpn_keys) {
 					emit calculateRPNRequest(OPERATION_MULTIPLY);
