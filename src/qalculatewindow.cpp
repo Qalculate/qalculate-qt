@@ -207,6 +207,7 @@ std::string unhtmlize(std::string str) {
 	gsub("&lt;", "<", str);
 	gsub("&quot;", "\"", str);
 	gsub("&hairsp;", "", str);
+	gsub("&nbsp;", " ", str);
 	gsub("&thinsp;", THIN_SPACE, str);
 	return str;
 }
@@ -1627,8 +1628,32 @@ void QalculateWindow::setOption(std::string str) {
 			settings->tc_set = true;
 			expressionCalculationUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") SET_BOOL_D(settings->printops.round_halfway_to_even)
-	else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
+	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") {
+		bool b = settings->printops.round_halfway_to_even;
+		SET_BOOL(b)
+		if(b != settings->printops.round_halfway_to_even || settings->rounding_mode == 2) {
+			settings->rounding_mode = b ? 0 : 1;
+			settings->printops.custom_time_zone = 0;
+			settings->printops.round_halfway_to_even = b;
+			resultFormatUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "rounding")) {
+		int v = -1;
+		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even")) v = 1;
+		else if(equalsIgnoreCase(svalue, "standard")) v = 0;
+		else if(equalsIgnoreCase(svalue, "truncate")) v = 2;
+		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
+			v = s2i(svalue);
+		}
+		if(v < 0 || v > 2) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v != settings->rounding_mode) {
+			settings->rounding_mode = v;
+			settings->printops.custom_time_zone = (v == 2 ? -21586 : 0);
+			settings->printops.round_halfway_to_even = (v == 1);
+			resultFormatUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
 		bool b = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN);
 		SET_BOOL(b)
 		if(b != (settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN)) {
@@ -2899,7 +2924,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					settings->printops.custom_time_zone = 0;
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -2946,7 +2970,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					settings->printops.custom_time_zone = 0;
+					settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -2957,7 +2981,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					settings->printops.custom_time_zone = 0;
+					settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -3428,7 +3452,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
 		settings->evalops.parse_options.units_enabled = b_units_saved;
 		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-		settings->printops.custom_time_zone = 0;
+		settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 		settings->printops.time_zone = TIME_ZONE_LOCAL;
 		return;
 	}
@@ -3492,7 +3516,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
 	settings->evalops.parse_options.units_enabled = b_units_saved;
 	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-	settings->printops.custom_time_zone = 0;
+	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
 
 	if(stack_index == 0) {
@@ -3822,7 +3846,8 @@ void set_result_bases(const MathStructure &m) {
 			nr = m[0].number();
 			nr.negate();
 		}
-		nr.round(settings->printops.round_halfway_to_even);
+		if(settings->rounding_mode == 2) nr.trunc();
+		else nr.round(settings->printops.round_halfway_to_even);
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
 		po.show_ending_zeroes = false;
@@ -3886,6 +3911,23 @@ void QalculateWindow::onExpressionChanged() {
 	}
 	CALCULATOR->endTemporaryStopMessages();
 	updateResultBases();
+}
+
+std::string ellipsize_result(const std::string &result_text, size_t length) {
+	length /= 2;
+	size_t index1 = result_text.find(SPACE, length);
+	if(index1 == std::string::npos || index1 > length * 1.2) index1 = result_text.find(THIN_SPACE, length);
+	if(index1 == std::string::npos || index1 > length * 1.2) {
+		index1 = length;
+		while(index1 > 0 && result_text[index1] < 0 && (unsigned char) result_text[index1 + 1] < 0xC0) index1--;
+	}
+	size_t index2 = result_text.find(SPACE, result_text.length() - length);
+	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) index2 = result_text.find(THIN_SPACE, result_text.length() - length);
+	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
+		index2 = result_text.length() - length;
+		while(index2 > index1 && result_text[index2] < 0 && (unsigned char) result_text[index2 + 1] < 0xC0) index2--;
+	}
+	return result_text.substr(0, index1) + " (…) " + result_text.substr(index2, result_text.length() - index2);
 }
 
 void ViewThread::run() {
@@ -3992,16 +4034,16 @@ void ViewThread::run() {
 			} else {
 				std::string str = unhtmlize(result_text);
 				if(str.length() > 5000) {
-					result_text = str.substr(0, 1000) + " (…) " + str.substr(str.length() - 1000, 1000);
+					result_text = ellipsize_result(str, 1000);
 				}
 			}
 		} else if(result_text.length() > 50000) {
 			if(mstruct->isNumber())	{
-				result_text = result_text.substr(0, 5000) + " (…) " + result_text.substr(result_text.length() - 5000, 5000);
+				result_text = ellipsize_result(result_text, 5000);
 			} else {
 				std::string str = unhtmlize(result_text);
 				if(str.length() > 20000) {
-					result_text = str.substr(0, 2000) + " (…) " + str.substr(str.length() - 2000, 2000);
+					result_text = ellipsize_result(result_text, 2000);
 				}
 			}
 		}
@@ -5918,7 +5960,7 @@ void QalculateWindow::onInsertFunctionExec() {
 		str = "<span font-weight=\"bold\">";
 		if(!b_approx) str += "= ";
 		else str += SIGN_ALMOST_EQUAL " ";
-		if(result_text.length() > 100000) str += QString::fromStdString(result_text.substr(0, 10000) + " (…) " + result_text.substr(result_text.length() - 10000, 10000));
+		if(result_text.length() > 100000) str += QString::fromStdString(ellipsize_result(result_text, 20000));
 		else str += QString::fromStdString(result_text);
 		str += "</span>";
 		fd->w_scrollresult->show();

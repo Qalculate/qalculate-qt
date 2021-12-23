@@ -58,7 +58,7 @@ class PreferencesDialog : public QDialog {
 		void readPrecisionToggled(bool);
 		void intervalCalculationChanged(int);
 		void complexFormChanged(int);
-		void roundEvenToggled(bool);
+		void roundingChanged(int);
 		void repeatingDecimalsToggled(bool);
 		void mixedUnitsToggled(bool);
 		void abbreviateNamesToggled(bool);

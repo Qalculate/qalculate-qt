@@ -88,16 +88,41 @@ QString MatrixWidget::getMatrixString() const {
 	}
 	if(max_r < 0) {max_r = matrixTable->rowCount() - 1; max_c = matrixTable->columnCount() - 1;}
 	str = "[";
+	QString str_e;
 	for(int r = 0; r <= max_r; r++) {
-		if(r > 0) {QString::fromStdString(CALCULATOR->getComma()); str += " ";}
-		str += "[";
+		if(r > 0) str += "; ";
 		for(int c = 0; c <= max_c; c++) {
-			if(c > 0) {QString::fromStdString(CALCULATOR->getComma()); str += " ";}
+			if(c > 0) str += "  ";
 			QTableWidgetItem *item = matrixTable->item(r, c);
-			if(!item || item->text().isEmpty()) str += "0";
-			else str += item->text();
+			if(!item || item->text().isEmpty()) {
+				str += "0";
+			} else {
+				str_e = item->text();
+				bool in_cit1 = false, in_cit2 = false;
+				int pars = 0, brackets = 0;
+				for(int i = 0; i < str_e.length(); i++) {
+					if(!in_cit1 && !in_cit2) {
+						if(str_e[i] == '[') brackets++;
+						else if(str_e[i] == ']' && brackets > 0) brackets++;
+						else if(str_e[i] == '(' && brackets == 0) pars++;
+						else if(str_e[i] == ')' && brackets == 0 && pars > 0) pars--;
+						else if(brackets == 0 && pars == 0 && (str_e[i].isSpace() || str_e[i] == ';' || (str_e[i] == ',' && settings->printops.decimalpoint() != ","))) {
+							str += "(";
+							str_e += ")";
+							break;
+						}
+					}
+					if(str_e[i] == '\"') {
+						if(in_cit1) in_cit1 = false;
+						else if(!in_cit2) in_cit1 = true;
+					} else if(str_e[i] == '\'') {
+						if(in_cit2) in_cit2 = false;
+						else if(!in_cit1) in_cit1 = true;
+					}
+				}
+				str += str_e;
+			}
 		}
-		str += "]";
 	}
 	str += "]";
 	return str;

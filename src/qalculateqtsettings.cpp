@@ -153,6 +153,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.indicate_infinite_series = false;
 	printops.show_ending_zeroes = true;
 	printops.round_halfway_to_even = false;
+	rounding_mode = 0;
 	printops.number_fraction_format = FRACTION_DECIMAL;
 	printops.restrict_fraction_length = false;
 	printops.abbreviate_names = true;
@@ -621,6 +622,14 @@ void QalculateQtSettings::loadPreferences() {
 					}
 				} else if(svar == "round_halfway_to_even") {
 					printops.round_halfway_to_even = v;
+					printops.custom_time_zone = 0;
+					rounding_mode = (v ? 1 : 0);
+				} else if(svar == "rounding_mode") {
+					if(v >= 0 && v <= 2) {
+						rounding_mode = v;
+						printops.custom_time_zone = (v == 2 ? -21586 : 0);
+						printops.round_halfway_to_even = (v == 1);
+					}
 				} else if(svar == "approximation") {
 					if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
 						evalops.approximation = (ApproximationMode) v;
@@ -980,7 +989,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
 	fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
 	fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
-	fprintf(file, "round_halfway_to_even=%i\n", printops.round_halfway_to_even);
+	fprintf(file, "rounding_mode=%i\n", rounding_mode);
 	if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
 	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 	else fprintf(file, "approximation=%i\n", evalops.approximation);

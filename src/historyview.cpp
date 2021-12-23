@@ -122,6 +122,7 @@ QString unhtmlize(QString str) {
 	str.replace("&amp;", "&");
 	str.replace("&gt;", ">");
 	str.replace("&lt;", "<");
+	str.replace("&nbsp;", " ");
 	str.replace("&quot;", "\"");
 	return str;
 }

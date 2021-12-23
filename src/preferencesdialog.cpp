@@ -154,7 +154,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	decimalCommaBox = box;
 	BOX(tr("Ignore comma in numbers"), settings->evalops.parse_options.comma_as_separator, ignoreCommaToggled(bool)); ignoreCommaBox = box;
 	BOX(tr("Ignore dots in numbers"), settings->evalops.parse_options.dot_as_separator, ignoreDotToggled(bool)); ignoreDotBox = box;
-	BOX(tr("Round halfway numbers to even"), settings->printops.round_halfway_to_even, roundEvenToggled(bool));
 	BOX(tr("Indicate repeating decimals"), settings->printops.indicate_infinite_series, repeatingDecimalsToggled(bool));
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
@@ -180,6 +179,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	if(settings->adaptive_interval_display) combo->setCurrentIndex(0);
 	else combo->setCurrentIndex(combo->findData(settings->printops.interval_display));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalDisplayChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(new QLabel(tr("Rounding:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Round halfway upwards"), 0);
+	combo->addItem(tr("Round halfway to even"), 1);
+	combo->addItem(tr("Truncate"), 2);
+	combo->setCurrentIndex(combo->findData(settings->rounding_mode));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(roundingChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Complex number form:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -405,8 +412,10 @@ void PreferencesDialog::complexFormChanged(int i) {
 	settings->complex_angle_form = (settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS);
 	emit expressionCalculationUpdated(0);
 }
-void PreferencesDialog::roundEvenToggled(bool b) {
-	settings->printops.round_halfway_to_even = b;
+void PreferencesDialog::roundingChanged(int i) {
+	settings->rounding_mode = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+	settings->printops.round_halfway_to_even = (settings->rounding_mode == 1);
 	emit resultFormatUpdated();
 }
 void PreferencesDialog::repeatingDecimalsToggled(bool b) {
