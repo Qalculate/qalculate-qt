@@ -810,7 +810,6 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	cdata = new CompletionData;
 	history_index = -1;
 	disable_history_arrow_keys = false;
-	settings->display_expression_status = true;
 	block_display_parse = 0;
 	block_text_change = 0;
 	dont_change_index = false;
@@ -1700,9 +1699,9 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Delayed completion"), this, SLOT(enableCompletionDelay())); action->setCheckable(true); if(settings->completion_delay > 0) action->setChecked(true);
 		menu = cmenu->addMenu(tr("Expression Status"));
 		group = new QActionGroup(this);
-		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); if(!settings->display_expression_status) action->setChecked(true);
-		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); if(settings->display_expression_status && settings->expression_status_delay > 0) action->setChecked(true);
-		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); if(settings->display_expression_status && settings->expression_status_delay == 0) action->setChecked(true);
+		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); statusOffAction = action;
+		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
+		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
@@ -1718,6 +1717,9 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	deleteAction->setEnabled(b_sel);
 	selectAllAction->setEnabled(!b_empty);
 	clearAction->setEnabled(!b_empty);
+	if(!settings->display_expression_status) statusOffAction->setChecked(true);
+	else if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
+	else statusNoDelayAction->setChecked(true);
 	cmenu->popup(e->globalPos());
 }
 void ExpressionEdit::insertDate() {
@@ -1864,7 +1866,8 @@ void ExpressionEdit::showCurrentStatus() {
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
 		remove_spaces(current_text);
-		if(current_status_is_expression && settings->auto_calculate) {
+		qDebug() << str_nohtml.length();
+		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
@@ -1885,7 +1888,7 @@ void ExpressionEdit::showCurrentStatus() {
 				}
 			}
 		}
-		if(str_nohtml == current_text) {
+		if(str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
 		} else if(tipLabel && tipLabel->isVisible()) {
 			tipLabel->reuseTip(str, mapToGlobal(cursorRect().bottomRight()));

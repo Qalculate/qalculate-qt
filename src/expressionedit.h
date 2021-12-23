@@ -61,7 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
