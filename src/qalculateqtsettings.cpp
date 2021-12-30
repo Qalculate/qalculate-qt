@@ -744,13 +744,6 @@ void QalculateQtSettings::loadPreferences() {
 	ename.name = "MRC";
 	v_memory->addName(ename);
 	CALCULATOR->addVariable(v_memory);
-	if(do_imaginary_j && CALCULATOR->v_i->hasName("j") == 0) {
-		ExpressionName ename = CALCULATOR->v_i->getName(1);
-		ename.name = "j";
-		ename.reference = false;
-		CALCULATOR->v_i->addName(ename, 1, true);
-		CALCULATOR->v_i->setChanged(false);
-	}
 
 	if(style >= 0) updateStyle();
 	else if(palette >= 0) updatePalette();
@@ -936,7 +929,7 @@ void QalculateQtSettings::savePreferences(bool) {
 	fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
 	fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
 	fprintf(file, "e_notation=%i\n", printops.lower_case_e);
-	fprintf(file, "imaginary_j=%i\n", CALCULATOR->v_i->hasName("j") > 0);
+	fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 	fprintf(file, "base_display=%i\n", printops.base_display);
 	if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
 	fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);

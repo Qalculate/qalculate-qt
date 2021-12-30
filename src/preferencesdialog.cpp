@@ -329,6 +329,7 @@ void PreferencesDialog::imaginaryJToggled(bool b) {
 		v_i->setChanged(false);
 	}
 	emit expressionFormatUpdated(false);
+	emit symbolsUpdated();
 }
 void PreferencesDialog::decimalCommaToggled(bool b) {
 	settings->decimal_comma = b;

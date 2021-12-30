@@ -1866,7 +1866,6 @@ void ExpressionEdit::showCurrentStatus() {
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
 		remove_spaces(current_text);
-		qDebug() << str_nohtml.length();
 		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;

@@ -150,6 +150,15 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	if(settings->do_imaginary_j && CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") == 0) {
+		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
+		ExpressionName ename = v_i->getName(1);
+		ename.name = "j";
+		ename.reference = false;
+		v_i->addName(ename, 1, true);
+		v_i->setChanged(false);
+	}
+
 	settings->f_answer->setCategory(CALCULATOR->getFunctionById(FUNCTION_ID_WARNING)->category());
 	settings->f_answer->setChanged(false);
 

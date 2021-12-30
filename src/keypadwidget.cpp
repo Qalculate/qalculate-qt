@@ -207,7 +207,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setText("x!");
 	c++;
 	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getVariableById(VARIABLE_ID_EULER), SIGN_PI, c, 3);
-	ITEM_OPERATOR_ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_I), "∠", CALCULATOR->getFunctionById(FUNCTION_ID_ARG), "i", c, 2);
+	ITEM_OPERATOR_ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_I), "∠", CALCULATOR->getFunctionById(FUNCTION_ID_ARG), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i", c, 2);
+	imaginaryButton = button;
 	QFont ifont(button->font());
 	ifont.setStyle(QFont::StyleItalic);
 	button->setFont(ifont);
@@ -359,6 +360,7 @@ KeypadWidget::~KeypadWidget() {}
 
 void KeypadWidget::updateSymbols() {
 	multiplicationButton->setText(settings->multiplicationSign());
+	multiplicationButton->setText(settings->multiplicationSign());
 	multiplicationButton->setProperty(BUTTON_DATA, settings->multiplicationSign());
 	divisionButton->setText(settings->divisionSign());
 	divisionButton->setProperty(BUTTON_DATA, settings->divisionSign(false));
@@ -366,6 +368,7 @@ void KeypadWidget::updateSymbols() {
 	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
 	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));
 	dotButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getDecimalPoint()));
+	imaginaryButton->setText(CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i");
 }
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
