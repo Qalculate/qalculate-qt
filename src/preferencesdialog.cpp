@@ -546,17 +546,22 @@ void PreferencesDialog::darkModeToggled(bool b) {
 		if(styleCombo->currentIndex() == 0 || styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
 			for(int i = 1; i < styleCombo->count(); i++) {
 				if(styleCombo->itemText(i).compare("Fusion", Qt::CaseInsensitive) == 0) {
+					int prev_style = settings->style;
 					styleCombo->setCurrentIndex(i);
+					settings->light_style = prev_style;
 					break;
 				}
 			}
 		}
+	} else if(light_style != settings->style && styleCombo->currentText().compare("Fusion", Qt::CaseInsensitive) == 0) {
+		styleCombo->setCurrentIndex(settings->light_style < 0 ? 0 : settings->light_style + 1);
 	}
 #endif
 	settings->updatePalette();
 }
 void PreferencesDialog::styleChanged(int i) {
 	settings->style = i - 1;
+	settings->light_style = settings->style;
 	settings->updateStyle();
 }
 void PreferencesDialog::factorizeToggled(bool b) {

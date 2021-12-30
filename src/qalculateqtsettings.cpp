@@ -244,6 +244,7 @@ void QalculateQtSettings::loadPreferences() {
 	custom_keypad_font = "";
 	custom_app_font = "";
 	style = -1;
+	light_style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
 	save_mode_on_exit = true;
@@ -375,6 +376,8 @@ void QalculateQtSettings::loadPreferences() {
 					datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "style") {
 					style = v;
+				} else if(svar == "light_style") {
+					light_style = v;
 				} else if(svar == "palette") {
 					palette = v;
 				} else if(svar == "color") {
@@ -745,6 +748,7 @@ void QalculateQtSettings::loadPreferences() {
 	v_memory->addName(ename);
 	CALCULATOR->addVariable(v_memory);
 
+	if(palette != 1) light_style = style;
 	if(style >= 0) updateStyle();
 	else if(palette >= 0) updatePalette();
 
@@ -843,9 +847,14 @@ void QalculateQtSettings::updatePalette() {
 void QalculateQtSettings::updateStyle() {
 	if(style >= 0 && style < QStyleFactory::keys().count()) {
 		QStyle *s = QStyleFactory::create(QStyleFactory::keys().at(style));
-		if(!s) return;
-		QApplication::setStyle(s);
+		if(s) QApplication::setStyle(s);
 	}
+#ifdef _WIN32
+	else {
+		QStyle *s = QStyleFactory::create("windowsvista");
+		if(s) QApplication::setStyle(s);
+	}
+#endif
 	updatePalette();
 }
 void QalculateQtSettings::savePreferences(bool) {
@@ -899,6 +908,9 @@ void QalculateQtSettings::savePreferences(bool) {
 	fprintf(file, "completion_min2=%i\n", completion_min2);
 	fprintf(file, "completion_delay=%i\n", completion_delay);
 	fprintf(file, "style=%i\n", style);
+#ifdef _WIN32
+	if(light_style != style && palette == 1) fprintf(file, "light_style=%i\n", light_style);
+#endif
 	fprintf(file, "palette=%i\n", palette);
 	fprintf(file, "color=%i\n", colorize_result);
 	fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
