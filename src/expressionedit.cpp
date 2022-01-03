@@ -1388,6 +1388,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Minus: {
+				if(settings->rpn_mode && settings->rpn_keys) {
+					emit calculateRPNRequest(OPERATION_SUBTRACT);
+					return;
+				}
 				if(doChainMode(SIGN_MINUS)) return;
 				wrapSelection(SIGN_MINUS);
 				return;
