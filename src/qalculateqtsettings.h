@@ -97,6 +97,8 @@ class QalculateQtSettings : QObject {
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
+		int default_signed = -1, default_bits = -1;
+		int keypad_type;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;

@@ -46,7 +46,7 @@ bool string_is_less(std::string str1, std::string str2) {
 	bool b_uni = false;
 	while(i < str1.length() && i < str2.length()) {
 		if(str1[i] == str2[i]) i++;
-		else if(str1[i] < 0 || str2[i] < 0) {b_uni = true; break;}
+		else if((signed char) str1[i] < 0 || (signed char) str2[i] < 0) {b_uni = true; break;}
 		else return str1[i] < str2[i];
 	}
 	if(b_uni) return QString::fromStdString(str1).compare(QString::fromStdString(str2)) < 0;
@@ -231,6 +231,7 @@ void QalculateQtSettings::loadPreferences() {
 	display_expression_status = true;
 	expression_status_delay = 1000;
 	prefixes_default = true;
+	keypad_type = 0;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
 	use_custom_keypad_font = false;
@@ -257,6 +258,9 @@ void QalculateQtSettings::loadPreferences() {
 	check_version = false;
 #endif
 	last_version_check_date.setToCurrentDate();
+
+	default_signed = -1;
+	default_bits = -1;
 
 	favourite_functions_changed = false;
 	favourite_variables_changed = false;
@@ -344,6 +348,8 @@ void QalculateQtSettings::loadPreferences() {
 					clear_history_on_exit = v;
 				} else if(svar == "window_state") {
 					window_state = QByteArray::fromBase64(svalue.c_str());
+				} else if(svar == "keypad_type") {
+					if(v >= 0 && v <= 3) keypad_type = v;
 				} else if(svar == "replace_expression") {
 					replace_expression = v;
 				} else if(svar == "window_geometry") {
@@ -472,10 +478,10 @@ void QalculateQtSettings::loadPreferences() {
 					last_version_check_date.set(svalue);
 				} else if(svar == "last_found_version") {
 					last_found_version = svalue;
-				/*} else if(svar == "bit_width") {
+				} else if(svar == "bit_width") {
 					default_bits = v;
 				} else if(svar == "signed_integer") {
-					default_signed = v;*/
+					default_signed = v;
 				} else if(svar == "min_deci") {
 					printops.min_decimals = v;
 				} else if(svar == "use_min_deci") {
@@ -925,9 +931,10 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 	if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 	fprintf(file, "replace_expression=%i\n", replace_expression);
+	fprintf(file, "keypad_type=%i\n", keypad_type);
 	fprintf(file, "rpn_keys=%i\n", rpn_keys);
-	/*if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
-	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);*/
+	if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
+	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
@@ -1055,7 +1062,7 @@ void QalculateQtSettings::savePreferences(bool) {
 								std::string str = unhtmlize(v_result[i][i2]);
 								if(str.length() > 5000) {
 									int index = 50;
-									while(index >= 0 && str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+									while(index >= 0 && (signed char) str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
 									gsub("\n", "<br>", str);
 									fprintf(file,  "=%s …\n", str.substr(0, index + 1).c_str());
 								} else {

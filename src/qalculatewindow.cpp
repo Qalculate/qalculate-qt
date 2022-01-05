@@ -129,6 +129,16 @@ bool contains_unknown_variable(const MathStructure &m) {
 	return false;
 }
 
+QAction *find_child_data(QObject *parent, const QString &name, int v) {
+	QActionGroup *group = parent->findChild<QActionGroup*>(name);
+	if(!group) return NULL;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == v) return actions.at(i);
+	}
+	return NULL;
+}
+
 std::string print_with_evalops(const Number &nr) {
 	PrintOptions po;
 	po.is_approximate = NULL;
@@ -617,6 +627,17 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
 	keypadAction->setCheckable(true);
+	menu = new QMenu(this);
+	keypadAction->setMenu(menu);
+	group = new QActionGroup(this); group->setObjectName("group_keypad");
+	action = menu->addAction(tr("General"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(KEYPAD_GENERAL); if(settings->keypad_type == KEYPAD_GENERAL) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Programming"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(KEYPAD_PROGRAMMING); if(settings->keypad_type == KEYPAD_PROGRAMMING) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Algebra"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(KEYPAD_ALGEBRA); if(settings->keypad_type == KEYPAD_ALGEBRA) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Custom"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(KEYPAD_CUSTOM); if(settings->keypad_type == KEYPAD_CUSTOM) {base_checked = true; action->setChecked(true);}
 	tb->addAction(keypadAction);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -803,6 +824,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(MPlusClicked()), this, SLOT(onMPlusClicked()));
 	connect(keypad, SIGNAL(MMinusClicked()), this, SLOT(onMMinusClicked()));
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
+	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -1033,7 +1055,9 @@ void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onOperatorClicked(const QString &str) {
-	if(settings->rpn_mode) {
+	if(settings->rpn_mode && str != "NOT") {
+		if(str == " mod ") {onFunctionClicked(CALCULATOR->getFunctionById(FUNCTION_ID_MOD)); return;}
+		if(str == " rem ") {onFunctionClicked(CALCULATOR->getFunctionById(FUNCTION_ID_REM)); return;}
 		if(expressionEdit->expressionHasChanged()) {
 			if(!expressionEdit->toPlainText().trimmed().isEmpty()) {
 				calculateExpression(true);
@@ -1056,7 +1080,18 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
 		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : str);
 	} else {
-		if(!expressionEdit->doChainMode(str)) expressionEdit->wrapSelection(str);
+		if((str == "//" || str == " mod " || str == " rem ") && (settings->rpn_mode || expressionEdit->document()->isEmpty() || settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN || (expressionEdit->textCursor().atStart() && !expressionEdit->textCursor().hasSelection()))) {
+			MathFunction *f;
+			if(str == " mod ") f = CALCULATOR->getFunctionById(FUNCTION_ID_MOD);
+			else if(str == " rem ") f = CALCULATOR->getFunctionById(FUNCTION_ID_REM);
+			else f = CALCULATOR->getActiveFunction("div");
+			if(f) {
+				expressionEdit->blockCompletion(false);
+				onFunctionClicked(f);
+				return;
+			}
+		}
+		if(!expressionEdit->doChainMode(str == "NOT" ? "!" : str)) expressionEdit->wrapSelection(str == "NOT" ? "!" : str);
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) calculate();
@@ -1075,22 +1110,116 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		calculateRPN(f);
 		return;
 	}
+	QString sargs;
+	if(f->id() == FUNCTION_ID_CIRCULAR_SHIFT || f->id() == FUNCTION_ID_BIT_CMP) {
+		Argument *arg_bits = f->getArgumentDefinition(f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? 3 : 2);
+		Argument *arg_steps = (f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? f->getArgumentDefinition(2) : NULL);
+		Argument *arg_signed = f->getArgumentDefinition(f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? 4 : 3);
+		MathSpinBox *spin = NULL;
+		if(arg_bits && arg_signed && (f->id() != FUNCTION_ID_CIRCULAR_SHIFT || arg_steps)) {
+			QDialog *dialog = new QDialog(this);
+			if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+			dialog->setWindowTitle(QString::fromStdString(f->title(true)));
+			QVBoxLayout *box = new QVBoxLayout(dialog);
+			QGridLayout *grid = new QGridLayout();
+			box->addLayout(grid);
+			if(arg_steps) {
+				grid->addWidget(new QLabel(tr("%1:").arg(QString::fromStdString(arg_steps->name()))), 0, 0);
+				int min = INT_MIN, max = INT_MAX;
+				if(arg_steps->type() == ARGUMENT_TYPE_INTEGER) {
+					IntegerArgument *iarg = (IntegerArgument*) arg_steps;
+					if(iarg->min()) {
+						min = iarg->min()->intValue();
+					}
+					if(iarg->max()) {
+						max = iarg->max()->intValue();
+					}
+				}
+				spin = new MathSpinBox();
+				spin->setRange(min, max);
+				if(!f->getDefaultValue(2).empty()) {
+					spin->setValue(s2i(f->getDefaultValue(2)));
+				} else if(!arg_steps->zeroForbidden() && min <= 0 && max >= 0) {
+					spin->setValue(0);
+				} else {
+					if(max < 0) {
+						spin->setValue(max);
+					} else if(min <= 1) {
+						spin->setValue(1);
+					} else {
+						spin->setValue(min);
+					}
+				}
+				grid->addWidget(spin, 0, 1);
+			}
+			grid->addWidget(new QLabel(tr("%1:").arg(QString::fromStdString(arg_bits->name()))), arg_steps ? 1 : 0, 0);
+			QComboBox *combo = new QComboBox(dialog);
+			combo->addItem("8", 8);
+			combo->addItem("16", 16);
+			combo->addItem("32", 32);
+			combo->addItem("64", 64);
+			combo->addItem("128", 128);
+			combo->addItem("256", 256);
+			combo->addItem("512", 512);
+			combo->addItem("1024", 1024);
+			int i = combo->findData(settings->default_bits);
+			if(i < 0) i = 2;
+			combo->setCurrentIndex(i);
+			grid->addWidget(combo, arg_steps ? 1 : 0, 1);
+			QCheckBox *button = new QCheckBox(QString::fromStdString(arg_signed->name()));
+			button->setChecked(settings->default_signed > 0 || (settings->default_signed < 0 && f->id() == FUNCTION_ID_CIRCULAR_SHIFT));
+			grid->addWidget(button, arg_steps ? 2 : 1, 0, 2, 1, Qt::AlignRight);
+			QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+			buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+			buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+			box->addWidget(buttonBox);
+			connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+			connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+			if(dialog->exec() == QDialog::Accepted) {
+				Number bits = combo->currentData().toInt();
+				if(bits.isZero()) bits = 32;
+				sargs = QString::fromStdString(CALCULATOR->getComma());
+				sargs += " ";
+				if(spin) {
+					if(settings->evalops.parse_options.base != BASE_DECIMAL) {
+						Number nr(spin->value(), 1);
+						sargs += QString::fromStdString(print_with_evalops(nr));
+					} else {
+						sargs += spin->cleanText();
+					}
+					sargs += QString::fromStdString(CALCULATOR->getComma());
+					sargs += " ";
+				}
+				sargs += QString::fromStdString(print_with_evalops(bits));
+				sargs += QString::fromStdString(CALCULATOR->getComma());
+				sargs += " ";
+				if(button->isChecked()) sargs += "1";
+				else sargs += "0";
+				settings->default_bits = bits.intValue();
+				settings->default_signed = button->isChecked();
+				dialog->deleteLater();
+			} else {
+				dialog->deleteLater();
+				return;
+			}
+		}
+	}
 	expressionEdit->blockCompletion();
 	QTextCursor cur = expressionEdit->textCursor();
 	bool do_exec = false;
 	if(settings->chain_mode) {
 		if(!expressionEdit->document()->isEmpty()) {
 			expressionEdit->selectAll();
-			do_exec = f->minargs() <= 1;
+			do_exec = !sargs.isEmpty() || f->minargs() <= 1;
 		}
 	} else if(cur.hasSelection()) {
-		do_exec = f->minargs() <= 1 && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+		do_exec = (!sargs.isEmpty() || f->minargs() <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
 		expressionEdit->selectAll();
-		do_exec = f->minargs() <= 1;
+		do_exec = !sargs.isEmpty() || f->minargs() <= 1;
 	}
 	if(do_exec) expressionEdit->blockParseStatus();
-	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1);
+	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
@@ -1213,6 +1342,23 @@ void QalculateWindow::onAnswerClicked() {
 		onInsertValueRequested(settings->history_answer.size());
 	}
 }
+void QalculateWindow::onBaseClicked(int v, bool b) {
+	if(b && v != settings->evalops.parse_options.base) {
+		settings->evalops.parse_options.base = v;
+		QAction *action = find_child_data(this, "group_inbase", v);
+		if(action) action->setChecked(true);
+		expressionFormatUpdated(false);
+	}
+	if(v != settings->printops.base) {
+		settings->printops.base = v;
+		to_base = 0;
+		to_bits = 0;
+		QAction *action = find_child_data(this, "group_outbase", v);
+		if(action) action->setChecked(true);
+		resultFormatUpdated();
+	}
+	keypad->updateBase();
+}
 void QalculateWindow::serverNewConnection() {
 	socket = server->nextPendingConnection();
 	if(socket) {
@@ -1226,6 +1372,10 @@ void QalculateWindow::socketReadyRead() {
 		settings->savePreferences(false);
 		return;
 	}
+#ifdef _WIN32
+	setWindowState(windowState() | Qt::WindowMinimized);
+	qApp->processEvents();
+#endif
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -1265,6 +1415,10 @@ void QalculateWindow::onActivateRequested(const QStringList &arguments, const QS
 		if(!command.isEmpty()) {expressionEdit->setExpression(command); calculate();}
 		args.clear();
 	}
+#ifdef _WIN32
+	setWindowState(windowState() | Qt::WindowMinimized);
+	qApp->processEvents();
+#endif
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -1432,16 +1586,6 @@ void set_assumption(const std::string &str, AssumptionType &at, AssumptionSign &
 #define SET_BOOL_PT(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionFormatUpdated(true);}}
 #define SET_BOOL_PF(x)		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(x != v) {x = v; expressionFormatUpdated(false);}}
 
-QAction *find_child_data(QObject *parent, const QString &name, int v) {
-	QActionGroup *group = parent->findChild<QActionGroup*>(name);
-	if(!group) return NULL;
-	QList<QAction*> actions = group->actions();
-	for(int i = 0; i < actions.count(); i++) {
-		if(actions.at(i)->data().toInt() == v) return actions.at(i);
-	}
-	return NULL;
-}
-
 void QalculateWindow::setOption(std::string str) {
 	remove_blank_ends(str);
 	gsub(SIGN_MINUS, "-", str);
@@ -1536,7 +1680,7 @@ void QalculateWindow::setOption(std::string str) {
 		} else if(b_in) {
 			if(v == BASE_CUSTOM || v != settings->evalops.parse_options.base) {
 				settings->evalops.parse_options.base = v;
-				QAction *action = find_child_data(this, "group_intbase", v);
+				QAction *action = find_child_data(this, "group_inbase", v);
 				if(!action) action = find_child_data(this, "group_inbase", BASE_CUSTOM);
 				if(action) {
 					action->setChecked(true);
@@ -2301,7 +2445,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		bool b_command = false;
 		if(str[0] == '/' && str.length() > 1) {
 			size_t i = str.find_first_not_of(SPACES, 1);
-			if(i != std::string::npos && str[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, str[i])) {
+			if(i != std::string::npos && (signed char) str[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, str[i])) {
 				b_command = true;
 			}
 		}
@@ -3245,6 +3389,12 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				} else if(str2 == "==") {
 					CALCULATOR->calculateRPN(OPERATION_EQUALS, 0, settings->evalops, parsed_mstruct);
 					do_mathoperation = true;
+				} else if(str2 == "&&") {
+					CALCULATOR->calculateRPN(OPERATION_LOGICAL_AND, 0, settings->evalops, parsed_mstruct);
+					do_mathoperation = true;
+				} else if(str2 == "||") {
+					CALCULATOR->calculateRPN(OPERATION_LOGICAL_OR, 0, settings->evalops, parsed_mstruct);
+					do_mathoperation = true;
 				} else if(str2 == "//") {
 					MathFunction *fdiv = CALCULATOR->getActiveFunction("div");
 					if(fdiv) {
@@ -3919,13 +4069,13 @@ std::string ellipsize_result(const std::string &result_text, size_t length) {
 	if(index1 == std::string::npos || index1 > length * 1.2) index1 = result_text.find(THIN_SPACE, length);
 	if(index1 == std::string::npos || index1 > length * 1.2) {
 		index1 = length;
-		while(index1 > 0 && result_text[index1] < 0 && (unsigned char) result_text[index1 + 1] < 0xC0) index1--;
+		while(index1 > 0 && (signed char) result_text[index1] < 0 && (unsigned char) result_text[index1 + 1] < 0xC0) index1--;
 	}
 	size_t index2 = result_text.find(SPACE, result_text.length() - length);
 	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) index2 = result_text.find(THIN_SPACE, result_text.length() - length);
 	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
 		index2 = result_text.length() - length;
-		while(index2 > index1 && result_text[index2] < 0 && (unsigned char) result_text[index2 + 1] < 0xC0) index2--;
+		while(index2 > index1 && (signed char) result_text[index2] < 0 && (unsigned char) result_text[index2 + 1] < 0xC0) index2--;
 	}
 	return result_text.substr(0, index1) + " (…) " + result_text.substr(index2, result_text.length() - index2);
 }
@@ -4734,6 +4884,11 @@ void QalculateWindow::newFunction() {
 		updateFunctionsMenu();
 	}
 }
+void QalculateWindow::keypadTypeActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	settings->keypad_type = v;
+	keypad->setKeypadType(v);
+}
 void QalculateWindow::onKeypadActivated(bool b) {
 	keypadDock->setVisible(b);
 	if(b) keypadDock->raise();
@@ -4854,6 +5009,7 @@ void QalculateWindow::outputBaseActivated() {
 	} else {
 		settings->printops.base = v;
 	}
+	keypad->updateBase();
 	resultFormatUpdated();
 }
 void QalculateWindow::onCustomOutputBaseChanged(int v) {
@@ -4866,6 +5022,7 @@ void QalculateWindow::onCustomOutputBaseChanged(int v) {
 		settings->printops.base = BASE_CUSTOM;
 		CALCULATOR->setCustomOutputBase(Number(v, 1));
 	}
+	keypad->updateBase();
 	resultFormatUpdated();
 }
 void QalculateWindow::inputBaseActivated() {
@@ -4881,6 +5038,7 @@ void QalculateWindow::inputBaseActivated() {
 	} else {
 		settings->evalops.parse_options.base = v;
 	}
+	keypad->updateBase();
 	expressionFormatUpdated(false);
 }
 void QalculateWindow::onCustomInputBaseChanged(int v) {
@@ -4891,6 +5049,7 @@ void QalculateWindow::onCustomInputBaseChanged(int v) {
 		settings->evalops.parse_options.base = BASE_CUSTOM;
 		CALCULATOR->setCustomInputBase(Number(v, 1));
 	}
+	keypad->updateBase();
 	expressionFormatUpdated(false);
 }
 void QalculateWindow::assumptionsTypeActivated() {

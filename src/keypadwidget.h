@@ -18,6 +18,7 @@
 #include <libqalculate/qalculate.h>
 
 class QTimer;
+class QStackedLayout;
 
 class KeypadButton : public QPushButton {
 
@@ -54,6 +55,13 @@ class KeypadButton : public QPushButton {
 
 };
 
+enum {
+	KEYPAD_GENERAL = 0,
+	KEYPAD_PROGRAMMING = 1,
+	KEYPAD_ALGEBRA = 2,
+	KEYPAD_CUSTOM = 3
+};
+
 class KeypadWidget : public QWidget {
 
 	Q_OBJECT
@@ -65,7 +73,8 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton;
+		QStackedLayout *leftStack;
 		void changeEvent(QEvent *e);
 
 	protected slots:
@@ -79,11 +88,15 @@ class KeypadWidget : public QWidget {
 		void onSymbolButtonClicked3();
 		void onOperatorButtonClicked3();
 		void onItemButtonClicked3();
+		void onBaseButtonClicked();
+		void onBaseButtonClicked2();
 		void onHypToggled(bool);
 
 	public slots:
 
+		void updateBase();
 		void updateSymbols();
+		void setKeypadType(int);
 
 	signals:
 
@@ -108,6 +121,7 @@ class KeypadWidget : public QWidget {
 		void MMinusClicked();
 		void backspaceClicked();
 		void answerClicked();
+		void baseClicked(int, bool);
 
 };
 

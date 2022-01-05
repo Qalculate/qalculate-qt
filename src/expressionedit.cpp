@@ -124,7 +124,7 @@ void  ExpressionTipLabel::updateSize(const QPoint &pos) {
 			QScreen *screen = widget->screen();
 #	else
 			QScreen *screen = QGuiApplication::screenAt(pos);
-#endif
+#	endif
 			if(!screen) screen = QGuiApplication::primaryScreen();
 			if(screen) {
 				const qreal screenWidth = screen->geometry().width();
@@ -175,9 +175,9 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 	QScreen *scr = QGuiApplication::screenAt(pos);
 #	endif
 	if(!scr) scr = QGuiApplication::primaryScreen();
-	QRect screen = scr->geometry();
+	QRect screen = scr->availableGeometry();
 #else
-	QRect screen = QApplication::desktop()->screenGeometry(widget);
+	QRect screen = QApplication::desktop()->availableGeometry(widget);
 #endif
 	QPoint p = pos;
 	p += QPoint(2, 16);
@@ -206,12 +206,12 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 bool last_is_operator(std::string str, bool allow_exp) {
 	remove_blank_ends(str);
 	if(str.empty()) return false;
-	if(str[str.length() - 1] > 0) {
+	if((signed char) str[str.length() - 1] > 0) {
 		if(is_in(OPERATORS "\\" LEFT_PARENTHESIS LEFT_VECTOR_WRAP, str[str.length() - 1]) && (str[str.length() - 1] != '!' || str.length() == 1)) return true;
 		if(allow_exp && is_in(EXP, str[str.length() - 1])) return true;
 		if(str.length() >= 3 && str[str.length() - 1] == 'r' && str[str.length() - 2] == 'o' && str[str.length() - 3] == 'x') return true;
 	} else {
-		if(str.length() >= 3 && str[str.length() - 2] < 0) {
+		if(str.length() >= 3 && (signed char) str[str.length() - 2] < 0) {
 			str = str.substr(str.length() - 3);
 			if(str == "∧" || str == "∨" || str == "⊻" || str == "≤" || str == "≥" || str == "≠" || str == "∠" || str == settings->multiplicationSign() || str == settings->divisionSign() || str == SIGN_MINUS) {
 				return true;
@@ -300,15 +300,15 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 			return i1 >= str1.length();
 		}
 		if(i1 >= str1.length()) break;
-		if((str1[i1] < 0 && i1 + 1 < str1.length()) || (str2[i2] < 0 && i2 + 1 < str2.length())) {
+		if(((signed char) str1[i1] < 0 && i1 + 1 < str1.length()) || ((signed char) str2[i2] < 0 && i2 + 1 < str2.length())) {
 			size_t iu1 = 1, iu2 = 1;
-			if(str1[i1] < 0) {
-				while(iu1 + i1 < str1.length() && str1[i1 + iu1] < 0) {
+			if((signed char) str1[i1] < 0) {
+				while(iu1 + i1 < str1.length() && (signed char) str1[i1 + iu1] < 0) {
 					iu1++;
 				}
 			}
-			if(str2[i2] < 0) {
-				while(iu2 + i2 < str2.length() && str2[i2 + iu2] < 0) {
+			if((signed char) str2[i2] < 0) {
+				while(iu2 + i2 < str2.length() && (signed char) str2[i2 + iu2] < 0) {
 					iu2++;
 				}
 			}
@@ -2035,7 +2035,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	}
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
-		if(i != std::string::npos && text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
+		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
 			if(show_tooltip) setStatusText("qalc command");
 			return;
 		}
@@ -2810,7 +2810,7 @@ void ExpressionEdit::insertBrackets() {
 	cur.endEditBlock();
 	highlightParentheses();
 }
-void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma) {
+void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args) {
 	parse_blocked++;
 	QTextCursor cur = textCursor();
 	if(cur.hasSelection()) {
@@ -2827,12 +2827,13 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					if(always_add_parentheses && insert_before) {
 						setCursorWidth(0);
 						cur.beginEditBlock();
-						insertPlainText(text + "()");
-						moveCursor(QTextCursor::PreviousCharacter);
+						insertPlainText(text + "(" + add_args +")");
+						cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + 1);
 						cur.endEditBlock();
+						setTextCursor(cur);
 						setCursorWidth(1);
 					} else if(always_add_parentheses) {
-						insertPlainText("()" + text);
+						insertPlainText("(" + add_args +")" + text);
 					} else if(!text.isEmpty()) {
 						insertPlainText(text);
 					} else {
@@ -2869,6 +2870,11 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			cur.insertText(text + "(");
 			iend += text.length() + 1;
 			cur.setPosition(iend);
+			int iend_text = iend;
+			if(!add_args.isEmpty()) {
+				cur.insertText(add_args);
+				iend += add_args.length();
+			}
 			if(add_comma) {
 				cur.insertText(QString::fromStdString(CALCULATOR->getComma()) + " )");
 				iend += 3;
@@ -2878,8 +2884,8 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			}
 			istart++;
 			CALCULATOR->parseSigns(str);
-			if(!str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
-				iend--;
+			if(!str.empty() && is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+				iend = iend_text;
 			}
 			cur.setPosition(iend);
 			cur.endEditBlock();
@@ -2896,12 +2902,13 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	} else if(always_add_parentheses && insert_before) {
 		setCursorWidth(0);
 		cur.beginEditBlock();
-		insertPlainText(text + "()");
-		moveCursor(QTextCursor::PreviousCharacter);
+		insertPlainText(text + "(" + add_args + ")");
+		cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + 1);
 		cur.endEditBlock();
+		setTextCursor(cur);
 		setCursorWidth(1);
 	} else if(always_add_parentheses) {
-		insertPlainText("()" + text);
+		insertPlainText("(" + add_args + ")" + text);
 	} else if(!text.isEmpty()) {
 		insertPlainText(text);
 	} else {

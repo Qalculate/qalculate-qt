@@ -142,8 +142,10 @@ class QalculateWindow : public QMainWindow {
 		void onMPlusClicked();
 		void onMMinusClicked();
 		void onAnswerClicked();
+		void onBaseClicked(int, bool);
 		void onToActivated();
 		void onStoreActivated();
+		void keypadTypeActivated();
 		void onKeypadActivated(bool);
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);

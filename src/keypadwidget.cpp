@@ -15,6 +15,8 @@
 #include <QLabel>
 #include <QTimer>
 #include <QTextDocument>
+#include <QStackedLayout>
+#include <QHBoxLayout>
 #include <QDebug>
 
 #include "keypadwidget.h"
@@ -23,6 +25,11 @@
 #define BUTTON_DATA "QALCULATE DATA1"
 #define BUTTON_DATA2 "QALCULATE DATA2"
 #define BUTTON_DATA3 "QALCULATE DATA3"
+
+#define SYMBOL_BUTTON_BOX(x)			button = new KeypadButton(x, this); \
+						button->setProperty(BUTTON_DATA, x); \
+						connect(button, SIGNAL(clicked()), this, SLOT(onSymbolButtonClicked())); \
+						box->addWidget(button);
 
 #define SYMBOL_BUTTON3(x, y, z, r, c)		button = new KeypadButton(x, this); \
 						button->setProperty(BUTTON_DATA, x); \
@@ -111,6 +118,7 @@
 						grid->addWidget(button, r, c, 1, 1);
 
 #define OPERATOR_BUTTON(x, r, c) 		OPERATOR_BUTTON3(x, x, x, r, c)
+#define OPERATOR_BUTTON2(x, y, r, c) 		OPERATOR_BUTTON3(x, y, y, r, c)
 
 #define ITEM_BUTTON3(o1, o2, o3, x, r, c)	button = new KeypadButton(x, this); \
 						button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) o1)); \
@@ -140,14 +148,24 @@
 #define ITEM_BUTTON(o, x, r, c) 		ITEM_BUTTON3(o, o, o, x, r, c)
 #define ITEM_BUTTON2(o1, o2, x, r, c) 		ITEM_BUTTON3(o1, o2, o2, x, r, c)
 
+#define BASE_BUTTON(x, i, r, c)			button = new KeypadButton(x); \
+						button->setCheckable(true); \
+						grid->addWidget(button, r, c); \
+						button->setProperty(BUTTON_DATA, i); \
+						connect(button, SIGNAL(clicked()), this, SLOT(onBaseButtonClicked())); \
+						connect(button, SIGNAL(clicked2()), this, SLOT(onBaseButtonClicked2()));
+
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
-	QGridLayout *grid1 = new QGridLayout();
-	QGridLayout *grid2 = new QGridLayout();
-	box->addLayout(grid1, 2);
+	leftStack = new QStackedLayout();
+	box->addLayout(leftStack, 2);
 	box->addSpacing(box->spacing());
+	QGridLayout *grid2 = new QGridLayout();
 	box->addLayout(grid2, 3);
-	QGridLayout *grid = grid1;
+	QWidget *keypadG = new QWidget(this);
+	leftStack->addWidget(keypadG);
+	QGridLayout *grid = new QGridLayout(keypadG);
+	grid->setContentsMargins(0, 0, 0, 0);
 	KeypadButton *button;
 	MathFunction *f, *f2;
 	int c = 0;
@@ -234,6 +252,83 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(forwardButton, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
 	connect(forwardButton, SIGNAL(clicked3()), this, SIGNAL(endClicked()));
 	grid->addWidget(forwardButton, c, 3, 1, 1);
+	grid->setRowStretch(0, 1);
+	grid->setRowStretch(1, 1);
+	grid->setRowStretch(2, 1);
+	grid->setRowStretch(3, 1);
+	grid->setRowStretch(4, 1);
+	grid->setRowStretch(0, 1);
+	grid->setColumnStretch(0, 1);
+	grid->setColumnStretch(1, 1);
+	grid->setColumnStretch(2, 1);
+	grid->setColumnStretch(3, 1);
+
+	QWidget *keypadP = new QWidget(this);
+	leftStack->addWidget(keypadP);
+	grid = new QGridLayout(keypadP);
+	grid->setContentsMargins(0, 0, 0, 0);
+	BASE_BUTTON("BIN", 2, 0, 0); binButton = button;
+	BASE_BUTTON("OCT", 8, 0, 1); octButton = button;
+	BASE_BUTTON("DEC", 10, 0, 2); decButton = button;
+	BASE_BUTTON("HEX", 16, 0, 3); hexButton = button;
+	box = new QHBoxLayout();
+	SYMBOL_BUTTON_BOX("A"); aButton = button;
+	SYMBOL_BUTTON_BOX("B"); bButton = button;
+	SYMBOL_BUTTON_BOX("C"); cButton = button;
+	SYMBOL_BUTTON_BOX("D"); dButton = button;
+	SYMBOL_BUTTON_BOX("E"); eButton = button;
+	SYMBOL_BUTTON_BOX("F"); fButton = button;
+	updateBase();
+	grid->addLayout(box, 1, 0, 1, 4);
+	OPERATOR_BUTTON2("&", "&&", 2, 0);
+	button->setText("AND");
+	button->setToolTip(tr("Bitwise AND"), tr("Logical AND"));
+	OPERATOR_BUTTON2("|", "||", 2, 1);
+	button->setText("OR");
+	button->setToolTip(tr("Bitwise OR"), tr("Logical OR"));
+	OPERATOR_BUTTON(" xor ", 2, 2);
+	button->setText("XOR");
+	button->setToolTip(tr("Bitwise Exclusive OR"));
+	OPERATOR_BUTTON2("~", "NOT", 2, 3);
+	button->setText("NOT");
+	button->setToolTip(tr("Bitwise NOT"), tr("Logical NOT"));
+	OPERATOR_BUTTON("<<", 3, 0);
+	button->setToolTip(tr("Bitwise Left Shift"));
+	OPERATOR_BUTTON(">>", 3, 1);
+	button->setToolTip(tr("Bitwise Right Shift"));
+	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_BIT_CMP), tr("cmp"), 3, 2);
+	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_CIRCULAR_SHIFT), tr("rot"), 3, 3);
+	OPERATOR_BUTTON2(" mod ", " rem ", 4, 0);
+	button->setText("mod");
+	button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_MOD)->title(true)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_REM)->title(true)));
+	OPERATOR_BUTTON("//", 4, 1);
+	button->setText("div");
+	f = CALCULATOR->getActiveFunction("div");
+	if(f) button->setToolTip(QString::fromStdString(f->title(true)));
+	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
+	if(f && f2) {
+		ITEM_BUTTON2(f2, f, "log<sub>2</sub>", 4, 2);
+	} else {
+		ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), "ln", 4, 2);
+	}
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_ASCII), CALCULATOR->getFunctionById(FUNCTION_ID_CHAR), tr("a→1"), 4, 3);
+	grid->setRowStretch(0, 1);
+	grid->setRowStretch(1, 1);
+	grid->setRowStretch(2, 1);
+	grid->setRowStretch(3, 1);
+	grid->setRowStretch(4, 1);
+	grid->setRowStretch(0, 1);
+	grid->setColumnStretch(0, 1);
+	grid->setColumnStretch(1, 1);
+	grid->setColumnStretch(2, 1);
+	grid->setColumnStretch(3, 1);
+
+	QWidget *keypadX = new QWidget(this);
+	leftStack->addWidget(keypadX);
+	grid = new QGridLayout(keypadX);
+	grid->setContentsMargins(0, 0, 0, 0);
+	c = 0;
+
 	grid = grid2;
 	c = 0;
 	SYMBOL_BUTTON2("(", "[", 1, c)
@@ -335,29 +430,39 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(equalsClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(equalsClicked()));
 	grid->addWidget(button, 3, c, 1, 1);
-	grid1->setRowStretch(0, 1);
-	grid1->setRowStretch(1, 1);
-	grid1->setRowStretch(2, 1);
-	grid1->setRowStretch(3, 1);
-	grid1->setRowStretch(4, 1);
-	grid2->setRowStretch(0, 1);
-	grid2->setRowStretch(1, 1);
-	grid2->setRowStretch(2, 1);
-	grid2->setRowStretch(3, 1);
-	grid1->setRowStretch(0, 1);
-	grid1->setColumnStretch(0, 1);
-	grid1->setColumnStretch(1, 1);
-	grid1->setColumnStretch(2, 1);
-	grid1->setColumnStretch(3, 1);
-	grid2->setColumnStretch(0, 1);
-	grid2->setColumnStretch(1, 1);
-	grid2->setColumnStretch(2, 1);
-	grid2->setColumnStretch(3, 1);
-	grid2->setColumnStretch(4, 1);
-	grid2->setColumnStretch(5, 1);
+	grid->setRowStretch(0, 1);
+	grid->setRowStretch(1, 1);
+	grid->setRowStretch(2, 1);
+	grid->setRowStretch(3, 1);
+	grid->setColumnStretch(0, 1);
+	grid->setColumnStretch(1, 1);
+	grid->setColumnStretch(2, 1);
+	grid->setColumnStretch(3, 1);
+	grid->setColumnStretch(4, 1);
+	grid->setColumnStretch(5, 1);
+	setKeypadType(settings->keypad_type);
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::setKeypadType(int i) {
+	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
+	leftStack->setCurrentIndex(i);
+}
+void KeypadWidget::updateBase() {
+	binButton->setChecked(settings->printops.base == 2 && settings->evalops.parse_options.base == 2);
+	octButton->setChecked(settings->printops.base == 8 && settings->evalops.parse_options.base == 8);
+	decButton->setChecked(settings->printops.base == 10 && settings->evalops.parse_options.base == 10);
+	hexButton->setChecked(settings->printops.base == 16 && settings->evalops.parse_options.base == 16);
+	int base = settings->evalops.parse_options.base;
+	if(base == BASE_CUSTOM) base = CALCULATOR->customOutputBase().intValue();
+	else if(base < 2 || base > 36) base = 10;
+	aButton->setEnabled(base > 10);
+	bButton->setEnabled(base > 11);
+	cButton->setEnabled(base > 12);
+	dButton->setEnabled(base > 13);
+	eButton->setEnabled(base > 14);
+	fButton->setEnabled(base > 15);
+}
 void KeypadWidget::updateSymbols() {
 	multiplicationButton->setText(settings->multiplicationSign());
 	multiplicationButton->setText(settings->multiplicationSign());
@@ -413,6 +518,14 @@ void KeypadWidget::onOperatorButtonClicked2() {
 void KeypadWidget::onOperatorButtonClicked3() {
 	QPushButton *button = qobject_cast<QPushButton*>(sender());
 	emit operatorClicked(button->property(BUTTON_DATA3).toString());
+}
+void KeypadWidget::onBaseButtonClicked() {
+	QPushButton *button = qobject_cast<QPushButton*>(sender());
+	emit baseClicked(button->property(BUTTON_DATA).toInt(), true);
+}
+void KeypadWidget::onBaseButtonClicked2() {
+	QPushButton *button = qobject_cast<QPushButton*>(sender());
+	emit baseClicked(button->property(BUTTON_DATA).toInt(), false);
 }
 void KeypadWidget::onItemButtonClicked() {
 	QPushButton *button = qobject_cast<QPushButton*>(sender());
