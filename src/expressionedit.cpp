@@ -2810,7 +2810,7 @@ void ExpressionEdit::insertBrackets() {
 	cur.endEditBlock();
 	highlightParentheses();
 }
-void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args) {
+void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args, bool quote) {
 	parse_blocked++;
 	QTextCursor cur = textCursor();
 	if(cur.hasSelection()) {
@@ -2827,8 +2827,9 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					if(always_add_parentheses && insert_before) {
 						setCursorWidth(0);
 						cur.beginEditBlock();
-						insertPlainText(text + "(" + add_args +")");
-						cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + 1);
+						if(quote) insertPlainText(text + "(\"\"" + add_args +")");
+						else insertPlainText(text + "(" + add_args +")");
+						cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + (quote ? 2 : 1));
 						cur.endEditBlock();
 						setTextCursor(cur);
 						setCursorWidth(1);
@@ -2867,10 +2868,12 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			cur.beginEditBlock();
 			str = CALCULATOR->unlocalizeExpression(qstr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 			cur.setPosition(istart);
-			cur.insertText(text + "(");
-			iend += text.length() + 1;
+			if(quote) cur.insertText(text + "(\"");
+			else cur.insertText(text + "(");
+			iend += text.length() + (quote ? 2 : 1);
 			cur.setPosition(iend);
 			int iend_text = iend;
+			if(quote) {cur.insertText("\""); iend++; cur.setPosition(iend);}
 			if(!add_args.isEmpty()) {
 				cur.insertText(add_args);
 				iend += add_args.length();
@@ -2884,8 +2887,10 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			}
 			istart++;
 			CALCULATOR->parseSigns(str);
-			if(!str.empty() && is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+			if(!quote && !str.empty() && is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
 				iend = iend_text;
+			} else if(add_comma) {
+				iend--;
 			}
 			cur.setPosition(iend);
 			cur.endEditBlock();
@@ -2902,8 +2907,9 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	} else if(always_add_parentheses && insert_before) {
 		setCursorWidth(0);
 		cur.beginEditBlock();
-		insertPlainText(text + "(" + add_args + ")");
-		cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + 1);
+		if(quote) insertPlainText(text + "(\"\"" + add_args + ")");
+		else insertPlainText(text + "(" + add_args + ")");
+		cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + (quote ? 2 : 1));
 		cur.endEditBlock();
 		setTextCursor(cur);
 		setCursorWidth(1);

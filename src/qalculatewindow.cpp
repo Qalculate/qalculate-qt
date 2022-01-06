@@ -623,22 +623,29 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
-	keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
+	/*keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
 	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
 	keypadAction->setCheckable(true);
 	menu = new QMenu(this);
+	keypadAction->setMenu(menu);*/
+	keypadAction = new QToolButton(this); keypadAction->setIcon(LOAD_ICON("keypad")); keypadAction->setText(tr("Keypad"));
+	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); modeAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
+	keypadAction->setPopupMode(QToolButton::InstantPopup);
+	menu = new QMenu(this);
 	keypadAction->setMenu(menu);
 	group = new QActionGroup(this); group->setObjectName("group_keypad");
 	action = menu->addAction(tr("General"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_GENERAL); if(settings->keypad_type == KEYPAD_GENERAL) {base_checked = true; action->setChecked(true);}
+	action->setData(KEYPAD_GENERAL);
 	action = menu->addAction(tr("Programming"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_PROGRAMMING); if(settings->keypad_type == KEYPAD_PROGRAMMING) {base_checked = true; action->setChecked(true);}
+	action->setData(KEYPAD_PROGRAMMING);
 	action = menu->addAction(tr("Algebra"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_ALGEBRA); if(settings->keypad_type == KEYPAD_ALGEBRA) {base_checked = true; action->setChecked(true);}
+	action->setData(KEYPAD_ALGEBRA);
 	action = menu->addAction(tr("Custom"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_CUSTOM); if(settings->keypad_type == KEYPAD_CUSTOM) {base_checked = true; action->setChecked(true);}
-	tb->addAction(keypadAction);
+	action->setData(KEYPAD_CUSTOM);
+	action = menu->addAction(tr("None"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(-1); action->setChecked(true);
+	tb->addWidget(keypadAction);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tb->addWidget(spacer);
@@ -825,6 +832,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(MMinusClicked()), this, SLOT(onMMinusClicked()));
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
+	connect(keypad, SIGNAL(factorizeClicked()), this, SLOT(onFactorizeClicked()));
+	connect(keypad, SIGNAL(expandClicked()), this, SLOT(onExpandClicked()));
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -1111,6 +1120,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		return;
 	}
 	QString sargs;
+	bool b_text = (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_TEXT);
 	if(f->id() == FUNCTION_ID_CIRCULAR_SHIFT || f->id() == FUNCTION_ID_BIT_CMP) {
 		Argument *arg_bits = f->getArgumentDefinition(f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? 3 : 2);
 		Argument *arg_steps = (f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? f->getArgumentDefinition(2) : NULL);
@@ -1203,6 +1213,67 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 				return;
 			}
 		}
+	} else if(f->id() == FUNCTION_ID_ROOT) {
+		size_t index = 2;
+		Argument *arg_n = f->getArgumentDefinition(index);
+		MathSpinBox *spin = NULL;
+		if(arg_n) {
+			QDialog *dialog = new QDialog(this);
+			if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+			dialog->setWindowTitle(QString::fromStdString(f->title(true)));
+			QVBoxLayout *box = new QVBoxLayout(dialog);
+			QGridLayout *grid = new QGridLayout();
+			box->addLayout(grid);
+			grid->addWidget(new QLabel(tr("%1:").arg(QString::fromStdString(arg_n->name()))), 0, 0);
+			int min = INT_MIN, max = INT_MAX;
+			if(arg_n->type() == ARGUMENT_TYPE_INTEGER) {
+				IntegerArgument *iarg = (IntegerArgument*) arg_n;
+				if(iarg->min()) {
+					min = iarg->min()->intValue();
+				}
+				if(iarg->max()) {
+					max = iarg->max()->intValue();
+				}
+			}
+			spin = new MathSpinBox();
+			spin->setRange(min, max);
+			if(!f->getDefaultValue(index).empty()) {
+				spin->setValue(s2i(f->getDefaultValue(index)));
+			} else if(f->id() == FUNCTION_ID_ROOT) {
+				spin->setValue(2);
+			} else if(!arg_n->zeroForbidden() && min <= 0 && max >= 0) {
+				spin->setValue(0);
+			} else {
+				if(max < 0) {
+					spin->setValue(max);
+				} else if(min <= 1) {
+					spin->setValue(1);
+				} else {
+					spin->setValue(min);
+				}
+			}
+			grid->addWidget(spin, 0, 1);
+			QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+			buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+			buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+			box->addWidget(buttonBox);
+			connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+			connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+			if(dialog->exec() == QDialog::Accepted) {
+				sargs = QString::fromStdString(CALCULATOR->getComma());
+				sargs += " ";
+				if(settings->evalops.parse_options.base != BASE_DECIMAL) {
+					Number nr(spin->value(), 1);
+					sargs += QString::fromStdString(print_with_evalops(nr));
+				} else {
+					sargs += spin->cleanText();
+				}
+				dialog->deleteLater();
+			} else {
+				dialog->deleteLater();
+				return;
+			}
+		}
 	}
 	expressionEdit->blockCompletion();
 	QTextCursor cur = expressionEdit->textCursor();
@@ -1219,7 +1290,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		do_exec = !sargs.isEmpty() || f->minargs() <= 1;
 	}
 	if(do_exec) expressionEdit->blockParseStatus();
-	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs);
+	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs, b_text);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
@@ -1358,6 +1429,12 @@ void QalculateWindow::onBaseClicked(int v, bool b) {
 		resultFormatUpdated();
 	}
 	keypad->updateBase();
+}
+void QalculateWindow::onFactorizeClicked() {
+	executeCommand(COMMAND_FACTORIZE);
+}
+void QalculateWindow::onExpandClicked() {
+	executeCommand(COMMAND_EXPAND);
 }
 void QalculateWindow::serverNewConnection() {
 	socket = server->nextPendingConnection();
@@ -4886,15 +4963,22 @@ void QalculateWindow::newFunction() {
 }
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
-	settings->keypad_type = v;
-	keypad->setKeypadType(v);
+	if(v < 0) {
+		keypadDock->setVisible(false);
+	} else {
+		settings->keypad_type = v;
+		keypad->setKeypadType(v);
+		keypadDock->setVisible(true);
+		keypadDock->raise();
+	}
 }
 void QalculateWindow::onKeypadActivated(bool b) {
 	keypadDock->setVisible(b);
 	if(b) keypadDock->raise();
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
-	keypadAction->setChecked(b);
+	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
+	if(action) action->setChecked(true);
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);

@@ -29,6 +29,8 @@
 #define SYMBOL_BUTTON_BOX(x)			button = new KeypadButton(x, this); \
 						button->setProperty(BUTTON_DATA, x); \
 						connect(button, SIGNAL(clicked()), this, SLOT(onSymbolButtonClicked())); \
+						connect(button, SIGNAL(clicked2()), this, SLOT(onSymbolButtonClicked())); \
+						connect(button, SIGNAL(clicked3()), this, SLOT(onSymbolButtonClicked())); \
 						box->addWidget(button);
 
 #define SYMBOL_BUTTON3(x, y, z, r, c)		button = new KeypadButton(x, this); \
@@ -124,7 +126,7 @@
 						button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) o1)); \
 						button->setProperty(BUTTON_DATA2, QVariant::fromValue((void*) o2)); \
 						button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) o3)); \
-						button->setToolTip(QString::fromStdString(o1->title(true)), o1 == o2 ? QString() : QString::fromStdString(o2->title(true)), o2 == o3 ? QString() : QString::fromStdString(o3->title(true))); \
+						button->setToolTip(QString::fromStdString(o1->title(true)), (void*) o1 == (void*) o2 ? QString() : QString::fromStdString(o2->title(true)), (void*) o2 == (void*) o3 ? QString() : QString::fromStdString(o3->title(true))); \
 						connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked())); \
 						connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked2())); \
 						connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked3())); \
@@ -153,7 +155,8 @@
 						grid->addWidget(button, r, c); \
 						button->setProperty(BUTTON_DATA, i); \
 						connect(button, SIGNAL(clicked()), this, SLOT(onBaseButtonClicked())); \
-						connect(button, SIGNAL(clicked2()), this, SLOT(onBaseButtonClicked2()));
+						connect(button, SIGNAL(clicked2()), this, SLOT(onBaseButtonClicked2())); \
+						connect(button, SIGNAL(clicked3()), this, SLOT(onBaseButtonClicked2()));
 
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
@@ -327,7 +330,45 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	leftStack->addWidget(keypadX);
 	grid = new QGridLayout(keypadX);
 	grid->setContentsMargins(0, 0, 0, 0);
-	c = 0;
+	SYMBOL_BUTTON("x", 0, 0);
+	button->setFont(ifont);
+	SYMBOL_BUTTON("y", 0, 1);
+	button->setFont(ifont);
+	SYMBOL_BUTTON("z", 0, 2);
+	button->setFont(ifont);
+	SYMBOL_BUTTON("n", 0, 3);
+	SYMBOL_BUTTON2("=", SIGN_NOT_EQUAL, 1, 2);
+	SYMBOL_BUTTON("/.", 1, 3);
+	SYMBOL_BUTTON("<", 2, 0);
+	SYMBOL_BUTTON(SIGN_LESS_OR_EQUAL, 2, 1);
+	SYMBOL_BUTTON(">", 2, 2);
+	SYMBOL_BUTTON(SIGN_GREATER_OR_EQUAL, 2, 3);
+	button->setToolTip(tr("where"));
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SUM), CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT), "∑", 3, 0);
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_DIFFERENTIATE), CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE), "<font size=\"-1\"><i>d/dx</i></font>", 3, 1);
+	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_INTEGRATE), "∫", 3, 2);
+	button = new KeypadButton("<font size=\"-1\">a(x)<sup>b</sup></font>", this);
+	connect(button, SIGNAL(clicked()), this, SIGNAL(factorizeClicked()));
+	connect(button, SIGNAL(clicked2()), this, SIGNAL(expandClicked()));
+	connect(button, SIGNAL(clicked3()), this, SIGNAL(expandClicked()));
+	button->setToolTip(tr("Factorize"), tr("Expand"));
+	grid->addWidget(button, 3, 3);
+	ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_PI), SIGN_PI, 1, 0);
+	ITEM_BUTTON2(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), "e", 1, 1);
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, 4, 0);
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), "∛", 4, 1);
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", 4, 2);
+	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_ABS), "|x|", 4, 3);
+	grid->setRowStretch(0, 1);
+	grid->setRowStretch(1, 1);
+	grid->setRowStretch(2, 1);
+	grid->setRowStretch(3, 1);
+	grid->setRowStretch(4, 1);
+	grid->setRowStretch(0, 1);
+	grid->setColumnStretch(0, 1);
+	grid->setColumnStretch(1, 1);
+	grid->setColumnStretch(2, 1);
+	grid->setColumnStretch(3, 1);
 
 	grid = grid2;
 	c = 0;
@@ -425,10 +466,11 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(acButton, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
 	grid->addWidget(acButton, 0, c, 1, 1);
 	button = new KeypadButton("=", this);
-	button->setToolTip(tr("Calculate expression"));
+	button->setToolTip(tr("Calculate expression"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE)->title(true)));
+	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))); \
 	connect(button, SIGNAL(clicked()), this, SIGNAL(equalsClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(equalsClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(equalsClicked()));
+	connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked()));
+	connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked()));
 	grid->addWidget(button, 3, c, 1, 1);
 	grid->setRowStretch(0, 1);
 	grid->setRowStretch(1, 1);

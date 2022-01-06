@@ -122,6 +122,8 @@ class KeypadWidget : public QWidget {
 		void backspaceClicked();
 		void answerClicked();
 		void baseClicked(int, bool);
+		void factorizeClicked();
+		void expandClicked();
 
 };
 

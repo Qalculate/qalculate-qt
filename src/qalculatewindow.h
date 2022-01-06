@@ -89,8 +89,8 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction, *modeAction;
-		QAction *toAction, *storeAction, *variablesAction, *functionsAction, *unitsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *keypadAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QToolButton *menuAction, *modeAction, *keypadAction;
+		QAction *toAction, *storeAction, *variablesAction, *functionsAction, *unitsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
 		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
@@ -143,6 +143,8 @@ class QalculateWindow : public QMainWindow {
 		void onMMinusClicked();
 		void onAnswerClicked();
 		void onBaseClicked(int, bool);
+		void onFactorizeClicked();
+		void onExpandClicked();
 		void onToActivated();
 		void onStoreActivated();
 		void keypadTypeActivated();
