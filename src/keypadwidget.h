@@ -80,6 +80,7 @@ class KeypadWidget : public QWidget {
 	protected slots:
 
 		void onSymbolButtonClicked();
+		void onSymbolToolButtonClicked();
 		void onOperatorButtonClicked();
 		void onItemButtonClicked();
 		void onSymbolButtonClicked2();
@@ -91,6 +92,10 @@ class KeypadWidget : public QWidget {
 		void onBaseButtonClicked();
 		void onBaseButtonClicked2();
 		void onHypToggled(bool);
+		void assumptionsTypeActivated();
+		void assumptionsSignActivated();
+		void defaultAssumptionsActivated();
+		void updateAssumptions();
 
 	public slots:
 
@@ -124,6 +129,7 @@ class KeypadWidget : public QWidget {
 		void baseClicked(int, bool);
 		void factorizeClicked();
 		void expandClicked();
+		void expressionCalculationUpdated(int);
 
 };
 

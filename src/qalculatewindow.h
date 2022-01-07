@@ -89,8 +89,9 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction, *modeAction, *keypadAction;
-		QAction *toAction, *storeAction, *variablesAction, *functionsAction, *unitsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QToolButton *menuAction, *modeAction, *keypadAction_t;
+		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction;
+		QAction *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction;
 		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
@@ -148,7 +149,7 @@ class QalculateWindow : public QMainWindow {
 		void onToActivated();
 		void onStoreActivated();
 		void keypadTypeActivated();
-		void onKeypadActivated(bool);
+		void onKeypadActivated();
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
 		void onBasesVisibilityChanged(bool);
@@ -261,6 +262,7 @@ class QalculateWindow : public QMainWindow {
 		void checkVersion();
 		void reportBug();
 		void help();
+		void updateShortcuts(bool initial = false);
 
 	signals:
 

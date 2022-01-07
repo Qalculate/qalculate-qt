@@ -20,6 +20,7 @@
 #include <QKeyEvent>
 #include <QColor>
 #include <QProgressDialog>
+#include <QKeySequence>
 #include <QDebug>
 
 extern int b_busy;
@@ -259,6 +260,10 @@ void QalculateQtSettings::loadPreferences() {
 #endif
 	last_version_check_date.setToCurrentDate();
 
+
+	default_shortcuts = true;
+	keyboard_shortcuts.clear();
+
 	default_signed = -1;
 	default_bits = -1;
 
@@ -334,6 +339,17 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "favourite_variable") {
 					favourite_variables_pre.push_back(svalue);
 					favourite_variables_changed = true;
+				} else if(svar == "keyboard_shortcut") {
+					default_shortcuts = false;
+					char str1[svalue.length()];
+					char str2[svalue.length()];
+					keyboard_shortcut ks;
+					int n = sscanf(svalue.c_str(), "%s:%i:%s", str1, &ks.type, str2);
+					if(n >= 2 && ks.type >= SHORTCUT_TYPE_FUNCTION && ks.type <= LAST_SHORTCUT_TYPE) {
+						if(n == 3) ks.value = str1;
+						ks.key = str1;
+						keyboard_shortcuts.push_back(ks);
+					}
 				} else if(svar == "version") {
 					parse_qalculate_version(svalue, preferences_version);
 				} else if(svar == "always_on_top") {
@@ -732,6 +748,34 @@ void QalculateQtSettings::loadPreferences() {
 		first_time = false;
 	} else {
 		first_time = true;
+	}
+
+	if(default_shortcuts) {
+		keyboard_shortcut ks;
+#define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; keyboard_shortcuts.push_back(ks);
+		ADD_SHORTCUT(QKeySequence(QKeySequence::Quit).toString(), SHORTCUT_TYPE_QUIT, "")
+		ADD_SHORTCUT(QKeySequence(QKeySequence::HelpContents).toString(), SHORTCUT_TYPE_HELP, "")
+		//ADD_SHORTCUT(GDK_KEY_c, GDK_CONTROL_MASK | GDK_MOD1_MASK, SHORTCUT_TYPE_COPY_RESULT, "")
+		ADD_SHORTCUT(QKeySequence(QKeySequence::Save).toString(), SHORTCUT_TYPE_STORE, "")
+		ADD_SHORTCUT("Ctrl+M", SHORTCUT_TYPE_MANAGE_VARIABLES, "")
+		ADD_SHORTCUT("Ctrl+F", SHORTCUT_TYPE_MANAGE_FUNCTIONS, "")
+		ADD_SHORTCUT("Ctrl+U", SHORTCUT_TYPE_MANAGE_UNITS, "")
+		ADD_SHORTCUT("Ctrl+P", SHORTCUT_TYPE_PLOT, "")
+		ADD_SHORTCUT("Ctrl+R", SHORTCUT_TYPE_RPN_MODE, "")
+		ADD_SHORTCUT("Ctrl+K", SHORTCUT_TYPE_KEYPAD, "")
+		ADD_SHORTCUT("Alt+K", SHORTCUT_TYPE_KEYPAD, "")
+		ADD_SHORTCUT("Ctrl+T", SHORTCUT_TYPE_CONVERT, "")
+		ADD_SHORTCUT("Ctrl+B", SHORTCUT_TYPE_NUMBER_BASES, "")
+		/*ADD_SHORTCUT(GDK_KEY_parenright, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_SMART_PARENTHESES, "")
+		ADD_SHORTCUT(GDK_KEY_parenleft, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_SMART_PARENTHESES, "")
+		ADD_SHORTCUT(GDK_KEY_Up, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_UP, "")
+		ADD_SHORTCUT(GDK_KEY_Down, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_DOWN, "")
+		ADD_SHORTCUT(GDK_KEY_Right, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_SWAP, "")
+		ADD_SHORTCUT(GDK_KEY_Left, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_LASTX, "")
+		ADD_SHORTCUT(GDK_KEY_c, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_RPN_COPY, "")
+		ADD_SHORTCUT(GDK_KEY_Delete, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_DELETE, "")
+		ADD_SHORTCUT(GDK_KEY_Delete, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_RPN_CLEAR, "")
+		ADD_SHORTCUT(GDK_KEY_Tab, 0, SHORTCUT_TYPE_ACTIVATE_FIRST_COMPLETION, "")*/
 	}
 
 	updateMessagePrintOptions();

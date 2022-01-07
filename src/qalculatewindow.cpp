@@ -330,8 +330,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menuAction->setMenu(menu);
 	menu2 = menu;
 	menu = menu2->addMenu(tr("New"));
-	menu->addAction(tr("Function…"), this, SLOT(newFunction()));
-	menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
+	newFunctionAction = menu->addAction(tr("Function…"), this, SLOT(newFunction()));
+	newVariableAction = menu->addAction(tr("Variable/Constant…"), this, SLOT(newVariable()));
 	menu->addAction(tr("Unknown Variable…"), this, SLOT(newUnknown()));
 	menu->addAction(tr("Matrix…"), this, SLOT(newMatrix()));
 	menu->addAction(tr("Unit…"), this, SLOT(newUnit()));
@@ -340,33 +340,33 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(tr("Import CSV File…"), this, SLOT(importCSV()));
 	menu->addAction(tr("Export CSV File…"), this, SLOT(exportCSV()));
 	menu->addSeparator();
-	menu->addAction(tr("Functions"), this, SLOT(openFunctions()), Qt::CTRL | Qt::Key_F);
-	variablesAction = menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()), Qt::CTRL | Qt::Key_M);
-	menu->addAction(tr("Units"), this, SLOT(openUnits()), Qt::CTRL | Qt::Key_U);
-	menu->addAction(tr("Data Sets"), this, SLOT(openDatasets()));
+	functionsAction = menu->addAction(tr("Functions"), this, SLOT(openFunctions()));
+	variablesAction = menu->addAction(tr("Variables and Constants"), this, SLOT(openVariables()));
+	unitsAction = menu->addAction(tr("Units"), this, SLOT(openUnits()));
+	datasetsAction = menu->addAction(tr("Data Sets"), this, SLOT(openDatasets()));
 	menu->addSeparator();
-	menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()), Qt::CTRL | Qt::Key_P);
-	menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
-	menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
-	menu->addAction(tr("Percentage Calculation Tool"), this, SLOT(openPercentageCalculation()));
-	menu->addAction(tr("Periodic Table"), this, SLOT(openPeriodicTable()));
+	plotAction = menu->addAction(tr("Plot Functions/Data"), this, SLOT(openPlot()));
+	fpAction = menu->addAction(tr("Floating Point Conversion (IEEE 754)"), this, SLOT(openFPConversion()));
+	calendarsAction = menu->addAction(tr("Calendar Conversion"), this, SLOT(openCalendarConversion()));
+	percentageAction = menu->addAction(tr("Percentage Calculation Tool"), this, SLOT(openPercentageCalculation()));
+	periodicTableAction = menu->addAction(tr("Periodic Table"), this, SLOT(openPeriodicTable()));
 	menu->addSeparator();
-	menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
+	exratesAction = menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
 	menu->addSeparator();
 	group = new QActionGroup(this);
 	action = menu->addAction(tr("Normal Mode"), this, SLOT(normalModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_normalmode"); if(!settings->rpn_mode && !settings->chain_mode) action->setChecked(true);
-	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated()), Qt::CTRL | Qt::Key_R); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true);
-	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true);
+	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true); rpnAction = action;
+	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true); chainAction = action;
 	menu->addSeparator();
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
 	menu->addSeparator();
-	menu->addAction(tr("Help"), this, SLOT(help()), QKeySequence::HelpContents);
+	helpAction = menu->addAction(tr("Help"), this, SLOT(help()));
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
 	menu->addAction(tr("Check for Updates"), this, SLOT(checkVersion()));
 	menu->addAction(tr("About %1").arg("Qt"), qApp, SLOT(aboutQt()));
 	menu->addAction(tr("About %1").arg("Qalculate!"), this, SLOT(showAbout()));
 	menu->addSeparator();
-	menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()), QKeySequence::Quit);
+	quitAction = menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()));
 
 	modeAction = new QToolButton(this); modeAction->setIcon(LOAD_ICON("configure")); modeAction->setText(tr("Mode"));
 	modeAction->setShortcut(Qt::ALT | Qt::Key_M); modeAction->setToolTip(tr("Mode (%1)").arg(modeAction->shortcut().toString(QKeySequence::NativeText)));
@@ -420,7 +420,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Type", "Assumptions type"));
 	group = new QActionGroup(this); group->setObjectName("group_type");
 	action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true); action->setObjectName("");
+	action->setData(ASSUMPTION_TYPE_NUMBER); assumptionTypeActions[0] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_NUMBER) action->setChecked(true);
 	action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(ASSUMPTION_TYPE_REAL); assumptionTypeActions[1] = action; if(CALCULATOR->defaultAssumptions()->type() == ASSUMPTION_TYPE_REAL) action->setChecked(true);
 	action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
@@ -581,59 +581,44 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
 	toAction->setEnabled(false);
-	toAction->setShortcut(Qt::CTRL | Qt::Key_T); toAction->setToolTip(tr("Convert (%1)").arg(toAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
 	tb->addAction(toAction);
-	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this); storeAction->setShortcut(QKeySequence::Save); storeAction->setToolTip(tr("Store (%1)").arg(storeAction->shortcut().toString(QKeySequence::NativeText)));
+	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this);
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
 	updateVariablesMenu();
 	storeAction->setMenu(variablesMenu);
 	tb->addAction(storeAction);
-	functionsAction = new QAction(LOAD_ICON("function"), tr("Functions"), this); functionsAction->setToolTip(tr("Functions (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_F).toString(QKeySequence::NativeText)));
-	connect(functionsAction, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
+	functionsAction_t = new QAction(LOAD_ICON("function"), tr("Functions"), this);
+	connect(functionsAction_t, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
 	functionsMenu = new QMenu(this);
 	updateFunctionsMenu();
-	functionsAction->setMenu(functionsMenu);
-	tb->addAction(functionsAction);
-	unitsAction = new QAction(LOAD_ICON("units"), tr("Units"), this); unitsAction->setToolTip(tr("Units (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_U).toString(QKeySequence::NativeText)));
-	connect(unitsAction, SIGNAL(triggered(bool)), this, SLOT(openUnits()));
+	functionsAction_t->setMenu(functionsMenu);
+	tb->addAction(functionsAction_t);
+	unitsAction_t = new QAction(LOAD_ICON("units"), tr("Units"), this);
+	connect(unitsAction_t, SIGNAL(triggered(bool)), this, SLOT(openUnits()));
 	unitsMenu = new QMenu(this);
 	updateUnitsMenu();
-	unitsAction->setMenu(unitsMenu);
-	tb->addAction(unitsAction);
+	unitsAction_t->setMenu(unitsMenu);
+	tb->addAction(unitsAction_t);
 	if(CALCULATOR->canPlot()) {
-		plotAction = new QAction(LOAD_ICON("plot"), tr("Plot Functions/Data"), this); plotAction->setToolTip(tr("Plot Functions/Data (%1)").arg(QKeySequence(Qt::CTRL | Qt::Key_P).toString(QKeySequence::NativeText)));
-		connect(plotAction, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
-		tb->addAction(plotAction);
+		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot Functions/Data"), this);
+		connect(plotAction_t, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
+		tb->addAction(plotAction_t);
 	} else {
-		plotAction = NULL;
+		plotAction_t = NULL;
 	}
-	fpAction = NULL;
-	calendarsAction = NULL;
-	percentageAction = NULL;
-	/*calendarsAction = new QAction(LOAD_ICON("calendars"), tr("Calendar Conversion"), this);
-	connect(calendarsAction, SIGNAL(triggered(bool)), this, SLOT(openCalendarConversion()));
-	tb->addAction(calendarsAction);
-	percentageAction = new QAction(LOAD_ICON("percentage"), tr("Percentage Calculation Tool"), this);
-	connect(percentageAction, SIGNAL(triggered(bool)), this, SLOT(openPercentageCalculation()));
-	tb->addAction(percentageAction);*/
 	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
-	basesAction->setShortcut(Qt::CTRL | Qt::Key_B); basesAction->setToolTip(tr("Number Bases (%1)").arg(basesAction->shortcut().toString(QKeySequence::NativeText)));
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
-	/*keypadAction = new QAction(LOAD_ICON("keypad"), tr("Keypad"), this);
-	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); keypadAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
-	connect(keypadAction, SIGNAL(triggered(bool)), this, SLOT(onKeypadActivated(bool)));
-	keypadAction->setCheckable(true);
+	keypadAction_t = new QToolButton(this); keypadAction_t->setIcon(LOAD_ICON("keypad")); keypadAction_t->setText(tr("Keypad"));
+	keypadAction_t->setPopupMode(QToolButton::InstantPopup);
+	keypadAction = new QAction("Keypad", this);
+	addAction(keypadAction);
+	connect(keypadAction, SIGNAL(triggered()), this, SLOT(onKeypadActivated()));
 	menu = new QMenu(this);
-	keypadAction->setMenu(menu);*/
-	keypadAction = new QToolButton(this); keypadAction->setIcon(LOAD_ICON("keypad")); keypadAction->setText(tr("Keypad"));
-	keypadAction->setShortcut(Qt::CTRL | Qt::Key_K); modeAction->setToolTip(tr("Keypad (%1)").arg(keypadAction->shortcut().toString(QKeySequence::NativeText)));
-	keypadAction->setPopupMode(QToolButton::InstantPopup);
-	menu = new QMenu(this);
-	keypadAction->setMenu(menu);
+	keypadAction_t->setMenu(menu);
 	group = new QActionGroup(this); group->setObjectName("group_keypad");
 	action = menu->addAction(tr("General"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(KEYPAD_GENERAL);
@@ -645,7 +630,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(KEYPAD_CUSTOM);
 	action = menu->addAction(tr("None"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(-1); action->setChecked(true);
-	tb->addWidget(keypadAction);
+	tb->addWidget(keypadAction_t);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tb->addWidget(spacer);
@@ -800,6 +785,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
 
+	updateShortcuts(true);
+
 	connect(historyView, SIGNAL(insertTextRequested(std::string)), this, SLOT(onInsertTextRequested(std::string)));
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
@@ -810,6 +797,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
+	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
@@ -854,6 +842,73 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
+void QalculateWindow::updateShortcuts(bool initial) {
+	QList<QKeySequence> shortcuts;
+	if(!initial) {
+		functionsAction->setShortcut(QKeySequence());
+		unitsAction->setShortcut(QKeySequence());
+		variablesAction->setShortcut(QKeySequence());
+		datasetsAction->setShortcut(QKeySequence());
+		plotAction->setShortcut(QKeySequence());
+		fpAction->setShortcut(QKeySequence());
+		calendarsAction->setShortcut(QKeySequence());
+		periodicTableAction->setShortcut(QKeySequence());
+		percentageAction->setShortcut(QKeySequence());
+		helpAction->setShortcut(QKeySequence());
+		quitAction->setShortcut(QKeySequence());
+		toAction->setShortcut(QKeySequence());
+		basesAction->setShortcut(QKeySequence());
+		keypadAction->setShortcut(QKeySequence());
+	}
+	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
+	storeAction->setToolTip(tr("Store"));
+	unitsAction_t->setToolTip(tr("Units"));
+	functionsAction_t->setToolTip(tr("Functions"));
+	basesAction->setToolTip(tr("Number Bases"));
+	toAction->setToolTip(tr("Convert"));
+	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+		keyboard_shortcut ks = settings->keyboard_shortcuts[i];
+		QAction *action = NULL;
+		switch(ks.type) {
+			case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
+			case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
+			case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
+			case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
+			case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
+			case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
+			case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
+			case SHORTCUT_TYPE_CONVERT: {action = toAction; break;}
+			case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
+			case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
+			case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
+			case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
+			case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
+			case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
+			case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
+			default: {}
+		}
+		if(action) {
+			shortcuts = action->shortcuts();
+			shortcuts << QKeySequence(ks.key);
+			action->setShortcuts(shortcuts);
+			if(ks.type == SHORTCUT_TYPE_PLOT) {
+				if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			} else if(ks.type == SHORTCUT_TYPE_STORE) {
+				storeAction->setToolTip(tr("Store (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			} else if(ks.type == SHORTCUT_TYPE_MANAGE_UNITS) {
+				unitsAction_t->setToolTip(tr("Units (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			} else if(ks.type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+				functionsAction_t->setToolTip(tr("Functions (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			} else if(ks.type == SHORTCUT_TYPE_NUMBER_BASES) {
+				basesAction->setToolTip(tr("Number Bases (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			} else if(ks.type == SHORTCUT_TYPE_CONVERT) {
+				toAction->setToolTip(tr("Convert (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			}
+		}
+	}
+}
 bool sort_compare_item(ExpressionItem *o1, ExpressionItem *o2) {
 	return o1->title(true, settings->printops.use_unicode_signs) < o2->title(true, settings->printops.use_unicode_signs);
 }
@@ -4617,13 +4672,10 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		menuAction->setIcon(LOAD_ICON("menu"));
 		toAction->setIcon(LOAD_ICON("convert"));
 		storeAction->setIcon(LOAD_ICON("document-save"));
-		functionsAction->setIcon(LOAD_ICON("function"));
-		unitsAction->setIcon(LOAD_ICON("units"));
-		if(plotAction) plotAction->setIcon(LOAD_ICON("plot"));
-		if(fpAction) fpAction->setIcon(LOAD_ICON("floatingpoint"));
-		if(calendarsAction) calendarsAction->setIcon(LOAD_ICON("calendars"));
-		if(percentageAction) percentageAction->setIcon(LOAD_ICON("percentage"));
-		keypadAction->setIcon(LOAD_ICON("keypad"));
+		functionsAction_t->setIcon(LOAD_ICON("function"));
+		unitsAction_t->setIcon(LOAD_ICON("units"));
+		if(plotAction_t) plotAction_t->setIcon(LOAD_ICON("plot"));
+		keypadAction_t->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
 		modeAction->setIcon(LOAD_ICON("configure"));
 		rpnUpAction->setIcon(LOAD_ICON("go-up"));
@@ -4972,7 +5024,8 @@ void QalculateWindow::keypadTypeActivated() {
 		keypadDock->raise();
 	}
 }
-void QalculateWindow::onKeypadActivated(bool b) {
+void QalculateWindow::onKeypadActivated() {
+	bool b = !keypadDock->isVisible();
 	keypadDock->setVisible(b);
 	if(b) keypadDock->raise();
 }
@@ -6349,12 +6402,18 @@ void QalculateWindow::rpnModeActivated() {
 	}
 }
 void QalculateWindow::chainModeActivated() {
-	settings->rpn_mode = false;
-	settings->chain_mode = true;
-	rpnDock->hide();
-	CALCULATOR->clearRPNStack();
-	rpnView->clear();
-	rpnView->setRowCount(0);
+	if(settings->chain_mode) {
+		normalModeActivated();
+		QAction *w = findChild<QAction*>("action_normalmode");
+		if(w) w->setChecked(true);
+	} else {
+		settings->rpn_mode = false;
+		settings->chain_mode = true;
+		rpnDock->hide();
+		CALCULATOR->clearRPNStack();
+		rpnView->clear();
+		rpnView->setRowCount(0);
+	}
 }
 void QalculateWindow::checkVersion() {
 	settings->checkVersion(true, this);

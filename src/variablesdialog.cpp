@@ -461,7 +461,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 					break;
 				}
 			}
-			delButton->setEnabled(v->isLocal());
+			delButton->setEnabled(v->isLocal() && !settings->isAnswerVariable(v) && v != settings->v_memory && v != CALCULATOR->getVariableById(VARIABLE_ID_X) && v != CALCULATOR->getVariableById(VARIABLE_ID_Y) && v != CALCULATOR->getVariableById(VARIABLE_ID_Z));
 			deactivateButton->setEnabled(!settings->isAnswerVariable(v) && v != settings->v_memory);
 			descriptionView->setHtml(QString::fromStdString(str));
 			return;

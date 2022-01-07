@@ -17,6 +17,10 @@
 #include <QTextDocument>
 #include <QStackedLayout>
 #include <QHBoxLayout>
+#include <QMenu>
+#include <QAction>
+#include <QActionGroup>
+#include <QToolButton>
 #include <QDebug>
 
 #include "keypadwidget.h"
@@ -330,12 +334,55 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	leftStack->addWidget(keypadX);
 	grid = new QGridLayout(keypadX);
 	grid->setContentsMargins(0, 0, 0, 0);
-	SYMBOL_BUTTON("x", 0, 0);
-	button->setFont(ifont);
-	SYMBOL_BUTTON("y", 0, 1);
-	button->setFont(ifont);
-	SYMBOL_BUTTON("z", 0, 2);
-	button->setFont(ifont);
+	for(size_t i = 0; i < 3; i++) {
+		QToolButton *tb = new QToolButton(this);
+		tb->setText(i == 0 ? "x" : (i == 1 ? "y" : "z"));
+		tb->setFocusPolicy(Qt::TabFocus);
+		QFontMetrics fm(tb->font());
+		QSize size = fm.boundingRect("DEL").size();
+		size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+		tb->setMinimumSize(size);
+		tb->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+		int id = 0;
+		if(i == 0) id = VARIABLE_ID_X;
+		else if(i == 1) id = VARIABLE_ID_Y;
+		else if(i == 2) id = VARIABLE_ID_Z;
+		tb->setFont(ifont);
+		QMenu *menu = new QMenu(this);
+		tb->setMenu(menu);
+		tb->setPopupMode(QToolButton::MenuButtonPopup);
+		connect(tb, SIGNAL(clicked()), this, SLOT(onSymbolToolButtonClicked()));
+		grid->addWidget(tb, 0, i);
+		menu->addSeparator();
+		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateAssumptions()));
+		menu->setProperty(BUTTON_DATA, id);
+		QAction *action = menu->addAction(tr("Default assumptions"), this, SLOT(defaultAssumptionsActivated())); action->setProperty(BUTTON_DATA, id);
+		QActionGroup *group = new QActionGroup(this); group->setObjectName("group_type_" + tb->text());
+		action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_NUMBER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_REAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_RATIONAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_INTEGER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_BOOLEAN); action->setProperty(BUTTON_DATA, id);
+		menu->addSeparator();
+		group = new QActionGroup(this); group->setObjectName("group_sign_" + tb->text());
+		action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_UNKNOWN); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONZERO); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_POSITIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONNEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONPOSITIVE);
+	}
 	SYMBOL_BUTTON("n", 0, 3);
 	SYMBOL_BUTTON2("=", SIGN_NOT_EQUAL, 1, 2);
 	SYMBOL_BUTTON("/.", 1, 3);
@@ -486,6 +533,65 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::updateAssumptions() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	int id = menu->property(BUTTON_DATA).toInt();
+	QActionGroup *group = NULL;
+	Variable *v = CALCULATOR->getVariableById(id);
+	if(!v || v->isKnown()) return;
+	UnknownVariable *uv = (UnknownVariable*) v;
+	Assumptions *ass = uv->assumptions();
+	if(!ass) ass = CALCULATOR->defaultAssumptions();
+	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_type_x");
+	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_type_y");
+	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_type_z");
+	if(!group) return;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == ass->type()) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+	group = NULL;
+	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_sign_x");
+	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_sign_y");
+	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_sign_z");
+	if(!group) return;
+	actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == ass->sign()) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+}
+void KeypadWidget::defaultAssumptionsActivated() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	Variable *v = CALCULATOR->getVariableById(action->property(BUTTON_DATA).toInt());
+	if(!v || v->isKnown()) return;
+	UnknownVariable *uv = (UnknownVariable*) v;
+	uv->setAssumptions(NULL);
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::assumptionsTypeActivated() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	Variable *v = CALCULATOR->getVariableById(action->property(BUTTON_DATA).toInt());
+	if(!v || v->isKnown()) return;
+	UnknownVariable *uv = (UnknownVariable*) v;
+	if(!uv->assumptions()) uv->setAssumptions(new Assumptions());
+	uv->assumptions()->setType((AssumptionType) action->data().toInt());
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::assumptionsSignActivated() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	Variable *v = CALCULATOR->getVariableById(action->property(BUTTON_DATA).toInt());
+	if(!v || v->isKnown()) return;
+	UnknownVariable *uv = (UnknownVariable*) v;
+	if(!uv->assumptions()) uv->setAssumptions(new Assumptions());
+	uv->assumptions()->setSign((AssumptionSign) action->data().toInt());
+	emit expressionCalculationUpdated(0);
+}
 void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
 	leftStack->setCurrentIndex(i);
@@ -540,6 +646,10 @@ void KeypadWidget::onHypToggled(bool b) {
 void KeypadWidget::onSymbolButtonClicked() {
 	QPushButton *button = qobject_cast<QPushButton*>(sender());
 	emit symbolClicked(button->property(BUTTON_DATA).toString());
+}
+void KeypadWidget::onSymbolToolButtonClicked() {
+	QToolButton *button = qobject_cast<QToolButton*>(sender());
+	emit symbolClicked(button->text());
 }
 void KeypadWidget::onSymbolButtonClicked2() {
 	QPushButton *button = qobject_cast<QPushButton*>(sender());
