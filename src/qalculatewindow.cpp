@@ -44,6 +44,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QDesktopServices>
+#include <QClipboard>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -222,6 +223,35 @@ std::string unhtmlize(std::string str) {
 	return str;
 }
 
+void base_from_string(std::string str, int &base, Number &nbase, bool input_base) {
+	if(equalsIgnoreCase(str, "golden") || equalsIgnoreCase(str, "golden ratio") || str == "φ") base = BASE_GOLDEN_RATIO;
+	else if(equalsIgnoreCase(str, "roman") || equalsIgnoreCase(str, "roman")) base = BASE_ROMAN_NUMERALS;
+	else if(!input_base && (equalsIgnoreCase(str, "time") || equalsIgnoreCase(str, "time"))) base = BASE_TIME;
+	else if(str == "b26" || str == "B26") base = BASE_BIJECTIVE_26;
+	else if(equalsIgnoreCase(str, "unicode")) base = BASE_UNICODE;
+	else if(equalsIgnoreCase(str, "supergolden") || equalsIgnoreCase(str, "supergolden ratio") || str == "ψ") base = BASE_SUPER_GOLDEN_RATIO;
+	else if(equalsIgnoreCase(str, "pi") || str == "π") base = BASE_PI;
+	else if(str == "e") base = BASE_E;
+	else if(str == "sqrt(2)" || str == "sqrt 2" || str == "sqrt2" || str == "√2") base = BASE_SQRT2;
+	else {
+		EvaluationOptions eo = settings->evalops;
+		eo.parse_options.base = 10;
+		MathStructure m;
+		eo.approximation = APPROXIMATION_TRY_EXACT;
+		CALCULATOR->beginTemporaryStopMessages();
+		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 350, eo);
+		if(CALCULATOR->endTemporaryStopMessages()) {
+			base = BASE_CUSTOM;
+			nbase.clear();
+		} else if(m.isInteger() && m.number() >= 2 && m.number() <= 36) {
+			base = m.number().intValue();
+		} else {
+			base = BASE_CUSTOM;
+			nbase = m.number();
+		}
+	}
+}
+
 class QalculateDockWidget : public QDockWidget {
 
 	public:
@@ -313,21 +343,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QFont appfont;
 	if(settings->use_custom_app_font) appfont.fromString(QString::fromStdString(settings->custom_app_font));
 
-	action = new QAction("Negate", this);
-	action->setShortcut(Qt::CTRL | Qt::Key_Minus);
-	addAction(action);
-	connect(action, SIGNAL(triggered()), this, SLOT(negate()));
-
-	action = new QAction("Approximate", this);
-	action->setShortcuts({Qt::CTRL | Qt::Key_Return, Qt::CTRL | Qt::Key_Enter});
-	addAction(action);
-	connect(action, SIGNAL(triggered()), this, SLOT(approximateResult()));
-
-	menuAction = new QToolButton(this); menuAction->setIcon(LOAD_ICON("menu")); menuAction->setText(tr("Menu"));
-	menuAction->setShortcut(Qt::Key_F10); menuAction->setToolTip(tr("Menu (%1)").arg(menuAction->shortcut().toString(QKeySequence::NativeText)));
-	menuAction->setPopupMode(QToolButton::InstantPopup);
+	menuAction_t = new QToolButton(this); menuAction_t->setIcon(LOAD_ICON("menu")); menuAction_t->setText(tr("Menu"));
+	menuAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
-	menuAction->setMenu(menu);
+	menuAction_t->setMenu(menu);
 	menu2 = menu;
 	menu = menu2->addMenu(tr("New"));
 	newFunctionAction = menu->addAction(tr("Function…"), this, SLOT(newFunction()));
@@ -368,11 +387,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	quitAction = menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()));
 
-	modeAction = new QToolButton(this); modeAction->setIcon(LOAD_ICON("configure")); modeAction->setText(tr("Mode"));
-	modeAction->setShortcut(Qt::ALT | Qt::Key_M); modeAction->setToolTip(tr("Mode (%1)").arg(modeAction->shortcut().toString(QKeySequence::NativeText)));
-	modeAction->setPopupMode(QToolButton::InstantPopup);
+	modeAction_t = new QToolButton(this); modeAction_t->setIcon(LOAD_ICON("configure")); modeAction_t->setText(tr("Mode"));
+	modeAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
-	modeAction->setMenu(menu);
+	modeAction_t->setMenu(menu);
 
 	ADD_SECTION(tr("General Display Mode"));
 	QFontMetrics fm1(settings->use_custom_app_font ? appfont : menu->font());
@@ -380,26 +398,26 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	w = fm1.boundingRect(tr("General Display Mode")).width() * 1.5;
 	group = new QActionGroup(this); group->setObjectName("group_general");
 	action = menu->addAction(tr("Normal"), this, SLOT(normalActivated())); action->setCheckable(true); group->addAction(action);
-	action->setToolTip("500 000<br>5 × 10<sup>14</sup><br>50 km/s<br>y − x<br>erf(10) ≈ 1.000 000 000");
+	action->setToolTip("500 000<br>5 × 10<sup>14</sup><br>50 km/s<br>y − x<br>erf(10) ≈ 1.000 000 000"); normalAction = action;
 	if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
 	action = menu->addAction(tr("Scientific"), this, SLOT(scientificActivated())); action->setCheckable(true); group->addAction(action);
-	action->setToolTip("5 × 10<sup>5</sup><br>5 × 10<sup>4</sup> m·s<sup>−1</sup><br>−y + x<br>erf(10) ≈ 1.000 000 000");
+	action->setToolTip("5 × 10<sup>5</sup><br>5 × 10<sup>4</sup> m·s<sup>−1</sup><br>−y + x<br>erf(10) ≈ 1.000 000 000"); sciAction = action;
 	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
 	action = menu->addAction(tr("Engineering"), this, SLOT(engineeringActivated())); action->setCheckable(true); group->addAction(action);
-	action->setToolTip("500 × 10<sup>3</sup><br>50 × 10<sup>3</sup> m/s<br>−y + x<br>erf(10) ≈ 1.000 000 000");
+	action->setToolTip("500 × 10<sup>3</sup><br>50 × 10<sup>3</sup> m/s<br>−y + x<br>erf(10) ≈ 1.000 000 000"); engAction = action;
 	if(settings->printops.min_exp == EXP_BASE_3) action->setChecked(true);
 	action = menu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
-	action->setToolTip("500 000 000 000 000<br>50 km/s<br>y − x<br>erf(10) ≈ 1");
+	action->setToolTip("500 000 000 000 000<br>50 km/s<br>y − x<br>erf(10) ≈ 1"); simpleAction = action;
 	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
 
 	ADD_SECTION(tr("Angle Unit"));
 	w2 = fm1.boundingRect(tr("Angle Unit")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this);
-	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians");
+	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action;
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees");
+	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action;
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians");
+	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action;
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
 
 	ADD_SECTION(tr("Approximation"));
@@ -491,7 +509,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	aww = new QWidget(this);
 	aw->setDefaultWidget(aww);
 	awl = new QHBoxLayout(aww);
-	QSpinBox *customOutputBaseEdit = new QSpinBox(this);
+	customOutputBaseEdit = new QSpinBox(this);
 	customOutputBaseEdit->setRange(INT_MIN, INT_MAX);
 	customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? (CALCULATOR->customOutputBase().isZero() ? 10 : CALCULATOR->customOutputBase().intValue()) : ((settings->printops.base >= 2 && settings->printops.base <= 36) ? settings->printops.base : 10)); customOutputBaseEdit->setObjectName("spinbox_outbase");
 	customOutputBaseEdit->setAlignment(Qt::AlignRight);
@@ -538,7 +556,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	aww = new QWidget(this);
 	aw->setDefaultWidget(aww);
 	awl = new QHBoxLayout(aww);
-	QSpinBox *customInputBaseEdit = new QSpinBox(this);
+	customInputBaseEdit = new QSpinBox(this);
 	customInputBaseEdit->setRange(INT_MIN, INT_MAX);
 	customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? (CALCULATOR->customInputBase().isZero() ? 10 : CALCULATOR->customInputBase().intValue()) : ((settings->evalops.parse_options.base >= 2 && settings->evalops.parse_options.base <= 36) ? settings->evalops.parse_options.base : 10)); customInputBaseEdit->setObjectName("spinbox_inbase");
 	customInputBaseEdit->setAlignment(Qt::AlignRight);
@@ -577,7 +595,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addAction(aw);
 
 	menu->setMinimumWidth(w);
-	tb->addWidget(modeAction);
+	tb->addWidget(modeAction_t);
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
 	toAction->setEnabled(false);
@@ -614,27 +632,26 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addAction(basesAction);
 	keypadAction_t = new QToolButton(this); keypadAction_t->setIcon(LOAD_ICON("keypad")); keypadAction_t->setText(tr("Keypad"));
 	keypadAction_t->setPopupMode(QToolButton::InstantPopup);
-	keypadAction = new QAction("Keypad", this);
-	addAction(keypadAction);
-	connect(keypadAction, SIGNAL(triggered()), this, SLOT(onKeypadActivated()));
 	menu = new QMenu(this);
 	keypadAction_t->setMenu(menu);
 	group = new QActionGroup(this); group->setObjectName("group_keypad");
 	action = menu->addAction(tr("General"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_GENERAL);
+	action->setData(KEYPAD_GENERAL); gKeypadAction = action;
 	action = menu->addAction(tr("Programming"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_PROGRAMMING);
+	action->setData(KEYPAD_PROGRAMMING); pKeypadAction = action;
 	action = menu->addAction(tr("Algebra"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_ALGEBRA);
+	action->setData(KEYPAD_ALGEBRA); xKeypadAction = action;
 	action = menu->addAction(tr("Custom"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_CUSTOM);
+	action->setData(KEYPAD_CUSTOM); cKeypadAction = action;
 	action = menu->addAction(tr("None"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(-1); action->setChecked(true);
+	action->setData(-1); action->setChecked(true); keypadAction = action;
+	menu->addSeparator();
+	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad);
 	tb->addWidget(keypadAction_t);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tb->addWidget(spacer);
-	tb->addWidget(menuAction);
+	tb->addWidget(menuAction_t);
 
 	expressionEdit = new ExpressionEdit(this, tb);
 	QFont font = expressionEdit->font();
@@ -731,25 +748,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rpnTB->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	rpnTB->setOrientation(Qt::Vertical);
 	rpnBox->addWidget(rpnTB);
-	rpnUpAction = new QAction(LOAD_ICON("go-up"), "RPN Up", this); rpnUpAction->setShortcut(Qt::CTRL | Qt::Key_Up); rpnUpAction->setEnabled(false); rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up (%1)").arg(rpnUpAction->shortcut().toString(QKeySequence::NativeText)));
-	connect(rpnUpAction, SIGNAL(triggered(bool)), this, SLOT(registerUp())); rpnUpAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnUpAction = new QAction(LOAD_ICON("go-up"), "RPN Up", this); rpnUpAction->setEnabled(false);
+	connect(rpnUpAction, SIGNAL(triggered(bool)), this, SLOT(registerUp()));
 	rpnTB->addAction(rpnUpAction);
-	rpnDownAction = new QAction(LOAD_ICON("go-down"), "RPN Down", this); rpnDownAction->setShortcut(Qt::CTRL | Qt::Key_Down); rpnDownAction->setEnabled(false); rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down (%1)").arg(rpnDownAction->shortcut().toString(QKeySequence::NativeText))); rpnDownAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnDownAction = new QAction(LOAD_ICON("go-down"), "RPN Down", this); rpnDownAction->setEnabled(false);
 	connect(rpnDownAction, SIGNAL(triggered(bool)), this, SLOT(registerDown()));
 	rpnTB->addAction(rpnDownAction);
-	rpnSwapAction = new QAction(LOAD_ICON("rpn-swap"), "RPN Swap", this); rpnSwapAction->setShortcut(Qt::CTRL | Qt::Key_Right); rpnSwapAction->setEnabled(false); rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack (%1)").arg(rpnSwapAction->shortcut().toString(QKeySequence::NativeText))); rpnSwapAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnSwapAction = new QAction(LOAD_ICON("rpn-swap"), "RPN Swap", this); rpnSwapAction->setEnabled(false);
 	connect(rpnSwapAction, SIGNAL(triggered(bool)), this, SLOT(registerSwap()));
 	rpnTB->addAction(rpnSwapAction);
-	rpnCopyAction = new QAction(LOAD_ICON("edit-copy"), "RPN Copy", this); rpnCopyAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_C); rpnCopyAction->setEnabled(false); rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack (%1)").arg(rpnCopyAction->shortcut().toString(QKeySequence::NativeText))); rpnCopyAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnCopyAction = new QAction(LOAD_ICON("edit-copy"), "RPN Copy", this); rpnCopyAction->setEnabled(false);
 	connect(rpnCopyAction, SIGNAL(triggered(bool)), this, SLOT(copyRegister()));
 	rpnTB->addAction(rpnCopyAction);
-	rpnLastxAction = new QAction(LOAD_ICON("edit-undo"), "RPN LastX", this); rpnLastxAction->setShortcut(Qt::CTRL | Qt::Key_Left); rpnLastxAction->setEnabled(false); rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation (%1)").arg(rpnLastxAction->shortcut().toString(QKeySequence::NativeText))); rpnLastxAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnLastxAction = new QAction(LOAD_ICON("edit-undo"), "RPN LastX", this); rpnLastxAction->setEnabled(false);
 	connect(rpnLastxAction, SIGNAL(triggered(bool)), this, SLOT(rpnLastX()));
 	rpnTB->addAction(rpnLastxAction);
-	rpnDeleteAction = new QAction(LOAD_ICON("edit-delete"), "RPN Delete", this); rpnDeleteAction->setShortcut(Qt::CTRL | Qt::Key_Delete); rpnDeleteAction->setEnabled(false); rpnDeleteAction->setToolTip(tr("Delete the top or selected value (%1)").arg(rpnDeleteAction->shortcut().toString(QKeySequence::NativeText))); rpnDeleteAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnDeleteAction = new QAction(LOAD_ICON("edit-delete"), "RPN Delete", this); rpnDeleteAction->setEnabled(false);
 	connect(rpnDeleteAction, SIGNAL(triggered(bool)), this, SLOT(deleteRegister()));
 	rpnTB->addAction(rpnDeleteAction);
-	rpnClearAction = new QAction(LOAD_ICON("edit-clear"), "RPN Clear", this); rpnClearAction->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_Delete); rpnClearAction->setEnabled(false); rpnClearAction->setToolTip(tr("Clear the RPN stack (%1)").arg(rpnClearAction->shortcut().toString(QKeySequence::NativeText))); rpnClearAction->setShortcutContext(Qt::ApplicationShortcut);
+	rpnClearAction = new QAction(LOAD_ICON("edit-clear"), "RPN Clear", this); rpnClearAction->setEnabled(false);
 	connect(rpnClearAction, SIGNAL(triggered(bool)), this, SLOT(clearStack()));
 	rpnTB->addAction(rpnClearAction);
 	rpnDock->setWidget(rpnWidget);
@@ -785,7 +802,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
 
-	updateShortcuts(true);
+	loadShortcuts();
 
 	connect(historyView, SIGNAL(insertTextRequested(std::string)), this, SLOT(onInsertTextRequested(std::string)));
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
@@ -798,6 +815,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
 	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
+	connect(keypad, SIGNAL(shortcutClicked(int, const QString&)), this, SLOT(shortcutClicked(int, const QString&)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
@@ -842,71 +860,448 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
-void QalculateWindow::updateShortcuts(bool initial) {
-	QList<QKeySequence> shortcuts;
-	if(!initial) {
-		functionsAction->setShortcut(QKeySequence());
-		unitsAction->setShortcut(QKeySequence());
-		variablesAction->setShortcut(QKeySequence());
-		datasetsAction->setShortcut(QKeySequence());
-		plotAction->setShortcut(QKeySequence());
-		fpAction->setShortcut(QKeySequence());
-		calendarsAction->setShortcut(QKeySequence());
-		periodicTableAction->setShortcut(QKeySequence());
-		percentageAction->setShortcut(QKeySequence());
-		helpAction->setShortcut(QKeySequence());
-		quitAction->setShortcut(QKeySequence());
-		toAction->setShortcut(QKeySequence());
-		basesAction->setShortcut(QKeySequence());
-		keypadAction->setShortcut(QKeySequence());
-	}
+void QalculateWindow::loadShortcuts() {
 	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
 	storeAction->setToolTip(tr("Store"));
 	unitsAction_t->setToolTip(tr("Units"));
 	functionsAction_t->setToolTip(tr("Functions"));
 	basesAction->setToolTip(tr("Number Bases"));
 	toAction->setToolTip(tr("Convert"));
+	menuAction_t->setToolTip(tr("Menu"));
+	modeAction_t->setToolTip(tr("Mode"));
+	rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up"));
+	rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down"));
+	rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack"));
+	rpnDeleteAction->setToolTip(tr("Delete the top or selected value"));
+	rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation"));
+	rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack"));
+	rpnClearAction->setToolTip(tr("Clear the RPN stack"));
 	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-		keyboard_shortcut ks = settings->keyboard_shortcuts[i];
-		QAction *action = NULL;
-		switch(ks.type) {
-			case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
-			case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
-			case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
-			case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
-			case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
-			case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
-			case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
-			case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
-			case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
-			case SHORTCUT_TYPE_CONVERT: {action = toAction; break;}
-			case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
-			case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
-			case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
-			case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
-			case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
-			case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
-			case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
-			default: {}
+		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
+	}
+}
+void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
+	if(!ks->action) return;
+	if(ks->new_action) {
+		removeAction(ks->action);
+		ks->action->deleteLater();
+		return;
+	}
+	QList<QKeySequence> shortcuts = ks->action->shortcuts();
+	shortcuts.removeAll(QKeySequence(ks->key));
+	ks->action->setShortcuts(shortcuts);
+	if(ks->type == SHORTCUT_TYPE_PLOT && plotAction_t) {
+		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_STORE) {
+		storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+	} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
+		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_CONVERT) {
+		toAction->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_MODE) {
+		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_MENU) {
+		menuAction_t->setToolTip(tr("Menu") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+		rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+		rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+		rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+		rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+		rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+		rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+		rpnClearAction->setToolTip(tr("Clear the RPN stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	}
+}
+void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
+	QAction *action = NULL;
+	switch(ks->type) {
+		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
+		case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
+		case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
+		case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
+		case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
+		case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
+		case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
+		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
+		case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
+		case SHORTCUT_TYPE_CONVERT: {action = toAction; break;}
+		case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
+		case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
+		case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
+		case SHORTCUT_TYPE_GRADIANS: {action = graAction; break;}
+		case SHORTCUT_TYPE_NORMAL_NOTATION: {action = normalAction; break;}
+		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {action = sciAction; break;}
+		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {action = engAction; break;}
+		case SHORTCUT_TYPE_SIMPLE_NOTATION: {action = simpleAction; break;}
+		case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
+		case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
+		case SHORTCUT_TYPE_GENERAL_KEYPAD: {action = gKeypadAction; break;}
+		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
+		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
+		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
+		case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
+		case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
+		case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
+		case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
+		case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
+		case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
+		case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
+		case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
+		case SHORTCUT_TYPE_RPN_DOWN: {action = rpnDownAction; break;}
+		case SHORTCUT_TYPE_RPN_SWAP: {action = rpnSwapAction; break;}
+		case SHORTCUT_TYPE_RPN_LASTX: {action = rpnLastxAction; break;}
+		case SHORTCUT_TYPE_RPN_COPY: {action = rpnCopyAction; break;}
+		case SHORTCUT_TYPE_RPN_DELETE: {action = rpnDeleteAction; break;}
+		case SHORTCUT_TYPE_RPN_CLEAR: {action = rpnClearAction; break;}
+		default: {}
+	}
+	if(action) {
+		ks->new_action = false;
+		QList<QKeySequence> shortcuts = action->shortcuts();
+		shortcuts << QKeySequence(ks->key);
+		action->setShortcuts(shortcuts);
+		if(ks->type == SHORTCUT_TYPE_PLOT) {
+			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_STORE) {
+			storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
+			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_CONVERT) {
+			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_MODE) {
+			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_MENU) {
+			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+			rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+			rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+			rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+			rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+			rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
-		if(action) {
-			shortcuts = action->shortcuts();
-			shortcuts << QKeySequence(ks.key);
-			action->setShortcuts(shortcuts);
-			if(ks.type == SHORTCUT_TYPE_PLOT) {
-				if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-			} else if(ks.type == SHORTCUT_TYPE_STORE) {
-				storeAction->setToolTip(tr("Store (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-			} else if(ks.type == SHORTCUT_TYPE_MANAGE_UNITS) {
-				unitsAction_t->setToolTip(tr("Units (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-			} else if(ks.type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-				functionsAction_t->setToolTip(tr("Functions (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-			} else if(ks.type == SHORTCUT_TYPE_NUMBER_BASES) {
-				basesAction->setToolTip(tr("Number Bases (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-			} else if(ks.type == SHORTCUT_TYPE_CONVERT) {
-				toAction->setToolTip(tr("Convert (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+	} else {
+		ks->new_action = true;
+		action = new QAction();
+		action->setShortcut(ks->key);
+		action->setData(QVariant::fromValue((void*) ks));
+		addAction(action);
+		connect(action, SIGNAL(triggered()), this, SLOT(shortcutActivated()));
+	}
+	ks->action = action;
+}
+void QalculateWindow::shortcutActivated() {
+	keyboard_shortcut *ks = (keyboard_shortcut*) qobject_cast<QAction*>(sender())->data().value<void*>();
+	triggerShortcut(ks->type, ks->value);
+}
+void QalculateWindow::shortcutClicked(int type, const QString &value) {
+	triggerShortcut((shortcut_type) type, value.toStdString());
+}
+bool contains_prefix(const MathStructure &m) {
+	if(m.isUnit() && (m.prefix() || m.unit()->subtype() == SUBTYPE_COMPOSITE_UNIT)) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_prefix(m[i])) return true;
+	}
+	return false;
+}
+void QalculateWindow::triggerShortcut(int type, const std::string &value) {
+	switch(type) {
+		case SHORTCUT_TYPE_NEGATE: {
+			negate();
+			break;
+		}
+		case SHORTCUT_TYPE_INVERT: {
+			onFunctionClicked(CALCULATOR->getActiveFunction("inv"));
+			break;
+		}
+		case SHORTCUT_TYPE_APPROXIMATE: {
+			approximateResult();
+			break;
+		}
+		case SHORTCUT_TYPE_MODE: {
+			modeAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_MENU: {
+			menuAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_FUNCTION: {
+			onFunctionClicked(CALCULATOR->getActiveFunction(value));
+			break;
+		}
+		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
+			insertFunction(CALCULATOR->getActiveFunction(value), this);
+			break;
+		}
+		case SHORTCUT_TYPE_VARIABLE: {
+			onVariableClicked(CALCULATOR->getActiveVariable(value));
+			break;
+		}
+		case SHORTCUT_TYPE_UNIT: {
+			onUnitClicked(CALCULATOR->getActiveUnit(value));
+			break;
+		}
+		case SHORTCUT_TYPE_OPERATOR: {
+			onOperatorClicked(QString::fromStdString(value));
+			break;
+		}
+		case SHORTCUT_TYPE_TEXT: {
+			onSymbolClicked(QString::fromStdString(value));
+			break;
+		}
+		case SHORTCUT_TYPE_DATE: {
+			expressionEdit->insertDate();
+			break;
+		}
+		case SHORTCUT_TYPE_MATRIX: {
+			expressionEdit->insertMatrix();
+			break;
+		}
+		case SHORTCUT_TYPE_SMART_PARENTHESES: {
+			expressionEdit->smartParentheses();
+			break;
+		}
+		case SHORTCUT_TYPE_CONVERT_TO: {
+			ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+			executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(value, pa));
+			break;
+		}
+		case SHORTCUT_TYPE_OPTIMAL_UNIT: {
+			executeCommand(COMMAND_CONVERT_OPTIMAL);
+			break;
+		}
+		case SHORTCUT_TYPE_BASE_UNITS: {
+			executeCommand(COMMAND_CONVERT_BASE);
+			break;
+		}
+		case SHORTCUT_TYPE_OPTIMAL_PREFIX: {
+			to_prefix = 0;
+			bool b_use_unit_prefixes = settings->printops.use_unit_prefixes;
+			bool b_use_prefixes_for_all_units = settings->printops.use_prefixes_for_all_units;
+			if(contains_prefix(*mstruct)) {
+				mstruct->unformat(settings->evalops);
+				executeCommand(COMMAND_CALCULATE, false);
 			}
+			settings->printops.use_unit_prefixes = true;
+			settings->printops.use_prefixes_for_all_units = true;
+			setResult(NULL, true, false, true);
+			settings->printops.use_unit_prefixes = b_use_unit_prefixes;
+			settings->printops.use_prefixes_for_all_units = b_use_prefixes_for_all_units;
+			break;
 		}
+		case SHORTCUT_TYPE_TO_NUMBER_BASE: {
+			int save_base = settings->printops.base;
+			Number save_nbase = CALCULATOR->customOutputBase();
+			to_base = 0;
+			to_bits = 0;
+			Number nbase;
+			base_from_string(value, settings->printops.base, nbase);
+			CALCULATOR->setCustomOutputBase(nbase);
+			resultFormatUpdated();
+			settings->printops.base = save_base;
+			CALCULATOR->setCustomOutputBase(save_nbase);
+			break;
+		}
+		case SHORTCUT_TYPE_FACTORIZE: {
+			executeCommand(COMMAND_FACTORIZE);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPAND: {
+			executeCommand(COMMAND_EXPAND);
+			break;
+		}
+		case SHORTCUT_TYPE_PARTIAL_FRACTIONS: {
+			executeCommand(COMMAND_EXPAND_PARTIAL_FRACTIONS);
+			break;
+		}
+		case SHORTCUT_TYPE_INPUT_BASE: {
+			Number nbase;
+			base_from_string(value, settings->evalops.parse_options.base, nbase, true);
+			QAction *action = find_child_data(this, "group_inbase", settings->evalops.parse_options.base);
+			if(!action) action = customInputBaseAction;
+			if(action) action->setChecked(true);
+			if(settings->printops.base == BASE_CUSTOM) CALCULATOR->setCustomInputBase(nbase);
+			if(action == customInputBaseAction) customInputBaseEdit->setValue(settings->evalops.parse_options.base == BASE_CUSTOM ? CALCULATOR->customInputBase().intValue() : settings->evalops.parse_options.base);
+			expressionFormatUpdated(false);
+			keypad->updateBase();
+			break;
+		}
+		case SHORTCUT_TYPE_OUTPUT_BASE: {
+			Number nbase;
+			base_from_string(value, settings->printops.base, nbase, false);
+			to_base = 0;
+			to_bits = 0;
+			QAction *action = find_child_data(this, "group_outbase", settings->printops.base);
+			if(!action) action = customOutputBaseAction;
+			if(action) action->setChecked(true);
+			if(settings->printops.base == BASE_CUSTOM) CALCULATOR->setCustomOutputBase(nbase);
+			if(action == customOutputBaseAction) customOutputBaseEdit->setValue(settings->printops.base == BASE_CUSTOM ? CALCULATOR->customOutputBase().intValue() : settings->printops.base);
+			resultFormatUpdated();
+			keypad->updateBase();
+			break;
+		}
+		case SHORTCUT_TYPE_HISTORY_SEARCH: {
+			historyView->editFind();
+			break;
+		}
+		case SHORTCUT_TYPE_MEMORY_CLEAR: {
+			onMCClicked();
+			break;
+		}
+		case SHORTCUT_TYPE_MEMORY_RECALL: {
+			onMRClicked();
+			break;
+		}
+		case SHORTCUT_TYPE_MEMORY_STORE: {
+			onMSClicked();
+			break;
+		}
+		case SHORTCUT_TYPE_MEMORY_ADD: {
+			onMPlusClicked();
+			break;
+		}
+		case SHORTCUT_TYPE_MEMORY_SUBTRACT: {
+			onMMinusClicked();
+			break;
+		}
+		case SHORTCUT_TYPE_COPY_RESULT: {
+			if(!settings->v_result.empty()) {
+				QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_INSERT_RESULT: {
+			if(!settings->v_result.empty()) {
+				expressionEdit->blockCompletion();
+				expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+				if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+				expressionEdit->blockCompletion(false);
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_ALWAYS_ON_TOP: {
+			settings->always_on_top = !settings->always_on_top;
+			onAlwaysOnTopChanged();
+			break;
+		}
+		case SHORTCUT_TYPE_COMPLETE: {
+			expressionEdit->completeOrActivateFirst();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_CLEAR: {
+			expressionEdit->clear();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_DELETE: {
+			expressionEdit->textCursor().deleteChar();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_BACKSPACE: {
+			expressionEdit->textCursor().deletePreviousChar();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_START: {
+			expressionEdit->moveCursor(QTextCursor::Start);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_END: {
+			expressionEdit->moveCursor(QTextCursor::End);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_RIGHT: {
+			expressionEdit->moveCursor(QTextCursor::NextCharacter);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_LEFT: {
+			expressionEdit->moveCursor(QTextCursor::PreviousCharacter);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_UP: {
+			expressionEdit->moveCursor(QTextCursor::PreviousRow);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_DOWN: {
+			expressionEdit->moveCursor(QTextCursor::NextRow);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_UNDO: {
+			expressionEdit->editUndo();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_REDO: {
+			expressionEdit->editRedo();
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {
+			QKeyEvent e(QEvent::KeyPress, Qt::Key_PageDown, Qt::NoModifier);
+			expressionEdit->keyPressEvent(&e);
+			break;
+		}
+		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {
+			QKeyEvent e(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
+			expressionEdit->keyPressEvent(&e);
+			break;
+		}
+		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {functionsAction->trigger(); break;}
+		case SHORTCUT_TYPE_MANAGE_VARIABLES: {variablesAction->trigger(); break;}
+		case SHORTCUT_TYPE_MANAGE_UNITS: {unitsAction->trigger(); break;}
+		case SHORTCUT_TYPE_MANAGE_DATA_SETS: {datasetsAction->trigger(); break;}
+		case SHORTCUT_TYPE_FLOATING_POINT: {fpAction->trigger(); break;}
+		case SHORTCUT_TYPE_CALENDARS: {calendarsAction->trigger(); break;}
+		case SHORTCUT_TYPE_PERIODIC_TABLE: {periodicTableAction->trigger(); break;}
+		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {percentageAction->trigger(); break;}
+		case SHORTCUT_TYPE_NUMBER_BASES: {basesAction->trigger(); break;}
+		case SHORTCUT_TYPE_CONVERT: {toAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_MODE: {rpnAction->trigger(); break;}
+		case SHORTCUT_TYPE_DEGREES: {degAction->trigger(); break;}
+		case SHORTCUT_TYPE_RADIANS: {radAction->trigger(); break;}
+		case SHORTCUT_TYPE_GRADIANS: {graAction->trigger(); break;}
+		case SHORTCUT_TYPE_NORMAL_NOTATION: {normalAction->trigger(); break;}
+		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {sciAction->trigger(); break;}
+		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {engAction->trigger(); break;}
+		case SHORTCUT_TYPE_SIMPLE_NOTATION: {simpleAction->trigger(); break;}
+		case SHORTCUT_TYPE_CHAIN_MODE: {chainAction->trigger(); break;}
+		case SHORTCUT_TYPE_KEYPAD: {keypadAction->trigger(); break;}
+		case SHORTCUT_TYPE_GENERAL_KEYPAD: {gKeypadAction->trigger(); break;}
+		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {pKeypadAction->trigger(); break;}
+		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {xKeypadAction->trigger(); break;}
+		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {cKeypadAction->trigger(); break;}
+		case SHORTCUT_TYPE_STORE: {storeAction->trigger(); break;}
+		case SHORTCUT_TYPE_NEW_VARIABLE: {newVariableAction->trigger(); break;}
+		case SHORTCUT_TYPE_NEW_FUNCTION: {newFunctionAction->trigger(); break;}
+		case SHORTCUT_TYPE_PLOT: {plotAction->trigger(); break;}
+		case SHORTCUT_TYPE_UPDATE_EXRATES: {exratesAction->trigger(); break;}
+		case SHORTCUT_TYPE_HELP: {helpAction->trigger(); break;}
+		case SHORTCUT_TYPE_QUIT: {quitAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_UP: {rpnUpAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_DOWN: {rpnDownAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_SWAP: {rpnSwapAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_LASTX: {rpnLastxAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_COPY: {rpnCopyAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_DELETE: {rpnDeleteAction->trigger(); break;}
+		case SHORTCUT_TYPE_RPN_CLEAR: {rpnClearAction->trigger(); break;}
 	}
 }
 bool sort_compare_item(ExpressionItem *o1, ExpressionItem *o2) {
@@ -1184,7 +1579,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		if(arg_bits && arg_signed && (f->id() != FUNCTION_ID_CIRCULAR_SHIFT || arg_steps)) {
 			QDialog *dialog = new QDialog(this);
 			if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-			dialog->setWindowTitle(QString::fromStdString(f->title(true)));
+			dialog->setWindowTitle(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)));
 			QVBoxLayout *box = new QVBoxLayout(dialog);
 			QGridLayout *grid = new QGridLayout();
 			box->addLayout(grid);
@@ -1275,7 +1670,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		if(arg_n) {
 			QDialog *dialog = new QDialog(this);
 			if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-			dialog->setWindowTitle(QString::fromStdString(f->title(true)));
+			dialog->setWindowTitle(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)));
 			QVBoxLayout *box = new QVBoxLayout(dialog);
 			QGridLayout *grid = new QGridLayout();
 			box->addLayout(grid);
@@ -1355,12 +1750,14 @@ void QalculateWindow::negate() {
 	onFunctionClicked(CALCULATOR->getActiveFunction("neg"));
 }
 void QalculateWindow::onVariableClicked(Variable *v) {
+	if(!v) return;
 	expressionEdit->blockCompletion();
 	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onUnitClicked(Unit *u) {
+	if(!u) return;
 	expressionEdit->blockCompletion();
 	if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 		expressionEdit->insertPlainText(QString::fromStdString(((CompositeUnit*) u)->print(true, settings->printops.abbreviate_names, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) expressionEdit)));
@@ -1650,34 +2047,6 @@ int s2b(const std::string &str) {
 	int i = s2i(str);
 	if(i > 0) return 1;
 	return 0;
-}
-void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false) {
-	if(equalsIgnoreCase(str, "golden") || equalsIgnoreCase(str, "golden ratio") || str == "φ") base = BASE_GOLDEN_RATIO;
-	else if(equalsIgnoreCase(str, "roman") || equalsIgnoreCase(str, "roman")) base = BASE_ROMAN_NUMERALS;
-	else if(!input_base && (equalsIgnoreCase(str, "time") || equalsIgnoreCase(str, "time"))) base = BASE_TIME;
-	else if(str == "b26" || str == "B26") base = BASE_BIJECTIVE_26;
-	else if(equalsIgnoreCase(str, "unicode")) base = BASE_UNICODE;
-	else if(equalsIgnoreCase(str, "supergolden") || equalsIgnoreCase(str, "supergolden ratio") || str == "ψ") base = BASE_SUPER_GOLDEN_RATIO;
-	else if(equalsIgnoreCase(str, "pi") || str == "π") base = BASE_PI;
-	else if(str == "e") base = BASE_E;
-	else if(str == "sqrt(2)" || str == "sqrt 2" || str == "sqrt2" || str == "√2") base = BASE_SQRT2;
-	else {
-		EvaluationOptions eo = settings->evalops;
-		eo.parse_options.base = 10;
-		MathStructure m;
-		eo.approximation = APPROXIMATION_TRY_EXACT;
-		CALCULATOR->beginTemporaryStopMessages();
-		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 350, eo);
-		if(CALCULATOR->endTemporaryStopMessages()) {
-			base = BASE_CUSTOM;
-			nbase.clear();
-		} else if(m.isInteger() && m.number() >= 2 && m.number() <= 36) {
-			base = m.number().intValue();
-		} else {
-			base = BASE_CUSTOM;
-			nbase = m.number();
-		}
-	}
 }
 void set_assumption(const std::string &str, AssumptionType &at, AssumptionSign &as, bool last_of_two = false) {
 	if(equalsIgnoreCase(str, "none") || str == "0") {
@@ -4669,7 +5038,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		QColor c = QApplication::palette().base().color();
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
-		menuAction->setIcon(LOAD_ICON("menu"));
+		menuAction_t->setIcon(LOAD_ICON("menu"));
 		toAction->setIcon(LOAD_ICON("convert"));
 		storeAction->setIcon(LOAD_ICON("document-save"));
 		functionsAction_t->setIcon(LOAD_ICON("function"));
@@ -4677,7 +5046,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		if(plotAction_t) plotAction_t->setIcon(LOAD_ICON("plot"));
 		keypadAction_t->setIcon(LOAD_ICON("keypad"));
 		basesAction->setIcon(LOAD_ICON("number-bases"));
-		modeAction->setIcon(LOAD_ICON("configure"));
+		modeAction_t->setIcon(LOAD_ICON("configure"));
 		rpnUpAction->setIcon(LOAD_ICON("go-up"));
 		rpnDownAction->setIcon(LOAD_ICON("go-down"));
 		rpnSwapAction->setIcon(LOAD_ICON("rpn-swap"));
@@ -5013,21 +5382,22 @@ void QalculateWindow::newFunction() {
 		updateFunctionsMenu();
 	}
 }
+void QalculateWindow::hideNumpad(bool b) {
+	keypad->hideNumpad(b);
+}
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	if(v < 0) {
-		keypadDock->setVisible(false);
+		bool b = !keypadDock->isVisible();
+		keypadDock->setVisible(b);
+		if(b) keypadDock->raise();
 	} else {
+		if(settings->keypad_type == v && keypadDock->isVisible()) v = KEYPAD_GENERAL;
 		settings->keypad_type = v;
 		keypad->setKeypadType(v);
 		keypadDock->setVisible(true);
 		keypadDock->raise();
 	}
-}
-void QalculateWindow::onKeypadActivated() {
-	bool b = !keypadDock->isVisible();
-	keypadDock->setVisible(b);
-	if(b) keypadDock->raise();
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);

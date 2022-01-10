@@ -14,11 +14,18 @@
 
 #include <QWidget>
 #include <QPushButton>
+#include <QVector>
 
 #include <libqalculate/qalculate.h>
 
 class QTimer;
 class QStackedLayout;
+class QToolButton;
+class QLineEdit;
+class QListWidget;
+class QDialog;
+class QGridLayout;
+class QAction;
 
 class KeypadButton : public QPushButton {
 
@@ -32,6 +39,7 @@ class KeypadButton : public QPushButton {
 
 		void setToolTip(const QString &s1, const QString &s2 = QString(), const QString &s3 = QString());
 		void setRichText(const QString &text);
+		const QString &richText() const;
 
 	protected:
 
@@ -74,8 +82,19 @@ class KeypadWidget : public QWidget {
 	protected:
 
 		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton;
+		QPushButton *customOKButton;
+		QToolButton *customEditButton;
+		QVector<QVector<KeypadButton*> > customButtons;
 		QStackedLayout *leftStack;
+		QGridLayout *customGrid;
+		QLineEdit *labelEdit, *valueEdit;
+		QListWidget *actionList;
+		QWidget *numpad;
+		QDialog *customActionDialog;
+		QAction *addRowAction, *addColumnAction, *removeRowAction, *removeColumnAction;
+		bool b_edit;
 		void changeEvent(QEvent *e);
+		void editCustomAction(KeypadButton*, int);
 
 	protected slots:
 
@@ -91,17 +110,29 @@ class KeypadWidget : public QWidget {
 		void onItemButtonClicked3();
 		void onBaseButtonClicked();
 		void onBaseButtonClicked2();
+		void onCustomButtonClicked();
+		void onCustomButtonClicked2();
+		void onCustomButtonClicked3();
 		void onHypToggled(bool);
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
 		void defaultAssumptionsActivated();
 		void updateAssumptions();
+		void onCustomEditClicked(bool);
+		void removeCustomRow();
+		void addCustomRow();
+		void removeCustomColumn();
+		void addCustomColumn();
+		void updateCustomActionOK();
+		void customActionOKClicked();
+		void currentCustomActionChanged(int);
 
 	public slots:
 
 		void updateBase();
 		void updateSymbols();
 		void setKeypadType(int);
+		void hideNumpad(bool);
 
 	signals:
 
@@ -130,6 +161,7 @@ class KeypadWidget : public QWidget {
 		void factorizeClicked();
 		void expandClicked();
 		void expressionCalculationUpdated(int);
+		void shortcutClicked(int, const QString&);
 
 };
 

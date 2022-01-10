@@ -68,7 +68,7 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 	if(item->type() == TYPE_UNIT) {
 		return name_matches(item, filter) || title_matches(item, filter) || country_matches((Unit*) item, filter);
 	}
-	std::string title = item->title(true);
+	std::string title = item->title(true, settings->printops.use_unicode_signs);
 	remove_blank_ends(title);
 	while(title.length() >= filter.length()) {
 		if(equalsIgnoreCase(filter, title.substr(0, filter.length()))) {

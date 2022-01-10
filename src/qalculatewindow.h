@@ -45,6 +45,7 @@ class CalendarConversionDialog;
 class QTableWidget;
 class QMenu;
 struct FunctionDialog;
+struct keyboard_shortcut;
 
 class QalculateWindow : public QMainWindow {
 
@@ -89,9 +90,8 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction, *modeAction, *keypadAction_t;
-		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction;
-		QAction *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction;
+		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
+		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
 		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
@@ -99,7 +99,7 @@ class QalculateWindow : public QMainWindow {
 		QFont saved_app_font;
 
 		QTableWidget *rpnView;
-		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnEditAction, *rpnClearAction;
+		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;
 
 		bool send_event;
 
@@ -119,6 +119,8 @@ class QalculateWindow : public QMainWindow {
 		void RPNRegisterAdded(std::string, int = 0);
 		void RPNRegisterRemoved(int);
 		void RPNRegisterChanged(std::string, int);
+		void triggerShortcut(int, const std::string&);
+		void loadShortcuts();
 
 	protected slots:
 
@@ -149,7 +151,7 @@ class QalculateWindow : public QMainWindow {
 		void onToActivated();
 		void onStoreActivated();
 		void keypadTypeActivated();
-		void onKeypadActivated();
+		void hideNumpad(bool);
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
 		void onBasesVisibilityChanged(bool);
@@ -220,6 +222,10 @@ class QalculateWindow : public QMainWindow {
 		void updateFunctionsMenu();
 		void updateUnitsMenu();
 		void updateVariablesMenu();
+		void shortcutActivated();
+		void shortcutClicked(int, const QString&);
+		void keyboardShortcutAdded(keyboard_shortcut *ks);
+		void keyboardShortcutRemoved(keyboard_shortcut *ks);
 
 	public slots:
 
@@ -262,7 +268,6 @@ class QalculateWindow : public QMainWindow {
 		void checkVersion();
 		void reportBug();
 		void help();
-		void updateShortcuts(bool initial = false);
 
 	signals:
 

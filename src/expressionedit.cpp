@@ -351,6 +351,7 @@ bool title_matches(ExpressionItem *item, const std::string &str, size_t minlengt
 		big_A = (str[0] == 'A');
 	}
 	const std::string &title = item->title(true);
+	if(title.empty()) return false;
 	size_t i = 0;
 	while(true) {
 		while(true) {
@@ -1363,6 +1364,13 @@ void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
 	if(!event->isAutoRepeat()) disable_history_arrow_keys = false;
 	QPlainTextEdit::keyReleaseEvent(event);
 }
+void ExpressionEdit::completeOrActivateFirst() {
+	if(completionView->isVisible()) {
+		onCompletionActivated(completionView->currentIndex().isValid() ? completionView->currentIndex() : completionModel->index(0, 0));
+	} else {
+		complete();
+	}
+}
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Undo)) {
 		editUndo();
@@ -1392,8 +1400,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_SUBTRACT);
 					return;
 				}
-				if(doChainMode(SIGN_MINUS)) return;
-				wrapSelection(SIGN_MINUS);
+				if(doChainMode(settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) return;
+				wrapSelection(settings->printops.use_unicode_signs ? SIGN_MINUS : "-");
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {

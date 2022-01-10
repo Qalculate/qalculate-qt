@@ -4,8 +4,9 @@
 	<file alias="actions/scalable/calendars.svg">data/scalable/calendars.svg</file>
 	<file alias="actions/scalable/configure.svg">data/scalable/configure.svg</file>
 	<file alias="actions/scalable/convert.svg">data/scalable/convert.svg</file>
-	<file alias="actions/scalable/document-save.svg">data/scalable/document-save.svg</file>
+	<file alias="actions/scalable/document-edit.svg">data/scalable/document-edit.svg</file>
 	<file alias="actions/scalable/document-open.svg">data/scalable/document-open.svg</file>
+	<file alias="actions/scalable/document-save.svg">data/scalable/document-save.svg</file>
 	<file alias="actions/scalable/edit-clear.svg">data/scalable/edit-clear.svg</file>
 	<file alias="actions/scalable/edit-copy.svg">data/scalable/edit-copy.svg</file>
 	<file alias="actions/scalable/edit-delete.svg">data/scalable/edit-delete.svg</file>
@@ -28,6 +29,7 @@
 	<file alias="dark/actions/scalable/calendars.svg">data/scalable/calendars-dark.svg</file>
 	<file alias="dark/actions/scalable/configure.svg">data/scalable/configure-dark.svg</file>
 	<file alias="dark/actions/scalable/convert.svg">data/scalable/convert-dark.svg</file>
+	<file alias="dark/actions/scalable/document-edit.svg">data/scalable/document-edit-dark.svg</file>
 	<file alias="dark/actions/scalable/document-open.svg">data/scalable/document-open-dark.svg</file>
 	<file alias="dark/actions/scalable/document-save.svg">data/scalable/document-save-dark.svg</file>
 	<file alias="dark/actions/scalable/edit-clear.svg">data/scalable/edit-clear-dark.svg</file>

@@ -14,6 +14,8 @@
 #include <QPaintEvent>
 #include <QLabel>
 #include <QTimer>
+#include <QLineEdit>
+#include <QListWidget>
 #include <QTextDocument>
 #include <QStackedLayout>
 #include <QHBoxLayout>
@@ -21,6 +23,8 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QToolButton>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QDebug>
 
 #include "keypadwidget.h"
@@ -29,6 +33,9 @@
 #define BUTTON_DATA "QALCULATE DATA1"
 #define BUTTON_DATA2 "QALCULATE DATA2"
 #define BUTTON_DATA3 "QALCULATE DATA3"
+#define BUTTON_VALUE "QALCULATE VALUE1"
+#define BUTTON_VALUE2 "QALCULATE VALUE2"
+#define BUTTON_VALUE3 "QALCULATE VALUE3"
 
 #define SYMBOL_BUTTON_BOX(x)			button = new KeypadButton(x, this); \
 						button->setProperty(BUTTON_DATA, x); \
@@ -130,7 +137,7 @@
 						button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) o1)); \
 						button->setProperty(BUTTON_DATA2, QVariant::fromValue((void*) o2)); \
 						button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) o3)); \
-						button->setToolTip(QString::fromStdString(o1->title(true)), (void*) o1 == (void*) o2 ? QString() : QString::fromStdString(o2->title(true)), (void*) o2 == (void*) o3 ? QString() : QString::fromStdString(o3->title(true))); \
+						button->setToolTip(QString::fromStdString(o1->title(true, settings->printops.use_unicode_signs)), (void*) o1 == (void*) o2 ? QString() : QString::fromStdString(o2->title(true, settings->printops.use_unicode_signs)), (void*) o2 == (void*) o3 ? QString() : QString::fromStdString(o3->title(true, settings->printops.use_unicode_signs))); \
 						connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked())); \
 						connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked2())); \
 						connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked3())); \
@@ -140,7 +147,7 @@
 							button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) o1)); \
 							button->setProperty(BUTTON_DATA2, o2); \
 							button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) o3)); \
-							button->setToolTip(QString::fromStdString(o1->title(true)), o2, QString::fromStdString(o3->title(true))); \
+							button->setToolTip(QString::fromStdString(o1->title(true, settings->printops.use_unicode_signs)), o2, QString::fromStdString(o3->title(true, settings->printops.use_unicode_signs))); \
 							connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked())); \
 							connect(button, SIGNAL(clicked2()), this, SLOT(onOperatorButtonClicked2())); \
 							connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked3())); \
@@ -149,7 +156,7 @@
 #define SET_ITEM_BUTTON2(button, o1, o2)	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) o1)); \
 						button->setProperty(BUTTON_DATA2, QVariant::fromValue((void*) o2)); \
 						button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) o2)); \
-						button->setToolTip(QString::fromStdString(o1->title(true)), QString::fromStdString(o2->title(true)));
+						button->setToolTip(QString::fromStdString(o1->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(o2->title(true, settings->printops.use_unicode_signs)));
 
 #define ITEM_BUTTON(o, x, r, c) 		ITEM_BUTTON3(o, o, o, x, r, c)
 #define ITEM_BUTTON2(o1, o2, x, r, c) 		ITEM_BUTTON3(o1, o2, o2, x, r, c)
@@ -165,10 +172,13 @@
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
 	leftStack = new QStackedLayout();
-	box->addLayout(leftStack, 2);
+	box->addLayout(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
 	box->addSpacing(box->spacing());
-	QGridLayout *grid2 = new QGridLayout();
-	box->addLayout(grid2, 3);
+	numpad = new QWidget(this);
+	if(settings->hide_numpad) numpad->hide();
+	QGridLayout *grid2 = new QGridLayout(numpad);
+	grid2->setContentsMargins(0, 0, 0, 0);
+	box->addWidget(numpad, 6);
 	QWidget *keypadG = new QWidget(this);
 	leftStack->addWidget(keypadG);
 	QGridLayout *grid = new QGridLayout(keypadG);
@@ -214,7 +224,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	c++;
 	OPERATOR_ITEM2_BUTTON("^", CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), c, 3);
 	button->setRichText("x<sup>y</sup>");
-	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true)));
+	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true, settings->printops.use_unicode_signs)));
 	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 2);
 	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
 	if(f && f2) {
@@ -225,7 +235,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("!", f, f2, c, 0);
-		button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL)->title(true)), QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
+		button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_FACTORIAL)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(f2->title(true, settings->printops.use_unicode_signs)));
 	} else {
 		OPERATOR_BUTTON("!", c, 0);
 	}
@@ -244,7 +254,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setRichText("<i>x</i> =");
 	c++;
 	SYMBOL_BUTTON2("%", "‰", c, 1);
-	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true)));
+	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
 	SYMBOL_ITEM2_BUTTON("±", CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY), CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL), c, 0);
 	button->setToolTip(tr("Uncertainty/interval"), tr("Relative error"), tr("Interval"));
 	backButton = new KeypadButton(LOAD_ICON("go-back"), this, true);
@@ -259,16 +269,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(forwardButton, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
 	connect(forwardButton, SIGNAL(clicked3()), this, SIGNAL(endClicked()));
 	grid->addWidget(forwardButton, c, 3, 1, 1);
-	grid->setRowStretch(0, 1);
-	grid->setRowStretch(1, 1);
-	grid->setRowStretch(2, 1);
-	grid->setRowStretch(3, 1);
-	grid->setRowStretch(4, 1);
-	grid->setRowStretch(0, 1);
-	grid->setColumnStretch(0, 1);
-	grid->setColumnStretch(1, 1);
-	grid->setColumnStretch(2, 1);
-	grid->setColumnStretch(3, 1);
+	for(c = 0; c < 4; c++) grid->setColumnStretch(c, 1);
+	for(int r = 0; r < 5; r++) grid->setRowStretch(r, 1);
 
 	QWidget *keypadP = new QWidget(this);
 	leftStack->addWidget(keypadP);
@@ -307,11 +309,11 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_CIRCULAR_SHIFT), tr("rot"), 3, 3);
 	OPERATOR_BUTTON2(" mod ", " rem ", 4, 0);
 	button->setText("mod");
-	button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_MOD)->title(true)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_REM)->title(true)));
+	button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_MOD)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_REM)->title(true, settings->printops.use_unicode_signs)));
 	OPERATOR_BUTTON("//", 4, 1);
 	button->setText("div");
 	f = CALCULATOR->getActiveFunction("div");
-	if(f) button->setToolTip(QString::fromStdString(f->title(true)));
+	if(f) button->setToolTip(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)));
 	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
 	if(f && f2) {
 		ITEM_BUTTON2(f2, f, "log<sub>2</sub>", 4, 2);
@@ -319,16 +321,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), "ln", 4, 2);
 	}
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_ASCII), CALCULATOR->getFunctionById(FUNCTION_ID_CHAR), tr("a→1"), 4, 3);
-	grid->setRowStretch(0, 1);
-	grid->setRowStretch(1, 1);
-	grid->setRowStretch(2, 1);
-	grid->setRowStretch(3, 1);
-	grid->setRowStretch(4, 1);
-	grid->setRowStretch(0, 1);
-	grid->setColumnStretch(0, 1);
-	grid->setColumnStretch(1, 1);
-	grid->setColumnStretch(2, 1);
-	grid->setColumnStretch(3, 1);
+	for(c = 0; c < 4; c++) grid->setColumnStretch(c, 1);
+	for(int r = 0; r < 5; r++) grid->setRowStretch(r, 1);
 
 	QWidget *keypadX = new QWidget(this);
 	leftStack->addWidget(keypadX);
@@ -386,11 +380,11 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	SYMBOL_BUTTON("n", 0, 3);
 	SYMBOL_BUTTON2("=", SIGN_NOT_EQUAL, 1, 2);
 	SYMBOL_BUTTON("/.", 1, 3);
+	button->setToolTip(QString::fromStdString(CALCULATOR->localWhereString()));
 	SYMBOL_BUTTON("<", 2, 0);
 	SYMBOL_BUTTON(SIGN_LESS_OR_EQUAL, 2, 1);
 	SYMBOL_BUTTON(">", 2, 2);
 	SYMBOL_BUTTON(SIGN_GREATER_OR_EQUAL, 2, 3);
-	button->setToolTip(tr("where"));
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SUM), CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT), "∑", 3, 0);
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_DIFFERENTIATE), CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE), "<font size=\"-1\"><i>d/dx</i></font>", 3, 1);
 	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_INTEGRATE), "∫", 3, 2);
@@ -406,16 +400,71 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), "∛", 4, 1);
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", 4, 2);
 	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_ABS), "|x|", 4, 3);
-	grid->setRowStretch(0, 1);
-	grid->setRowStretch(1, 1);
-	grid->setRowStretch(2, 1);
-	grid->setRowStretch(3, 1);
-	grid->setRowStretch(4, 1);
-	grid->setRowStretch(0, 1);
-	grid->setColumnStretch(0, 1);
-	grid->setColumnStretch(1, 1);
-	grid->setColumnStretch(2, 1);
-	grid->setColumnStretch(3, 1);
+	for(c = 0; c < 4; c++) grid->setColumnStretch(c, 1);
+	for(int r = 0; r < 5; r++) grid->setRowStretch(r, 1);
+
+	QWidget *keypadC = new QWidget(this);
+	leftStack->addWidget(keypadC);
+	grid = new QGridLayout(keypadC);
+	grid->setContentsMargins(0, 0, 0, 0);
+	customGrid = grid;
+	customEditButton = new QToolButton(this);
+	customEditButton->setIcon(LOAD_ICON("document-edit"));
+	customEditButton->setFocusPolicy(Qt::TabFocus);
+	customEditButton->setCheckable(true);
+	QFontMetrics fm(customEditButton->font());
+	QSize size = fm.boundingRect("DEL").size();
+	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
+	customEditButton->setMinimumSize(size);
+	customEditButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+	QMenu *menu = new QMenu(this);
+	addColumnAction = menu->addAction(tr("Add column"), this, SLOT(addCustomColumn())); addColumnAction->setEnabled(settings->custom_button_columns < 100);
+	addRowAction = menu->addAction(tr("Add row"), this, SLOT(addCustomRow())); addRowAction->setEnabled(settings->custom_button_rows < 100);
+	removeColumnAction = menu->addAction(tr("Remove column"), this, SLOT(removeCustomColumn())); removeColumnAction->setEnabled(settings->custom_button_columns > 1);
+	removeRowAction = menu->addAction(tr("Remove row"), this, SLOT(removeCustomRow())); removeRowAction->setEnabled(settings->custom_button_rows > 1);
+	customEditButton->setMenu(menu);
+	customEditButton->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(customEditButton, SIGNAL(toggled(bool)), this, SLOT(onCustomEditClicked(bool)));
+	grid->addWidget(customEditButton, 0, 0);
+	customButtons.resize(settings->custom_button_columns);
+	for(c = 0; c < settings->custom_button_columns; c++) {
+		customButtons[c].resize(settings->custom_button_rows);
+		for(int r = 0; r < settings->custom_button_rows; r++) {
+			if(c == 0 && r == 0) {
+				customButtons[c][r] = NULL;
+			} else {
+				button = new KeypadButton(QString(), this);
+				connect(button, SIGNAL(clicked()), this, SLOT(onCustomButtonClicked()));
+				connect(button, SIGNAL(clicked2()), this, SLOT(onCustomButtonClicked2()));
+				connect(button, SIGNAL(clicked3()), this, SLOT(onCustomButtonClicked3()));
+				grid->addWidget(button, r, c);
+				customButtons[c][r] = button;
+			}
+			grid->setRowStretch(r, 1);
+		}
+		grid->setColumnStretch(c, 1);
+	}
+	for(size_t i = 0; i < settings->custom_buttons.size();) {
+		custom_button *cb = &settings->custom_buttons[i];
+		if(cb->c > 0 && cb->r > 0 && (cb->c != 1 || cb->r != 1) && cb->c <= customButtons.size() && cb->r <= customButtons[cb->c - 1].size()) {
+			button = customButtons[cb->c - 1][cb->r - 1];
+			if(button) {
+				if(cb->label.contains("</")) button->setRichText(cb->label);
+				else button->setText(cb->label);
+				button->setProperty(BUTTON_DATA, cb->type[0]);
+				button->setProperty(BUTTON_VALUE, QString::fromStdString(cb->value[0]));
+				button->setProperty(BUTTON_DATA2, cb->type[1]);
+				button->setProperty(BUTTON_VALUE2, QString::fromStdString(cb->value[1]));
+				button->setProperty(BUTTON_DATA3, cb->type[2]);
+				button->setProperty(BUTTON_VALUE3, QString::fromStdString(cb->value[2]));
+				button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
+			}
+			i++;
+		} else {
+			settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+		}
+	}
+	b_edit = false;
 
 	grid = grid2;
 	c = 0;
@@ -434,7 +483,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	commaButton = button;
 	c++;
 	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
-	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true)));
+	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true, settings->printops.use_unicode_signs)));
 	f = CALCULATOR->getActiveFunction("inv");
 	if(f) {
 		SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
@@ -467,7 +516,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("E", f, f2, 3, c);
-		button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true)), QString::fromStdString(f2->title(true)));
+		button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(f2->title(true, settings->printops.use_unicode_signs)));
 	} else {
 		OPERATOR_BUTTON("E", 3, c);
 		button->setToolTip("10<sup>x</sup>");
@@ -477,7 +526,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
 	button = new KeypadButton("ANS", this);
 	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
-	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true)), tr("Previous result (static)"));
+	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true, settings->printops.use_unicode_signs)), tr("Previous result (static)"));
 	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
@@ -497,7 +546,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	f = CALCULATOR->getActiveFunction("neg");
 	if(f) {
 		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
+		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
 	} else {
 		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
 		button->setToolTip(tr("Subtraction"), tr("Minus"));
@@ -513,26 +562,216 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(acButton, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
 	grid->addWidget(acButton, 0, c, 1, 1);
 	button = new KeypadButton("=", this);
-	button->setToolTip(tr("Calculate expression"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE)->title(true)));
+	button->setToolTip(tr("Calculate expression"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE)->title(true, settings->printops.use_unicode_signs)));
 	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))); \
 	connect(button, SIGNAL(clicked()), this, SIGNAL(equalsClicked()));
 	connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked()));
 	connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked()));
 	grid->addWidget(button, 3, c, 1, 1);
-	grid->setRowStretch(0, 1);
-	grid->setRowStretch(1, 1);
-	grid->setRowStretch(2, 1);
-	grid->setRowStretch(3, 1);
-	grid->setColumnStretch(0, 1);
-	grid->setColumnStretch(1, 1);
-	grid->setColumnStretch(2, 1);
-	grid->setColumnStretch(3, 1);
-	grid->setColumnStretch(4, 1);
-	grid->setColumnStretch(5, 1);
+	for(c = 0; c < 6; c++) grid->setColumnStretch(c, 1);
+	for(int r = 0; r < 4; r++) grid->setRowStretch(r, 1);
 	setKeypadType(settings->keypad_type);
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::updateCustomActionOK() {
+	int i = actionList->currentRow();
+	customOKButton->setEnabled(i == 0 || (i > 0 && (!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(i - 1) || !valueEdit->text().trimmed().isEmpty())));
+}
+void KeypadWidget::customActionOKClicked() {
+	QString value = valueEdit->text().trimmed();
+	if(settings->testShortcutValue(actionList->currentRow() - 1, value, customActionDialog)) {
+		customActionDialog->accept();
+	} else {
+		valueEdit->setFocus();
+	}
+	valueEdit->setText(value);
+}
+void KeypadWidget::currentCustomActionChanged(int i) {
+	valueEdit->setEnabled(SHORTCUT_REQUIRES_VALUE(i));
+	if(!valueEdit->isEnabled()) valueEdit->clear();
+}
+
+void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
+	if(i < 1 || i > 3) return;
+	QDialog *dialog = new QDialog(this);
+	customActionDialog = dialog;
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Button Action"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	if(i == 1) {
+		grid->addWidget(new QLabel(tr("Label:"), dialog), 0, 0);
+		labelEdit = new QLineEdit(dialog);
+		labelEdit->setText(button->richText().isEmpty() ? button->text() : button->richText());
+		grid->addWidget(labelEdit, 0, 1);
+	} else {
+		labelEdit = NULL;
+	}
+	grid->addWidget(new QLabel(tr("Action:"), dialog), i == 2 ? 0 : 1, 0);
+	actionList = new QListWidget(dialog);
+	grid->addWidget(actionList, i == 2 ? 1 : 2, 0, 1, 2);
+	int type = -1;
+	if(button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).isValid()) type = button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).toInt();
+	actionList->addItem(tr("None"));
+	actionList->setCurrentRow(0);
+	for(int i = SHORTCUT_TYPE_FUNCTION; i <= LAST_SHORTCUT_TYPE; i++) {
+		actionList->addItem(settings->shortcutTypeText((shortcut_type) i));
+		if(i == type) actionList->setCurrentRow(i + 1);
+	}
+	grid->addWidget(new QLabel(tr("Value:"), dialog), i == 2 ? 2 : 3, 0);
+	valueEdit = new MathLineEdit(dialog);
+	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) valueEdit->setText(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString());
+	grid->addWidget(valueEdit, i == 2 ? 2 : 3, 1);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(customActionOKClicked()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	if(labelEdit) connect(labelEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateCustomActionOK()));
+	connect(actionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateCustomActionOK()));
+	connect(actionList, SIGNAL(currentRowChanged(int)), this, SLOT(currentCustomActionChanged(int)));
+	connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateCustomActionOK()));
+	customOKButton = buttonBox->button(QDialogButtonBox::Ok);
+	customOKButton->setEnabled(false);
+	if(labelEdit) labelEdit->setFocus();
+	else actionList->setFocus();
+	if(dialog->exec() == QDialog::Accepted) {
+		int grid_i = customGrid->indexOf(button);
+		int c = 0, r = 0, cs = 0, rs = 0;
+		customGrid->getItemPosition(grid_i, &r, &c, &rs, &cs);
+		c++; r++;
+		size_t index = 0;
+		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
+			if(settings->custom_buttons[i - 1].r == r && settings->custom_buttons[i - 1].c == c) {
+				index = i;
+				break;
+			}
+		}
+		if(index == 0) {
+			custom_button cb;
+			cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+			settings->custom_buttons.push_back(cb);
+			index = settings->custom_buttons.size();
+		}
+		index--;
+		custom_button *cb = &settings->custom_buttons[index];
+		cb->type[i - 1] = actionList->currentRow() - 1;
+		cb->value[i - 1] = valueEdit->text().trimmed().toStdString();
+		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentRow() - 1);
+		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->text().trimmed());
+		button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
+		if(labelEdit) {
+			settings->custom_buttons[index].label = labelEdit->text().trimmed();
+			if(labelEdit->text().contains("</")) button->setRichText(labelEdit->text().trimmed());
+			else button->setText(labelEdit->text());
+		}
+	}
+	dialog->deleteLater();
+}
+void KeypadWidget::onCustomEditClicked(bool b) {
+	b_edit = b;
+}
+void KeypadWidget::addCustomRow() {
+	settings->custom_button_rows++;
+	int r = settings->custom_button_rows - 1;
+	for(int c = 0; c < settings->custom_button_columns; c++) {
+		customButtons[c].resize(settings->custom_button_rows);
+		KeypadButton *button = new KeypadButton(QString(), this);
+		connect(button, SIGNAL(clicked()), this, SLOT(onCustomButtonClicked()));
+		connect(button, SIGNAL(clicked2()), this, SLOT(onCustomButtonClicked2()));
+		connect(button, SIGNAL(clicked3()), this, SLOT(onCustomButtonClicked3()));
+		customGrid->addWidget(button, r, c);
+		customButtons[c][r] = button;
+		customGrid->setRowStretch(r, 1);
+	}
+	addRowAction->setEnabled(settings->custom_button_rows < 100);
+	removeRowAction->setEnabled(true);
+}
+void KeypadWidget::addCustomColumn() {
+	settings->custom_button_columns++;
+	customButtons.resize(settings->custom_button_columns);
+	int c = settings->custom_button_columns - 1;
+	customButtons[c].resize(settings->custom_button_rows);
+	for(int r = 0; r < settings->custom_button_rows; r++) {
+		KeypadButton *button = new KeypadButton(QString(), this);
+		connect(button, SIGNAL(clicked()), this, SLOT(onCustomButtonClicked()));
+		connect(button, SIGNAL(clicked2()), this, SLOT(onCustomButtonClicked2()));
+		connect(button, SIGNAL(clicked3()), this, SLOT(onCustomButtonClicked3()));
+		customGrid->addWidget(button, r, c);
+		customButtons[c][r] = button;
+		customGrid->setRowStretch(r, 1);
+	}
+	customGrid->setColumnStretch(c, 1);
+	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	addColumnAction->setEnabled(settings->custom_button_columns < 100);
+	removeColumnAction->setEnabled(true);
+}
+void KeypadWidget::removeCustomRow() {
+	if(settings->custom_button_rows <= 1) return;
+	settings->custom_button_rows--;
+	int r = settings->custom_button_rows;
+	customGrid->setRowStretch(r, 0);
+	for(int c = 0; c < settings->custom_button_columns; c++) {
+		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
+			if(settings->custom_buttons[i - 1].r == r + 1 && settings->custom_buttons[i - 1].c == c + 1) {
+				settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+				break;
+			}
+		}
+		customGrid->removeWidget(customButtons[c][r]);
+		customButtons[c][r]->deleteLater();
+		customButtons[c].pop_back();
+	}
+	addRowAction->setEnabled(true);
+	removeRowAction->setEnabled(settings->custom_button_rows > 1);
+}
+void KeypadWidget::removeCustomColumn() {
+	if(settings->custom_button_columns <= 1) return;
+	settings->custom_button_columns--;
+	int c = settings->custom_button_columns;
+	customGrid->setColumnStretch(c, 0);
+	for(int r = 0; r < settings->custom_button_rows; r++) {
+		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
+			if(settings->custom_buttons[i - 1].r == r + 1 && settings->custom_buttons[i - 1].c == c + 1) {
+				settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+				break;
+			}
+		}
+		customGrid->removeWidget(customButtons[c][r]);
+		customButtons[c][r]->deleteLater();
+	}
+	customButtons.pop_back();
+	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	addColumnAction->setEnabled(true);
+	removeColumnAction->setEnabled(settings->custom_button_columns > 1);
+}
+void KeypadWidget::onCustomButtonClicked() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit || !button->property(BUTTON_DATA).isValid() || button->property(BUTTON_DATA).toInt() < 0) {
+		editCustomAction(button, 1);
+	} else {
+		emit shortcutClicked(button->property(BUTTON_DATA).toInt(), button->property(BUTTON_VALUE).toString());
+	}
+}
+void KeypadWidget::onCustomButtonClicked2() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit || !button->property(BUTTON_DATA2).isValid() || button->property(BUTTON_DATA2).toInt() < 0) {
+		editCustomAction(button, 2);
+	} else {
+		emit shortcutClicked(button->property(BUTTON_DATA2).toInt(), button->property(BUTTON_VALUE2).toString());
+	}
+}
+void KeypadWidget::onCustomButtonClicked3() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit || !button->property(BUTTON_DATA3).isValid() || button->property(BUTTON_DATA3).toInt() < 0) {
+		editCustomAction(button, 3);
+	} else {
+		emit shortcutClicked(button->property(BUTTON_DATA2).toInt(), button->property(BUTTON_VALUE3).toString());
+	}
+}
 void KeypadWidget::updateAssumptions() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
 	int id = menu->property(BUTTON_DATA).toInt();
@@ -596,6 +835,9 @@ void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
 	leftStack->setCurrentIndex(i);
 }
+void KeypadWidget::hideNumpad(bool b) {
+	numpad->setVisible(!b);
+}
 void KeypadWidget::updateBase() {
 	binButton->setChecked(settings->printops.base == 2 && settings->evalops.parse_options.base == 2);
 	octButton->setChecked(settings->printops.base == 8 && settings->evalops.parse_options.base == 8);
@@ -629,6 +871,7 @@ void KeypadWidget::changeEvent(QEvent *e) {
 		delButton->setIcon(LOAD_ICON("edit-delete"));
 		backButton->setIcon(LOAD_ICON("go-back"));
 		forwardButton->setIcon(LOAD_ICON("go-forward"));
+		customEditButton->setIcon(LOAD_ICON("document-edit"));
 	}
 	QWidget::changeEvent(e);
 }
@@ -722,6 +965,9 @@ KeypadButton::~KeypadButton() {}
 void KeypadButton::setRichText(const QString &text) {
 	richtext = text;
 	setText(QString());
+}
+const QString &KeypadButton::richText() const {
+	return richtext;
 }
 void KeypadButton::paintEvent(QPaintEvent *p) {
 	QPushButton::paintEvent(p);

@@ -19,6 +19,7 @@
 
 class QWidget;
 class QByteArray;
+class QAction;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
@@ -38,6 +39,7 @@ bool name_matches(ExpressionItem *item, const std::string &str);
 bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
 bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
 bool contains_plot_or_save(const std::string &str);
+void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 
 enum {
 	TITLE_APP,
@@ -52,14 +54,14 @@ enum {
 	CLEAR_EXPRESSION
 };
 
-enum {
+typedef enum {
 	SHORTCUT_TYPE_FUNCTION,
 	SHORTCUT_TYPE_FUNCTION_WITH_DIALOG,
 	SHORTCUT_TYPE_VARIABLE,
 	SHORTCUT_TYPE_UNIT,
+	SHORTCUT_TYPE_OPERATOR,
 	SHORTCUT_TYPE_TEXT,
 	SHORTCUT_TYPE_DATE,
-	SHORTCUT_TYPE_VECTOR,
 	SHORTCUT_TYPE_MATRIX,
 	SHORTCUT_TYPE_SMART_PARENTHESES,
 	SHORTCUT_TYPE_CONVERT_TO,
@@ -72,6 +74,8 @@ enum {
 	SHORTCUT_TYPE_EXPAND,
 	SHORTCUT_TYPE_PARTIAL_FRACTIONS,
 	SHORTCUT_TYPE_APPROXIMATE,
+	SHORTCUT_TYPE_NEGATE,
+	SHORTCUT_TYPE_INVERT,
 	SHORTCUT_TYPE_RPN_UP,
 	SHORTCUT_TYPE_RPN_DOWN,
 	SHORTCUT_TYPE_RPN_SWAP,
@@ -79,13 +83,14 @@ enum {
 	SHORTCUT_TYPE_RPN_LASTX,
 	SHORTCUT_TYPE_RPN_DELETE,
 	SHORTCUT_TYPE_RPN_CLEAR,
-	SHORTCUT_TYPE_META_MODE,
 	SHORTCUT_TYPE_OUTPUT_BASE,
 	SHORTCUT_TYPE_INPUT_BASE,
 	SHORTCUT_TYPE_DEGREES,
 	SHORTCUT_TYPE_RADIANS,
 	SHORTCUT_TYPE_GRADIANS,
+	SHORTCUT_TYPE_NORMAL_NOTATION,
 	SHORTCUT_TYPE_SCIENTIFIC_NOTATION,
+	SHORTCUT_TYPE_ENGINEERING_NOTATION,
 	SHORTCUT_TYPE_SIMPLE_NOTATION,
 	SHORTCUT_TYPE_COPY_RESULT,
 	SHORTCUT_TYPE_INSERT_RESULT,
@@ -98,8 +103,7 @@ enum {
 	SHORTCUT_TYPE_KEYPAD,
 	SHORTCUT_TYPE_HISTORY_SEARCH,
 	SHORTCUT_TYPE_ALWAYS_ON_TOP,
-	SHORTCUT_TYPE_DO_COMPLETION,
-	SHORTCUT_TYPE_ACTIVATE_FIRST_COMPLETION,
+	SHORTCUT_TYPE_COMPLETE,
 	SHORTCUT_TYPE_MANAGE_VARIABLES,
 	SHORTCUT_TYPE_MANAGE_FUNCTIONS,
 	SHORTCUT_TYPE_MANAGE_UNITS,
@@ -110,6 +114,19 @@ enum {
 	SHORTCUT_TYPE_MEMORY_STORE,
 	SHORTCUT_TYPE_MEMORY_ADD,
 	SHORTCUT_TYPE_MEMORY_SUBTRACT,
+	SHORTCUT_TYPE_EXPRESSION_CLEAR,
+	SHORTCUT_TYPE_EXPRESSION_DELETE,
+	SHORTCUT_TYPE_EXPRESSION_BACKSPACE,
+	SHORTCUT_TYPE_EXPRESSION_START,
+	SHORTCUT_TYPE_EXPRESSION_END,
+	SHORTCUT_TYPE_EXPRESSION_RIGHT,
+	SHORTCUT_TYPE_EXPRESSION_LEFT,
+	SHORTCUT_TYPE_EXPRESSION_UP,
+	SHORTCUT_TYPE_EXPRESSION_DOWN,
+	SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT,
+	SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS,
+	SHORTCUT_TYPE_EXPRESSION_UNDO,
+	SHORTCUT_TYPE_EXPRESSION_REDO,
 	SHORTCUT_TYPE_NEW_VARIABLE,
 	SHORTCUT_TYPE_NEW_FUNCTION,
 	SHORTCUT_TYPE_PLOT,
@@ -123,14 +140,25 @@ enum {
 	SHORTCUT_TYPE_MENU,
 	SHORTCUT_TYPE_HELP,
 	SHORTCUT_TYPE_QUIT
-};
+} shortcut_type;
 
 #define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_QUIT
 
+#define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE)
+
 struct keyboard_shortcut {
 	QString key;
-	int type;
+	shortcut_type type;
 	std::string value;
+	QAction *action;
+	bool new_action;
+};
+
+struct custom_button {
+	int c, r;
+	int type[3];
+	std::string value[3];
+	QString label;
 };
 
 DECLARE_BUILTIN_FUNCTION(AnswerFunction, 0)
@@ -154,6 +182,9 @@ class QalculateQtSettings : QObject {
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
 		bool isAnswerVariable(Variable *v);
+		QString shortcutTypeText(shortcut_type type);
+		QString shortcutText(int type, const std::string &value);
+		bool testShortcutValue(int type, QString &value, QWidget *parent = NULL);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
 		const char *multiplicationSign(bool units = false);
@@ -180,6 +211,7 @@ class QalculateQtSettings : QObject {
 		int replace_expression;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		bool hide_numpad;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;
@@ -222,6 +254,8 @@ class QalculateQtSettings : QObject {
 		std::vector<std::string> favourite_units_pre;
 		bool default_shortcuts;
 		std::vector<keyboard_shortcut> keyboard_shortcuts;
+		int custom_button_columns, custom_button_rows;
+		std::vector<custom_button> custom_buttons;
 		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;
 
 };

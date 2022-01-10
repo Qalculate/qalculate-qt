@@ -145,6 +145,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editDelete();
 		void insertDate();
 		void insertMatrix();
+		void completeOrActivateFirst();
 		bool complete(MathStructure* = NULL, const QPoint& = QPoint(), bool = false);
 
 	signals:

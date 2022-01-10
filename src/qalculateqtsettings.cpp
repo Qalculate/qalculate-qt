@@ -233,6 +233,7 @@ void QalculateQtSettings::loadPreferences() {
 	expression_status_delay = 1000;
 	prefixes_default = true;
 	keypad_type = 0;
+	hide_numpad = false;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
 	use_custom_keypad_font = false;
@@ -263,6 +264,9 @@ void QalculateQtSettings::loadPreferences() {
 
 	default_shortcuts = true;
 	keyboard_shortcuts.clear();
+	custom_buttons.clear();
+	custom_button_rows = 5;
+	custom_button_columns = 4;
 
 	default_signed = -1;
 	default_bits = -1;
@@ -344,12 +348,67 @@ void QalculateQtSettings::loadPreferences() {
 					char str1[svalue.length()];
 					char str2[svalue.length()];
 					keyboard_shortcut ks;
-					int n = sscanf(svalue.c_str(), "%s:%i:%s", str1, &ks.type, str2);
-					if(n >= 2 && ks.type >= SHORTCUT_TYPE_FUNCTION && ks.type <= LAST_SHORTCUT_TYPE) {
+					int ks_type = 0;
+					int n = sscanf(svalue.c_str(), "%s:%i:%s", str1, &ks_type, str2);
+					if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
 						if(n == 3) ks.value = str1;
+						remove_blank_ends(ks.value);
+						ks.type = (shortcut_type) ks_type;
 						ks.key = str1;
+						ks.new_action = false;
+						ks.action = NULL;
 						keyboard_shortcuts.push_back(ks);
 					}
+				} else if(svar == "custom_button_label") {
+					int c = 0, r = 0;
+					char str[svalue.length()];
+					int n = sscanf(svalue.c_str(), "%i:%i:%s", &r, &c, str);
+					if(n == 3 && c > 0 && r > 0) {
+						size_t index = 0;
+						for(size_t i = custom_buttons.size(); i > 0; i--) {
+							if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+								index = i;
+								break;
+							}
+						}
+						if(index == 0) {
+							custom_button cb;
+							cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+							custom_buttons.push_back(cb);
+							index = custom_buttons.size();
+						}
+						index--;
+						custom_buttons[index].label = QString::fromUtf8(str).trimmed();
+					}
+				} else if(svar == "custom_button") {
+					int c = 0, r = 0;
+					unsigned int bi = 0;
+					char str[svalue.length()];
+					int cb_type = -1;
+					int n = sscanf(svalue.c_str(), "%i:%i:%u:%i:%s", &c, &r, &bi, &cb_type, str);
+					if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
+						size_t index = 0;
+						for(size_t i = custom_buttons.size(); i > 0; i--) {
+							if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+								index = i;
+								break;
+							}
+						}
+						if(index == 0) {
+							custom_button cb;
+							cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+							custom_buttons.push_back(cb);
+							index = custom_buttons.size();
+						}
+						index--;
+						custom_buttons[index].type[bi] = cb_type;
+						if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
+						else custom_buttons[index].value[bi] = "";
+					}
+				} else if(svar == "custom_button_rows") {
+					if(v > 0 && v <= 100) custom_button_rows = v;
+				} else if(svar == "custom_button_columns") {
+					if(v > 0 && v <= 100) custom_button_columns = v;
 				} else if(svar == "version") {
 					parse_qalculate_version(svalue, preferences_version);
 				} else if(svar == "always_on_top") {
@@ -366,6 +425,8 @@ void QalculateQtSettings::loadPreferences() {
 					window_state = QByteArray::fromBase64(svalue.c_str());
 				} else if(svar == "keypad_type") {
 					if(v >= 0 && v <= 3) keypad_type = v;
+				} else if(svar == "hide_numpad") {
+					hide_numpad = v;
 				} else if(svar == "replace_expression") {
 					replace_expression = v;
 				} else if(svar == "window_geometry") {
@@ -752,10 +813,10 @@ void QalculateQtSettings::loadPreferences() {
 
 	if(default_shortcuts) {
 		keyboard_shortcut ks;
-#define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; keyboard_shortcuts.push_back(ks);
+#define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; ks.action = NULL; ks.new_action = false; keyboard_shortcuts.push_back(ks);
 		ADD_SHORTCUT(QKeySequence(QKeySequence::Quit).toString(), SHORTCUT_TYPE_QUIT, "")
 		ADD_SHORTCUT(QKeySequence(QKeySequence::HelpContents).toString(), SHORTCUT_TYPE_HELP, "")
-		//ADD_SHORTCUT(GDK_KEY_c, GDK_CONTROL_MASK | GDK_MOD1_MASK, SHORTCUT_TYPE_COPY_RESULT, "")
+		ADD_SHORTCUT("Ctrl+Alt+C", SHORTCUT_TYPE_COPY_RESULT, "")
 		ADD_SHORTCUT(QKeySequence(QKeySequence::Save).toString(), SHORTCUT_TYPE_STORE, "")
 		ADD_SHORTCUT("Ctrl+M", SHORTCUT_TYPE_MANAGE_VARIABLES, "")
 		ADD_SHORTCUT("Ctrl+F", SHORTCUT_TYPE_MANAGE_FUNCTIONS, "")
@@ -766,16 +827,20 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Alt+K", SHORTCUT_TYPE_KEYPAD, "")
 		ADD_SHORTCUT("Ctrl+T", SHORTCUT_TYPE_CONVERT, "")
 		ADD_SHORTCUT("Ctrl+B", SHORTCUT_TYPE_NUMBER_BASES, "")
-		/*ADD_SHORTCUT(GDK_KEY_parenright, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_SMART_PARENTHESES, "")
-		ADD_SHORTCUT(GDK_KEY_parenleft, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_SMART_PARENTHESES, "")
-		ADD_SHORTCUT(GDK_KEY_Up, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_UP, "")
-		ADD_SHORTCUT(GDK_KEY_Down, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_DOWN, "")
-		ADD_SHORTCUT(GDK_KEY_Right, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_SWAP, "")
-		ADD_SHORTCUT(GDK_KEY_Left, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_LASTX, "")
-		ADD_SHORTCUT(GDK_KEY_c, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_RPN_COPY, "")
-		ADD_SHORTCUT(GDK_KEY_Delete, GDK_CONTROL_MASK, SHORTCUT_TYPE_RPN_DELETE, "")
-		ADD_SHORTCUT(GDK_KEY_Delete, GDK_CONTROL_MASK | GDK_SHIFT_MASK, SHORTCUT_TYPE_RPN_CLEAR, "")
-		ADD_SHORTCUT(GDK_KEY_Tab, 0, SHORTCUT_TYPE_ACTIVATE_FIRST_COMPLETION, "")*/
+		ADD_SHORTCUT("Ctrl+-", SHORTCUT_TYPE_NEGATE, "")
+		ADD_SHORTCUT("Ctrl+Enter", SHORTCUT_TYPE_APPROXIMATE, "")
+		ADD_SHORTCUT("Ctrl+Return", SHORTCUT_TYPE_APPROXIMATE, "")
+		ADD_SHORTCUT("Alt+M", SHORTCUT_TYPE_MODE, "")
+		ADD_SHORTCUT("F10", SHORTCUT_TYPE_MENU, "")
+		ADD_SHORTCUT("Ctrl+)", SHORTCUT_TYPE_SMART_PARENTHESES, "")
+		ADD_SHORTCUT("Ctrl+(", SHORTCUT_TYPE_SMART_PARENTHESES, "")
+		ADD_SHORTCUT("Ctrl+Up", SHORTCUT_TYPE_RPN_UP, "")
+		ADD_SHORTCUT("Ctrl+Down", SHORTCUT_TYPE_RPN_DOWN, "")
+		ADD_SHORTCUT("Ctrl+Right", SHORTCUT_TYPE_RPN_SWAP, "")
+		ADD_SHORTCUT("Ctrl+Left", SHORTCUT_TYPE_RPN_LASTX, "")
+		ADD_SHORTCUT("Ctrl+Shift+C", SHORTCUT_TYPE_RPN_COPY, "")
+		ADD_SHORTCUT("Ctrl+Delete", SHORTCUT_TYPE_RPN_DELETE, "")
+		ADD_SHORTCUT("Ctrl+Shift+Delete", SHORTCUT_TYPE_RPN_CLEAR, "")
 	}
 
 	updateMessagePrintOptions();
@@ -976,7 +1041,27 @@ void QalculateQtSettings::savePreferences(bool) {
 	if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 	fprintf(file, "replace_expression=%i\n", replace_expression);
 	fprintf(file, "keypad_type=%i\n", keypad_type);
+	fprintf(file, "hide_numpad=%i\n", hide_numpad);
 	fprintf(file, "rpn_keys=%i\n", rpn_keys);
+	if(!custom_buttons.empty()) {
+		fprintf(file, "custom_button_columns=%i\n", custom_button_columns);
+		fprintf(file, "custom_button_rows=%i\n", custom_button_rows);
+		for(unsigned int i = 0; i < custom_buttons.size(); i++) {
+			if(!custom_buttons[i].label.isEmpty()) fprintf(file, "custom_button_label=%i:%i:%s\n", custom_buttons[i].r, custom_buttons[i].c, custom_buttons[i].label.toUtf8().data());
+			for(unsigned int bi = 0; bi <= 2; bi++) {
+				if(custom_buttons[i].type[bi] != -1) {
+					if(custom_buttons[i].value[bi].empty()) fprintf(file, "custom_button=%i:%i:%u:%i\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi]);
+					else fprintf(file, "custom_button=%i:%i:%u:%i:%s\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi], custom_buttons[i].value[bi].c_str());
+				}
+			}
+		}
+	}
+	if(!default_shortcuts) {
+		for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+			if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s:%i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
+			else fprintf(file, "keyboard_shortcut=%s:%i:%s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
+		}
+	}
 	if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
 	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
@@ -1209,6 +1294,10 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 				insert(settings->multiplicationSign(b_unit));
 				return;
 			}
+			case Qt::Key_Slash: {
+				insert(settings->divisionSign(false));
+				return;
+			}
 			case Qt::Key_Minus: {
 				insert(SIGN_MINUS);
 				return;
@@ -1427,5 +1516,160 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 #endif
 	}
 	last_version_check_date.setToCurrentDate();
+}
+
+QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
+	if(type < 0) return QString();
+	switch(type) {
+		case SHORTCUT_TYPE_FUNCTION: {
+			MathFunction *f = CALCULATOR->getActiveFunction(value);
+			return QString::fromStdString(f->title(true, printops.use_unicode_signs));
+		}
+		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
+			MathFunction *f = CALCULATOR->getActiveFunction(value);
+			return QString::fromStdString(f->title(true, printops.use_unicode_signs));
+		}
+		case SHORTCUT_TYPE_VARIABLE: {
+			Variable *v = CALCULATOR->getActiveVariable(value);
+			return QString::fromStdString(v->title(true, printops.use_unicode_signs));
+		}
+		case SHORTCUT_TYPE_UNIT: {
+			Unit *u = CALCULATOR->getActiveUnit(value);
+			return QString::fromStdString(u->title(true, printops.use_unicode_signs));
+		}
+		default: {}
+	}
+	if(value.empty()) return shortcutTypeText((shortcut_type) type);
+	return tr("%1: %2").arg(shortcutTypeText((shortcut_type) type)).arg(QString::fromStdString(value));
+}
+QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
+	switch(type) {
+		case SHORTCUT_TYPE_FUNCTION: {return tr("Insert function");}
+		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {return tr("Insert function (dialog)");}
+		case SHORTCUT_TYPE_VARIABLE: {return tr("Insert variable");}
+		case SHORTCUT_TYPE_APPROXIMATE: {return tr("Approximate result");}
+		case SHORTCUT_TYPE_NEGATE: {return tr("Negate");}
+		case SHORTCUT_TYPE_INVERT: {return tr("Invert");}
+		case SHORTCUT_TYPE_UNIT: {return tr("Insert unit");}
+		case SHORTCUT_TYPE_TEXT: {return tr("Insert text");}
+		case SHORTCUT_TYPE_OPERATOR: {return tr("Insert operator");}
+		case SHORTCUT_TYPE_DATE: {return tr("Insert date");}
+		case SHORTCUT_TYPE_MATRIX: {return tr("Insert matrix");}
+		case SHORTCUT_TYPE_SMART_PARENTHESES: {return tr("Insert smart parentheses");}
+		case SHORTCUT_TYPE_CONVERT_TO: {return tr("Convert to unit");}
+		case SHORTCUT_TYPE_CONVERT: {return tr("Convert");}
+		case SHORTCUT_TYPE_OPTIMAL_UNIT: {return tr("Convert to optimal unit");}
+		case SHORTCUT_TYPE_BASE_UNITS: {return tr("Convert to base units");}
+		case SHORTCUT_TYPE_OPTIMAL_PREFIX: {return tr("Convert to optimal prefix");}
+		case SHORTCUT_TYPE_TO_NUMBER_BASE: {return tr("Convert to number base");}
+		case SHORTCUT_TYPE_FACTORIZE: {return tr("Factorize result");}
+		case SHORTCUT_TYPE_EXPAND: {return tr("Expand result");}
+		case SHORTCUT_TYPE_PARTIAL_FRACTIONS: {return tr("Expand partial fractions");}
+		case SHORTCUT_TYPE_RPN_DOWN: {return tr("RPN: down");}
+		case SHORTCUT_TYPE_RPN_UP: {return tr("RPN: up");}
+		case SHORTCUT_TYPE_RPN_SWAP: {return tr("RPN: swap");}
+		case SHORTCUT_TYPE_RPN_COPY: {return tr("RPN: copy");}
+		case SHORTCUT_TYPE_RPN_LASTX: {return tr("RPN: lastx");}
+		case SHORTCUT_TYPE_RPN_DELETE: {return tr("RPN: delete register");}
+		case SHORTCUT_TYPE_RPN_CLEAR: {return tr("RPN: clear stack");}
+		case SHORTCUT_TYPE_INPUT_BASE: {return tr("Set expression base");}
+		case SHORTCUT_TYPE_OUTPUT_BASE: {return tr("Set result base");}
+		case SHORTCUT_TYPE_DEGREES: {return tr("Set angle unit to degrees");}
+		case SHORTCUT_TYPE_RADIANS: {return tr("Set angle unit to radians");}
+		case SHORTCUT_TYPE_GRADIANS: {return tr("Set angle unit to gradians");}
+		case SHORTCUT_TYPE_NORMAL_NOTATION: {return tr("Active normal notation");}
+		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific notation");}
+		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering notation");}
+		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple notation");}
+		case SHORTCUT_TYPE_RPN_MODE: {return tr("Toggle RPN mode");}
+		case SHORTCUT_TYPE_GENERAL_KEYPAD: {return tr("Show general keypad");}
+		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {return tr("Toggle programming keypad");}
+		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {return tr("Toggle algebra keypad");}
+		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {return tr("Toggle custom keypad");}
+		case SHORTCUT_TYPE_KEYPAD: {return tr("Show/hide keypad");}
+		case SHORTCUT_TYPE_HISTORY_SEARCH: {return tr("Search history");}
+		case SHORTCUT_TYPE_MANAGE_VARIABLES: {return tr("Show variables");}
+		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {return tr("Show functions");}
+		case SHORTCUT_TYPE_MANAGE_UNITS: {return tr("Show units");}
+		case SHORTCUT_TYPE_MANAGE_DATA_SETS: {return tr("Show data sets");}
+		case SHORTCUT_TYPE_STORE: {return tr("Store result");}
+		case SHORTCUT_TYPE_MEMORY_CLEAR: {return tr("MC (memory clear)");}
+		case SHORTCUT_TYPE_MEMORY_RECALL: {return tr("MR (memory recall)");}
+		case SHORTCUT_TYPE_MEMORY_STORE: {return tr("MS (memory store)");}
+		case SHORTCUT_TYPE_MEMORY_ADD: {return tr("M+ (memory plus)");}
+		case SHORTCUT_TYPE_MEMORY_SUBTRACT: {return tr("M− (memory minus)");}
+		case SHORTCUT_TYPE_NEW_VARIABLE: {return tr("New variable");}
+		case SHORTCUT_TYPE_NEW_FUNCTION: {return tr("New function");}
+		case SHORTCUT_TYPE_PLOT: {return tr("Open plot functions/data");}
+		case SHORTCUT_TYPE_NUMBER_BASES: {return tr("Open convert number bases");}
+		case SHORTCUT_TYPE_FLOATING_POINT: {return tr("Open floating point conversion");}
+		case SHORTCUT_TYPE_CALENDARS: {return tr("Open calender conversion");}
+		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {return tr("Open percentage calculation tool");}
+		case SHORTCUT_TYPE_PERIODIC_TABLE: {return tr("Open periodic table");}
+		case SHORTCUT_TYPE_UPDATE_EXRATES: {return tr("Update exchange rates");}
+		case SHORTCUT_TYPE_COPY_RESULT: {return tr("Copy result");}
+		case SHORTCUT_TYPE_INSERT_RESULT: {return tr("Insert result");}
+		case SHORTCUT_TYPE_MODE: {return tr("Open mode menu");}
+		case SHORTCUT_TYPE_MENU: {return tr("Open menu");}
+		case SHORTCUT_TYPE_HELP: {return tr("Help");}
+		case SHORTCUT_TYPE_QUIT: {return tr("Quit");}
+		case SHORTCUT_TYPE_CHAIN_MODE: {return tr("Toggle chain mode");}
+		case SHORTCUT_TYPE_ALWAYS_ON_TOP: {return tr("Toggle keep above");}
+		case SHORTCUT_TYPE_COMPLETE: {return tr("Show completion (activate first item)");}
+		case SHORTCUT_TYPE_EXPRESSION_CLEAR: {return tr("Clear expression");}
+		case SHORTCUT_TYPE_EXPRESSION_DELETE: {return tr("Delete");}
+		case SHORTCUT_TYPE_EXPRESSION_BACKSPACE: {return tr("Backspace");}
+		case SHORTCUT_TYPE_EXPRESSION_START: {return tr("Home");}
+		case SHORTCUT_TYPE_EXPRESSION_END: {return tr("End");}
+		case SHORTCUT_TYPE_EXPRESSION_RIGHT: {return tr("Right");}
+		case SHORTCUT_TYPE_EXPRESSION_LEFT: {return tr("Left");}
+		case SHORTCUT_TYPE_EXPRESSION_UP: {return tr("Up");}
+		case SHORTCUT_TYPE_EXPRESSION_DOWN: {return tr("Down");}
+		case SHORTCUT_TYPE_EXPRESSION_UNDO: {return tr("Undo");}
+		case SHORTCUT_TYPE_EXPRESSION_REDO: {return tr("Redo");}
+		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {return tr("Expression history next");}
+		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {return tr("Expression history previous");}
+	}
+	return "-";
+}
+
+bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w) {
+	switch(type) {
+		case SHORTCUT_TYPE_FUNCTION: {}
+		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
+			if(value.length() > 2 && value.right(2) == "()") value.chop(2);
+			if(!CALCULATOR->getActiveFunction(value.toStdString())) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Function not found."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_VARIABLE: {
+			if(!CALCULATOR->getActiveVariable(value.toStdString())) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Variable not found."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_UNIT: {
+			if(!CALCULATOR->getActiveUnit(value.toStdString())) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_TO_NUMBER_BASE: {}
+		case SHORTCUT_TYPE_INPUT_BASE: {}
+		case SHORTCUT_TYPE_OUTPUT_BASE: {
+			Number nbase; int base;
+			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
+			if(base == BASE_CUSTOM && nbase.isZero()) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported base."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+	}
+	return true;
 }
 
