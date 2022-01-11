@@ -42,9 +42,15 @@
 #include <QFileDialog>
 #include <QScrollArea>
 #include <QTableWidget>
+#include <QTreeWidget>
+#include <QListWidget>
+#include <QTreeWidgetItem>
+#include <QListWidgetItem>
+#include <QKeySequenceEdit>
 #include <QHeaderView>
 #include <QDesktopServices>
 #include <QClipboard>
+#include <QScrollBar>
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -313,6 +319,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	ecTimer = NULL;
 	rfTimer = NULL;
+	shortcutsDialog = NULL;
 	preferencesDialog = NULL;
 	functionsDialog = NULL;
 	datasetsDialog = NULL;
@@ -377,6 +384,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("RPN Mode"), this, SLOT(rpnModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_rpnmode"); if(settings->rpn_mode) action->setChecked(true); rpnAction = action;
 	action = menu->addAction(tr("Chain Mode"), this, SLOT(chainModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_chainmode"); if(settings->chain_mode) action->setChecked(true); chainAction = action;
 	menu->addSeparator();
+	menu->addAction(tr("Keyboard Shortcuts"), this, SLOT(editKeyboardShortcuts()));
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
 	menu->addSeparator();
 	helpAction = menu->addAction(tr("Help"), this, SLOT(help()));
@@ -888,7 +896,7 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 		return;
 	}
 	QList<QKeySequence> shortcuts = ks->action->shortcuts();
-	shortcuts.removeAll(QKeySequence(ks->key));
+	shortcuts.removeAll(QKeySequence::fromString(ks->key));
 	ks->action->setShortcuts(shortcuts);
 	if(ks->type == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
@@ -968,7 +976,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 	if(action) {
 		ks->new_action = false;
 		QList<QKeySequence> shortcuts = action->shortcuts();
-		shortcuts << QKeySequence(ks->key);
+		shortcuts << QKeySequence::fromString(ks->key);
 		action->setShortcuts(shortcuts);
 		if(ks->type == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
@@ -1252,6 +1260,10 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_EXPRESSION_REDO: {
 			expressionEdit->editRedo();
+			break;
+		}
+		case SHORTCUT_TYPE_CALCULATE_EXPRESSION: {
+			calculate();
 			break;
 		}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {
@@ -5649,6 +5661,216 @@ void QalculateWindow::onAppFontChanged() {
 }
 void QalculateWindow::onExpressionStatusModeChanged() {
 	if(preferencesDialog) preferencesDialog->updateExpressionStatus();
+}
+void QalculateWindow::removeShortcutClicked() {
+	QTreeWidgetItem *item = shortcutList->currentItem();
+	if(!item) return;
+	keyboard_shortcut *ks = (keyboard_shortcut*) item->data(0, Qt::UserRole).value<void*>();
+	keyboardShortcutRemoved(ks);
+	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+		if(&settings->keyboard_shortcuts[i] == ks) {
+			settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
+			break;
+		}
+	}
+	settings->default_shortcuts = false;
+	delete item;
+}
+void QalculateWindow::updateShortcutActionOK() {
+	QListWidgetItem *item = shortcutActionList->currentItem();
+	shortcutActionOKButton->setEnabled(item && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->text().trimmed().isEmpty()));
+}
+void QalculateWindow::shortcutActionOKClicked() {
+	QString value = shortcutActionValueEdit->text().trimmed();
+	if(settings->testShortcutValue(shortcutActionList->currentRow(), value, shortcutActionDialog)) {
+		shortcutActionDialog->accept();
+	} else {
+		shortcutActionValueEdit->setFocus();
+	}
+	shortcutActionValueEdit->setText(value);
+}
+void QalculateWindow::currentShortcutActionChanged(int i) {
+	shortcutActionValueEdit->setEnabled(i >= 0 && SHORTCUT_REQUIRES_VALUE(shortcutActionList->item(i)->data(Qt::UserRole).toInt()));
+	shortcutActionValueLabel->setEnabled(shortcutActionValueEdit->isEnabled());
+	if(!shortcutActionValueEdit->isEnabled()) shortcutActionValueEdit->clear();
+}
+bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_shortcut *ks) {
+	QDialog *dialog = new QDialog(this);
+	shortcutActionDialog = dialog;
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(ks ? tr("Edit Keyboard Shortcut") : tr("New Keyboard Shortcut"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	grid->addWidget(new QLabel(tr("Action:"), dialog), 0, 0);
+	shortcutActionList = new QListWidget(dialog);
+	grid->addWidget(shortcutActionList, 1, 0, 1, 2);
+	for(int i = SHORTCUT_TYPE_FUNCTION; i <= LAST_SHORTCUT_TYPE; i++) {
+		if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
+			QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), shortcutActionList);
+			item->setData(Qt::UserRole, i);
+			if((!ks && i == 0) || (ks && i == ks->type)) shortcutActionList->setCurrentRow(i);
+		}
+	}
+	shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());
+	shortcutActionValueLabel = new QLabel(tr("Value:"), dialog);
+	grid->addWidget(shortcutActionValueLabel, 2, 0);
+	shortcutActionValueEdit = new MathLineEdit(dialog);
+	if(ks) shortcutActionValueEdit->setText(QString::fromStdString(ks->value));
+	grid->addWidget(shortcutActionValueEdit, 2, 1);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(shortcutActionOKClicked()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	connect(shortcutActionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateShortcutActionOK()));
+	connect(shortcutActionList, SIGNAL(currentRowChanged(int)), this, SLOT(currentShortcutActionChanged(int)));
+	connect(shortcutActionValueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateShortcutActionOK()));
+	shortcutActionOKButton = buttonBox->button(QDialogButtonBox::Ok);
+	currentShortcutActionChanged(shortcutActionList->currentRow());
+	updateShortcutActionOK();
+	shortcutActionList->setFocus();
+	dialog->resize(dialog->sizeHint().width(), dialog->sizeHint().width() * 1.25);
+	if(dialog->exec() == QDialog::Accepted) {
+		dialog->deleteLater();
+		dialog = new QDialog(this);
+		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		dialog->setWindowTitle(tr("Set key combination"));
+		box = new QVBoxLayout(dialog);
+		grid = new QGridLayout();
+		grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
+		QKeySequenceEdit *keyEdit = new QKeySequenceEdit(dialog);
+		grid->addWidget(keyEdit, 1, 0);
+		box->addLayout(grid);
+		buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+		box->addWidget(buttonBox);
+		connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+		connect(keyEdit, SIGNAL(editingFinished()), dialog, SLOT(accept()));
+		keyEdit->setFocus();
+		while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
+			QString key = keyEdit->keySequence().toString();
+			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] < Qt::Key_Back)))) {
+				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
+				keyEdit->clear();
+				keyEdit->setFocus();
+				continue;
+			}
+			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+				if(&settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i].key == key) {
+					if(QMessageBox::question(this, QString(), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
+							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) &settings->keyboard_shortcuts[i]) {
+								delete shortcutList->topLevelItem(index);
+								break;
+							}
+						}
+						keyboardShortcutRemoved(&settings->keyboard_shortcuts[i]);
+						settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
+						settings->default_shortcuts = false;
+						break;
+					} else {
+						dialog->deleteLater();
+						return false;
+					}
+				}
+			}
+			new_ks->key = key;
+			new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
+			new_ks->value = shortcutActionValueEdit->text().trimmed().toStdString();
+			new_ks->action = NULL;
+			new_ks->new_action = false;
+			dialog->deleteLater();
+			return true;
+		}
+	}
+	dialog->deleteLater();
+	return false;
+}
+void QalculateWindow::addShortcutClicked() {
+	keyboard_shortcut ks;
+	if(editKeyboardShortcut(&ks, NULL)) {
+		settings->keyboard_shortcuts.push_back(ks);
+		size_t i = settings->keyboard_shortcuts.size() - 1;
+		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
+		QTreeWidgetItem *item = new QTreeWidgetItem(shortcutList);
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+		settings->default_shortcuts = false;
+	}
+}
+void QalculateWindow::editShortcutClicked() {
+	QTreeWidgetItem *item = shortcutList->currentItem();
+	if(!item) return;
+	keyboard_shortcut *ks_old = (keyboard_shortcut*) item->data(0, Qt::UserRole).value<void*>();
+	keyboard_shortcut ks;
+	if(editKeyboardShortcut(&ks, ks_old)) {
+		keyboardShortcutRemoved(ks_old);
+		for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+			if(&settings->keyboard_shortcuts[i] == ks_old) {
+				settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
+				break;
+			}
+		}
+		settings->keyboard_shortcuts.push_back(ks);
+		size_t i = settings->keyboard_shortcuts.size() - 1;
+		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+		settings->default_shortcuts = false;
+	}
+}
+void QalculateWindow::editKeyboardShortcuts() {
+	if(shortcutsDialog) {
+		shortcutsDialog->setWindowState((shortcutsDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		shortcutsDialog->show();
+		qApp->processEvents();
+		shortcutsDialog->raise();
+		shortcutsDialog->activateWindow();
+		return;
+	}
+	shortcutsDialog = new QDialog(this);
+	shortcutsDialog->resize(700, 500);
+	if(settings->always_on_top) shortcutsDialog->setWindowFlags(shortcutsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	shortcutsDialog->setWindowTitle(tr("Keyboard Shortcuts"));
+	QVBoxLayout *box = new QVBoxLayout(shortcutsDialog);
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	shortcutList = new QTreeWidget(shortcutsDialog);
+	shortcutList->setSelectionMode(QAbstractItemView::SingleSelection);
+	shortcutList->setRootIsDecorated(false);
+	shortcutList->setColumnCount(2);
+	shortcutList->header()->setVisible(false);
+	shortcutList->header()->setStretchLastSection(false);
+	shortcutList->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	shortcutList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+		QTreeWidgetItem *item = new QTreeWidgetItem(shortcutList);
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+	}
+	shortcutList->setSortingEnabled(true);
+	shortcutList->sortByColumn(1, Qt::AscendingOrder);
+	grid->addWidget(shortcutList);
+	QVBoxLayout *vbox = new QVBoxLayout();
+	grid->addLayout(vbox, 0, 1);
+	addShortcutButton = new QPushButton(tr("Add…"), this);
+	connect(addShortcutButton, SIGNAL(clicked()), this, SLOT(addShortcutClicked()));
+	vbox->addWidget(addShortcutButton);
+	editShortcutButton = new QPushButton(tr("Edit…"), this);
+	connect(editShortcutButton, SIGNAL(clicked()), this, SLOT(editShortcutClicked()));
+	vbox->addWidget(editShortcutButton);
+	removeShortcutButton = new QPushButton(tr("Remove"), this);
+	connect(removeShortcutButton, SIGNAL(clicked()), this, SLOT(removeShortcutClicked()));
+	vbox->addWidget(removeShortcutButton);
+	vbox->addStretch(1);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, shortcutsDialog);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), shortcutsDialog, SLOT(reject()));
+	shortcutsDialog->show();
 }
 void QalculateWindow::editPreferences() {
 	if(preferencesDialog) {

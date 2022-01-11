@@ -44,6 +44,12 @@ class PeriodicTableDialog;
 class CalendarConversionDialog;
 class QTableWidget;
 class QMenu;
+class QTreeWidget;
+class QPushButton;
+class QListWidget;
+class QLineEdit;
+class QLabel;
+class QDialog;
 struct FunctionDialog;
 struct keyboard_shortcut;
 
@@ -84,6 +90,9 @@ class QalculateWindow : public QMainWindow {
 		PlotDialog *plotDialog;
 		PeriodicTableDialog *periodicTableDialog;
 		CalendarConversionDialog *calendarConversionDialog;
+		QDialog *shortcutsDialog, *shortcutActionDialog;
+		QLineEdit *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
+		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock, *rpnDock;
@@ -121,6 +130,7 @@ class QalculateWindow : public QMainWindow {
 		void RPNRegisterChanged(std::string, int);
 		void triggerShortcut(int, const std::string&);
 		void loadShortcuts();
+		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL);
 
 	protected slots:
 
@@ -226,6 +236,12 @@ class QalculateWindow : public QMainWindow {
 		void shortcutClicked(int, const QString&);
 		void keyboardShortcutAdded(keyboard_shortcut *ks);
 		void keyboardShortcutRemoved(keyboard_shortcut *ks);
+		void addShortcutClicked();
+		void editShortcutClicked();
+		void removeShortcutClicked();
+		void shortcutActionOKClicked();
+		void updateShortcutActionOK();
+		void currentShortcutActionChanged(int);
 
 	public slots:
 
@@ -251,6 +267,7 @@ class QalculateWindow : public QMainWindow {
 		void convertToUnit(Unit*);
 		void importCSV();
 		void exportCSV();
+		void editKeyboardShortcuts();
 		void editPreferences();
 		void onDatasetsChanged();
 		void onFunctionsChanged();

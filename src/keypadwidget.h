@@ -26,6 +26,7 @@ class QListWidget;
 class QDialog;
 class QGridLayout;
 class QAction;
+class QLabel;
 
 class KeypadButton : public QPushButton {
 
@@ -88,6 +89,7 @@ class KeypadWidget : public QWidget {
 		QStackedLayout *leftStack;
 		QGridLayout *customGrid;
 		QLineEdit *labelEdit, *valueEdit;
+		QLabel *valueLabel;
 		QListWidget *actionList;
 		QWidget *numpad;
 		QDialog *customActionDialog;

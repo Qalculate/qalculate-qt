@@ -349,7 +349,7 @@ void QalculateQtSettings::loadPreferences() {
 					char str2[svalue.length()];
 					keyboard_shortcut ks;
 					int ks_type = 0;
-					int n = sscanf(svalue.c_str(), "%s:%i:%s", str1, &ks_type, str2);
+					int n = sscanf(svalue.c_str(), "%s %i %s", str1, &ks_type, str2);
 					if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
 						if(n == 3) ks.value = str1;
 						remove_blank_ends(ks.value);
@@ -362,7 +362,7 @@ void QalculateQtSettings::loadPreferences() {
 				} else if(svar == "custom_button_label") {
 					int c = 0, r = 0;
 					char str[svalue.length()];
-					int n = sscanf(svalue.c_str(), "%i:%i:%s", &r, &c, str);
+					int n = sscanf(svalue.c_str(), "%i %i %s", &r, &c, str);
 					if(n == 3 && c > 0 && r > 0) {
 						size_t index = 0;
 						for(size_t i = custom_buttons.size(); i > 0; i--) {
@@ -385,7 +385,7 @@ void QalculateQtSettings::loadPreferences() {
 					unsigned int bi = 0;
 					char str[svalue.length()];
 					int cb_type = -1;
-					int n = sscanf(svalue.c_str(), "%i:%i:%u:%i:%s", &c, &r, &bi, &cb_type, str);
+					int n = sscanf(svalue.c_str(), "%i %i %u %i %s", &c, &r, &bi, &cb_type, str);
 					if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
 						size_t index = 0;
 						for(size_t i = custom_buttons.size(); i > 0; i--) {
@@ -1047,19 +1047,19 @@ void QalculateQtSettings::savePreferences(bool) {
 		fprintf(file, "custom_button_columns=%i\n", custom_button_columns);
 		fprintf(file, "custom_button_rows=%i\n", custom_button_rows);
 		for(unsigned int i = 0; i < custom_buttons.size(); i++) {
-			if(!custom_buttons[i].label.isEmpty()) fprintf(file, "custom_button_label=%i:%i:%s\n", custom_buttons[i].r, custom_buttons[i].c, custom_buttons[i].label.toUtf8().data());
+			if(!custom_buttons[i].label.isEmpty()) fprintf(file, "custom_button_label=%i %i %s\n", custom_buttons[i].r, custom_buttons[i].c, custom_buttons[i].label.toUtf8().data());
 			for(unsigned int bi = 0; bi <= 2; bi++) {
 				if(custom_buttons[i].type[bi] != -1) {
-					if(custom_buttons[i].value[bi].empty()) fprintf(file, "custom_button=%i:%i:%u:%i\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi]);
-					else fprintf(file, "custom_button=%i:%i:%u:%i:%s\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi], custom_buttons[i].value[bi].c_str());
+					if(custom_buttons[i].value[bi].empty()) fprintf(file, "custom_button=%i %i %u %i\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi]);
+					else fprintf(file, "custom_button=%i %i %u %i %s\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi], custom_buttons[i].value[bi].c_str());
 				}
 			}
 		}
 	}
 	if(!default_shortcuts) {
 		for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-			if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s:%i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
-			else fprintf(file, "keyboard_shortcut=%s:%i:%s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
+			if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
+			else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
 		}
 	}
 	if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
@@ -1627,6 +1627,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_EXPRESSION_DOWN: {return tr("Down");}
 		case SHORTCUT_TYPE_EXPRESSION_UNDO: {return tr("Undo");}
 		case SHORTCUT_TYPE_EXPRESSION_REDO: {return tr("Redo");}
+		case SHORTCUT_TYPE_CALCULATE_EXPRESSION: {return tr("Calculate expression");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {return tr("Expression history next");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {return tr("Expression history previous");}
 	}
