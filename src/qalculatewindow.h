@@ -45,11 +45,14 @@ class CalendarConversionDialog;
 class QTableWidget;
 class QMenu;
 class QTreeWidget;
+class QTreeWidgetItem;
 class QPushButton;
 class QListWidget;
+class QListWidgetItem;
 class QLineEdit;
 class QLabel;
 class QDialog;
+class QComboBox;
 struct FunctionDialog;
 struct keyboard_shortcut;
 
@@ -91,7 +94,7 @@ class QalculateWindow : public QMainWindow {
 		PeriodicTableDialog *periodicTableDialog;
 		CalendarConversionDialog *calendarConversionDialog;
 		QDialog *shortcutsDialog, *shortcutActionDialog;
-		QLineEdit *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
+		QComboBox *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
 		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton;
 
 		KeypadWidget *keypad;
@@ -100,9 +103,12 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
 		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
-		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
+		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
 		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
+		QMenu *recentWSMenu;
+		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;
+		QList<QAction*> recentWSAction;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 		QTimer *ecTimer, *rfTimer;
 		QFont saved_app_font;
@@ -111,6 +117,7 @@ class QalculateWindow : public QMainWindow {
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;
 
 		bool send_event;
+		bool workspace_changed;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
@@ -130,7 +137,10 @@ class QalculateWindow : public QMainWindow {
 		void RPNRegisterChanged(std::string, int);
 		void triggerShortcut(int, const std::string&);
 		void loadShortcuts();
-		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL);
+		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL, bool = false);
+		void loadWorkspace(const QString &filename);
+		void updateWSActions();
+		bool askSaveWorkspace();
 
 	protected slots:
 
@@ -241,7 +251,15 @@ class QalculateWindow : public QMainWindow {
 		void removeShortcutClicked();
 		void shortcutActionOKClicked();
 		void updateShortcutActionOK();
-		void currentShortcutActionChanged(int);
+		void currentShortcutActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void currentShortcutChanged(QTreeWidgetItem*, QTreeWidgetItem*);
+		void shortcutDoubleClicked(QTreeWidgetItem*, int);
+		void saveWorkspace();
+		void saveWorkspaceAs();
+		void openWorkspace();
+		void openDefaultWorkspace();
+		void openRecentWorkspace();
+
 
 	public slots:
 

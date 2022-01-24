@@ -129,6 +129,498 @@ QIcon load_icon(const QString &str, QWidget *w) {
 	else return QIcon(":/icons/dark/actions/scalable/" + str + ".svg");
 }
 
+void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std::string &svalue, bool is_workspace) {
+	int v = s2i(svalue);
+	if(svar == "history_expression" || svar == "history_expression*") {
+		v_expression.push_back(svalue);
+		v_delexpression.push_back(false);
+		v_protected.push_back(svar[svar.length() - 1] == '*');
+		v_result.push_back(std::vector<std::string>());
+		v_exact.push_back(std::vector<int>());
+		v_delresult.push_back(std::vector<bool>());
+	} else if(svar == "history_result" || svar == "history_result_approximate") {
+		if(!v_result.empty()) {
+			v_result[settings->v_result.size() - 1].push_back(svalue);
+			v_delresult[settings->v_result.size() - 1].push_back(false);
+			if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
+				v_exact[settings->v_exact.size() - 1].push_back(svar.length() < 20);
+			}
+		}
+	} else if(svar == "history_exact") {
+		if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
+	} else if(svar == "expression_history") {
+		expression_history.push_back(svalue);
+	} else if(svar == "keypad_type") {
+		if(v >= 0 && v <= 3) keypad_type = v;
+	} else if(svar == "hide_numpad") {
+		hide_numpad = v;
+	} else if(svar == "version") {
+		parse_qalculate_version(svalue, preferences_version);
+	} else if(!is_workspace) {
+		if(svar == "favourite_function") {
+			favourite_functions_pre.push_back(svalue);
+			favourite_functions_changed = true;
+		} else if(svar == "favourite_unit") {
+			favourite_units_pre.push_back(svalue);
+			favourite_units_changed = true;
+		} else if(svar == "favourite_variable") {
+			favourite_variables_pre.push_back(svalue);
+			favourite_variables_changed = true;
+		} else if(svar == "keyboard_shortcut") {
+			default_shortcuts = false;
+			char str1[svalue.length()];
+			char str2[svalue.length()];
+			keyboard_shortcut ks;
+			int ks_type = 0;
+			int n = sscanf(svalue.c_str(), "%s %i %s", str1, &ks_type, str2);
+			if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
+				if(n == 3) ks.value = str1;
+				remove_blank_ends(ks.value);
+				ks.type = (shortcut_type) ks_type;
+				ks.key = str1;
+				ks.new_action = false;
+				ks.action = NULL;
+				keyboard_shortcuts.push_back(ks);
+			}
+		} else if(svar == "custom_button_label") {
+			int c = 0, r = 0;
+			char str[svalue.length()];
+			int n = sscanf(svalue.c_str(), "%i %i %s", &r, &c, str);
+			if(n == 3 && c > 0 && r > 0) {
+				size_t index = 0;
+				for(size_t i = custom_buttons.size(); i > 0; i--) {
+					if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+						index = i;
+						break;
+					}
+				}
+				if(index == 0) {
+					custom_button cb;
+					cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+					custom_buttons.push_back(cb);
+					index = custom_buttons.size();
+				}
+				index--;
+				custom_buttons[index].label = QString::fromUtf8(str).trimmed();
+			}
+		} else if(svar == "custom_button") {
+			int c = 0, r = 0;
+			unsigned int bi = 0;
+			char str[svalue.length()];
+			int cb_type = -1;
+			int n = sscanf(svalue.c_str(), "%i %i %u %i %s", &c, &r, &bi, &cb_type, str);
+			if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
+				size_t index = 0;
+				for(size_t i = custom_buttons.size(); i > 0; i--) {
+					if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+						index = i;
+						break;
+					}
+				}
+				if(index == 0) {
+					custom_button cb;
+					cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+					custom_buttons.push_back(cb);
+					index = custom_buttons.size();
+				}
+				index--;
+				custom_buttons[index].type[bi] = cb_type;
+				if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
+				else custom_buttons[index].value[bi] = "";
+			}
+		} else if(svar == "custom_button_rows") {
+			if(v > 0 && v <= 100) custom_button_rows = v;
+		} else if(svar == "custom_button_columns") {
+			if(v > 0 && v <= 100) custom_button_columns = v;
+		} else if(svar == "recent_workspace") {
+			recent_workspaces.push_back(svalue);
+		} else if(svar == "always_on_top") {
+			always_on_top = v;
+		} else if(svar == "keep_function_dialog_open") {
+			keep_function_dialog_open = v;
+		} else if(svar == "save_mode_on_exit") {
+			save_mode_on_exit = v;
+		} else if(svar == "save_definitions_on_exit") {
+			save_defs_on_exit = v;
+		} else if(svar == "clear_history_on_exit") {
+			clear_history_on_exit = v;
+		} else if(svar == "window_state") {
+			window_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "replace_expression") {
+			replace_expression = v;
+		} else if(svar == "window_geometry") {
+			window_geometry = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "splitter_state") {
+			splitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "functions_geometry") {
+			functions_geometry = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "functions_vsplitter_state") {
+			functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "functions_hsplitter_state") {
+			functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "units_geometry") {
+			units_geometry = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "units_vsplitter_state") {
+			units_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "units_hsplitter_state") {
+			units_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "variables_geometry") {
+			variables_geometry = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "variables_vsplitter_state") {
+			variables_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "variables_hsplitter_state") {
+			variables_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "datasets_geometry") {
+			datasets_geometry = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "datasets_vsplitter_state") {
+			datasets_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "datasets_hsplitter_state") {
+			datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "style") {
+			style = v;
+		} else if(svar == "light_style") {
+			light_style = v;
+		} else if(svar == "palette") {
+			palette = v;
+		} else if(svar == "color") {
+			colorize_result = v;
+		} else if(svar == "ignore_locale") {
+			ignore_locale = v;
+		} else if(svar == "window_title_mode") {
+			if(v >= 0 && v <= 2) title_type = v;
+		} else if(svar == "auto_update_exchange_rates") {
+			auto_update_exchange_rates = v;
+		} else if(svar == "display_expression_status") {
+			display_expression_status = v;
+		} else if(svar == "expression_status_delay") {
+			if(v < 0) v = 0;
+			expression_status_delay = v;
+		} else if(svar == "enable_input_method") {
+			enable_input_method = v;
+		} else if(svar == "enable_completion") {
+			enable_completion = v;
+		} else if(svar == "enable_completion2") {
+			enable_completion2 = v;
+		} else if(svar == "completion_min") {
+			if(v < 1) v = 1;
+			completion_min = v;
+		} else if(svar == "completion_min2") {
+			if(v < 1) v = 1;
+			completion_min2 = v;
+		} else if(svar == "completion_delay") {
+			if(v < 0) v = 0;
+			completion_delay = v;
+		} else if(svar == "use_custom_result_font") {
+			use_custom_result_font = v;
+		} else if(svar == "use_custom_expression_font") {
+			use_custom_expression_font = v;
+		} else if(svar == "use_custom_keypad_font") {
+			use_custom_keypad_font = v;
+		} else if(svar == "use_custom_application_font") {
+			use_custom_app_font = v;
+		} else if(svar == "custom_result_font") {
+			custom_result_font = svalue;
+			save_custom_result_font = true;
+		} else if(svar == "custom_expression_font") {
+			custom_expression_font = svalue;
+			save_custom_expression_font = true;
+		} else if(svar == "custom_keypad_font") {
+			custom_keypad_font = svalue;
+			save_custom_keypad_font = true;
+		} else if(svar == "custom_application_font") {
+			custom_app_font = svalue;
+			save_custom_app_font = true;
+		} else if(svar == "multiplication_sign") {
+			if(v >= MULTIPLICATION_SIGN_ASTERISK && v <= MULTIPLICATION_SIGN_ALTDOT) {
+				printops.multiplication_sign = (MultiplicationSign) v;
+			}
+		} else if(svar == "division_sign") {
+			if(v >= DIVISION_SIGN_SLASH && v <= DIVISION_SIGN_DIVISION) printops.division_sign = (DivisionSign) v;
+		} else if(svar == "plot_legend_placement") {
+			if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
+		} else if(svar == "plot_style") {
+			if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_DOTS) default_plot_style = (PlotStyle) v;
+		} else if(svar == "plot_smoothing") {
+			if(v >= PLOT_SMOOTHING_NONE && v <= PLOT_SMOOTHING_SBEZIER) default_plot_smoothing = (PlotSmoothing) v;
+		} else if(svar == "plot_display_grid") {
+			default_plot_display_grid = v;
+		} else if(svar == "plot_full_border") {
+			default_plot_full_border = v;
+		} else if(svar == "plot_min") {
+			default_plot_min = svalue;
+		} else if(svar == "plot_max") {
+			default_plot_max = svalue;
+		} else if(svar == "plot_step") {
+			default_plot_step = svalue;
+		} else if(svar == "plot_sampling_rate") {
+			default_plot_sampling_rate = v;
+		} else if(svar == "plot_use_sampling_rate") {
+			default_plot_use_sampling_rate = v;
+		} else if(svar == "plot_variable") {
+			default_plot_variable = svalue;
+		} else if(svar == "plot_rows") {
+			default_plot_rows = v;
+		} else if(svar == "plot_type") {
+			if(v >= 0 && v <= 2) default_plot_type = v;
+		} else if(svar == "plot_color") {
+			default_plot_color = v;
+		} else if(svar == "plot_linewidth") {
+			default_plot_linewidth = v;
+		} else if(svar == "max_plot_time") {
+			max_plot_time = v;
+		} else if(svar == "check_version") {
+			check_version = v;
+		} else if(svar == "last_version_check") {
+			last_version_check_date.set(svalue);
+		} else if(svar == "last_found_version") {
+			last_found_version = svalue;
+		} else if(svar == "bit_width") {
+			default_bits = v;
+		} else if(svar == "signed_integer") {
+			default_signed = v;
+		} else if(svar == "rpn_keys") {
+			rpn_keys = v;
+		} else if(svar == "rpn_shown") {
+			rpn_shown = v;
+		} else if(svar == "use_unicode_signs") {
+			printops.use_unicode_signs = v;
+		} else if(svar == "e_notation") {
+			printops.lower_case_e = v;
+		} else if(svar == "lower_case_numbers") {
+			printops.lower_case_numbers = v;
+		} else if(svar == "imaginary_j") {
+			do_imaginary_j = v;
+		} else if(svar == "base_display") {
+			if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_SUFFIX) printops.base_display = (BaseDisplay) v;
+		} else if(svar == "twos_complement") {
+			printops.twos_complement = v;
+		} else if(svar == "hexadecimal_twos_complement") {
+			printops.hexadecimal_twos_complement = v;
+		} else if(svar == "spell_out_logical_operators") {
+			printops.spell_out_logical_operators = v;
+		} else if(svar == "caret_as_xor") {
+			caret_as_xor = v;
+		} else if(svar == "decimal_comma") {
+			decimal_comma = v;
+			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
+			else if(v > 0) CALCULATOR->useDecimalComma();
+		} else if(svar == "dot_as_separator") {
+			if(v < 0) {
+				evalops.parse_options.dot_as_separator = CALCULATOR->default_dot_as_separator;
+				dot_question_asked = false;
+			} else {
+				evalops.parse_options.dot_as_separator = v;
+				dot_question_asked = true;
+			}
+		} else if(svar == "comma_as_separator") {
+			evalops.parse_options.comma_as_separator = v;
+			if(CALCULATOR->getDecimalPoint() != COMMA) {
+				CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
+			}
+		} else if(svar == "temperature_calculation") {
+			CALCULATOR->setTemperatureCalculationMode((TemperatureCalculationMode) v);
+			tc_set = true;
+		} else if(svar == "implicit_question_asked") {
+			implicit_question_asked = true;
+		} else if(svar == "calculate_as_you_type") {
+			auto_calculate = v;
+		}
+	} else if(svar == "min_deci") {
+		printops.min_decimals = v;
+	} else if(svar == "use_min_deci") {
+		printops.use_min_decimals = v;
+	} else if(svar == "max_deci") {
+		printops.max_decimals = v;
+	} else if(svar == "use_max_deci") {
+		printops.use_max_decimals = v;
+	} else if(svar == "precision") {
+		CALCULATOR->setPrecision(v);
+	} else if(svar == "min_exp") {
+		printops.min_exp = v;
+	} else if(svar == "interval_arithmetic") {
+		CALCULATOR->useIntervalArithmetic(v);
+	} else if(svar == "interval_display") {
+		if(v == 0) {
+			printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
+		} else {
+			v--;
+			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
+				printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
+			}
+		}
+	} else if(svar == "negative_exponents") {
+		printops.negative_exponents = v;
+	} else if(svar == "sort_minus_last") {
+		printops.sort_options.minus_last = v;
+	} else if(svar == "place_units_separately") {
+		printops.place_units_separately = v;
+	} else if(svar == "use_prefixes") {
+		printops.use_unit_prefixes = v;
+	} else if(svar == "use_prefixes_for_all_units") {
+		printops.use_prefixes_for_all_units = v;
+	} else if(svar == "use_prefixes_for_currencies") {
+		printops.use_prefixes_for_currencies = v;
+	} else if(svar == "prefixes_default") {
+		prefixes_default = v;
+	} else if(svar == "number_fraction_format") {
+		if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
+			printops.number_fraction_format = (NumberFractionFormat) v;
+			printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 1) {
+			printops.number_fraction_format = FRACTION_FRACTIONAL;
+			printops.restrict_fraction_length = false;
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 2) {
+			printops.number_fraction_format = FRACTION_DECIMAL;
+			dual_fraction = 1;
+		} else if(v < 0) {
+			printops.number_fraction_format = FRACTION_DECIMAL;
+			dual_fraction = -1;
+		}
+	} else if(svar == "complex_number_form") {
+		if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
+			evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
+			complex_angle_form = true;
+		} else if(v >= COMPLEX_NUMBER_FORM_RECTANGULAR && v <= COMPLEX_NUMBER_FORM_CIS) {
+			evalops.complex_number_form = (ComplexNumberForm) v;
+			complex_angle_form = false;
+		}
+	} else if(svar == "number_base") {
+		printops.base = v;
+	} else if(svar == "custom_number_base") {
+		CALCULATOR->beginTemporaryStopMessages();
+		MathStructure m;
+		CALCULATOR->calculate(&m, svalue, 500);
+		CALCULATOR->endTemporaryStopMessages();
+		CALCULATOR->setCustomOutputBase(m.number());
+	} else if(svar == "number_base_expression") {
+		evalops.parse_options.base = v;
+	} else if(svar == "custom_number_base_expression") {
+		CALCULATOR->beginTemporaryStopMessages();
+		MathStructure m;
+		CALCULATOR->calculate(&m, svalue, 500);
+		CALCULATOR->endTemporaryStopMessages();
+		CALCULATOR->setCustomInputBase(m.number());
+	} else if(svar == "read_precision") {
+		if(v >= DONT_READ_PRECISION && v <= READ_PRECISION_WHEN_DECIMALS) {
+			evalops.parse_options.read_precision = (ReadPrecisionMode) v;
+		}
+	} else if(svar == "assume_denominators_nonzero") {
+		evalops.assume_denominators_nonzero = v;
+	} else if(svar == "warn_about_denominators_assumed_nonzero") {
+		evalops.warn_about_denominators_assumed_nonzero = v;
+	} else if(svar == "structuring") {
+		if(v >= STRUCTURING_NONE && v <= STRUCTURING_FACTORIZE) {
+			evalops.structuring = (StructuringMode) v;
+			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
+		}
+	} else if(svar == "angle_unit") {
+		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
+			evalops.parse_options.angle_unit = (AngleUnit) v;
+		}
+	} else if(svar == "functions_enabled") {
+		evalops.parse_options.functions_enabled = v;
+	} else if(svar == "variables_enabled") {
+		evalops.parse_options.variables_enabled = v;
+	} else if(svar == "donot_calculate_variables") {
+		evalops.calculate_variables = !v;
+	} else if(svar == "calculate_variables") {
+		evalops.calculate_variables = v;
+	} else if(svar == "variable_units_enabled") {
+		CALCULATOR->setVariableUnitsEnabled(v);
+	} else if(svar == "calculate_functions") {
+		evalops.calculate_functions = v;
+	} else if(svar == "sync_units") {
+		evalops.sync_units = v;
+	} else if(svar == "unknownvariables_enabled") {
+		evalops.parse_options.unknowns_enabled = v;
+	} else if(svar == "units_enabled") {
+		evalops.parse_options.units_enabled = v;
+	} else if(svar == "allow_complex") {
+		evalops.allow_complex = v;
+	} else if(svar == "allow_infinite") {
+		evalops.allow_infinite = v;
+	} else if(svar == "use_short_units") {
+		printops.abbreviate_names = v;
+	} else if(svar == "abbreviate_names") {
+		printops.abbreviate_names = v;
+	} else if(svar == "all_prefixes_enabled") {
+		printops.use_all_prefixes = v;
+	} else if(svar == "denominator_prefix_enabled") {
+		printops.use_denominator_prefix = v;
+	} else if(svar == "auto_post_conversion") {
+		if(v >= POST_CONVERSION_NONE && v <= POST_CONVERSION_OPTIMAL) {
+			evalops.auto_post_conversion = (AutoPostConversion) v;
+		}
+	} else if(svar == "mixed_units_conversion") {
+		if(v >= MIXED_UNITS_CONVERSION_NONE || v <= MIXED_UNITS_CONVERSION_FORCE_ALL) {
+			evalops.mixed_units_conversion = (MixedUnitsConversion) v;
+		}
+	} else if(svar == "local_currency_conversion") {
+		evalops.local_currency_conversion = v;
+	} else if(svar == "use_binary_prefixes") {
+		CALCULATOR->useBinaryPrefixes(v);
+	} else if(svar == "indicate_infinite_series") {
+		printops.indicate_infinite_series = v;
+	} else if(svar == "show_ending_zeroes") {
+		printops.show_ending_zeroes = v;
+	} else if(svar == "digit_grouping") {
+		if(v >= DIGIT_GROUPING_NONE && v <= DIGIT_GROUPING_LOCALE) {
+			printops.digit_grouping = (DigitGrouping) v;
+		}
+	} else if(svar == "round_halfway_to_even") {
+		printops.round_halfway_to_even = v;
+		printops.custom_time_zone = 0;
+		rounding_mode = (v ? 1 : 0);
+	} else if(svar == "rounding_mode") {
+		if(v >= 0 && v <= 2) {
+			rounding_mode = v;
+			printops.custom_time_zone = (v == 2 ? -21586 : 0);
+			printops.round_halfway_to_even = (v == 1);
+		}
+	} else if(svar == "approximation") {
+		if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
+			evalops.approximation = (ApproximationMode) v;
+			dual_approximation = 0;
+		} else if(v == APPROXIMATION_APPROXIMATE + 1) {
+			evalops.approximation = APPROXIMATION_TRY_EXACT;
+			dual_approximation = 1;
+		} else if(v < 0) {
+			evalops.approximation = APPROXIMATION_TRY_EXACT;
+			dual_approximation = -1;
+		}
+	} else if(svar == "interval_calculation") {
+		if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
+			evalops.interval_calculation = (IntervalCalculation) v;
+		}
+	} else if(svar == "chain_mode") {
+		chain_mode = v;
+	} else if(svar == "rpn_mode") {
+		rpn_mode = v;
+	} else if(svar == "limit_implicit_multiplication") {
+		evalops.parse_options.limit_implicit_multiplication = v;
+		printops.limit_implicit_multiplication = v;
+	} else if(svar == "parsing_mode") {
+		evalops.parse_options.parsing_mode = (ParsingMode) v;
+		if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
+	} else if(svar == "default_assumption_type") {
+		if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
+			CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
+		}
+	} else if(svar == "default_assumption_sign") {
+		if(v >= ASSUMPTION_SIGN_UNKNOWN && v <= ASSUMPTION_SIGN_NONZERO) {
+			CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
+		}
+	} else if(svar == "spacious") {
+		printops.spacious = v;
+	} else if(svar == "excessive_parenthesis") {
+		printops.excessive_parenthesis = v;
+	} else if(svar == "short_multiplication") {
+		printops.short_multiplication = v;
+	}
+}
+
 void QalculateQtSettings::loadPreferences() {
 
 	f_answer = CALCULATOR->addFunction(new AnswerFunction());
@@ -137,6 +629,8 @@ void QalculateQtSettings::loadPreferences() {
 	CALCULATOR->useIntervalArithmetic(true);
 	CALCULATOR->setTemperatureCalculationMode(TEMPERATURE_CALCULATION_HYBRID);
 	CALCULATOR->useBinaryPrefixes(0);
+
+	current_workspace = "";
 
 	printops.multiplication_sign = MULTIPLICATION_SIGN_X;
 	printops.division_sign = DIVISION_SIGN_DIVISION_SLASH;
@@ -304,7 +798,6 @@ void QalculateQtSettings::loadPreferences() {
 		char line[1000000L];
 		std::string stmp, svalue, svar;
 		size_t i;
-		int v;
 		while(true) {
 			if(fgets(line, 1000000L, file) == NULL) break;
 			stmp = line;
@@ -314,495 +807,7 @@ void QalculateQtSettings::loadPreferences() {
 				remove_blank_ends(svar);
 				svalue = stmp.substr(i + 1);
 				remove_blank_ends(svalue);
-				v = s2i(svalue);
-				if(svar == "history_expression" || svar == "history_expression*") {
-					v_expression.push_back(svalue);
-					v_delexpression.push_back(false);
-					v_protected.push_back(svar[svar.length() - 1] == '*');
-					v_result.push_back(std::vector<std::string>());
-					v_exact.push_back(std::vector<int>());
-					v_delresult.push_back(std::vector<bool>());
-				} else if(svar == "history_result" || svar == "history_result_approximate") {
-					if(!v_result.empty()) {
-						v_result[settings->v_result.size() - 1].push_back(svalue);
-						v_delresult[settings->v_result.size() - 1].push_back(false);
-						if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
-							v_exact[settings->v_exact.size() - 1].push_back(svar.length() < 20);
-						}
-					}
-				} else if(svar == "history_exact") {
-					if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
-				} else if(svar == "expression_history") {
-					expression_history.push_back(svalue);
-				} else if(svar == "favourite_function") {
-					favourite_functions_pre.push_back(svalue);
-					favourite_functions_changed = true;
-				} else if(svar == "favourite_unit") {
-					favourite_units_pre.push_back(svalue);
-					favourite_units_changed = true;
-				} else if(svar == "favourite_variable") {
-					favourite_variables_pre.push_back(svalue);
-					favourite_variables_changed = true;
-				} else if(svar == "keyboard_shortcut") {
-					default_shortcuts = false;
-					char str1[svalue.length()];
-					char str2[svalue.length()];
-					keyboard_shortcut ks;
-					int ks_type = 0;
-					int n = sscanf(svalue.c_str(), "%s %i %s", str1, &ks_type, str2);
-					if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-						if(n == 3) ks.value = str1;
-						remove_blank_ends(ks.value);
-						ks.type = (shortcut_type) ks_type;
-						ks.key = str1;
-						ks.new_action = false;
-						ks.action = NULL;
-						keyboard_shortcuts.push_back(ks);
-					}
-				} else if(svar == "custom_button_label") {
-					int c = 0, r = 0;
-					char str[svalue.length()];
-					int n = sscanf(svalue.c_str(), "%i %i %s", &r, &c, str);
-					if(n == 3 && c > 0 && r > 0) {
-						size_t index = 0;
-						for(size_t i = custom_buttons.size(); i > 0; i--) {
-							if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
-								index = i;
-								break;
-							}
-						}
-						if(index == 0) {
-							custom_button cb;
-							cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
-							custom_buttons.push_back(cb);
-							index = custom_buttons.size();
-						}
-						index--;
-						custom_buttons[index].label = QString::fromUtf8(str).trimmed();
-					}
-				} else if(svar == "custom_button") {
-					int c = 0, r = 0;
-					unsigned int bi = 0;
-					char str[svalue.length()];
-					int cb_type = -1;
-					int n = sscanf(svalue.c_str(), "%i %i %u %i %s", &c, &r, &bi, &cb_type, str);
-					if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
-						size_t index = 0;
-						for(size_t i = custom_buttons.size(); i > 0; i--) {
-							if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
-								index = i;
-								break;
-							}
-						}
-						if(index == 0) {
-							custom_button cb;
-							cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
-							custom_buttons.push_back(cb);
-							index = custom_buttons.size();
-						}
-						index--;
-						custom_buttons[index].type[bi] = cb_type;
-						if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
-						else custom_buttons[index].value[bi] = "";
-					}
-				} else if(svar == "custom_button_rows") {
-					if(v > 0 && v <= 100) custom_button_rows = v;
-				} else if(svar == "custom_button_columns") {
-					if(v > 0 && v <= 100) custom_button_columns = v;
-				} else if(svar == "version") {
-					parse_qalculate_version(svalue, preferences_version);
-				} else if(svar == "always_on_top") {
-					always_on_top = v;
-				} else if(svar == "keep_function_dialog_open") {
-					keep_function_dialog_open = v;
-				} else if(svar == "save_mode_on_exit") {
-					save_mode_on_exit = v;
-				} else if(svar == "save_definitions_on_exit") {
-					save_defs_on_exit = v;
-				} else if(svar == "clear_history_on_exit") {
-					clear_history_on_exit = v;
-				} else if(svar == "window_state") {
-					window_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "keypad_type") {
-					if(v >= 0 && v <= 3) keypad_type = v;
-				} else if(svar == "hide_numpad") {
-					hide_numpad = v;
-				} else if(svar == "replace_expression") {
-					replace_expression = v;
-				} else if(svar == "window_geometry") {
-					window_geometry = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "splitter_state") {
-					splitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "functions_geometry") {
-					functions_geometry = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "functions_vsplitter_state") {
-					functions_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "functions_hsplitter_state") {
-					functions_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "units_geometry") {
-					units_geometry = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "units_vsplitter_state") {
-					units_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "units_hsplitter_state") {
-					units_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "variables_geometry") {
-					variables_geometry = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "variables_vsplitter_state") {
-					variables_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "variables_hsplitter_state") {
-					variables_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "datasets_geometry") {
-					datasets_geometry = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "datasets_vsplitter_state") {
-					datasets_vsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "datasets_hsplitter_state") {
-					datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
-				} else if(svar == "style") {
-					style = v;
-				} else if(svar == "light_style") {
-					light_style = v;
-				} else if(svar == "palette") {
-					palette = v;
-				} else if(svar == "color") {
-					colorize_result = v;
-				} else if(svar == "ignore_locale") {
-					ignore_locale = v;
-				} else if(svar == "window_title_mode") {
-					if(v >= 0 && v <= 2) title_type = v;
-				} else if(svar == "auto_update_exchange_rates") {
-					auto_update_exchange_rates = v;
-				} else if(svar == "display_expression_status") {
-					display_expression_status = v;
-				} else if(svar == "expression_status_delay") {
-					if(v < 0) v = 0;
-					expression_status_delay = v;
-				} else if(svar == "enable_input_method") {
-					enable_input_method = v;
-				} else if(svar == "enable_completion") {
-					enable_completion = v;
-				} else if(svar == "enable_completion2") {
-					enable_completion2 = v;
-				} else if(svar == "completion_min") {
-					if(v < 1) v = 1;
-					completion_min = v;
-				} else if(svar == "completion_min2") {
-					if(v < 1) v = 1;
-					completion_min2 = v;
-				} else if(svar == "completion_delay") {
-					if(v < 0) v = 0;
-					completion_delay = v;
-				} else if(svar == "use_custom_result_font") {
-					use_custom_result_font = v;
-				} else if(svar == "use_custom_expression_font") {
-					use_custom_expression_font = v;
-				} else if(svar == "use_custom_keypad_font") {
-					use_custom_keypad_font = v;
-				} else if(svar == "use_custom_application_font") {
-					use_custom_app_font = v;
-				} else if(svar == "custom_result_font") {
-					custom_result_font = svalue;
-					save_custom_result_font = true;
-				} else if(svar == "custom_expression_font") {
-					custom_expression_font = svalue;
-					save_custom_expression_font = true;
-				} else if(svar == "custom_keypad_font") {
-					custom_keypad_font = svalue;
-					save_custom_keypad_font = true;
-				} else if(svar == "custom_application_font") {
-					custom_app_font = svalue;
-					save_custom_app_font = true;
-				} else if(svar == "multiplication_sign") {
-					if(v >= MULTIPLICATION_SIGN_ASTERISK && v <= MULTIPLICATION_SIGN_ALTDOT) {
-						printops.multiplication_sign = (MultiplicationSign) v;
-					}
-				} else if(svar == "division_sign") {
-					if(v >= DIVISION_SIGN_SLASH && v <= DIVISION_SIGN_DIVISION) printops.division_sign = (DivisionSign) v;
-				} else if(svar == "plot_legend_placement") {
-					if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
-				} else if(svar == "plot_style") {
-					if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_DOTS) default_plot_style = (PlotStyle) v;
-				} else if(svar == "plot_smoothing") {
-					if(v >= PLOT_SMOOTHING_NONE && v <= PLOT_SMOOTHING_SBEZIER) default_plot_smoothing = (PlotSmoothing) v;
-				} else if(svar == "plot_display_grid") {
-					default_plot_display_grid = v;
-				} else if(svar == "plot_full_border") {
-					default_plot_full_border = v;
-				} else if(svar == "plot_min") {
-					default_plot_min = svalue;
-				} else if(svar == "plot_max") {
-					default_plot_max = svalue;
-				} else if(svar == "plot_step") {
-					default_plot_step = svalue;
-				} else if(svar == "plot_sampling_rate") {
-					default_plot_sampling_rate = v;
-				} else if(svar == "plot_use_sampling_rate") {
-					default_plot_use_sampling_rate = v;
-				} else if(svar == "plot_variable") {
-					default_plot_variable = svalue;
-				} else if(svar == "plot_rows") {
-					default_plot_rows = v;
-				} else if(svar == "plot_type") {
-					if(v >= 0 && v <= 2) default_plot_type = v;
-				} else if(svar == "plot_color") {
-					default_plot_color = v;
-				} else if(svar == "plot_linewidth") {
-					default_plot_linewidth = v;
-				} else if(svar == "max_plot_time") {
-					max_plot_time = v;
-				} else if(svar == "check_version") {
-					check_version = v;
-				} else if(svar == "last_version_check") {
-					last_version_check_date.set(svalue);
-				} else if(svar == "last_found_version") {
-					last_found_version = svalue;
-				} else if(svar == "bit_width") {
-					default_bits = v;
-				} else if(svar == "signed_integer") {
-					default_signed = v;
-				} else if(svar == "min_deci") {
-					printops.min_decimals = v;
-				} else if(svar == "use_min_deci") {
-					printops.use_min_decimals = v;
-				} else if(svar == "max_deci") {
-					printops.max_decimals = v;
-				} else if(svar == "use_max_deci") {
-					printops.use_max_decimals = v;
-				} else if(svar == "precision") {
-					CALCULATOR->setPrecision(v);
-				} else if(svar == "min_exp") {
-					printops.min_exp = v;
-				} else if(svar == "interval_arithmetic") {
-					CALCULATOR->useIntervalArithmetic(v);
-				} else if(svar == "interval_display") {
-					if(v == 0) {
-						printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
-					} else {
-						v--;
-						if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
-							printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
-						}
-					}
-				} else if(svar == "negative_exponents") {
-					printops.negative_exponents = v;
-				} else if(svar == "sort_minus_last") {
-					printops.sort_options.minus_last = v;
-				} else if(svar == "place_units_separately") {
-					printops.place_units_separately = v;
-				} else if(svar == "use_prefixes") {
-					printops.use_unit_prefixes = v;
-				} else if(svar == "use_prefixes_for_all_units") {
-					printops.use_prefixes_for_all_units = v;
-				} else if(svar == "use_prefixes_for_currencies") {
-					printops.use_prefixes_for_currencies = v;
-				} else if(svar == "prefixes_default") {
-					prefixes_default = v;
-				} else if(svar == "number_fraction_format") {
-					if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
-						printops.number_fraction_format = (NumberFractionFormat) v;
-						printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
-						dual_fraction = 0;
-					} else if(v == FRACTION_COMBINED + 1) {
-						printops.number_fraction_format = FRACTION_FRACTIONAL;
-						printops.restrict_fraction_length = false;
-						dual_fraction = 0;
-					} else if(v == FRACTION_COMBINED + 2) {
-						printops.number_fraction_format = FRACTION_DECIMAL;
-						dual_fraction = 1;
-					} else if(v < 0) {
-						printops.number_fraction_format = FRACTION_DECIMAL;
-						dual_fraction = -1;
-					}
-				} else if(svar == "complex_number_form") {
-					if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
-						evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
-						complex_angle_form = true;
-					} else if(v >= COMPLEX_NUMBER_FORM_RECTANGULAR && v <= COMPLEX_NUMBER_FORM_CIS) {
-						evalops.complex_number_form = (ComplexNumberForm) v;
-						complex_angle_form = false;
-					}
-				} else if(svar == "number_base") {
-					printops.base = v;
-				} else if(svar == "custom_number_base") {
-					CALCULATOR->beginTemporaryStopMessages();
-					MathStructure m;
-					CALCULATOR->calculate(&m, svalue, 500);
-					CALCULATOR->endTemporaryStopMessages();
-					CALCULATOR->setCustomOutputBase(m.number());
-				} else if(svar == "number_base_expression") {
-					evalops.parse_options.base = v;
-				} else if(svar == "custom_number_base_expression") {
-					CALCULATOR->beginTemporaryStopMessages();
-					MathStructure m;
-					CALCULATOR->calculate(&m, svalue, 500);
-					CALCULATOR->endTemporaryStopMessages();
-					CALCULATOR->setCustomInputBase(m.number());
-				} else if(svar == "read_precision") {
-					if(v >= DONT_READ_PRECISION && v <= READ_PRECISION_WHEN_DECIMALS) {
-						evalops.parse_options.read_precision = (ReadPrecisionMode) v;
-					}
-				} else if(svar == "assume_denominators_nonzero") {
-					evalops.assume_denominators_nonzero = v;
-				} else if(svar == "warn_about_denominators_assumed_nonzero") {
-					evalops.warn_about_denominators_assumed_nonzero = v;
-				} else if(svar == "structuring") {
-					if(v >= STRUCTURING_NONE && v <= STRUCTURING_FACTORIZE) {
-						evalops.structuring = (StructuringMode) v;
-						printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
-					}
-				} else if(svar == "angle_unit") {
-					if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
-						evalops.parse_options.angle_unit = (AngleUnit) v;
-					}
-				} else if(svar == "functions_enabled") {
-					evalops.parse_options.functions_enabled = v;
-				} else if(svar == "variables_enabled") {
-					evalops.parse_options.variables_enabled = v;
-				} else if(svar == "donot_calculate_variables") {
-					evalops.calculate_variables = !v;
-				} else if(svar == "calculate_variables") {
-					evalops.calculate_variables = v;
-				} else if(svar == "variable_units_enabled") {
-					CALCULATOR->setVariableUnitsEnabled(v);
-				} else if(svar == "calculate_functions") {
-					evalops.calculate_functions = v;
-				} else if(svar == "sync_units") {
-					evalops.sync_units = v;
-				} else if(svar == "temperature_calculation") {
-					CALCULATOR->setTemperatureCalculationMode((TemperatureCalculationMode) v);
-					tc_set = true;
-				} else if(svar == "unknownvariables_enabled") {
-					evalops.parse_options.unknowns_enabled = v;
-				} else if(svar == "units_enabled") {
-					evalops.parse_options.units_enabled = v;
-				} else if(svar == "allow_complex") {
-					evalops.allow_complex = v;
-				} else if(svar == "allow_infinite") {
-					evalops.allow_infinite = v;
-				} else if(svar == "use_short_units") {
-					printops.abbreviate_names = v;
-				} else if(svar == "abbreviate_names") {
-					printops.abbreviate_names = v;
-				} else if(svar == "all_prefixes_enabled") {
-					printops.use_all_prefixes = v;
-				} else if(svar == "denominator_prefix_enabled") {
-					printops.use_denominator_prefix = v;
-				} else if(svar == "auto_post_conversion") {
-					if(v >= POST_CONVERSION_NONE && v <= POST_CONVERSION_OPTIMAL) {
-						evalops.auto_post_conversion = (AutoPostConversion) v;
-					}
-				} else if(svar == "mixed_units_conversion") {
-					if(v >= MIXED_UNITS_CONVERSION_NONE || v <= MIXED_UNITS_CONVERSION_FORCE_ALL) {
-						evalops.mixed_units_conversion = (MixedUnitsConversion) v;
-					}
-				} else if(svar == "local_currency_conversion") {
-					evalops.local_currency_conversion = v;
-				} else if(svar == "use_binary_prefixes") {
-					CALCULATOR->useBinaryPrefixes(v);
-				} else if(svar == "indicate_infinite_series") {
-					printops.indicate_infinite_series = v;
-				} else if(svar == "show_ending_zeroes") {
-					printops.show_ending_zeroes = v;
-				} else if(svar == "digit_grouping") {
-					if(v >= DIGIT_GROUPING_NONE && v <= DIGIT_GROUPING_LOCALE) {
-						printops.digit_grouping = (DigitGrouping) v;
-					}
-				} else if(svar == "round_halfway_to_even") {
-					printops.round_halfway_to_even = v;
-					printops.custom_time_zone = 0;
-					rounding_mode = (v ? 1 : 0);
-				} else if(svar == "rounding_mode") {
-					if(v >= 0 && v <= 2) {
-						rounding_mode = v;
-						printops.custom_time_zone = (v == 2 ? -21586 : 0);
-						printops.round_halfway_to_even = (v == 1);
-					}
-				} else if(svar == "approximation") {
-					if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
-						evalops.approximation = (ApproximationMode) v;
-						dual_approximation = 0;
-					} else if(v == APPROXIMATION_APPROXIMATE + 1) {
-						evalops.approximation = APPROXIMATION_TRY_EXACT;
-						dual_approximation = 1;
-					} else if(v < 0) {
-						evalops.approximation = APPROXIMATION_TRY_EXACT;
-						dual_approximation = -1;
-					}
-				} else if(svar == "interval_calculation") {
-					if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
-						evalops.interval_calculation = (IntervalCalculation) v;
-					}
-				} else if(svar == "calculate_as_you_type") {
-					auto_calculate = v;
-				} else if(svar == "chain_mode") {
-					chain_mode = v;
-				} else if(svar == "rpn_mode") {
-					rpn_mode = v;
-				} else if(svar == "rpn_keys") {
-					rpn_keys = v;
-				} else if(svar == "rpn_shown") {
-					rpn_shown = v;
-				} else if(svar == "limit_implicit_multiplication") {
-					evalops.parse_options.limit_implicit_multiplication = v;
-					printops.limit_implicit_multiplication = v;
-				} else if(svar == "parsing_mode") {
-					evalops.parse_options.parsing_mode = (ParsingMode) v;
-					if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
-				} else if(svar == "implicit_question_asked") {
-					implicit_question_asked = true;
-				} else if(svar == "default_assumption_type") {
-					if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
-						CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
-					}
-				} else if(svar == "default_assumption_sign") {
-					if(v >= ASSUMPTION_SIGN_UNKNOWN && v <= ASSUMPTION_SIGN_NONZERO) {
-						CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
-					}
-				} else if(svar == "spacious") {
-					printops.spacious = v;
-				} else if(svar == "excessive_parenthesis") {
-					printops.excessive_parenthesis = v;
-				} else if(svar == "short_multiplication") {
-					printops.short_multiplication = v;
-				} else if(svar == "use_unicode_signs") {
-					printops.use_unicode_signs = v;
-				} else if(svar == "e_notation") {
-					printops.lower_case_e = v;
-				} else if(svar == "lower_case_numbers") {
-					printops.lower_case_numbers = v;
-				} else if(svar == "imaginary_j") {
-					do_imaginary_j = v;
-				} else if(svar == "base_display") {
-					if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_SUFFIX) printops.base_display = (BaseDisplay) v;
-				} else if(svar == "twos_complement") {
-					printops.twos_complement = v;
-				} else if(svar == "hexadecimal_twos_complement") {
-					printops.hexadecimal_twos_complement = v;
-				/*} else if(svar == "twos_complement_input") {
-					twos_complement_in = v;
-				} else if(svar == "hexadecimal_twos_complement_input") {
-					hexadecimal_twos_complement_in = v;*/
-				} else if(svar == "spell_out_logical_operators") {
-					printops.spell_out_logical_operators = v;
-				} else if(svar == "caret_as_xor") {
-					caret_as_xor = v;
-				} else if(svar == "decimal_comma") {
-					decimal_comma = v;
-					if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
-					else if(v > 0) CALCULATOR->useDecimalComma();
-				} else if(svar == "dot_as_separator") {
-					if(v < 0) {
-						evalops.parse_options.dot_as_separator = CALCULATOR->default_dot_as_separator;
-						dot_question_asked = false;
-					} else {
-						evalops.parse_options.dot_as_separator = v;
-						dot_question_asked = true;
-					}
-				} else if(svar == "comma_as_separator") {
-					evalops.parse_options.comma_as_separator = v;
-					if(CALCULATOR->getDecimalPoint() != COMMA) {
-						CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
-					}
-				}
+				readPreferenceValue(svar, svalue);
 			}
 		}
 		fclose(file);
@@ -972,203 +977,284 @@ void QalculateQtSettings::updateStyle() {
 #endif
 	updatePalette();
 }
-void QalculateQtSettings::savePreferences(bool) {
 
-	FILE *file = NULL;
+void QalculateQtSettings::savePreferences(bool save_mode) {
 	std::string homedir = getLocalDir();
 	recursiveMakeDir(homedir);
 	std::string filename = buildPath(homedir, "qalculate-qt.cfg");
-	file = fopen(filename.c_str(), "w+");
-	if(file == NULL) {
+	if(!savePreferences(filename.c_str(), false, save_mode)) {
 		QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Ok);
-		return;
 	}
-	fprintf(file, "\n[General]\n");
-	fprintf(file, "version=%s\n", VERSION);
-	fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
-	fprintf(file, "ignore_locale=%i\n", ignore_locale);
-	fprintf(file, "check_version=%i\n", check_version);
-	if(check_version) {
-		fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
-		if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
-	}
-	if(!window_state.isEmpty()) fprintf(file, "window_state=%s\n", window_state.toBase64().data());
-	if(!window_geometry.isEmpty()) fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
-	if(rpn_shown) fprintf(file, "rpn_shown=%i\n", rpn_shown);
-	fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
-	if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());
-	if(!functions_vsplitter_state.isEmpty()) fprintf(file, "functions_vsplitter_state=%s\n", functions_vsplitter_state.toBase64().data());
-	if(!functions_hsplitter_state.isEmpty()) fprintf(file, "functions_hsplitter_state=%s\n", functions_hsplitter_state.toBase64().data());
-	fprintf(file, "keep_function_dialog_open=%i\n", keep_function_dialog_open);
-	if(!units_geometry.isEmpty()) fprintf(file, "units_geometry=%s\n", units_geometry.toBase64().data());
-	if(!units_vsplitter_state.isEmpty()) fprintf(file, "units_vsplitter_state=%s\n", units_vsplitter_state.toBase64().data());
-	if(!units_hsplitter_state.isEmpty()) fprintf(file, "units_hsplitter_state=%s\n", units_hsplitter_state.toBase64().data());
-	if(!variables_geometry.isEmpty()) fprintf(file, "variables_geometry=%s\n", variables_geometry.toBase64().data());
-	if(!variables_vsplitter_state.isEmpty()) fprintf(file, "variables_vsplitter_state=%s\n", variables_vsplitter_state.toBase64().data());
-	if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
-	if(!datasets_geometry.isEmpty()) fprintf(file, "datasets_geometry=%s\n", datasets_geometry.toBase64().data());
-	if(!datasets_vsplitter_state.isEmpty()) fprintf(file, "datasets_vsplitter_state=%s\n", datasets_vsplitter_state.toBase64().data());
-	if(!datasets_hsplitter_state.isEmpty()) fprintf(file, "datasets_hsplitter_state=%s\n", datasets_hsplitter_state.toBase64().data());
-	fprintf(file, "always_on_top=%i\n", always_on_top);
-	if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
-	fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
-	fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
-	fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
-	fprintf(file, "enable_input_method=%i\n", enable_input_method);
-	fprintf(file, "display_expression_status=%i\n", display_expression_status);
-	fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
-	fprintf(file, "enable_completion=%i\n", enable_completion);
-	fprintf(file, "enable_completion2=%i\n", enable_completion2);
-	fprintf(file, "completion_min=%i\n", completion_min);
-	fprintf(file, "completion_min2=%i\n", completion_min2);
-	fprintf(file, "completion_delay=%i\n", completion_delay);
-	fprintf(file, "style=%i\n", style);
-#ifdef _WIN32
-	if(light_style != style && palette == 1) fprintf(file, "light_style=%i\n", light_style);
-#endif
-	fprintf(file, "palette=%i\n", palette);
-	fprintf(file, "color=%i\n", colorize_result);
-	fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
-	fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
-	fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);
-	fprintf(file, "use_custom_application_font=%i\n", use_custom_app_font);
-	if(use_custom_result_font || save_custom_result_font) fprintf(file, "custom_result_font=%s\n", custom_result_font.c_str());
-	if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
-	if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
-	if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
-	if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
-	if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
-	if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
-	fprintf(file, "replace_expression=%i\n", replace_expression);
-	fprintf(file, "keypad_type=%i\n", keypad_type);
-	fprintf(file, "hide_numpad=%i\n", hide_numpad);
-	fprintf(file, "rpn_keys=%i\n", rpn_keys);
-	if(!custom_buttons.empty()) {
-		fprintf(file, "custom_button_columns=%i\n", custom_button_columns);
-		fprintf(file, "custom_button_rows=%i\n", custom_button_rows);
-		for(unsigned int i = 0; i < custom_buttons.size(); i++) {
-			if(!custom_buttons[i].label.isEmpty()) fprintf(file, "custom_button_label=%i %i %s\n", custom_buttons[i].r, custom_buttons[i].c, custom_buttons[i].label.toUtf8().data());
-			for(unsigned int bi = 0; bi <= 2; bi++) {
-				if(custom_buttons[i].type[bi] != -1) {
-					if(custom_buttons[i].value[bi].empty()) fprintf(file, "custom_button=%i %i %u %i\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi]);
-					else fprintf(file, "custom_button=%i %i %u %i %s\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi], custom_buttons[i].value[bi].c_str());
+}
+bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspace, bool) {
+	std::string shistory, smode, sgeneral;
+	bool read_default = !is_workspace && !current_workspace.empty();
+	if(read_default) {
+		FILE *file = fopen(filename, "r");
+		if(!file) return false;
+		char line[1000000L];
+		std::string stmp, svalue, svar;
+		size_t i;
+		bool b_mode = false, b_history = false;
+		while(true) {
+			if(fgets(line, 1000000L, file) == NULL) break;
+			stmp = line;
+			remove_blank_ends(stmp);
+			if(!stmp.empty()) {
+				if(stmp[0] == '[') {
+					b_mode = false;
+					b_history = false;
+				} else if(b_mode) {
+					smode += stmp;
+					smode += "\n";
+				} else if(b_history) {
+					shistory += stmp;
+					shistory += "\n";
+				}
+				if(!b_mode && !b_history) {
+					if(stmp == "[Mode]") {
+						b_mode = true;
+					} else if(!clear_history_on_exit && stmp == "[History]") {
+						b_history = true;
+					} else if((i = stmp.find_first_of("=")) != std::string::npos) {
+						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad") {
+							sgeneral += stmp;
+							sgeneral += "\n";
+						}
+					}
 				}
 			}
 		}
+		fclose(file);
 	}
-	if(!default_shortcuts) {
-		for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-			if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
-			else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
+	FILE *file = fopen(filename, "w+");
+	if(!file) return false;
+	if(is_workspace) fputs("QALCULATE WORKSPACE FILE\n", file);
+	fprintf(file, "\n[General]\n");
+	fprintf(file, "version=%s\n", VERSION);
+	if(!is_workspace) {
+		fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
+		fprintf(file, "ignore_locale=%i\n", ignore_locale);
+		fprintf(file, "check_version=%i\n", check_version);
+		if(check_version) {
+			fprintf(file, "last_version_check=%s\n", last_version_check_date.toISOString().c_str());
+			if(!last_found_version.empty()) fprintf(file, "last_found_version=%s\n", last_found_version.c_str());
 		}
+		if(!window_state.isEmpty()) fprintf(file, "window_state=%s\n", window_state.toBase64().data());
+		if(!window_geometry.isEmpty()) fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+		if(rpn_shown) fprintf(file, "rpn_shown=%i\n", rpn_shown);
+		fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
+		if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());
+		if(!functions_vsplitter_state.isEmpty()) fprintf(file, "functions_vsplitter_state=%s\n", functions_vsplitter_state.toBase64().data());
+		if(!functions_hsplitter_state.isEmpty()) fprintf(file, "functions_hsplitter_state=%s\n", functions_hsplitter_state.toBase64().data());
+		fprintf(file, "keep_function_dialog_open=%i\n", keep_function_dialog_open);
+		if(!units_geometry.isEmpty()) fprintf(file, "units_geometry=%s\n", units_geometry.toBase64().data());
+		if(!units_vsplitter_state.isEmpty()) fprintf(file, "units_vsplitter_state=%s\n", units_vsplitter_state.toBase64().data());
+		if(!units_hsplitter_state.isEmpty()) fprintf(file, "units_hsplitter_state=%s\n", units_hsplitter_state.toBase64().data());
+		if(!variables_geometry.isEmpty()) fprintf(file, "variables_geometry=%s\n", variables_geometry.toBase64().data());
+		if(!variables_vsplitter_state.isEmpty()) fprintf(file, "variables_vsplitter_state=%s\n", variables_vsplitter_state.toBase64().data());
+		if(!variables_hsplitter_state.isEmpty()) fprintf(file, "variables_hsplitter_state=%s\n", variables_hsplitter_state.toBase64().data());
+		if(!datasets_geometry.isEmpty()) fprintf(file, "datasets_geometry=%s\n", datasets_geometry.toBase64().data());
+		if(!datasets_vsplitter_state.isEmpty()) fprintf(file, "datasets_vsplitter_state=%s\n", datasets_vsplitter_state.toBase64().data());
+		if(!datasets_hsplitter_state.isEmpty()) fprintf(file, "datasets_hsplitter_state=%s\n", datasets_hsplitter_state.toBase64().data());
+		fprintf(file, "always_on_top=%i\n", always_on_top);
+		if(title_type != TITLE_APP) fprintf(file, "window_title_mode=%i\n", title_type);
+		fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
+		fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
+		fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
+		fprintf(file, "enable_input_method=%i\n", enable_input_method);
+		fprintf(file, "display_expression_status=%i\n", display_expression_status);
+		fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
+		fprintf(file, "enable_completion=%i\n", enable_completion);
+		fprintf(file, "enable_completion2=%i\n", enable_completion2);
+		fprintf(file, "completion_min=%i\n", completion_min);
+		fprintf(file, "completion_min2=%i\n", completion_min2);
+		fprintf(file, "completion_delay=%i\n", completion_delay);
+		fprintf(file, "style=%i\n", style);
+#ifdef _WIN32
+		if(light_style != style && palette == 1) fprintf(file, "light_style=%i\n", light_style);
+#endif
+		fprintf(file, "palette=%i\n", palette);
+		fprintf(file, "color=%i\n", colorize_result);
+		fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
+		fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
+		fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);
+		fprintf(file, "use_custom_application_font=%i\n", use_custom_app_font);
+		if(use_custom_result_font || save_custom_result_font) fprintf(file, "custom_result_font=%s\n", custom_result_font.c_str());
+		if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
+		if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
+		if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
+		if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
+		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
+		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
+		fprintf(file, "replace_expression=%i\n", replace_expression);
 	}
-	if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
-	if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
-	fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
-	fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
-	fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
-	fprintf(file, "decimal_comma=%i\n", decimal_comma);
-	fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
-	fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
-	fprintf(file, "twos_complement=%i\n", printops.twos_complement);
-	fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
-	/*fprintf(file, "twos_complement_input=%i\n", twos_complement_in);
-	fprintf(file, "hexadecimal_twos_complement_input=%i\n", hexadecimal_twos_complement_in);*/
-	fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
-	fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
-	fprintf(file, "e_notation=%i\n", printops.lower_case_e);
-	fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
-	fprintf(file, "base_display=%i\n", printops.base_display);
-	if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
-	fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
-	fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
-	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
-	fprintf(file, "prefixes_default=%i\n", prefixes_default);
-	fprintf(file, "\n[Mode]\n");
-	fprintf(file, "min_deci=%i\n", printops.min_decimals);
-	fprintf(file, "use_min_deci=%i\n", printops.use_min_decimals);
-	fprintf(file, "max_deci=%i\n", printops.max_decimals);
-	fprintf(file, "use_max_deci=%i\n", printops.use_max_decimals);
-	fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
-	//fprintf(file, "interval_arithmetic=%i\n", CALCULATOR->usesIntervalArithmetic());
-	fprintf(file, "interval_display=%i\n", adaptive_interval_display ? 0 : printops.interval_display + 1);
-	fprintf(file, "min_exp=%i\n", printops.min_exp);
-	fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
-	fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
-	if(dual_fraction < 0) fprintf(file, "number_fraction_format=%i\n", -1);
-	else if(dual_fraction > 0) fprintf(file, "number_fraction_format=%i\n", FRACTION_COMBINED + 2);
-	else fprintf(file, "number_fraction_format=%i\n", printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL ? FRACTION_COMBINED + 1 : printops.number_fraction_format);
-	fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
-	fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
-	fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);
-	fprintf(file, "use_prefixes_for_currencies=%i\n", printops.use_prefixes_for_currencies);
-	fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
-	fprintf(file, "abbreviate_names=%i\n", printops.abbreviate_names);
-	fprintf(file, "all_prefixes_enabled=%i\n", printops.use_all_prefixes);
-	fprintf(file, "denominator_prefix_enabled=%i\n", printops.use_denominator_prefix);
-	fprintf(file, "place_units_separately=%i\n", printops.place_units_separately);
-	fprintf(file, "auto_post_conversion=%i\n", evalops.auto_post_conversion);
-	fprintf(file, "mixed_units_conversion=%i\n", evalops.mixed_units_conversion);
-	fprintf(file, "number_base=%i\n", printops.base);
-	if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
-	fprintf(file, "number_base_expression=%i\n", evalops.parse_options.base);
-	if(!CALCULATOR->customInputBase().isZero()) fprintf(file, "custom_number_base_expression=%s\n", CALCULATOR->customInputBase().print(CALCULATOR->save_printoptions).c_str());
-	fprintf(file, "read_precision=%i\n", evalops.parse_options.read_precision);
-	fprintf(file, "assume_denominators_nonzero=%i\n", evalops.assume_denominators_nonzero);
-	fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
-	fprintf(file, "structuring=%i\n", evalops.structuring);
-	fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
-	fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
-	fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
-	fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);
-	fprintf(file, "calculate_variables=%i\n", evalops.calculate_variables);
-	fprintf(file, "variable_units_enabled=%i\n", CALCULATOR->variableUnitsEnabled());
-	fprintf(file, "sync_units=%i\n", evalops.sync_units);
-	fprintf(file, "unknownvariables_enabled=%i\n", evalops.parse_options.unknowns_enabled);
-	fprintf(file, "units_enabled=%i\n", evalops.parse_options.units_enabled);
-	fprintf(file, "allow_complex=%i\n", evalops.allow_complex);
-	fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
-	fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
-	fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
-	fprintf(file, "rounding_mode=%i\n", rounding_mode);
-	if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
-	else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
-	else fprintf(file, "approximation=%i\n", evalops.approximation);
-	fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
-	fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
-	fprintf(file, "rpn_mode=%i\n", rpn_mode);
-	fprintf(file, "chain_mode=%i\n", chain_mode);
-	fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
-	fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
-	fprintf(file, "spacious=%i\n", printops.spacious);
-	fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
-	fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());
-	if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_BOOLEAN) fprintf(file, "default_assumption_sign=%i\n", CALCULATOR->defaultAssumptions()->sign());
-	fprintf(file, "\n[Plotting]\n");
-	fprintf(file, "plot_legend_placement=%i\n", default_plot_legend_placement);
-	fprintf(file, "plot_style=%i\n", default_plot_style);
-	fprintf(file, "plot_smoothing=%i\n", default_plot_smoothing);
-	fprintf(file, "plot_display_grid=%i\n", default_plot_display_grid);
-	fprintf(file, "plot_full_border=%i\n", default_plot_full_border);
-	fprintf(file, "plot_min=%s\n", default_plot_min.c_str());
-	fprintf(file, "plot_max=%s\n", default_plot_max.c_str());
-	fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
-	fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
-	fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
-	fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
-	fprintf(file, "plot_rows=%i\n", default_plot_rows);
-	fprintf(file, "plot_type=%i\n", default_plot_type);
-	fprintf(file, "plot_color=%i\n", default_plot_color);
-	fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
-	if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
-	if(!clear_history_on_exit) {
+	if(read_default) {
+		fputs(sgeneral.c_str(), file);
+	} else {
+		fprintf(file, "keypad_type=%i\n", keypad_type);
+		fprintf(file, "hide_numpad=%i\n", hide_numpad);
+	}
+	if(!is_workspace) {
+		fprintf(file, "rpn_keys=%i\n", rpn_keys);
+		for(size_t i = 0; i < recent_workspaces.size(); i++) {
+			fprintf(file, "recent_workspace=%s\n", recent_workspaces[i].c_str());
+		}
+		if(!custom_buttons.empty()) {
+			fprintf(file, "custom_button_columns=%i\n", custom_button_columns);
+			fprintf(file, "custom_button_rows=%i\n", custom_button_rows);
+			for(unsigned int i = 0; i < custom_buttons.size(); i++) {
+				if(!custom_buttons[i].label.isEmpty()) fprintf(file, "custom_button_label=%i %i %s\n", custom_buttons[i].r, custom_buttons[i].c, custom_buttons[i].label.toUtf8().data());
+				for(unsigned int bi = 0; bi <= 2; bi++) {
+					if(custom_buttons[i].type[bi] != -1) {
+						if(custom_buttons[i].value[bi].empty()) fprintf(file, "custom_button=%i %i %u %i\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi]);
+						else fprintf(file, "custom_button=%i %i %u %i %s\n", custom_buttons[i].c, custom_buttons[i].r, bi, custom_buttons[i].type[bi], custom_buttons[i].value[bi].c_str());
+					}
+				}
+			}
+		}
+		if(!default_shortcuts) {
+			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+				if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
+				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
+			}
+		}
+		if(favourite_functions_changed) {
+			for(size_t i = 0; i < favourite_functions.size(); i++) {
+				if(CALCULATOR->stillHasFunction(favourite_functions[i]) && favourite_functions[i]->isActive() && favourite_functions[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_function=%s\n", favourite_functions[i]->referenceName().c_str());
+				}
+			}
+		}
+		if(favourite_units_changed) {
+			for(size_t i = 0; i < favourite_units.size(); i++) {
+				if(CALCULATOR->stillHasUnit(favourite_units[i]) && favourite_units[i]->isActive() && favourite_units[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_unit=%s\n", favourite_units[i]->referenceName().c_str());
+				}
+			}
+		}
+		if(favourite_variables_changed) {
+			for(size_t i = 0; i < favourite_variables.size(); i++) {
+				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {
+					fprintf(file, "favourite_variable=%s\n", favourite_variables[i]->referenceName().c_str());
+				}
+			}
+		}
+		if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
+		if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
+		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
+		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
+		fprintf(file, "decimal_comma=%i\n", decimal_comma);
+		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
+		fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
+		fprintf(file, "twos_complement=%i\n", printops.twos_complement);
+		fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
+		fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
+		fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
+		fprintf(file, "e_notation=%i\n", printops.lower_case_e);
+		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
+		fprintf(file, "base_display=%i\n", printops.base_display);
+		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
+		fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
+		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
+		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
+		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+	}
+	if(read_default) {
+		fprintf(file, "\n[Mode]\n");
+		fputs(smode.c_str(), file);
+	} else {
+		fprintf(file, "\n[Mode]\n");
+		fprintf(file, "min_deci=%i\n", printops.min_decimals);
+		fprintf(file, "use_min_deci=%i\n", printops.use_min_decimals);
+		fprintf(file, "max_deci=%i\n", printops.max_decimals);
+		fprintf(file, "use_max_deci=%i\n", printops.use_max_decimals);
+		fprintf(file, "precision=%i\n", CALCULATOR->getPrecision());
+		fprintf(file, "interval_display=%i\n", adaptive_interval_display ? 0 : printops.interval_display + 1);
+		fprintf(file, "min_exp=%i\n", printops.min_exp);
+		fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
+		fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
+		if(dual_fraction < 0) fprintf(file, "number_fraction_format=%i\n", -1);
+		else if(dual_fraction > 0) fprintf(file, "number_fraction_format=%i\n", FRACTION_COMBINED + 2);
+		else fprintf(file, "number_fraction_format=%i\n", printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL ? FRACTION_COMBINED + 1 : printops.number_fraction_format);
+		fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
+		fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
+		fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);
+		fprintf(file, "use_prefixes_for_currencies=%i\n", printops.use_prefixes_for_currencies);
+		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
+		fprintf(file, "prefixes_default=%i\n", prefixes_default);
+		fprintf(file, "abbreviate_names=%i\n", printops.abbreviate_names);
+		fprintf(file, "all_prefixes_enabled=%i\n", printops.use_all_prefixes);
+		fprintf(file, "denominator_prefix_enabled=%i\n", printops.use_denominator_prefix);
+		fprintf(file, "place_units_separately=%i\n", printops.place_units_separately);
+		fprintf(file, "auto_post_conversion=%i\n", evalops.auto_post_conversion);
+		fprintf(file, "mixed_units_conversion=%i\n", evalops.mixed_units_conversion);
+		fprintf(file, "number_base=%i\n", printops.base);
+		if(!CALCULATOR->customOutputBase().isZero()) fprintf(file, "custom_number_base=%s\n", CALCULATOR->customOutputBase().print(CALCULATOR->save_printoptions).c_str());
+		fprintf(file, "number_base_expression=%i\n", evalops.parse_options.base);
+		if(!CALCULATOR->customInputBase().isZero()) fprintf(file, "custom_number_base_expression=%s\n", CALCULATOR->customInputBase().print(CALCULATOR->save_printoptions).c_str());
+		fprintf(file, "read_precision=%i\n", evalops.parse_options.read_precision);
+		fprintf(file, "assume_denominators_nonzero=%i\n", evalops.assume_denominators_nonzero);
+		fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
+		fprintf(file, "structuring=%i\n", evalops.structuring);
+		fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
+		fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
+		fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
+		fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);
+		fprintf(file, "calculate_variables=%i\n", evalops.calculate_variables);
+		fprintf(file, "variable_units_enabled=%i\n", CALCULATOR->variableUnitsEnabled());
+		fprintf(file, "sync_units=%i\n", evalops.sync_units);
+		fprintf(file, "unknownvariables_enabled=%i\n", evalops.parse_options.unknowns_enabled);
+		fprintf(file, "units_enabled=%i\n", evalops.parse_options.units_enabled);
+		fprintf(file, "allow_complex=%i\n", evalops.allow_complex);
+		fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
+		fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
+		fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
+		fprintf(file, "rounding_mode=%i\n", rounding_mode);
+		if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
+		else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
+		else fprintf(file, "approximation=%i\n", evalops.approximation);
+		fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
+		fprintf(file, "rpn_mode=%i\n", rpn_mode);
+		fprintf(file, "chain_mode=%i\n", chain_mode);
+		fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
+		fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
+		fprintf(file, "spacious=%i\n", printops.spacious);
+		fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
+		fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());
+		if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_BOOLEAN) fprintf(file, "default_assumption_sign=%i\n", CALCULATOR->defaultAssumptions()->sign());
+	}
+	if(!is_workspace) {
+		fprintf(file, "\n[Plotting]\n");
+		fprintf(file, "plot_legend_placement=%i\n", default_plot_legend_placement);
+		fprintf(file, "plot_style=%i\n", default_plot_style);
+		fprintf(file, "plot_smoothing=%i\n", default_plot_smoothing);
+		fprintf(file, "plot_display_grid=%i\n", default_plot_display_grid);
+		fprintf(file, "plot_full_border=%i\n", default_plot_full_border);
+		fprintf(file, "plot_min=%s\n", default_plot_min.c_str());
+		fprintf(file, "plot_max=%s\n", default_plot_max.c_str());
+		fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
+		fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
+		fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
+		fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
+		fprintf(file, "plot_rows=%i\n", default_plot_rows);
+		fprintf(file, "plot_type=%i\n", default_plot_type);
+		fprintf(file, "plot_color=%i\n", default_plot_color);
+		fprintf(file, "plot_linewidth=%i\n", default_plot_linewidth);
+		if(max_plot_time != 5) fprintf(file, "max_plot_time=%i\n", max_plot_time);
+	}
+	if(read_default) {
+		fprintf(file, "\n[History]\n");
+		fputs(shistory.c_str(), file);
+	} else if(!clear_history_on_exit || is_workspace) {
 		fprintf(file, "\n[History]\n");
 		if(!v_expression.empty()) {
 			long int n = 0;
 			size_t i = v_expression.size() - 1;
 			while(true) {
 				n++;
-				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+				for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
 					if(v_result[i][i2].length() > 300 && (v_result[i][i2].length() <= 6000 || unhtmlize(v_result[i][i2]).length() <= 5000)) {
 						n += v_result[i][i2].length() / 300;
 					}
@@ -1183,7 +1269,7 @@ void QalculateQtSettings::savePreferences(bool) {
 					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
 					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
 					n++;
-					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
 						if(!v_delresult[i][i2]) {
 							if(v_exact[i][i2]) fprintf(file, "history_result");
 							else fprintf(file, "history_result_approximate");
@@ -1209,30 +1295,13 @@ void QalculateQtSettings::savePreferences(bool) {
 			gsub("\n", " ", expression_history[i]);
 			fprintf(file, "expression_history=%s\n", expression_history[i].c_str());
 		}
-		if(favourite_functions_changed) {
-			for(size_t i = 0; i < favourite_functions.size(); i++) {
-				if(CALCULATOR->stillHasFunction(favourite_functions[i]) && favourite_functions[i]->isActive() && favourite_functions[i]->category() != CALCULATOR->temporaryCategory()) {
-					fprintf(file, "favourite_function=%s\n", favourite_functions[i]->referenceName().c_str());
-				}
-			}
-		}
-		if(favourite_units_changed) {
-			for(size_t i = 0; i < favourite_units.size(); i++) {
-				if(CALCULATOR->stillHasUnit(favourite_units[i]) && favourite_units[i]->isActive() && favourite_units[i]->category() != CALCULATOR->temporaryCategory()) {
-					fprintf(file, "favourite_unit=%s\n", favourite_units[i]->referenceName().c_str());
-				}
-			}
-		}
-		if(favourite_variables_changed) {
-			for(size_t i = 0; i < favourite_variables.size(); i++) {
-				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {
-					fprintf(file, "favourite_variable=%s\n", favourite_variables[i]->referenceName().c_str());
-				}
-			}
-		}
+	}
+	if(is_workspace) {
+		fprintf(file, "\n[Definitions]\n");
+		fputs(CALCULATOR->saveTemporaryDefinitions().c_str(), file);
 	}
 	fclose(file);
-
+	return true;
 }
 
 const char *QalculateQtSettings::multiplicationSign(bool units) {
@@ -1638,6 +1707,7 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 	switch(type) {
 		case SHORTCUT_TYPE_FUNCTION: {}
 		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
+			value = value.trimmed();
 			if(value.length() > 2 && value.right(2) == "()") value.chop(2);
 			if(!CALCULATOR->getActiveFunction(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Function not found."), QMessageBox::Ok);
@@ -1646,6 +1716,7 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_VARIABLE: {
+			value = value.trimmed();
 			if(!CALCULATOR->getActiveVariable(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Variable not found."), QMessageBox::Ok);
 				return false;
@@ -1653,15 +1724,21 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_UNIT: {
+			value = value.trimmed();
 			if(!CALCULATOR->getActiveUnit(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
 				return false;
 			}
 			break;
 		}
+		case SHORTCUT_TYPE_OPERATOR: {
+			value = value.trimmed();
+			break;
+		}
 		case SHORTCUT_TYPE_TO_NUMBER_BASE: {}
 		case SHORTCUT_TYPE_INPUT_BASE: {}
 		case SHORTCUT_TYPE_OUTPUT_BASE: {
+			value = value.trimmed();
 			Number nbase; int base;
 			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
 			if(base == BASE_CUSTOM && nbase.isZero()) {
@@ -1672,5 +1749,99 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 		}
 	}
 	return true;
+}
+
+bool QalculateQtSettings::loadWorkspace(const char *filename) {
+	FILE *file = NULL;
+	std::string stmp, svalue, svar;
+	char line[1000000L];
+	if(!filename || strlen(filename) == 0) {
+		file = fopen(buildPath(getLocalDir(), "qalculate-qt.cfg").c_str(), "r");
+		if(!file) return false;
+	} else {
+		file = fopen(filename, "r");
+		if(!file) return false;
+		if(fgets(line, 1000000L, file) == NULL) return false;
+		stmp = line;
+		if(stmp.find("QALCULATE") == std::string::npos) return false;
+	}
+	size_t i;
+	v_expression.clear();
+	v_protected.clear();
+	v_delexpression.clear();
+	v_result.clear();
+	v_exact.clear();
+	v_delresult.clear();
+	expression_history.clear();
+	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+		if(CALCULATOR->variables[i]->isLocal() && CALCULATOR->variables[i]->category() == CALCULATOR->temporaryCategory()) CALCULATOR->variables[i]->destroy();
+	}
+	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+		if(CALCULATOR->functions[i]->isLocal() && CALCULATOR->functions[i]->category() == CALCULATOR->temporaryCategory()) CALCULATOR->functions[i]->destroy();
+	}
+	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+		if(CALCULATOR->units[i]->isLocal() && CALCULATOR->units[i]->category() == CALCULATOR->temporaryCategory()) CALCULATOR->units[i]->destroy();
+	}
+	for(size_t i = 0; i < history_answer.size(); i++) {
+		history_answer[i]->unref();
+	}
+	history_answer.clear();
+	current_result = NULL;
+	v_memory->set(m_zero);
+	while(true) {
+		if(fgets(line, 1000000L, file) == NULL) break;
+		stmp = line;
+		remove_blank_ends(stmp);
+		if((i = stmp.find_first_of("=")) != std::string::npos) {
+			svar = stmp.substr(0, i);
+			remove_blank_ends(svar);
+			svalue = stmp.substr(i + 1);
+			remove_blank_ends(svalue);
+			readPreferenceValue(svar, svalue, true);
+		} else if(stmp == "[Definitions]") {
+			stmp = "";
+			while(true) {
+				if(fgets(line, 1000000L, file) == NULL) break;
+				stmp += line;
+			}
+			remove_blank_ends(stmp);
+			CALCULATOR->loadDefinitions(stmp.c_str(), true);
+			for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+				if(CALCULATOR->variables[i]->isLocal() && !CALCULATOR->variables[i]->isHidden() && CALCULATOR->variables[i]->isActive() && CALCULATOR->variables[i]->category() == CALCULATOR->temporaryCategory()) favourite_variables.push_back(CALCULATOR->variables[i]);
+			}
+			for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+				if(CALCULATOR->functions[i]->isLocal() && !CALCULATOR->functions[i]->isHidden() && CALCULATOR->functions[i]->isActive() && CALCULATOR->functions[i]->category() == CALCULATOR->temporaryCategory()) favourite_functions.push_back(CALCULATOR->functions[i]);
+			}
+			for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+				if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isHidden() && CALCULATOR->units[i]->isActive() && CALCULATOR->units[i]->category() == CALCULATOR->temporaryCategory()) favourite_units.push_back(CALCULATOR->units[i]);
+			}
+		}
+	}
+	current_workspace = filename;
+	for(size_t i = 0; i < recent_workspaces.size(); i++) {
+		if(recent_workspaces[i] == current_workspace) {
+			recent_workspaces.erase(recent_workspaces.begin() + i);
+			break;
+		}
+	}
+	if(recent_workspaces.size() >= 9) recent_workspaces.erase(recent_workspaces.begin());
+	recent_workspaces.push_back(filename);
+	fclose(file);
+	return true;
+}
+bool QalculateQtSettings::saveWorkspace(const char *filename) {
+	if(savePreferences(filename, true)) {
+		current_workspace = filename;
+		for(size_t i = 0; i < recent_workspaces.size(); i++) {
+			if(recent_workspaces[i] == current_workspace) {
+				recent_workspaces.erase(recent_workspaces.begin() + i);
+				break;
+			}
+		}
+		if(recent_workspaces.size() >= 9) recent_workspaces.erase(recent_workspaces.begin());
+		recent_workspaces.push_back(filename);
+		return true;
+	}
+	return false;
 }
 

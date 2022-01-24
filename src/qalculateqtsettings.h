@@ -174,7 +174,9 @@ class QalculateQtSettings : QObject {
 		~QalculateQtSettings();
 
 		void loadPreferences();
+		void readPreferenceValue(const std::string &svar, const std::string &svalue, bool is_workspace = false);
 		void savePreferences(bool save_mode = true);
+		bool savePreferences(const char *filename, bool is_workspace = false, bool save_mode = true);
 		void updateStyle();
 		void updatePalette();
 		void updateMessagePrintOptions();
@@ -192,6 +194,8 @@ class QalculateQtSettings : QObject {
 		const char *divisionSign(bool output = true);
 		std::string localizeExpression(std::string, bool unit_expression = false);
 		std::string unlocalizeExpression(std::string);
+		bool loadWorkspace(const char *filename);
+		bool saveWorkspace(const char *filename);
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
@@ -240,6 +244,9 @@ class QalculateQtSettings : QObject {
 		bool check_version;
 		std::string last_found_version;
 		int preferences_version[3];
+
+		std::string current_workspace;
+		std::vector<std::string> recent_workspaces;
 
 		std::vector<std::string> v_expression;
 		std::vector<bool> v_protected;

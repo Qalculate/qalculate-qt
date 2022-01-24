@@ -41,7 +41,6 @@ class HistoryView : public QTextEdit {
 
 		QString s_text;
 		int i_pos;
-		QImage *paste_image;
 		QMenu *cmenu;
 		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
 		QColor prev_color;

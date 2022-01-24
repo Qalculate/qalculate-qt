@@ -22,7 +22,9 @@ class QTimer;
 class QStackedLayout;
 class QToolButton;
 class QLineEdit;
+class QComboBox;
 class QListWidget;
+class QListWidgetItem;
 class QDialog;
 class QGridLayout;
 class QAction;
@@ -88,7 +90,8 @@ class KeypadWidget : public QWidget {
 		QVector<QVector<KeypadButton*> > customButtons;
 		QStackedLayout *leftStack;
 		QGridLayout *customGrid;
-		QLineEdit *labelEdit, *valueEdit;
+		QLineEdit *labelEdit;
+		QComboBox *valueEdit;
 		QLabel *valueLabel;
 		QListWidget *actionList;
 		QWidget *numpad;
@@ -127,7 +130,7 @@ class KeypadWidget : public QWidget {
 		void addCustomColumn();
 		void updateCustomActionOK();
 		void customActionOKClicked();
-		void currentCustomActionChanged(int);
+		void currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*);
 
 	public slots:
 

@@ -444,28 +444,6 @@ int completion_names_match(std::string name, const std::string &str, size_t minl
 	return (b_match ? 2 : 0);
 }
 
-std::string sub_suffix(const ExpressionName *ename) {
-	size_t i = ename->name.rfind('_');
-	bool b = i == std::string::npos || i == ename->name.length() - 1 || i == 0;
-	size_t i2 = 1;
-	std::string str;
-	if(b) {
-		if(is_in(NUMBERS, ename->name[ename->name.length() - 1])) {
-			while(ename->name.length() > i2 + 1 && is_in(NUMBERS, ename->name[ename->name.length() - 1 - i2])) {
-					i2++;
-			}
-		}
-		str += ename->name.substr(0, ename->name.length() - i2);
-	} else {
-		str += ename->name.substr(0, i);
-	}
-	str += "<sub>";
-	if(b) str += ename->name.substr(ename->name.length() - i2, i2);
-	else str += ename->name.substr(i + 1, ename->name.length() - (i + 1));
-	str += "</sub>";
-	return str;
-}
-
 class HTMLDelegate : public QStyledItemDelegate {
 	public:
 		void paint(QPainter * painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -976,7 +954,7 @@ void ExpressionEdit::updateCompletion() {
 			const ExpressionName *ename, *ename_r;
 			ename_r = &CALCULATOR->functions[i]->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
 			if(ename_r->suffix && ename_r->name.length() > 1) {
-				str = sub_suffix(ename_r);
+				str = sub_suffix_html(ename_r->name);
 			} else {
 				str = ename_r->name;
 			}
@@ -986,7 +964,7 @@ void ExpressionEdit::updateCompletion() {
 				if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), this))) {
 					str += " <i>";
 					if(ename->suffix && ename->name.length() > 1) {
-						str += sub_suffix(ename);
+						str += sub_suffix_html(ename->name);
 					} else {
 						str += ename->name;
 					}
@@ -1006,7 +984,7 @@ void ExpressionEdit::updateCompletion() {
 				if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), completionView))) {
 					if(!b) {
 						if(ename_r->suffix && ename_r->name.length() > 1) {
-							str = sub_suffix(ename_r);
+							str = sub_suffix_html(ename_r->name);
 						} else {
 							str = ename_r->name;
 						}
@@ -1014,7 +992,7 @@ void ExpressionEdit::updateCompletion() {
 					}
 					str += " <i>";
 					if(ename->suffix && ename->name.length() > 1) {
-						str += sub_suffix(ename);
+						str += sub_suffix_html(ename->name);
 					} else {
 						str += ename->name;
 					}
@@ -1022,7 +1000,7 @@ void ExpressionEdit::updateCompletion() {
 				}
 			}
 			if(!b && ename_r->suffix && ename_r->name.length() > 1) {
-				str = sub_suffix(ename_r);
+				str = sub_suffix_html(ename_r->name);
 				b = true;
 			}
 			if(settings->printops.use_unicode_signs && can_display_unicode_string_function("→", completionView)) {
@@ -1111,7 +1089,7 @@ void ExpressionEdit::updateCompletion() {
 					if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), completionView))) {
 						if(!b) {
 							if(ename_r->suffix && ename_r->name.length() > 1) {
-								str = sub_suffix(ename_r);
+								str = sub_suffix_html(ename_r->name);
 							} else {
 								str = ename_r->name;
 							}
@@ -1119,7 +1097,7 @@ void ExpressionEdit::updateCompletion() {
 						}
 						str += " <i>";
 						if(ename->suffix && ename->name.length() > 1) {
-							str += sub_suffix(ename);
+							str += sub_suffix_html(ename->name);
 						} else {
 							str += ename->name;
 						}
@@ -1127,7 +1105,7 @@ void ExpressionEdit::updateCompletion() {
 					}
 				}
 				if(!b && ename_r->suffix && ename_r->name.length() > 1) {
-					str = sub_suffix(ename_r);
+					str = sub_suffix_html(ename_r->name);
 					b = true;
 				}
 				title = QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
@@ -1160,7 +1138,7 @@ void ExpressionEdit::updateCompletion() {
 							bool b_italic = !str.empty();
 							if(b_italic) str += " <i>";
 							if(ename->suffix && ename->name.length() > 1) {
-								str += sub_suffix(ename);
+								str += sub_suffix_html(ename->name);
 							} else {
 								str += ename->name;
 							}
@@ -1219,7 +1197,7 @@ void ExpressionEdit::updateCompletion() {
 			if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), completionView))) {
 				if(!b) {
 					if(ename_r->suffix && ename_r->name.length() > 1) {
-						str = sub_suffix(ename_r);
+						str = sub_suffix_html(ename_r->name);
 					} else {
 						str = ename_r->name;
 					}
@@ -1227,7 +1205,7 @@ void ExpressionEdit::updateCompletion() {
 				}
 				str += " <i>";
 				if(ename->suffix && ename->name.length() > 1) {
-					str += sub_suffix(ename);
+					str += sub_suffix_html(ename->name);
 				} else {
 					str += ename->name;
 				}
@@ -1235,7 +1213,7 @@ void ExpressionEdit::updateCompletion() {
 			}
 		}
 		if(!b && ename_r->suffix && ename_r->name.length() > 1) {
-			str = sub_suffix(ename_r);
+			str = sub_suffix_html(ename_r->name);
 			b = true;
 		}
 		title = sprefix;
@@ -3189,10 +3167,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 					}
 				}
 			}
-			if(ename && ename->completion_only) {
-				ename = &item->preferredInputName(ename->abbreviation, settings->printops.use_unicode_signs, ename->plural, false, &can_display_unicode_string_function, (void*) this);
-			}
-			if(!ename) ename = ename_r;
+			if(!ename || ename->completion_only) ename = ename_r;
 			if(!ename) return;
 			str = ename->name;
 		}

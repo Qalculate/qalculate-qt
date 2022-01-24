@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QScrollBar>
+#include <QComboBox>
 #include <QDebug>
 
 #include "keypadwidget.h"
@@ -296,7 +297,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	OPERATOR_BUTTON2("|", "||", 2, 1);
 	button->setText("OR");
 	button->setToolTip(tr("Bitwise OR"), tr("Logical OR"));
-	OPERATOR_BUTTON(" xor ", 2, 2);
+	OPERATOR_BUTTON("xor", 2, 2);
 	button->setText("XOR");
 	button->setToolTip(tr("Bitwise Exclusive OR"));
 	OPERATOR_BUTTON2("~", "NOT", 2, 3);
@@ -308,7 +309,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(tr("Bitwise Right Shift"));
 	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_BIT_CMP), tr("cmp"), 3, 2);
 	ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_CIRCULAR_SHIFT), tr("rot"), 3, 3);
-	OPERATOR_BUTTON2(" mod ", " rem ", 4, 0);
+	OPERATOR_BUTTON2("mod", "rem", 4, 0);
 	button->setText("mod");
 	button->setToolTip(QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_MOD)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_REM)->title(true, settings->printops.use_unicode_signs)));
 	OPERATOR_BUTTON("//", 4, 1);
@@ -577,21 +578,69 @@ KeypadWidget::~KeypadWidget() {}
 
 void KeypadWidget::updateCustomActionOK() {
 	QListWidgetItem *item = actionList->currentItem();
-	customOKButton->setEnabled(item && (item->data(Qt::UserRole).toInt() < 0 || ((!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !valueEdit->text().trimmed().isEmpty()))));
+	customOKButton->setEnabled(item && (item->data(Qt::UserRole).toInt() < 0 || ((!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !valueEdit->currentText().isEmpty()))));
 }
 void KeypadWidget::customActionOKClicked() {
-	QString value = valueEdit->text().trimmed();
-	if(settings->testShortcutValue(actionList->currentItem()->data(Qt::UserRole).toInt(), value, customActionDialog)) {
+	QString value = valueEdit->currentText();
+	QListWidgetItem *item = actionList->currentItem();
+	if(!item) return;
+	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, customActionDialog)) {
 		customActionDialog->accept();
 	} else {
 		valueEdit->setFocus();
 	}
-	valueEdit->setText(value);
+	valueEdit->setCurrentText(value);
 }
-void KeypadWidget::currentCustomActionChanged(int i) {
-	valueEdit->setEnabled(i > 0 && SHORTCUT_REQUIRES_VALUE(actionList->item(i)->data(Qt::UserRole).toInt()));
-	valueLabel->setEnabled(valueEdit->isEnabled());
-	if(!valueEdit->isEnabled()) valueEdit->clear();
+void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
+	if(!item || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+		valueEdit->clear();
+		valueEdit->clearEditText();
+		valueEdit->setEnabled(false);
+		valueLabel->setEnabled(false);
+		return;
+	}
+	int i = item->data(Qt::UserRole).toInt();
+	int i_prev = -1;
+	if(item_prev) i_prev = item_prev->data(Qt::UserRole).toInt();
+	valueEdit->setEnabled(true);
+	valueLabel->setEnabled(true);
+	if(i == SHORTCUT_TYPE_FUNCTION || i == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
+		if(i_prev != SHORTCUT_TYPE_FUNCTION && i_prev != SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
+			valueEdit->clear();
+			QStringList citems;
+			for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+				MathFunction *f = CALCULATOR->functions[i];
+				if(f->isActive() && !f->isHidden()) citems << QString::fromStdString(f->referenceName());
+			}
+			citems.sort(Qt::CaseInsensitive);
+			valueEdit->addItems(citems);
+			valueEdit->clearEditText();
+		}
+	} else {
+		valueEdit->clear();
+		if(i == SHORTCUT_TYPE_UNIT) {
+			QStringList citems;
+			for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+				Unit *u = CALCULATOR->units[i];
+				if(u->isActive() && !u->isHidden()) citems << QString::fromStdString(u->referenceName());
+			}
+			citems.sort(Qt::CaseInsensitive);
+			valueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_VARIABLE) {
+			QStringList citems;
+			for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+				Variable *v = CALCULATOR->variables[i];
+				if(v->isActive() && !v->isHidden()) citems << QString::fromStdString(v->referenceName());
+			}
+			citems.sort(Qt::CaseInsensitive);
+			valueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_OPERATOR) {
+			QStringList citems;
+			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
+			valueEdit->addItems(citems);
+		}
+		valueEdit->clearEditText();
+	}
 }
 
 void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
@@ -618,18 +667,20 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	if(button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).isValid()) type = button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).toInt();
 	QListWidgetItem *item = new QListWidgetItem(tr("None"), actionList);
 	item->setData(Qt::UserRole, -1);
-	actionList->setCurrentRow(0);
+	actionList->setCurrentItem(item);
 	for(int i = SHORTCUT_TYPE_FUNCTION; i <= LAST_SHORTCUT_TYPE; i++) {
 		item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), actionList);
 		item->setData(Qt::UserRole, i);
-		if(i == type) actionList->setCurrentRow(i + 1);
+		if(i == type) actionList->setCurrentItem(item);
 	}
 	valueLabel = new QLabel(tr("Value:"), dialog);
 	actionList->setMinimumWidth(actionList->sizeHintForColumn(0) + actionList->frameWidth() * 2 + actionList->contentsMargins().left() + actionList->contentsMargins().right() + actionList->verticalScrollBar()->sizeHint().width());
 	grid->addWidget(valueLabel, i != 1 ? 2 : 3, 0);
-	valueEdit = new MathLineEdit(dialog);
-	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) valueEdit->setText(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString());
+	valueEdit = new QComboBox(dialog);
+	valueEdit->setEditable(true);
+	valueEdit->setLineEdit(new MathLineEdit());
 	grid->addWidget(valueEdit, i != 1 ? 2 : 3, 1);
+	grid->setColumnStretch(1, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
@@ -638,10 +689,11 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
 	if(labelEdit) connect(labelEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateCustomActionOK()));
 	connect(actionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateCustomActionOK()));
-	connect(actionList, SIGNAL(currentRowChanged(int)), this, SLOT(currentCustomActionChanged(int)));
-	connect(valueEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateCustomActionOK()));
+	connect(actionList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*)));
+	connect(valueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateCustomActionOK()));
 	customOKButton = buttonBox->button(QDialogButtonBox::Ok);
-	currentCustomActionChanged(actionList->currentRow());
+	currentCustomActionChanged(actionList->currentItem(), NULL);
+	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) valueEdit->setCurrentText(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString());
 	customOKButton->setEnabled(false);
 	if(labelEdit) labelEdit->setFocus();
 	else actionList->setFocus();
@@ -667,9 +719,9 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 		index--;
 		custom_button *cb = &settings->custom_buttons[index];
 		cb->type[i - 1] = actionList->currentItem()->data(Qt::UserRole).toInt();
-		cb->value[i - 1] = valueEdit->text().trimmed().toStdString();
+		cb->value[i - 1] = valueEdit->currentText().toStdString();
 		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentItem()->data(Qt::UserRole).toInt());
-		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->text().trimmed());
+		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->currentText());
 		button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
 		if(labelEdit) {
 			settings->custom_buttons[index].label = labelEdit->text().trimmed();

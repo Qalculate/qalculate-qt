@@ -128,6 +128,8 @@ QString unhtmlize(QString str) {
 }
 
 HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
+	i_pos = 0;
+	last_ans = 0;
 	setReadOnly(true);
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
@@ -198,22 +200,26 @@ void remove_top_border(QString &s_text) {
 }
 
 void HistoryView::loadInitial() {
+	s_text.clear();
+	i_pos = 0;
+	last_ans = 0;
+	last_ref = "";
 	if(!settings->v_expression.empty()) {
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
 			addResult(settings->v_result[i], settings->v_expression[i], true, false, QString(), NULL, true, i);
 		}
-		if(!s_text.isEmpty()) {
-			if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
-				replace_colors(s_text);
-				for(size_t i = 0; i < settings->v_expression.size(); i++) {
-					replace_colors(settings->v_expression[i]);
-					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-						replace_colors(settings->v_result[i][i2]);
-					}
+	}
+	if(!s_text.isEmpty()) {
+		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
+			replace_colors(s_text);
+			for(size_t i = 0; i < settings->v_expression.size(); i++) {
+				replace_colors(settings->v_expression[i]);
+				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+					replace_colors(settings->v_result[i][i2]);
 				}
 			}
-			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 		}
+		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 	}
 }
 
