@@ -67,6 +67,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Application name"), TITLE_APP);
 	combo->addItem(tr("Result"), TITLE_RESULT);
 	combo->addItem(tr("Application name + result"), TITLE_APP_RESULT);
+	combo->addItem(tr("Workspace"), TITLE_WORKSPACE);
+	combo->addItem(tr("Application name + workspace"), TITLE_APP_WORKSPACE);
 	combo->setCurrentIndex(combo->findData(settings->title_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(titleChanged(int)));
 	l2->addWidget(combo, r, 1); r++;

@@ -154,6 +154,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= 0 && v <= 3) keypad_type = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
+	} else if(svar == "show_bases") {
+		show_bases = v;
 	} else if(svar == "version") {
 		parse_qalculate_version(svalue, preferences_version);
 	} else if(!is_workspace) {
@@ -234,6 +236,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			if(v > 0 && v <= 100) custom_button_columns = v;
 		} else if(svar == "recent_workspace") {
 			recent_workspaces.push_back(svalue);
+		} else if(svar == "last_workspace") {
+			current_workspace = svalue;
+		} else if(svar == "save_workspace") {
+			save_workspace = v;
 		} else if(svar == "always_on_top") {
 			always_on_top = v;
 		} else if(svar == "keep_function_dialog_open") {
@@ -287,7 +293,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "ignore_locale") {
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
-			if(v >= 0 && v <= 2) title_type = v;
+			if(v >= 0 && v <= 4) title_type = v;
 		} else if(svar == "auto_update_exchange_rates") {
 			auto_update_exchange_rates = v;
 		} else if(svar == "display_expression_status") {
@@ -631,6 +637,7 @@ void QalculateQtSettings::loadPreferences() {
 	CALCULATOR->useBinaryPrefixes(0);
 
 	current_workspace = "";
+	save_workspace = -1;
 
 	printops.multiplication_sign = MULTIPLICATION_SIGN_X;
 	printops.division_sign = DIVISION_SIGN_DIVISION_SLASH;
@@ -728,6 +735,7 @@ void QalculateQtSettings::loadPreferences() {
 	prefixes_default = true;
 	keypad_type = 0;
 	hide_numpad = false;
+	show_bases = -1;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
 	use_custom_keypad_font = false;
@@ -755,6 +763,15 @@ void QalculateQtSettings::loadPreferences() {
 #endif
 	last_version_check_date.setToCurrentDate();
 
+	current_workspace = "";
+	recent_workspaces.clear();
+	v_expression.clear();
+	v_protected.clear();
+	v_delexpression.clear();
+	v_result.clear();
+	v_exact.clear();
+	v_delresult.clear();
+	expression_history.clear();
 
 	default_shortcuts = true;
 	keyboard_shortcuts.clear();
@@ -871,6 +888,10 @@ void QalculateQtSettings::loadPreferences() {
 	if(palette != 1) light_style = style;
 	if(style >= 0) updateStyle();
 	else if(palette >= 0) updatePalette();
+
+	if(!current_workspace.empty()) {
+		if(!loadWorkspace(current_workspace.c_str())) current_workspace = "";
+	}
 
 }
 void QalculateQtSettings::updateFavourites() {
@@ -1017,7 +1038,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					} else if(!clear_history_on_exit && stmp == "[History]") {
 						b_history = true;
 					} else if((i = stmp.find_first_of("=")) != std::string::npos) {
-						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad") {
+						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_bases") {
 							sgeneral += stmp;
 							sgeneral += "\n";
 						}
@@ -1094,9 +1115,12 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	} else {
 		fprintf(file, "keypad_type=%i\n", keypad_type);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
+		fprintf(file, "show_bases=%i\n", show_bases);
 	}
 	if(!is_workspace) {
 		fprintf(file, "rpn_keys=%i\n", rpn_keys);
+		if(!current_workspace.empty()) fprintf(file, "last_workspace=%s\n", current_workspace.c_str());
+		if(save_workspace >= 0) fprintf(file, "save_workspace=%i\n", save_workspace);
 		for(size_t i = 0; i < recent_workspaces.size(); i++) {
 			fprintf(file, "recent_workspace=%s\n", recent_workspaces[i].c_str());
 		}
@@ -1646,10 +1670,10 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_DEGREES: {return tr("Set angle unit to degrees");}
 		case SHORTCUT_TYPE_RADIANS: {return tr("Set angle unit to radians");}
 		case SHORTCUT_TYPE_GRADIANS: {return tr("Set angle unit to gradians");}
-		case SHORTCUT_TYPE_NORMAL_NOTATION: {return tr("Active normal notation");}
-		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific notation");}
-		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering notation");}
-		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple notation");}
+		case SHORTCUT_TYPE_NORMAL_NOTATION: {return tr("Active normal display mode");}
+		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
+		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
+		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}
 		case SHORTCUT_TYPE_RPN_MODE: {return tr("Toggle RPN mode");}
 		case SHORTCUT_TYPE_GENERAL_KEYPAD: {return tr("Show general keypad");}
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {return tr("Toggle programming keypad");}
@@ -1817,15 +1841,19 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 			}
 		}
 	}
-	current_workspace = filename;
-	for(size_t i = 0; i < recent_workspaces.size(); i++) {
-		if(recent_workspaces[i] == current_workspace) {
-			recent_workspaces.erase(recent_workspaces.begin() + i);
-			break;
+	if(!filename || strlen(filename) == 0) {
+		current_workspace = "";
+	} else {
+		current_workspace = filename;
+		for(size_t i = 0; i < recent_workspaces.size(); i++) {
+			if(recent_workspaces[i] == current_workspace) {
+				recent_workspaces.erase(recent_workspaces.begin() + i);
+				break;
+			}
 		}
+		if(recent_workspaces.size() >= 9) recent_workspaces.erase(recent_workspaces.begin());
+		recent_workspaces.push_back(filename);
 	}
-	if(recent_workspaces.size() >= 9) recent_workspaces.erase(recent_workspaces.begin());
-	recent_workspaces.push_back(filename);
 	fclose(file);
 	return true;
 }
@@ -1843,5 +1871,15 @@ bool QalculateQtSettings::saveWorkspace(const char *filename) {
 		return true;
 	}
 	return false;
+}
+QString QalculateQtSettings::workspaceTitle() {
+	if(current_workspace.empty()) return QString();
+#ifdef _WIN32
+	size_t index = current_workspace.rfind('\\');
+#else
+	size_t index = current_workspace.rfind('/');
+#endif
+	if(index != std::string::npos) return QString::fromStdString(current_workspace.substr(index + 1));
+	return QString::fromStdString(current_workspace);
 }
 

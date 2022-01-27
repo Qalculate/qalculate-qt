@@ -865,6 +865,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
+	if(settings->show_bases >= 0) basesDock->setVisible(settings->show_bases > 0);
+	rpnDock->setVisible(settings->rpn_mode);
+
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 
 	if(settings->use_custom_app_font) {
@@ -1942,6 +1945,7 @@ void QalculateWindow::socketReadyRead() {
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
 		settings->allow_multiple_instances = true;
+		settings->show_bases = basesDock->isVisible();
 		settings->savePreferences(false);
 		return;
 	}
@@ -1959,6 +1963,7 @@ void QalculateWindow::socketReadyRead() {
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
 		settings->allow_multiple_instances = false;
+		settings->show_bases = basesDock->isVisible();
 		settings->savePreferences(false);
 		command = command.mid(1).trimmed();
 		if(command.isEmpty()) return;
@@ -1970,6 +1975,16 @@ void QalculateWindow::socketReadyRead() {
 			if(i > 0) {
 				QString file = command.left(i);
 				executeFromFile(file);
+				command = command.mid(i);
+			}
+		}
+	} else if(command[0] == 'w') {
+		command = command.mid(1).trimmed();
+		if(!command.isEmpty()) {
+			int i = command.indexOf(";");
+			if(i > 0) {
+				QString file = command.left(i);
+				loadWorkspace(file);
 				command = command.mid(i);
 			}
 		}
@@ -2036,6 +2051,7 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 		return;
 	}
 	settings->updateMessagePrintOptions();
+	workspace_changed = true;
 	setResult(NULL, true, false, false);
 	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
 }
@@ -2052,6 +2068,7 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 			if(parsed_mstruct->contains(settings->vans[i])) expressionEdit->clear();
 		}
 	}
+	workspace_changed = true;
 	if(!settings->rpn_mode && recalculate) {
 		calculateExpression(false);
 	}
@@ -2067,6 +2084,7 @@ void QalculateWindow::expressionCalculationUpdated(int delay) {
 		ecTimer->start(delay);
 		return;
 	}
+	workspace_changed = true;
 	expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 	settings->updateMessagePrintOptions();
 	if(!settings->rpn_mode) {
@@ -3045,6 +3063,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 					else settings->window_geometry = QByteArray();
 					settings->splitter_state = ehSplitter->saveState();
+					settings->show_bases = basesDock->isVisible();
 					settings->savePreferences();
 					if(current_expr) expressionEdit->clear();
 				} else if(equalsIgnoreCase(str, "definitions")) {
@@ -4039,7 +4058,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	i = 0;
 
 	if(CALCULATOR->busy() && !was_busy) {
-		if(updateWindowTitle(tr("Calculating…"))) title_set = true;
+		if(!do_stack && updateWindowTitle(tr("Calculating…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
 		dialog->setWindowTitle(tr("Calculating…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
@@ -4749,6 +4768,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(b_busy) return;
 
+	workspace_changed = true;
+
 	std::string prev_result_text = result_text;
 	bool prev_approximate = *settings->printops.is_approximate;
 
@@ -4920,7 +4941,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	i = 0;
 
 	if(b_busy && viewThread->running) {
-		if(updateWindowTitle(tr("Processing…"))) title_set = true;
+		if(!do_stack && updateWindowTitle(tr("Processing…"))) title_set = true;
 		dialog = new QProgressDialog(tr("Processing…"), tr("Cancel"), 0, 0, this);
 		dialog->setWindowTitle(tr("Processing…"));
 		connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
@@ -4944,7 +4965,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(!do_stack) {
 		if(basesDock->isVisible()) updateResultBases();
-		if((settings->title_type == TITLE_APP || !updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true)) && title_set) updateWindowTitle();
+		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 	}
 	if(register_moved) {
 		update_parse = true;
@@ -5285,13 +5306,16 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 }
 void QalculateWindow::closeEvent(QCloseEvent *e) {
 	if(!settings->current_workspace.empty()) {
-		if(!askSaveWorkspace()) return;
+		int i = askSaveWorkspace();
+		if(i < 0) return;
+		if(i == 0) settings->current_workspace = "";
 	}
 	settings->window_state = saveState();
 	if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
 	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
+	settings->show_bases = basesDock->isVisible();
 	CALCULATOR->abort();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
@@ -5396,6 +5420,8 @@ void QalculateWindow::newFunction() {
 }
 void QalculateWindow::hideNumpad(bool b) {
 	keypad->hideNumpad(b);
+	settings->hide_numpad = b;
+	workspace_changed = true;
 }
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
@@ -5410,6 +5436,7 @@ void QalculateWindow::keypadTypeActivated() {
 		keypadDock->setVisible(true);
 		keypadDock->raise();
 	}
+	workspace_changed = true;
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
@@ -5427,23 +5454,59 @@ void QalculateWindow::onBasesVisibilityChanged(bool b) {
 bool QalculateWindow::displayMessages() {
 	return settings->displayMessages(this);
 }
-bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result) {
+bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool type_change) {
 	if(title_modified) return false;
+	if(type_change) {
+		if(settings->title_type == TITLE_APP_RESULT || settings->title_type == TITLE_APP_WORKSPACE || settings->title_type == TITLE_APP) {
+			qApp->setApplicationDisplayName("Qalculate!");
+			setWindowTitle(QString());
+		} else if(settings->title_type == TITLE_RESULT) {
+			qApp->setApplicationDisplayName(QString());
+			setWindowTitle(QString());
+		}
+		if(settings->title_type == TITLE_RESULT || settings->title_type == TITLE_APP_RESULT) {
+			if(result_text.empty()) {
+				if(settings->title_type == TITLE_RESULT) setWindowTitle("Qalculate!");
+			} else {
+				setWindowTitle(QString::fromStdString(unhtmlize(result_text)));
+			}
+		}
+	}
 	switch(settings->title_type) {
 		case TITLE_RESULT: {
-			if(str.isEmpty()) return false;
-			qApp->setApplicationDisplayName(QString());
-			if(!str.isEmpty()) setWindowTitle(str);
+			if(str.isEmpty()) {
+				if(is_result) {
+					setWindowTitle("Qalculate!");
+					return true;
+				}
+				return false;
+			}
+			setWindowTitle(str);
 			break;
 		}
 		case TITLE_APP_RESULT: {
-			if(!str.isEmpty()) setWindowTitle(str);
+			if(str.isEmpty() && !is_result) {
+				return false;
+			}
+			setWindowTitle(str);
+			break;
+		}
+		case TITLE_WORKSPACE: {
+			if(is_result) return false;
+			if(settings->workspaceTitle().isEmpty()) qApp->setApplicationDisplayName("Qalculate!");
+			else qApp->setApplicationDisplayName(settings->workspaceTitle());
+			setWindowTitle(str);
+			break;
+		}
+		case TITLE_APP_WORKSPACE: {
+			if(is_result) return false;
+			if(str.isEmpty()) setWindowTitle(settings->workspaceTitle());
+			else setWindowTitle(str);
 			break;
 		}
 		default: {
 			if(is_result) return false;
-			if(!str.isEmpty()) setWindowTitle(str);
-			else setWindowTitle(QString());
+			setWindowTitle(str);
 		}
 	}
 	return true;
@@ -5622,7 +5685,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 }
 void QalculateWindow::onTitleTypeChanged() {
 	title_modified = false;
-	updateWindowTitle();
+	updateWindowTitle(QString(), false, true);
 }
 void QalculateWindow::onPreferencesClosed() {
 	preferencesDialog->deleteLater();
@@ -7098,7 +7161,6 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 	bool rpn_mode_prev = settings->rpn_mode;
 	bool chain_mode_prev = settings->chain_mode;
 	if(settings->loadWorkspace(filename.toLocal8Bit().data())) {
-		workspace_changed = false;
 		mstruct->unref();
 		mstruct = new MathStructure();
 		mstruct_exact.setUndefined();
@@ -7117,6 +7179,7 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		keypad->updateSymbols();
 		if(settings->keypad_type < 0) keypadDock->hide();
 		else keypadDock->show();
+		basesDock->setVisible(settings->show_bases > 0);
 		QAction *action = find_child_data(this, "group_keypad", settings->keypad_type);
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);
@@ -7183,6 +7246,8 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 			w->blockSignals(false);
 		}
 		updateWSActions();
+		updateWindowTitle();
+		workspace_changed = false;
 	} else {
 		QMessageBox::critical(this, tr("Error"), tr("Failed to open workspace"), QMessageBox::Ok);
 	}
@@ -7191,6 +7256,7 @@ void QalculateWindow::saveWorkspaceAs() {
 	while(true) {
 		QString str = QFileDialog::getSaveFileName(this);
 		if(str.isEmpty()) break;
+		settings->show_bases = basesDock->isVisible();
 		if(settings->saveWorkspace(str.toLocal8Bit().data())) {
 			workspace_changed = false;
 			updateWSActions();
@@ -7201,6 +7267,7 @@ void QalculateWindow::saveWorkspaceAs() {
 	}
 }
 void QalculateWindow::saveWorkspace() {
+	settings->show_bases = basesDock->isVisible();
 	if(settings->saveWorkspace(settings->current_workspace.c_str())) {
 		workspace_changed = false;
 		updateWSActions();
@@ -7208,19 +7275,37 @@ void QalculateWindow::saveWorkspace() {
 		QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Ok);
 	}
 }
-bool QalculateWindow::askSaveWorkspace() {
+int QalculateWindow::askSaveWorkspace() {
 	if(!workspace_changed) return true;
-	QMessageBox::StandardButton b = QMessageBox::warning(this, tr("Save file?"), tr("Do you want to save the current workspace?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+	bool b_noask = settings->save_workspace >= 0;
+	int b = 0;
+	if(b_noask) {
+		if(settings->save_workspace > 0) b = QMessageBox::Yes;
+		else b = QMessageBox::No;
+	} else {
+		QMessageBox *dialog = new QMessageBox(QMessageBox::Question, tr("Save file?"), tr("Do you want to save the current workspace?"), QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
+		dialog->setCheckBox(new QCheckBox(tr("Do not ask again")));
+		b = dialog->exec();
+		b_noask = dialog->checkBox()->isChecked();
+		dialog->deleteLater();
+	}
 	if(b == QMessageBox::Yes) {
+		settings->show_bases = basesDock->isVisible();
 		if(!settings->saveWorkspace(settings->current_workspace.c_str())) {
 			QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Ok);
-			return false;
+			return -1;
 		}
 		workspace_changed = false;
+		if(b_noask) settings->save_workspace = 1;
+		return 1;
+	} else if(b == QMessageBox::Cancel) {
+		return -1;
 	}
-	return b != QMessageBox::Cancel;
+	if(b_noask) settings->save_workspace = 0;
+	return 0;
 }
 void QalculateWindow::openRecentWorkspace() {
+	settings->show_bases = basesDock->isVisible();
 	if(settings->current_workspace.empty()) {
 		settings->window_state = saveState();
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
@@ -7228,12 +7313,13 @@ void QalculateWindow::openRecentWorkspace() {
 		settings->splitter_state = ehSplitter->saveState();
 		settings->savePreferences();
 	} else {
-		if(!askSaveWorkspace()) return;
+		if(askSaveWorkspace() < 0) return;
 	}
 	loadWorkspace(qobject_cast<QAction*>(sender())->data().toString());
 	updateWSActions();
 }
 void QalculateWindow::openWorkspace() {
+	settings->show_bases = basesDock->isVisible();
 	if(settings->current_workspace.empty()) {
 		settings->window_state = saveState();
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
@@ -7241,7 +7327,7 @@ void QalculateWindow::openWorkspace() {
 		settings->splitter_state = ehSplitter->saveState();
 		settings->savePreferences();
 	} else {
-		if(!askSaveWorkspace()) return;
+		if(askSaveWorkspace() < 0) return;
 	}
 	QString str = QFileDialog::getOpenFileName(this);
 	if(!str.isEmpty()) {
@@ -7250,7 +7336,7 @@ void QalculateWindow::openWorkspace() {
 	updateWSActions();
 }
 void QalculateWindow::openDefaultWorkspace() {
-	if(!askSaveWorkspace()) return;
+	if(askSaveWorkspace() < 0) return;
 	loadWorkspace(QString());
 	workspace_changed = false;
 	updateWSActions();

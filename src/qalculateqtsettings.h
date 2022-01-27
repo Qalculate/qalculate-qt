@@ -44,7 +44,9 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
-	TITLE_APP_RESULT
+	TITLE_APP_RESULT,
+	TITLE_WORKSPACE,
+	TITLE_APP_WORKSPACE
 };
 
 enum {
@@ -196,6 +198,7 @@ class QalculateQtSettings : QObject {
 		std::string unlocalizeExpression(std::string);
 		bool loadWorkspace(const char *filename);
 		bool saveWorkspace(const char *filename);
+		QString workspaceTitle();
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
@@ -216,6 +219,7 @@ class QalculateQtSettings : QObject {
 		int replace_expression;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		int show_bases;
 		bool hide_numpad;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
@@ -247,6 +251,7 @@ class QalculateQtSettings : QObject {
 
 		std::string current_workspace;
 		std::vector<std::string> recent_workspaces;
+		int save_workspace;
 
 		std::vector<std::string> v_expression;
 		std::vector<bool> v_protected;

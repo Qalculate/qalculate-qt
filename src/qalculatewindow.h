@@ -67,7 +67,7 @@ class QalculateWindow : public QMainWindow {
 
 		void setCommandLineParser(QCommandLineParser*);
 		bool displayMessages();
-		bool updateWindowTitle(const QString &str = QString(), bool is_result = false);
+		bool updateWindowTitle(const QString &str = QString(), bool is_result = false, bool type_change = false);
 		void executeFromFile(const QString&);
 		void loadInitialHistory();
 
@@ -140,7 +140,7 @@ class QalculateWindow : public QMainWindow {
 		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL, bool = false);
 		void loadWorkspace(const QString &filename);
 		void updateWSActions();
-		bool askSaveWorkspace();
+		int askSaveWorkspace();
 
 	protected slots:
 
