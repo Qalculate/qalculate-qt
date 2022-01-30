@@ -56,6 +56,7 @@ class PreferencesDialog : public QDialog {
 		void exratesChanged(int);
 		void binaryPrefixesToggled(bool);
 		void readPrecisionToggled(bool);
+		void simplifiedPercentageToggled(bool);
 		void intervalCalculationChanged(int);
 		void complexFormChanged(int);
 		void roundingChanged(int);

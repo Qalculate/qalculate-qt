@@ -1863,7 +1863,9 @@ void ExpressionEdit::showCurrentStatus() {
 			std::string result = CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options);
 			if(!contains_plot_or_save(result)) {
 				CALCULATOR->beginTemporaryStopMessages();
+				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 				result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
+				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 				std::string result_nohtml = unhtmlize(result);
 				remove_spaces(result_nohtml);
 				if(!CALCULATOR->endTemporaryStopMessages() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
@@ -2059,6 +2061,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	std::string str_e, str_u, str_w, str_sub;
 	bool had_errors = false, had_warnings = false;
 	settings->evalops.parse_options.preserve_format = true;
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	if(!cursor.atStart()) {
 		settings->evalops.parse_options.unended_function = &mfunc;
 		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_unit = NULL;}
@@ -2390,6 +2393,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		CALCULATOR->clearMessages();
 		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
 	}
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	settings->evalops.parse_options.preserve_format = false;
 }
 

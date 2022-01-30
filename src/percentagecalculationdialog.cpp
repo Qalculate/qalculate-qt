@@ -151,6 +151,7 @@ void PercentageCalculationDialog::updatePercentageEntries() {
 	EvaluationOptions eo;
 	eo.parse_options = settings->evalops.parse_options;
 	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+	if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	eo.parse_options.read_precision = DONT_READ_PRECISION;
 	eo.parse_options.base = 10;
 	eo.assume_denominators_nonzero = true;

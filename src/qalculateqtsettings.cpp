@@ -610,6 +610,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(svar == "parsing_mode") {
 		evalops.parse_options.parsing_mode = (ParsingMode) v;
 		if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
+	} else if(svar == "simplified_percentage") {
+		simplified_percentage = v;
 	} else if(svar == "default_assumption_type") {
 		if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
 			CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
@@ -720,6 +722,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_shown = false;
 	caret_as_xor = false;
 	do_imaginary_j = false;
+	simplified_percentage = true;
 	color = 1;
 	colorize_result = true;
 	chain_mode = false;
@@ -1244,6 +1247,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "chain_mode=%i\n", chain_mode);
 		fprintf(file, "limit_implicit_multiplication=%i\n", evalops.parse_options.limit_implicit_multiplication);
 		fprintf(file, "parsing_mode=%i\n", evalops.parse_options.parsing_mode);
+		fprintf(file, "simplified_percentage=%i\n", simplified_percentage);
 		fprintf(file, "spacious=%i\n", printops.spacious);
 		fprintf(file, "excessive_parenthesis=%i\n", printops.excessive_parenthesis);
 		fprintf(file, "default_assumption_type=%i\n", CALCULATOR->defaultAssumptions()->type());

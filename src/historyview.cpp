@@ -33,6 +33,13 @@
 #include "historyview.h"
 #include "qalculateqtsettings.h"
 
+bool qstring_has_nondigit(const QString &str) {
+	for(int i = 0; i < str.length(); i++) {
+		if(!str[i].isDigit()) return true;
+	}
+	return false;
+}
+
 QString unhtmlize(QString str) {
 	int i = 0, i2;
 	str.remove("\n");
@@ -51,6 +58,7 @@ QString unhtmlize(QString str) {
 				QString str2 = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
 				if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i, SIGN_POWER_2);
 				else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i, SIGN_POWER_3);
+				else if(str.length() == i3 + 7 && (str2.length() == 1 || !qstring_has_nondigit(str2))) str.replace(i, i3 - i, "^" + str2);
 				else str.replace(i, i3 - i, "^(" + str2 + ")");
 				continue;
 			}
@@ -92,6 +100,7 @@ QString unhtmlize(QString str) {
 					QString str2 = unhtmlize(str.mid(i + 5, i3 - i - 5));
 					if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
 					else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
+					else if(str.length() == i3 + 6 && (str2.length() == 1 || !qstring_has_nondigit(str2))) str.replace(i, i3 - i + 6, "^" + str2);
 					else str.replace(i, i3 - i + 6, "^(" + str2 + ")");
 					continue;
 				}

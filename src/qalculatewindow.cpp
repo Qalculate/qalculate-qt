@@ -123,7 +123,6 @@ std::string result_bin, result_oct, result_dec, result_hex;
 Number max_bases, min_bases;
 bool title_modified = false;
 
-extern void fix_to_struct(MathStructure &m);
 extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1);
 extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
 extern int has_information_unit(const MathStructure &m, bool top = true);
@@ -191,6 +190,7 @@ std::string unhtmlize(std::string str) {
 					std::string str2 = unhtmlize(str.substr(i + 5, i3 - i - 5));
 					if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
 					else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
+					else if((str.length() == i3 + 6 || (str.length() == i3 + 13 && str.find("</span>", i3) != std::string::npos)) && (unicode_length(str2) == 1 || str2.find_first_not_of(NUMBERS) == std::string::npos)) str.replace(i, i3 - i + 6, std::string("^") + str2);
 					else str.replace(i, i3 - i + 6, std::string("^(") + str2 + ")");
 					continue;
 				}
@@ -2389,6 +2389,7 @@ void QalculateWindow::setOption(std::string str) {
 			else normalModeActivated();
 		}
 	} else if(equalsIgnoreCase(svar, "short multiplication") || svar == "shortmul") SET_BOOL_D(settings->printops.short_multiplication)
+	else if(equalsIgnoreCase(svar, "simplified percentage") || svar == "percent") SET_BOOL_PT(settings->simplified_percentage)
 	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_D(settings->printops.lower_case_e)
 	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
 	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
@@ -3891,6 +3892,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	size_t stack_size = 0;
 
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+
 	parsed_tostruct->setUndefined();
 	CALCULATOR->resetExchangeRatesUsed();
 	if(do_stack) {
@@ -4155,6 +4158,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
 		settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 		settings->printops.time_zone = TIME_ZONE_LOCAL;
+		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 		return;
 	}
 
@@ -4219,6 +4223,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
 	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
 	if(stack_index == 0) {
 		if(unitsDialog && unitsDialog->isVisible()) {

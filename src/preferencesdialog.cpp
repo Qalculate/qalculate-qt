@@ -132,6 +132,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	parseCombo = combo;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(parsingModeChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Simplified percentage"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
@@ -397,6 +398,10 @@ void PreferencesDialog::binaryPrefixesToggled(bool b) {
 void PreferencesDialog::abbreviateNamesToggled(bool b) {
 	settings->printops.abbreviate_names = b;
 	emit resultFormatUpdated();
+}
+void PreferencesDialog::simplifiedPercentageToggled(bool b) {
+	settings->simplified_percentage = b;
+	emit expressionFormatUpdated(true);
 }
 void PreferencesDialog::readPrecisionToggled(bool b) {
 	if(b) settings->evalops.parse_options.read_precision = READ_PRECISION_WHEN_DECIMALS;
