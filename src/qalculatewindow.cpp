@@ -1544,8 +1544,8 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 	if(str.length() >= 3) {
 		s_low = str.toLower();
 		if(str == "NOT") s = "!";
-		else if(s == "not") s = str + " ";
-		else if(s == "nor" || s == "mod" || s == "rem" || s == "comb" || s == "perm" || s == "xor" || s == "bitand" || s == "bitor" || s == "nand" || s == "cross" || s == "dot" || s == "and" || s == "or" || s == "per" || s == "times" || s == "minus" || s == "plus" || s == "div") s = " " + str + " ";
+		else if(s_low == "not") s = str + " ";
+		else if(s_low == "nor" || s_low == "mod" || s_low == "rem" || s_low == "comb" || s_low == "perm" || s_low == "xor" || s_low == "bitand" || s_low == "bitor" || s_low == "nand" || s_low == "cross" || s_low == "dot" || s_low == "and" || s_low == "or" || s_low == "per" || s_low == "times" || s_low == "minus" || s_low == "plus" || s_low == "div") s = " " + str + " ";
 		else s = str;
 	} else {
 		s = str;
@@ -5876,7 +5876,13 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		keyEdit->setFocus();
 		while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
 			QString key = keyEdit->keySequence().toString();
-			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] < Qt::Key_Back)))) {
+			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || keyEdit->keySequence() == QKeySequence::Backspace || 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+#else
+			(keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] < Qt::Key_Back)))
+#endif
+			) {
 				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
 				keyEdit->clear();
 				keyEdit->setFocus();

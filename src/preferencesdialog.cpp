@@ -132,7 +132,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	parseCombo = combo;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(parsingModeChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
-	BOX_G(tr("Simplified percentage"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
+	BOX_G(tr("Simplified percentage calculation"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
@@ -185,9 +185,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Rounding:"), this), r, 0);
 	combo = new QComboBox(this);
-	combo->addItem(tr("Round halfway upwards"), 0);
-	combo->addItem(tr("Round halfway to even"), 1);
-	combo->addItem(tr("Truncate"), 2);
+	combo->addItem(tr("Round halfway numbers away from zero"), 0);
+	combo->addItem(tr("Round halfway numbers to even"), 1);
+	combo->addItem(tr("Truncate all numbers"), 2);
 	combo->setCurrentIndex(combo->findData(settings->rounding_mode));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(roundingChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
