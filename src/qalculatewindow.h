@@ -137,7 +137,7 @@ class QalculateWindow : public QMainWindow {
 		void RPNRegisterChanged(std::string, int);
 		void triggerShortcut(int, const std::string&);
 		void loadShortcuts();
-		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL, bool = false);
+		bool editKeyboardShortcut(keyboard_shortcut*, keyboard_shortcut* = NULL, int = 0);
 		void loadWorkspace(const QString &filename);
 		void updateWSActions();
 		int askSaveWorkspace();

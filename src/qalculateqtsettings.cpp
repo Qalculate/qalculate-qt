@@ -150,6 +150,76 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(!v_exact.empty()) v_exact[settings->v_exact.size() - 1].push_back(v);
 	} else if(svar == "expression_history") {
 		expression_history.push_back(svalue);
+	} else if(!is_workspace && svar == "favourite_function") {
+		favourite_functions_pre.push_back(svalue);
+		favourite_functions_changed = true;
+	} else if(!is_workspace && svar == "favourite_unit") {
+		favourite_units_pre.push_back(svalue);
+		favourite_units_changed = true;
+	} else if(!is_workspace && svar == "favourite_variable") {
+		favourite_variables_pre.push_back(svalue);
+		favourite_variables_changed = true;
+	} else if(!is_workspace && svar == "keyboard_shortcut") {
+		default_shortcuts = false;
+		char str1[svalue.length()];
+		char str2[svalue.length()];
+		keyboard_shortcut ks;
+		int ks_type = 0;
+		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
+		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
+			if(n == 3) {ks.value = str2; remove_blank_ends(ks.value);}
+			ks.type = (shortcut_type) ks_type;
+			ks.key = str1;
+			ks.new_action = false;
+			ks.action = NULL;
+			keyboard_shortcuts.push_back(ks);
+		}
+	} else if(!is_workspace && svar == "custom_button_label") {
+		int c = 0, r = 0;
+		char str[svalue.length()];
+		int n = sscanf(svalue.c_str(), "%i %i %[^\n]", &r, &c, str);
+		if(n == 3 && c > 0 && r > 0) {
+			size_t index = 0;
+			for(size_t i = custom_buttons.size(); i > 0; i--) {
+				if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+					index = i;
+					break;
+				}
+			}
+			if(index == 0) {
+				custom_button cb;
+				cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+				custom_buttons.push_back(cb);
+				index = custom_buttons.size();
+			}
+			index--;
+			custom_buttons[index].label = QString::fromUtf8(str).trimmed();
+		}
+	} else if(!is_workspace && svar == "custom_button") {
+		int c = 0, r = 0;
+		unsigned int bi = 0;
+		char str[svalue.length()];
+		int cb_type = -1;
+		int n = sscanf(svalue.c_str(), "%i %i %u %i %[^\n]", &c, &r, &bi, &cb_type, str);
+		if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
+			size_t index = 0;
+			for(size_t i = custom_buttons.size(); i > 0; i--) {
+				if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
+					index = i;
+					break;
+				}
+			}
+			if(index == 0) {
+				custom_button cb;
+				cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
+				custom_buttons.push_back(cb);
+				index = custom_buttons.size();
+			}
+			index--;
+			custom_buttons[index].type[bi] = cb_type;
+			if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
+			else custom_buttons[index].value[bi] = "";
+		}
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 3) keypad_type = v;
 	} else if(svar == "hide_numpad") {
@@ -158,79 +228,203 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		show_bases = v;
 	} else if(svar == "version") {
 		parse_qalculate_version(svalue, preferences_version);
+	} else if(svar == "min_deci") {
+		printops.min_decimals = v;
+	} else if(svar == "use_min_deci") {
+		printops.use_min_decimals = v;
+	} else if(svar == "max_deci") {
+		printops.max_decimals = v;
+	} else if(svar == "use_max_deci") {
+		printops.use_max_decimals = v;
+	} else if(svar == "precision") {
+		CALCULATOR->setPrecision(v);
+	} else if(svar == "min_exp") {
+		printops.min_exp = v;
+	} else if(svar == "interval_arithmetic") {
+		CALCULATOR->useIntervalArithmetic(v);
+	} else if(svar == "interval_display") {
+		if(v == 0) {
+			printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
+		} else {
+			v--;
+			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
+				printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
+			}
+		}
+	} else if(svar == "negative_exponents") {
+		printops.negative_exponents = v;
+	} else if(svar == "sort_minus_last") {
+		printops.sort_options.minus_last = v;
+	} else if(svar == "place_units_separately") {
+		printops.place_units_separately = v;
+	} else if(svar == "use_prefixes") {
+		printops.use_unit_prefixes = v;
+	} else if(svar == "use_prefixes_for_all_units") {
+		printops.use_prefixes_for_all_units = v;
+	} else if(svar == "use_prefixes_for_currencies") {
+		printops.use_prefixes_for_currencies = v;
+	} else if(svar == "prefixes_default") {
+		prefixes_default = v;
+	} else if(svar == "number_fraction_format") {
+		if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
+			printops.number_fraction_format = (NumberFractionFormat) v;
+			printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 1) {
+			printops.number_fraction_format = FRACTION_FRACTIONAL;
+			printops.restrict_fraction_length = false;
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 2) {
+			printops.number_fraction_format = FRACTION_DECIMAL;
+			dual_fraction = 1;
+		} else if(v < 0) {
+			printops.number_fraction_format = FRACTION_DECIMAL;
+			dual_fraction = -1;
+		}
+	} else if(svar == "complex_number_form") {
+		if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
+			evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
+			complex_angle_form = true;
+		} else if(v >= COMPLEX_NUMBER_FORM_RECTANGULAR && v <= COMPLEX_NUMBER_FORM_CIS) {
+			evalops.complex_number_form = (ComplexNumberForm) v;
+			complex_angle_form = false;
+		}
+	} else if(svar == "number_base") {
+		printops.base = v;
+	} else if(svar == "custom_number_base") {
+		CALCULATOR->beginTemporaryStopMessages();
+		MathStructure m;
+		CALCULATOR->calculate(&m, svalue, 500);
+		CALCULATOR->endTemporaryStopMessages();
+		CALCULATOR->setCustomOutputBase(m.number());
+	} else if(svar == "number_base_expression") {
+		evalops.parse_options.base = v;
+	} else if(svar == "custom_number_base_expression") {
+		CALCULATOR->beginTemporaryStopMessages();
+		MathStructure m;
+		CALCULATOR->calculate(&m, svalue, 500);
+		CALCULATOR->endTemporaryStopMessages();
+		CALCULATOR->setCustomInputBase(m.number());
+	} else if(svar == "read_precision") {
+		if(v >= DONT_READ_PRECISION && v <= READ_PRECISION_WHEN_DECIMALS) {
+			evalops.parse_options.read_precision = (ReadPrecisionMode) v;
+		}
+	} else if(svar == "assume_denominators_nonzero") {
+		evalops.assume_denominators_nonzero = v;
+	} else if(svar == "warn_about_denominators_assumed_nonzero") {
+		evalops.warn_about_denominators_assumed_nonzero = v;
+	} else if(svar == "structuring") {
+		if(v >= STRUCTURING_NONE && v <= STRUCTURING_FACTORIZE) {
+			evalops.structuring = (StructuringMode) v;
+			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
+		}
+	} else if(svar == "angle_unit") {
+		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
+			evalops.parse_options.angle_unit = (AngleUnit) v;
+		}
+	} else if(svar == "functions_enabled") {
+		evalops.parse_options.functions_enabled = v;
+	} else if(svar == "variables_enabled") {
+		evalops.parse_options.variables_enabled = v;
+	} else if(svar == "donot_calculate_variables") {
+		evalops.calculate_variables = !v;
+	} else if(svar == "calculate_variables") {
+		evalops.calculate_variables = v;
+	} else if(svar == "variable_units_enabled") {
+		CALCULATOR->setVariableUnitsEnabled(v);
+	} else if(svar == "calculate_functions") {
+		evalops.calculate_functions = v;
+	} else if(svar == "sync_units") {
+		evalops.sync_units = v;
+	} else if(svar == "unknownvariables_enabled") {
+		evalops.parse_options.unknowns_enabled = v;
+	} else if(svar == "units_enabled") {
+		evalops.parse_options.units_enabled = v;
+	} else if(svar == "allow_complex") {
+		evalops.allow_complex = v;
+	} else if(svar == "allow_infinite") {
+		evalops.allow_infinite = v;
+	} else if(svar == "use_short_units") {
+		printops.abbreviate_names = v;
+	} else if(svar == "abbreviate_names") {
+		printops.abbreviate_names = v;
+	} else if(svar == "all_prefixes_enabled") {
+		printops.use_all_prefixes = v;
+	} else if(svar == "denominator_prefix_enabled") {
+		printops.use_denominator_prefix = v;
+	} else if(svar == "auto_post_conversion") {
+		if(v >= POST_CONVERSION_NONE && v <= POST_CONVERSION_OPTIMAL) {
+			evalops.auto_post_conversion = (AutoPostConversion) v;
+		}
+	} else if(svar == "mixed_units_conversion") {
+		if(v >= MIXED_UNITS_CONVERSION_NONE || v <= MIXED_UNITS_CONVERSION_FORCE_ALL) {
+			evalops.mixed_units_conversion = (MixedUnitsConversion) v;
+		}
+	} else if(svar == "local_currency_conversion") {
+		evalops.local_currency_conversion = v;
+	} else if(svar == "use_binary_prefixes") {
+		CALCULATOR->useBinaryPrefixes(v);
+	} else if(svar == "indicate_infinite_series") {
+		printops.indicate_infinite_series = v;
+	} else if(svar == "show_ending_zeroes") {
+		printops.show_ending_zeroes = v;
+	} else if(svar == "digit_grouping") {
+		if(v >= DIGIT_GROUPING_NONE && v <= DIGIT_GROUPING_LOCALE) {
+			printops.digit_grouping = (DigitGrouping) v;
+		}
+	} else if(svar == "round_halfway_to_even") {
+		printops.round_halfway_to_even = v;
+		printops.custom_time_zone = 0;
+		rounding_mode = (v ? 1 : 0);
+	} else if(svar == "rounding_mode") {
+		if(v >= 0 && v <= 2) {
+			rounding_mode = v;
+			printops.custom_time_zone = (v == 2 ? -21586 : 0);
+			printops.round_halfway_to_even = (v == 1);
+		}
+	} else if(svar == "approximation") {
+		if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
+			evalops.approximation = (ApproximationMode) v;
+			dual_approximation = 0;
+		} else if(v == APPROXIMATION_APPROXIMATE + 1) {
+			evalops.approximation = APPROXIMATION_TRY_EXACT;
+			dual_approximation = 1;
+		} else if(v < 0) {
+			evalops.approximation = APPROXIMATION_TRY_EXACT;
+			dual_approximation = -1;
+		}
+	} else if(svar == "interval_calculation") {
+		if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
+			evalops.interval_calculation = (IntervalCalculation) v;
+		}
+	} else if(svar == "chain_mode") {
+		chain_mode = v;
+	} else if(svar == "rpn_mode") {
+		rpn_mode = v;
+	} else if(svar == "limit_implicit_multiplication") {
+		evalops.parse_options.limit_implicit_multiplication = v;
+		printops.limit_implicit_multiplication = v;
+	} else if(svar == "parsing_mode") {
+		evalops.parse_options.parsing_mode = (ParsingMode) v;
+		if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
+	} else if(svar == "simplified_percentage") {
+		simplified_percentage = v;
+	} else if(svar == "default_assumption_type") {
+		if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
+			CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
+		}
+	} else if(svar == "default_assumption_sign") {
+		if(v >= ASSUMPTION_SIGN_UNKNOWN && v <= ASSUMPTION_SIGN_NONZERO) {
+			CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
+		}
+	} else if(svar == "spacious") {
+		printops.spacious = v;
+	} else if(svar == "excessive_parenthesis") {
+		printops.excessive_parenthesis = v;
+	} else if(svar == "short_multiplication") {
+		printops.short_multiplication = v;
 	} else if(!is_workspace) {
-		if(svar == "favourite_function") {
-			favourite_functions_pre.push_back(svalue);
-			favourite_functions_changed = true;
-		} else if(svar == "favourite_unit") {
-			favourite_units_pre.push_back(svalue);
-			favourite_units_changed = true;
-		} else if(svar == "favourite_variable") {
-			favourite_variables_pre.push_back(svalue);
-			favourite_variables_changed = true;
-		} else if(svar == "keyboard_shortcut") {
-			default_shortcuts = false;
-			char str1[svalue.length()];
-			char str2[svalue.length()];
-			keyboard_shortcut ks;
-			int ks_type = 0;
-			int n = sscanf(svalue.c_str(), "%s %i %s", str1, &ks_type, str2);
-			if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-				if(n == 3) ks.value = str1;
-				remove_blank_ends(ks.value);
-				ks.type = (shortcut_type) ks_type;
-				ks.key = str1;
-				ks.new_action = false;
-				ks.action = NULL;
-				keyboard_shortcuts.push_back(ks);
-			}
-		} else if(svar == "custom_button_label") {
-			int c = 0, r = 0;
-			char str[svalue.length()];
-			int n = sscanf(svalue.c_str(), "%i %i %s", &r, &c, str);
-			if(n == 3 && c > 0 && r > 0) {
-				size_t index = 0;
-				for(size_t i = custom_buttons.size(); i > 0; i--) {
-					if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
-						index = i;
-						break;
-					}
-				}
-				if(index == 0) {
-					custom_button cb;
-					cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
-					custom_buttons.push_back(cb);
-					index = custom_buttons.size();
-				}
-				index--;
-				custom_buttons[index].label = QString::fromUtf8(str).trimmed();
-			}
-		} else if(svar == "custom_button") {
-			int c = 0, r = 0;
-			unsigned int bi = 0;
-			char str[svalue.length()];
-			int cb_type = -1;
-			int n = sscanf(svalue.c_str(), "%i %i %u %i %s", &c, &r, &bi, &cb_type, str);
-			if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
-				size_t index = 0;
-				for(size_t i = custom_buttons.size(); i > 0; i--) {
-					if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
-						index = i;
-						break;
-					}
-				}
-				if(index == 0) {
-					custom_button cb;
-					cb.c = c; cb.r = r; cb.type[0] = -1; cb.type[1] = -1; cb.type[2] = -1;
-					custom_buttons.push_back(cb);
-					index = custom_buttons.size();
-				}
-				index--;
-				custom_buttons[index].type[bi] = cb_type;
-				if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
-				else custom_buttons[index].value[bi] = "";
-			}
-		} else if(svar == "custom_button_rows") {
+		if(svar == "custom_button_rows") {
 			if(v > 0 && v <= 100) custom_button_rows = v;
 		} else if(svar == "custom_button_columns") {
 			if(v > 0 && v <= 100) custom_button_columns = v;
@@ -431,201 +625,6 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "calculate_as_you_type") {
 			auto_calculate = v;
 		}
-	} else if(svar == "min_deci") {
-		printops.min_decimals = v;
-	} else if(svar == "use_min_deci") {
-		printops.use_min_decimals = v;
-	} else if(svar == "max_deci") {
-		printops.max_decimals = v;
-	} else if(svar == "use_max_deci") {
-		printops.use_max_decimals = v;
-	} else if(svar == "precision") {
-		CALCULATOR->setPrecision(v);
-	} else if(svar == "min_exp") {
-		printops.min_exp = v;
-	} else if(svar == "interval_arithmetic") {
-		CALCULATOR->useIntervalArithmetic(v);
-	} else if(svar == "interval_display") {
-		if(v == 0) {
-			printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
-		} else {
-			v--;
-			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
-				printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
-			}
-		}
-	} else if(svar == "negative_exponents") {
-		printops.negative_exponents = v;
-	} else if(svar == "sort_minus_last") {
-		printops.sort_options.minus_last = v;
-	} else if(svar == "place_units_separately") {
-		printops.place_units_separately = v;
-	} else if(svar == "use_prefixes") {
-		printops.use_unit_prefixes = v;
-	} else if(svar == "use_prefixes_for_all_units") {
-		printops.use_prefixes_for_all_units = v;
-	} else if(svar == "use_prefixes_for_currencies") {
-		printops.use_prefixes_for_currencies = v;
-	} else if(svar == "prefixes_default") {
-		prefixes_default = v;
-	} else if(svar == "number_fraction_format") {
-		if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
-			printops.number_fraction_format = (NumberFractionFormat) v;
-			printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
-			dual_fraction = 0;
-		} else if(v == FRACTION_COMBINED + 1) {
-			printops.number_fraction_format = FRACTION_FRACTIONAL;
-			printops.restrict_fraction_length = false;
-			dual_fraction = 0;
-		} else if(v == FRACTION_COMBINED + 2) {
-			printops.number_fraction_format = FRACTION_DECIMAL;
-			dual_fraction = 1;
-		} else if(v < 0) {
-			printops.number_fraction_format = FRACTION_DECIMAL;
-			dual_fraction = -1;
-		}
-	} else if(svar == "complex_number_form") {
-		if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
-			evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
-			complex_angle_form = true;
-		} else if(v >= COMPLEX_NUMBER_FORM_RECTANGULAR && v <= COMPLEX_NUMBER_FORM_CIS) {
-			evalops.complex_number_form = (ComplexNumberForm) v;
-			complex_angle_form = false;
-		}
-	} else if(svar == "number_base") {
-		printops.base = v;
-	} else if(svar == "custom_number_base") {
-		CALCULATOR->beginTemporaryStopMessages();
-		MathStructure m;
-		CALCULATOR->calculate(&m, svalue, 500);
-		CALCULATOR->endTemporaryStopMessages();
-		CALCULATOR->setCustomOutputBase(m.number());
-	} else if(svar == "number_base_expression") {
-		evalops.parse_options.base = v;
-	} else if(svar == "custom_number_base_expression") {
-		CALCULATOR->beginTemporaryStopMessages();
-		MathStructure m;
-		CALCULATOR->calculate(&m, svalue, 500);
-		CALCULATOR->endTemporaryStopMessages();
-		CALCULATOR->setCustomInputBase(m.number());
-	} else if(svar == "read_precision") {
-		if(v >= DONT_READ_PRECISION && v <= READ_PRECISION_WHEN_DECIMALS) {
-			evalops.parse_options.read_precision = (ReadPrecisionMode) v;
-		}
-	} else if(svar == "assume_denominators_nonzero") {
-		evalops.assume_denominators_nonzero = v;
-	} else if(svar == "warn_about_denominators_assumed_nonzero") {
-		evalops.warn_about_denominators_assumed_nonzero = v;
-	} else if(svar == "structuring") {
-		if(v >= STRUCTURING_NONE && v <= STRUCTURING_FACTORIZE) {
-			evalops.structuring = (StructuringMode) v;
-			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
-		}
-	} else if(svar == "angle_unit") {
-		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
-			evalops.parse_options.angle_unit = (AngleUnit) v;
-		}
-	} else if(svar == "functions_enabled") {
-		evalops.parse_options.functions_enabled = v;
-	} else if(svar == "variables_enabled") {
-		evalops.parse_options.variables_enabled = v;
-	} else if(svar == "donot_calculate_variables") {
-		evalops.calculate_variables = !v;
-	} else if(svar == "calculate_variables") {
-		evalops.calculate_variables = v;
-	} else if(svar == "variable_units_enabled") {
-		CALCULATOR->setVariableUnitsEnabled(v);
-	} else if(svar == "calculate_functions") {
-		evalops.calculate_functions = v;
-	} else if(svar == "sync_units") {
-		evalops.sync_units = v;
-	} else if(svar == "unknownvariables_enabled") {
-		evalops.parse_options.unknowns_enabled = v;
-	} else if(svar == "units_enabled") {
-		evalops.parse_options.units_enabled = v;
-	} else if(svar == "allow_complex") {
-		evalops.allow_complex = v;
-	} else if(svar == "allow_infinite") {
-		evalops.allow_infinite = v;
-	} else if(svar == "use_short_units") {
-		printops.abbreviate_names = v;
-	} else if(svar == "abbreviate_names") {
-		printops.abbreviate_names = v;
-	} else if(svar == "all_prefixes_enabled") {
-		printops.use_all_prefixes = v;
-	} else if(svar == "denominator_prefix_enabled") {
-		printops.use_denominator_prefix = v;
-	} else if(svar == "auto_post_conversion") {
-		if(v >= POST_CONVERSION_NONE && v <= POST_CONVERSION_OPTIMAL) {
-			evalops.auto_post_conversion = (AutoPostConversion) v;
-		}
-	} else if(svar == "mixed_units_conversion") {
-		if(v >= MIXED_UNITS_CONVERSION_NONE || v <= MIXED_UNITS_CONVERSION_FORCE_ALL) {
-			evalops.mixed_units_conversion = (MixedUnitsConversion) v;
-		}
-	} else if(svar == "local_currency_conversion") {
-		evalops.local_currency_conversion = v;
-	} else if(svar == "use_binary_prefixes") {
-		CALCULATOR->useBinaryPrefixes(v);
-	} else if(svar == "indicate_infinite_series") {
-		printops.indicate_infinite_series = v;
-	} else if(svar == "show_ending_zeroes") {
-		printops.show_ending_zeroes = v;
-	} else if(svar == "digit_grouping") {
-		if(v >= DIGIT_GROUPING_NONE && v <= DIGIT_GROUPING_LOCALE) {
-			printops.digit_grouping = (DigitGrouping) v;
-		}
-	} else if(svar == "round_halfway_to_even") {
-		printops.round_halfway_to_even = v;
-		printops.custom_time_zone = 0;
-		rounding_mode = (v ? 1 : 0);
-	} else if(svar == "rounding_mode") {
-		if(v >= 0 && v <= 2) {
-			rounding_mode = v;
-			printops.custom_time_zone = (v == 2 ? -21586 : 0);
-			printops.round_halfway_to_even = (v == 1);
-		}
-	} else if(svar == "approximation") {
-		if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
-			evalops.approximation = (ApproximationMode) v;
-			dual_approximation = 0;
-		} else if(v == APPROXIMATION_APPROXIMATE + 1) {
-			evalops.approximation = APPROXIMATION_TRY_EXACT;
-			dual_approximation = 1;
-		} else if(v < 0) {
-			evalops.approximation = APPROXIMATION_TRY_EXACT;
-			dual_approximation = -1;
-		}
-	} else if(svar == "interval_calculation") {
-		if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
-			evalops.interval_calculation = (IntervalCalculation) v;
-		}
-	} else if(svar == "chain_mode") {
-		chain_mode = v;
-	} else if(svar == "rpn_mode") {
-		rpn_mode = v;
-	} else if(svar == "limit_implicit_multiplication") {
-		evalops.parse_options.limit_implicit_multiplication = v;
-		printops.limit_implicit_multiplication = v;
-	} else if(svar == "parsing_mode") {
-		evalops.parse_options.parsing_mode = (ParsingMode) v;
-		if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
-	} else if(svar == "simplified_percentage") {
-		simplified_percentage = v;
-	} else if(svar == "default_assumption_type") {
-		if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
-			CALCULATOR->defaultAssumptions()->setType((AssumptionType) v);
-		}
-	} else if(svar == "default_assumption_sign") {
-		if(v >= ASSUMPTION_SIGN_UNKNOWN && v <= ASSUMPTION_SIGN_NONZERO) {
-			CALCULATOR->defaultAssumptions()->setSign((AssumptionSign) v);
-		}
-	} else if(svar == "spacious") {
-		printops.spacious = v;
-	} else if(svar == "excessive_parenthesis") {
-		printops.excessive_parenthesis = v;
-	} else if(svar == "short_multiplication") {
-		printops.short_multiplication = v;
 	}
 }
 

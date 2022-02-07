@@ -177,7 +177,7 @@ std::string unhtmlize(std::string str) {
 	size_t i = 0, i2;
 	while(true) {
 		i = str.find("<", i);
-		if(i == std::string::npos) break;
+		if(i == std::string::npos || i == str.length() - 1) break;
 		i2 = str.find(">", i + 1);
 		if(i2 == std::string::npos) break;
 		if((i2 - i == 3 && str.substr(i + 1, 2) == "br") || (i2 - i == 4 && str.substr(i + 1, 3) == "/tr")) {
@@ -4920,7 +4920,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 	} else {
 		matrix_mstruct.clear();
-		if(!mstruct->isMatrix() || mstruct->rows() * mstruct->columns() <= 10 || mstruct->columns() * mstruct->rows() > 10000) {
+		if(!mstruct->isMatrix() || mstruct->rows() * mstruct->columns() <= 16 || mstruct->columns() * mstruct->rows() > 10000) {
 			if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 		} else {
 			if(!viewThread->write((void*) &matrix_mstruct)) {b_busy--; viewThread->cancel(); return;}
@@ -5786,7 +5786,7 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 		}
 	} else {
 		shortcutActionValueEdit->clear();
-		if(i == SHORTCUT_TYPE_UNIT) {
+		if(i == SHORTCUT_TYPE_UNIT || i == SHORTCUT_TYPE_CONVERT_TO) {
 			QStringList citems;
 			for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
 				Unit *u = CALCULATOR->units[i];
@@ -5810,13 +5810,13 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 		shortcutActionValueEdit->clearEditText();
 	}
 }
-bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_shortcut *ks, bool keyonly) {
-	if(!ks) keyonly = false;
+bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_shortcut *ks, int type) {
+	if(!ks) type = 0;
 	QDialog *dialog = NULL;
 	shortcutActionList = NULL;
 	shortcutActionValueEdit = NULL;
 	shortcutActionDialog = NULL;
-	if(!keyonly) {
+	if(type != 2) {
 		dialog = new QDialog(this);
 		shortcutActionDialog = dialog;
 		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -5860,6 +5860,14 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 	}
 	if(!dialog || dialog->exec() == QDialog::Accepted) {
 		if(dialog) dialog->deleteLater();
+		if(type == 1) {
+			new_ks->key = ks->key;
+			new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
+			new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
+			new_ks->action = NULL;
+			new_ks->new_action = false;
+			return true;
+		}
 		dialog = new QDialog(this);
 		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		dialog->setWindowTitle(tr("Set key combination"));
@@ -5878,9 +5886,9 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			QString key = keyEdit->keySequence().toString();
 			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || keyEdit->keySequence() == QKeySequence::Backspace || 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
 #else
-			(keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] < Qt::Key_Back)))
+			(keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
 #endif
 			) {
 				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
@@ -5910,7 +5918,7 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			new_ks->key = key;
 			if(shortcutActionList) {
 				new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
-				new_ks->value = shortcutActionValueEdit->currentText().toStdString();
+				new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
 			} else {
 				new_ks->type = ks->type;
 				new_ks->value = ks->value;
@@ -5948,7 +5956,7 @@ void QalculateWindow::shortcutDoubleClicked(QTreeWidgetItem *item, int c) {
 	if(!item) return;
 	keyboard_shortcut *ks_old = (keyboard_shortcut*) item->data(0, Qt::UserRole).value<void*>();
 	keyboard_shortcut ks;
-	if(editKeyboardShortcut(&ks, ks_old, c == 1)) {
+	if(editKeyboardShortcut(&ks, ks_old, c + 1)) {
 		keyboardShortcutRemoved(ks_old);
 		for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
 			if(&settings->keyboard_shortcuts[i] == ks_old) {

@@ -618,7 +618,7 @@ void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidget
 		}
 	} else {
 		valueEdit->clear();
-		if(i == SHORTCUT_TYPE_UNIT) {
+		if(i == SHORTCUT_TYPE_UNIT || i == SHORTCUT_TYPE_CONVERT_TO) {
 			QStringList citems;
 			for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
 				Unit *u = CALCULATOR->units[i];
@@ -719,7 +719,7 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 		index--;
 		custom_button *cb = &settings->custom_buttons[index];
 		cb->type[i - 1] = actionList->currentItem()->data(Qt::UserRole).toInt();
-		cb->value[i - 1] = valueEdit->currentText().toStdString();
+		cb->value[i - 1] = valueEdit->currentText().trimmed().toStdString();
 		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentItem()->data(Qt::UserRole).toInt());
 		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->currentText());
 		button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
