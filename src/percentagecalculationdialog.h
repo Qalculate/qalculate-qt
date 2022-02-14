@@ -34,13 +34,8 @@ class PercentageCalculationDialog : public QDialog {
 
 	protected slots:
 
-		void onValue1EditChanged(const QString&);
-		void onValue2EditChanged(const QString&);
-		void onChangeEditChanged(const QString&);
-		void onChange1EditChanged(const QString&);
-		void onChange2EditChanged(const QString&);
-		void onCompare1EditChanged(const QString&);
-		void onCompare2EditChanged(const QString&);
+		void onPercentageEntryChanged(const QString&);
+		void onPercentageEntryEditingFinished();
 		void onClearClicked();
 
 	public:

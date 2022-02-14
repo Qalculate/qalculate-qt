@@ -560,7 +560,7 @@ void PreferencesDialog::darkModeToggled(bool b) {
 				}
 			}
 		}
-	} else if(light_style != settings->style && styleCombo->currentText().compare("Fusion", Qt::CaseInsensitive) == 0) {
+	} else if(settings->light_style != settings->style && styleCombo->currentText().compare("Fusion", Qt::CaseInsensitive) == 0) {
 		styleCombo->setCurrentIndex(settings->light_style < 0 ? 0 : settings->light_style + 1);
 	}
 #endif

@@ -22,30 +22,39 @@
 #include "qalculateqtsettings.h"
 #include "percentagecalculationdialog.h"
 
+#define PERCENTAGE_ENTRY_ID "QALCULATE DATA1"
+
 PercentageCalculationDialog::PercentageCalculationDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("Percentage"));
 	QVBoxLayout *box = new QVBoxLayout(this);
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Value 1"), this), 0, 0, Qt::AlignRight);
 	value1Edit = new MathLineEdit(this); value1Edit->setAlignment(Qt::AlignRight); grid->addWidget(value1Edit, 0, 1);
+	value1Edit->setProperty(PERCENTAGE_ENTRY_ID, 1);
 	QFontMetrics fm(value1Edit->font());
 	QString str; str.fill('0', 27);
 	value1Edit->setMinimumWidth(fm.boundingRect(str).width());
 	grid->addWidget(new QLabel(tr("Value 2"), this), 1, 0, Qt::AlignRight);
 	value2Edit = new MathLineEdit(this); value2Edit->setAlignment(Qt::AlignRight); grid->addWidget(value2Edit, 1, 1);
+	value2Edit->setProperty(PERCENTAGE_ENTRY_ID, 2);
 	grid->addWidget(new QLabel(tr("Change from 1 to 2"), this), 2, 0, Qt::AlignRight);
 	changeEdit = new MathLineEdit(this); changeEdit->setAlignment(Qt::AlignRight); grid->addWidget(changeEdit, 2, 1);
+	changeEdit->setProperty(PERCENTAGE_ENTRY_ID, 4);
 	grid->addWidget(new QLabel(tr("Change from 1 to 2"), this), 3, 0, Qt::AlignRight);
 	change1Edit = new MathLineEdit(this); change1Edit->setAlignment(Qt::AlignRight); grid->addWidget(change1Edit, 3, 1);
+	change1Edit->setProperty(PERCENTAGE_ENTRY_ID, 8);
 	grid->addWidget(new QLabel("%", this), 3, 2, Qt::AlignRight);
 	grid->addWidget(new QLabel(tr("Change from 2 to 1"), this), 4, 0, Qt::AlignRight);
 	change2Edit = new MathLineEdit(this); change2Edit->setAlignment(Qt::AlignRight); grid->addWidget(change2Edit, 4, 1);
+	change2Edit->setProperty(PERCENTAGE_ENTRY_ID, 16);
 	grid->addWidget(new QLabel("%", this), 4, 2, Qt::AlignRight);
 	grid->addWidget(new QLabel(tr("2 compared to 1"), this), 5, 0, Qt::AlignRight);
 	compare1Edit = new MathLineEdit(this); compare1Edit->setAlignment(Qt::AlignRight); grid->addWidget(compare1Edit, 5, 1);
+	compare1Edit->setProperty(PERCENTAGE_ENTRY_ID, 32);
 	grid->addWidget(new QLabel("%", this), 5, 2, Qt::AlignRight);
 	grid->addWidget(new QLabel(tr("1 compared to 2"), this), 6, 0, Qt::AlignRight);
 	compare2Edit = new MathLineEdit(this); compare2Edit->setAlignment(Qt::AlignRight); grid->addWidget(compare2Edit, 6, 1);
+	compare2Edit->setProperty(PERCENTAGE_ENTRY_ID, 64);
 	grid->addWidget(new QLabel("%", this), 6, 2, Qt::AlignRight);
 	value1Edit->setFocus();
 	QLabel *descr = new QLabel("<i>" + tr("Enter two values, of which at most one is a percentage, and the others will be calculated for you.") + "</i>", this);
@@ -60,13 +69,20 @@ PercentageCalculationDialog::PercentageCalculationDialog(QWidget *parent) : QDia
 	box->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(clearButton, SIGNAL(clicked()), this, SLOT(onClearClicked()));
-	connect(value1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onValue1EditChanged(const QString&)));
-	connect(value2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onValue2EditChanged(const QString&)));
-	connect(changeEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onChangeEditChanged(const QString&)));
-	connect(change1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onChange1EditChanged(const QString&)));
-	connect(change2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onChange2EditChanged(const QString&)));
-	connect(compare1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onCompare1EditChanged(const QString&)));
-	connect(compare2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onCompare2EditChanged(const QString&)));
+	connect(value1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(value2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(changeEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(change1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(change2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(compare1Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(compare2Edit, SIGNAL(textEdited(const QString&)), this, SLOT(onPercentageEntryChanged(const QString&)));
+	connect(value1Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(value2Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(changeEdit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(change1Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(change2Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(compare1Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
+	connect(compare2Edit, SIGNAL(editingFinished()), this, SLOT(onPercentageEntryEditingFinished()));
 	updating_percentage_entries = false;
 }
 PercentageCalculationDialog::~PercentageCalculationDialog() {}
@@ -75,7 +91,7 @@ void PercentageCalculationDialog::resetValues(const QString &str) {
 	onClearClicked();
 	if(!str.trimmed().isEmpty()) {
 		value1Edit->setText(str.trimmed());
-		onValue1EditChanged(value1Edit->text());
+		percentageEntryChanged(value1Edit->property(PERCENTAGE_ENTRY_ID).toInt(), str.trimmed().isEmpty());
 	}
 	value1Edit->setFocus();
 }
@@ -93,13 +109,35 @@ void PercentageCalculationDialog::onClearClicked() {
 	percentage_entries_changes.clear();
 	updating_percentage_entries = false;
 }
-void PercentageCalculationDialog::onValue1EditChanged(const QString &str) {percentageEntryChanged(1, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onValue2EditChanged(const QString &str) {percentageEntryChanged(2, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onChangeEditChanged(const QString &str) {percentageEntryChanged(4, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onChange1EditChanged(const QString &str) {percentageEntryChanged(8, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onChange2EditChanged(const QString &str) {percentageEntryChanged(16, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onCompare1EditChanged(const QString &str) {percentageEntryChanged(32, str.trimmed().isEmpty());}
-void PercentageCalculationDialog::onCompare2EditChanged(const QString &str) {percentageEntryChanged(64, str.trimmed().isEmpty());}
+void PercentageCalculationDialog::onPercentageEntryEditingFinished() {
+	QLineEdit *entry = qobject_cast<QLineEdit*>(sender());
+	int id = entry->property(PERCENTAGE_ENTRY_ID).toInt();
+	QString str1 = entry->text();
+	EvaluationOptions eo;
+	eo.parse_options = settings->evalops.parse_options;
+	if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+	if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+	eo.parse_options.read_precision = DONT_READ_PRECISION;
+	eo.parse_options.base = 10;
+	eo.assume_denominators_nonzero = true;
+	eo.warn_about_denominators_assumed_nonzero = false;
+	MathStructure m1(CALCULATOR->parse(CALCULATOR->unlocalizeExpression(str1.toStdString(), eo.parse_options), eo.parse_options));
+	CALCULATOR->calculate(&m1, 500, eo);
+	PrintOptions po = settings->printops;
+	po.base = 10;
+	po.number_fraction_format = FRACTION_DECIMAL;
+	po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+	if(id > 4) {
+		po.max_decimals = 2;
+		po.use_max_decimals = true;
+	}
+	entry->blockSignals(true);
+	entry->setText(QString::fromStdString(m1.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m1, 200, po)));
+	entry->blockSignals(false);
+}
+void PercentageCalculationDialog::onPercentageEntryChanged(const QString &str) {
+	percentageEntryChanged(qobject_cast<QLineEdit*>(sender())->property(PERCENTAGE_ENTRY_ID).toInt(), str.trimmed().isEmpty());
+}
 void PercentageCalculationDialog::percentageEntryChanged(int entry_id, bool is_empty) {
 	if(updating_percentage_entries) return;
 	for(size_t i = 0; i < percentage_entries_changes.size(); i++) {
@@ -117,15 +155,15 @@ void PercentageCalculationDialog::percentageEntryChanged(int entry_id, bool is_e
 void PercentageCalculationDialog::updatePercentageEntries() {
 	if(updating_percentage_entries) return;
 	if(percentage_entries_changes.size() < 2) return;
-	int variant = percentage_entries_changes[percentage_entries_changes.size() - 1];
+	int variant1 = percentage_entries_changes[percentage_entries_changes.size() - 1];
 	int variant2 = percentage_entries_changes[percentage_entries_changes.size() - 2];
-	if(variant > 4) {
+	if(variant1 > 4) {
 		for(int i = percentage_entries_changes.size() - 3; i >= 0 && variant2 > 4; i--) {
 			variant2 = percentage_entries_changes[(size_t) i];
 		}
 		if(variant2 > 4) return;
 	}
-	variant += variant2;
+	int variant = variant1 + variant2;
 	updating_percentage_entries = true;
 	MathStructure m1, m2, m3, m4, m5, m6, m7, m1_pre, m2_pre;
 	QString str1, str2;
@@ -249,15 +287,15 @@ void PercentageCalculationDialog::updatePercentageEntries() {
 		po.base = 10;
 		po.number_fraction_format = FRACTION_DECIMAL;
 		po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
-		value1Edit->setText(QString::fromStdString(m1.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m1, 200, po)));
-		value2Edit->setText(QString::fromStdString(m2.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m2, 200, po)));
-		changeEdit->setText(QString::fromStdString(m3.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m3, 200, po)));
+		if(variant1 != 1) value1Edit->setText(QString::fromStdString(m1.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m1, 200, po)));
+		if(variant1 != 2) value2Edit->setText(QString::fromStdString(m2.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m2, 200, po)));
+		if(variant1 != 4) changeEdit->setText(QString::fromStdString(m3.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m3, 200, po)));
 		po.max_decimals = 2;
 		po.use_max_decimals = true;
-		change1Edit->setText(m1.isZero() ? QString() : QString::fromStdString(m4.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m4, 200, po)));
-		change2Edit->setText(m2.isZero() ? QString() : QString::fromStdString(m5.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m5, 200, po)));
-		compare1Edit->setText(m1.isZero() ? QString() : QString::fromStdString(m6.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m6, 200, po)));
-		compare2Edit->setText(m2.isZero() ? QString() : QString::fromStdString(m7.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m7, 200, po)));
+		if(variant1 != 8) change1Edit->setText(m1.isZero() ? QString() : QString::fromStdString(m4.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m4, 200, po)));
+		if(variant1 != 16) change2Edit->setText(m2.isZero() ? QString() : QString::fromStdString(m5.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m5, 200, po)));
+		if(variant1 != 32) compare1Edit->setText(m1.isZero() ? QString() : QString::fromStdString(m6.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m6, 200, po)));
+		if(variant1 != 64) compare2Edit->setText(m2.isZero() ? QString() : QString::fromStdString(m7.isAborted() ? CALCULATOR->timedOutString() : CALCULATOR->print(m7, 200, po)));
 	}
 	CALCULATOR->clearMessages();
 	updating_percentage_entries = false;

@@ -838,7 +838,11 @@ void QalculateQtSettings::loadPreferences() {
 	if(default_shortcuts) {
 		keyboard_shortcut ks;
 #define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; ks.action = NULL; ks.new_action = false; keyboard_shortcuts.push_back(ks);
+#ifdef _WIN32
+		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
+#else
 		ADD_SHORTCUT(QKeySequence(QKeySequence::Quit).toString(), SHORTCUT_TYPE_QUIT, "")
+#endif
 		ADD_SHORTCUT(QKeySequence(QKeySequence::HelpContents).toString(), SHORTCUT_TYPE_HELP, "")
 		ADD_SHORTCUT("Ctrl+Alt+C", SHORTCUT_TYPE_COPY_RESULT, "")
 		ADD_SHORTCUT(QKeySequence(QKeySequence::Save).toString(), SHORTCUT_TYPE_STORE, "")

@@ -418,25 +418,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	group = new QActionGroup(this); group->setObjectName("group_general");
 	action = menu->addAction(tr("Normal"), this, SLOT(normalActivated())); action->setCheckable(true); group->addAction(action);
 	action->setToolTip("500 000<br>5 × 10<sup>14</sup><br>50 km/s<br>y − x<br>erf(10) ≈ 1.000 000 000"); normalAction = action;
-	if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
+	action->setData(EXP_PRECISION); if(settings->printops.min_exp == EXP_PRECISION) action->setChecked(true);
 	action = menu->addAction(tr("Scientific"), this, SLOT(scientificActivated())); action->setCheckable(true); group->addAction(action);
 	action->setToolTip("5 × 10<sup>5</sup><br>5 × 10<sup>4</sup> m·s<sup>−1</sup><br>−y + x<br>erf(10) ≈ 1.000 000 000"); sciAction = action;
-	if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
+	action->setData(EXP_SCIENTIFIC); if(settings->printops.min_exp == EXP_SCIENTIFIC) action->setChecked(true);
 	action = menu->addAction(tr("Engineering"), this, SLOT(engineeringActivated())); action->setCheckable(true); group->addAction(action);
 	action->setToolTip("500 × 10<sup>3</sup><br>50 × 10<sup>3</sup> m/s<br>−y + x<br>erf(10) ≈ 1.000 000 000"); engAction = action;
-	if(settings->printops.min_exp == EXP_BASE_3) action->setChecked(true);
+	action->setData(EXP_BASE_3); if(settings->printops.min_exp == EXP_BASE_3) action->setChecked(true);
 	action = menu->addAction(tr("Simple"), this, SLOT(simpleActivated())); action->setCheckable(true); group->addAction(action);
 	action->setToolTip("500 000 000 000 000<br>50 km/s<br>y − x<br>erf(10) ≈ 1"); simpleAction = action;
-	if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
+	action->setData(EXP_NONE); if(settings->printops.min_exp == EXP_NONE) action->setChecked(true);
 
 	ADD_SECTION(tr("Angle Unit"));
 	w2 = fm1.boundingRect(tr("Angle Unit")).width() * 1.5; if(w2 > w) w = w2;
-	group = new QActionGroup(this);
-	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action;
+	group = new QActionGroup(this); group->setObjectName("group_angleunit");
+	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action; action->setData(ANGLE_UNIT_RADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action;
+	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action; action->setData(ANGLE_UNIT_DEGREES);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action;
+	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
 
 	ADD_SECTION(tr("Approximation"));
@@ -1025,7 +1025,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		}
 	} else {
 		ks->new_action = true;
-		action = new QAction();
+		action = new QAction(this);
 		action->setShortcut(ks->key);
 		action->setData(QVariant::fromValue((void*) ks));
 		addAction(action);
@@ -1524,7 +1524,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2021 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2022 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -2495,13 +2495,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(v < 0 || v > 3) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			QAction *w = NULL;
-			if(v == ANGLE_UNIT_DEGREES) w = findChild<QAction*>("action_degrees");
-			else if(v == ANGLE_UNIT_RADIANS)w = findChild<QAction*>("action_radians");
-			else if(v == ANGLE_UNIT_GRADIANS) w = findChild<QAction*>("action_gradians");
-			if(w) {
-				w->setChecked(true);
-			}
+			QAction *w = find_child_data(this, "group_angleunit", v);
+			if(w) w->setChecked(true);
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
 		}
@@ -5884,9 +5879,9 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		keyEdit->setFocus();
 		while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
 			QString key = keyEdit->keySequence().toString();
-			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || keyEdit->keySequence() == QKeySequence::Backspace || 
+			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+			keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
 #else
 			(keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
 #endif
@@ -7238,10 +7233,7 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		if(action) action->setChecked(true);
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) action->setChecked(true);
-		action = NULL;
-		if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action = findChild<QAction*>("action_degrees");
-		else if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action = findChild<QAction*>("action_radians");
-		else if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action = findChild<QAction*>("action_gradians");
+		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
 		if(action) action->setChecked(true);
 		action = NULL;
 		if(settings->dual_approximation < 0) action = findChild<QAction*>("action_autoappr");
