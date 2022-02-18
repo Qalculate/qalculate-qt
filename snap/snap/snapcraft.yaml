@@ -1,0 +1,130 @@
+name: qalculate-qt
+title: Qalculate! (Qt)
+version: '4.0.0'
+license: GPL-2.0+
+summary: The ultimate desktop calculator
+description: |
+  Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple
+  to use but provides power and versatility normally reserved for complicated
+  math packages, as well as useful tools for everyday needs (such as currency
+  conversion and percent calculation). Features include a large library of
+  customizable functions, unit calculations and conversion, physical constants,
+  symbolic calculations (including integrals and equations), arbitrary precision,
+  uncertainty propagation, interval arithmetic, plotting, and a user-friendly
+  interface.
+
+grade: stable
+confinement: strict
+base: core18
+
+apps:
+  qalc:
+    environment:
+        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
+    command: desktop-launch qalc
+    extensions: [kde-neon]
+    plugs: [network, home, removable-media]
+  qalculate-qt:
+    environment:
+        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
+    command:  desktop-launch $SNAP/usr/local/bin/qalculate-qt
+    extensions: [kde-neon]
+    plugs: [unity7, gsettings, network, home, removable-media]
+  gnuplot:
+    environment: 
+        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
+    command: desktop-launch gnuplot
+    extensions: [kde-neon]
+    plugs: [unity7, gsettings, home, removable-media]
+
+parts:
+  libqalculate:
+    source: https://github.com/Qalculate/libqalculate.git
+    source-tag: v4.0.0
+    source-depth: 1
+    plugin: autotools
+    build-environment:
+      - CXXFLAGS: "$CXXFLAGS -fsigned-char"
+    build-packages:
+      - libncurses5-dev
+      - libreadline-dev
+      - libcurl4-gnutls-dev
+      - libicu-dev
+      - libxml2-dev
+      - libgmp-dev
+      - libmpfr-dev
+      - intltool
+      - doxygen
+    stage-packages:
+      - libmpfr6
+      - libgmp10
+    override-build: |
+      for p in $SNAPCRAFT_PROJECT_DIR/patches/lib/*.patch
+      do
+        cat $p | patch -p1
+      done
+      ./autogen.sh
+      snapcraftctl build
+      echo Stripping qalc
+      strip $SNAPCRAFT_PART_INSTALL/bin/qalc
+    after:
+      - patches
+    prime:
+      - -include
+      - -lib/pkgconfig
+      - -lib/*.a
+      - -share/doc
+      - -usr/share/doc
+      - -usr/share/lintian
+
+  qalculate-qt:
+    source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.0.0/qalculate-qt-4.0.0.tar.gz
+    source-checksum: sha512/049519abf524a40526445b05566b6e6c631f1a582656606a4443b393c55cc28e606ee826a3c2a6bd34c2d40775c27e3d868f65e56636a1ec73558e62add85aaa
+    plugin: qmake
+    build-snaps:
+      - kde-frameworks-5-core18-sdk
+    build-packages:
+      - libgmp-dev
+      - libxml2-dev
+      - qttools5-dev-tools
+    after:
+      - libqalculate
+      - patches
+    prime:
+      - -share/applications
+
+  gnuplot:
+    source: https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.8/gnuplot-5.2.8.tar.gz
+    source-checksum: sha512/513dff15236dcb58c3c5471cdaa0713242787dbf30ef860c3f69152cb87c6392e4973caff5eb178707bbb84c78548e806b2920864a37686bce49425fbfdc4e8c
+    plugin: autotools
+    configflags:
+      - --without-gd
+      - --without-libcerf
+      - --without-linux-vga
+      - --without-lua
+      - --with-readline=gnu
+      - --with-qt
+    build-snaps:
+      - kde-frameworks-5-core18-sdk
+    build-packages:
+      - libqt5svg5-dev
+      - qttools5-dev-tools
+    prime:
+      - -share/applications
+      - -share/doc
+      - -share/man
+    override-build: |
+      snapcraftctl build
+      echo Stripping gnuplot
+      strip $SNAPCRAFT_PART_INSTALL/bin/gnuplot
+      strip $SNAPCRAFT_PART_INSTALL/libexec/gnuplot/5.2/gnuplot_x11
+      strip $SNAPCRAFT_PART_INSTALL/libexec/gnuplot/5.2/gnuplot_qt
+
+  patches:
+    source: patches
+    plugin: dump
+    organize:
+      "*": patches/
+    prime:
+      - -*
+

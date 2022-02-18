@@ -1,0 +1,15 @@
+[Desktop Entry]
+Name=Qalculate! (Qt)
+GenericName=Calculator
+GenericName[sv]=Kalkylator
+Comment=Powerful and easy to use calculator
+Comment[nl]=Gemakkelijk te gebruiken rekenmachine met veel mogelijkheden
+Comment[sv]=Kraftfull och användarvänlig miniräknare
+Exec=qalculate-qt
+Icon=${SNAP}/meta/gui/qalculate.svg
+Terminal=false
+Type=Application
+StartupNotify=true
+StartupWMClass=qalculate-qt
+Categories=Qt;Utility;Calculator;Science;Math;
+Keywords=calculation;arithmetic;scientific;financial;
