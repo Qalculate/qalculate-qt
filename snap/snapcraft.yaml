@@ -59,7 +59,7 @@ parts:
       - libmpfr6
       - libgmp10
     override-build: |
-      for p in $SNAPCRAFT_PROJECT_DIR/patches/lib/*.patch
+      for p in $SNAPCRAFT_PROJECT_DIR/local/patches/lib/*.patch
       do
         cat $p | patch -p1
       done
@@ -121,10 +121,10 @@ parts:
       strip $SNAPCRAFT_PART_INSTALL/libexec/gnuplot/5.2/gnuplot_qt
 
   patches:
-    source: patches
+    source: local/patches
     plugin: dump
     organize:
-      "*": patches/
+      "*": local/patches/
     prime:
       - -*
 
