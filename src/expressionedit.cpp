@@ -33,6 +33,7 @@
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
 #include <QStylePainter>
+#include <QMimeData>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	include <QScreen>
 #else
@@ -3462,5 +3463,16 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 QString ExpressionEdit::selectedText(bool b) {
 	if(b && !textCursor().hasSelection()) return toPlainText();
 	return textCursor().selectedText();
+}
+void ExpressionEdit::insertFromMimeData(const QMimeData *source) {
+	QString str;
+	if(source->hasHtml()) str = QString::fromStdString(unhtmlize(source->html().toStdString())).trimmed();
+	else if(source->hasText()) str = source->text();
+	if(settings->printops.use_unicode_signs && str.length() > 1) {
+		str.replace("-", SIGN_MINUS);
+		str.replace("*", settings->multiplicationSign());
+		str.replace("/", settings->divisionSign(false));
+	}
+	if(!str.isEmpty()) insertPlainText(str);
 }
 

@@ -95,6 +95,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 		void keyReleaseEvent(QKeyEvent*) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
+		void insertFromMimeData(const QMimeData*) override;
 
 	public:
 

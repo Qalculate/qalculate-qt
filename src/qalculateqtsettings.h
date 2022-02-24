@@ -225,6 +225,7 @@ class QalculateQtSettings : QObject {
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;
 		bool auto_calculate;
+		int history_expression_type;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
@@ -254,6 +255,8 @@ class QalculateQtSettings : QObject {
 		int save_workspace;
 
 		std::vector<std::string> v_expression;
+		std::vector<std::string> v_parse;
+		std::vector<bool> v_pexact;
 		std::vector<bool> v_protected;
 		std::vector<bool> v_delexpression;
 		std::vector<std::vector<std::string> > v_result;

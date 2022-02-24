@@ -93,6 +93,11 @@ QString unhtmlize(QString str) {
 				str.remove(i, i3 - i);
 				continue;
 			}
+		} else if(i2 - i == 5 && str.mid(i + 1, 4) == "head") {
+			int i3 = str.indexOf("</head>", i2 + 1);
+			if(i3 > 0) {
+				i2 = i3 + 6;
+			}
 		} else if(i2 - i == 4) {
 			if(str.mid(i + 1, 3) == "sup") {
 				int i3 = str.indexOf("</sup>", i2 + 1);
@@ -159,6 +164,12 @@ void replace_colors(QString &s_text) {
 		s_text.replace("color:#580058", "color:#FFAAFF");
 		s_text.replace("color:#000080", "color:#FFAAAA");
 		s_text.replace("color:#008000", "color:#BBFFBB");
+		s_text.replace("color:#668888", "color:#88AAAA");
+		s_text.replace("color:#888866", "color:#AAAA88");
+		s_text.replace("color:#886688", "color:#AA88AA");
+		s_text.replace("color:#666699", "color:#AA8888");
+		s_text.replace("color:#669966", "color:#99BB99");
+		s_text.replace("color: #666666", "color: #AAAAAA");
 		s_text.replace(":/icons/actions", ":/icons/dark/actions");
 	} else {
 		s_text.replace("color: #AAAAAA", "color: #585858");
@@ -169,6 +180,12 @@ void replace_colors(QString &s_text) {
 		s_text.replace("color:#FFAAFF", "color:#580058");
 		s_text.replace("color:#FFAAAA", "color:#000080");
 		s_text.replace("color:#BBFFBB", "color:#008000");
+		s_text.replace("color:#88AAAA", "color:#668888");
+		s_text.replace("color:#AAAA88", "color:#888866");
+		s_text.replace("color:#AA88AA", "color:#886688");
+		s_text.replace("color:#AA8888", "color:#666699");
+		s_text.replace("color:#99BB99", "color:#669966");
+		s_text.replace("color: #AAAAAA", "color: #666666");
 		s_text.replace(":/icons/dark/actions", ":/icons/actions");
 	}
 }
@@ -188,6 +205,23 @@ void replace_colors(std::string &str) {
 		gsub("color:#BBFFBB", "color:#008000", str);
 		gsub(":/icons/dark/actions", ":/icons/actions", str);
 	}
+}
+
+std::string replace_parse_colors(std::string str) {
+	if(settings->color == 2) {
+		gsub("color:#AAFFFF", "color:#88AAAA", str);
+		gsub("color:#FFFFAA", "color:#AAAA88", str);
+		gsub("color:#FFAAFF", "color:#AA88AA", str);
+		gsub("color:#FFAAAA", "color:#AA8888", str);
+		gsub("color:#BBFFBB", "color:#99BB99", str);
+	} else {
+		gsub("color:#005858", "color:#668888", str);
+		gsub("color:#585800", "color:#888866", str);
+		gsub("color:#580058", "color:#886688", str);
+		gsub("color:#000080", "color:#666699", str);
+		gsub("color:#008000", "color:#669966", str);
+	}
+	return str;
 }
 
 void replace_one(QString &str, const QString &origstr, const QString &newstr, bool b_last = false) {
@@ -215,14 +249,14 @@ void HistoryView::loadInitial() {
 	last_ref = "";
 	if(!settings->v_expression.empty()) {
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
-			addResult(settings->v_result[i], settings->v_expression[i], true, false, QString(), NULL, true, i);
+			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, true, i);
 		}
 	}
 	if(!s_text.isEmpty()) {
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 			replace_colors(s_text);
 			for(size_t i = 0; i < settings->v_expression.size(); i++) {
-				replace_colors(settings->v_expression[i]);
+				replace_colors(settings->v_parse[i]);
 				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
 					replace_colors(settings->v_result[i][i2]);
 				}
@@ -238,15 +272,29 @@ void HistoryView::loadInitial() {
 	else if(paste_h < 24) {paste_h = 16;} \
 	else {paste_h = 24;} \
 
-void HistoryView::addResult(std::vector<std::string> values, std::string expression, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
+void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
 	PASTE_H
 	QString str;
-	if(!expression.empty()) {
+	if(!expression.empty() || !parse.empty()) {
 		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %2 px; padding-top: 0px; border-top: 0px none %3; text-align:left\"><a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h / 4).arg(textColor().name());
-		str += QString::fromStdString(expression);
+		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
+			str += QString::fromStdString(expression).toHtmlEscaped();
+			if(!parse.empty() && settings->history_expression_type > 1) {
+				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
+				else str += "&nbsp; <i style=\"color: #666666\">";
+				if(pexact) str += "= ";
+				else if(pexact) str += SIGN_ALMOST_EQUAL " ";
+				str += QString::fromStdString(replace_parse_colors(parse));
+				str += "</i>";
+			}
+		} else {
+			str += QString::fromStdString(parse);
+		}
 		str += "</a></td></tr>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
+			settings->v_parse.push_back(parse);
+			settings->v_pexact.push_back(true);
 			settings->v_protected.push_back(false);
 			settings->v_delexpression.push_back(false);
 			settings->v_result.push_back(values);
@@ -294,10 +342,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "</td></tr>";
 			}
 		} while(CALCULATOR->nextMessage());
-		if(str.isEmpty() && values.empty() && expression.empty()) return;
+		if(str.isEmpty() && values.empty() && expression.empty() && parse.empty()) return;
 	}
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
-	if(!expression.empty()) i_pos = str.length();
+	if(!expression.empty() || !parse.empty()) i_pos = str.length();
 	for(size_t i = 0; i < values.size(); i++) {
 		size_t i_answer = -1;
 		if(!initial_load) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
@@ -306,7 +354,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w); str += "\">";
 		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
 		if(!initial_load && (dual_approx || i == 0)) {
-			if(expression.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
+			if(expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
 			QString sref;
 			if(settings->color == 2) {
 				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
@@ -329,7 +377,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "; font-size:x-large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		}
-		if(!expression.empty() && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 2);
+		if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 2);
 		str += "\">";
 		int b_exact = 1;
 		if(initial_load) {
@@ -359,7 +407,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(i < i_pos) i_pos -= (i2 - i + 1);
 		}
 	}
-	if(expression.empty()) {
+	if(expression.empty() && parse.empty()) {
 		if(!initial_load) {
 			i = 0;
 			while(true) {
@@ -393,7 +441,7 @@ void HistoryView::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
 		setTextColor(palette().text().color());
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
-			replace_colors(settings->v_expression[i]);
+			replace_colors(settings->v_parse[i]);
 			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
 				replace_colors(settings->v_result[i][i2]);
 			}
@@ -410,7 +458,7 @@ void HistoryView::changeEvent(QEvent *e) {
 }
 void HistoryView::addMessages() {
 	std::vector<std::string> values;
-	addResult(values, "", true);
+	addResult(values, "", true, "", true);
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
@@ -431,7 +479,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 				index = str.indexOf(":");
 				if(index < 0) {
 					int i = str.toInt();
-					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i].empty() ? settings->v_parse[i] : settings->v_expression[i]);
 				} else {
 					int i1 = str.left(index).toInt();
 					int i2 = str.mid(index + 1).toInt();
@@ -447,7 +495,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 				int index = str.indexOf(":");
 				if(index < 0) {
 					int i = str.toInt();
-					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+					if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i].empty() ? settings->v_parse[i] : settings->v_expression[i]);
 				} else {
 					int i1 = str.left(index).toInt();
 					int i2 = str.mid(index + 1).toInt();
@@ -469,7 +517,7 @@ void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 			index = str.indexOf(":");
 			if(index < 0) {
 				int i = str.toInt();
-				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i].empty() ? settings->v_parse[i] : settings->v_expression[i]);
 			} else {
 				int i1 = str.left(index).toInt();
 				int i2 = str.mid(index + 1).toInt();
@@ -485,7 +533,7 @@ void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 			int index = str.indexOf(":");
 			if(index < 0) {
 				int i = str.toInt();
-				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i]);
+				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i].empty() ? settings->v_parse[i] : settings->v_expression[i]);
 			} else {
 				int i1 = str.left(index).toInt();
 				int i2 = str.mid(index + 1).toInt();
@@ -540,6 +588,8 @@ void HistoryView::editMoveToTop() {
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
 	settings->v_delexpression[i1] = true;
 	settings->v_expression.push_back(settings->v_expression[i1]);
+	settings->v_parse.push_back(settings->v_parse[i1]);
+	settings->v_pexact.push_back(settings->v_pexact[i1]);
 	settings->v_protected.push_back(settings->v_protected[i1]);
 	settings->v_delexpression.push_back(false);
 	settings->v_result.push_back(settings->v_result[i1]);
@@ -765,7 +815,7 @@ void HistoryView::editCopyFormatted() {
 		indexAtPos(context_pos, &i1, &i2);
 		if(i1 < 0) return;
 		if(i2 < 0) {
-			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(settings->v_expression[i1]));
+			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(settings->v_parse[i1].empty() ? settings->v_expression[i1] : settings->v_parse[i1]));
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) QApplication::clipboard()->setText(QString::fromStdString(settings->v_result[i1][i2]));
 		}
@@ -795,7 +845,7 @@ void HistoryView::editCopy() {
 		indexAtPos(context_pos, &i1, &i2);
 		if(i1 < 0) return;
 		if(i2 < 0) {
-			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_expression[i1])));
+			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize((settings->history_expression_type == 0 && !settings->v_parse[i1].empty()) || settings->v_expression[i1].empty() ? settings->v_parse[i1] : settings->v_expression[i1])));
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[i1][i2])));
 		}
@@ -812,7 +862,7 @@ void HistoryView::editInsertText() {
 	if(i2 >= 0) {
 		if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
 	} else {
-		if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i1]);
+		if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i1].empty() ? settings->v_parse[i1] : settings->v_expression[i1]);
 	}
 }
 

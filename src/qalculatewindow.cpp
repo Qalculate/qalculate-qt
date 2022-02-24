@@ -183,6 +183,11 @@ std::string unhtmlize(std::string str) {
 		if((i2 - i == 3 && str.substr(i + 1, 2) == "br") || (i2 - i == 4 && str.substr(i + 1, 3) == "/tr")) {
 			str.replace(i, i2 - i + 1, "\n");
 			continue;
+		} else if(i2 - i == 5 && str.substr(i + 1, 4) == "head") {
+			size_t i3 = str.find("</head>", i2 + 1);
+			if(i3 != std::string::npos) {
+				i2 = i3 + 6;
+			}
 		} else if(i2 - i == 4) {
 			if(str.substr(i + 1, 3) == "sup") {
 				size_t i3 = str.find("</sup>", i2 + 1);
@@ -5017,7 +5022,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
+		historyView->addResult(alt_results, update_parse ? prev_result_text : "", !parsed_approx, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 	}
 
 	if(do_to) {
@@ -5343,10 +5348,15 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::importCSV() {
+	size_t n = CALCULATOR->variables.size();
 	if(CSVDialog::importCSVFile(this)) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		for(size_t i = n; i < CALCULATOR->variables.size(); i++) {
+			if(!CALCULATOR->variables[i]->isHidden()) settings->favourite_variables.push_back(CALCULATOR->variables[i]);
+		}
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::exportCSV() {
@@ -6044,6 +6054,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
+	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), this, SLOT(loadInitialHistory()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

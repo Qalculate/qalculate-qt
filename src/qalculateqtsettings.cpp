@@ -138,12 +138,26 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		v_result.push_back(std::vector<std::string>());
 		v_exact.push_back(std::vector<int>());
 		v_delresult.push_back(std::vector<bool>());
+	} else if(svar == "history_parse") {
+		if(v_expression.size() > v_parse.size()) {
+			v_parse.push_back(svalue);
+			v_pexact.push_back(true);
+		}
+	} else if(svar == "history_parse_approximate") {
+		if(v_expression.size() > v_parse.size()) {
+			v_parse.push_back(svalue);
+			v_pexact.push_back(false);
+		}
 	} else if(svar == "history_result" || svar == "history_result_approximate") {
+		if(v_parse.size() < v_expression.size()) {
+			v_parse.push_back(v_expression[v_expression.size() - 1]);
+			v_expression[v_expression.size() - 1] = "";
+		}
 		if(!v_result.empty()) {
-			v_result[settings->v_result.size() - 1].push_back(svalue);
-			v_delresult[settings->v_result.size() - 1].push_back(false);
-			if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
-				v_exact[settings->v_exact.size() - 1].push_back(svar.length() < 20);
+			v_result[v_result.size() - 1].push_back(svalue);
+			v_delresult[v_result.size() - 1].push_back(false);
+			if(v_exact[v_exact.size() - 1].size() < v_result[v_result.size() - 1].size()) {
+				v_exact[v_exact.size() - 1].push_back(svar.length() < 20);
 			}
 		}
 	} else if(svar == "history_exact") {
@@ -448,6 +462,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
+		} else if(svar == "history_expression_type") {
+			history_expression_type = v;
 		} else if(svar == "window_geometry") {
 			window_geometry = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "splitter_state") {
@@ -757,6 +773,7 @@ void QalculateQtSettings::loadPreferences() {
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
+	history_expression_type = 0;
 	keep_function_dialog_open = false;
 #ifdef _WIN32
 	check_version = true;
@@ -768,10 +785,12 @@ void QalculateQtSettings::loadPreferences() {
 	current_workspace = "";
 	recent_workspaces.clear();
 	v_expression.clear();
+	v_parse.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
 	v_exact.clear();
+	v_pexact.clear();
 	v_delresult.clear();
 	expression_history.clear();
 
@@ -833,6 +852,11 @@ void QalculateQtSettings::loadPreferences() {
 		first_time = false;
 	} else {
 		first_time = true;
+	}
+
+	while(v_expression.size() > v_parse.size()) {
+		v_parse.push_back("");
+		v_pexact.push_back(true);
 	}
 
 	if(default_shortcuts) {
@@ -1115,6 +1139,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
+		fprintf(file, "history_expression_type=%i\n", history_expression_type);
 	}
 	if(read_default) {
 		fputs(sgeneral.c_str(), file);
@@ -1299,6 +1324,10 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				if((i >= i_first || v_protected[i]) && !v_delexpression[i]) {
 					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
 					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+					if(!v_parse[i].empty()) {
+						if(v_pexact[i]) fprintf(file, "history_parse=%s\n", v_parse[i].c_str());
+						else fprintf(file, "history_parse_approximate=%s\n", v_parse[i].c_str());
+					}
 					n++;
 					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
 						if(!v_delresult[i][i2]) {
@@ -1798,10 +1827,12 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	}
 	size_t i;
 	v_expression.clear();
+	v_parse.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
 	v_exact.clear();
+	v_pexact.clear();
 	v_delresult.clear();
 	expression_history.clear();
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
@@ -1847,6 +1878,10 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 				if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isHidden() && CALCULATOR->units[i]->isActive() && CALCULATOR->units[i]->category() == CALCULATOR->temporaryCategory()) favourite_units.push_back(CALCULATOR->units[i]);
 			}
 		}
+	}
+	while(v_expression.size() > v_parse.size()) {
+		v_parse.push_back("");
+		v_pexact.push_back(true);
 	}
 	if(!filename || strlen(filename) == 0) {
 		current_workspace = "";

@@ -32,7 +32,7 @@ class HistoryView : public QTextEdit {
 
 		ExpressionEdit *expressionEdit;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
 		void addMessages();
 		void loadInitial();
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);

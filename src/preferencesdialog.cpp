@@ -111,6 +111,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
 	hbox->addWidget(statusDelayWidget);
 	hbox->addStretch(1);
+	l2->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Parsed expression"), 0);
+	combo->addItem(tr("Entered expression"), 1);
+	combo->addItem(tr("Both parsed and entered expression"), 2);
+	combo->setCurrentIndex(combo->findData(settings->history_expression_type));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(historyExpressionChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Expression after calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Keep expression"), KEEP_EXPRESSION);
@@ -582,6 +590,10 @@ void PreferencesDialog::closeEvent(QCloseEvent *e) {
 }
 void PreferencesDialog::replaceExpressionChanged(int i) {
 	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+}
+void PreferencesDialog::historyExpressionChanged(int i) {
+	settings->history_expression_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	emit historyExpressionTypeChanged();
 }
 
 void PreferencesDialog::updateDot() {
