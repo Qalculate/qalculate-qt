@@ -50,6 +50,7 @@
 #include <QHeaderView>
 #include <QDesktopServices>
 #include <QClipboard>
+#include <QMimeData>
 #include <QScrollBar>
 #include <QDebug>
 
@@ -1215,7 +1216,11 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
-				QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(settings->v_result[settings->v_result.size() - 1][0]));
+				qm->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+				qm->setObjectName("history_result");
+				QApplication::clipboard()->setMimeData(qm);
 			}
 			break;
 		}

@@ -31,6 +31,9 @@ bool can_display_unicode_string_function(const char *str, void *w);
 
 std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str);
+QString unhtmlize(QString str);
+std::string unformat(std::string str);
+QString unformat(QString str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);

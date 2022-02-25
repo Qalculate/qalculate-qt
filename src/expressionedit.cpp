@@ -3466,7 +3466,7 @@ QString ExpressionEdit::selectedText(bool b) {
 }
 void ExpressionEdit::insertFromMimeData(const QMimeData *source) {
 	QString str;
-	if(source->hasHtml()) str = QString::fromStdString(unhtmlize(source->html().toStdString())).trimmed();
+	if(!source->objectName().startsWith("history_") && source->hasHtml()) str = unhtmlize(source->html()).trimmed();
 	else if(source->hasText()) str = source->text();
 	if(settings->printops.use_unicode_signs && str.length() > 1) {
 		str.replace("-", SIGN_MINUS);
