@@ -265,6 +265,7 @@ class QalculateQtSettings : QObject {
 		std::vector<std::vector<std::string> > v_result;
 		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
+		std::vector<std::vector<size_t> > v_value;
 		std::vector<MathFunction*> favourite_functions;
 		std::vector<Variable*> favourite_variables;
 		std::vector<Unit*> favourite_units;

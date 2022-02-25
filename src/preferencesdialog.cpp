@@ -113,9 +113,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	hbox->addStretch(1);
 	l2->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
-	combo->addItem(tr("Parsed expression"), 0);
-	combo->addItem(tr("Entered expression"), 1);
-	combo->addItem(tr("Both parsed and entered expression"), 2);
+	combo->addItem(tr("Parsed"), 0);
+	combo->addItem(tr("Entered"), 1);
+	combo->addItem(tr("Entered + parsed"), 2);
 	combo->setCurrentIndex(combo->findData(settings->history_expression_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(historyExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;

@@ -36,6 +36,7 @@ class HistoryView : public QTextEdit {
 		void addMessages();
 		void loadInitial();
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
+		void replaceColors(QString&);
 
 	protected:
 

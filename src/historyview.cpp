@@ -155,7 +155,7 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 }
 HistoryView::~HistoryView() {}
 
-void replace_colors(QString &s_text) {
+void HistoryView::replaceColors(QString &s_text) {
 	if(settings->color == 2) {
 		s_text.replace("color: #585858", "color: #AAAAAA");
 		s_text.replace("color: #800000", "color: #FFAAAA");
@@ -171,6 +171,7 @@ void replace_colors(QString &s_text) {
 		s_text.replace("color:#666699", "color:#AA8888");
 		s_text.replace("color:#669966", "color:#99BB99");
 		s_text.replace("color: #666666", "color: #AAAAAA");
+		s_text.replace(prev_color.name(QColor::HexRgb), textColor().name(QColor::HexRgb));
 		s_text.replace(":/icons/actions", ":/icons/dark/actions");
 	} else {
 		s_text.replace("color: #AAAAAA", "color: #585858");
@@ -187,6 +188,7 @@ void replace_colors(QString &s_text) {
 		s_text.replace("color:#AA8888", "color:#666699");
 		s_text.replace("color:#99BB99", "color:#669966");
 		s_text.replace("color: #AAAAAA", "color: #666666");
+		s_text.replace(prev_color.name(QColor::HexRgb), textColor().name(QColor::HexRgb));
 		s_text.replace(":/icons/dark/actions", ":/icons/actions");
 	}
 }
@@ -249,13 +251,26 @@ void HistoryView::loadInitial() {
 	last_ans = 0;
 	last_ref = "";
 	if(!settings->v_expression.empty()) {
-		for(size_t i = 0; i < settings->v_expression.size(); i++) {
-			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, true, i);
+		for(size_t i = 0; i < settings->v_expression.size();) {
+			if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1])) {
+				settings->v_delexpression.erase(settings->v_delexpression.begin() + i);
+				settings->v_expression.erase(settings->v_expression.begin() + i);
+				settings->v_parse.erase(settings->v_parse.begin() + i);
+				settings->v_result.erase(settings->v_result.begin() + i);
+				settings->v_delresult.erase(settings->v_delresult.begin() + i);
+				settings->v_protected.erase(settings->v_protected.begin() + i);
+				settings->v_exact.erase(settings->v_exact.begin() + i);
+				settings->v_pexact.erase(settings->v_pexact.begin() + i);
+				settings->v_value.erase(settings->v_value.begin() + i);
+			} else {
+				addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, true, i);
+				i++;
+			}
 		}
 	}
 	if(!s_text.isEmpty()) {
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
-			replace_colors(s_text);
+			replaceColors(s_text);
 			for(size_t i = 0; i < settings->v_expression.size(); i++) {
 				replace_colors(settings->v_parse[i]);
 				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
@@ -274,13 +289,14 @@ void HistoryView::loadInitial() {
 	else {paste_h = 24;} \
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
+	if(initial_load && settings->v_delexpression[index]) return;
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
 		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %2 px; padding-top: 0px; border-top: 0px none %3; text-align:left\"><a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h / 4).arg(textColor().name());
 		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
 			str += QString::fromStdString(expression).toHtmlEscaped();
-			if(!parse.empty() && settings->history_expression_type > 1) {
+			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
 				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
 				else str += "&nbsp; <i style=\"color: #666666\">";
 				if(pexact) str += "= ";
@@ -301,9 +317,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_result.push_back(values);
 			settings->v_exact.push_back(std::vector<int>());
 			settings->v_delresult.push_back(std::vector<bool>());
+			settings->v_value.push_back(std::vector<size_t>());
 			for(size_t i = 0; i < values.size(); i++) {
 				settings->v_exact[settings->v_exact.size() - 1].push_back(exact || i < values.size() - 1);
 				settings->v_delresult[settings->v_delresult.size() - 1].push_back(false);
+				settings->v_value[settings->v_value.size() - 1].push_back(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 			}
 		}
 	} else if(!initial_load && !settings->v_result.empty()) {
@@ -311,6 +329,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_result[settings->v_result.size() - 1].insert(settings->v_result[settings->v_result.size() - 1].begin(), values[i - 1]);
 			settings->v_exact[settings->v_exact.size() - 1].insert(settings->v_exact[settings->v_exact.size() - 1].begin(), exact || i < values.size());
 			settings->v_delresult[settings->v_delresult.size() - 1].insert(settings->v_delresult[settings->v_delresult.size() - 1].begin(), false);
+			settings->v_value[settings->v_value.size() - 1].insert(settings->v_value[settings->v_value.size() - 1].begin(), dual_approx && i == 1 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 		}
 	}
 	if(!initial_load && CALCULATOR->message()) {
@@ -347,20 +366,23 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
 	if(!expression.empty() || !parse.empty()) i_pos = str.length();
+	size_t i_answer_pre = 0;
 	for(size_t i = 0; i < values.size(); i++) {
-		size_t i_answer = -1;
-		if(!initial_load) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
+		if(initial_load && settings->v_delresult[index][i]) continue;
+		size_t i_answer = 0;
+		if(initial_load) i_answer = settings->v_value[index][i];
+		else i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
 		QFontMetrics fm(font());
 		int w = fm.boundingRect("#9999").width();
 		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w); str += "\">";
 		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
-		if(!initial_load && (dual_approx || i == 0)) {
-			if(expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
+		if(i_answer != 0 && i_answer != i_answer_pre) {
+			if(!initial_load && expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
 			QString sref;
 			if(settings->color == 2) {
-				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			} else {
-				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			}
 			str += sref;
 			if(!dual_approx || i == values.size()) {
@@ -387,13 +409,14 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(exact < 0) b_exact = -1;
 			else if(exact == 0 && i == values.size() - 1) b_exact = 0;
 		}
-		if(initial_load) str += QString("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg((int) index).arg((int) i);
-		else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(settings->v_expression.size() - 1).arg(settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+		if(i_answer == 0) str += QString("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+		else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		if(b_exact > 0) str += "= ";
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
 		str += "</a></td></tr>";
+		i_answer_pre = i_answer;
 	}
 	str.replace("\n", "<br>");
 	int i = 0;
@@ -448,7 +471,7 @@ void HistoryView::changeEvent(QEvent *e) {
 			}
 		}
 		if(!s_text.isEmpty()) {
-			replace_colors(s_text);
+			replaceColors(s_text);
 			s_text.replace("1px dashed " + prev_color.name(), "1px dashed " + textColor().name());
 			s_text.replace("0px none " + prev_color.name(), "0px none " + textColor().name());
 			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");

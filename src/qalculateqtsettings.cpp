@@ -138,6 +138,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		v_result.push_back(std::vector<std::string>());
 		v_exact.push_back(std::vector<int>());
 		v_delresult.push_back(std::vector<bool>());
+		v_value.push_back(std::vector<size_t>());
 	} else if(svar == "history_parse") {
 		if(v_expression.size() > v_parse.size()) {
 			v_parse.push_back(svalue);
@@ -155,6 +156,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		}
 		if(!v_result.empty()) {
 			v_result[v_result.size() - 1].push_back(svalue);
+			v_value[v_value.size() - 1].push_back(0);
 			v_delresult[v_result.size() - 1].push_back(false);
 			if(v_exact[v_exact.size() - 1].size() < v_result[v_result.size() - 1].size()) {
 				v_exact[v_exact.size() - 1].push_back(svar.length() < 20);
@@ -786,6 +788,7 @@ void QalculateQtSettings::loadPreferences() {
 	recent_workspaces.clear();
 	v_expression.clear();
 	v_parse.clear();
+	v_value.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
@@ -1828,6 +1831,7 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	size_t i;
 	v_expression.clear();
 	v_parse.clear();
+	v_value.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
