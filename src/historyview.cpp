@@ -138,6 +138,8 @@ QString unhtmlize(QString str) {
 	str.replace("&gt;", ">");
 	str.replace("&lt;", "<");
 	str.replace("&nbsp;", " ");
+	str.replace("&thinsp;", THIN_SPACE);
+	str.replace("&#8239;", NNBSP);
 	str.replace("&quot;", "\"");
 	return str;
 }
@@ -753,9 +755,12 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		cmenu = new QMenu(this);
 		insertValueAction = cmenu->addAction(tr("Insert Value"), this, SLOT(editInsertValue()));
 		insertTextAction = cmenu->addAction(tr("Insert Text"), this, SLOT(editInsertText()));
-		copyAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopy()));
+		copyAction = new QAction(tr("Copy"));
+		connect(copyAction, SIGNAL(triggered()), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
+		copyFormattedAction = cmenu->addAction(tr("Copy"), this, SLOT(editCopyFormatted()));
+		copyAsciiAction = cmenu->addAction(tr("Copy unformatted ASCII"), this, SLOT(editCopyAscii()));
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
@@ -779,6 +784,8 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		insertValueAction->setEnabled(i3 >= 0);
 		insertTextAction->setEnabled(true);
 		copyAction->setEnabled(true);
+		copyFormattedAction->setEnabled(true);
+		copyAsciiAction->setEnabled(true);
 		delAction->setEnabled(true);
 		protectAction->setEnabled(true);
 		bool b = false;
@@ -791,6 +798,8 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		movetotopAction->setEnabled(b);
 	} else {
 		copyAction->setEnabled(textCursor().hasSelection());
+		copyFormattedAction->setEnabled(textCursor().hasSelection());
+		copyAsciiAction->setEnabled(textCursor().hasSelection());
 		delAction->setEnabled(false);
 		protectAction->setEnabled(false);
 		movetotopAction->setEnabled(false);
@@ -829,29 +838,67 @@ void HistoryView::editFind() {
 	dialog->deleteLater();
 }
 
+void remove_separator(std::string &copy_text) {
+	for(size_t i = ((CALCULATOR->local_digit_group_separator.empty() || CALCULATOR->local_digit_group_separator == " ") ? 1 : 0); i < 4; i++) {
+		std::string str_sep;
+		if(i == 0) str_sep = CALCULATOR->local_digit_group_separator;
+		else if(i == 1) str_sep = THIN_SPACE;
+		else if(i == 2) str_sep = NNBSP;
+		else str_sep = " ";
+		size_t index = copy_text.find(str_sep);
+		while(index != std::string::npos) {
+			if(index > 0 && index + str_sep.length() < copy_text.length() && copy_text[index - 1] >= '0' && copy_text[index - 1] <= '9' && copy_text[index + str_sep.length()] >= '0' && copy_text[index + str_sep.length()] <= '9') {
+				copy_text.erase(index, str_sep.length());
+			} else {
+				index++;
+			}
+			index = copy_text.find(str_sep, index);
+		}
+	}
+}
+QString replace_first_minus(const QString &qstr) {
+	if(qstr.indexOf(SIGN_MINUS) == 0) {
+		std::string str = qstr.toStdString();
+		if(str.find_first_of(OPERATORS) == std::string::npos) {
+			for(size_t i = strlen(SIGN_MINUS); i < str.length(); i++) {
+				if((signed char) str[i] < 0) return qstr;
+			}
+			std::string str_new = str;
+			str_new.replace(0, strlen(SIGN_MINUS), "-");
+			return QString::fromStdString(str_new);
+		}
+	}
+	return qstr;
+}
+
+std::string replace_first_minus(const std::string &str) {
+	if(str.find(SIGN_MINUS) == 0 && str.find_first_of(OPERATORS) == std::string::npos) {
+		for(size_t i = strlen(SIGN_MINUS); i < str.length(); i++) {
+			if((signed char) str[i] < 0) return str;
+		}
+		std::string str_new = str;
+		str_new.replace(0, strlen(SIGN_MINUS), "-");
+		return str_new;
+	}
+	return str;
+}
+
 std::string unformat(std::string str) {
+	remove_separator(str);
 	gsub(SIGN_MINUS, "-", str);
 	gsub(SIGN_MULTIPLICATION, "*", str);
 	gsub(SIGN_MULTIDOT, "*", str);
 	gsub(SIGN_MIDDLEDOT, "*", str);
 	gsub(THIN_SPACE, "", str);
+	gsub(NNBSP, "", str);
 	gsub(SIGN_DIVISION, "/", str);
 	gsub(SIGN_DIVISION_SLASH, "/", str);
+	gsub(SIGN_SQRT, "sqrt", str);
+	gsub("Ω", "ohm", str);
 	return str;
 }
 
-QString unformat(QString str) {
-	str.replace(SIGN_MINUS, "-");
-	str.replace(SIGN_MULTIPLICATION, "*");
-	str.replace(SIGN_MULTIDOT, "*");
-	str.replace(SIGN_MIDDLEDOT, "*");
-	str.replace(THIN_SPACE, "");
-	str.replace(SIGN_DIVISION, "/");
-	str.replace(SIGN_DIVISION_SLASH, "/");
-	return str;
-}
-
-void HistoryView::editCopy() {
+void HistoryView::editCopy(int ascii) {
 	if(textCursor().hasSelection()) {
 		QString str = textCursor().selection().toHtml();
 		int i = str.indexOf("<!--StartFragment-->");
@@ -869,34 +916,53 @@ void HistoryView::editCopy() {
 		} else {
 			str = unhtmlize(textCursor().selectedText());
 		}
-		QMimeData *qm = new QMimeData();
-		qm->setHtml(textCursor().selection().toHtml());
-		qm->setText(unformat(str));
-		qm->setObjectName("history_selection");
-		QApplication::clipboard()->setMimeData(qm);
+		if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
+			QApplication::clipboard()->setText(QString::fromStdString(unformat(str.toStdString())));
+		} else {
+			QMimeData *qm = new QMimeData();
+			qm->setHtml(textCursor().selection().toHtml());
+			qm->setText(str);
+			qm->setObjectName("history_selection");
+			QApplication::clipboard()->setMimeData(qm);
+		}
 	} else {
 		int i1 = -1, i2 = -1;
 		indexAtPos(context_pos, &i1, &i2);
 		if(i1 < 0) return;
 		if(i2 < 0) {
 			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) {
-				QMimeData *qm = new QMimeData();
-				qm->setHtml(QString::fromStdString(settings->v_parse[i1]));
-				if(!settings->v_expression[i1].empty()) qm->setText(QString::fromStdString(unformat(settings->v_expression[i1])));
-				else qm->setText(QString::fromStdString(unformat(unhtmlize(settings->v_parse[i1]))));
-				qm->setObjectName("history_expression");
-				QApplication::clipboard()->setMimeData(qm);
+				if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
+					if(!settings->v_expression[i1].empty()) QApplication::clipboard()->setText(QString::fromStdString(unformat(settings->v_expression[i1])));
+					else QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_parse[i1]))));
+				} else {
+					QMimeData *qm = new QMimeData();
+					qm->setHtml(QString::fromStdString(settings->v_parse[i1]));
+					if(!settings->v_expression[i1].empty()) qm->setText(QString::fromStdString(settings->v_expression[i1]));
+					else qm->setText(QString::fromStdString(unhtmlize(settings->v_parse[i1])));
+					qm->setObjectName("history_expression");
+					QApplication::clipboard()->setMimeData(qm);
+				}
 			}
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) {
-				QMimeData *qm = new QMimeData();
-				qm->setHtml(QString::fromStdString((settings->v_result[i1][i2])));
-				qm->setText(QString::fromStdString(unformat(unhtmlize((settings->v_result[i1][i2])))));
-				qm->setObjectName("history_result");
-				QApplication::clipboard()->setMimeData(qm);
+				if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize((settings->v_result[i1][i2])))));
+				} else {
+					QMimeData *qm = new QMimeData();
+					qm->setHtml(QString::fromStdString(settings->v_result[i1][i2]));
+					qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2]))));
+					qm->setObjectName("history_result");
+					QApplication::clipboard()->setMimeData(qm);
+				}
 			}
 		}
 	}
+}
+void HistoryView::editCopyAscii() {
+	editCopy(1);
+}
+void HistoryView::editCopyFormatted() {
+	editCopy(0);
 }
 void HistoryView::editInsertValue() {
 	int i1 = -1, i2 = -1, i3 = -1;

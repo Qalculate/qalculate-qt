@@ -618,6 +618,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.spell_out_logical_operators = v;
 		} else if(svar == "caret_as_xor") {
 			caret_as_xor = v;
+		} else if(svar == "copy_ascii") {
+			copy_ascii = v;
 		} else if(svar == "decimal_comma") {
 			decimal_comma = v;
 			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
@@ -738,6 +740,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_keys = true;
 	rpn_shown = false;
 	caret_as_xor = false;
+	copy_ascii = false;
 	do_imaginary_j = false;
 	simplified_percentage = true;
 	color = 1;
@@ -1202,6 +1205,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+		fprintf(file, "copy_ascii=%i\n", copy_ascii);
 		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);

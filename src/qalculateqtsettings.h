@@ -29,11 +29,13 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
 
+#define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
+
 std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str);
 QString unhtmlize(QString str);
 std::string unformat(std::string str);
-QString unformat(QString str);
+std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
@@ -229,6 +231,7 @@ class QalculateQtSettings : QObject {
 		bool rpn_shown;
 		bool auto_calculate;
 		int history_expression_type;
+		bool copy_ascii;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

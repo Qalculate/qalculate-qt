@@ -232,6 +232,7 @@ std::string unhtmlize(std::string str) {
 	gsub("&hairsp;", "", str);
 	gsub("&nbsp;", " ", str);
 	gsub("&thinsp;", THIN_SPACE, str);
+	gsub("&#8239;", NNBSP, str);
 	return str;
 }
 
@@ -1216,11 +1217,15 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
-				QMimeData *qm = new QMimeData();
-				qm->setHtml(QString::fromStdString(settings->v_result[settings->v_result.size() - 1][0]));
-				qm->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
-				qm->setObjectName("history_result");
-				QApplication::clipboard()->setMimeData(qm);
+				if(settings->copy_ascii) {
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+				} else {
+					QMimeData *qm = new QMimeData();
+					qm->setHtml(QString::fromStdString(settings->v_result[settings->v_result.size() - 1][0]));
+					qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+					qm->setObjectName("history_result");
+					QApplication::clipboard()->setMimeData(qm);
+				}
 			}
 			break;
 		}
@@ -1623,7 +1628,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		return;
 	}
 	QString sargs;
-	bool b_text = (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_TEXT);
+	bool b_text = USE_QUOTES(f->getArgumentDefinition(1), f);
 	if(f->id() == FUNCTION_ID_CIRCULAR_SHIFT || f->id() == FUNCTION_ID_BIT_CMP) {
 		Argument *arg_bits = f->getArgumentDefinition(f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? 3 : 2);
 		Argument *arg_steps = (f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? f->getArgumentDefinition(2) : NULL);
@@ -4605,13 +4610,21 @@ void QalculateWindow::onExpressionChanged() {
 std::string ellipsize_result(const std::string &result_text, size_t length) {
 	length /= 2;
 	size_t index1 = result_text.find(SPACE, length);
-	if(index1 == std::string::npos || index1 > length * 1.2) index1 = result_text.find(THIN_SPACE, length);
+	if(index1 == std::string::npos || index1 > length * 1.2) {
+		index1 = result_text.find(THIN_SPACE, length);
+		size_t index1b = result_text.find(NNBSP, length);
+		if(index1b != std::string::npos && (index1 == std::string::npos || index1b < index1)) index1 = index1b;
+	}
 	if(index1 == std::string::npos || index1 > length * 1.2) {
 		index1 = length;
 		while(index1 > 0 && (signed char) result_text[index1] < 0 && (unsigned char) result_text[index1 + 1] < 0xC0) index1--;
 	}
 	size_t index2 = result_text.find(SPACE, result_text.length() - length);
-	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) index2 = result_text.find(THIN_SPACE, result_text.length() - length);
+	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
+		index2 = result_text.find(THIN_SPACE, result_text.length() - length);
+		size_t index2b = result_text.find(NNBSP, result_text.length() - length);
+		if(index2b != std::string::npos && (index2 == std::string::npos || index2b < index2)) index2 = index2b;
+	}
 	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
 		index2 = result_text.length() - length;
 		while(index2 > index1 && (signed char) result_text[index2] < 0 && (unsigned char) result_text[index2 + 1] < 0xC0) index2--;
@@ -6574,7 +6587,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		typestr = "";
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		defstr = QString::fromStdString(CALCULATOR->localizeExpression(f->getDefaultValue(i + 1), pa));
-		if(arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
+		if(USE_QUOTES(arg, f) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
 			defstr = defstr.mid(1, defstr.length() - 2);
 		}
 		fd->label[i] = new QLabel(tr("%1:").arg(argstr));
@@ -6707,6 +6720,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 					combo->addItem("persian");
 					fd->entry[i] = combo->lineEdit();
 					entry = combo;
+				} else if(USE_QUOTES(arg, f)) {
+					fd->entry[i] = new QLineEdit();
 				} else {
 					fd->entry[i] = new MathLineEdit();
 				}
@@ -6936,7 +6951,7 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 				str2 = ((QLineEdit*) fd->entry[argcount - 1])->text().toStdString();
 				remove_blank_ends(str2);
 			}
-			if(!str2.empty() && f->getArgumentDefinition(argcount) && (f->getArgumentDefinition(argcount)->suggestsQuotes() || (f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
+			if(!str2.empty() && USE_QUOTES(f->getArgumentDefinition(argcount), f) && str2.find(CALCULATOR->getComma()) == std::string::npos) {
 				if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
 					str2.insert(0, "\"");
 					str2 += "\"";
@@ -6975,7 +6990,7 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 			str2 = ((QLineEdit*) fd->entry[i])->text().toStdString();
 			remove_blank_ends(str2);
 		}
-		if((i < f->minargs() || !str2.empty()) && f->getArgumentDefinition(i + 1) && (f->getArgumentDefinition(i + 1)->suggestsQuotes() || (f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
+		if((i < f->minargs() || !str2.empty()) && USE_QUOTES(f->getArgumentDefinition(i + 1), f) && str2.find(CALCULATOR->getComma()) == std::string::npos) {
 			if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
 				str2.insert(0, "\"");
 				str2 += "\"";

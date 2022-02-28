@@ -43,7 +43,7 @@ class HistoryView : public QTextEdit {
 		QString s_text;
 		int i_pos;
 		QMenu *cmenu;
-		QAction *insertTextAction, *insertValueAction, *copyAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
@@ -66,7 +66,9 @@ class HistoryView : public QTextEdit {
 
 		void editInsertValue();
 		void editInsertText();
-		void editCopy();
+		void editCopy(int = -1);
+		void editCopyFormatted();
+		void editCopyAscii();
 		void editClear();
 		void editRemove();
 		void editProtect();

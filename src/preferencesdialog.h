@@ -88,6 +88,8 @@ class PreferencesDialog : public QDialog {
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
 		void historyExpressionChanged(int);
+		void copyAsciiToggled(bool);
+		void caretAsXorToggled(bool);
 
 	public:
 

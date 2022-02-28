@@ -61,6 +61,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
+	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
+	BOX_G(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -128,7 +130,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->replace_expression));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
-	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -168,6 +169,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Indicate repeating decimals"), settings->printops.indicate_infinite_series, repeatingDecimalsToggled(bool));
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
+	BOX(tr("Copy result as unformatted ASCII by default"), settings->copy_ascii, copyAsciiToggled(bool));
 	l2 = new QGridLayout();
 	r = 0;
 	l2->addWidget(new QLabel(tr("Digit grouping:"), this), r, 0);
@@ -437,6 +439,12 @@ void PreferencesDialog::roundingChanged(int i) {
 void PreferencesDialog::repeatingDecimalsToggled(bool b) {
 	settings->printops.indicate_infinite_series = b;
 	emit resultFormatUpdated();
+}
+void PreferencesDialog::copyAsciiToggled(bool b) {
+	settings->copy_ascii = b;
+}
+void PreferencesDialog::caretAsXorToggled(bool b) {
+	settings->caret_as_xor = b;
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
 	if(b) settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;

@@ -1370,6 +1370,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_MULTIPLY);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode(settings->multiplicationSign())) return;
 				wrapSelection(settings->multiplicationSign());
 				return;
@@ -1379,6 +1380,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_SUBTRACT);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode(settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) return;
 				wrapSelection(settings->printops.use_unicode_signs ? SIGN_MINUS : "-");
 				return;
@@ -1388,6 +1390,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
@@ -1401,6 +1404,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
 				wrapSelection(settings->caret_as_xor ? " xor " : "^");
 				return;
@@ -1410,6 +1414,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_ADD);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode("+")) return;
 				wrapSelection("+");
 				return;
@@ -1419,6 +1424,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					emit calculateRPNRequest(OPERATION_DIVIDE);
 					return;
 				}
+				if(expressionInQuotes()) break;
 				if(doChainMode(settings->divisionSign(false))) return;
 				wrapSelection(settings->divisionSign(false));
 				return;
@@ -1835,18 +1841,29 @@ void ExpressionEdit::blockUndo(bool b) {
 	else block_add_to_undo--;
 }
 void remove_spaces(std::string &str) {
-	size_t i = 0, i2;
+	size_t i = 0;
 	while(true) {
 		i = str.find(' ', i);
-		i2 = str.find(THIN_SPACE, i);
-		if(i2 != std::string::npos && (i == std::string::npos || i2 < i)) {
-			str.erase(i2, 3);
-			i = i2;
-		} else if(i != std::string::npos) {
-			str.erase(i, 1);
-		} else {
-			break;
-		}
+		if(i != std::string::npos) str.erase(i, 1);
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(THIN_SPACE, i);
+		if(i != std::string::npos) str.erase(i, strlen(THIN_SPACE));
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(NNBSP, i);
+		if(i != std::string::npos) str.erase(i, strlen(NNBSP));
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(NBSP, i);
+		if(i != std::string::npos) str.erase(i, strlen(NBSP));
+		else break;
 	}
 }
 void ExpressionEdit::showCurrentStatus() {
@@ -2699,6 +2716,20 @@ void ExpressionEdit::onCursorPositionChanged() {
 	highlightParentheses();
 	displayParseStatus();
 }
+bool ExpressionEdit::expressionInQuotes() {
+	bool in_cit1 = false, in_cit2 = false;
+	QString str = toPlainText();
+	int pos = textCursor().selectionStart();
+	for(int i = 0; i < pos; i++) {
+		if(!in_cit2 && str[i] == '\"') {
+			in_cit1 = !in_cit1;
+		} else if(!in_cit1 && str[i] == '\'') {
+			in_cit2 = !in_cit2;
+		}
+	}
+	return in_cit1 || in_cit2;
+}
+
 void ExpressionEdit::highlightParentheses() {
 	if(document()->isEmpty()) return;
 	if(parentheses_highlighted) {
@@ -3469,9 +3500,27 @@ void ExpressionEdit::insertFromMimeData(const QMimeData *source) {
 	if(!source->objectName().startsWith("history_") && source->hasHtml()) str = unhtmlize(source->html()).trimmed();
 	else if(source->hasText()) str = source->text();
 	if(settings->printops.use_unicode_signs && str.length() > 1) {
-		str.replace("-", SIGN_MINUS);
-		str.replace("*", settings->multiplicationSign());
-		str.replace("/", settings->divisionSign(false));
+		bool in_cit1 = false, in_cit2 = false;
+		QString text = toPlainText();
+		int pos = textCursor().selectionStart();
+		for(int i = 0; i < pos; i++) {
+			if(!in_cit2 && text[i] == '\"') {
+				in_cit1 = !in_cit1;
+			} else if(!in_cit1 && text[i] == '\'') {
+				in_cit2 = !in_cit2;
+			}
+		}
+		for(int i = 0; i < str.length(); i++) {
+			if(!in_cit2 && str[i] == '\"') {
+				in_cit1 = !in_cit1;
+			} else if(!in_cit1 && str[i] == '\'') {
+				in_cit2 = !in_cit2;
+			} else if(!in_cit1 && !in_cit2) {
+				if(str[i] == '*') str.replace(i, 1, settings->multiplicationSign());
+				else if(str[i] == '/') str.replace(i, 1, settings->divisionSign(false));
+				else if(str[i] == '-') str.replace(i, 1, SIGN_MINUS);
+			}
+		}
 	}
 	if(!str.isEmpty()) insertPlainText(str);
 }
