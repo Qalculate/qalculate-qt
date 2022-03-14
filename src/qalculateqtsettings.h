@@ -32,9 +32,10 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
 
 std::string to_html_escaped(const std::string str);
-std::string unhtmlize(std::string str);
-QString unhtmlize(QString str);
+std::string unhtmlize(std::string str, bool b_ascii = false);
+QString unhtmlize(QString str, bool b_ascii = false);
 std::string unformat(std::string str);
+std::string uncolorize(std::string str);
 std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);

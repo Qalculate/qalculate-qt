@@ -174,7 +174,7 @@ std::string print_with_evalops(const Number &nr) {
 	return str;
 }
 
-std::string unhtmlize(std::string str) {
+std::string unhtmlize(std::string str, bool b_ascii) {
 	size_t i = 0, i2;
 	while(true) {
 		i = str.find("<", i);
@@ -193,9 +193,9 @@ std::string unhtmlize(std::string str) {
 			if(str.substr(i + 1, 3) == "sup") {
 				size_t i3 = str.find("</sup>", i2 + 1);
 				if(i3 != std::string::npos) {
-					std::string str2 = unhtmlize(str.substr(i + 5, i3 - i - 5));
-					if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
-					else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
+					std::string str2 = unhtmlize(str.substr(i + 5, i3 - i - 5), b_ascii);
+					if(!b_ascii && str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
+					else if(!b_ascii && str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
 					else if((str.length() == i3 + 6 || (str.length() == i3 + 13 && str.find("</span>", i3) != std::string::npos)) && (unicode_length(str2) == 1 || str2.find_first_not_of(NUMBERS) == std::string::npos)) str.replace(i, i3 - i + 6, std::string("^") + str2);
 					else str.replace(i, i3 - i + 6, std::string("^(") + str2 + ")");
 					continue;
@@ -204,14 +204,14 @@ std::string unhtmlize(std::string str) {
 				size_t i3 = str.find("</sub>", i + 4);
 				if(i3 != std::string::npos) {
 					if(i3 - i2 > 16 && str.substr(i2 + 1, 7) == "<small>" && str.substr(i3 - 8, 8) == "</small>") str.erase(i, i3 - i + 6);
-					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5)));
+					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5), b_ascii));
 					continue;
 				}
 			}
 		} else if(i2 - i == 17 && str.substr(i + 1, 16) == "i class=\"symbol\"") {
 			size_t i3 = str.find("</i>", i2 + 1);
 			if(i3 != std::string::npos) {
-				std::string name = unhtmlize(str.substr(i2 + 1, i3 - i2 - 1));
+				std::string name = unhtmlize(str.substr(i2 + 1, i3 - i2 - 1), b_ascii);
 				if(name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
 					name.insert(0, 1, '\\');
 				} else {
@@ -1218,10 +1218,10 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
 				if(settings->copy_ascii) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0], true))));
 				} else {
 					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(settings->v_result[settings->v_result.size() - 1][0]));
+					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
 					qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
 					qm->setObjectName("history_result");
 					QApplication::clipboard()->setMimeData(qm);
@@ -1964,8 +1964,6 @@ void QalculateWindow::socketReadyRead() {
 		settings->savePreferences(false);
 		return;
 	}
-	setWindowState(windowState() | Qt::WindowMinimized);
-	qApp->processEvents();
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -2020,8 +2018,6 @@ void QalculateWindow::onActivateRequested(const QStringList &arguments, const QS
 		if(!command.isEmpty()) {expressionEdit->setExpression(command); calculate();}
 		args.clear();
 	}
-	setWindowState(windowState() | Qt::WindowMinimized);
-	qApp->processEvents();
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -4320,13 +4316,15 @@ void CommandThread::run() {
 				break;
 			}
 			case COMMAND_CONVERT_STRING: {
-				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_units_string, eo2, NULL, true, parsed_mstruct));
+				MathStructure pm_tmp(*parsed_mstruct);
+				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_units_string, eo2, NULL, true, &pm_tmp));
 				eo2.approximation = APPROXIMATION_EXACT;
 				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convert(*((MathStructure*) x2), command_convert_units_string, eo2, NULL, true));
 				break;
 			}
 			case COMMAND_CONVERT_UNIT: {
-				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_unit, eo2, false, true, true, parsed_mstruct));
+				MathStructure pm_tmp(*parsed_mstruct);
+				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_unit, eo2, false, true, true, &pm_tmp));
 				eo2.approximation = APPROXIMATION_EXACT;
 				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convert(*((MathStructure*) x2), command_convert_unit, eo2, false, true, true));
 				break;
@@ -5037,6 +5035,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		QString flag;
 		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
 			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
+			if(!QFile::exists(flag)) flag.clear();
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
@@ -6587,7 +6586,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		typestr = "";
 		ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 		defstr = QString::fromStdString(CALCULATOR->localizeExpression(f->getDefaultValue(i + 1), pa));
-		if(USE_QUOTES(arg, f) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
+		if(arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && defstr.length() >= 2 && defstr[0] == '\"' && defstr[defstr.length() - 1] == '\"') {
 			defstr = defstr.mid(1, defstr.length() - 2);
 		}
 		fd->label[i] = new QLabel(tr("%1:").arg(argstr));
@@ -6951,8 +6950,11 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 				str2 = ((QLineEdit*) fd->entry[argcount - 1])->text().toStdString();
 				remove_blank_ends(str2);
 			}
-			if(!str2.empty() && USE_QUOTES(f->getArgumentDefinition(argcount), f) && str2.find(CALCULATOR->getComma()) == std::string::npos) {
-				if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+			if(!str2.empty() && USE_QUOTES(f->getArgumentDefinition(argcount), f) && (unicode_length(str2) <= 2 || str2.find_first_of("\"\'") == std::string::npos)) {
+				if(str2.find("\"") != std::string::npos) {
+					str2.insert(0, "\'");
+					str2 += "\'";
+				} else {
 					str2.insert(0, "\"");
 					str2 += "\"";
 				}
@@ -6990,8 +6992,11 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 			str2 = ((QLineEdit*) fd->entry[i])->text().toStdString();
 			remove_blank_ends(str2);
 		}
-		if((i < f->minargs() || !str2.empty()) && USE_QUOTES(f->getArgumentDefinition(i + 1), f) && str2.find(CALCULATOR->getComma()) == std::string::npos) {
-			if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+		if((i < f->minargs() || !str2.empty()) && USE_QUOTES(f->getArgumentDefinition(i + 1), f) && (unicode_length(str2) <= 2 || str2.find_first_of("\"\'") == std::string::npos)) {
+			if(str2.find("\"") != std::string::npos) {
+				str2.insert(0, "\'");
+				str2 += "\'";
+			} else {
 				str2.insert(0, "\"");
 				str2 += "\"";
 			}
@@ -7222,6 +7227,8 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 	bool rpn_mode_prev = settings->rpn_mode;
 	bool chain_mode_prev = settings->chain_mode;
 	if(settings->loadWorkspace(filename.toLocal8Bit().data())) {
+		settings->preferences_version[0] = 4;
+		settings->preferences_version[1] = 1;
 		mstruct->unref();
 		mstruct = new MathStructure();
 		mstruct_exact.setUndefined();

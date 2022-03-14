@@ -41,7 +41,7 @@ bool qstring_has_nondigit(const QString &str) {
 	return false;
 }
 
-QString unhtmlize(QString str) {
+QString unhtmlize(QString str, bool b_ascii) {
 	int i = 0, i2;
 	str.remove("\n");
 	while(true) {
@@ -56,9 +56,9 @@ QString unhtmlize(QString str) {
 		if(i_sup > i && i2 > i_sup) {
 			int i3 = str.indexOf("</", i2 + 1);
 			if(i3 >= 0) {
-				QString str2 = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
-				if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i, SIGN_POWER_2);
-				else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i, SIGN_POWER_3);
+				QString str2 = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1), b_ascii);
+				if(!b_ascii && str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i, SIGN_POWER_2);
+				else if(!b_ascii && str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i, SIGN_POWER_3);
 				else if(str.length() == i3 + 7 && (str2.length() == 1 || !qstring_has_nondigit(str2))) str.replace(i, i3 - i, "^" + str2);
 				else str.replace(i, i3 - i, "^(" + str2 + ")");
 				continue;
@@ -67,23 +67,27 @@ QString unhtmlize(QString str) {
 			int i3 = str.indexOf("</", i2 + 1);
 			if(i3 >= 0) {
 				if(i_small > i && i2 > i_small) str.remove(i, i3 - i);
-				else str.replace(i, i3 - i, "_" + unhtmlize(str.mid(i2 + 1, i3 - i2 - 1)));
+				else str.replace(i, i3 - i, "_" + unhtmlize(str.mid(i2 + 1, i3 - i2 - 1), b_ascii));
 				continue;
 			}
 		} else if(i_italic > i && i2 > i_italic) {
 			int i3 = str.indexOf("</", i2 + 1);
 			if(i3 >= 0) {
-				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
-				Variable *v = CALCULATOR->getActiveVariable(name.toStdString());
-				bool replace_all_i = (!v || v->isKnown());
-				if(replace_all_i && name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
-					name.insert(0, "\\");
-				} else if(replace_all_i) {
-					name.insert(0, "\"");
-					name += "\"";
+				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1), b_ascii);
+				if(!name.isEmpty() && name[0] != '\''  && name[0] != '\"') {
+					Variable *v = CALCULATOR->getActiveVariable(name.toStdString());
+					bool replace_all_i = (!v || v->isKnown());
+					if(replace_all_i && name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
+						name.insert(0, "\\");
+						str.replace(i, i3 - i, name);
+						continue;
+					} else if(replace_all_i) {
+						name.insert(0, "\"");
+						name += "\"";
+						str.replace(i, i3 - i, name);
+						continue;
+					}
 				}
-				str.replace(i, i3 - i, name);
-				continue;
 			}
 		} else if((i2 - i == 3 && str.mid(i + 1, 2) == "br") || (i2 - i == 4 && str.mid(i + 1, 3) == "/tr")) {
 			str.replace(i, i2 - i + 1, "\n");
@@ -103,7 +107,7 @@ QString unhtmlize(QString str) {
 			if(str.mid(i + 1, 3) == "sup") {
 				int i3 = str.indexOf("</sup>", i2 + 1);
 				if(i3 >= 0) {
-					QString str2 = unhtmlize(str.mid(i + 5, i3 - i - 5));
+					QString str2 = unhtmlize(str.mid(i + 5, i3 - i - 5), b_ascii);
 					if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
 					else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
 					else if(str.length() == i3 + 6 && (str2.length() == 1 || !qstring_has_nondigit(str2))) str.replace(i, i3 - i + 6, "^" + str2);
@@ -113,14 +117,14 @@ QString unhtmlize(QString str) {
 			} else if(str.mid(i + 1, 3) == "sub") {
 				int i3 = str.indexOf("</sub>", i + 4);
 				if(i3 >= 0) {
-					str.replace(i, i3 - i + 6, "_" + unhtmlize(str.mid(i + 5, i3 - i - 5)));
+					str.replace(i, i3 - i + 6, "_" + unhtmlize(str.mid(i + 5, i3 - i - 5), b_ascii));
 					continue;
 				}
 			}
 		} else if(i2 - i == 17 && str.mid(i + 1, 16) == "i class=\"symbol\"") {
 			int i3 = str.indexOf("</i>", i2 + 1);
 			if(i3 >= 0) {
-				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1));
+				QString name = unhtmlize(str.mid(i2 + 1, i3 - i2 - 1), b_ascii);
 				if(name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
 					name.insert(0, "\\");
 				} else {
@@ -165,7 +169,8 @@ void HistoryView::replaceColors(QString &s_text) {
 		s_text.replace("color:#005858", "color:#AAFFFF");
 		s_text.replace("color:#585800", "color:#FFFFAA");
 		s_text.replace("color:#580058", "color:#FFAAFF");
-		s_text.replace("color:#000080", "color:#FFAAAA");
+		s_text.replace("color:#800000", "color:#FFAAAA");
+		s_text.replace("color:#000080", "color:#AAAAFF");
 		s_text.replace("color:#008000", "color:#BBFFBB");
 		s_text.replace("color:#668888", "color:#88AAAA");
 		s_text.replace("color:#888866", "color:#AAAA88");
@@ -182,7 +187,8 @@ void HistoryView::replaceColors(QString &s_text) {
 		s_text.replace("color:#AAFFFF", "color:#005858");
 		s_text.replace("color:#FFFFAA", "color:#585800");
 		s_text.replace("color:#FFAAFF", "color:#580058");
-		s_text.replace("color:#FFAAAA", "color:#000080");
+		s_text.replace("color:#FFAAAA", "color:#800000");
+		s_text.replace("color:#AAAAFF", "color:#000080");
 		s_text.replace("color:#BBFFBB", "color:#008000");
 		s_text.replace("color:#88AAAA", "color:#668888");
 		s_text.replace("color:#AAAA88", "color:#888866");
@@ -199,17 +205,57 @@ void replace_colors(std::string &str) {
 		gsub("color:#005858", "color:#AAFFFF", str);
 		gsub("color:#585800", "color:#FFFFAA", str);
 		gsub("color:#580058", "color:#FFAAFF", str);
-		gsub("color:#000080", "color:#FFAAAA", str);
+		gsub("color:#800000", "color:#FFAAAA", str);
+		gsub("color:#000080", "color:#AAAAFF", str);
 		gsub("color:#008000", "color:#BBFFBB", str);
 		gsub(":/icons/actions", ":/icons/dark/actions", str);
 	} else {
 		gsub("color:#AAFFFF", "color:#005858", str);
 		gsub("color:#FFFFAA", "color:#585800", str);
 		gsub("color:#FFAAFF", "color:#580058", str);
-		gsub("color:#FFAAAA", "color:#000080", str);
+		gsub("color:#FFAAAA", "color:#800000", str);
+		gsub("color:#AAAAFF", "color:#000080", str);
 		gsub("color:#BBFFBB", "color:#008000", str);
 		gsub(":/icons/dark/actions", ":/icons/actions", str);
 	}
+}
+std::string uncolorize(std::string str) {
+	size_t i = 0;
+	while(true) {
+		i = str.find(" style=\"color:#", i);
+		if(i == std::string::npos) break;
+		str.erase(i, 22);
+	}
+	gsub(" class=\"nous\"", "", str);
+	gsub(" class=\"symbol\"", "", str);
+	i = 0;
+	size_t i2 = 0, i1 = 0;
+	int depth = 0;
+	while(true) {
+		i2 = str.find("</span>", i);
+		i = str.find("<span", i);
+		if(i2 != std::string::npos && (i == std::string::npos || i2 < i)) {
+			if(depth > 0) {
+				depth--;
+				if(depth == 0 && str[i1 + 5] == '>') {
+					str.erase(i2, 7);
+					str.erase(i1, 6);
+					i = i1;
+				} else {
+					i = i2 + 7;
+				}
+			} else {
+				i = i2 + 7;
+			}
+		} else if(i != std::string::npos) {
+			if(depth == 0) i1 = i;
+			i += 6;
+			depth++;
+		} else {
+			break;
+		}
+	}
+	return str;
 }
 
 std::string replace_parse_colors(std::string str) {
@@ -247,6 +293,13 @@ void remove_top_border(QString &s_text) {
 	}
 }
 
+QString get_uah() {
+	if((settings->first_time || settings->preferences_version[0] != 4 || settings->preferences_version[1] != 1) && settings->history_answer.empty()) {
+		return "<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><img src=\":/data/flags/UAH.png\"></td>";
+	}
+	return QString();
+}
+
 void HistoryView::loadInitial() {
 	s_text.clear();
 	i_pos = 0;
@@ -270,7 +323,9 @@ void HistoryView::loadInitial() {
 			}
 		}
 	}
-	if(!s_text.isEmpty()) {
+
+	QString uah_str = get_uah();
+	if(!s_text.isEmpty() || !uah_str.isEmpty()) {
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 			replaceColors(s_text);
 			for(size_t i = 0; i < settings->v_expression.size(); i++) {
@@ -280,7 +335,7 @@ void HistoryView::loadInitial() {
 				}
 			}
 		}
-		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + uah_str + s_text + "</table></body>");
 	}
 }
 
@@ -295,25 +350,35 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
-		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %2 px; padding-top: 0px; border-top: 0px none %3; text-align:left\"><a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size()).arg(paste_h / 4).arg(textColor().name());
+		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(textColor().name());
 		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
-			str += QString::fromStdString(expression).toHtmlEscaped();
 			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
+				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+				str += QString::fromStdString(expression).toHtmlEscaped();
+				str += "</a>";
 				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
 				else str += "&nbsp; <i style=\"color: #666666\">";
+				str += QString("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
 				if(pexact) str += "= ";
-				else if(pexact) str += SIGN_ALMOST_EQUAL " ";
+				else str += SIGN_ALMOST_EQUAL " ";
 				str += QString::fromStdString(replace_parse_colors(parse));
+				str += "</a>";
 				str += "</i>";
+			} else {
+				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+				str += QString::fromStdString(expression).toHtmlEscaped();
+				str += "</a>";
 			}
 		} else {
+			str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
 			str += QString::fromStdString(parse);
+			str += "</a>";
 		}
-		str += "</a></td></tr>";
+		str += "</td></tr>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_parse.push_back(parse);
-			settings->v_pexact.push_back(true);
+			settings->v_pexact.push_back(pexact);
 			settings->v_protected.push_back(false);
 			settings->v_delexpression.push_back(false);
 			settings->v_result.push_back(values);
@@ -416,7 +481,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(b_exact > 0) str += "= ";
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
-		if(!image.isEmpty() && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
+		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
 		str += "</a></td></tr>";
 		i_answer_pre = i_answer;
 	}
@@ -472,11 +537,11 @@ void HistoryView::changeEvent(QEvent *e) {
 				replace_colors(settings->v_result[i][i2]);
 			}
 		}
-		if(!s_text.isEmpty()) {
+
+		QString uah_str = get_uah();
+		if(!s_text.isEmpty() || !uah_str.isEmpty()) {
 			replaceColors(s_text);
-			s_text.replace("1px dashed " + prev_color.name(), "1px dashed " + textColor().name());
-			s_text.replace("0px none " + prev_color.name(), "0px none " + textColor().name());
-			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + uah_str + s_text + "</table></body>");
 		}
 		prev_color = textColor();
 	}
@@ -517,6 +582,9 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 				int index = str.indexOf(":");
 				if(index < 0) emit insertValueRequested(str.mid(1).toInt());
 				else emit insertValueRequested(str.mid(1, index - 1).toInt());
+			} else if(str[0] == 'e' || str[0] == 'a') {
+				int i = str.mid(1).toInt();
+				if(i >= 0 && (size_t) i < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i].empty() ? settings->v_parse[i] : settings->v_expression[i]);
 			} else {
 				int index = str.indexOf(":");
 				if(index < 0) {
@@ -595,6 +663,7 @@ void HistoryView::editClear() {
 			if(i1 == 0) settings->current_result = NULL;
 			settings->v_delexpression[i1] = true;
 			int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
+			if(index < 0) index = s_text.indexOf("<a name=\"e" + QString::number(i1) + "\"");
 			if(index >= 0) {
 				int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
 				int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
@@ -622,6 +691,7 @@ void HistoryView::editMoveToTop() {
 	settings->v_exact.push_back(settings->v_exact[i1]);
 	settings->v_delresult.push_back(settings->v_delresult[i1]);
 	int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
+	if(index < 0) index = s_text.indexOf("<a name=\"e" + QString::number(i1) + "\"");
 	if(index >= 0) {
 		int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
 		int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
@@ -675,6 +745,10 @@ void HistoryView::editRemove() {
 		settings->v_delexpression[i1] = true;
 	}
 	int index = s_text.indexOf("<a name=\"" + sref + "\"");
+	if(index < 0 && i2 < 0) {
+		sref = "e" + QString::number(i1);
+		index = s_text.indexOf("<a name=\"" + sref + "\"");
+	}
 	if(index >= 0) {
 		int index2 = s_text.indexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "</a></td></tr>", index);
 		if(index2 >= 0) index2 += (i2 < 0 ? 0 : 14);
@@ -717,6 +791,17 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 	QString sref = anchorAt(pos);
 	if(sref.isEmpty()) {
 		QTextCursor cur = cursorForPosition(pos);
+		cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+		QString str = cur.selection().toHtml();
+		int i = str.lastIndexOf("<a name=\"");
+		if(i >= 0) {
+			i += 9;
+			int i2 = str.indexOf("\"", i);
+			if(i2 >= 0) sref = str.mid(i, i2 - i);
+		}
+	}
+	if(sref.isEmpty()) {
+		QTextCursor cur = cursorForPosition(pos);
 		cur.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
 		cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
 		QString str = cur.selection().toHtml();
@@ -743,6 +828,8 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 		} else {
 			*expression_index = sref.mid(i + 1).toInt();
 		}
+	} else if(sref[0] == 'a' || sref[0] == 'e') {
+		*expression_index = sref.mid(1).toInt();
 	} else if(i >= 0) {
 		*expression_index = sref.left(i).toInt();
 		*result_index = sref.mid(i + 1).toInt();
@@ -755,7 +842,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		cmenu = new QMenu(this);
 		insertValueAction = cmenu->addAction(tr("Insert Value"), this, SLOT(editInsertValue()));
 		insertTextAction = cmenu->addAction(tr("Insert Text"), this, SLOT(editInsertText()));
-		copyAction = new QAction(tr("Copy"));
+		copyAction = new QAction(tr("Copy"), this);
 		connect(copyAction, SIGNAL(triggered()), this, SLOT(editCopy()));
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
@@ -889,8 +976,8 @@ std::string unformat(std::string str) {
 	gsub(SIGN_MULTIPLICATION, "*", str);
 	gsub(SIGN_MULTIDOT, "*", str);
 	gsub(SIGN_MIDDLEDOT, "*", str);
-	gsub(THIN_SPACE, "", str);
-	gsub(NNBSP, "", str);
+	gsub(THIN_SPACE, " ", str);
+	gsub(NNBSP, " ", str);
 	gsub(SIGN_DIVISION, "/", str);
 	gsub(SIGN_DIVISION_SLASH, "/", str);
 	gsub(SIGN_SQRT, "sqrt", str);
@@ -899,57 +986,148 @@ std::string unformat(std::string str) {
 }
 
 void HistoryView::editCopy(int ascii) {
+	if(ascii < 0) ascii = settings->copy_ascii;
 	if(textCursor().hasSelection()) {
-		QString str = textCursor().selection().toHtml();
+		QString str = textCursor().selection().toHtml(), str_nohtml;
 		int i = str.indexOf("<!--StartFragment-->");
 		if(i >= 0) {
 			int i2 = str.indexOf("<!--EndFragment-->", i + 20);
 			if(i2 >= 0) str = str.mid(i + 20, i2 - i - 20).trimmed();
-			str = unhtmlize(str);
+			str_nohtml = unhtmlize(str, ascii);
 		} else if(str.startsWith("<!DOCTYPE")) {
 			i = str.indexOf("<body>");
 			int i2 = str.indexOf("</body>", i + 6);
 			if(i2 >= 0) str = str.mid(i + 6, i2 - i - 6).trimmed();
-			str = unhtmlize(str).trimmed();
-			str.replace("\n\n", "\n");
-			str.replace("\n ", "\n");
+			str_nohtml = unhtmlize(str, ascii).trimmed();
+			str_nohtml.replace("\n\n", "\n");
+			str_nohtml.replace("\n ", "\n");
 		} else {
-			str = unhtmlize(textCursor().selectedText());
+			str_nohtml = unhtmlize(textCursor().selectedText(), ascii);
 		}
-		if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
-			QApplication::clipboard()->setText(QString::fromStdString(unformat(str.toStdString())));
+		if(ascii) {
+			QApplication::clipboard()->setText(QString::fromStdString(unformat(str_nohtml.toStdString())));
 		} else {
+			i = 0;
+			while(true) {
+				i = str.indexOf("color:", i);
+				if(i < 0) break;
+				int i2 = str.indexOf(";", i);
+				int i3 = str.indexOf("\"", i);
+				if(i2 < 0 || i3 < i2) i2 = i3 - 1;
+				if(i2 < 0) break;
+				str.remove(i, i2 - i);
+			}
+			i = 0;
+			while(true) {
+				i = str.indexOf("<img", i);
+				if(i < 0) break;
+				int i2 = str.indexOf("/>", i);
+				if(i2 < 0) break;
+				str.remove(i, i2 - i + 2);
+			}
+			str.remove("font-size:x-large;");
+			str.remove("font-size:large;");
+			str.replace("; ;", ";");
+			str.replace("style=\" ", "style=\"");
+			str.replace("style=\" ", "style=\"");
+			str.replace("style=\"; ", "style=\"");
+			str.remove(" style=\"\"");
+			str.remove(" style=\";\"");
+			int i2 = 0;
+			QList<int> i1;
+			i = 0;
+			int depth = 0;
+			while(true) {
+				i2 = str.indexOf("</span>", i);
+				i = str.indexOf("<span", i);
+				if(i2 >= 0 && (i < 0 || i2 < i)) {
+					if(depth > 0) {
+						depth--;
+						int i3 = str.indexOf(">", i1.last());
+						if(i3 < i1.last()) break;
+						QString str2 = str.mid(i1.last() + 5, i3 - (i1.last() + 5) + 1);
+						if(str2 == ">") {
+							str.remove(i2, 7);
+							str.remove(i1.last(), 6);
+							i = i1.last();
+						} else if(str2 == " style=\"vertical-align:super;\">") {
+							str.replace(i2, 7, "</sup>");
+							str.replace(i1.last(), str2.length() + 5, "<sup>");
+							i = i1.last();
+						} else if(str2 == " style=\"font-style:italic; vertical-align:super;\">") {
+							str.replace(i2, 7, "</i></sup>");
+							str.replace(i1.last(), str2.length() + 5, "<sup><i>");
+							i = i1.last();
+						} else if(str2 == " style=\"font-style:italic;\">") {
+							str.replace(i2, 7, "</i>");
+							str.replace(i1.last(), str2.length() + 5, "<i>");
+							i = i1.last();
+						} else if(str2 == " style=\"vertical-align:sub;\">") {
+							str.replace(i2, 7, "</sub>");
+							str.replace(i1.last(), str2.length() + 5, "<sub>");
+							i = i1.last();
+						} else {
+							i = i2 + 7;
+						}
+						i1.removeLast();
+					} else {
+						i = i2 + 7;
+					}
+				} else if(i >= 0) {
+					i1 << i;
+					i += 6;
+					depth++;
+				} else {
+					break;
+				}
+			}
+			i = 0;
+			while(true) {
+				i = str.indexOf("<a", i);
+				if(i < 0) break;
+				i2 = str.indexOf(">", i);
+				if(i2 < 0) break;
+				str.remove(i, i2 - i + 1);
+			}
+			str.remove("</a>");
 			QMimeData *qm = new QMimeData();
-			qm->setHtml(textCursor().selection().toHtml());
-			qm->setText(str);
+			qm->setHtml(str);
+			qm->setText(str_nohtml);
 			qm->setObjectName("history_selection");
 			QApplication::clipboard()->setMimeData(qm);
 		}
 	} else {
 		int i1 = -1, i2 = -1;
-		indexAtPos(context_pos, &i1, &i2);
+		QString astr;
+		indexAtPos(context_pos, &i1, &i2, NULL, &astr);
 		if(i1 < 0) return;
 		if(i2 < 0) {
 			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) {
-				if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
-					if(!settings->v_expression[i1].empty()) QApplication::clipboard()->setText(QString::fromStdString(unformat(settings->v_expression[i1])));
-					else QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_parse[i1]))));
+				if(astr[0] == 'e' || (astr[0] != 'a' && settings->history_expression_type == 1 && !settings->v_expression[i1].empty())) {
+					if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
+						QApplication::clipboard()->setText(QString::fromStdString(unformat(settings->v_expression[i1])));
+					} else {
+						QApplication::clipboard()->setText(QString::fromStdString(settings->v_expression[i1]));
+					}
 				} else {
-					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(settings->v_parse[i1]));
-					if(!settings->v_expression[i1].empty()) qm->setText(QString::fromStdString(settings->v_expression[i1]));
-					else qm->setText(QString::fromStdString(unhtmlize(settings->v_parse[i1])));
-					qm->setObjectName("history_expression");
-					QApplication::clipboard()->setMimeData(qm);
+					if(ascii) {
+						QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_parse[i1], true))));
+					} else {
+						QMimeData *qm = new QMimeData();
+						qm->setHtml(QString::fromStdString(uncolorize(settings->v_parse[i1])));
+						qm->setText(QString::fromStdString(unhtmlize(settings->v_parse[i1])));
+						qm->setObjectName("history_expression");
+						QApplication::clipboard()->setMimeData(qm);
+					}
 				}
 			}
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) {
-				if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize((settings->v_result[i1][i2])))));
+				if(ascii) {
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[i1][i2], true))));
 				} else {
 					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(settings->v_result[i1][i2]));
+					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2])));
 					qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2]))));
 					qm->setObjectName("history_result");
 					QApplication::clipboard()->setMimeData(qm);

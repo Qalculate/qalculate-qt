@@ -153,6 +153,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v_parse.size() < v_expression.size()) {
 			v_parse.push_back(v_expression[v_expression.size() - 1]);
 			v_expression[v_expression.size() - 1] = "";
+			v_pexact.push_back(true);
 		}
 		if(!v_result.empty()) {
 			v_result[v_result.size() - 1].push_back(svalue);
@@ -834,8 +835,8 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_use_sampling_rate = true;
 	max_plot_time = 5;
 
-	preferences_version[0] = 3;
-	preferences_version[1] = 22;
+	preferences_version[0] = 4;
+	preferences_version[1] = 1;
 	preferences_version[2] = 0;
 
 	if(file) {
@@ -1329,11 +1330,16 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 			size_t i_first = i;
 			for(i = 0; i < v_expression.size(); i++) {
 				if((i >= i_first || v_protected[i]) && !v_delexpression[i]) {
-					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
-					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
-					if(!v_parse[i].empty()) {
-						if(v_pexact[i]) fprintf(file, "history_parse=%s\n", v_parse[i].c_str());
-						else fprintf(file, "history_parse_approximate=%s\n", v_parse[i].c_str());
+					if(v_expression[i].empty()) {
+						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_parse[i].c_str());
+						else fprintf(file, "history_expression=%s\n", v_parse[i].c_str());
+					} else {
+						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
+						else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+						if(!v_parse[i].empty()) {
+							if(v_pexact[i]) fprintf(file, "history_parse=%s\n", v_parse[i].c_str());
+							else fprintf(file, "history_parse_approximate=%s\n", v_parse[i].c_str());
+						}
 					}
 					n++;
 					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
@@ -1515,6 +1521,7 @@ void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent
 				qApp->processEvents();
 				sleep_ms(10);
 			}
+			dialog->cancel();
 			dialog->deleteLater();
 		}
 	}

@@ -61,7 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *clearHistoryAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
@@ -149,6 +149,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void insertMatrix();
 		void completeOrActivateFirst();
 		bool complete(MathStructure* = NULL, const QPoint& = QPoint(), bool = false);
+		void clearHistory();
 
 	signals:
 

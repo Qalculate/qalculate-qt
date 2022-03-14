@@ -25,8 +25,8 @@
 <file>data/flags/BSD.png</file>
 <file>data/flags/BTC.png</file>
 <file>data/flags/BWP.png</file>
-<file>data/flags/BYN.png</file>
-<file>data/flags/BYR.png</file>
+<!--<file>data/flags/BYN.png</file>-->
+<!--<file>data/flags/BYR.png</file>-->
 <file>data/flags/BZD.png</file>
 <file>data/flags/CAD.png</file>
 <file>data/flags/CDF.png</file>
@@ -135,7 +135,7 @@
 <file>data/flags/QAR.png</file>
 <file>data/flags/RON.png</file>
 <file>data/flags/RSD.png</file>
-<file>data/flags/RUB.png</file>
+<!--<file>data/flags/RUB.png</file>-->
 <file>data/flags/RWF.png</file>
 <file>data/flags/SAR.png</file>
 <file>data/flags/SBD.png</file>

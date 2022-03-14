@@ -35,6 +35,10 @@
 #include "qalculatewindow.h"
 #include "qalculateqtsettings.h"
 
+#ifdef _WIN32
+#	include <windows.h>
+#endif
+
 QString custom_title;
 QalculateQtSettings *settings;
 extern bool title_modified;
@@ -48,6 +52,9 @@ int main(int argc, char **argv) {
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
 	app.setApplicationVersion(VERSION);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
 	settings = new QalculateQtSettings();
 
@@ -107,6 +114,11 @@ int main(int argc, char **argv) {
 				}
 			}
 			if(settings->allow_multiple_instances <= 0) {
+#ifdef _WIN32
+				qint64 pid = 0;
+				lockFile.getLockInfo(&pid, NULL, NULL);
+				if(pid != 0) AllowSetForegroundWindow(pid);
+#endif
 				QTextStream outStream(stdout);
 				outStream << QApplication::tr("%1 is already running.").arg(app.applicationDisplayName()) << '\n';
 				QLocalSocket socket;

@@ -34,6 +34,7 @@
 #include <QVBoxLayout>
 #include <QStylePainter>
 #include <QMimeData>
+#include <QClipboard>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	include <QScreen>
 #else
@@ -1359,6 +1360,18 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 		editRedo();
 		return;
 	}
+	if(event->matches(QKeySequence::Copy) && !textCursor().hasSelection() && !settings->v_result.empty()) {
+		if(settings->copy_ascii) {
+			QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+		} else {
+			QMimeData *qm = new QMimeData();
+			qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
+			qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+			qm->setObjectName("history_result");
+			QApplication::clipboard()->setMimeData(qm);
+		}
+		return;
+	}
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Insert: {
@@ -1674,6 +1687,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(clear()));
 		clearAction->setShortcut(Qt::Key_Escape);
 		clearAction->setShortcutContext(Qt::WidgetShortcut);
+		clearHistoryAction = cmenu->addAction(tr("Clear History"), this, SLOT(clearHistory()));
 		cmenu->addSeparator();
 		QMenu *menu = cmenu->addMenu(tr("Completion"));
 		int completion_level = 0;
@@ -1714,6 +1728,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	deleteAction->setEnabled(b_sel);
 	selectAllAction->setEnabled(!b_empty);
 	clearAction->setEnabled(!b_empty);
+	clearHistoryAction->setEnabled(!settings->expression_history.empty());
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
 	else if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
@@ -1873,12 +1888,12 @@ void ExpressionEdit::showCurrentStatus() {
 		QString str = current_status_text;
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
-		remove_spaces(current_text);
 		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
-			std::string result = CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options);
+			std::string result = CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options);
+			remove_spaces(current_text);
 			if(!contains_plot_or_save(result)) {
 				CALCULATOR->beginTemporaryStopMessages();
 				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
@@ -1896,6 +1911,8 @@ void ExpressionEdit::showCurrentStatus() {
 					str_nohtml = "";
 				}
 			}
+		} else {
+			remove_spaces(current_text);
 		}
 		if(str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
@@ -2709,7 +2726,7 @@ void ExpressionEdit::onCursorPositionChanged() {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(block_text_change) return;
 	cursor_has_moved = true;
-	int epos = toPlainText().length() - textCursor().position();
+	int epos = document()->characterCount() - 1 - textCursor().position();
 	if(epos == previous_epos) return;
 	previous_epos = epos;
 	completionView->hide();
@@ -2718,12 +2735,11 @@ void ExpressionEdit::onCursorPositionChanged() {
 }
 bool ExpressionEdit::expressionInQuotes() {
 	bool in_cit1 = false, in_cit2 = false;
-	QString str = toPlainText();
 	int pos = textCursor().selectionStart();
 	for(int i = 0; i < pos; i++) {
-		if(!in_cit2 && str[i] == '\"') {
+		if(!in_cit2 && document()->characterAt(i) == '\"') {
 			in_cit1 = !in_cit1;
-		} else if(!in_cit1 && str[i] == '\'') {
+		} else if(!in_cit1 && document()->characterAt(i) == '\'') {
 			in_cit2 = !in_cit2;
 		}
 	}
@@ -2742,10 +2758,10 @@ void ExpressionEdit::highlightParentheses() {
 	}
 	if(textCursor().hasSelection()) return;
 	int pos = textCursor().position(), ipar2;
-	QString text = toPlainText();
-	if(pos > text.length()) pos = text.length();
-	bool b = pos < text.length() && text.at(pos) == ')';
-	if(!b && pos > 0 && text.at(pos - 1) == ')') {
+	int l = document()->characterCount() - 1;
+	if(pos > l) pos = l;
+	bool b = pos < l && document()->characterAt(pos) == ')';
+	if(!b && pos > 0 && document()->characterAt(pos - 1) == ')') {
 		pos--;
 		b = true;
 	}
@@ -2754,24 +2770,24 @@ void ExpressionEdit::highlightParentheses() {
 		int pars = 1;
 		while(ipar2 > 0) {
 			ipar2--;
-			if(text.at(ipar2) == ')') pars++;
-			else if(text.at(ipar2) == '(') pars--;
+			if(document()->characterAt(ipar2) == ')') pars++;
+			else if(document()->characterAt(ipar2) == '(') pars--;
 			if(pars == 0) break;
 		}
 		b = (pars == 0);
 	} else {
-		b = pos < text.length() && text.at(pos) == '(';
-		if(!b && pos > 0 && text.at(pos - 1) == '(') {
+		b = pos < l && document()->characterAt(pos) == '(';
+		if(!b && pos > 0 && document()->characterAt(pos - 1) == '(') {
 			pos--;
 			b = true;
 		}
 		if(b) {
 			ipar2 = pos;
 			int pars = 1;
-			while(ipar2 + 1 < text.length()) {
+			while(ipar2 + 1 < l) {
 				ipar2++;
-				if(text.at(ipar2) == '(') pars++;
-				else if(text.at(ipar2) == ')') pars--;
+				if(document()->characterAt(ipar2) == '(') pars++;
+				else if(document()->characterAt(ipar2) == ')') pars--;
 				if(pars == 0) break;
 			}
 			b = (pars == 0);
@@ -2890,6 +2906,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			cur.beginEditBlock();
 			str = CALCULATOR->unlocalizeExpression(qstr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 			cur.setPosition(istart);
+			if(quote && str.length() > 2 && str.find_first_of("\"\'") != std::string::npos) quote = false;
 			if(quote) cur.insertText(text + "(\"");
 			else cur.insertText(text + "(");
 			iend += text.length() + (quote ? 2 : 1);
@@ -3320,6 +3337,10 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 }
 void ExpressionEdit::hideCompletion() {
 	completionView->hide();
+}
+void ExpressionEdit::clearHistory() {
+	settings->expression_history.clear();
+	history_index = -1;
 }
 void ExpressionEdit::addToHistory() {
 	std::string str = toPlainText().toStdString();
