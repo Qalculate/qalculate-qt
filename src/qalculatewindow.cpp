@@ -5033,7 +5033,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			gsub("\n", "<br>", alt_results[i]);
 		}
 		QString flag;
-		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
+		if((mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) || (mstruct->isUnit() && mstruct->unit()->isCurrency())) {
 			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
 			if(!QFile::exists(flag)) flag.clear();
 		}

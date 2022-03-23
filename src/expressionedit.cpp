@@ -29,6 +29,7 @@
 #include <QMenu>
 #include <QCalendarWidget>
 #include <QDialog>
+#include <QFile>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QVBoxLayout>
@@ -933,8 +934,10 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
 						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
 						items.append(item); \
-						if(flagheight <= 0) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName()))); \
-						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName()))); \
+						if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) item = new QStandardItem(y); \
+						else if(flagheight <= 0) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName()))); \
+						else if(flagheight == 32) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img width=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight / ratio).arg(QString::fromStdString(u->referenceName()))); \
+						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight / ratio).arg(QString::fromStdString(u->referenceName()))); \
 						item->setData(ifont, Qt::FontRole); \
 						items.append(item); \
 						sourceModel->appendRow(items);
@@ -947,9 +950,11 @@ void ExpressionEdit::updateCompletion() {
 	QList<QStandardItem *> items;
 	QFont ifont(completionView->font());
 	QFontMetrics fm(ifont);
-	int flagheight = fm.ascent();
-	if(flagheight >= 32) flagheight = -1;
+	qreal ratio = qApp->devicePixelRatio();
+	int flagheight = fm.height() * ratio;
+	if(flagheight >= 32) flagheight = (ratio == 1 ? -1 : 32);
 	else if(flagheight > 16) flagheight = 16;
+	else flagheight /= ratio;
 	ifont.setStyle(QFont::StyleItalic);
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
 		if(CALCULATOR->functions[i]->isActive()) {

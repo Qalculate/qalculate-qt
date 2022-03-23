@@ -481,7 +481,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(b_exact > 0) str += "= ";
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
-		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
+		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) {
+			if(qApp->devicePixelRatio() > 1) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" width=\"%2\"/>").arg(image).arg(32 / qApp->devicePixelRatio());
+			else str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
+		}
 		str += "</a></td></tr>";
 		i_answer_pre = i_answer;
 	}
