@@ -61,8 +61,8 @@ bool item_in_calculator(ExpressionItem *item) {
 	return false;
 }
 
-AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
-	if(QApplication::tr("answer") != "answer") addName("answer");
+AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
+	if(QApplication::tr("answer") != "answer") addName(QApplication::tr("answer").toStdString(), 1);
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
 	arg->addArgument(new IntegerArgument("", ARGUMENT_MIN_MAX_NONZERO, true, true, INTEGER_TYPE_SINT));
 	setArgumentDefinition(1, arg);
@@ -241,6 +241,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= 0 && v <= 3) keypad_type = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
+	} else if(svar == "show_keypad") {
+		show_keypad = v;
 	} else if(svar == "show_bases") {
 		show_bases = v;
 	} else if(svar == "version") {
@@ -758,6 +760,7 @@ void QalculateQtSettings::loadPreferences() {
 	expression_status_delay = 1000;
 	prefixes_default = true;
 	keypad_type = 0;
+	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
 	use_custom_result_font = false;
@@ -837,7 +840,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 4;
 	preferences_version[1] = 1;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -1075,7 +1078,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					} else if(!clear_history_on_exit && stmp == "[History]") {
 						b_history = true;
 					} else if((i = stmp.find_first_of("=")) != std::string::npos) {
-						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_bases") {
+						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_keypad" || stmp.substr(0, i) == "show_bases") {
 							sgeneral += stmp;
 							sgeneral += "\n";
 						}
@@ -1152,6 +1155,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fputs(sgeneral.c_str(), file);
 	} else {
 		fprintf(file, "keypad_type=%i\n", keypad_type);
+		if(show_keypad >= 0) fprintf(file, "show_keypad=%i\n", show_keypad);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
 		fprintf(file, "show_bases=%i\n", show_bases);
 	}

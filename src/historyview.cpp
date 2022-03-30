@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include <QDialog>
 #include <QMimeData>
+#include <QDate>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -293,9 +294,10 @@ void remove_top_border(QString &s_text) {
 	}
 }
 
-QString get_uah() {
-	if((settings->first_time || settings->preferences_version[0] != 4 || settings->preferences_version[1] != 1) && settings->history_answer.empty()) {
-		return "<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><img src=\":/data/flags/UAH.png\"></td>";
+QString get_uah(QWidget *w) {
+	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 9) {
+		QFontMetrics fm(w->font());
+		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></td>").arg(fm.ascent() * 1.5);
 	}
 	return QString();
 }
@@ -324,7 +326,7 @@ void HistoryView::loadInitial() {
 		}
 	}
 
-	QString uah_str = get_uah();
+	QString uah_str = get_uah(this);
 	if(!s_text.isEmpty() || !uah_str.isEmpty()) {
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 			replaceColors(s_text);
@@ -340,10 +342,8 @@ void HistoryView::loadInitial() {
 }
 
 #define PASTE_H QFontMetrics fm(font()); \
-	int paste_h = fm.ascent(); \
-	if(paste_h < 16) {paste_h = 12;} \
-	else if(paste_h < 24) {paste_h = 16;} \
-	else {paste_h = 24;} \
+	int paste_h = fm.ascent() * 0.75; \
+	if(paste_h < 12) paste_h = 12;
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
 	if(initial_load && settings->v_delexpression[index]) return;
@@ -482,8 +482,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) {
-			if(qApp->devicePixelRatio() > 1) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" width=\"%2\"/>").arg(image).arg(32 / qApp->devicePixelRatio());
-			else str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\"/>").arg(image);
+			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"/>").arg(image).arg(fm.ascent());
 		}
 		str += "</a></td></tr>";
 		i_answer_pre = i_answer;
@@ -541,7 +540,7 @@ void HistoryView::changeEvent(QEvent *e) {
 			}
 		}
 
-		QString uah_str = get_uah();
+		QString uah_str = get_uah(this);
 		if(!s_text.isEmpty() || !uah_str.isEmpty()) {
 			replaceColors(s_text);
 			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + uah_str + s_text + "</table></body>");
@@ -973,7 +972,7 @@ std::string replace_first_minus(const std::string &str) {
 	return str;
 }
 
-std::string unformat(std::string str) {
+std::string unformat(std::string str, bool restorable) {
 	remove_separator(str);
 	gsub(SIGN_MINUS, "-", str);
 	gsub(SIGN_MULTIPLICATION, "*", str);
@@ -985,6 +984,7 @@ std::string unformat(std::string str) {
 	gsub(SIGN_DIVISION_SLASH, "/", str);
 	gsub(SIGN_SQRT, "sqrt", str);
 	gsub("Ω", "ohm", str);
+	gsub("µ", restorable ? "µ" : "u", str);
 	return str;
 }
 

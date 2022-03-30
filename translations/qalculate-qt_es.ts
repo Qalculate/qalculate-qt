@@ -5932,7 +5932,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1303"/>
-        <location filename="../src/expressionedit.cpp" line="2269"/>
+        <location filename="../src/expressionedit.cpp" line="2277"/>
         <source>Unicode</source>
         <translation>Unicode</translation>
     </message>
@@ -5942,92 +5942,92 @@ Do you want to overwrite the function?</source>
         <translation>Huso horario UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1661"/>
+        <location filename="../src/expressionedit.cpp" line="1669"/>
         <source>Undo</source>
         <translation>Deshacer</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1664"/>
+        <location filename="../src/expressionedit.cpp" line="1672"/>
         <source>Redo</source>
         <translation>Rehacer</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1668"/>
+        <location filename="../src/expressionedit.cpp" line="1676"/>
         <source>Cut</source>
         <translation type="unfinished">Cortar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1671"/>
+        <location filename="../src/expressionedit.cpp" line="1679"/>
         <source>Copy</source>
         <translation>Copiar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1674"/>
+        <location filename="../src/expressionedit.cpp" line="1682"/>
         <source>Paste</source>
         <translation type="unfinished">Pegar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1677"/>
+        <location filename="../src/expressionedit.cpp" line="1685"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1681"/>
+        <location filename="../src/expressionedit.cpp" line="1689"/>
         <source>Insert Date…</source>
         <translation>Insertar fecha…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1682"/>
+        <location filename="../src/expressionedit.cpp" line="1690"/>
         <source>Insert Matrix…</source>
         <translation>Insertar matriz…</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1684"/>
+        <location filename="../src/expressionedit.cpp" line="1692"/>
         <source>Select All</source>
         <translation type="unfinished">Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1687"/>
+        <location filename="../src/expressionedit.cpp" line="1695"/>
         <source>Clear</source>
         <translation>Limpiar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1690"/>
+        <location filename="../src/expressionedit.cpp" line="1698"/>
         <source>Clear History</source>
         <translation type="unfinished">Limpiar historial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1692"/>
+        <location filename="../src/expressionedit.cpp" line="1700"/>
         <source>Completion</source>
         <translation>Completado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1704"/>
+        <location filename="../src/expressionedit.cpp" line="1712"/>
         <source>No completion</source>
         <translation>Sin completado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1705"/>
+        <location filename="../src/expressionedit.cpp" line="1713"/>
         <source>Limited strict completion</source>
         <translation>Completado estricto limitado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1706"/>
+        <location filename="../src/expressionedit.cpp" line="1714"/>
         <source>Strict completion</source>
         <translation>Completado estricto</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1707"/>
+        <location filename="../src/expressionedit.cpp" line="1715"/>
         <source>Limited full completion</source>
         <translation>Completado completo limitado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1708"/>
+        <location filename="../src/expressionedit.cpp" line="1716"/>
         <source>Full completion</source>
         <translation>Completado completo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1710"/>
+        <location filename="../src/expressionedit.cpp" line="1718"/>
         <source>Delayed completion</source>
         <translation>Completado retrasado</translation>
     </message>
@@ -6036,352 +6036,352 @@ Do you want to overwrite the function?</source>
         <translation type="obsolete">Habilitar método de entrada</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1711"/>
+        <location filename="../src/expressionedit.cpp" line="1719"/>
         <source>Expression Status</source>
         <translation type="unfinished">Estado de la expresión</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1713"/>
+        <location filename="../src/expressionedit.cpp" line="1721"/>
         <source>Off</source>
         <translation type="unfinished">Desactivado</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1714"/>
+        <location filename="../src/expressionedit.cpp" line="1722"/>
         <source>With delay</source>
         <translation type="unfinished">Con retraso</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1715"/>
+        <location filename="../src/expressionedit.cpp" line="1723"/>
         <source>Without delay</source>
         <translation type="unfinished">Sin demora</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1717"/>
+        <location filename="../src/expressionedit.cpp" line="1725"/>
         <source>Use input method</source>
         <translation type="unfinished">Usar método de entrada</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1754"/>
+        <location filename="../src/expressionedit.cpp" line="1762"/>
         <source>Matrix</source>
         <translation>Matriz</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1966"/>
+        <location filename="../src/expressionedit.cpp" line="1974"/>
         <source>Too many arguments for %1().</source>
         <translation>Demasiados argumentos para %1().</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1995"/>
+        <location filename="../src/expressionedit.cpp" line="2003"/>
         <source>argument</source>
         <translation>argumento</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2012"/>
+        <location filename="../src/expressionedit.cpp" line="2020"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2066"/>
+        <location filename="../src/expressionedit.cpp" line="2074"/>
         <source>MC (memory clear)</source>
         <translation>MC (limpiar la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2069"/>
+        <location filename="../src/expressionedit.cpp" line="2077"/>
         <source>MS (memory store)</source>
         <translation>MS (guardar en la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2072"/>
+        <location filename="../src/expressionedit.cpp" line="2080"/>
         <source>M+ (memory plus)</source>
         <translation>M+ (añadir a la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2075"/>
+        <location filename="../src/expressionedit.cpp" line="2083"/>
         <source>M− (memory minus)</source>
         <translation>M− (quitar de la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2083"/>
-        <location filename="../src/expressionedit.cpp" line="2085"/>
+        <location filename="../src/expressionedit.cpp" line="2091"/>
+        <location filename="../src/expressionedit.cpp" line="2093"/>
         <source>factorize</source>
         <translation>factorizar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2086"/>
-        <location filename="../src/expressionedit.cpp" line="2088"/>
+        <location filename="../src/expressionedit.cpp" line="2094"/>
+        <location filename="../src/expressionedit.cpp" line="2096"/>
         <source>expand</source>
         <translation>expandir</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2236"/>
+        <location filename="../src/expressionedit.cpp" line="2244"/>
         <source>hexadecimal</source>
         <translation>hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2237"/>
-        <location filename="../src/expressionedit.cpp" line="2347"/>
+        <location filename="../src/expressionedit.cpp" line="2245"/>
+        <location filename="../src/expressionedit.cpp" line="2355"/>
         <source>hexadecimal number</source>
         <translation>número hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2238"/>
+        <location filename="../src/expressionedit.cpp" line="2246"/>
         <source>octal</source>
         <translation>octal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2239"/>
+        <location filename="../src/expressionedit.cpp" line="2247"/>
         <source>octal number</source>
         <translation>número octal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2240"/>
+        <location filename="../src/expressionedit.cpp" line="2248"/>
         <source>decimal</source>
         <translation>decimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2241"/>
+        <location filename="../src/expressionedit.cpp" line="2249"/>
         <source>decimal number</source>
         <translation>número decimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2242"/>
+        <location filename="../src/expressionedit.cpp" line="2250"/>
         <source>duodecimal</source>
         <translation>duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2243"/>
+        <location filename="../src/expressionedit.cpp" line="2251"/>
         <source>duodecimal number</source>
         <translation>número duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2244"/>
+        <location filename="../src/expressionedit.cpp" line="2252"/>
         <source>binary</source>
         <translation>binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2245"/>
-        <location filename="../src/expressionedit.cpp" line="2341"/>
+        <location filename="../src/expressionedit.cpp" line="2253"/>
+        <location filename="../src/expressionedit.cpp" line="2349"/>
         <source>binary number</source>
         <translation>número binario</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2246"/>
+        <location filename="../src/expressionedit.cpp" line="2254"/>
         <source>roman</source>
         <translation>romano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2247"/>
+        <location filename="../src/expressionedit.cpp" line="2255"/>
         <source>roman numerals</source>
         <translation>números romanos</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2248"/>
+        <location filename="../src/expressionedit.cpp" line="2256"/>
         <source>bijective</source>
         <translation>biyectivo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2249"/>
+        <location filename="../src/expressionedit.cpp" line="2257"/>
         <source>bijective base-26</source>
         <translation>base biyectiva 26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2250"/>
+        <location filename="../src/expressionedit.cpp" line="2258"/>
         <source>sexagesimal</source>
         <translation>sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2251"/>
+        <location filename="../src/expressionedit.cpp" line="2259"/>
         <source>sexagesimal number</source>
         <translation>número sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2252"/>
-        <location filename="../src/expressionedit.cpp" line="2253"/>
+        <location filename="../src/expressionedit.cpp" line="2260"/>
+        <location filename="../src/expressionedit.cpp" line="2261"/>
         <source>latitude</source>
         <translation>latitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2254"/>
-        <location filename="../src/expressionedit.cpp" line="2255"/>
+        <location filename="../src/expressionedit.cpp" line="2262"/>
+        <location filename="../src/expressionedit.cpp" line="2263"/>
         <source>longitude</source>
         <translation>longitud</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2257"/>
+        <location filename="../src/expressionedit.cpp" line="2265"/>
         <source>32-bit floating point</source>
         <translation>punto flotante de 32 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2259"/>
+        <location filename="../src/expressionedit.cpp" line="2267"/>
         <source>64-bit floating point</source>
         <translation>punto flotante de 64 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2261"/>
+        <location filename="../src/expressionedit.cpp" line="2269"/>
         <source>16-bit floating point</source>
         <translation>punto flotante de 16 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2263"/>
+        <location filename="../src/expressionedit.cpp" line="2271"/>
         <source>80-bit (x86) floating point</source>
         <translation>punto flotante de 80 bits (x86)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2265"/>
+        <location filename="../src/expressionedit.cpp" line="2273"/>
         <source>128-bit floating point</source>
         <translation>punto flotante de 128 bits</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2266"/>
+        <location filename="../src/expressionedit.cpp" line="2274"/>
         <source>time</source>
         <translation>tiempo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2267"/>
+        <location filename="../src/expressionedit.cpp" line="2275"/>
         <source>time format</source>
         <translation>formato de tiempo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2270"/>
+        <location filename="../src/expressionedit.cpp" line="2278"/>
         <source>bases</source>
         <translation>bases</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2271"/>
+        <location filename="../src/expressionedit.cpp" line="2279"/>
         <source>number bases</source>
         <translation>bases numéricas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2272"/>
-        <location filename="../src/expressionedit.cpp" line="2273"/>
+        <location filename="../src/expressionedit.cpp" line="2280"/>
+        <location filename="../src/expressionedit.cpp" line="2281"/>
         <source>calendars</source>
         <translation>calendarios</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2274"/>
+        <location filename="../src/expressionedit.cpp" line="2282"/>
         <source>optimal</source>
         <translation type="unfinished">óptima</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2275"/>
+        <location filename="../src/expressionedit.cpp" line="2283"/>
         <source>optimal unit</source>
         <translation>unidad óptima</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2276"/>
-        <location filename="../src/expressionedit.cpp" line="2351"/>
+        <location filename="../src/expressionedit.cpp" line="2284"/>
+        <location filename="../src/expressionedit.cpp" line="2359"/>
         <source>base</source>
         <translation>base</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2277"/>
+        <location filename="../src/expressionedit.cpp" line="2285"/>
         <source>base units</source>
         <translation>unidades base</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2278"/>
+        <location filename="../src/expressionedit.cpp" line="2286"/>
         <source>mixed</source>
         <translation type="unfinished">mixtas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2279"/>
+        <location filename="../src/expressionedit.cpp" line="2287"/>
         <source>mixed units</source>
         <translation>unidades mixtas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2280"/>
-        <location filename="../src/expressionedit.cpp" line="2281"/>
+        <location filename="../src/expressionedit.cpp" line="2288"/>
+        <location filename="../src/expressionedit.cpp" line="2289"/>
         <source>fraction</source>
         <translation>fracción</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2282"/>
-        <location filename="../src/expressionedit.cpp" line="2283"/>
+        <location filename="../src/expressionedit.cpp" line="2290"/>
+        <location filename="../src/expressionedit.cpp" line="2291"/>
         <source>factors</source>
         <translation>factores</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2284"/>
+        <location filename="../src/expressionedit.cpp" line="2292"/>
         <source>partial fraction</source>
         <translation type="unfinished">fracción parcial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2285"/>
+        <location filename="../src/expressionedit.cpp" line="2293"/>
         <source>expanded partial fractions</source>
         <translation>fracciones parciales expandidas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2286"/>
+        <location filename="../src/expressionedit.cpp" line="2294"/>
         <source>rectangular</source>
         <translation type="unfinished">rectangular</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2286"/>
+        <location filename="../src/expressionedit.cpp" line="2294"/>
         <source>cartesian</source>
         <translation>cartesiano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2287"/>
+        <location filename="../src/expressionedit.cpp" line="2295"/>
         <source>complex rectangular form</source>
         <translation type="unfinished">forma compleja rectangular</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2288"/>
+        <location filename="../src/expressionedit.cpp" line="2296"/>
         <source>exponential</source>
         <translation>exponencial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2289"/>
+        <location filename="../src/expressionedit.cpp" line="2297"/>
         <source>complex exponential form</source>
         <translation>forma compleja exponencial</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2290"/>
+        <location filename="../src/expressionedit.cpp" line="2298"/>
         <source>polar</source>
         <translation>polar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2291"/>
+        <location filename="../src/expressionedit.cpp" line="2299"/>
         <source>complex polar form</source>
         <translation>forma compleja polar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2293"/>
+        <location filename="../src/expressionedit.cpp" line="2301"/>
         <source>complex cis form</source>
         <translation>forma compleja cis</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2294"/>
+        <location filename="../src/expressionedit.cpp" line="2302"/>
         <source>angle</source>
         <translation>ángulo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2295"/>
+        <location filename="../src/expressionedit.cpp" line="2303"/>
         <source>complex angle notation</source>
         <translation>Notación compleja de ángulo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2296"/>
+        <location filename="../src/expressionedit.cpp" line="2304"/>
         <source>phasor</source>
         <translation>fasor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2297"/>
+        <location filename="../src/expressionedit.cpp" line="2305"/>
         <source>complex phasor notation</source>
         <translation>notación compleja de fasor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2299"/>
+        <location filename="../src/expressionedit.cpp" line="2307"/>
         <source>UTC time zone</source>
         <translation>huso horario UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2352"/>
+        <location filename="../src/expressionedit.cpp" line="2360"/>
         <source>number base %1</source>
         <translation>base numérica %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2625"/>
+        <location filename="../src/expressionedit.cpp" line="2633"/>
         <source>Data object</source>
         <translation>Objeto de datos</translation>
     </message>
@@ -6770,18 +6770,18 @@ Do you want to overwrite the function?</source>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="843"/>
+        <location filename="../src/historyview.cpp" line="845"/>
         <source>Insert Value</source>
         <translation type="unfinished">Insertar valor</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="844"/>
+        <location filename="../src/historyview.cpp" line="846"/>
         <source>Insert Text</source>
         <translation type="unfinished">Insertar texto</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="845"/>
-        <location filename="../src/historyview.cpp" line="849"/>
+        <location filename="../src/historyview.cpp" line="847"/>
+        <location filename="../src/historyview.cpp" line="851"/>
         <source>Copy</source>
         <translation>Copiar</translation>
     </message>
@@ -6790,48 +6790,48 @@ Do you want to overwrite the function?</source>
         <translation type="obsolete">Copiar texto formateado</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="850"/>
+        <location filename="../src/historyview.cpp" line="852"/>
         <source>Copy unformatted ASCII</source>
         <translation type="unfinished">Copiar ASCII sin formato</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="851"/>
+        <location filename="../src/historyview.cpp" line="853"/>
         <source>Select All</source>
         <translation type="unfinished">Seleccionar todos</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="854"/>
+        <location filename="../src/historyview.cpp" line="856"/>
         <source>Search…</source>
         <translation type="unfinished">Buscar…</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="858"/>
+        <location filename="../src/historyview.cpp" line="860"/>
         <source>Protect</source>
         <translation type="unfinished">Proteger</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="860"/>
+        <location filename="../src/historyview.cpp" line="862"/>
         <source>Move to Top</source>
         <translation type="unfinished">Mover a la cima</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="862"/>
+        <location filename="../src/historyview.cpp" line="864"/>
         <source>Remove</source>
         <translation type="unfinished">Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="863"/>
+        <location filename="../src/historyview.cpp" line="865"/>
         <source>Clear</source>
         <translation>Limpiar</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="916"/>
+        <location filename="../src/historyview.cpp" line="918"/>
         <source>Text:</source>
         <translation type="unfinished">Texto:</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="914"/>
-        <location filename="../src/historyview.cpp" line="921"/>
+        <location filename="../src/historyview.cpp" line="916"/>
+        <location filename="../src/historyview.cpp" line="923"/>
         <source>Search</source>
         <translation type="unfinished">Buscar</translation>
     </message>
@@ -8051,6 +8051,11 @@ Do you want to overwrite the function?</source>
         <translation>Ignorar puntos en números</translation>
     </message>
     <message>
+        <location filename="../src/preferencesdialog.cpp" line="172"/>
+        <source>Copy unformatted ASCII by default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/preferencesdialog.cpp" line="198"/>
         <source>Round halfway numbers away from zero</source>
         <translation type="unfinished">Redondear números intermedios lejos de cero</translation>
@@ -8094,11 +8099,6 @@ Do you want to overwrite the function?</source>
         <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Simplified percentage calculation</source>
         <translation type="unfinished">Cálculo porcentual simplificado</translation>
-    </message>
-    <message>
-        <location filename="../src/preferencesdialog.cpp" line="172"/>
-        <source>Copy result as unformatted ASCII by default</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="175"/>
@@ -8390,9 +8390,8 @@ Si múltiples instancias están abiertas simultáneamente, solo las definiciones
 </translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="64"/>
         <location filename="../src/qalculateqtsettings.cpp" line="65"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="909"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="912"/>
         <source>answer</source>
         <translation>respuesta</translation>
     </message>
@@ -8412,68 +8411,68 @@ Si múltiples instancias están abiertas simultáneamente, solo las definiciones
         <translation>Índice de historial %s no existe.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="908"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="911"/>
         <source>Last Answer</source>
         <translation>Última respuesta</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="911"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="914"/>
         <source>Answer 2</source>
         <translation>Respuesta 2</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="912"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="915"/>
         <source>Answer 3</source>
         <translation>Respuesta 3</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="913"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="916"/>
         <source>Answer 4</source>
         <translation>Respuesta 4</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="914"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="917"/>
         <source>Answer 5</source>
         <translation>Respuesta 5</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="915"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="918"/>
         <source>Memory</source>
         <translation>Memoria</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1044"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1787"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1795"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1803"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1819"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1047"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1791"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1799"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1807"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1823"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1044"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1047"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
         <translation>No se pudieron guardar las preferencias en 
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1787"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1791"/>
         <source>Function not found.</source>
         <translation type="unfinished">Función no encontrada.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1795"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1799"/>
         <source>Variable not found.</source>
         <translation type="unfinished">Variable no encontrada.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1803"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1807"/>
         <source>Unit not found.</source>
         <translation type="unfinished">Unidad no encontrada.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1819"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1823"/>
         <source>Unsupported base.</source>
         <translation type="unfinished">Base no soportada.</translation>
     </message>
@@ -8481,12 +8480,12 @@ Si múltiples instancias están abiertas simultáneamente, solo las definiciones
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1488"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1492"/>
         <source>Update exchange rates?</source>
         <translation type="unfinished">¿Actualizar tasas de cambio?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="1488"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1492"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
@@ -8504,59 +8503,59 @@ Do you wish to update the exchange rates now?</source>
         <translation type="vanished">Buscando tasas de cambio.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1516"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1517"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1520"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1521"/>
         <source>Fetching exchange rates…</source>
         <translation type="unfinished">Buscando tasas de cambio…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1551"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1564"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1573"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1624"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1647"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1555"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1568"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1577"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1628"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1651"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1552"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1556"/>
         <source>Warning</source>
         <translation type="unfinished">Advertencia</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1553"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
         <source>Information</source>
         <translation type="unfinished">Información</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1564"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1568"/>
         <source>Path of executable not found.</source>
         <translation>Ruta de ejecutable no encontrada.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1573"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1577"/>
         <source>curl not found.</source>
         <translation>No se encontró curl.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1624"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1628"/>
         <source>Failed to run update script.
 %1</source>
         <translation>Error al ejecutar el script de actualización.
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1647"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1651"/>
         <source>Failed to check for updates.</source>
         <translation>Fallo al buscar actualizaciones.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1648"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
         <source>No updates found.</source>
         <translation>No se encontró ninguna actualización.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1654"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
@@ -8565,7 +8564,7 @@ Do you wish to update to version %3?</source>
 ¿Quiere actualizar a la versión %3?</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
@@ -8574,437 +8573,437 @@ You can get version %3 at %2.</source>
 Puedes obtener la versión %3 en %2.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1686"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1690"/>
         <source>%1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1690"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1694"/>
         <source>Insert function</source>
         <translation type="unfinished">Insertar función</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1691"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1695"/>
         <source>Insert function (dialog)</source>
         <translation type="unfinished">Insertar función (diálogo)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1692"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1696"/>
         <source>Insert variable</source>
         <translation type="unfinished">Insertar variable</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1693"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1697"/>
         <source>Approximate result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1694"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1698"/>
         <source>Negate</source>
         <translation type="unfinished">Negar</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1695"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1699"/>
         <source>Invert</source>
         <translation type="unfinished">Invertir</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1696"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1700"/>
         <source>Insert unit</source>
         <translation type="unfinished">Insertar unidad</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1697"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1701"/>
         <source>Insert text</source>
         <translation type="unfinished">Insertar texto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1698"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1702"/>
         <source>Insert operator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1699"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1703"/>
         <source>Insert date</source>
         <translation type="unfinished">Insertar fecha</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1700"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1704"/>
         <source>Insert matrix</source>
         <translation type="unfinished">Insertar matriz</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1701"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1705"/>
         <source>Insert smart parentheses</source>
         <translation type="unfinished">Insertar paréntesis inteligentes</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1702"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1706"/>
         <source>Convert to unit</source>
         <translation type="unfinished">Convertir a unidad</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1703"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1707"/>
         <source>Convert</source>
         <translation type="unfinished">Convertir</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1704"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1708"/>
         <source>Convert to optimal unit</source>
         <translation type="unfinished">Convertir a unidades óptimas</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1705"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1709"/>
         <source>Convert to base units</source>
         <translation type="unfinished">Convertir a unidades base</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1706"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1710"/>
         <source>Convert to optimal prefix</source>
         <translation type="unfinished">Convertir a prefijo óptimo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1707"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1711"/>
         <source>Convert to number base</source>
         <translation type="unfinished">Convertir a base numérica</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1708"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1712"/>
         <source>Factorize result</source>
         <translation type="unfinished">Factorizar resultado</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1709"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1713"/>
         <source>Expand result</source>
         <translation type="unfinished">Expandir resultado</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1710"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1714"/>
         <source>Expand partial fractions</source>
         <translation type="unfinished">Expandir fracciones parciales</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1711"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1715"/>
         <source>RPN: down</source>
         <translation type="unfinished">RPN: abajo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1712"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1716"/>
         <source>RPN: up</source>
         <translation type="unfinished">RPN: arriba</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1713"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1717"/>
         <source>RPN: swap</source>
         <translation type="unfinished">RPN: intercambiar</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1714"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1718"/>
         <source>RPN: copy</source>
         <translation type="unfinished">RPN: copiar</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1715"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1719"/>
         <source>RPN: lastx</source>
         <translation type="unfinished">RPN: último x</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1716"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1720"/>
         <source>RPN: delete register</source>
         <translation type="unfinished">RPN: eliminar registro</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1717"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1721"/>
         <source>RPN: clear stack</source>
         <translation type="unfinished">RPN: limpiar pila</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1718"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1722"/>
         <source>Set expression base</source>
         <translation type="unfinished">Definir base de expresión</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1719"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1723"/>
         <source>Set result base</source>
         <translation type="unfinished">Definir base de resultado</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1720"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1724"/>
         <source>Set angle unit to degrees</source>
         <translation type="unfinished">Definir unidad de ángulos a grados</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1721"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1725"/>
         <source>Set angle unit to radians</source>
         <translation type="unfinished">Definir unidad de ángulos a radianes</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1722"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1726"/>
         <source>Set angle unit to gradians</source>
         <translation type="unfinished">Definir unidad de ángulos a gradianes</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1723"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1727"/>
         <source>Active normal display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1724"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1728"/>
         <source>Activate scientific display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1725"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1729"/>
         <source>Activate engineering display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1726"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1730"/>
         <source>Activate simple display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1727"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1731"/>
         <source>Toggle RPN mode</source>
         <translation type="unfinished">Alternar modo RPN</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1728"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1732"/>
         <source>Show general keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1729"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1733"/>
         <source>Toggle programming keypad</source>
         <translation type="unfinished">Alternar teclado de programación</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1730"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1734"/>
         <source>Toggle algebra keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1731"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1735"/>
         <source>Toggle custom keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1732"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1736"/>
         <source>Show/hide keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1733"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1737"/>
         <source>Search history</source>
         <translation type="unfinished">Buscar historial</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1734"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1738"/>
         <source>Show variables</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1735"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1739"/>
         <source>Show functions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1736"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1740"/>
         <source>Show units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1737"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1741"/>
         <source>Show data sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1738"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1742"/>
         <source>Store result</source>
         <translation type="unfinished">Guardar resultado</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1739"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1743"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished">MC (limpiar la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1740"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1744"/>
         <source>MR (memory recall)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1741"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1745"/>
         <source>MS (memory store)</source>
         <translation type="unfinished">MS (guardar en la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1742"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1746"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished">M+ (añadir a la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1743"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1747"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished">M− (quitar de la memoria)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1744"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1748"/>
         <source>New variable</source>
         <translation type="unfinished">Nueva variable</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1745"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1749"/>
         <source>New function</source>
         <translation type="unfinished">Nueva función</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1746"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1750"/>
         <source>Open plot functions/data</source>
         <translation type="unfinished">Abrir graficado de función/datos</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1747"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1751"/>
         <source>Open convert number bases</source>
         <translation type="unfinished">Abrir conversión de bases numéricas</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1748"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1752"/>
         <source>Open floating point conversion</source>
         <translation type="unfinished">Abrir conversión de punto flotante</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1749"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1753"/>
         <source>Open calender conversion</source>
         <translation type="unfinished">Abrir conversión de calendario</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1750"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1754"/>
         <source>Open percentage calculation tool</source>
         <translation type="unfinished">Abrir herramienta de cálculo de porcentaje</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1751"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1755"/>
         <source>Open periodic table</source>
         <translation type="unfinished">Abrir tabla periódica</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1752"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1756"/>
         <source>Update exchange rates</source>
         <translation type="unfinished">Actualizar tasas de cambio</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1753"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1757"/>
         <source>Copy result</source>
         <translation type="unfinished">Copiar resultado</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1754"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1758"/>
         <source>Insert result</source>
         <translation type="unfinished">Insertar texto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1755"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1759"/>
         <source>Open mode menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1756"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1760"/>
         <source>Open menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1757"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1761"/>
         <source>Help</source>
         <translation type="unfinished">Ayuda</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1758"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1762"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1759"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1763"/>
         <source>Toggle chain mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1760"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1764"/>
         <source>Toggle keep above</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1761"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1765"/>
         <source>Show completion (activate first item)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1762"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1766"/>
         <source>Clear expression</source>
         <translation type="unfinished">Limpiar expresión</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1763"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1767"/>
         <source>Delete</source>
         <translation type="unfinished">Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1764"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1768"/>
         <source>Backspace</source>
         <translation type="unfinished">Retroceso</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1765"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1769"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1766"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1770"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1767"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1771"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1768"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1772"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1769"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1773"/>
         <source>Up</source>
         <translation type="unfinished">Arriba</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1770"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1774"/>
         <source>Down</source>
         <translation type="unfinished">Abajo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1771"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1775"/>
         <source>Undo</source>
         <translation type="unfinished">Deshacer</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1772"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1776"/>
         <source>Redo</source>
         <translation type="unfinished">Rehacer</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1773"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1777"/>
         <source>Calculate expression</source>
         <translation type="unfinished">Calcular expresión</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1774"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1778"/>
         <source>Expression history next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1775"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1779"/>
         <source>Expression history previous</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9082,9 +9081,9 @@ Puedes obtener la versión %3 en %2.</translation>
     <name>QalculateWindow</name>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="362"/>
-        <location filename="../src/qalculatewindow.cpp" line="899"/>
-        <location filename="../src/qalculatewindow.cpp" line="937"/>
-        <location filename="../src/qalculatewindow.cpp" line="1017"/>
+        <location filename="../src/qalculatewindow.cpp" line="900"/>
+        <location filename="../src/qalculatewindow.cpp" line="938"/>
+        <location filename="../src/qalculatewindow.cpp" line="1018"/>
         <source>Menu</source>
         <translation type="unfinished">Menú</translation>
     </message>
@@ -9155,9 +9154,9 @@ Puedes obtener la versión %3 en %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="387"/>
         <location filename="../src/qalculatewindow.cpp" line="636"/>
-        <location filename="../src/qalculatewindow.cpp" line="896"/>
-        <location filename="../src/qalculatewindow.cpp" line="929"/>
-        <location filename="../src/qalculatewindow.cpp" line="1009"/>
+        <location filename="../src/qalculatewindow.cpp" line="897"/>
+        <location filename="../src/qalculatewindow.cpp" line="930"/>
+        <location filename="../src/qalculatewindow.cpp" line="1010"/>
         <source>Functions</source>
         <translation>Funciones</translation>
     </message>
@@ -9169,18 +9168,18 @@ Puedes obtener la versión %3 en %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="389"/>
         <location filename="../src/qalculatewindow.cpp" line="642"/>
-        <location filename="../src/qalculatewindow.cpp" line="895"/>
-        <location filename="../src/qalculatewindow.cpp" line="927"/>
-        <location filename="../src/qalculatewindow.cpp" line="1007"/>
+        <location filename="../src/qalculatewindow.cpp" line="896"/>
+        <location filename="../src/qalculatewindow.cpp" line="928"/>
+        <location filename="../src/qalculatewindow.cpp" line="1008"/>
         <source>Units</source>
         <translation>Unidades</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="392"/>
         <location filename="../src/qalculatewindow.cpp" line="649"/>
-        <location filename="../src/qalculatewindow.cpp" line="893"/>
-        <location filename="../src/qalculatewindow.cpp" line="923"/>
-        <location filename="../src/qalculatewindow.cpp" line="1003"/>
+        <location filename="../src/qalculatewindow.cpp" line="894"/>
+        <location filename="../src/qalculatewindow.cpp" line="924"/>
+        <location filename="../src/qalculatewindow.cpp" line="1004"/>
         <source>Plot Functions/Data</source>
         <translation>Graficar funciones/datos</translation>
     </message>
@@ -9216,7 +9215,7 @@ Puedes obtener la versión %3 en %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="405"/>
-        <location filename="../src/qalculatewindow.cpp" line="6026"/>
+        <location filename="../src/qalculatewindow.cpp" line="6029"/>
         <source>Keyboard Shortcuts</source>
         <translation type="unfinished">Atajos de teclado</translation>
     </message>
@@ -9243,7 +9242,7 @@ Puedes obtener la versión %3 en %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="411"/>
         <location filename="../src/qalculatewindow.cpp" line="412"/>
-        <location filename="../src/qalculatewindow.cpp" line="1542"/>
+        <location filename="../src/qalculatewindow.cpp" line="1543"/>
         <source>About %1</source>
         <translation type="unfinished">Acerca de %1</translation>
     </message>
@@ -9254,9 +9253,9 @@ Puedes obtener la versión %3 en %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="416"/>
-        <location filename="../src/qalculatewindow.cpp" line="900"/>
-        <location filename="../src/qalculatewindow.cpp" line="935"/>
-        <location filename="../src/qalculatewindow.cpp" line="1015"/>
+        <location filename="../src/qalculatewindow.cpp" line="901"/>
+        <location filename="../src/qalculatewindow.cpp" line="936"/>
+        <location filename="../src/qalculatewindow.cpp" line="1016"/>
         <source>Mode</source>
         <translation type="unfinished">Modo</translation>
     </message>
@@ -9524,9 +9523,9 @@ Puedes obtener la versión %3 en %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="626"/>
-        <location filename="../src/qalculatewindow.cpp" line="898"/>
-        <location filename="../src/qalculatewindow.cpp" line="933"/>
-        <location filename="../src/qalculatewindow.cpp" line="1013"/>
+        <location filename="../src/qalculatewindow.cpp" line="899"/>
+        <location filename="../src/qalculatewindow.cpp" line="934"/>
+        <location filename="../src/qalculatewindow.cpp" line="1014"/>
         <source>Convert</source>
         <translation type="unfinished">Convertir</translation>
     </message>
@@ -9536,9 +9535,9 @@ Puedes obtener la versión %3 en %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="630"/>
-        <location filename="../src/qalculatewindow.cpp" line="894"/>
-        <location filename="../src/qalculatewindow.cpp" line="925"/>
-        <location filename="../src/qalculatewindow.cpp" line="1005"/>
+        <location filename="../src/qalculatewindow.cpp" line="895"/>
+        <location filename="../src/qalculatewindow.cpp" line="926"/>
+        <location filename="../src/qalculatewindow.cpp" line="1006"/>
         <source>Store</source>
         <translation>Guardar</translation>
     </message>
@@ -9652,246 +9651,246 @@ Puedes obtener la versión %3 en %2.</translation>
         <translation type="vanished">Limpiar la pila RPN (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1353"/>
+        <location filename="../src/qalculatewindow.cpp" line="1354"/>
         <source>New Function…</source>
         <translation type="unfinished">Nueva función…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1542"/>
+        <location filename="../src/qalculatewindow.cpp" line="1543"/>
         <source>Powerful and easy to use calculator</source>
         <translation>Calculadora poderosa y fácil de usar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1542"/>
+        <location filename="../src/qalculatewindow.cpp" line="1543"/>
         <source>License: GNU General Public License version 2 or later</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3078"/>
-        <location filename="../src/qalculatewindow.cpp" line="5932"/>
-        <location filename="../src/qalculatewindow.cpp" line="7317"/>
-        <location filename="../src/qalculatewindow.cpp" line="7330"/>
-        <location filename="../src/qalculatewindow.cpp" line="7340"/>
-        <location filename="../src/qalculatewindow.cpp" line="7360"/>
+        <location filename="../src/qalculatewindow.cpp" line="3079"/>
+        <location filename="../src/qalculatewindow.cpp" line="5935"/>
+        <location filename="../src/qalculatewindow.cpp" line="7319"/>
+        <location filename="../src/qalculatewindow.cpp" line="7332"/>
+        <location filename="../src/qalculatewindow.cpp" line="7342"/>
+        <location filename="../src/qalculatewindow.cpp" line="7362"/>
         <source>Error</source>
         <translation type="unfinished">Error</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3078"/>
+        <location filename="../src/qalculatewindow.cpp" line="3079"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>No se pudo guardar las definiciones</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3586"/>
+        <location filename="../src/qalculatewindow.cpp" line="3587"/>
         <source>hexadecimal</source>
         <translation>hexadecimal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3589"/>
+        <location filename="../src/qalculatewindow.cpp" line="3590"/>
         <source>octal</source>
         <translation>octal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3592"/>
+        <location filename="../src/qalculatewindow.cpp" line="3593"/>
         <source>decimal</source>
         <translation>decimal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3595"/>
+        <location filename="../src/qalculatewindow.cpp" line="3596"/>
         <source>duodecimal</source>
         <translation>duodecimal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3598"/>
+        <location filename="../src/qalculatewindow.cpp" line="3599"/>
         <source>binary</source>
         <translation>binario</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3601"/>
+        <location filename="../src/qalculatewindow.cpp" line="3602"/>
         <source>roman</source>
         <translation>romano</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3604"/>
+        <location filename="../src/qalculatewindow.cpp" line="3605"/>
         <source>bijective</source>
         <translation>biyectivo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3607"/>
-        <location filename="../src/qalculatewindow.cpp" line="3610"/>
-        <location filename="../src/qalculatewindow.cpp" line="3613"/>
+        <location filename="../src/qalculatewindow.cpp" line="3608"/>
+        <location filename="../src/qalculatewindow.cpp" line="3611"/>
+        <location filename="../src/qalculatewindow.cpp" line="3614"/>
         <source>sexagesimal</source>
         <translation>sexagesimal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3616"/>
-        <location filename="../src/qalculatewindow.cpp" line="3619"/>
+        <location filename="../src/qalculatewindow.cpp" line="3617"/>
+        <location filename="../src/qalculatewindow.cpp" line="3620"/>
         <source>latitude</source>
         <translation>latitud</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3622"/>
-        <location filename="../src/qalculatewindow.cpp" line="3625"/>
+        <location filename="../src/qalculatewindow.cpp" line="3623"/>
+        <location filename="../src/qalculatewindow.cpp" line="3626"/>
         <source>longitude</source>
         <translation>longitud</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3643"/>
+        <location filename="../src/qalculatewindow.cpp" line="3644"/>
         <source>time</source>
         <translation>tiempo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3693"/>
+        <location filename="../src/qalculatewindow.cpp" line="3694"/>
         <source>Time zone parsing failed.</source>
         <translation>Analizado de husos horarios falló.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3716"/>
+        <location filename="../src/qalculatewindow.cpp" line="3717"/>
         <source>bases</source>
         <translation>bases</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3725"/>
+        <location filename="../src/qalculatewindow.cpp" line="3726"/>
         <source>calendars</source>
         <translation>calendarios</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3734"/>
+        <location filename="../src/qalculatewindow.cpp" line="3735"/>
         <source>rectangular</source>
         <translation type="unfinished">rectangular</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3734"/>
+        <location filename="../src/qalculatewindow.cpp" line="3735"/>
         <source>cartesian</source>
         <translation>cartesiano</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3745"/>
+        <location filename="../src/qalculatewindow.cpp" line="3746"/>
         <source>exponential</source>
         <translation>exponencial</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3756"/>
+        <location filename="../src/qalculatewindow.cpp" line="3757"/>
         <source>polar</source>
         <translation>polar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3780"/>
+        <location filename="../src/qalculatewindow.cpp" line="3781"/>
         <source>phasor</source>
         <translation>fasor</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3780"/>
+        <location filename="../src/qalculatewindow.cpp" line="3781"/>
         <source>angle</source>
         <translation>ángulo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3791"/>
+        <location filename="../src/qalculatewindow.cpp" line="3792"/>
         <source>optimal</source>
         <translation type="unfinished">óptimas</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3802"/>
-        <location filename="../src/qalculatewindow.cpp" line="3848"/>
+        <location filename="../src/qalculatewindow.cpp" line="3803"/>
+        <location filename="../src/qalculatewindow.cpp" line="3849"/>
         <source>base</source>
         <translation type="unfinished">base</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3813"/>
+        <location filename="../src/qalculatewindow.cpp" line="3814"/>
         <source>mixed</source>
         <translation type="unfinished">mixtas</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3827"/>
+        <location filename="../src/qalculatewindow.cpp" line="3828"/>
         <source>fraction</source>
         <translation>fracción</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3830"/>
+        <location filename="../src/qalculatewindow.cpp" line="3831"/>
         <source>factors</source>
         <translation>factores</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3839"/>
+        <location filename="../src/qalculatewindow.cpp" line="3840"/>
         <source>partial fraction</source>
         <translation>fracción parcial</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3889"/>
+        <location filename="../src/qalculatewindow.cpp" line="3890"/>
         <source>factorize</source>
         <translation>factorizar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3892"/>
+        <location filename="../src/qalculatewindow.cpp" line="3893"/>
         <source>expand</source>
         <translation>expandir</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4070"/>
         <location filename="../src/qalculatewindow.cpp" line="4071"/>
         <location filename="../src/qalculatewindow.cpp" line="4072"/>
-        <location filename="../src/qalculatewindow.cpp" line="4429"/>
+        <location filename="../src/qalculatewindow.cpp" line="4073"/>
+        <location filename="../src/qalculatewindow.cpp" line="4430"/>
         <source>Calculating…</source>
         <translation>Calculando…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4071"/>
-        <location filename="../src/qalculatewindow.cpp" line="4438"/>
-        <location filename="../src/qalculatewindow.cpp" line="4966"/>
+        <location filename="../src/qalculatewindow.cpp" line="4072"/>
+        <location filename="../src/qalculatewindow.cpp" line="4439"/>
+        <location filename="../src/qalculatewindow.cpp" line="4967"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4101"/>
-        <location filename="../src/qalculatewindow.cpp" line="4829"/>
+        <location filename="../src/qalculatewindow.cpp" line="4102"/>
+        <location filename="../src/qalculatewindow.cpp" line="4830"/>
         <source>RPN Operation</source>
         <translation>Operación RPN</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4417"/>
+        <location filename="../src/qalculatewindow.cpp" line="4418"/>
         <source>Factorizing…</source>
         <translation>Factorizando…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4421"/>
+        <location filename="../src/qalculatewindow.cpp" line="4422"/>
         <source>Expanding partial fractions…</source>
         <translation>Expandiendo fracciones parciales…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4425"/>
+        <location filename="../src/qalculatewindow.cpp" line="4426"/>
         <source>Expanding…</source>
         <translation>Expandiendo…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4433"/>
+        <location filename="../src/qalculatewindow.cpp" line="4434"/>
         <source>Converting…</source>
         <translation>Convirtiendo…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4825"/>
+        <location filename="../src/qalculatewindow.cpp" line="4826"/>
         <source>RPN Register Moved</source>
         <translation>Registro RPN movido</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="4965"/>
         <location filename="../src/qalculatewindow.cpp" line="4966"/>
         <location filename="../src/qalculatewindow.cpp" line="4967"/>
+        <location filename="../src/qalculatewindow.cpp" line="4968"/>
         <source>Processing…</source>
         <translation>Procesando…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5089"/>
-        <location filename="../src/qalculatewindow.cpp" line="6908"/>
+        <location filename="../src/qalculatewindow.cpp" line="5090"/>
+        <location filename="../src/qalculatewindow.cpp" line="6911"/>
         <source>Matrix</source>
         <translation>Matriz</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5192"/>
+        <location filename="../src/qalculatewindow.cpp" line="5193"/>
         <source>Temperature Calculation Mode</source>
         <translation>Modo de cálculo de temperatura</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5198"/>
+        <location filename="../src/qalculatewindow.cpp" line="5199"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -9900,54 +9899,54 @@ Por favor seleccione el modo de cálculo de temperatura
 (el modo puede ser cambiado después en las preferencias).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5201"/>
+        <location filename="../src/qalculatewindow.cpp" line="5202"/>
         <source>Absolute</source>
         <translation>Absoluto</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5205"/>
+        <location filename="../src/qalculatewindow.cpp" line="5206"/>
         <source>Relative</source>
         <translation>Relativo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5209"/>
+        <location filename="../src/qalculatewindow.cpp" line="5210"/>
         <source>Hybrid</source>
         <translation>Hibrido</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5250"/>
+        <location filename="../src/qalculatewindow.cpp" line="5251"/>
         <source>Interpretation of dots</source>
         <translation>Interpretación de los puntos</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5256"/>
+        <location filename="../src/qalculatewindow.cpp" line="5257"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>Por favor seleccione la interpretación de los puntos (\&quot;.\&quot;)
 (esto puede ser cambiado después en las preferencias).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5259"/>
+        <location filename="../src/qalculatewindow.cpp" line="5260"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>Ambos punto y coma como separadores decimales</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5263"/>
+        <location filename="../src/qalculatewindow.cpp" line="5264"/>
         <source>Dot as thousands separator</source>
         <translation>Punto como separador de miles</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5267"/>
+        <location filename="../src/qalculatewindow.cpp" line="5268"/>
         <source>Only dot as decimal separator</source>
         <translation>Solo punto como separador decimal</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5295"/>
+        <location filename="../src/qalculatewindow.cpp" line="5296"/>
         <source>Parsing Mode</source>
         <translation type="unfinished">Modo de análisis</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5301"/>
+        <location filename="../src/qalculatewindow.cpp" line="5302"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -9956,161 +9955,161 @@ Por favor seleccione interpretación de expresiones con multiplicación implíci
 (esto puede ser cambiado después en las preferencias).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5304"/>
+        <location filename="../src/qalculatewindow.cpp" line="5305"/>
         <source>Implicit multiplication first</source>
         <translation type="unfinished">Multiplicación implícita primero</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5309"/>
+        <location filename="../src/qalculatewindow.cpp" line="5310"/>
         <source>Conventional</source>
         <translation type="unfinished">Convencional</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5314"/>
+        <location filename="../src/qalculatewindow.cpp" line="5315"/>
         <source>Adaptive</source>
         <translation type="unfinished">Adaptativo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5861"/>
+        <location filename="../src/qalculatewindow.cpp" line="5864"/>
         <source>Edit Keyboard Shortcut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5861"/>
+        <location filename="../src/qalculatewindow.cpp" line="5864"/>
         <source>New Keyboard Shortcut</source>
         <translation type="unfinished">Nuevo atajo de teclado</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5865"/>
+        <location filename="../src/qalculatewindow.cpp" line="5868"/>
         <source>Action:</source>
         <translation type="unfinished">Acción:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5876"/>
+        <location filename="../src/qalculatewindow.cpp" line="5879"/>
         <source>Value:</source>
         <translation type="unfinished">Valor:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5911"/>
+        <location filename="../src/qalculatewindow.cpp" line="5914"/>
         <source>Set key combination</source>
         <translation type="unfinished">Definir combinación de teclas</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5914"/>
+        <location filename="../src/qalculatewindow.cpp" line="5917"/>
         <source>Press the key combination you wish to use for the action.</source>
         <translation type="unfinished">Presiona la combinación de teclas que quieres usar para la acción.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5932"/>
+        <location filename="../src/qalculatewindow.cpp" line="5935"/>
         <source>Reserved key combination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5939"/>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">La combinación de teclas ta está en uso.
 ¿Quiere remplazar la acción actual (%1)?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6052"/>
+        <location filename="../src/qalculatewindow.cpp" line="6055"/>
         <source>Add…</source>
         <translation type="unfinished">Añadir…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6055"/>
+        <location filename="../src/qalculatewindow.cpp" line="6058"/>
         <source>Edit…</source>
         <translation type="unfinished">Editar…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6059"/>
+        <location filename="../src/qalculatewindow.cpp" line="6062"/>
         <source>Remove</source>
         <translation type="unfinished">Eliminar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6330"/>
+        <location filename="../src/qalculatewindow.cpp" line="6333"/>
         <source>Gnuplot was not found</source>
         <translation>No se encontró Gnuplot</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6330"/>
+        <location filename="../src/qalculatewindow.cpp" line="6333"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>%1 (%2) tiene que estar instalado por separado, tiene que y encontrarse en la ruta de búsqueda para que el graficado funcione.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6522"/>
+        <location filename="../src/qalculatewindow.cpp" line="6525"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Ejemplo:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6560"/>
+        <location filename="../src/qalculatewindow.cpp" line="6563"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation type="unfinished">Ingresar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6560"/>
+        <location filename="../src/qalculatewindow.cpp" line="6563"/>
         <source>Calculate</source>
         <translation>Calcular</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6561"/>
+        <location filename="../src/qalculatewindow.cpp" line="6564"/>
         <source>Apply to Stack</source>
         <translation>Aplicar a la pila</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6561"/>
+        <location filename="../src/qalculatewindow.cpp" line="6564"/>
         <source>Insert</source>
         <translation>Insertar</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7317"/>
+        <location filename="../src/qalculatewindow.cpp" line="7319"/>
         <source>Failed to open workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7330"/>
-        <location filename="../src/qalculatewindow.cpp" line="7340"/>
-        <location filename="../src/qalculatewindow.cpp" line="7360"/>
+        <location filename="../src/qalculatewindow.cpp" line="7332"/>
+        <location filename="../src/qalculatewindow.cpp" line="7342"/>
+        <location filename="../src/qalculatewindow.cpp" line="7362"/>
         <source>Couldn&apos;t save workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7351"/>
+        <location filename="../src/qalculatewindow.cpp" line="7353"/>
         <source>Save file?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7351"/>
+        <location filename="../src/qalculatewindow.cpp" line="7353"/>
         <source>Do you want to save the current workspace?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7352"/>
+        <location filename="../src/qalculatewindow.cpp" line="7354"/>
         <source>Do not ask again</source>
         <translation type="unfinished">No preguntar de nuevo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6552"/>
+        <location filename="../src/qalculatewindow.cpp" line="6555"/>
         <source>Keep open</source>
         <translation>Mantener abierto</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6577"/>
+        <location filename="../src/qalculatewindow.cpp" line="6580"/>
         <source>Value</source>
         <translation>Valor</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6579"/>
+        <location filename="../src/qalculatewindow.cpp" line="6582"/>
         <source>Argument</source>
         <translation>Argumento</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1645"/>
-        <location filename="../src/qalculatewindow.cpp" line="1673"/>
-        <location filename="../src/qalculatewindow.cpp" line="1735"/>
-        <location filename="../src/qalculatewindow.cpp" line="6592"/>
+        <location filename="../src/qalculatewindow.cpp" line="1646"/>
+        <location filename="../src/qalculatewindow.cpp" line="1674"/>
+        <location filename="../src/qalculatewindow.cpp" line="1736"/>
+        <location filename="../src/qalculatewindow.cpp" line="6595"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
@@ -10145,85 +10144,85 @@ Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="897"/>
-        <location filename="../src/qalculatewindow.cpp" line="931"/>
-        <location filename="../src/qalculatewindow.cpp" line="1011"/>
+        <location filename="../src/qalculatewindow.cpp" line="898"/>
+        <location filename="../src/qalculatewindow.cpp" line="932"/>
+        <location filename="../src/qalculatewindow.cpp" line="1012"/>
         <source>Number Bases</source>
         <translation type="unfinished">Bases numéricas</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="901"/>
-        <location filename="../src/qalculatewindow.cpp" line="939"/>
-        <location filename="../src/qalculatewindow.cpp" line="1019"/>
+        <location filename="../src/qalculatewindow.cpp" line="902"/>
+        <location filename="../src/qalculatewindow.cpp" line="940"/>
+        <location filename="../src/qalculatewindow.cpp" line="1020"/>
         <source>Rotate the stack or move the selected register up</source>
         <translation type="unfinished">Rotar la pila o mover el registro seleccionado hacia arriba</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="902"/>
-        <location filename="../src/qalculatewindow.cpp" line="941"/>
-        <location filename="../src/qalculatewindow.cpp" line="1021"/>
+        <location filename="../src/qalculatewindow.cpp" line="903"/>
+        <location filename="../src/qalculatewindow.cpp" line="942"/>
+        <location filename="../src/qalculatewindow.cpp" line="1022"/>
         <source>Rotate the stack or move the selected register down</source>
         <translation type="unfinished">Rotar la pila o mover el registro seleccionado hacia abajo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="903"/>
-        <location filename="../src/qalculatewindow.cpp" line="943"/>
-        <location filename="../src/qalculatewindow.cpp" line="1023"/>
+        <location filename="../src/qalculatewindow.cpp" line="904"/>
+        <location filename="../src/qalculatewindow.cpp" line="944"/>
+        <location filename="../src/qalculatewindow.cpp" line="1024"/>
         <source>Swap the top two values or move the selected value to the top of the stack</source>
         <translation type="unfinished">Intercambiar los dos primeros valores o mover el valor seleccionado encima de la pila</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="904"/>
-        <location filename="../src/qalculatewindow.cpp" line="945"/>
-        <location filename="../src/qalculatewindow.cpp" line="1025"/>
+        <location filename="../src/qalculatewindow.cpp" line="905"/>
+        <location filename="../src/qalculatewindow.cpp" line="946"/>
+        <location filename="../src/qalculatewindow.cpp" line="1026"/>
         <source>Delete the top or selected value</source>
         <translation type="unfinished">Eliminar el primer valor o el valor seleccionado</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="905"/>
-        <location filename="../src/qalculatewindow.cpp" line="947"/>
-        <location filename="../src/qalculatewindow.cpp" line="1027"/>
+        <location filename="../src/qalculatewindow.cpp" line="906"/>
+        <location filename="../src/qalculatewindow.cpp" line="948"/>
+        <location filename="../src/qalculatewindow.cpp" line="1028"/>
         <source>Enter the top value from before the last numeric operation</source>
         <translation type="unfinished">Ingresar el primer valor previo a la última operación numérica</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="906"/>
-        <location filename="../src/qalculatewindow.cpp" line="949"/>
-        <location filename="../src/qalculatewindow.cpp" line="1029"/>
+        <location filename="../src/qalculatewindow.cpp" line="907"/>
+        <location filename="../src/qalculatewindow.cpp" line="950"/>
+        <location filename="../src/qalculatewindow.cpp" line="1030"/>
         <source>Copy the selected or top value to the top of the stack</source>
         <translation type="unfinished">Copiar el primer valor o el seleccionado encima de la pila</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="907"/>
-        <location filename="../src/qalculatewindow.cpp" line="951"/>
-        <location filename="../src/qalculatewindow.cpp" line="1031"/>
+        <location filename="../src/qalculatewindow.cpp" line="908"/>
+        <location filename="../src/qalculatewindow.cpp" line="952"/>
+        <location filename="../src/qalculatewindow.cpp" line="1032"/>
         <source>Clear the RPN stack</source>
         <translation type="unfinished">Limpiar la pila RPN</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6647"/>
+        <location filename="../src/qalculatewindow.cpp" line="6650"/>
         <source>True</source>
         <translation>Verdadero</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6650"/>
+        <location filename="../src/qalculatewindow.cpp" line="6653"/>
         <source>False</source>
         <translation>False</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6676"/>
+        <location filename="../src/qalculatewindow.cpp" line="6679"/>
         <source>Info</source>
         <translation>Información</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6728"/>
-        <location filename="../src/qalculatewindow.cpp" line="6736"/>
+        <location filename="../src/qalculatewindow.cpp" line="6731"/>
+        <location filename="../src/qalculatewindow.cpp" line="6739"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>opcional</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7105"/>
+        <location filename="../src/qalculatewindow.cpp" line="7108"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Fallo al abrir %1.

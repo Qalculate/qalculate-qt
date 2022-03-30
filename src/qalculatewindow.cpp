@@ -873,6 +873,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
 	if(settings->show_bases >= 0) basesDock->setVisible(settings->show_bases > 0);
+	if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad > 0);
 	rpnDock->setVisible(settings->rpn_mode);
 
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -5346,18 +5347,17 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	if(!settings->current_workspace.empty()) {
 		int i = askSaveWorkspace();
 		if(i < 0) return;
-		if(i == 0) settings->current_workspace = "";
 	}
 	settings->window_state = saveState();
 	if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
-	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	settings->show_bases = basesDock->isVisible();
+	settings->savePreferences(settings->save_mode_on_exit);
+	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	CALCULATOR->abort();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
-	settings->savePreferences(settings->save_mode_on_exit);
 }
 
 void QalculateWindow::onToActivated() {
@@ -5472,18 +5472,21 @@ void QalculateWindow::keypadTypeActivated() {
 		bool b = !keypadDock->isVisible();
 		keypadDock->setVisible(b);
 		if(b) keypadDock->raise();
+		settings->show_keypad = b ? 1 : 0;
 	} else {
 		if(settings->keypad_type == v && keypadDock->isVisible()) v = KEYPAD_GENERAL;
 		settings->keypad_type = v;
 		keypad->setKeypadType(v);
 		keypadDock->setVisible(true);
 		keypadDock->raise();
+		settings->show_keypad = 1;
 	}
 	workspace_changed = true;
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
 	if(action) action->setChecked(true);
+	settings->show_keypad = b ? 1 : 0;
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);
@@ -7245,10 +7248,9 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		updateVariablesMenu();
 		keypad->updateBase();
 		keypad->updateSymbols();
-		if(settings->keypad_type < 0) keypadDock->hide();
-		else keypadDock->show();
+		if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad);
 		basesDock->setVisible(settings->show_bases > 0);
-		QAction *action = find_child_data(this, "group_keypad", settings->keypad_type);
+		QAction *action = find_child_data(this, "group_keypad", settings->show_keypad == 0 ? -1 : settings->keypad_type);
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);
 		keypad->setKeypadType(settings->keypad_type);

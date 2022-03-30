@@ -169,7 +169,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Indicate repeating decimals"), settings->printops.indicate_infinite_series, repeatingDecimalsToggled(bool));
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
-	BOX(tr("Copy result as unformatted ASCII by default"), settings->copy_ascii, copyAsciiToggled(bool));
+	BOX(tr("Copy unformatted ASCII by default"), settings->copy_ascii, copyAsciiToggled(bool));
 	l2 = new QGridLayout();
 	r = 0;
 	l2->addWidget(new QLabel(tr("Digit grouping:"), this), r, 0);

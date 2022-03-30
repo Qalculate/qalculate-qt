@@ -34,7 +34,7 @@ bool can_display_unicode_string_function(const char *str, void *w);
 std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);
-std::string unformat(std::string str);
+std::string unformat(std::string str, bool restorable = false);
 std::string uncolorize(std::string str);
 std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
@@ -225,6 +225,7 @@ class QalculateQtSettings : QObject {
 		int replace_expression;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		int show_keypad;
 		int show_bases;
 		bool hide_numpad;
 		bool keep_function_dialog_open;

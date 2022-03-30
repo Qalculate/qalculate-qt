@@ -936,8 +936,7 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						items.append(item); \
 						if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) item = new QStandardItem(y); \
 						else if(flagheight <= 0) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName()))); \
-						else if(flagheight == 32) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img width=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight / ratio).arg(QString::fromStdString(u->referenceName()))); \
-						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight / ratio).arg(QString::fromStdString(u->referenceName()))); \
+						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName()))); \
 						item->setData(ifont, Qt::FontRole); \
 						items.append(item); \
 						sourceModel->appendRow(items);
@@ -950,11 +949,7 @@ void ExpressionEdit::updateCompletion() {
 	QList<QStandardItem *> items;
 	QFont ifont(completionView->font());
 	QFontMetrics fm(ifont);
-	qreal ratio = qApp->devicePixelRatio();
-	int flagheight = fm.height() * ratio;
-	if(flagheight >= 32) flagheight = (ratio == 1 ? -1 : 32);
-	else if(flagheight > 16) flagheight = 16;
-	else flagheight /= ratio;
+	int flagheight = fm.ascent();
 	ifont.setStyle(QFont::StyleItalic);
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
 		if(CALCULATOR->functions[i]->isActive()) {
@@ -1365,16 +1360,24 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 		editRedo();
 		return;
 	}
-	if(event->matches(QKeySequence::Copy) && !textCursor().hasSelection() && !settings->v_result.empty()) {
-		if(settings->copy_ascii) {
-			QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
-		} else {
-			QMimeData *qm = new QMimeData();
-			qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
-			qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
-			qm->setObjectName("history_result");
-			QApplication::clipboard()->setMimeData(qm);
+	if(event->matches(QKeySequence::Copy)) {
+		if(!textCursor().hasSelection() && !settings->v_result.empty()) {
+			if(settings->copy_ascii) {
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
+				qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+				qm->setObjectName("history_result");
+				QApplication::clipboard()->setMimeData(qm);
+			}
+		} else if(settings->copy_ascii && textCursor().hasSelection()) {
+			QApplication::clipboard()->setText(QString::fromStdString(unformat(textCursor().selectedText().toStdString(), true)));
 		}
+		return;
+	} else if(event->matches(QKeySequence::Cut) && settings->copy_ascii && textCursor().hasSelection()) {
+		QApplication::clipboard()->setText(QString::fromStdString(unformat(textCursor().selectedText().toStdString(), true)));
+		textCursor().deleteChar();
 		return;
 	}
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
@@ -1531,7 +1534,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_Enter: {
 				if(completionView->isVisible() && completionView->currentIndex().isValid()) {
 					onCompletionActivated(completionView->currentIndex());
-				} else {
+				} else if(!document()->isEmpty()) {
 					emit returnPressed();
 				}
 				return;
@@ -3545,6 +3548,8 @@ void ExpressionEdit::insertFromMimeData(const QMimeData *source) {
 				if(str[i] == '*') str.replace(i, 1, settings->multiplicationSign());
 				else if(str[i] == '/') str.replace(i, 1, settings->divisionSign(false));
 				else if(str[i] == '-') str.replace(i, 1, SIGN_MINUS);
+				else if(str[i] == 's' && settings->copy_ascii && settings->printops.use_unicode_signs && i + 3 < str.length() && str[i + 1] == 'q' && str[i + 2] == 'r' && str[i + 3] == 't') str.replace(i, 4, SIGN_SQRT);
+				else if(str[i] == 'o' && settings->copy_ascii && settings->printops.use_unicode_signs && i + 2 < str.length() && str[i + 1] == 'h' && str[i + 2] == 'm') str.replace(i, 3, "Ω");
 			}
 		}
 	}
