@@ -8749,6 +8749,9 @@ Möchten Sie die Wechselkurse jetzt aktualisieren?</numerusform>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation type="unfinished">Information</translation>
     </message>
@@ -10235,6 +10238,11 @@ Bitte wählen Sie die Interpretation von Ausdrücken mit implizite Multiplikatio
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">Die Tastenkombination ist bereits in Gebrauch.
 Möchten Sie die aktuelle Aktion (%1) ersetzen?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation type="unfinished">Frage</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

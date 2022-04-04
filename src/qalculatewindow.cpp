@@ -1540,7 +1540,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2022 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2022 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -5939,7 +5939,7 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			}
 			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
 				if(&settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i].key == key) {
-					if(QMessageBox::question(this, QString(), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
 						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
 							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) &settings->keyboard_shortcuts[i]) {
 								delete shortcutList->topLevelItem(index);

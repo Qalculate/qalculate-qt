@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
-	app.setApplicationVersion(VERSION);
+	app.setApplicationVersion("4.1.1");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
 	parser->process(app);
 
 	if(parser->isSet(vOption)) {
-		printf(VERSION "\n");
+		puts(qApp->applicationVersion().toUtf8().data());
 		return 0;
 	}
 

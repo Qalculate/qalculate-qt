@@ -7486,6 +7486,9 @@ Do you wish to update the exchange rates now?</source>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8933,6 +8936,11 @@ Please select interpretation of expressions with implicit multiplication
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation type="unfinished">Vraag</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

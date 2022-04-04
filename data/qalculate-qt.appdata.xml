@@ -77,6 +77,7 @@
       <li>Restrict use of reciprocal in unit conversion, e.g. invert in "5m/s to s/m" (= 0.2 s/m) but not in "500/lb to g" (= 1.1/g)</li>
       <li>New mHg unit (allows use with prefixes other than milli)</li>
       <li>Always display abbreviated unit name (symbol) with abbreviated prefix (when unit only has short name)</li>
+      <li>Minor improvements to automatic unit conversion</li>
       <li>Fix display of (1 + f(x))/n</li>
      </ul>
    </description>

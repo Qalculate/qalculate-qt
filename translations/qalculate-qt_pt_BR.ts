@@ -8511,6 +8511,9 @@ Deseja atualizar as taxas de câmbio agora?</numerusform>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9988,6 +9991,11 @@ Please select interpretation of expressions with implicit multiplication
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">A combinação de teclas já está em uso.
 Deseja substituir a ação atual (%1)?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

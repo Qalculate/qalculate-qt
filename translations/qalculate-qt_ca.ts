@@ -8631,6 +8631,9 @@ Voleu actualitzar les taxes d&apos;intercanvi ara?</numerusform>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation type="unfinished">Informació</translation>
     </message>
@@ -10117,6 +10120,11 @@ Si us plau, seleccioneu la interpretació de l&apos;expressió amb multiplicaci�
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">La combinació de tecles ja està en ús.
 Voleu reemplaçar l&apos;acció actual (%1)?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation type="unfinished">Pregunta</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

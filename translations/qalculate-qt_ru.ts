@@ -3940,6 +3940,9 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation>Информирование</translation>
     </message>
@@ -4931,6 +4934,11 @@ Please select interpretation of expressions with implicit multiplication
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">Комбинация клавиш уже используется.
 Вы хотите заменить текущее действие (%1)?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation>Вопрос</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

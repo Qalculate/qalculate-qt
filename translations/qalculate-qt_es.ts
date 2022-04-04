@@ -8524,6 +8524,9 @@ Do you wish to update the exchange rates now?</source>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation type="unfinished">Información</translation>
     </message>
@@ -10010,6 +10013,11 @@ Por favor seleccione interpretación de expresiones con multiplicación implíci
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">La combinación de teclas ta está en uso.
 ¿Quiere remplazar la acción actual (%1)?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation type="unfinished">Pregunta</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

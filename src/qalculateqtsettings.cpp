@@ -1092,7 +1092,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	if(!file) return false;
 	if(is_workspace) fputs("QALCULATE WORKSPACE FILE\n", file);
 	fprintf(file, "\n[General]\n");
-	fprintf(file, "version=%s\n", VERSION);
+	fprintf(file, "version=%s\n", qApp->applicationVersion().toUtf8().data());
 	if(!is_workspace) {
 		fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
 		fprintf(file, "ignore_locale=%i\n", ignore_locale);
@@ -1643,23 +1643,23 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	}
 	std::string new_version;
 #ifdef _WIN32
-	int ret = checkAvailableVersion("windows", VERSION, &new_version, force ? 10 : 5);
+	int ret = checkAvailableVersion("windows", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
 #else
-	int ret = checkAvailableVersion("qalculate-qt", VERSION, &new_version, force ? 10 : 5);
+	int ret = checkAvailableVersion("qalculate-qt", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
 #endif
 	if(force && ret <= 0) {
 		if(ret < 0) QMessageBox::critical(parent, tr("Error"), tr("Failed to check for updates."));
-		else QMessageBox::information(parent, QString(), tr("No updates found."));
+		else QMessageBox::information(parent, tr("Information"), tr("No updates found."));
 		if(ret < 0) return;
 	}
 	if(ret > 0 && (force || new_version != last_found_version)) {
 		last_found_version = new_version;
 #ifdef AUTO_UPDATE
-		if(QMessageBox::question(parent, QString(), "<div>" + tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes) + "</div>") {
+		if(QMessageBox::question(parent, tr("Information"), "<div>" + tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes) + "</div>") {
 			autoUpdate(new_version);
 		}
 #else
-		QMessageBox::information(parent, QString(), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
+		QMessageBox::information(parent, tr("Information"), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
 #endif
 	}
 	last_version_check_date.setToCurrentDate();

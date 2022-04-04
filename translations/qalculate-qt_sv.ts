@@ -9746,6 +9746,9 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1557"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1652"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1658"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1662"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
@@ -11149,6 +11152,11 @@ Vänligen välj tolkning av uttryck med implicit multiplikation
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation>Tangentkombinationen används redan. Vill du ersätta den nuvarande åtgärden (%1)?</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5942"/>
+        <source>Question</source>
+        <translation>Fråga</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>

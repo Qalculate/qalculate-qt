@@ -39,7 +39,6 @@ CONFIG += qt
 QT += widgets network
 MOC_DIR = build
 OBJECTS_DIR = build
-DEFINES += VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/dataseteditdialog.h src/datasetsdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/percentagecalculationdialog.h src/periodictabledialog.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/uniteditdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
 
