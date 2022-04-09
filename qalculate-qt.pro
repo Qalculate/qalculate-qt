@@ -97,7 +97,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 
-	appdata.files = data/io.github.Qalculate.qalculate-qt.appdata.xml
+	appdata.files = data/io.github.Qalculate.qalculate-qt.metainfo.xml
 	appdata.path = $$APPDATA_DIR
 
 	appicon16.files = data/16/qalculate-qt.png
