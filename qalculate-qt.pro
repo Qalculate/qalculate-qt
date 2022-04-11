@@ -94,10 +94,10 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 		
 	qm.path = $$TRANSLATIONS_DIR
 
-	desktop.files = data/qalculate-qt.desktop
+	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 
-	appdata.files = data/qalculate-qt.appdata.xml
+	appdata.files = data/io.github.Qalculate.qalculate-qt.metainfo.xml
 	appdata.path = $$APPDATA_DIR
 
 	appicon16.files = data/16/qalculate-qt.png
@@ -120,7 +120,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 } else {
 	RESOURCES = icons.qrc flags.qrc translations.qrc
 	target.path = $$PREFIX/bin
-	desktop.files = data/qalculate-qt.desktop
+	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 	appicon64.files = data/64/qalculate-qt.png
 	appicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps

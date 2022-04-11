@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
- <id>qalculate-qt.desktop</id>
+ <id>io.github.Qalculate.qalculate-qt</id>
  <metadata_license>CC0-1.0</metadata_license>
  <project_license>GPL-2.0+</project_license>
  <name>Qalculate! (Qt UI)</name>
@@ -62,7 +62,7 @@
   <kudo>ModernToolkit</kudo>
   <kudo>UserDocs</kudo>
  </kudos>
- <launchable type="desktop-id">qalculate-qt.desktop</launchable>
+ <launchable type="desktop-id">io.github.Qalculate.qalculate-qt.desktop</launchable>
  <provides>
   <binary>qalculate-qt</binary>
  </provides>
