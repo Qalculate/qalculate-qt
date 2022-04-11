@@ -1895,7 +1895,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="299"/>
         <source>Logical OR</source>
-        <translation>Logical OR</translation>
+        <translation>Логическое ИЛИ</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="302"/>
