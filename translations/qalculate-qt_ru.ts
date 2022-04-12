@@ -1900,138 +1900,138 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="296"/>
         <source>Logical AND</source>
-        <translation type="unfinished">Логическое И</translation>
+        <translation>Логическое И</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="299"/>
         <source>Logical OR</source>
-        <translation type="unfinished">Logical OR</translation>
+        <translation>Логическое ИЛИ</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="302"/>
         <source>Bitwise Exclusive OR</source>
-        <translation type="unfinished">Побитовое исключающее ИЛИ</translation>
+        <translation>Побитовое исключающее ИЛИ</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="305"/>
         <source>Logical NOT</source>
-        <translation type="unfinished">Логическое НЕ</translation>
+        <translation>Логическое НЕ</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="307"/>
         <source>Bitwise Left Shift</source>
-        <translation type="unfinished">Побитовый сдвиг влево</translation>
+        <translation>Побитовый сдвиг влево</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="309"/>
         <source>Bitwise Right Shift</source>
-        <translation type="unfinished">Побитовый сдвиг вправо</translation>
+        <translation>Побитовый сдвиг вправо</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="310"/>
         <source>cmp</source>
-        <translation type="unfinished"></translation>
+        <translation>доп</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="311"/>
         <source>rot</source>
-        <translation type="unfinished"></translation>
+        <translation>рот</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="325"/>
         <source>a→1</source>
-        <translation type="unfinished"></translation>
+        <translation>А→1</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="355"/>
         <source>Default assumptions</source>
-        <translation type="unfinished">Предположения по умолчанию</translation>
+        <translation>Предположения по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="357"/>
         <source>Number</source>
-        <translation type="unfinished">Число</translation>
+        <translation>Число</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="359"/>
         <source>Real</source>
-        <translation type="unfinished">Вещественное</translation>
+        <translation>Вещественное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="361"/>
         <source>Rational</source>
-        <translation type="unfinished">Рациональное</translation>
+        <translation>Рациональное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="363"/>
         <source>Integer</source>
-        <translation type="unfinished">Целое</translation>
+        <translation>Целое</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="365"/>
         <source>Boolean</source>
-        <translation type="unfinished">Логическое</translation>
+        <translation>Логическое</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="369"/>
         <source>Unknown</source>
         <comment>Unknown assumptions sign</comment>
-        <translation type="unfinished">Неизвестное</translation>
+        <translation>Неизвестное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="371"/>
         <source>Non-zero</source>
-        <translation type="unfinished">Ненулевое</translation>
+        <translation>Ненулевое</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="373"/>
         <source>Positive</source>
-        <translation type="unfinished">Положительное</translation>
+        <translation>Положительное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="375"/>
         <source>Non-negative</source>
-        <translation type="unfinished">Неотрицательное</translation>
+        <translation>Неотрицательное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="377"/>
         <source>Negative</source>
-        <translation type="unfinished">Отрицательное</translation>
+        <translation>Отрицательное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="379"/>
         <source>Non-positive</source>
-        <translation type="unfinished">Не положительное</translation>
+        <translation>Не положительное</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="397"/>
         <source>Factorize</source>
-        <translation type="unfinished">Разложить на множители</translation>
+        <translation>Разложить на множители</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="397"/>
         <source>Expand</source>
-        <translation type="unfinished">Раскрывать</translation>
+        <translation>Раскрывать</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="423"/>
         <source>Add column</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить столбец</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="424"/>
         <source>Add row</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить строку</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="425"/>
         <source>Remove column</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить столбец</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="426"/>
         <source>Remove row</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить строку</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="474"/>
@@ -2093,27 +2093,27 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/keypadwidget.cpp" line="651"/>
         <source>Button Action</source>
-        <translation type="unfinished">Действие клавиши</translation>
+        <translation>Действие клавиши</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="656"/>
         <source>Label:</source>
-        <translation type="unfinished">Метка:</translation>
+        <translation>Метка:</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="663"/>
         <source>Action:</source>
-        <translation type="unfinished">Действие:</translation>
+        <translation>Действие:</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="668"/>
         <source>None</source>
-        <translation type="unfinished">Никакой</translation>
+        <translation>Ничего</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="676"/>
         <source>Value:</source>
-        <translation type="unfinished">Значение:</translation>
+        <translation>Значение:</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="296"/>
@@ -2777,12 +2777,12 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="72"/>
         <source>Workspace</source>
-        <translation type="unfinished">Рабочее пространство</translation>
+        <translation>Рабочее пространство</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="73"/>
         <source>Application name + workspace</source>
-        <translation type="unfinished">Имя приложения + рабочее пространство</translation>
+        <translation>Имя приложения + рабочее пространство</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="77"/>
@@ -2899,7 +2899,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="200"/>
         <source>Truncate all numbers</source>
-        <translation type="unfinished">Обрезать все числа</translation>
+        <translation>Обрезать все числа</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="145"/>
@@ -3005,7 +3005,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="198"/>
         <source>Round halfway numbers away from zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа вверх</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="199"/>
@@ -3045,7 +3045,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Simplified percentage calculation</source>
-        <translation type="unfinished"></translation>
+        <translation>Упрощенный процентный расчет</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="175"/>
@@ -3105,7 +3105,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="196"/>
         <source>Rounding:</source>
-        <translation type="unfinished"></translation>
+        <translation>Округление:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="204"/>
@@ -3289,7 +3289,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/main.cpp" line="86"/>
         <source>Open workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть рабочее пространство</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="88"/>
@@ -3396,22 +3396,22 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1791"/>
         <source>Function not found.</source>
-        <translation type="unfinished">Функция не найдена.</translation>
+        <translation>Функция не найдена.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1799"/>
         <source>Variable not found.</source>
-        <translation type="unfinished">Переменная не найдена.</translation>
+        <translation>Переменная не найдена.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1807"/>
         <source>Unit not found.</source>
-        <translation type="unfinished">Единица измерения не найдена.</translation>
+        <translation>Единица измерения не найдена.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1823"/>
         <source>Unsupported base.</source>
-        <translation type="unfinished">Неподдерживаемое основание.</translation>
+        <translation>Неподдерживаемое основание.</translation>
     </message>
 </context>
 <context>
@@ -3492,437 +3492,437 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1690"/>
         <source>%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1: %2</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1694"/>
         <source>Insert function</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить функцию</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1695"/>
         <source>Insert function (dialog)</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить функцию (на выбор)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1696"/>
         <source>Insert variable</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить переменную</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1697"/>
         <source>Approximate result</source>
-        <translation type="unfinished"></translation>
+        <translation>Приблезительный результат</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1698"/>
         <source>Negate</source>
-        <translation type="unfinished"></translation>
+        <translation>Отрицание</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1699"/>
         <source>Invert</source>
-        <translation type="unfinished"></translation>
+        <translation>Обратить</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1700"/>
         <source>Insert unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить единицу измерения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1701"/>
         <source>Insert text</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить текст</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1702"/>
         <source>Insert operator</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить оператор</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1703"/>
         <source>Insert date</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить дату</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1704"/>
         <source>Insert matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить матрицу</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1705"/>
         <source>Insert smart parentheses</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить умные скобки</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1706"/>
         <source>Convert to unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать в единицу измерения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1707"/>
         <source>Convert</source>
-        <translation type="unfinished">Перевести</translation>
+        <translation>Преобразовать</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1708"/>
         <source>Convert to optimal unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать в оптимальную единицу измерения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1709"/>
         <source>Convert to base units</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать в базовые единицы измерения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1710"/>
         <source>Convert to optimal prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать в оптимальный префикс</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1711"/>
         <source>Convert to number base</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразовать к основанию систем счисления</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1712"/>
         <source>Factorize result</source>
-        <translation type="unfinished">Разложить результат на множители</translation>
+        <translation>Разложить результат на множители</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1713"/>
         <source>Expand result</source>
-        <translation type="unfinished"></translation>
+        <translation>Развернуть результат</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1714"/>
         <source>Expand partial fractions</source>
-        <translation type="unfinished"></translation>
+        <translation>Развернуть частичные дроби</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1715"/>
         <source>RPN: down</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: вниз</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1716"/>
         <source>RPN: up</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: вверх</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1717"/>
         <source>RPN: swap</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: обменять</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1718"/>
         <source>RPN: copy</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: копировать</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1719"/>
         <source>RPN: lastx</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: последний x</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1720"/>
         <source>RPN: delete register</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: удалить</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1721"/>
         <source>RPN: clear stack</source>
-        <translation type="unfinished"></translation>
+        <translation>ПОЛИЗ: очистить стек</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1722"/>
         <source>Set expression base</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить основание для выражения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1723"/>
         <source>Set result base</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить основание для результата</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1724"/>
         <source>Set angle unit to degrees</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить угловую единицу измерения в градусы</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1725"/>
         <source>Set angle unit to radians</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить угловую единицу измерения в радианы</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1726"/>
         <source>Set angle unit to gradians</source>
-        <translation type="unfinished"></translation>
+        <translation>Установить угловую единицу измерения в грады</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1727"/>
         <source>Active normal display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать простой режим отображения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1728"/>
         <source>Activate scientific display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать научный режим отображения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1729"/>
         <source>Activate engineering display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать инженерный режим отображения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1730"/>
         <source>Activate simple display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать упрощённый режим отображения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1731"/>
         <source>Toggle RPN mode</source>
-        <translation type="unfinished"></translation>
+        <translation>В(ы)ключить режим ПОЛИЗ</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1732"/>
         <source>Show general keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать основную клавиатуру</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1733"/>
         <source>Toggle programming keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>В(ы)ключить клавиатуру программирования</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1734"/>
         <source>Toggle algebra keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>В(ы)ключить алгебраическую клавиатуру</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1735"/>
         <source>Toggle custom keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>В(ы)ключить пользовательскую клавиатуру</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1736"/>
         <source>Show/hide keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать/скрыть клавиатуру</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1737"/>
         <source>Search history</source>
-        <translation type="unfinished"></translation>
+        <translation>Искать в истории</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1738"/>
         <source>Show variables</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать переменные</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1739"/>
         <source>Show functions</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать функции</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1740"/>
         <source>Show units</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать единицы измерения</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1741"/>
         <source>Show data sets</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать наборы данных</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1742"/>
         <source>Store result</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить результат</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1743"/>
         <source>MC (memory clear)</source>
-        <translation type="unfinished">MC (отчистить память)</translation>
+        <translation>MC (отчистить память)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1744"/>
         <source>MR (memory recall)</source>
-        <translation type="unfinished"></translation>
+        <translation>MR (вызвать из памяти)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1745"/>
         <source>MS (memory store)</source>
-        <translation type="unfinished">MS (сохранить в памяти)</translation>
+        <translation>MS (сохранить в памяти)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1746"/>
         <source>M+ (memory plus)</source>
-        <translation type="unfinished">M+ (прибавить к значению в памяти)</translation>
+        <translation>M+ (прибавить к значению в памяти)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1747"/>
         <source>M− (memory minus)</source>
-        <translation type="unfinished">M− (отнять от значения в памяти)</translation>
+        <translation>M− (отнять от значения в памяти)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1748"/>
         <source>New variable</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая переменная</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1749"/>
         <source>New function</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая функция</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1750"/>
         <source>Open plot functions/data</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть график функций/данных</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1751"/>
         <source>Open convert number bases</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть преобразование между основаниями систем счисления</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1752"/>
         <source>Open floating point conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть окно преобразования чисел с плавающей запятой</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1753"/>
         <source>Open calender conversion</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть окно преобразования календарей</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1754"/>
         <source>Open percentage calculation tool</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть окно инструмента расчёта процентов</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1755"/>
         <source>Open periodic table</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть окно с периодической таблицей</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1756"/>
         <source>Update exchange rates</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновить курсы валют</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1757"/>
         <source>Copy result</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать результат</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1758"/>
         <source>Insert result</source>
-        <translation type="unfinished"></translation>
+        <translation>Вставить результат</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1759"/>
         <source>Open mode menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть меню режимов</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1760"/>
         <source>Open menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть меню</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1761"/>
         <source>Help</source>
-        <translation type="unfinished">Справка</translation>
+        <translation>Справка</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1762"/>
         <source>Quit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation>Выход</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1763"/>
         <source>Toggle chain mode</source>
-        <translation type="unfinished"></translation>
+        <translation>В(ы)ключить режим цепочки</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1764"/>
         <source>Toggle keep above</source>
-        <translation type="unfinished"></translation>
+        <translation>Поддерживать поверх других</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1765"/>
         <source>Show completion (activate first item)</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать завершение (активировать первый элемент)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1766"/>
         <source>Clear expression</source>
-        <translation type="unfinished">Отчистить выражение</translation>
+        <translation>Отчистить выражение</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1767"/>
         <source>Delete</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1768"/>
         <source>Backspace</source>
-        <translation type="unfinished">Обратное перемещение</translation>
+        <translation>Обратное перемещение</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1769"/>
         <source>Home</source>
-        <translation type="unfinished"></translation>
+        <translation>Начало</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1770"/>
         <source>End</source>
-        <translation type="unfinished"></translation>
+        <translation>Конец</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1771"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Вправо</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1772"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Влево</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1773"/>
         <source>Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Вверх</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1774"/>
         <source>Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Вниз</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1775"/>
         <source>Undo</source>
-        <translation type="unfinished">Отменить</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1776"/>
         <source>Redo</source>
-        <translation type="unfinished">Повторить</translation>
+        <translation>Повторить</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1777"/>
         <source>Calculate expression</source>
-        <translation type="unfinished">Вычислить выражение</translation>
+        <translation>Вычислить выражение</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1778"/>
         <source>Expression history next</source>
-        <translation type="unfinished"></translation>
+        <translation>Следующее выражение в истории</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1779"/>
         <source>Expression history previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Предыдущее выражение в истории</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1555"/>
@@ -4058,27 +4058,27 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="373"/>
         <source>Workspaces</source>
-        <translation type="unfinished">Рабочие пространства</translation>
+        <translation>Рабочие пространства</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="374"/>
         <source>Open…</source>
-        <translation type="unfinished">Открыть…</translation>
+        <translation>Открыть…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="375"/>
         <source>Open default</source>
-        <translation type="unfinished">Открыть по умолчанию</translation>
+        <translation>Открыть по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="377"/>
         <source>Save</source>
-        <translation type="unfinished">Сохранить</translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="378"/>
         <source>Save As…</source>
-        <translation type="unfinished">Сохранить как…</translation>
+        <translation>Сохранить как…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="384"/>
@@ -4156,7 +4156,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="405"/>
         <location filename="../src/qalculatewindow.cpp" line="6029"/>
         <source>Keyboard Shortcuts</source>
-        <translation type="unfinished">Клавиатурные комбинации</translation>
+        <translation>Клавиатурные комбинации</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="406"/>
@@ -4896,43 +4896,43 @@ Please select interpretation of expressions with implicit multiplication
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5864"/>
         <source>Edit Keyboard Shortcut</source>
-        <translation type="unfinished"></translation>
+        <translation>Править клавиатурную комбинацию</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5864"/>
         <source>New Keyboard Shortcut</source>
-        <translation type="unfinished">Новая клавиатурная комбинация</translation>
+        <translation>Новая клавиатурная комбинация</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5868"/>
         <source>Action:</source>
-        <translation type="unfinished">Действие:</translation>
+        <translation>Действие:</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5879"/>
         <source>Value:</source>
-        <translation type="unfinished">Значение:</translation>
+        <translation>Значение:</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5914"/>
         <source>Set key combination</source>
-        <translation type="unfinished">Назначить комбинацию клавиш</translation>
+        <translation>Назначить комбинацию клавиш</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5917"/>
         <source>Press the key combination you wish to use for the action.</source>
-        <translation type="unfinished">ажмите комбинацию клавиш, которую хотите использовать для действия.</translation>
+        <translation>Нажмите комбинацию клавиш, которую хотите использовать для действия.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5935"/>
         <source>Reserved key combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Зарезервированная комбинация клавиш</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5942"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
-        <translation type="unfinished">Комбинация клавиш уже используется.
+        <translation>Комбинация клавиш уже используется.
 Вы хотите заменить текущее действие (%1)?</translation>
     </message>
     <message>
@@ -4943,17 +4943,17 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6055"/>
         <source>Add…</source>
-        <translation type="unfinished">Добавить…</translation>
+        <translation>Добавить…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6058"/>
         <source>Edit…</source>
-        <translation type="unfinished">Правка…</translation>
+        <translation>Правка…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6062"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6333"/>
@@ -4995,29 +4995,29 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7319"/>
         <source>Failed to open workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>удалось открыть рабочее пространство</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7332"/>
         <location filename="../src/qalculatewindow.cpp" line="7342"/>
         <location filename="../src/qalculatewindow.cpp" line="7362"/>
         <source>Couldn&apos;t save workspace</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось сохранить рабочее пространство</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7353"/>
         <source>Save file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранить файл?</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7353"/>
         <source>Do you want to save the current workspace?</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы хотите сохранить текущую рабочее пространство?</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7354"/>
         <source>Do not ask again</source>
-        <translation type="unfinished"></translation>
+        <translation>Не спрашивать снова</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6555"/>
@@ -5045,88 +5045,88 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="664"/>
         <source>General</source>
-        <translation type="unfinished">Основное</translation>
+        <translation>Основное</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="666"/>
         <source>Programming</source>
-        <translation type="unfinished">Программирование</translation>
+        <translation>Программирование</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="668"/>
         <source>Algebra</source>
-        <translation type="unfinished">Алгебра</translation>
+        <translation>Алгебра</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="670"/>
         <source>Custom</source>
-        <translation type="unfinished">Пользовательский</translation>
+        <translation>Пользовательская</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="672"/>
         <source>None</source>
-        <translation type="unfinished">Никакой</translation>
+        <translation>Ничего</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="675"/>
         <source>Hide Number Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрыть цифровую клавиатуру</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="898"/>
         <location filename="../src/qalculatewindow.cpp" line="932"/>
         <location filename="../src/qalculatewindow.cpp" line="1012"/>
         <source>Number Bases</source>
-        <translation type="unfinished">Основания систем счисления</translation>
+        <translation>Основания систем счисления</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="902"/>
         <location filename="../src/qalculatewindow.cpp" line="940"/>
         <location filename="../src/qalculatewindow.cpp" line="1020"/>
         <source>Rotate the stack or move the selected register up</source>
-        <translation type="unfinished">Повернуть стек или переместить выбранный регистр вверх</translation>
+        <translation>Повернуть стек или переместить выбранный регистр вверх</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="903"/>
         <location filename="../src/qalculatewindow.cpp" line="942"/>
         <location filename="../src/qalculatewindow.cpp" line="1022"/>
         <source>Rotate the stack or move the selected register down</source>
-        <translation type="unfinished">Повернуть стек или переместить выбранный регистр вниз</translation>
+        <translation>Повернуть стек или переместить выбранный регистр вниз</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="904"/>
         <location filename="../src/qalculatewindow.cpp" line="944"/>
         <location filename="../src/qalculatewindow.cpp" line="1024"/>
         <source>Swap the top two values or move the selected value to the top of the stack</source>
-        <translation type="unfinished">Поменять местами два верхних значения или переместить выбранное значение в вершину стека</translation>
+        <translation>Поменять местами два верхних значения или переместить выбранное значение в вершину стека</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="905"/>
         <location filename="../src/qalculatewindow.cpp" line="946"/>
         <location filename="../src/qalculatewindow.cpp" line="1026"/>
         <source>Delete the top or selected value</source>
-        <translation type="unfinished">Удалить верхнее или выбранное значение</translation>
+        <translation>Удалить верхнее или выбранное значение</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="906"/>
         <location filename="../src/qalculatewindow.cpp" line="948"/>
         <location filename="../src/qalculatewindow.cpp" line="1028"/>
         <source>Enter the top value from before the last numeric operation</source>
-        <translation type="unfinished">Введите верхнее значение перед последней числовой операцией</translation>
+        <translation>Введите верхнее значение перед последней числовой операцией</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="907"/>
         <location filename="../src/qalculatewindow.cpp" line="950"/>
         <location filename="../src/qalculatewindow.cpp" line="1030"/>
         <source>Copy the selected or top value to the top of the stack</source>
-        <translation type="unfinished">Скопировать выбранное или верхнее значение в вершину стека</translation>
+        <translation>Скопировать выбранное или верхнее значение в вершину стека</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="908"/>
         <location filename="../src/qalculatewindow.cpp" line="952"/>
         <location filename="../src/qalculatewindow.cpp" line="1032"/>
         <source>Clear the RPN stack</source>
-        <translation type="unfinished">Очистить стек ПОЛИЗ</translation>
+        <translation>Очистить стек ПОЛИЗ</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6650"/>
