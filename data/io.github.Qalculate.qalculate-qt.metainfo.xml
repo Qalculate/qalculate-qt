@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
- <id>qalculate-qt.desktop</id>
+ <id>io.github.Qalculate.qalculate-qt</id>
  <metadata_license>CC0-1.0</metadata_license>
  <project_license>GPL-2.0+</project_license>
  <name>Qalculate! (Qt UI)</name>
@@ -62,12 +62,46 @@
   <kudo>ModernToolkit</kudo>
   <kudo>UserDocs</kudo>
  </kudos>
- <launchable type="desktop-id">qalculate-qt.desktop</launchable>
+ <launchable type="desktop-id">io.github.Qalculate.qalculate-qt.desktop</launchable>
  <provides>
   <binary>qalculate-qt</binary>
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="4.1.1" date="2022-04-04">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Improve resolution and sizing of flag images</li>
+      <li>Do nothing when Enter is pressed if expression is empty</li>
+      <li>Restrict use of reciprocal in unit conversion, e.g. invert in "5m/s to s/m" (= 0.2 s/m) but not in "500/lb to g" (= 1.1/g)</li>
+      <li>New mHg unit (allows use with prefixes other than milli)</li>
+      <li>Always display abbreviated unit name (symbol) with abbreviated prefix (when unit only has short name)</li>
+      <li>Minor improvements to automatic unit conversion</li>
+      <li>Fix display of (1 + f(x))/n</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.1.0" date="2022-03-14">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Add option to show both parsed and entered (or only one) expression in history</li>
+      <li>Add option to clear expression history</li>
+      <li>Do not add duplicate results to history</li>
+      <li>Improved result copying, with proper html format and ASCII option</li>
+      <li>Do not replace *, -, / with Unicode operators if cursor is within quotation marks (apply same principles on paste)</li>
+      <li>Do not perform automatic (continuous) conversion, from conversion view, if result contains no unit</li>
+      <li>Use non-breaking narrow space as digit separator in reasonably short numbers, and between quantity and unit</li>
+      <li>Improve appearance of icons with display scaling</li>
+      <li>Update value of austronomical unit</li>
+      <li>Fix segfault with local digit grouping when separator is empty (e.g. with ignore locale)</li>
+      <li>Fix freezes and crashes with extrememly large vectors and matrices</li>
+      <li>Fix segfault in matrix multiplication</li>
+      <li>Minor bug fixes and feature improvements</li>
+     </ul>
+   </description>
+  </release>
   <release version="4.0.0" date="2022-02-14">
    <description>
     <p>Changes:</p>

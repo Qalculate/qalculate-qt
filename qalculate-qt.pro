@@ -1,4 +1,4 @@
-VERSION = 4.0.0
+VERSION = 4.1.1
 isEmpty(PREFIX) {
 	PREFIX = /usr/local
 }
@@ -39,7 +39,6 @@ CONFIG += qt
 QT += widgets network
 MOC_DIR = build
 OBJECTS_DIR = build
-DEFINES += VERSION=\\\"$$VERSION\\\"
 
 HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/dataseteditdialog.h src/datasetsdialog.h src/expressionedit.h src/fpconversiondialog.h src/functioneditdialog.h src/functionsdialog.h src/historyview.h src/itemproxymodel.h src/keypadwidget.h src/matrixwidget.h src/percentagecalculationdialog.h src/periodictabledialog.h src/plotdialog.h src/preferencesdialog.h src/qalculateqtsettings.h src/qalculatewindow.h src/unitsdialog.h src/uniteditdialog.h src/unknowneditdialog.h src/variableeditdialog.h src/variablesdialog.h
 
@@ -95,10 +94,10 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 		
 	qm.path = $$TRANSLATIONS_DIR
 
-	desktop.files = data/qalculate-qt.desktop
+	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 
-	appdata.files = data/qalculate-qt.appdata.xml
+	appdata.files = data/io.github.Qalculate.qalculate-qt.metainfo.xml
 	appdata.path = $$APPDATA_DIR
 
 	appicon16.files = data/16/qalculate-qt.png
@@ -121,7 +120,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 } else {
 	RESOURCES = icons.qrc flags.qrc translations.qrc
 	target.path = $$PREFIX/bin
-	desktop.files = data/qalculate-qt.desktop
+	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 	appicon64.files = data/64/qalculate-qt.png
 	appicon64.path = $$DESKTOP_ICON_DIR/hicolor/64x64/apps

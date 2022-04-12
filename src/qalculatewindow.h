@@ -69,7 +69,6 @@ class QalculateWindow : public QMainWindow {
 		bool displayMessages();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false, bool type_change = false);
 		void executeFromFile(const QString&);
-		void loadInitialHistory();
 
 	protected:
 
@@ -303,6 +302,7 @@ class QalculateWindow : public QMainWindow {
 		void checkVersion();
 		void reportBug();
 		void help();
+		void loadInitialHistory();
 
 	signals:
 

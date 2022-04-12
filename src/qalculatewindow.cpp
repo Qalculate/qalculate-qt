@@ -50,6 +50,7 @@
 #include <QHeaderView>
 #include <QDesktopServices>
 #include <QClipboard>
+#include <QMimeData>
 #include <QScrollBar>
 #include <QDebug>
 
@@ -173,7 +174,7 @@ std::string print_with_evalops(const Number &nr) {
 	return str;
 }
 
-std::string unhtmlize(std::string str) {
+std::string unhtmlize(std::string str, bool b_ascii) {
 	size_t i = 0, i2;
 	while(true) {
 		i = str.find("<", i);
@@ -183,13 +184,18 @@ std::string unhtmlize(std::string str) {
 		if((i2 - i == 3 && str.substr(i + 1, 2) == "br") || (i2 - i == 4 && str.substr(i + 1, 3) == "/tr")) {
 			str.replace(i, i2 - i + 1, "\n");
 			continue;
+		} else if(i2 - i == 5 && str.substr(i + 1, 4) == "head") {
+			size_t i3 = str.find("</head>", i2 + 1);
+			if(i3 != std::string::npos) {
+				i2 = i3 + 6;
+			}
 		} else if(i2 - i == 4) {
 			if(str.substr(i + 1, 3) == "sup") {
 				size_t i3 = str.find("</sup>", i2 + 1);
 				if(i3 != std::string::npos) {
-					std::string str2 = unhtmlize(str.substr(i + 5, i3 - i - 5));
-					if(str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
-					else if(str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
+					std::string str2 = unhtmlize(str.substr(i + 5, i3 - i - 5), b_ascii);
+					if(!b_ascii && str2.length() == 1 && str2[0] == '2') str.replace(i, i3 - i + 6, SIGN_POWER_2);
+					else if(!b_ascii && str2.length() == 1 && str2[0] == '3') str.replace(i, i3 - i + 6, SIGN_POWER_3);
 					else if((str.length() == i3 + 6 || (str.length() == i3 + 13 && str.find("</span>", i3) != std::string::npos)) && (unicode_length(str2) == 1 || str2.find_first_not_of(NUMBERS) == std::string::npos)) str.replace(i, i3 - i + 6, std::string("^") + str2);
 					else str.replace(i, i3 - i + 6, std::string("^(") + str2 + ")");
 					continue;
@@ -198,14 +204,14 @@ std::string unhtmlize(std::string str) {
 				size_t i3 = str.find("</sub>", i + 4);
 				if(i3 != std::string::npos) {
 					if(i3 - i2 > 16 && str.substr(i2 + 1, 7) == "<small>" && str.substr(i3 - 8, 8) == "</small>") str.erase(i, i3 - i + 6);
-					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5)));
+					else str.replace(i, i3 - i + 6, std::string("_") + unhtmlize(str.substr(i + 5, i3 - i - 5), b_ascii));
 					continue;
 				}
 			}
 		} else if(i2 - i == 17 && str.substr(i + 1, 16) == "i class=\"symbol\"") {
 			size_t i3 = str.find("</i>", i2 + 1);
 			if(i3 != std::string::npos) {
-				std::string name = unhtmlize(str.substr(i2 + 1, i3 - i2 - 1));
+				std::string name = unhtmlize(str.substr(i2 + 1, i3 - i2 - 1), b_ascii);
 				if(name.length() == 1 && ((name[0] >= 'a' && name[0] <= 'z') || (name[0] >= 'A' && name[0] <= 'Z'))) {
 					name.insert(0, 1, '\\');
 				} else {
@@ -226,6 +232,7 @@ std::string unhtmlize(std::string str) {
 	gsub("&hairsp;", "", str);
 	gsub("&nbsp;", " ", str);
 	gsub("&thinsp;", THIN_SPACE, str);
+	gsub("&#8239;", NNBSP, str);
 	return str;
 }
 
@@ -866,6 +873,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
 	if(settings->show_bases >= 0) basesDock->setVisible(settings->show_bases > 0);
+	if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad > 0);
 	rpnDock->setVisible(settings->rpn_mode);
 
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1210,7 +1218,15 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
-				QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+				if(settings->copy_ascii) {
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0], true))));
+				} else {
+					QMimeData *qm = new QMimeData();
+					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
+					qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+					qm->setObjectName("history_result");
+					QApplication::clipboard()->setMimeData(qm);
+				}
 			}
 			break;
 		}
@@ -1524,7 +1540,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2022 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(VERSION));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2022 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -1613,7 +1629,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		return;
 	}
 	QString sargs;
-	bool b_text = (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_TEXT);
+	bool b_text = USE_QUOTES(f->getArgumentDefinition(1), f);
 	if(f->id() == FUNCTION_ID_CIRCULAR_SHIFT || f->id() == FUNCTION_ID_BIT_CMP) {
 		Argument *arg_bits = f->getArgumentDefinition(f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? 3 : 2);
 		Argument *arg_steps = (f->id() == FUNCTION_ID_CIRCULAR_SHIFT ? f->getArgumentDefinition(2) : NULL);
@@ -1949,8 +1965,6 @@ void QalculateWindow::socketReadyRead() {
 		settings->savePreferences(false);
 		return;
 	}
-	setWindowState(windowState() | Qt::WindowMinimized);
-	qApp->processEvents();
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -2005,8 +2019,6 @@ void QalculateWindow::onActivateRequested(const QStringList &arguments, const QS
 		if(!command.isEmpty()) {expressionEdit->setExpression(command); calculate();}
 		args.clear();
 	}
-	setWindowState(windowState() | Qt::WindowMinimized);
-	qApp->processEvents();
 	setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
 	show();
 	qApp->processEvents();
@@ -4305,13 +4317,15 @@ void CommandThread::run() {
 				break;
 			}
 			case COMMAND_CONVERT_STRING: {
-				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_units_string, eo2, NULL, true, parsed_mstruct));
+				MathStructure pm_tmp(*parsed_mstruct);
+				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_units_string, eo2, NULL, true, &pm_tmp));
 				eo2.approximation = APPROXIMATION_EXACT;
 				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convert(*((MathStructure*) x2), command_convert_units_string, eo2, NULL, true));
 				break;
 			}
 			case COMMAND_CONVERT_UNIT: {
-				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_unit, eo2, false, true, true, parsed_mstruct));
+				MathStructure pm_tmp(*parsed_mstruct);
+				((MathStructure*) x)->set(CALCULATOR->convert(*((MathStructure*) x), command_convert_unit, eo2, false, true, true, &pm_tmp));
 				eo2.approximation = APPROXIMATION_EXACT;
 				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convert(*((MathStructure*) x2), command_convert_unit, eo2, false, true, true));
 				break;
@@ -4595,13 +4609,21 @@ void QalculateWindow::onExpressionChanged() {
 std::string ellipsize_result(const std::string &result_text, size_t length) {
 	length /= 2;
 	size_t index1 = result_text.find(SPACE, length);
-	if(index1 == std::string::npos || index1 > length * 1.2) index1 = result_text.find(THIN_SPACE, length);
+	if(index1 == std::string::npos || index1 > length * 1.2) {
+		index1 = result_text.find(THIN_SPACE, length);
+		size_t index1b = result_text.find(NNBSP, length);
+		if(index1b != std::string::npos && (index1 == std::string::npos || index1b < index1)) index1 = index1b;
+	}
 	if(index1 == std::string::npos || index1 > length * 1.2) {
 		index1 = length;
 		while(index1 > 0 && (signed char) result_text[index1] < 0 && (unsigned char) result_text[index1 + 1] < 0xC0) index1--;
 	}
 	size_t index2 = result_text.find(SPACE, result_text.length() - length);
-	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) index2 = result_text.find(THIN_SPACE, result_text.length() - length);
+	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
+		index2 = result_text.find(THIN_SPACE, result_text.length() - length);
+		size_t index2b = result_text.find(NNBSP, result_text.length() - length);
+		if(index2b != std::string::npos && (index2 == std::string::npos || index2b < index2)) index2 = index2b;
+	}
 	if(index2 == std::string::npos || index2 > result_text.length() - length * 0.8) {
 		index2 = result_text.length() - length;
 		while(index2 > index1 && (signed char) result_text[index2] < 0 && (unsigned char) result_text[index2 + 1] < 0xC0) index2--;
@@ -5012,12 +5034,29 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			gsub("\n", "<br>", alt_results[i]);
 		}
 		QString flag;
-		if(mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) {
+		if((mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) || (mstruct->isUnit() && mstruct->unit()->isCurrency())) {
 			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
+			if(!QFile::exists(flag)) flag.clear();
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
-		historyView->addResult(alt_results, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
+		size_t index = settings->v_expression.size();
+		while(index > 0 && settings->v_delexpression[index - 1]) index--;
+		bool b_add = true;
+		if(index > 0 && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1])) && alt_results.size() <= settings->v_result[index - 1].size()) {
+			b_add = false;
+			for(size_t i = 0; i < alt_results.size(); i++) {
+				if(settings->v_delresult[index - 1][i] || settings->v_exact[index - 1][i] != (b_exact || i < alt_results.size() - 1) || settings->v_result[index - 1][i] != alt_results[i]) {
+					b_add = true; break;
+				}
+			}
+		}
+		if(b_add) {
+			historyView->addResult(alt_results, update_parse ? prev_result_text : "", !parsed_approx, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
+		} else {
+			settings->history_answer.pop_back();
+			if(!mstruct_exact.isUndefined()) settings->history_answer.pop_back();
+		}
 	}
 
 	if(do_to) {
@@ -5308,18 +5347,17 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	if(!settings->current_workspace.empty()) {
 		int i = askSaveWorkspace();
 		if(i < 0) return;
-		if(i == 0) settings->current_workspace = "";
 	}
 	settings->window_state = saveState();
 	if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
-	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	settings->show_bases = basesDock->isVisible();
+	settings->savePreferences(settings->save_mode_on_exit);
+	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	CALCULATOR->abort();
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
-	settings->savePreferences(settings->save_mode_on_exit);
 }
 
 void QalculateWindow::onToActivated() {
@@ -5343,10 +5381,15 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::importCSV() {
+	size_t n = CALCULATOR->variables.size();
 	if(CSVDialog::importCSVFile(this)) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		for(size_t i = n; i < CALCULATOR->variables.size(); i++) {
+			if(!CALCULATOR->variables[i]->isHidden()) settings->favourite_variables.push_back(CALCULATOR->variables[i]);
+		}
+		updateVariablesMenu();
 	}
 }
 void QalculateWindow::exportCSV() {
@@ -5429,18 +5472,21 @@ void QalculateWindow::keypadTypeActivated() {
 		bool b = !keypadDock->isVisible();
 		keypadDock->setVisible(b);
 		if(b) keypadDock->raise();
+		settings->show_keypad = b ? 1 : 0;
 	} else {
 		if(settings->keypad_type == v && keypadDock->isVisible()) v = KEYPAD_GENERAL;
 		settings->keypad_type = v;
 		keypad->setKeypadType(v);
 		keypadDock->setVisible(true);
 		keypadDock->raise();
+		settings->show_keypad = 1;
 	}
 	workspace_changed = true;
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
 	if(action) action->setChecked(true);
+	settings->show_keypad = b ? 1 : 0;
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);
@@ -5893,7 +5939,7 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			}
 			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
 				if(&settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i].key == key) {
-					if(QMessageBox::question(this, QString(), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
 						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
 							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) &settings->keyboard_shortcuts[i]) {
 								delete shortcutList->topLevelItem(index);
@@ -6044,6 +6090,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
+	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), this, SLOT(loadInitialHistory()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();
@@ -6675,6 +6722,8 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 					combo->addItem("persian");
 					fd->entry[i] = combo->lineEdit();
 					entry = combo;
+				} else if(USE_QUOTES(arg, f)) {
+					fd->entry[i] = new QLineEdit();
 				} else {
 					fd->entry[i] = new MathLineEdit();
 				}
@@ -6904,8 +6953,11 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 				str2 = ((QLineEdit*) fd->entry[argcount - 1])->text().toStdString();
 				remove_blank_ends(str2);
 			}
-			if(!str2.empty() && f->getArgumentDefinition(argcount) && (f->getArgumentDefinition(argcount)->suggestsQuotes() || (f->getArgumentDefinition(argcount)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
-				if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+			if(!str2.empty() && USE_QUOTES(f->getArgumentDefinition(argcount), f) && (unicode_length(str2) <= 2 || str2.find_first_of("\"\'") == std::string::npos)) {
+				if(str2.find("\"") != std::string::npos) {
+					str2.insert(0, "\'");
+					str2 += "\'";
+				} else {
 					str2.insert(0, "\"");
 					str2 += "\"";
 				}
@@ -6943,8 +6995,11 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 			str2 = ((QLineEdit*) fd->entry[i])->text().toStdString();
 			remove_blank_ends(str2);
 		}
-		if((i < f->minargs() || !str2.empty()) && f->getArgumentDefinition(i + 1) && (f->getArgumentDefinition(i + 1)->suggestsQuotes() || (f->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_TEXT && str2.find(CALCULATOR->getComma()) == std::string::npos))) {
-			if(str2.length() < 1 || (str2[0] != '\"' && str[0] != '\'')) {
+		if((i < f->minargs() || !str2.empty()) && USE_QUOTES(f->getArgumentDefinition(i + 1), f) && (unicode_length(str2) <= 2 || str2.find_first_of("\"\'") == std::string::npos)) {
+			if(str2.find("\"") != std::string::npos) {
+				str2.insert(0, "\'");
+				str2 += "\'";
+			} else {
 				str2.insert(0, "\"");
 				str2 += "\"";
 			}
@@ -7175,6 +7230,8 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 	bool rpn_mode_prev = settings->rpn_mode;
 	bool chain_mode_prev = settings->chain_mode;
 	if(settings->loadWorkspace(filename.toLocal8Bit().data())) {
+		settings->preferences_version[0] = 4;
+		settings->preferences_version[1] = 1;
 		mstruct->unref();
 		mstruct = new MathStructure();
 		mstruct_exact.setUndefined();
@@ -7191,10 +7248,9 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		updateVariablesMenu();
 		keypad->updateBase();
 		keypad->updateSymbols();
-		if(settings->keypad_type < 0) keypadDock->hide();
-		else keypadDock->show();
+		if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad);
 		basesDock->setVisible(settings->show_bases > 0);
-		QAction *action = find_child_data(this, "group_keypad", settings->keypad_type);
+		QAction *action = find_child_data(this, "group_keypad", settings->show_keypad == 0 ? -1 : settings->keypad_type);
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);
 		keypad->setKeypadType(settings->keypad_type);

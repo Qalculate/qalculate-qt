@@ -29,8 +29,14 @@ bool can_display_unicode_string_function(const char *str, void *w);
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
 
+#define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
+
 std::string to_html_escaped(const std::string str);
-std::string unhtmlize(std::string str);
+std::string unhtmlize(std::string str, bool b_ascii = false);
+QString unhtmlize(QString str, bool b_ascii = false);
+std::string unformat(std::string str, bool restorable = false);
+std::string uncolorize(std::string str);
+std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
 bool string_is_less(std::string str1, std::string str2);
@@ -219,12 +225,15 @@ class QalculateQtSettings : QObject {
 		int replace_expression;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		int show_keypad;
 		int show_bases;
 		bool hide_numpad;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;
 		bool auto_calculate;
+		int history_expression_type;
+		bool copy_ascii;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
@@ -254,11 +263,14 @@ class QalculateQtSettings : QObject {
 		int save_workspace;
 
 		std::vector<std::string> v_expression;
+		std::vector<std::string> v_parse;
+		std::vector<bool> v_pexact;
 		std::vector<bool> v_protected;
 		std::vector<bool> v_delexpression;
 		std::vector<std::vector<std::string> > v_result;
 		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
+		std::vector<std::vector<size_t> > v_value;
 		std::vector<MathFunction*> favourite_functions;
 		std::vector<Variable*> favourite_variables;
 		std::vector<Unit*> favourite_units;

@@ -61,8 +61,8 @@ bool item_in_calculator(ExpressionItem *item) {
 	return false;
 }
 
-AnswerFunction::AnswerFunction() : MathFunction(QApplication::tr("answer").toStdString(), 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
-	if(QApplication::tr("answer") != "answer") addName("answer");
+AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
+	if(QApplication::tr("answer") != "answer") addName(QApplication::tr("answer").toStdString(), 1);
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
 	arg->addArgument(new IntegerArgument("", ARGUMENT_MIN_MAX_NONZERO, true, true, INTEGER_TYPE_SINT));
 	setArgumentDefinition(1, arg);
@@ -138,12 +138,29 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		v_result.push_back(std::vector<std::string>());
 		v_exact.push_back(std::vector<int>());
 		v_delresult.push_back(std::vector<bool>());
+		v_value.push_back(std::vector<size_t>());
+	} else if(svar == "history_parse") {
+		if(v_expression.size() > v_parse.size()) {
+			v_parse.push_back(svalue);
+			v_pexact.push_back(true);
+		}
+	} else if(svar == "history_parse_approximate") {
+		if(v_expression.size() > v_parse.size()) {
+			v_parse.push_back(svalue);
+			v_pexact.push_back(false);
+		}
 	} else if(svar == "history_result" || svar == "history_result_approximate") {
+		if(v_parse.size() < v_expression.size()) {
+			v_parse.push_back(v_expression[v_expression.size() - 1]);
+			v_expression[v_expression.size() - 1] = "";
+			v_pexact.push_back(true);
+		}
 		if(!v_result.empty()) {
-			v_result[settings->v_result.size() - 1].push_back(svalue);
-			v_delresult[settings->v_result.size() - 1].push_back(false);
-			if(v_exact[settings->v_exact.size() - 1].size() < v_result[settings->v_result.size() - 1].size()) {
-				v_exact[settings->v_exact.size() - 1].push_back(svar.length() < 20);
+			v_result[v_result.size() - 1].push_back(svalue);
+			v_value[v_value.size() - 1].push_back(0);
+			v_delresult[v_result.size() - 1].push_back(false);
+			if(v_exact[v_exact.size() - 1].size() < v_result[v_result.size() - 1].size()) {
+				v_exact[v_exact.size() - 1].push_back(svar.length() < 20);
 			}
 		}
 	} else if(svar == "history_exact") {
@@ -224,6 +241,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= 0 && v <= 3) keypad_type = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
+	} else if(svar == "show_keypad") {
+		show_keypad = v;
 	} else if(svar == "show_bases") {
 		show_bases = v;
 	} else if(svar == "version") {
@@ -448,6 +467,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
+		} else if(svar == "history_expression_type") {
+			history_expression_type = v;
 		} else if(svar == "window_geometry") {
 			window_geometry = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "splitter_state") {
@@ -600,6 +621,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.spell_out_logical_operators = v;
 		} else if(svar == "caret_as_xor") {
 			caret_as_xor = v;
+		} else if(svar == "copy_ascii") {
+			copy_ascii = v;
 		} else if(svar == "decimal_comma") {
 			decimal_comma = v;
 			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
@@ -720,6 +743,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_keys = true;
 	rpn_shown = false;
 	caret_as_xor = false;
+	copy_ascii = false;
 	do_imaginary_j = false;
 	simplified_percentage = true;
 	color = 1;
@@ -736,6 +760,7 @@ void QalculateQtSettings::loadPreferences() {
 	expression_status_delay = 1000;
 	prefixes_default = true;
 	keypad_type = 0;
+	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
 	use_custom_result_font = false;
@@ -757,6 +782,7 @@ void QalculateQtSettings::loadPreferences() {
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
+	history_expression_type = 0;
 	keep_function_dialog_open = false;
 #ifdef _WIN32
 	check_version = true;
@@ -768,10 +794,13 @@ void QalculateQtSettings::loadPreferences() {
 	current_workspace = "";
 	recent_workspaces.clear();
 	v_expression.clear();
+	v_parse.clear();
+	v_value.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
 	v_exact.clear();
+	v_pexact.clear();
 	v_delresult.clear();
 	expression_history.clear();
 
@@ -809,9 +838,9 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_use_sampling_rate = true;
 	max_plot_time = 5;
 
-	preferences_version[0] = 3;
-	preferences_version[1] = 22;
-	preferences_version[2] = 0;
+	preferences_version[0] = 4;
+	preferences_version[1] = 1;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -833,6 +862,11 @@ void QalculateQtSettings::loadPreferences() {
 		first_time = false;
 	} else {
 		first_time = true;
+	}
+
+	while(v_expression.size() > v_parse.size()) {
+		v_parse.push_back("");
+		v_pexact.push_back(true);
 	}
 
 	if(default_shortcuts) {
@@ -1044,7 +1078,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					} else if(!clear_history_on_exit && stmp == "[History]") {
 						b_history = true;
 					} else if((i = stmp.find_first_of("=")) != std::string::npos) {
-						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_bases") {
+						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_keypad" || stmp.substr(0, i) == "show_bases") {
 							sgeneral += stmp;
 							sgeneral += "\n";
 						}
@@ -1058,7 +1092,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	if(!file) return false;
 	if(is_workspace) fputs("QALCULATE WORKSPACE FILE\n", file);
 	fprintf(file, "\n[General]\n");
-	fprintf(file, "version=%s\n", VERSION);
+	fprintf(file, "version=%s\n", qApp->applicationVersion().toUtf8().data());
 	if(!is_workspace) {
 		fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
 		fprintf(file, "ignore_locale=%i\n", ignore_locale);
@@ -1115,11 +1149,13 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
+		fprintf(file, "history_expression_type=%i\n", history_expression_type);
 	}
 	if(read_default) {
 		fputs(sgeneral.c_str(), file);
 	} else {
 		fprintf(file, "keypad_type=%i\n", keypad_type);
+		if(show_keypad >= 0) fprintf(file, "show_keypad=%i\n", show_keypad);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
 		fprintf(file, "show_bases=%i\n", show_bases);
 	}
@@ -1174,6 +1210,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+		fprintf(file, "copy_ascii=%i\n", copy_ascii);
 		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
@@ -1297,8 +1334,17 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 			size_t i_first = i;
 			for(i = 0; i < v_expression.size(); i++) {
 				if((i >= i_first || v_protected[i]) && !v_delexpression[i]) {
-					if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
-					else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+					if(v_expression[i].empty()) {
+						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_parse[i].c_str());
+						else fprintf(file, "history_expression=%s\n", v_parse[i].c_str());
+					} else {
+						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_expression[i].c_str());
+						else fprintf(file, "history_expression=%s\n", v_expression[i].c_str());
+						if(!v_parse[i].empty()) {
+							if(v_pexact[i]) fprintf(file, "history_parse=%s\n", v_parse[i].c_str());
+							else fprintf(file, "history_parse_approximate=%s\n", v_parse[i].c_str());
+						}
+					}
 					n++;
 					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
 						if(!v_delresult[i][i2]) {
@@ -1479,6 +1525,7 @@ void QalculateQtSettings::fetchExchangeRates(int timeout, int n, QWidget *parent
 				qApp->processEvents();
 				sleep_ms(10);
 			}
+			dialog->cancel();
 			dialog->deleteLater();
 		}
 	}
@@ -1596,23 +1643,23 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	}
 	std::string new_version;
 #ifdef _WIN32
-	int ret = checkAvailableVersion("windows", VERSION, &new_version, force ? 10 : 5);
+	int ret = checkAvailableVersion("windows", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
 #else
-	int ret = checkAvailableVersion("qalculate-qt", VERSION, &new_version, force ? 10 : 5);
+	int ret = checkAvailableVersion("qalculate-qt", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
 #endif
 	if(force && ret <= 0) {
 		if(ret < 0) QMessageBox::critical(parent, tr("Error"), tr("Failed to check for updates."));
-		else QMessageBox::information(parent, QString(), tr("No updates found."));
+		else QMessageBox::information(parent, tr("Information"), tr("No updates found."));
 		if(ret < 0) return;
 	}
 	if(ret > 0 && (force || new_version != last_found_version)) {
 		last_found_version = new_version;
 #ifdef AUTO_UPDATE
-		if(QMessageBox::question(parent, QString(), "<div>" + tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes) + "</div>") {
+		if(QMessageBox::question(parent, tr("Information"), "<div>" + tr("A new version of %1 is available at %2.\n\nDo you wish to update to version %3?").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) == QMessageBox::Yes) + "</div>") {
 			autoUpdate(new_version);
 		}
 #else
-		QMessageBox::information(parent, QString(), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
+		QMessageBox::information(parent, tr("Information"), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
 #endif
 	}
 	last_version_check_date.setToCurrentDate();
@@ -1798,10 +1845,13 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	}
 	size_t i;
 	v_expression.clear();
+	v_parse.clear();
+	v_value.clear();
 	v_protected.clear();
 	v_delexpression.clear();
 	v_result.clear();
 	v_exact.clear();
+	v_pexact.clear();
 	v_delresult.clear();
 	expression_history.clear();
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
@@ -1847,6 +1897,10 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 				if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isHidden() && CALCULATOR->units[i]->isActive() && CALCULATOR->units[i]->category() == CALCULATOR->temporaryCategory()) favourite_units.push_back(CALCULATOR->units[i]);
 			}
 		}
+	}
+	while(v_expression.size() > v_parse.size()) {
+		v_parse.push_back("");
+		v_pexact.push_back(true);
 	}
 	if(!filename || strlen(filename) == 0) {
 		current_workspace = "";

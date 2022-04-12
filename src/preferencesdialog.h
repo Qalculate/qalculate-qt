@@ -87,6 +87,9 @@ class PreferencesDialog : public QDialog {
 		void replaceExpressionChanged(int);
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
+		void historyExpressionChanged(int);
+		void copyAsciiToggled(bool);
+		void caretAsXorToggled(bool);
 
 	public:
 
@@ -111,6 +114,7 @@ class PreferencesDialog : public QDialog {
 		void keypadFontChanged();
 		void appFontChanged();
 		void symbolsUpdated();
+		void historyExpressionTypeChanged();
 		void dialogClosed();
 
 };
