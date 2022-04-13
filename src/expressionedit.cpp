@@ -1371,10 +1371,11 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				qm->setObjectName("history_result");
 				QApplication::clipboard()->setMimeData(qm);
 			}
+			return;
 		} else if(settings->copy_ascii && textCursor().hasSelection()) {
 			QApplication::clipboard()->setText(QString::fromStdString(unformat(textCursor().selectedText().toStdString(), true)));
+			return;
 		}
-		return;
 	} else if(event->matches(QKeySequence::Cut) && settings->copy_ascii && textCursor().hasSelection()) {
 		QApplication::clipboard()->setText(QString::fromStdString(unformat(textCursor().selectedText().toStdString(), true)));
 		textCursor().deleteChar();
