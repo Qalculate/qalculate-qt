@@ -984,6 +984,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
 		case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
 		case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
+		case SHORTCUT_TYPE_HISTORY_SEARCH: {action = historyView->findAction; break;}
 		case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
 		case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
 		case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
@@ -1193,7 +1194,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			break;
 		}
 		case SHORTCUT_TYPE_HISTORY_SEARCH: {
-			historyView->editFind();
+			historyView->findAction->trigger();
 			break;
 		}
 		case SHORTCUT_TYPE_MEMORY_CLEAR: {
@@ -5035,7 +5036,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		}
 		QString flag;
 		if((mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1].isUnit() && (*mstruct)[1].unit()->isCurrency()) || (mstruct->isUnit() && mstruct->unit()->isCurrency())) {
-			flag = ":/data/flags/" + QString::fromStdString((*mstruct)[1].unit()->referenceName()) + ".png";
+			flag = ":/data/flags/" + QString::fromStdString(mstruct->isUnit() ? mstruct->unit()->referenceName() : (*mstruct)[1].unit()->referenceName()) + ".png";
 			if(!QFile::exists(flag)) flag.clear();
 		}
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
@@ -5714,6 +5715,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(plotDialog) plotDialog->setWindowFlags(plotDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(calendarConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		if(historyView->searchDialog) historyView->searchDialog->setWindowFlags(historyView->searchDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	} else {
 		setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(datasetsDialog) datasetsDialog->setWindowFlags(datasetsDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
@@ -5725,6 +5727,7 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 		if(plotDialog) plotDialog->setWindowFlags(plotDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(calendarConversionDialog) calendarConversionDialog->setWindowFlags(calendarConversionDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
 		if(preferencesDialog) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
+		if(historyView->searchDialog) historyView->searchDialog->setWindowFlags(historyView->searchDialog->windowFlags() & ~Qt::WindowStaysOnTopHint);
 	}
 	if(periodicTableDialog) periodicTableDialog->onAlwaysOnTopChanged();
 	show();

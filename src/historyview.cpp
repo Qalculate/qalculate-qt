@@ -159,6 +159,10 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	setTextColor(palette().text().color());
 	prev_color = textColor();
 	cmenu = NULL;
+	searchDialog = NULL;
+	findAction = new QAction(tr("Search…"), this);
+	addAction(findAction);
+	connect(findAction, SIGNAL(triggered()), this, SLOT(editFind()));
 }
 HistoryView::~HistoryView() {}
 
@@ -853,9 +857,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
-		findAction = cmenu->addAction(tr("Search…"), this, SLOT(editFind()));
-		findAction->setShortcut(QKeySequence::Find);
-		findAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addAction(findAction);
 		cmenu->addSeparator();
 		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
 		protectAction->setCheckable(true);
@@ -910,21 +912,31 @@ void HistoryView::doFind() {
 	}
 }
 void HistoryView::editFind() {
-	QDialog *dialog = new QDialog(this);
-	QVBoxLayout *box = new QVBoxLayout(dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog->setWindowTitle(tr("Search"));
+	if(searchDialog) {
+		searchDialog->setWindowState((searchDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		searchDialog->show();
+		qApp->processEvents();
+		searchDialog->raise();
+		searchDialog->activateWindow();
+		searchEdit->clear();
+		searchEdit->setFocus();
+		return;
+	}
+	searchDialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(searchDialog);
+	if(settings->always_on_top) searchDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	searchDialog->setWindowTitle(tr("Search"));
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Text:"), this), 0, 0);
 	searchEdit = new QLineEdit(this);
+	searchEdit->setFocus();
 	grid->addWidget(searchEdit, 0, 1);
 	box->addLayout(grid);
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, searchDialog);
 	connect(buttonBox->addButton(tr("Search"), QDialogButtonBox::AcceptRole), SIGNAL(clicked()), this, SLOT(doFind()));
-	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), dialog, SLOT(reject()));
+	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), searchDialog, SLOT(reject()));
 	box->addWidget(buttonBox);
-	dialog->exec();
-	dialog->deleteLater();
+	searchDialog->show();
 }
 
 void remove_separator(std::string &copy_text) {

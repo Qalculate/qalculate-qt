@@ -942,6 +942,57 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						sourceModel->appendRow(items);
 						
 
+bool ellipsize_completion_names(std::string &str) {
+	if(str.length() < 50) return false;
+	size_t l = 0, l_insub = 0, first_i = 0;
+	bool insub = false;
+	for(size_t i = 0; i < str.length(); i++) {
+		if(str[i] == '<') {
+			if(i + 1 == str.length()) break;
+			if(str[i + 1] == 's') {insub = true; l_insub = l;}
+			else if(insub && str[i + 1] == '/') {insub = false; l -= ((l - l_insub) * 6) / 10;}
+			else if(first_i == 0 && str[i + 1] == 'i') first_i = i;
+			i = str.find('>', i + 1);
+			if(i == std::string::npos) break;
+		} else if((signed char) str[i] > 0 || (unsigned char) str[i] >= 0xC0) {
+			if(first_i > 0 && l >= 35 && (!insub || l - ((l - l_insub) * 6) / 10 >= 35) && i < str.length() - 2 && str[i + 1] != '<' && str[i + 1] != ')' && str[i + 1] != '(') {
+				str = str.substr(0, i);
+				str += "…";
+				if(insub) str += "</sub>";
+				str += "</i>";
+				return true;
+			}
+			l++;
+		}
+	}
+	return false;
+}
+std::string capitalize_name(const std::string &str) {
+	if(str.length() <= 2 || (signed char) str[1] < 0 || str[str.length() - 1] == '_' || (settings->printops.use_unicode_signs && str.find("_to_") != std::string::npos)) return str;
+	size_t i = str.find('_');
+	if(i < 3) return str;
+	std::string name = str;
+	bool b_first = true;
+	while(true) {
+		if(i == std::string::npos) break;
+		if(b_first && i == name.length() - 2 && (name[name.length() - 1] < '0' || name[name.length() - 1] > '9') && ((signed char) name[i - 1] >= 0 || CALCULATOR->getPrefix(name.substr(0, i)))) return str;
+		name.erase(i, 1);
+		if(name[i] >= 'a' && name[i] <= 'z') {
+			name[i] -= ('a' - 'A');
+		} else if((signed char) name[i + 1] < 0) {
+			return str;
+		}
+		if(b_first) {
+			if(name[0] >= 'a' && name[0] <= 'z') {
+				name[0] -= ('a' - 'A');
+			}
+		}
+		b_first = false;
+		i = name.find('_', i + 1);
+	}
+	return name;
+}
+
 void ExpressionEdit::updateCompletion() {
 	sourceModel->clear();
 	std::string str;
@@ -957,6 +1008,8 @@ void ExpressionEdit::updateCompletion() {
 			ename_r = &CALCULATOR->functions[i]->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
 			if(ename_r->suffix && ename_r->name.length() > 1) {
 				str = sub_suffix_html(ename_r->name);
+			} else if(ename_r->name.find('_') != std::string::npos) {
+				str = capitalize_name(ename_r->name);
 			} else {
 				str = ename_r->name;
 			}
@@ -967,12 +1020,15 @@ void ExpressionEdit::updateCompletion() {
 					str += " <i>";
 					if(ename->suffix && ename->name.length() > 1) {
 						str += sub_suffix_html(ename->name);
+					} else if(ename->name.find('_') != std::string::npos) {
+						str += capitalize_name(ename->name);
 					} else {
 						str += ename->name;
 					}
 					str += "()</i>";
 				}
 			}
+			ellipsize_completion_names(str);
 			COMPLETION_APPEND_T(QString::fromStdString(str), QString::fromStdString(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView)), 1, CALCULATOR->functions[i], QString::fromStdString(CALCULATOR->functions[i]->description()))
 		}
 	}
@@ -987,6 +1043,8 @@ void ExpressionEdit::updateCompletion() {
 					if(!b) {
 						if(ename_r->suffix && ename_r->name.length() > 1) {
 							str = sub_suffix_html(ename_r->name);
+						} else if(ename_r->name.find('_') != std::string::npos) {
+							str = capitalize_name(ename_r->name);
 						} else {
 							str = ename_r->name;
 						}
@@ -995,6 +1053,8 @@ void ExpressionEdit::updateCompletion() {
 					str += " <i>";
 					if(ename->suffix && ename->name.length() > 1) {
 						str += sub_suffix_html(ename->name);
+					} else if(ename->name.find('_') != std::string::npos) {
+						str += capitalize_name(ename->name);
 					} else {
 						str += ename->name;
 					}
@@ -1003,6 +1063,9 @@ void ExpressionEdit::updateCompletion() {
 			}
 			if(!b && ename_r->suffix && ename_r->name.length() > 1) {
 				str = sub_suffix_html(ename_r->name);
+				b = true;
+			} else if(!b && ename_r->name.find('_') != std::string::npos) {
+				str = capitalize_name(ename_r->name);
 				b = true;
 			}
 			if(settings->printops.use_unicode_signs && can_display_unicode_string_function("→", completionView)) {
@@ -1027,6 +1090,7 @@ void ExpressionEdit::updateCompletion() {
 					}
 				}
 			}
+			ellipsize_completion_names(str);
 			if(!CALCULATOR->variables[i]->title(false).empty()) {
 				COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), QString::fromStdString(CALCULATOR->variables[i]->title()), 1, CALCULATOR->variables[i])
 			} else {
@@ -1092,6 +1156,8 @@ void ExpressionEdit::updateCompletion() {
 						if(!b) {
 							if(ename_r->suffix && ename_r->name.length() > 1) {
 								str = sub_suffix_html(ename_r->name);
+							} else if(ename_r->name.find('_') != std::string::npos) {
+								str = capitalize_name(ename_r->name);
 							} else {
 								str = ename_r->name;
 							}
@@ -1100,6 +1166,8 @@ void ExpressionEdit::updateCompletion() {
 						str += " <i>";
 						if(ename->suffix && ename->name.length() > 1) {
 							str += sub_suffix_html(ename->name);
+						} else if(ename->name.find('_') != std::string::npos) {
+							str += capitalize_name(ename->name);
 						} else {
 							str += ename->name;
 						}
@@ -1109,6 +1177,11 @@ void ExpressionEdit::updateCompletion() {
 				if(!b && ename_r->suffix && ename_r->name.length() > 1) {
 					str = sub_suffix_html(ename_r->name);
 					b = true;
+				} else if(!b && ename_r->name.find('_') != std::string::npos) {
+					str = capitalize_name(ename_r->name);
+					b = true;
+				} else {
+					ellipsize_completion_names(str);
 				}
 				title = QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				if(u->isCurrency()) {
@@ -1148,6 +1221,7 @@ void ExpressionEdit::updateCompletion() {
 							if(b_italic) str += "</i>";
 						}
 					}
+					ellipsize_completion_names(str);
 				} else {
 					str = cu->print(false, true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView);
 					size_t i_pow = str.find("^");
@@ -1217,6 +1291,8 @@ void ExpressionEdit::updateCompletion() {
 		if(!b && ename_r->suffix && ename_r->name.length() > 1) {
 			str = sub_suffix_html(ename_r->name);
 			b = true;
+		} else {
+			ellipsize_completion_names(str);
 		}
 		title = sprefix;
 		title += " ";
@@ -3101,7 +3177,8 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 				str = prefix->preferredInputName(ename->abbreviation, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this).name;
 				str += ename->name;
 			} else {
-				str = ename->name;
+				if(ename->name.find('_') != std::string::npos) str = capitalize_name(ename->name);
+				else str = ename->name;
 			}
 		} else if(cu && prefix) {
 			ename_r = &prefix->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this);
@@ -3231,7 +3308,8 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 			}
 			if(!ename || ename->completion_only) ename = ename_r;
 			if(!ename) return;
-			str = ename->name;
+			if(ename->name.find('_') != std::string::npos && str2 == capitalize_name(ename->name).substr(0, str2.length())) str = capitalize_name(ename->name);
+			else str = ename->name;
 		}
 	} else if(prefix) {
 		ename_r = &prefix->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) this);

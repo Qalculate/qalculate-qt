@@ -20,6 +20,7 @@ class QAction;
 class ExpressionEdit;
 class QColor;
 class QLineEdit;
+class QDialog;
 
 class HistoryView : public QTextEdit {
 
@@ -31,6 +32,8 @@ class HistoryView : public QTextEdit {
 		virtual ~HistoryView();
 
 		ExpressionEdit *expressionEdit;
+		QAction *findAction;
+		QDialog *searchDialog;
 
 		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
 		void addMessages();
@@ -43,7 +46,7 @@ class HistoryView : public QTextEdit {
 		QString s_text;
 		int i_pos;
 		QMenu *cmenu;
-		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *findAction, *protectAction, *movetotopAction;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;

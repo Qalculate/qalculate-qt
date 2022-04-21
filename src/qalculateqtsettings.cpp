@@ -577,6 +577,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			default_plot_sampling_rate = v;
 		} else if(svar == "plot_use_sampling_rate") {
 			default_plot_use_sampling_rate = v;
+		} else if(svar == "plot_complex") {
+			default_plot_complex = v;
 		} else if(svar == "plot_variable") {
 			default_plot_variable = svalue;
 		} else if(svar == "plot_rows") {
@@ -836,6 +838,7 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_variable = "x";
 	default_plot_color = true;
 	default_plot_use_sampling_rate = true;
+	default_plot_complex = -1;
 	max_plot_time = 5;
 
 	preferences_version[0] = 4;
@@ -1305,6 +1308,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
 		fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
 		fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
+		if(default_plot_complex >= 0) fprintf(file, "plot_complex=%i\n", default_plot_complex);
 		fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
 		fprintf(file, "plot_rows=%i\n", default_plot_rows);
 		fprintf(file, "plot_type=%i\n", default_plot_type);
