@@ -65,28 +65,7 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 		}
 	}
 	if(filter.empty()) return true;
-	if(item->type() == TYPE_UNIT) {
-		return name_matches(item, filter) || title_matches(item, filter) || country_matches((Unit*) item, filter);
-	}
-	std::string title = item->title(true, settings->printops.use_unicode_signs);
-	remove_blank_ends(title);
-	while(title.length() >= filter.length()) {
-		if(equalsIgnoreCase(filter, title.substr(0, filter.length()))) {
-			return true;
-		}
-		size_t i = title.find(' ');
-		if(i == std::string::npos) break;
-		title = title.substr(i + 1);
-		remove_blank_ends(title);
-	}
-	for(size_t i2 = 1; i2 <= item->countNames(); i2++) {
-		if(item->getName(i2).case_sensitive) {
-			if(filter == item->getName(i2).name.substr(0, filter.length())) return true;
-		} else {
-			if(equalsIgnoreCase(filter, item->getName(i2).name.substr(0, filter.length()))) return true;
-		}
-	}
-	return false;
+	return name_matches(item, filter) || title_matches(item, filter) || (item->type() == TYPE_UNIT && country_matches((Unit*) item, filter));
 }
 void ItemProxyModel::setFilter(std::string scat, std::string sfilter) {
 	remove_blank_ends(sfilter);

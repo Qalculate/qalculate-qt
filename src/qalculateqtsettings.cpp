@@ -645,6 +645,13 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "temperature_calculation") {
 			CALCULATOR->setTemperatureCalculationMode((TemperatureCalculationMode) v);
 			tc_set = true;
+		} else if(svar == "sinc_function") {
+			if(v == 1) {
+				CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->setDefaultValue(2, "pi");
+				sinc_set = true;
+			} else if(v == 0) {
+				sinc_set = true;
+			}
 		} else if(svar == "implicit_question_asked") {
 			implicit_question_asked = true;
 		} else if(svar == "calculate_as_you_type") {
@@ -738,6 +745,7 @@ void QalculateQtSettings::loadPreferences() {
 	decimal_comma = -1;
 	adaptive_interval_display = true;
 	tc_set = false;
+	sinc_set = false;
 	dual_fraction = -1;
 	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
@@ -1226,6 +1234,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 		fprintf(file, "base_display=%i\n", printops.base_display);
 		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
+		if(sinc_set) fprintf(file, "sinc_function=%i\n", CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->getDefaultValue(2) == "pi" ? 1 : 0);
 		fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());

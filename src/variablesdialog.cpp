@@ -381,12 +381,12 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 			std::string str;
 			const ExpressionName *ename = &v->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b>";
-			str += ename->name;
+			str += ename->formattedName(TYPE_VARIABLE, true, true);
 			str += "</b>";
 			for(size_t i2 = 1; i2 <= v->countNames(); i2++) {
 				if(&v->getName(i2) != ename) {
 					str += ", ";
-					str += v->getName(i2).name;
+					str += v->getName(i2).formattedName(TYPE_VARIABLE, true, true);
 				}
 			}
 			str += "<br><br>";

@@ -1546,7 +1546,7 @@ void QalculateWindow::showAbout() {
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
 	Number nr(i, 1, 0);
-	expressionEdit->insertPlainText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name)).arg(QString::fromStdString(print_with_evalops(nr))));
+	expressionEdit->insertPlainText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -1800,7 +1800,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		do_exec = !sargs.isEmpty() || f->minargs() <= 1;
 	}
 	if(do_exec) expressionEdit->blockParseStatus();
-	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs, b_text);
+	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs, b_text);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
@@ -1812,7 +1812,7 @@ void QalculateWindow::negate() {
 void QalculateWindow::onVariableClicked(Variable *v) {
 	if(!v) return;
 	expressionEdit->blockCompletion();
-	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
+	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_VARIABLE, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -1820,9 +1820,12 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 	if(!u) return;
 	expressionEdit->blockCompletion();
 	if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
-		expressionEdit->insertPlainText(QString::fromStdString(((CompositeUnit*) u)->print(true, settings->printops.abbreviate_names, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) expressionEdit)));
+		PrintOptions po = settings->printops;
+		po.is_approximate = NULL;
+		po.can_display_unicode_string_arg = (void*) expressionEdit;
+		expressionEdit->insertPlainText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true)));
 	} else {
-		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).name));
+		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
@@ -2354,6 +2357,21 @@ void QalculateWindow::setOption(std::string str) {
 			settings->tc_set = true;
 			expressionCalculationUpdated();
 		}
+	} else if(svar == "sinc")  {
+		int v = -1;
+		if(equalsIgnoreCase(svalue, "unnormalized")) v = 0;
+		else if(equalsIgnoreCase(svalue, "normalized")) v = 1;
+		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
+			v = s2i(svalue);
+		}
+		if(v < 0 || v > 1) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else {
+			if(v == 0) CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->setDefaultValue(2, "");
+			else CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->setDefaultValue(2, "pi");
+			settings->sinc_set = true;
+			expressionCalculationUpdated();
+		}
 	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") {
 		bool b = settings->printops.round_halfway_to_even;
 		SET_BOOL(b)
@@ -2408,7 +2426,7 @@ void QalculateWindow::setOption(std::string str) {
 	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
 		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
 		if(v_i) {
-		bool b = v_i->hasName("j") > 0;
+			bool b = v_i->hasName("j") > 0;
 			SET_BOOL(b)
 			if(b) {
 				ExpressionName ename = v_i->getName(1);
@@ -4157,7 +4175,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
-	if(!do_mathoperation && (askTC(*parsed_mstruct) || (check_exrates && settings->checkExchangeRates(this)))) {
+	if(!do_mathoperation && (askTC(*parsed_mstruct) || askSinc(*parsed_mstruct) || askSinc(*mstruct) || (check_exrates && settings->checkExchangeRates(this)))) {
 		b_busy--;
 		calculateExpression(force, do_mathoperation, op, f, settings->rpn_mode, stack_index, saved_execute_str, str, false);
 		settings->evalops.complex_number_form = cnf_bak;
@@ -5230,7 +5248,39 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	}
 	return false;
 }
-
+bool QalculateWindow::askSinc(MathStructure &m) {
+	if(settings->sinc_set || !m.containsFunctionId(FUNCTION_ID_SINC)) return false;
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Temperature Calculation Mode"));
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	box->addWidget(buttonBox);
+	grid->addWidget(new QLabel(tr("Please select desired variant of the sinc function.")), 0, 0, 1, 2);
+	QButtonGroup *group = new QButtonGroup(dialog);
+	group->setExclusive(true);
+	QRadioButton *w_1 = new QRadioButton(tr("Unnormalized"));
+	group->addButton(w_1);
+	grid->addWidget(w_1, 1, 0, Qt::AlignTop);
+	grid->addWidget(new QLabel("<i>sinc(x) = sin(x)/x</i>"), 1, 1);
+	QRadioButton *w_pi = new QRadioButton(tr("Normalized"));
+	group->addButton(w_pi);
+	grid->addWidget(w_pi, 2, 0, Qt::AlignTop);
+	grid->addWidget(new QLabel("<i>sinc(x) = sinc(πx)/(πx)</i>"), 2, 1);
+	w_1->setChecked(true);
+	dialog->exec();
+	bool b_pi = w_pi->isChecked();
+	dialog->deleteLater();
+	settings->sinc_set = true;
+	if(b_pi) {
+		CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->setDefaultValue(2, "pi");
+		return true;
+	}
+	return false;
+}
 bool QalculateWindow::askDot(const std::string &str) {
 	if(settings->dot_question_asked || CALCULATOR->getDecimalPoint() == DOT) return false;
 	size_t i = 0;
@@ -6111,7 +6161,7 @@ void QalculateWindow::onFunctionsChanged() {
 void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	expressionEdit->blockCompletion();
 	DataSet *ds = dp->parentSet();
-	std::string str = ds->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name;
+	std::string str = ds->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true);
 	str += "(";
 	str += o->getProperty(ds->getPrimaryKeyProperty());
 	str += CALCULATOR->getComma();
@@ -6143,7 +6193,7 @@ void QalculateWindow::applyFunction(MathFunction *f) {
 		calculateRPN(f);
 		return;
 	}
-	QString str = QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name);
+	QString str = QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true));
 	if(f->args() == 0) {
 		str += "()";
 	} else {
@@ -6470,7 +6520,7 @@ void QalculateWindow::onInsertFunctionRequested(MathFunction *f) {
 		expressionEdit->blockUndo(false);
 	}
 	QTextCursor cur = expressionEdit->textCursor();
-	expressionEdit->wrapSelection(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name), true, true);
+	expressionEdit->wrapSelection(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)), true, true);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -6479,7 +6529,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 
 	//if function takes no arguments, do not display dialog and insert function directly
 	if(f->args() == 0) {
-		expressionEdit->insertPlainText(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name) + "()");
+		expressionEdit->insertPlainText(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)) + "()");
 		//function_inserted(f);
 		return;
 	}
@@ -6849,7 +6899,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 						if(use_current_result) {
 							if(exact_text.empty()) {
 								Number nr(settings->history_answer.size(), 1, 0);
-								((QLineEdit*) fd->entry[i])->setText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).name)).arg(QString::fromStdString(print_with_evalops(nr))));
+								((QLineEdit*) fd->entry[i])->setText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 							} else {
 								((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(exact_text));
 							}
@@ -6932,7 +6982,7 @@ void QalculateWindow::onEntryEditMatrix() {
 }
 void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 	MathFunction *f = fd->f;
-	std::string str = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).name + "(", str2;
+	std::string str = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true) + "(", str2;
 	int argcount = fd->args;
 	if(f->maxargs() > 0 && f->minargs() < f->maxargs() && argcount > f->minargs()) {
 		while(true) {
