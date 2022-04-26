@@ -160,7 +160,7 @@ std::string print_with_evalops(const Number &nr) {
 	if(po.base == BASE_CUSTOM && CALCULATOR->customInputBase().isInteger() && (CALCULATOR->customInputBase() > 1 || CALCULATOR->customInputBase() < -1)) {
 		nr_base = CALCULATOR->customOutputBase();
 		CALCULATOR->setCustomOutputBase(CALCULATOR->customInputBase());
-	} else if((po.base < BASE_CUSTOM && po.base != BASE_UNICODE && po.base != BASE_BIJECTIVE_26) || (po.base == BASE_CUSTOM && CALCULATOR->customInputBase() <= 12 && CALCULATOR->customInputBase() >= -12)) {
+	} else if((po.base < BASE_CUSTOM && po.base != BASE_UNICODE && po.base != BASE_BIJECTIVE_26 && po.base != BASE_BINARY_DECIMAL) || (po.base == BASE_CUSTOM && CALCULATOR->customInputBase() <= 12 && CALCULATOR->customInputBase() >= -12)) {
 		po.base = 10;
 		std::string str = "dec(";
 		str += nr.print(po);
@@ -241,6 +241,7 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 	else if(equalsIgnoreCase(str, "roman") || equalsIgnoreCase(str, "roman")) base = BASE_ROMAN_NUMERALS;
 	else if(!input_base && (equalsIgnoreCase(str, "time") || equalsIgnoreCase(str, "time"))) base = BASE_TIME;
 	else if(str == "b26" || str == "B26") base = BASE_BIJECTIVE_26;
+	else if(equalsIgnoreCase(str, "bcd")) base = BASE_BINARY_DECIMAL;
 	else if(equalsIgnoreCase(str, "unicode")) base = BASE_UNICODE;
 	else if(equalsIgnoreCase(str, "supergolden") || equalsIgnoreCase(str, "supergolden ratio") || str == "ψ") base = BASE_SUPER_GOLDEN_RATIO;
 	else if(equalsIgnoreCase(str, "pi") || str == "π") base = BASE_PI;
@@ -519,6 +520,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_FP32); if(settings->printops.base == BASE_FP32) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("Double", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_FP64); if(settings->printops.base == BASE_FP64) {base_checked = true; action->setChecked(true);}
+	action = menu->addAction(tr("Binary-encoded decimal (BCD)"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BINARY_DECIMAL); if(settings->printops.base == BASE_BINARY_DECIMAL) action->setChecked(true);
 	action = menu->addAction("φ", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_GOLDEN_RATIO); if(settings->printops.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("ψ", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
@@ -566,6 +569,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_UNICODE); if(settings->evalops.parse_options.base == BASE_UNICODE) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("Bijective base-26"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BIJECTIVE_26); if(settings->evalops.parse_options.base == BASE_BIJECTIVE_26) action->setChecked(true);
+	action = menu->addAction(tr("Binary-encoded decimal (BCD)"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(BASE_BINARY_DECIMAL); if(settings->evalops.parse_options.base == BASE_BINARY_DECIMAL) action->setChecked(true);
 	action = menu->addAction("φ", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_GOLDEN_RATIO); if(settings->evalops.parse_options.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("ψ", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
@@ -2204,6 +2209,7 @@ void QalculateWindow::setOption(std::string str) {
 		bool b_out = equalsIgnoreCase(svar, "output base") || svar == "outbase";
 		if(equalsIgnoreCase(svalue, "roman")) v = BASE_ROMAN_NUMERALS;
 		else if(equalsIgnoreCase(svalue, "bijective") || str == "b26" || str == "B26") v = BASE_BIJECTIVE_26;
+		if(equalsIgnoreCase(svalue, "bcd")) v = BASE_BINARY_DECIMAL;
 		else if(equalsIgnoreCase(svalue, "fp32") || equalsIgnoreCase(svalue, "binary32") || equalsIgnoreCase(svalue, "float")) {if(b_in) v = 0; else v = BASE_FP32;}
 		else if(equalsIgnoreCase(svalue, "fp64") || equalsIgnoreCase(svalue, "binary64") || equalsIgnoreCase(svalue, "double")) {if(b_in) v = 0; else v = BASE_FP64;}
 		else if(equalsIgnoreCase(svalue, "fp16") || equalsIgnoreCase(svalue, "binary16")) {if(b_in) v = 0; else v = BASE_FP16;}
@@ -3623,6 +3629,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "bijective") || equalsIgnoreCase(to_str, tr("bijective").toStdString())) {
 				to_base = BASE_BIJECTIVE_26;
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "bcd")) {
+				to_base = BASE_BINARY_DECIMAL;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "sexa") || equalsIgnoreCase(to_str, "sexagesimal") || equalsIgnoreCase(to_str, tr("sexagesimal").toStdString())) {
 				to_base = BASE_SEXAGESIMAL;

@@ -740,9 +740,9 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
 				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && cdata->current_from_unit) {
 					if(cdata->current_from_unit != CALCULATOR->getDegUnit()) b_match = 0;
-				} else if(p_type >= 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
+				} else if(p_type > 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
 					if(!cdata->current_from_struct->isNumber() || (p_type > 290 && str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
-				} else if(p_type >= 200 && p_type < 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
+				} else if(p_type >= 200 && p_type <= 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
 					if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) b_match = 0;
 				} else if(p_type >= 300 && p_type < 400) {
@@ -1293,6 +1293,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND(str1, tr("Base units"), 101, NULL)
 	COMPLETION_CONVERT_STRING("base ")
 	COMPLETION_APPEND(str1, tr("Number Base"), 200, NULL)
+	COMPLETION_APPEND("bcd", tr("Binary-Coded Decimal"), 285, NULL)
 	COMPLETION_CONVERT_STRING("bijective")
 	COMPLETION_APPEND(str1, tr("Bijective Base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
@@ -2227,7 +2228,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(po.base == BASE_CUSTOM && (CALCULATOR->usesIntervalArithmetic() || CALCULATOR->customInputBase().isRational()) && (CALCULATOR->customInputBase().isInteger() || !CALCULATOR->customInputBase().isNegative()) && (CALCULATOR->customInputBase() > 1 || CALCULATOR->customInputBase() < -1)) {
 			nr_base = CALCULATOR->customOutputBase();
 			CALCULATOR->setCustomOutputBase(CALCULATOR->customInputBase());
-		} else if(po.base == BASE_CUSTOM || (po.base < BASE_CUSTOM && !CALCULATOR->usesIntervalArithmetic() && po.base != BASE_UNICODE && po.base != BASE_BIJECTIVE_26)) {
+		} else if(po.base == BASE_CUSTOM || (po.base < BASE_CUSTOM && !CALCULATOR->usesIntervalArithmetic() && po.base != BASE_UNICODE && po.base != BASE_BIJECTIVE_26 && po.base != BASE_BINARY_DECIMAL)) {
 			po.base = 10;
 			po.min_exp = 6;
 			po.use_max_decimals = true;
@@ -2302,6 +2303,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("roman numerals").toStdString();
 				} else if(equalsIgnoreCase(str_u, "bijective") || equalsIgnoreCase(str_u, tr("bijective").toStdString())) {
 					parsed_expression += tr("bijective base-26").toStdString();
+				} else if(equalsIgnoreCase(str_u, "bcd")) {
+					parsed_expression += tr("binary-coded decimal").toStdString();
 				} else if(equalsIgnoreCase(str_u, "sexa") || equalsIgnoreCase(str_u, "sexa2") || equalsIgnoreCase(str_u, "sexa3") || equalsIgnoreCase(str_u, "sexagesimal") || equalsIgnoreCase(str_u, tr("sexagesimal").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "sexagesimal", tr("sexagesimal"), "2") || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "sexagesimal", tr("sexagesimal"), "3")) {
 					parsed_expression += tr("sexagesimal number").toStdString();
 				} else if(equalsIgnoreCase(str_u, "latitude") || equalsIgnoreCase(str_u, tr("latitude").toStdString()) || EQUALS_IGNORECASE_AND_LOCAL_NR(str_u, "latitude", tr("latitude"), "2")) {
