@@ -170,6 +170,8 @@ void UnitEditDialog::editNames() {
 	if(!namesEditDialog) {
 		namesEditDialog = new NamesEditDialog(TYPE_UNIT, this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_unit, nameEdit->text());
+	} else {
+		namesEditDialog->setName(nameEdit->text());
 	}
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
@@ -191,13 +193,13 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 		}
 	}
 	if(CALCULATOR->unitNameTaken(nameEdit->text().trimmed().toStdString())) {
-		unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+		unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!unit || unit->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 			else *replaced_item = unit;
 		}
 	}
@@ -248,13 +250,13 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 		}
 	}
 	if(CALCULATOR->unitNameTaken(nameEdit->text().trimmed().toStdString(), u)) {
-		Unit *unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+		Unit *unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!unit || unit->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 			else if(unit != u) *replaced_item = unit;
 		}
 	}

@@ -81,6 +81,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	styleCombo->addItem(tr("Steps"), PLOT_STYLE_STEPS);
 	styleCombo->addItem(tr("Candlesticks"), PLOT_STYLE_CANDLESTICKS);
 	styleCombo->addItem(tr("Dots"), PLOT_STYLE_DOTS);
+	styleCombo->addItem(tr("Polar"), PLOT_STYLE_POLAR);
 	styleCombo->setCurrentIndex(styleCombo->findData(settings->default_plot_style));
 	grid->addWidget(new QLabel(tr("Smoothing:")), r, 0);
 	smoothingCombo = new QComboBox(this); grid->addWidget(smoothingCombo, r, 1); r++;

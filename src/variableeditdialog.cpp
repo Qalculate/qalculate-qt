@@ -121,6 +121,8 @@ void VariableEditDialog::editNames() {
 	if(!namesEditDialog) {
 		namesEditDialog = new NamesEditDialog(TYPE_VARIABLE, this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_variable, nameEdit->text());
+	} else {
+		namesEditDialog->setName(nameEdit->text());
 	}
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
@@ -155,13 +157,13 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 	if(replaced_item) *replaced_item = NULL;
 	Variable *var = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString())) {
-		var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 			else *replaced_item = var;
 		}
 	}
@@ -196,13 +198,13 @@ KnownVariable *VariableEditDialog::createVariable(MathStructure *default_value, 
 bool VariableEditDialog::modifyVariable(KnownVariable *v, MathStructure *default_value, ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->variableNameTaken(nameEdit->text().trimmed().toStdString(), v)) {
-		Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+		Variable *var = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!var || var->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
 		}
 		if(replaced_item) {
-			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+			if(!var) *replaced_item = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 			else if(var != v) *replaced_item = var;
 		}
 	}

@@ -354,6 +354,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			int iargs = f->maxargs();
 			if(iargs < 0) {
 				iargs = f->minargs() + 1;
+				if((int) f->lastArgumentDefinitionIndex() > iargs) iargs = (int) f->lastArgumentDefinitionIndex();
 			}
 			str += "(";
 			if(iargs != 0) {
@@ -370,8 +371,10 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 						str += arg->name();
 					} else {
 						str += tr("argument").toStdString();
-						str += " ";
-						str += i2s(i2);
+						if(i2 > 1 || f->maxargs() != 1) {
+							str += " ";
+							str += i2s(i2);
+						}
 					}
 					if(i2 > f->minargs()) {
 						str += "]";

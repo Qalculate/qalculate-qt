@@ -425,7 +425,7 @@ DataSet *DataSetEditDialog::createDataset(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
-		func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
@@ -474,7 +474,7 @@ DataSet *DataSetEditDialog::createDataset(MathFunction **replaced_item) {
 bool DataSetEditDialog::modifyDataset(DataSet *ds, MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), ds)) {
-		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;

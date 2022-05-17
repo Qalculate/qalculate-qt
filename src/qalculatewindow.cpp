@@ -916,6 +916,10 @@ void QalculateWindow::loadShortcuts() {
 	}
 }
 void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
+	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+		expressionEdit->enableTabCompletion(false);
+		return;
+	}
 	if(!ks->action) return;
 	if(ks->new_action) {
 		removeAction(ks->action);
@@ -958,6 +962,11 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	}
 }
 void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
+	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+		expressionEdit->enableTabCompletion(true);
+		ks->new_action = false;
+		return;
+	}
 	QAction *action = NULL;
 	switch(ks->type) {
 		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
@@ -3152,7 +3161,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 							b = false;
 						}
 						Variable *v = NULL;
-						if(b) v = CALCULATOR->getActiveVariable(name);
+						if(b) v = CALCULATOR->getActiveVariable(name, true);
 						if(b && ((!v && CALCULATOR->variableNameTaken(name)) || (v && (!v->isKnown() || !v->isLocal())))) {
 							CALCULATOR->error(true, "A unit or variable with the same name (%s) already exists.", name.c_str(), NULL);
 							b = false;
@@ -3210,7 +3219,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					b = false;
 				}
 				Variable *v = NULL;
-				if(b) v = CALCULATOR->getActiveVariable(name);
+				if(b) v = CALCULATOR->getActiveVariable(name, true);
 				if(b && ((!v && CALCULATOR->variableNameTaken(name)) || (v && (!v->isKnown() || !v->isLocal())))) {
 					CALCULATOR->error(true, "A unit or variable with the same name (%s) already exists.", name.c_str(), NULL);
 					b = false;
@@ -3263,7 +3272,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					CALCULATOR->error(true, "Illegal name: %s.", name.c_str(), NULL);
 					b = false;
 				}
-				MathFunction *f = CALCULATOR->getActiveFunction(name);
+				MathFunction *f = CALCULATOR->getActiveFunction(name, true);
 				if(b && ((!f && CALCULATOR->functionNameTaken(name)) || (f && (!f->isLocal() || f->subtype() != SUBTYPE_USER_FUNCTION)))) {
 					CALCULATOR->error(true, "A function with the same name (%s) already exists.", name.c_str(), NULL);
 					b = false;
@@ -5913,6 +5922,26 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 		shortcutActionValueEdit->clearEditText();
 	}
 }
+class QalculateKeySequenceEdit : public QKeySequenceEdit {
+	public:
+		QalculateKeySequenceEdit(QWidget *parent) : QKeySequenceEdit(parent) {
+			installEventFilter(this);
+		}
+	protected:
+		bool eventFilter(QObject*, QEvent *event) {
+			if(event->type() == QEvent::KeyPress) {
+				QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+				if(keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) {
+					keyPressEvent(keyEvent);
+					return true;
+				}
+				return false;
+			} else {
+				return false;
+			}
+		}
+};
+
 bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_shortcut *ks, int type) {
 	if(!ks) type = 0;
 	QDialog *dialog = NULL;
@@ -5977,7 +6006,7 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		QVBoxLayout *box = new QVBoxLayout(dialog);
 		QGridLayout *grid = new QGridLayout();
 		grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
-		QKeySequenceEdit *keyEdit = new QKeySequenceEdit(dialog);
+		QKeySequenceEdit *keyEdit = new QalculateKeySequenceEdit(dialog);
 		grid->addWidget(keyEdit, 1, 0);
 		box->addLayout(grid);
 		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
@@ -5989,9 +6018,9 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			QString key = keyEdit->keySequence().toString();
 			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-			keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+			keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && keyEdit->keySequence()[0].key() != Qt::Key_Tab && keyEdit->keySequence()[0].key() != Qt::Key_Backtab && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
 #else
-			(keyEdit->keySequence().count() == 1 && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
+			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0] != Qt::Key_Tab && keyEdit->keySequence()[0] != Qt::Key_Backtab && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
 #endif
 			) {
 				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
@@ -6550,8 +6579,9 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	if(f->args() > 0) {
 		args = f->args();
 	} else if(f->minargs() > 0) {
-		args = f->minargs() + 1;
-		has_vector = true;
+		args = f->minargs();
+		while(!f->getDefaultValue(args + 1).empty()) args++;
+		args++;
 	} else {
 		args = 1;
 		has_vector = true;
@@ -6591,9 +6621,12 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 		str.replace(">=", SIGN_GREATER_OR_EQUAL);
 		str.replace("<=", SIGN_LESS_OR_EQUAL);
 		str.replace("!=", SIGN_NOT_EQUAL);
+		str.replace("...", "…");
 		descr->setPlainText(str);
+		int n = str.count("\n");
+		if(n < 5) n = 5;
 		QFontMetrics fm(descr->font());
-		descr->setFixedHeight(fm.lineSpacing() * 5 + descr->frameWidth() * 2 + descr->contentsMargins().top() + descr->contentsMargins().bottom());
+		descr->setFixedHeight(fm.lineSpacing() * n + descr->frameWidth() * 2 + descr->contentsMargins().top() + descr->contentsMargins().bottom());
 	}
 
 	fd->w_scrollresult = new QScrollArea();
@@ -6606,6 +6639,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	font.setWeight(QFont::Bold);
 	QFontMetrics fm(font);
 	fd->w_scrollresult->setMinimumWidth(fm.averageCharWidth() * 40);
+	titleLabel->setMinimumWidth(fm.averageCharWidth() * 40);
 	fd->w_scrollresult->setWidget(fd->w_result);
 	fd->w_scrollresult->setWidgetResizable(true);
 	fd->w_scrollresult->setFrameShape(QFrame::NoFrame);
@@ -6642,8 +6676,10 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 				argstr = tr("Value");
 			} else {
 				argstr = tr("Argument");
-				argstr += " ";
-				argstr += QString::number(i + 1);
+				if(i > 0 || f->maxargs() != 1) {
+					argstr += " ";
+					argstr += QString::number(i + 1);
+				}
 			}
 		} else {
 			argstr = QString::fromStdString(arg->name());
@@ -6862,7 +6898,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			}
 		} else if(!arg || arg->type() != ARGUMENT_TYPE_DATA_PROPERTY || f->subtype() != SUBTYPE_DATA_SET) {
 			fd->entry[i]->blockSignals(true);
-			if(!defstr.isEmpty() && (!arg || (arg->type() != ARGUMENT_TYPE_DATE && arg->type() != ARGUMENT_TYPE_INTEGER))&& (i < f->minargs() || has_vector || (defstr != "undefined" && defstr != "\"\""))) {
+			if(!defstr.isEmpty() && (!arg || (arg->type() != ARGUMENT_TYPE_DATE && arg->type() != ARGUMENT_TYPE_INTEGER)) && (i < f->minargs() || has_vector || (defstr != "undefined" && defstr != "\"\""))) {
 				((QLineEdit*) fd->entry[i])->setText(defstr);
 			}
 			if(i == 0) {
@@ -6993,7 +7029,7 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 	MathFunction *f = fd->f;
 	std::string str = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true) + "(", str2;
 	int argcount = fd->args;
-	if(f->maxargs() > 0 && f->minargs() < f->maxargs() && argcount > f->minargs()) {
+	if((f->maxargs() < 0 || f->minargs() < f->maxargs()) && argcount > f->minargs()) {
 		while(true) {
 			ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 			std::string defstr = CALCULATOR->localizeExpression(f->getDefaultValue(argcount), pa);

@@ -314,6 +314,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 	int iargs = ds->maxargs();
 	if(iargs < 0) {
 		iargs = ds->minargs() + 1;
+		if((int) ds->lastArgumentDefinitionIndex() > iargs) iargs = (int) ds->lastArgumentDefinitionIndex();
 	}
 	str += "(";
 	if(iargs != 0) {
@@ -330,8 +331,10 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 				str += QString::fromStdString(arg->name());
 			} else {
 				str += tr("argument");
-				str += " ";
-				str += QString::number(i2);
+				if(i2 > 1 || ds->maxargs() != 1) {
+					str += " ";
+					str += QString::number(i2);
+				}
 			}
 			if(i2 > ds->minargs()) {
 				str += "]";

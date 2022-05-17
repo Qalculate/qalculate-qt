@@ -27,6 +27,7 @@
 #include <QDialog>
 #include <QMimeData>
 #include <QDate>
+#include <QDesktopServices>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -301,7 +302,7 @@ void remove_top_border(QString &s_text) {
 QString get_uah(QWidget *w) {
 	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 9) {
 		QFontMetrics fm(w->font());
-		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></td>").arg(fm.ascent() * 1.5);
+		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><a href=\"https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></a></td>").arg(fm.ascent() * 1.5);
 	}
 	return QString();
 }
@@ -610,6 +611,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 	if(!str.isEmpty() && e->button() == Qt::LeftButton) {
+		if(str.startsWith("https://")) QDesktopServices::openUrl(QUrl(str));
 		if(str[0] == 'p') {
 			int index = str.indexOf(":");
 			if(index < 0) return;

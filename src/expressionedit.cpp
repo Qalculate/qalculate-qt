@@ -817,6 +817,8 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	cursor_has_moved = false;
 	expression_has_changed = false;
 	expression_has_changed2 = false;
+	tabbed_index = -1;
+	enable_tab = false;
 	previous_epos = 0;
 	parsed_had_errors = false;
 	parsed_had_warnings = false;
@@ -997,7 +999,7 @@ bool name_has_formatting(const ExpressionName *ename) {
 }
 std::string format_name(const ExpressionName *ename, int type) {
 	bool was_capitalized = false;
-	std::string name = ename->formattedName(type, true, true, false, false, NULL, &was_capitalized);
+	std::string name = ename->formattedName(type, true, true, 0, false, false, NULL, &was_capitalized);
 	if(was_capitalized) {
 		if(ename->suffix) {
 			std::string str = name;
@@ -1391,12 +1393,33 @@ void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
 	if(!event->isAutoRepeat()) disable_history_arrow_keys = false;
 	QPlainTextEdit::keyReleaseEvent(event);
 }
-void ExpressionEdit::completeOrActivateFirst() {
+void ExpressionEdit::enableTabCompletion(bool b) {enable_tab = b;}
+bool ExpressionEdit::completeOrActivateFirst(bool backwards) {
 	if(completionView->isVisible()) {
-		onCompletionActivated(completionView->currentIndex().isValid() ? completionView->currentIndex() : completionModel->index(0, 0));
+		if(completionView->currentIndex().isValid()) {
+			onCompletionActivated(completionView->currentIndex());
+			tabbed_index = completionView->currentIndex().row();
+		} else {
+			onCompletionActivated(completionModel->index(0, 0));
+			tabbed_index = 0;
+		}
+		return true;
+	} else if(tabbed_index >= 0) {
+		if(backwards) tabbed_index--;
+		else tabbed_index++;
+		if(tabbed_index < 0) tabbed_index = completionModel->rowCount() - 1;
+		else if(tabbed_index >= completionModel->rowCount()) tabbed_index = 0;
+		int ti_bak = tabbed_index;
+		onCompletionActivated(completionModel->index(tabbed_index, 0));
+		tabbed_index = ti_bak;
+		return true;
 	} else {
+		int cm_bak = settings->completion_min;
+		settings->completion_min = 1;
 		complete();
+		settings->completion_min = cm_bak;
 	}
+	return completionView->isVisible();
 }
 void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Undo)) {
@@ -1446,6 +1469,16 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 			case Qt::Key_Minus: {
 				if(settings->rpn_mode && settings->rpn_keys) {
+					int pos = 0;
+					if(textCursor().hasSelection()) pos = textCursor().selectionStart();
+					else pos = textCursor().position();
+					if(pos >= 2) {
+						pos--;
+						if((document()->characterAt(pos) == 'E' || document()->characterAt(pos) == 'e') && document()->characterAt(pos - 1).isNumber()) {
+							insertPlainText(settings->printops.use_unicode_signs ? SIGN_MINUS : "-");
+							return;
+						}
+					}
 					emit calculateRPNRequest(OPERATION_SUBTRACT);
 					return;
 				}
@@ -1542,6 +1575,19 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 		}
 	}
+	if((event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab) && (event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == (Qt::ShiftModifier | Qt::KeypadModifier))) {
+		if(enable_tab) {
+			if(!completeOrActivateFirst(event->modifiers() & Qt::ShiftModifier || event->key() == Qt::Key_Backtab)) event->ignore();
+		} else {
+			if(completionView->isVisible()) {
+				QKeyEvent *e = new QKeyEvent(event->type(), event->modifiers() & Qt::ShiftModifier || event->key() == Qt::Key_Backtab ? Qt::Key_Up : Qt::Key_Down, Qt::NoModifier, QString(), event->isAutoRepeat(), event->count());
+				QApplication::postEvent(completionView, e);
+			} else {
+				event->ignore();
+			}
+		}
+		return;
+	}
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
 			case Qt::Key_Escape: {
@@ -1565,16 +1611,6 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					qApp->closeAllWindows();
 				} else {
 					clear();
-				}
-				return;
-			}
-			case Qt::Key_Tab: {
-				if(completionView->isVisible()) {
-					onCompletionActivated(completionView->currentIndex().isValid() ? completionView->currentIndex() : completionModel->index(0, 0));
-				} else if(!settings->enable_completion) {
-					complete();
-				} else {
-					event->ignore();
 				}
 				return;
 			}
@@ -2029,6 +2065,7 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	str += QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true));
 	if(iargs < 0) {
 		iargs = f->minargs() + 1;
+		if((int) f->lastArgumentDefinitionIndex() > iargs) iargs = (int) f->lastArgumentDefinitionIndex();
 		if(arg_index > iargs) arg_index = iargs;
 	}
 	if(arg_index > iargs && last_is_vctr) arg_index = iargs;
@@ -2049,8 +2086,10 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 				str2 = QString::fromStdString(arg->name());
 			} else {
 				str2 = tr("argument");
-				str2 += " ";
-				str2 += QString::number(i2);
+				if(i2 > 1 || f->maxargs() != 1) {
+					str2 += " ";
+					str2 += QString::number(i2);
+				}
 			}
 			if(i2 == arg_index) {
 				if(arg) {
@@ -2409,9 +2448,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 					parsed_expression += (tr("number base %1").arg(QString::fromStdString(to_str2))).toStdString();
 				} else {
-					Variable *v = CALCULATOR->getVariable(str_u);
+					Variable *v = CALCULATOR->getActiveVariable(str_u);
 					if(v && !v->isKnown()) v = NULL;
-					if(v && CALCULATOR->getUnit(str_u)) v = NULL;
+					if(v && CALCULATOR->getActiveUnit(str_u)) v = NULL;
 					if(v) {
 						mparse = v;
 					} else {
@@ -2491,6 +2530,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 }
 
 void ExpressionEdit::onTextChanged() {
+	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(block_text_change) return;
 	QString str = toPlainText();
@@ -2780,6 +2820,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 }
 
 void ExpressionEdit::onCursorPositionChanged() {
+	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(toolTipTimer) toolTipTimer->stop();
 	if(block_text_change) return;
@@ -2869,6 +2910,7 @@ void ExpressionEdit::highlightParentheses() {
 	}
 }
 void ExpressionEdit::selectAll(bool b) {
+	tabbed_index = -1;
 	QTextCursor cur = textCursor();
 	if(b) {
 		cur.select(QTextCursor::Document);
@@ -3118,6 +3160,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 #endif
 	if(!index.isValid()) return;
 	std::string str;
+	int cos_bak = current_object_start;
 	ExpressionItem *item = NULL;
 	Prefix *prefix = NULL;
 	int p_type = 0;
@@ -3405,6 +3448,8 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 		c.setPosition(c.position() + i_move);
 		setTextCursor(c);
 	}
+	current_object_start = cos_bak;
+	current_object_end = current_object_start + unicode_length(str);
 	blockCompletion(false);
 	if((do_completion_signal < 0 || (!item && !prefix)) && cdata->editing_to_expression && (current_object_end < 0 || current_object_end == text.length())) {
 		if(str[str.length() - 1] != ' ') {
