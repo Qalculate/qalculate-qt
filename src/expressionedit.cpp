@@ -2462,7 +2462,10 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							CALCULATOR->beginTemporaryStopMessages();
 							MathStructure to_struct(mparse);
 							to_struct.unformat();
+							ApproximationMode abak = settings->evalops.approximation;
+							if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
 							to_struct = CALCULATOR->convertToOptimalUnit(to_struct, settings->evalops, true);
+							settings->evalops.approximation = abak;
 							fix_to_struct_qt(to_struct);
 							if(!to_struct.isZero()) {
 								mparse2 = new MathStructure();

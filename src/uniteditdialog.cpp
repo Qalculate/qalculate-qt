@@ -349,7 +349,7 @@ void UnitEditDialog::setUnit(Unit *u) {
 		case SUBTYPE_ALIAS_UNIT: {
 			AliasUnit *au = (AliasUnit*) u;
 			mixBox->setChecked(au->mixWithBase() > 0);
-			baseEdit->setText(QString::fromStdString(au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, true, false, false, &can_display_unicode_string_function, (void*) baseEdit).formattedName(STRUCT_UNIT, true)));
+			baseEdit->setText(QString::fromStdString(au->firstBaseUnit()->preferredInputName(settings->printops.abbreviate_names, true, false, false, &can_display_unicode_string_function, (void*) baseEdit).formattedName(STRUCT_UNIT, true)));
 			exponentEdit->setValue(au->firstBaseExponent());
 			mbunEdit->setValue(au->mixWithBaseMinimum() > 1 ? au->mixWithBaseMinimum() : 1);
 			priorityEdit->setValue(au->mixWithBase());

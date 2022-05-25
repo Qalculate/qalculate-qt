@@ -28,6 +28,7 @@
 #include <QMimeData>
 #include <QDate>
 #include <QDesktopServices>
+#include <QToolTip>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -300,7 +301,7 @@ void remove_top_border(QString &s_text) {
 }
 
 QString get_uah(QWidget *w) {
-	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 9) {
+	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 8) {
 		QFontMetrics fm(w->font());
 		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><a href=\"https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></a></td>").arg(fm.ascent() * 1.5);
 	}
@@ -560,8 +561,14 @@ void HistoryView::addMessages() {
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
-	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
-	else viewport()->setCursor(Qt::PointingHandCursor);
+	if(str.isEmpty()) {
+		viewport()->setCursor(Qt::IBeamCursor);
+	} else {
+		viewport()->setCursor(Qt::PointingHandCursor);
+		if(str == "https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine") {
+			QToolTip::showText(mapToGlobal(e->pos()), "Please inform yourself about the war crimes\ncommitted against the Ukrainian people.", this);
+		}
+	}
 	QTextEdit::mouseMoveEvent(e);
 }
 void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
