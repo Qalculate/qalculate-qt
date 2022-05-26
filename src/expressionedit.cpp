@@ -53,6 +53,7 @@
 #define MATCH_ROLE (Qt::UserRole + 12)
 #define IMATCH_ROLE (Qt::UserRole + 13)
 
+#include <unordered_map>
 std::unordered_map<const ExpressionName*, std::string> capitalized_names;
 
 class ExpressionTipLabel : public QLabel {
