@@ -75,8 +75,8 @@ parts:
       - -usr/share/lintian
 
   qalculate-qt:
-    source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.2.0/qalculate-qt-4.2.0.tar.gz
-    source-checksum: sha512/7893bdec1b269088dca5eaa41f59e83c2a342c0451f73b1f56e89a749041ad84d373f189af754dc1e4640661e6e65bf9a91d49650ec01235676eeb7e68de2eb1
+    source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.2.0/qalculate-qt-4.2.0b.tar.gz
+    source-checksum: sha512/a4d2bf55d31bb1c757e1cbb21e22c4fbe767c44c89dfa17a29127df3cd7a8ccada7348d098707bc3243ac39697887fb6be8df5235204b106515365f74f4479d8
     plugin: qmake
     build-snaps:
       - kde-frameworks-5-core18-sdk
