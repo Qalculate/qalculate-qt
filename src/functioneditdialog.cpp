@@ -1091,12 +1091,14 @@ void FunctionEditDialog::argEditClicked() {
 	if(!nameEdit->isReadOnly()) {
 		if(arg) delete arg;
 		arg = d->createArgument();
+		argumentsModel->blockSignals(true);
 		item->setData(QVariant::fromValue((void*) arg));
 		item->setText(QString::fromStdString(arg->name()));
 		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
 		item = argumentsModel->item(r, 1);
 		item->setText(QString::fromStdString(arg->printlong()));
 		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		argumentsModel->blockSignals(false);
 		onFunctionChanged();
 	}
 	d->deleteLater();
