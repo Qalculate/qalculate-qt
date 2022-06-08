@@ -3006,9 +3006,9 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			}
 		}
 		setCursorWidth(0);
+		str = CALCULATOR->unlocalizeExpression(qstr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 		if(insert_before || text.isEmpty()) {
 			cur.beginEditBlock();
-			str = CALCULATOR->unlocalizeExpression(qstr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 			cur.setPosition(istart);
 			if(quote && str.length() > 2 && str.find_first_of("\"\'") != std::string::npos) quote = false;
 			if(quote) cur.insertText(text + "(\"");
@@ -3038,12 +3038,17 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 			cur.setPosition(iend);
 			cur.endEditBlock();
 		} else {
-			cur.beginEditBlock();
-			cur.setPosition(istart);
-			cur.insertText("(");
-			cur.setPosition(iend + 1);
-			cur.insertText(")" + text);
-			cur.endEditBlock();
+			CALCULATOR->parseSigns(str);
+			if(!str.empty() && is_in(OPERATORS, str[str.length() - 1]) && str[str.length() - 1] != NOT_CH) {
+				insertPlainText(text);
+			} else {
+				cur.beginEditBlock();
+				cur.setPosition(istart);
+				cur.insertText("(");
+				cur.setPosition(iend + 1);
+				cur.insertText(")" + text);
+				cur.endEditBlock();
+			}
 		}
 		setTextCursor(cur);
 		setCursorWidth(1);
