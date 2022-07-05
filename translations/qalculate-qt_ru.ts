@@ -4507,7 +4507,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="372"/>
         <source>Unit…</source>
-        <translation>Единицы измерения…</translation>
+        <translation>Единица измерения…</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="390"/>
