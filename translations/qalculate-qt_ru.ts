@@ -833,7 +833,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1298"/>
         <source>Binary-Coded Decimal</source>
-        <translation type="unfinished">Двоично-десятичный код</translation>
+        <translation>Двоично-десятичный код</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1300"/>
@@ -993,7 +993,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="1782"/>
         <source>Clear History</source>
-        <translation type="unfinished">Очищать историю</translation>
+        <translation>Очищать историю</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1784"/>
@@ -1177,7 +1177,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="2346"/>
         <source>binary-coded decimal</source>
-        <translation type="unfinished">двоично-десятичный код</translation>
+        <translation>двоично-десятичный код</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2347"/>
@@ -1773,7 +1773,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/historyview.cpp" line="865"/>
         <source>Copy unformatted ASCII</source>
-        <translation type="unfinished">Копировать неформатированный ASCII</translation>
+        <translation>Копировать неформатированный ASCII</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="165"/>
@@ -2524,7 +2524,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/plotdialog.cpp" line="84"/>
         <source>Polar</source>
-        <translation type="unfinished">Полярная</translation>
+        <translation>Полярная</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="86"/>
@@ -2627,7 +2627,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/plotdialog.cpp" line="140"/>
         <source>Show real and imaginary parts</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать действительную и мнимую части</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="148"/>
@@ -3020,7 +3020,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="172"/>
         <source>Copy unformatted ASCII by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать неформатированный ASCII по умолчанию</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="198"/>
@@ -3040,27 +3040,27 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="65"/>
         <source>Use caret for bitwise XOR</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать карет для побитового исключающего ИЛИ</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="116"/>
         <source>Expression in history:</source>
-        <translation type="unfinished"></translation>
+        <translation>Выражение в истории:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="118"/>
         <source>Parsed</source>
-        <translation type="unfinished"></translation>
+        <translation>Проанализированое</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="119"/>
         <source>Entered</source>
-        <translation type="unfinished"></translation>
+        <translation>Введное</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="120"/>
         <source>Entered + parsed</source>
-        <translation type="unfinished"></translation>
+        <translation>Введное + проанализированое</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="144"/>
@@ -4445,7 +4445,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="523"/>
         <location filename="../src/qalculatewindow.cpp" line="572"/>
         <source>Binary-encoded decimal (BCD)</source>
-        <translation type="unfinished">Двоично-десятичный код</translation>
+        <translation>Двоично-десятичный код</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="584"/>
@@ -4867,17 +4867,17 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5280"/>
         <source>Please select desired variant of the sinc function.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, выберите нужный вариант функции sinc.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5283"/>
         <source>Unnormalized</source>
-        <translation type="unfinished"></translation>
+        <translation>Ненормированный</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5287"/>
         <source>Normalized</source>
-        <translation type="unfinished"></translation>
+        <translation>Нормированный</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5320"/>
