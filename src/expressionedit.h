@@ -70,6 +70,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		QList<int> expression_undo_pos;
 		QString current_history;
 		int history_index, undo_index;
+		int tabbed_index;
+		bool enable_tab;
 		
 		CompletionData *cdata;
 		
@@ -147,7 +149,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		void editDelete();
 		void insertDate();
 		void insertMatrix();
-		void completeOrActivateFirst();
+		void enableTabCompletion(bool);
+		bool completeOrActivateFirst(bool = false);
 		bool complete(MathStructure* = NULL, const QPoint& = QPoint(), bool = false);
 		void clearHistory();
 

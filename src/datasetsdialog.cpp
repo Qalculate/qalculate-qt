@@ -309,11 +309,12 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 	const ExpressionName *ename = &ds->preferredName(false, true, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 	str += "<br>";
 	str += "<i><b>";
-	str += QString::fromStdString(ename->name);
+	str += QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true));
 	str += "</b>";
 	int iargs = ds->maxargs();
 	if(iargs < 0) {
 		iargs = ds->minargs() + 1;
+		if((int) ds->lastArgumentDefinitionIndex() > iargs) iargs = (int) ds->lastArgumentDefinitionIndex();
 	}
 	str += "(";
 	if(iargs != 0) {
@@ -330,8 +331,10 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 				str += QString::fromStdString(arg->name());
 			} else {
 				str += tr("argument");
-				str += " ";
-				str += QString::number(i2);
+				if(i2 > 1 || ds->maxargs() != 1) {
+					str += " ";
+					str += QString::number(i2);
+				}
 			}
 			if(i2 > ds->minargs()) {
 				str += "]";
@@ -346,7 +349,7 @@ void DataSetsDialog::selectedDatasetChanged(QTreeWidgetItem *item, QTreeWidgetIt
 	for(size_t i2 = 1; i2 <= ds->countNames(); i2++) {
 		if(&ds->getName(i2) != ename) {
 			str += "<br>";
-			str += QString::fromStdString(ds->getName(i2).name);
+			str += QString::fromStdString(ds->getName(i2).formattedName(TYPE_FUNCTION, true, true));
 		}
 	}
 	str += "</i>";

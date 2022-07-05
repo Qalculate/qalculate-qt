@@ -349,11 +349,12 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			std::string str;
 			const ExpressionName *ename = &f->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 			str = "<b><i>";
-			str += ename->name;
+			str += ename->formattedName(TYPE_FUNCTION, true, true);
 			str += "</b>";
 			int iargs = f->maxargs();
 			if(iargs < 0) {
 				iargs = f->minargs() + 1;
+				if((int) f->lastArgumentDefinitionIndex() > iargs) iargs = (int) f->lastArgumentDefinitionIndex();
 			}
 			str += "(";
 			if(iargs != 0) {
@@ -370,8 +371,10 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 						str += arg->name();
 					} else {
 						str += tr("argument").toStdString();
-						str += " ";
-						str += i2s(i2);
+						if(i2 > 1 || f->maxargs() != 1) {
+							str += " ";
+							str += i2s(i2);
+						}
 					}
 					if(i2 > f->minargs()) {
 						str += "]";
@@ -386,7 +389,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			for(size_t i2 = 1; i2 <= f->countNames(); i2++) {
 				if(&f->getName(i2) != ename) {
 					str += "<br>";
-					str += f->getName(i2).name;
+					str += f->getName(i2).formattedName(TYPE_FUNCTION, true, true);
 				}
 			}
 			str += "</i><br>";
@@ -404,7 +407,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				str += "<br>";
 				str += tr("Example:").toStdString();
 				str += " ";
-				str += to_html_escaped(f->example(false, ename->name));
+				str += to_html_escaped(f->example(false, ename->formattedName(TYPE_FUNCTION, true)));
 				str += "<br>";
 			}
 			if(f->subtype() == SUBTYPE_DATA_SET && !((DataSet*) f)->copyright().empty()) {

@@ -59,6 +59,7 @@ class NamesEditDialog : public QDialog {
 		void modifyNames(DataProperty*, const QString&);
 		static void modifyName(DataProperty*, const QString&);
 		void setNames(DataProperty*, const QString&);
+		void setName(const QString&);
 		QString firstName();
 
 };

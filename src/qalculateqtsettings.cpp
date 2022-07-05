@@ -23,6 +23,9 @@
 #include <QKeySequence>
 #include <QDebug>
 
+#define PREFERENCES_VERSION_BEFORE(i1, i2, i3) (preferences_version[0] < i1 || (preferences_version[0] == i1 && (preferences_version[1] < i2 || (preferences_version[1] == i2 && preferences_version[2] < i3))))
+#define PREFERENCES_VERSION_AFTER(i1, i2, i3) (preferences_version[0] > i1 || (preferences_version[0] == i1 && (preferences_version[1] > i2 || (preferences_version[1] == i2 && preferences_version[2] > i3))))
+
 extern int b_busy;
 
 bool can_display_unicode_string_function(const char*, void*) {
@@ -35,6 +38,7 @@ std::string to_html_escaped(const std::string strpre) {
 		gsub(">=", SIGN_GREATER_OR_EQUAL, str);
 		gsub("<=", SIGN_LESS_OR_EQUAL, str);
 		gsub("!=", SIGN_NOT_EQUAL, str);
+		gsub("...", "…", str);
 	}
 	gsub("&", "&amp;", str);
 	gsub("<", "&lt;", str);
@@ -560,7 +564,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "plot_legend_placement") {
 			if(v >= PLOT_LEGEND_NONE && v <= PLOT_LEGEND_OUTSIDE) default_plot_legend_placement = (PlotLegendPlacement) v;
 		} else if(svar == "plot_style") {
-			if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_DOTS) default_plot_style = (PlotStyle) v;
+			if(v >= PLOT_STYLE_LINES && v <= PLOT_STYLE_POLAR) default_plot_style = (PlotStyle) v;
 		} else if(svar == "plot_smoothing") {
 			if(v >= PLOT_SMOOTHING_NONE && v <= PLOT_SMOOTHING_SBEZIER) default_plot_smoothing = (PlotSmoothing) v;
 		} else if(svar == "plot_display_grid") {
@@ -577,6 +581,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			default_plot_sampling_rate = v;
 		} else if(svar == "plot_use_sampling_rate") {
 			default_plot_use_sampling_rate = v;
+		} else if(svar == "plot_complex") {
+			default_plot_complex = v;
 		} else if(svar == "plot_variable") {
 			default_plot_variable = svalue;
 		} else if(svar == "plot_rows") {
@@ -643,6 +649,13 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "temperature_calculation") {
 			CALCULATOR->setTemperatureCalculationMode((TemperatureCalculationMode) v);
 			tc_set = true;
+		} else if(svar == "sinc_function") {
+			if(v == 1) {
+				CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->setDefaultValue(2, "pi");
+				sinc_set = true;
+			} else if(v == 0) {
+				sinc_set = true;
+			}
 		} else if(svar == "implicit_question_asked") {
 			implicit_question_asked = true;
 		} else if(svar == "calculate_as_you_type") {
@@ -736,6 +749,7 @@ void QalculateQtSettings::loadPreferences() {
 	decimal_comma = -1;
 	adaptive_interval_display = true;
 	tc_set = false;
+	sinc_set = false;
 	dual_fraction = -1;
 	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
@@ -836,11 +850,12 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_variable = "x";
 	default_plot_color = true;
 	default_plot_use_sampling_rate = true;
+	default_plot_complex = -1;
 	max_plot_time = 5;
 
 	preferences_version[0] = 4;
-	preferences_version[1] = 1;
-	preferences_version[2] = 1;
+	preferences_version[1] = 2;
+	preferences_version[2] = 0;
 
 	if(file) {
 		char line[1000000L];
@@ -869,9 +884,9 @@ void QalculateQtSettings::loadPreferences() {
 		v_pexact.push_back(true);
 	}
 
-	if(default_shortcuts) {
-		keyboard_shortcut ks;
+	keyboard_shortcut ks;
 #define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; ks.action = NULL; ks.new_action = false; keyboard_shortcuts.push_back(ks);
+	if(default_shortcuts) {
 #ifdef _WIN32
 		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
 #else
@@ -903,6 +918,9 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Ctrl+Shift+C", SHORTCUT_TYPE_RPN_COPY, "")
 		ADD_SHORTCUT("Ctrl+Delete", SHORTCUT_TYPE_RPN_DELETE, "")
 		ADD_SHORTCUT("Ctrl+Shift+Delete", SHORTCUT_TYPE_RPN_CLEAR, "")
+		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
+	} else if(PREFERENCES_VERSION_BEFORE(4, 1, 2)) {
+		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
 	}
 
 	updateMessagePrintOptions();
@@ -1223,6 +1241,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 		fprintf(file, "base_display=%i\n", printops.base_display);
 		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
+		if(sinc_set) fprintf(file, "sinc_function=%i\n", CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->getDefaultValue(2) == "pi" ? 1 : 0);
 		fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
@@ -1305,6 +1324,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "plot_step=%s\n", default_plot_step.c_str());
 		fprintf(file, "plot_sampling_rate=%i\n", default_plot_sampling_rate);
 		fprintf(file, "plot_use_sampling_rate=%i\n", default_plot_use_sampling_rate);
+		if(default_plot_complex >= 0) fprintf(file, "plot_complex=%i\n", default_plot_complex);
 		fprintf(file, "plot_variable=%s\n", default_plot_variable.c_str());
 		fprintf(file, "plot_rows=%i\n", default_plot_rows);
 		fprintf(file, "plot_type=%i\n", default_plot_type);

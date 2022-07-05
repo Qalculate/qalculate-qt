@@ -170,6 +170,8 @@ void UnitEditDialog::editNames() {
 	if(!namesEditDialog) {
 		namesEditDialog = new NamesEditDialog(TYPE_UNIT, this, nameEdit->isReadOnly());
 		namesEditDialog->setNames(o_unit, nameEdit->text());
+	} else {
+		namesEditDialog->setName(nameEdit->text());
 	}
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
@@ -191,13 +193,13 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 		}
 	}
 	if(CALCULATOR->unitNameTaken(nameEdit->text().trimmed().toStdString())) {
-		unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+		unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!unit || unit->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 			else *replaced_item = unit;
 		}
 	}
@@ -248,13 +250,13 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 		}
 	}
 	if(CALCULATOR->unitNameTaken(nameEdit->text().trimmed().toStdString(), u)) {
-		Unit *unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString());
+		Unit *unit = CALCULATOR->getActiveUnit(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!unit || unit->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A unit or variable with the same name already exists.\nDo you want to overwrite it?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
 		}
 		if(replaced_item) {
-			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString());
+			if(!unit) *replaced_item = CALCULATOR->getActiveVariable(nameEdit->text().trimmed().toStdString(), true);
 			else if(unit != u) *replaced_item = unit;
 		}
 	}
@@ -347,7 +349,7 @@ void UnitEditDialog::setUnit(Unit *u) {
 		case SUBTYPE_ALIAS_UNIT: {
 			AliasUnit *au = (AliasUnit*) u;
 			mixBox->setChecked(au->mixWithBase() > 0);
-			baseEdit->setText(QString::fromStdString(au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, true, false, false, &can_display_unicode_string_function, (void*) baseEdit).name));
+			baseEdit->setText(QString::fromStdString(au->firstBaseUnit()->preferredInputName(settings->printops.abbreviate_names, true, false, false, &can_display_unicode_string_function, (void*) baseEdit).formattedName(STRUCT_UNIT, true)));
 			exponentEdit->setValue(au->firstBaseExponent());
 			mbunEdit->setValue(au->mixWithBaseMinimum() > 1 ? au->mixWithBaseMinimum() : 1);
 			priorityEdit->setValue(au->mixWithBase());
@@ -373,7 +375,10 @@ void UnitEditDialog::setUnit(Unit *u) {
 		}
 		case SUBTYPE_COMPOSITE_UNIT: {
 			typeCombo->setCurrentIndex(2);
-			baseEdit->setText(QString::fromStdString(((CompositeUnit*) u)->print(false, settings->printops.abbreviate_names, true, &can_display_unicode_string_function, (void*) baseEdit)));
+			PrintOptions po = settings->printops;
+			po.is_approximate = NULL;
+			po.can_display_unicode_string_arg = (void*) baseEdit;
+			baseEdit->setText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true, false)));
 			break;
 		}
 	}

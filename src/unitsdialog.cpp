@@ -518,12 +518,12 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 			if(u->subtype() != SUBTYPE_COMPOSITE_UNIT) {
 				const ExpressionName *ename = &u->preferredName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView);
 				str = "<b>";
-				str += ename->name;
+				str += ename->formattedName(TYPE_UNIT, true, true);
 				str += "</b>";
 				for(size_t i2 = 1; i2 <= u->countNames(); i2++) {
 					if(&u->getName(i2) != ename) {
 						str += ", ";
-						str += u->getName(i2).name;
+						str += u->getName(i2).formattedName(TYPE_UNIT, true, true);
 					}
 				}
 				str += "<br><br>";
@@ -544,7 +544,7 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 					m.set("x");
 					if(au->expression().find("\\y") != std::string::npos) mexp.set("y");
 					str += "<i>x</i> ";
-					str += u->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).name;
+					str += u->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).formattedName(TYPE_UNIT, true, true);
 					if(au->expression().find("\\y") != std::string::npos) str += "<sup><i>y</i></sup>";
 					str += " ";
 				}
@@ -570,7 +570,7 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 						str += m2.print(po, true, false, TAG_TYPE_HTML);
 						if(b_y) str += ")<sup><i>y</i></sup>";
 					} else {
-						str += au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).name;
+						str += au->firstBaseUnit()->preferredDisplayName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) descriptionView).formattedName(TYPE_UNIT, true, true);
 						if(b_y) str += "<sup><i>y</i></sup>";
 					}
 					str += " ";

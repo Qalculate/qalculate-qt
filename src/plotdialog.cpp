@@ -81,6 +81,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	styleCombo->addItem(tr("Steps"), PLOT_STYLE_STEPS);
 	styleCombo->addItem(tr("Candlesticks"), PLOT_STYLE_CANDLESTICKS);
 	styleCombo->addItem(tr("Dots"), PLOT_STYLE_DOTS);
+	styleCombo->addItem(tr("Polar"), PLOT_STYLE_POLAR);
 	styleCombo->setCurrentIndex(styleCombo->findData(settings->default_plot_style));
 	grid->addWidget(new QLabel(tr("Smoothing:")), r, 0);
 	smoothingCombo = new QComboBox(this); grid->addWidget(smoothingCombo, r, 1); r++;
@@ -136,6 +137,8 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	stepEdit->setText(QString::fromStdString(settings->default_plot_step));
 	stepButton->setChecked(!settings->default_plot_use_sampling_rate);
 	stepEdit->setEnabled(!settings->default_plot_use_sampling_rate);
+	complexBox = new QCheckBox(tr("Show real and imaginary parts"), this); grid->addWidget(complexBox, r, 0, 1, 2); complexBox->setChecked(settings->default_plot_complex); r++;
+	connect(complexBox, SIGNAL(clicked(bool)), this, SLOT(onComplexClicked(bool)));
 	connect(group, SIGNAL(buttonToggled(QAbstractButton*, bool)), this, SLOT(onRateStepToggled(QAbstractButton*, bool)));
 	applyButton2 = new QPushButton(tr("Apply"), this); grid->addWidget(applyButton2, r, 0, 1, 2, Qt::AlignRight | Qt::AlignTop);
 	grid->setRowStretch(r, 1);
@@ -215,7 +218,7 @@ void PlotDialog::reject() {
 	settings->default_plot_rows = rowsBox->isChecked();
 	settings->default_plot_type = (vectorButton->isChecked() ? 1 : (pairedButton->isChecked() ? 2 : 0));
 	settings->default_plot_variable = variableEdit->text().toStdString();
-	settings->default_plot_use_sampling_rate = rateButton->isChecked();;
+	settings->default_plot_use_sampling_rate = rateButton->isChecked();
 	CALCULATOR->closeGnuplot();
 	if(plotThread && plotThread->running) {
 		plotThread->write(0);
@@ -263,6 +266,7 @@ void PlotDialog::onAddClicked() {
 std::string plot_min, plot_max, plot_x, plot_str, plot_step;
 int plot_rate;
 bool plot_busy;
+int plot_complex;
 std::vector<MathStructure> y_vectors;
 std::vector<MathStructure> x_vectors;
 std::vector<PlotDataParameters*> pdps;
@@ -303,10 +307,10 @@ class PlotThread : public Thread {
 						if(plot_rate < 0) {
 							MathStructure m_step = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(plot_step, eo.parse_options), eo);
 							if(!CALCULATOR->aborted()) {
-								y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, m_step, x_vector, plot_x, eo.parse_options, 0));
+								y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, m_step, plot_complex >= 0 ? plot_complex : settings->evalops.allow_complex, x_vector, plot_x, eo.parse_options, 0));
 							}
 						} else if(!CALCULATOR->aborted()) {
-							y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, plot_rate, x_vector, plot_x, eo.parse_options, 0));
+							y_vector->set(CALCULATOR->expressionToPlotVector(CALCULATOR->unlocalizeExpression(plot_str, eo.parse_options), min, max, plot_rate, plot_complex, x_vector, plot_x, eo.parse_options, 0));
 						}
 					}
 					CALCULATOR->stopControl();
@@ -334,6 +338,7 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 		} else {
 			plot_rate = rateSpin->value();
 		}
+		plot_complex = settings->default_plot_complex;
 	}
 	plot_busy = true;
 	if(!plotThread) plotThread = new PlotThread;
@@ -608,6 +613,9 @@ void PlotDialog::onRemoveClicked() {
 		delete list[i];
 	}
 	updatePlot();
+}
+void PlotDialog::onComplexClicked(bool b) {
+	settings->default_plot_complex = b;
 }
 void PlotDialog::onApply2Clicked() {
 	for(int i = 0; ; i++) {

@@ -337,7 +337,22 @@ void NamesEditDialog::setNames(ExpressionItem *o, const QString &str) {
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->case_sensitive ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->completion_only ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		namesModel->appendRow(items);
+		if(!read_only && i == 1 && !item->text().isEmpty() && (!o || QString::fromStdString(ename->name) != item->text())) nameChanged(item);
 	}
+}
+void NamesEditDialog::setName(const QString &str) {
+	if(str.trimmed().isEmpty()) return;
+	QStandardItem *item = namesModel->item(0, 0);
+	if(!item) {
+		item = new QStandardItem();
+		QList<QStandardItem *> items;
+		items.append(item);
+		for(int i = 1; i < namesModel->columnCount(); i++) {
+			QStandardItem *item2 = new QStandardItem(); item2->setEditable(false); item2->setCheckable(true); item2->setCheckState(Qt::Unchecked); item2->setTextAlignment(Qt::AlignCenter); items.append(item2);
+		}
+		namesModel->appendRow(items);
+	}
+	if(str.trimmed() != item->text()) item->setText(str.trimmed());
 }
 QString NamesEditDialog::firstName() {
 	QStandardItem *item = namesModel->item(0, 0);
@@ -453,14 +468,14 @@ void NamesEditDialog::nameChanged(QStandardItem *item) {
 		else if(i_type == TYPE_UNIT) item->setText(QString::fromStdString(CALCULATOR->convertToValidUnitName(item->text().trimmed().toStdString())));
 		namesModel->blockSignals(false);
 		QMessageBox::warning(this, tr("Warning"), tr("Illegal name"));
-	} else if(i_type == TYPE_FUNCTION && o_item && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
-		MathFunction *f = CALCULATOR->getActiveFunction(item->text().trimmed().toStdString());
+	} else if(i_type == TYPE_FUNCTION && CALCULATOR->functionNameTaken(item->text().trimmed().toStdString(), (MathFunction*) o_item)) {
+		MathFunction *f = CALCULATOR->getActiveFunction(item->text().trimmed().toStdString(), true);
 		if(!f || f->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A function with the same name already exists."));
-	} else if(i_type == TYPE_VARIABLE && o_item && CALCULATOR->variableNameTaken(item->text().trimmed().toStdString(), (Variable*) o_item)) {
-		Variable *var = CALCULATOR->getActiveVariable(item->text().trimmed().toStdString());
+	} else if(i_type == TYPE_VARIABLE && CALCULATOR->variableNameTaken(item->text().trimmed().toStdString(), (Variable*) o_item)) {
+		Variable *var = CALCULATOR->getActiveVariable(item->text().trimmed().toStdString(), true);
 		if(!var || var->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
-	} else if(i_type == TYPE_UNIT && o_item && CALCULATOR->unitNameTaken(item->text().trimmed().toStdString(), (Unit*) o_item)) {
-		Unit *u = CALCULATOR->getActiveUnit(item->text().trimmed().toStdString());
+	} else if(i_type == TYPE_UNIT && CALCULATOR->unitNameTaken(item->text().trimmed().toStdString(), (Unit*) o_item)) {
+		Unit *u = CALCULATOR->getActiveUnit(item->text().trimmed().toStdString(), true);
 		if(!u || u->category() != CALCULATOR->temporaryCategory()) QMessageBox::warning(this, tr("Warning"), tr("A unit or variable with the same name already exists."));
 	}
 }
@@ -893,7 +908,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
-		func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return NULL;
@@ -943,7 +958,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
-		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString());
+		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString(), true);
 		if(name_edited && (!func || func->category() != CALCULATOR->temporaryCategory()) && QMessageBox::question(this, tr("Question"), tr("A function with the same name already exists.\nDo you want to overwrite the function?")) != QMessageBox::Yes) {
 			nameEdit->setFocus();
 			return false;
@@ -1076,12 +1091,14 @@ void FunctionEditDialog::argEditClicked() {
 	if(!nameEdit->isReadOnly()) {
 		if(arg) delete arg;
 		arg = d->createArgument();
+		argumentsModel->blockSignals(true);
 		item->setData(QVariant::fromValue((void*) arg));
 		item->setText(QString::fromStdString(arg->name()));
 		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
 		item = argumentsModel->item(r, 1);
 		item->setText(QString::fromStdString(arg->printlong()));
 		item->setData("<p>" + item->text() + "</p>", Qt::ToolTipRole);
+		argumentsModel->blockSignals(false);
 		onFunctionChanged();
 	}
 	d->deleteLater();

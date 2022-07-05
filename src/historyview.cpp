@@ -27,6 +27,8 @@
 #include <QDialog>
 #include <QMimeData>
 #include <QDate>
+#include <QDesktopServices>
+#include <QToolTip>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -159,6 +161,10 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	setTextColor(palette().text().color());
 	prev_color = textColor();
 	cmenu = NULL;
+	searchDialog = NULL;
+	findAction = new QAction(tr("Search…"), this);
+	addAction(findAction);
+	connect(findAction, SIGNAL(triggered()), this, SLOT(editFind()));
 }
 HistoryView::~HistoryView() {}
 
@@ -295,9 +301,9 @@ void remove_top_border(QString &s_text) {
 }
 
 QString get_uah(QWidget *w) {
-	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 9) {
+	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 8) {
 		QFontMetrics fm(w->font());
-		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></td>").arg(fm.ascent() * 1.5);
+		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><a href=\"https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></a></td>").arg(fm.ascent() * 1.5);
 	}
 	return QString();
 }
@@ -555,8 +561,14 @@ void HistoryView::addMessages() {
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
-	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
-	else viewport()->setCursor(Qt::PointingHandCursor);
+	if(str.isEmpty()) {
+		viewport()->setCursor(Qt::IBeamCursor);
+	} else {
+		viewport()->setCursor(Qt::PointingHandCursor);
+		if(str == "https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine") {
+			QToolTip::showText(mapToGlobal(e->pos()), "Please inform yourself about the war crimes\ncommitted against the Ukrainian people.", this);
+		}
+	}
 	QTextEdit::mouseMoveEvent(e);
 }
 void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
@@ -606,6 +618,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 void HistoryView::mouseReleaseEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 	if(!str.isEmpty() && e->button() == Qt::LeftButton) {
+		if(str.startsWith("https://")) QDesktopServices::openUrl(QUrl(str));
 		if(str[0] == 'p') {
 			int index = str.indexOf(":");
 			if(index < 0) return;
@@ -853,9 +866,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		selectAllAction = cmenu->addAction(tr("Select All"), this, SLOT(selectAll()));
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
-		findAction = cmenu->addAction(tr("Search…"), this, SLOT(editFind()));
-		findAction->setShortcut(QKeySequence::Find);
-		findAction->setShortcutContext(Qt::WidgetShortcut);
+		cmenu->addAction(findAction);
 		cmenu->addSeparator();
 		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
 		protectAction->setCheckable(true);
@@ -910,21 +921,31 @@ void HistoryView::doFind() {
 	}
 }
 void HistoryView::editFind() {
-	QDialog *dialog = new QDialog(this);
-	QVBoxLayout *box = new QVBoxLayout(dialog);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog->setWindowTitle(tr("Search"));
+	if(searchDialog) {
+		searchDialog->setWindowState((searchDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+		searchDialog->show();
+		qApp->processEvents();
+		searchDialog->raise();
+		searchDialog->activateWindow();
+		searchEdit->clear();
+		searchEdit->setFocus();
+		return;
+	}
+	searchDialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(searchDialog);
+	if(settings->always_on_top) searchDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	searchDialog->setWindowTitle(tr("Search"));
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Text:"), this), 0, 0);
 	searchEdit = new QLineEdit(this);
+	searchEdit->setFocus();
 	grid->addWidget(searchEdit, 0, 1);
 	box->addLayout(grid);
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, dialog);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, searchDialog);
 	connect(buttonBox->addButton(tr("Search"), QDialogButtonBox::AcceptRole), SIGNAL(clicked()), this, SLOT(doFind()));
-	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), dialog, SLOT(reject()));
+	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), searchDialog, SLOT(reject()));
 	box->addWidget(buttonBox);
-	dialog->exec();
-	dialog->deleteLater();
+	searchDialog->show();
 }
 
 void remove_separator(std::string &copy_text) {

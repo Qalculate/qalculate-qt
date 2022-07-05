@@ -123,6 +123,7 @@ class QalculateWindow : public QMainWindow {
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
 		bool askTC(MathStructure&);
+		bool askSinc(MathStructure&);
 		bool askDot(const std::string&);
 		bool askImplicit();
 		void keyPressEvent(QKeyEvent*) override;

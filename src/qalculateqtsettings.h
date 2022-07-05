@@ -208,7 +208,7 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage;
+		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
 		int rounding_mode;
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
@@ -251,7 +251,7 @@ class QalculateQtSettings : QObject {
 		PlotSmoothing default_plot_smoothing;
 		bool default_plot_display_grid, default_plot_full_border, default_plot_use_sampling_rate, default_plot_rows, default_plot_color;
 		std::string default_plot_min, default_plot_max, default_plot_step, default_plot_variable;
-		int default_plot_sampling_rate, default_plot_linewidth, default_plot_type, max_plot_time;
+		int default_plot_sampling_rate, default_plot_linewidth, default_plot_type, max_plot_time, default_plot_complex;
 
 		QalculateDateTime last_version_check_date;
 		bool check_version;

@@ -35,7 +35,7 @@ class PlotDialog : public QDialog {
 
 		QLineEdit *titleEdit, *expressionEdit, *variableEdit, *stepEdit, *titleEdit2, *xaxisEdit, *yaxisEdit, *minxEdit, *maxxEdit;
 		QRadioButton *functionButton, *vectorButton, *pairedButton, *primaryButton, *secondaryButton, *rateButton, *stepButton;
-		QCheckBox *rowsBox, *gridBox, *borderBox, *minyBox, *maxyBox, *logxBox, *logyBox;
+		QCheckBox *rowsBox, *gridBox, *borderBox, *minyBox, *maxyBox, *logxBox, *logyBox, *complexBox;
 		QComboBox *styleCombo, *smoothingCombo, *legendCombo;
 		QPushButton *addButton, *applyButton, *removeButton, *applyButton2, *applyButton3;
 		QTreeWidget *graphsTable;
@@ -60,6 +60,7 @@ class PlotDialog : public QDialog {
 		void enableDisableButtons();
 		void onExpressionActivated();
 		void onAddClicked();
+		void onComplexClicked(bool);
 		void onApplyClicked();
 		void onRemoveClicked();
 		void onApply2Clicked();
