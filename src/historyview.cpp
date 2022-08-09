@@ -300,14 +300,6 @@ void remove_top_border(QString &s_text) {
 	}
 }
 
-QString get_uah(QWidget *w) {
-	if((settings->first_time || settings->preferences_version[0] < 4 || (settings->preferences_version[0] == 4 && settings->preferences_version[1] == 0)) && settings->history_answer.empty() && QDate::currentDate().year() == 2022 && QDate::currentDate().month() < 8) {
-		QFontMetrics fm(w->font());
-		return QString("<tr><td colspan=\"2\" style=\"text-align:center; padding-top: 6px; padding-bottom: 12px\"><a href=\"https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine\"><img src=\":/data/flags/UAH.png\" height=\"%1\"></a></td>").arg(fm.ascent() * 1.5);
-	}
-	return QString();
-}
-
 void HistoryView::loadInitial() {
 	s_text.clear();
 	i_pos = 0;
@@ -332,8 +324,7 @@ void HistoryView::loadInitial() {
 		}
 	}
 
-	QString uah_str = get_uah(this);
-	if(!s_text.isEmpty() || !uah_str.isEmpty()) {
+	if(!s_text.isEmpty()) {
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 			replaceColors(s_text);
 			for(size_t i = 0; i < settings->v_expression.size(); i++) {
@@ -343,7 +334,7 @@ void HistoryView::loadInitial() {
 				}
 			}
 		}
-		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + uah_str + s_text + "</table></body>");
+		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 	}
 }
 
@@ -360,6 +351,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
 			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
 				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+				str += "\">";
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
@@ -372,13 +364,20 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "</i>";
 			} else {
 				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+				str += "\">";
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 			}
 		} else {
 			str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
 			str += QString::fromStdString(parse);
 			str += "</a>";
+		}
+		if(initial_load && settings->v_protected[index]) {
+			str += "<img src=\"data://img1px.png\" width=\"2\"/>";
+			if(settings->color == 2) str += "<img valign=\"top\" src=\":/icons/dark/actions/scalable/protected.svg\" height=\"16\"/>";
+			else str += "<img valign=\"top\" src=\":/icons/actions/scalable/protected.svg\" height=\"16\"/>";
 		}
 		str += "</td></tr>";
 		if(!initial_load) {
@@ -546,10 +545,9 @@ void HistoryView::changeEvent(QEvent *e) {
 			}
 		}
 
-		QString uah_str = get_uah(this);
-		if(!s_text.isEmpty() || !uah_str.isEmpty()) {
+		if(!s_text.isEmpty()) {
 			replaceColors(s_text);
-			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + uah_str + s_text + "</table></body>");
+			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 		}
 		prev_color = textColor();
 	}
@@ -561,14 +559,8 @@ void HistoryView::addMessages() {
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
-	if(str.isEmpty()) {
-		viewport()->setCursor(Qt::IBeamCursor);
-	} else {
-		viewport()->setCursor(Qt::PointingHandCursor);
-		if(str == "https://en.wikipedia.org/wiki/War_crimes_in_the_2022_Russian_invasion_of_Ukraine") {
-			QToolTip::showText(mapToGlobal(e->pos()), "Please inform yourself about the war crimes\ncommitted against the Ukrainian people.", this);
-		}
-	}
+	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
+	else viewport()->setCursor(Qt::PointingHandCursor);
 	QTextEdit::mouseMoveEvent(e);
 }
 void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
@@ -798,6 +790,29 @@ void HistoryView::editProtect() {
 	indexAtPos(context_pos, &i1, &i2);
 	if(i1 < 0 || i1 >= (int) settings->v_protected.size()) return;
 	settings->v_protected[i1] = protectAction->isChecked();
+	QString sref = QString::number(i1);
+	int index = s_text.indexOf("<a name=\"" + sref + "\"");
+	if(index < 0) {
+		sref = "e" + QString::number(i1);
+		index = s_text.indexOf("<a name=\"" + sref + "\"");
+	}
+	if(index > 0) {
+		int index2 = s_text.indexOf("</td>", index);
+		if(index2 > 0) {
+			if(protectAction->isChecked()) {
+				QString str = "<img src=\"data://img1px.png\" width=\"2\"/>";
+				if(settings->color == 2) str += "<img valign=\"top\" src=\":/icons/dark/actions/scalable/protected.svg\" height=\"16\"/>";
+				else str += "<img valign=\"top\" src=\":/icons/actions/scalable/protected.svg\" height=\"16\"/>";
+				s_text.insert(index2, str);
+			} else {
+				index = s_text.indexOf("<img src", index);
+				if(index > 0) {
+					s_text.remove(index, index2 - index);
+				}
+			}
+		}
+	}
+	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index, QString *anchorstr) {
 	*expression_index = -1;
