@@ -344,6 +344,41 @@ void HistoryView::loadInitial() {
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
 	if(initial_load && settings->v_delexpression[index]) return;
+	QString serror;
+	bool b_parse_error = false;
+	if(!initial_load && CALCULATOR->message()) {
+		do {
+			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
+				if(!settings->implicit_question_asked) *implicit_warning = true;
+			} else {
+				MessageType mtype = CALCULATOR->message()->type();
+				serror += "<tr><td class=\"message\" colspan=\"2\" style=\"text-align:left; font-size:normal";
+				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+					serror += "; color: ";
+					if(mtype == MESSAGE_ERROR) {
+						if(settings->color == 2) serror += "#FFAAAA";
+						else serror += "#800000";
+					} else {
+						if(settings->color == 2) serror += "#AAAAFF";
+						else serror += "#000080";
+					}
+					serror += "";
+					if(CALCULATOR->message()->stage() == MESSAGE_STAGE_PARSING) b_parse_error = true;
+				}
+				serror += "\">";
+				QString mstr = QString::fromStdString(CALCULATOR->message()->message());
+				if(!mstr.startsWith("-")) serror += "- ";
+				if(settings->printops.use_unicode_signs) {
+					mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
+					mstr.replace("<=", SIGN_LESS_OR_EQUAL);
+					mstr.replace("!=", SIGN_NOT_EQUAL);
+				}
+				serror += mstr.toHtmlEscaped();
+				serror += "</td></tr>";
+			}
+		} while(CALCULATOR->nextMessage());
+		if(serror.isEmpty() && values.empty() && expression.empty() && parse.empty()) return;
+	}
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
@@ -351,7 +386,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
 			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
 				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				str += "\">";
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
@@ -364,7 +398,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "</i>";
 			} else {
 				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				str += "\">";
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 			}
@@ -373,6 +406,15 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
 			str += QString::fromStdString(parse);
 			str += "</a>";
+			if(b_parse_error && !expression.empty()) {
+				str += "&nbsp;&nbsp;&nbsp; ";
+				if(settings->color == 2) str += "<i style=\"color: #AAAAAA\">";
+				else str += "<i style=\"color: #666666\">";
+				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
+				str += QString::fromStdString(replace_parse_colors(expression));
+				str += "</a>";
+				str += "</i>";
+			}
 		}
 		if(initial_load && settings->v_protected[index]) {
 			str += "<img src=\"data://img1px.png\" width=\"2\"/>";
@@ -404,38 +446,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_value[settings->v_value.size() - 1].insert(settings->v_value[settings->v_value.size() - 1].begin(), dual_approx && i == 1 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 		}
 	}
-	if(!initial_load && CALCULATOR->message()) {
-		do {
-			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
-				if(!settings->implicit_question_asked) *implicit_warning = true;
-			} else {
-				MessageType mtype = CALCULATOR->message()->type();
-				str += "<tr><td class=\"message\" colspan=\"2\" style=\"text-align:left; font-size:normal";
-				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-					str += "; color: ";
-					if(mtype == MESSAGE_ERROR) {
-						if(settings->color == 2) str += "#FFAAAA";
-						else str += "#800000";
-					} else {
-						if(settings->color == 2) str += "#AAAAFF";
-						else str += "#000080";
-					}
-					str += "";
-				}
-				str += "\">";
-				QString mstr = QString::fromStdString(CALCULATOR->message()->message());
-				if(!mstr.startsWith("-")) str += "- ";
-				if(settings->printops.use_unicode_signs) {
-					mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
-					mstr.replace("<=", SIGN_LESS_OR_EQUAL);
-					mstr.replace("!=", SIGN_NOT_EQUAL);
-				}
-				str += mstr.toHtmlEscaped();
-				str += "</td></tr>";
-			}
-		} while(CALCULATOR->nextMessage());
-		if(str.isEmpty() && values.empty() && expression.empty() && parse.empty()) return;
-	}
+	str += serror;
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
 	if(!expression.empty() || !parse.empty()) i_pos = str.length();
 	size_t i_answer_pre = 0;
