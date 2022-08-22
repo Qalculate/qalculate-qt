@@ -77,7 +77,6 @@ parts:
   qalculate-qt:
     source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.3.0/qalculate-qt-4.3.0.tar.gz
     source-checksum: sha512/be8cea6d4f0e49b296485b51237f742aa701a11fd5fc13d6bc0b454f69218fd50248a3467c1e189d6e82d2abef040287828c1f668e2a14b5845fb2faf1275f9f
-    source-depth: 1
     plugin: qmake
     build-snaps:
       - kde-frameworks-5-core18-sdk
