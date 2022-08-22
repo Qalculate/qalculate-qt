@@ -56,6 +56,8 @@
 #include <unordered_map>
 std::unordered_map<const ExpressionName*, std::string> capitalized_names;
 
+extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
+
 class ExpressionTipLabel : public QLabel {
 
 	public:
@@ -2173,6 +2175,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	}
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
+	transform_expression_for_equals_save(text, settings->evalops.parse_options);
 	size_t i = text.find_first_of(SPACES LEFT_PARENTHESIS);
 	if(i != std::string::npos) {
 		str_f = text.substr(0, i);

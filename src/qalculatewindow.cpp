@@ -127,6 +127,8 @@ bool title_modified = false;
 extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1);
 extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
 extern int has_information_unit(const MathStructure &m, bool top = true);
+extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
+extern bool expression_contains_save_function(const std::string&, const ParseOptions&, bool = false);
 
 bool contains_unknown_variable(const MathStructure &m) {
 	if(m.isVariable()) return !m.variable()->isKnown();
@@ -662,7 +664,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
 	keypadAction_t = new QToolButton(this); keypadAction_t->setIcon(LOAD_ICON("keypad")); keypadAction_t->setText(tr("Keypad"));
-	keypadAction_t->setPopupMode(QToolButton::InstantPopup);
+	keypadAction_t->setToolTip(tr("Keypad")); keypadAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	keypadAction_t->setMenu(menu);
 	group = new QActionGroup(this); group->setObjectName("group_keypad");
@@ -1802,19 +1804,21 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	expressionEdit->blockCompletion();
 	QTextCursor cur = expressionEdit->textCursor();
 	bool do_exec = false;
+	int minargs = f->minargs();
+	if(minargs == 1 && f->id() == FUNCTION_ID_LOGN) minargs = 2;
 	if(settings->chain_mode) {
 		if(!expressionEdit->document()->isEmpty()) {
 			expressionEdit->selectAll();
-			do_exec = !sargs.isEmpty() || f->minargs() <= 1;
+			do_exec = !sargs.isEmpty() || minargs <= 1;
 		}
 	} else if(cur.hasSelection()) {
-		do_exec = (!sargs.isEmpty() || f->minargs() <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+		do_exec = (!sargs.isEmpty() || minargs <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
 		expressionEdit->selectAll();
-		do_exec = !sargs.isEmpty() || f->minargs() <= 1;
+		do_exec = !sargs.isEmpty() || minargs <= 1;
 	}
 	if(do_exec) expressionEdit->blockParseStatus();
-	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)), true, true, f->minargs() > 1 && sargs.isEmpty(), sargs, b_text);
+	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)), true, true, minargs > 1 && sargs.isEmpty(), sargs, b_text);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	if(do_exec) expressionEdit->blockParseStatus(false);
 	expressionEdit->blockCompletion(false);
@@ -3920,6 +3924,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			}
 		}
 	}
+
 	if(execute_str.empty()) {
 		size_t i = str.find_first_of(SPACES LEFT_PARENTHESIS);
 		if(i != std::string::npos) {
@@ -3932,6 +3937,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_expand = true;
 			}
 		}
+	}
+
+	if(!do_stack && expression_contains_save_function(execute_str.empty() ? str : execute_str, settings->evalops.parse_options, true)) {
+		if(execute_str.empty()) execute_str = str;
+		transform_expression_for_equals_save(execute_str, settings->evalops.parse_options);
 	}
 
 	size_t stack_size = 0;
@@ -4610,12 +4620,8 @@ void set_result_bases(const MathStructure &m) {
 }
 
 bool contains_plot_or_save(const std::string &str) {
-	if(str.find(":=") != std::string::npos) return true;
+	if(expression_contains_save_function(str, settings->evalops.parse_options, false)) return true;
 	MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_PLOT);
-	for(size_t i = 1; f && i <= f->countNames(); i++) {
-		if(str.find(f->getName(i).name) != std::string::npos) return true;
-	}
-	f = CALCULATOR->getFunctionById(FUNCTION_ID_SAVE);
 	for(size_t i = 1; f && i <= f->countNames(); i++) {
 		if(str.find(f->getName(i).name) != std::string::npos) return true;
 	}

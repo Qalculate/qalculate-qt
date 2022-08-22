@@ -154,6 +154,11 @@ QString unhtmlize(QString str, bool b_ascii) {
 HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	i_pos = 0;
 	last_ans = 0;
+#ifdef _WIN32
+	has_lock_symbol = 1;
+#else
+	has_lock_symbol = -1;
+#endif
 	setReadOnly(true);
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
@@ -417,9 +422,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 		}
 		if(initial_load && settings->v_protected[index]) {
-			str += "<img src=\"data://img1px.png\" width=\"2\"/>";
-			if(settings->color == 2) str += "<img valign=\"top\" src=\":/icons/dark/actions/scalable/protected.svg\" height=\"16\"/>";
-			else str += "<img valign=\"top\" src=\":/icons/actions/scalable/protected.svg\" height=\"16\"/>";
+			if(has_lock_symbol < 0) {
+				QFontDatabase database;
+				if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
+				else has_lock_symbol = 0;
+			}
+			if(has_lock_symbol) str += " <small><sup>🔒</sup></small>";
+			else str += " <small><sup>[P]</sup></small>";
 		}
 		str += "</td></tr>";
 		if(!initial_load) {
@@ -811,12 +820,15 @@ void HistoryView::editProtect() {
 		int index2 = s_text.indexOf("</td>", index);
 		if(index2 > 0) {
 			if(protectAction->isChecked()) {
-				QString str = "<img src=\"data://img1px.png\" width=\"2\"/>";
-				if(settings->color == 2) str += "<img valign=\"top\" src=\":/icons/dark/actions/scalable/protected.svg\" height=\"16\"/>";
-				else str += "<img valign=\"top\" src=\":/icons/actions/scalable/protected.svg\" height=\"16\"/>";
-				s_text.insert(index2, str);
+				if(has_lock_symbol < 0) {
+					QFontDatabase database;
+					if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
+					else has_lock_symbol = 0;
+				}
+				if(has_lock_symbol) s_text.insert(index2, " <small><sup>🔒</sup></small>");
+				else s_text.insert(index2, " <small><sup>[P]</sup></small>");
 			} else {
-				index = s_text.indexOf("<img src", index);
+				index = s_text.indexOf(has_lock_symbol ? " <small><sup>🔒</sup></small>" : " <small><sup>[P]</sup></small>", index);
 				if(index > 0) {
 					s_text.remove(index, index2 - index);
 				}

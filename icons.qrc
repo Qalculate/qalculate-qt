@@ -23,7 +23,6 @@
 	<file alias="actions/scalable/menu.svg">data/scalable/open-menu.svg</file>
 	<file alias="actions/scalable/percentage.svg">data/scalable/percentage.svg</file>
 	<file alias="actions/scalable/plot.svg">data/scalable/plot.svg</file>
-	<file alias="actions/scalable/protected.svg">data/scalable/protected.svg</file>
 	<file alias="actions/scalable/rpn-swap.svg">data/scalable/rpn-swap.svg</file>
 	<file alias="actions/scalable/table.svg">data/scalable/table.svg</file>
 	<file alias="actions/scalable/units.svg">data/scalable/units.svg</file>
@@ -49,7 +48,6 @@
 	<file alias="dark/actions/scalable/menu.svg">data/scalable/open-menu-dark.svg</file>
 	<file alias="dark/actions/scalable/percentage.svg">data/scalable/percentage-dark.svg</file>
 	<file alias="dark/actions/scalable/plot.svg">data/scalable/plot-dark.svg</file>
-	<file alias="dark/actions/scalable/protected.svg">data/scalable/protected-dark.svg</file>
 	<file alias="dark/actions/scalable/rpn-swap.svg">data/scalable/rpn-swap-dark.svg</file>
 	<file alias="dark/actions/scalable/table.svg">data/scalable/table-dark.svg</file>
 	<file alias="dark/actions/scalable/units.svg">data/scalable/units-dark.svg</file>
