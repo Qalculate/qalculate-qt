@@ -4868,7 +4868,7 @@ Please select temperature calculation mode
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5286"/>
         <source>Please select desired variant of the sinc function.</source>
-        <translation>Пожалуйста, выберите нужный вариант функции sinc.</translation>
+        <translation>Выберите нужный вариант функции sinc.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5289"/>
