@@ -498,16 +498,17 @@ void PreferencesDialog::titleChanged(int i) {
 	emit titleTypeChanged();
 }
 void PreferencesDialog::resultFontClicked() {
-	bool ok = true;
 	QFont font; font.fromString(QString::fromStdString(settings->custom_result_font));
-	font = QFontDialog::getFont(&ok, font);
-	if(ok) {
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
 		settings->save_custom_result_font = true;
 		settings->use_custom_result_font = true;
-		settings->custom_result_font = font.toString().toStdString();
+		settings->custom_result_font = dialog->selectedFont().toString().toStdString();
 		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_result_font));
 		emit resultFontChanged();
 	}
+	dialog->deleteLater();
 }
 void PreferencesDialog::resultFontToggled(bool b) {
 	settings->use_custom_result_font = b;
