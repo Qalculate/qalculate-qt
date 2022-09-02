@@ -172,6 +172,7 @@ class QalculateWindow : public QMainWindow {
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void hideNumpad(bool);
+		void resetKeypadPosition();
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
 		void onBasesVisibilityChanged(bool);

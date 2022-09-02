@@ -680,6 +680,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
 	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad); hideNumpadAction = action;
+	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition()));
 	tb->addWidget(keypadAction_t);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -5541,6 +5542,17 @@ void QalculateWindow::hideNumpad(bool b) {
 	settings->hide_numpad = b;
 	workspace_changed = true;
 }
+
+void QalculateWindow::resetKeypadPosition() {
+	keypadDock->setFloating(false);
+	if(dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea) {
+		bool b = keypadDock->isVisible();
+		removeDockWidget(keypadDock);
+		addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
+		keypadDock->setVisible(b);
+	}
+}
+
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	if(v < 0) {
