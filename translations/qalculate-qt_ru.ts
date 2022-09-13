@@ -2403,7 +2403,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Simplified percentage calculation</source>
-        <translation>Упрощенный процентный расчет</translation>
+        <translation>Упрощённый процентный расчёт</translation>
     </message>
     <message>
         <source>Digit grouping:</source>
