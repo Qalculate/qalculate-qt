@@ -170,6 +170,9 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	findAction = new QAction(tr("Search…"), this);
 	addAction(findAction);
 	connect(findAction, SIGNAL(triggered()), this, SLOT(editFind()));
+	clearAction = new QAction(tr("Clear"), this);
+	addAction(clearAction);
+	connect(clearAction, SIGNAL(triggered()), this, SLOT(editClear()));
 }
 HistoryView::~HistoryView() {}
 
@@ -388,49 +391,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
 		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(textColor().name());
-		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
-			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
-				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				str += QString::fromStdString(expression).toHtmlEscaped();
-				str += "</a>";
-				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
-				else str += "&nbsp; <i style=\"color: #666666\">";
-				str += QString("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				if(pexact) str += "= ";
-				else str += SIGN_ALMOST_EQUAL " ";
-				str += QString::fromStdString(replace_parse_colors(parse));
-				str += "</a>";
-				str += "</i>";
-			} else {
-				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				str += QString::fromStdString(expression).toHtmlEscaped();
-				str += "</a>";
-			}
-		} else {
-			str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
-			str += QString::fromStdString(parse);
-			str += "</a>";
-			if(b_parse_error && !expression.empty()) {
-				str += "&nbsp;&nbsp;&nbsp; ";
-				if(settings->color == 2) str += "<i style=\"color: #AAAAAA\">";
-				else str += "<i style=\"color: #666666\">";
-				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size());
-				str += QString::fromStdString(replace_parse_colors(expression));
-				str += "</a>";
-				str += "</i>";
-			}
-		}
-		if(initial_load && settings->v_protected[index]) {
-			if(has_lock_symbol < 0) {
-				QFontDatabase database;
-				if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
-				else has_lock_symbol = 0;
-			}
-			if(has_lock_symbol) str += " <small><sup>🔒</sup></small>";
-			else str += " <small><sup>[P]</sup></small>";
-		}
-		str += "</td></tr>";
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_parse.push_back(parse);
@@ -447,6 +407,50 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				settings->v_value[settings->v_value.size() - 1].push_back(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 			}
 		}
+		gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", parse);
+		if(!expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
+			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
+				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QString::fromStdString(expression).toHtmlEscaped();
+				str += "</a>";
+				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
+				else str += "&nbsp; <i style=\"color: #666666\">";
+				str += QString("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				if(pexact) str += "= ";
+				else str += SIGN_ALMOST_EQUAL " ";
+				str += QString::fromStdString(replace_parse_colors(parse));
+				str += "</a>";
+				str += "</i>";
+			} else {
+				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QString::fromStdString(expression).toHtmlEscaped();
+				str += "</a>";
+			}
+		} else {
+			str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
+			str += QString::fromStdString(parse);
+			str += "</a>";
+			if(b_parse_error && !expression.empty()) {
+				str += "&nbsp;&nbsp;&nbsp; ";
+				if(settings->color == 2) str += "<i style=\"color: #AAAAAA\">";
+				else str += "<i style=\"color: #666666\">";
+				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QString::fromStdString(replace_parse_colors(expression));
+				str += "</a>";
+				str += "</i>";
+			}
+		}
+		if(initial_load && settings->v_protected[index]) {
+			if(has_lock_symbol < 0) {
+				QFontDatabase database;
+				if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
+				else has_lock_symbol = 0;
+			}
+			if(has_lock_symbol) str += " <small><sup>🔒</sup></small>";
+			else str += " <small><sup>[P]</sup></small>";
+		}
+		str += "</td></tr>";
 	} else if(!initial_load && !settings->v_result.empty()) {
 		for(size_t i = values.size(); i > 0; i--) {
 			settings->v_result[settings->v_result.size() - 1].insert(settings->v_result[settings->v_result.size() - 1].begin(), values[i - 1]);
@@ -687,7 +691,9 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 void HistoryView::editClear() {
 	for(size_t i1 = 0; i1 < settings->v_protected.size(); i1++) {
 		if(!settings->v_protected[i1]) {
-			if(i1 == 0) settings->current_result = NULL;
+			if(i1 == settings->v_protected.size() - 1) {
+				settings->current_result = NULL;
+			}
 			settings->v_delexpression[i1] = true;
 			int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
 			if(index < 0) index = s_text.indexOf("<a name=\"e" + QString::number(i1) + "\"");
@@ -911,7 +917,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		movetotopAction = cmenu->addAction(tr("Move to Top"), this, SLOT(editMoveToTop()));
 		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
-		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
+		cmenu->addAction(clearAction);
 	}
 	int i1 = -1, i2 = -1, i3 = -1;
 	context_pos = e->pos();

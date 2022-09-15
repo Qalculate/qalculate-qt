@@ -184,15 +184,15 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		default_shortcuts = false;
 		char str1[svalue.length()];
 		char str2[svalue.length()];
-		keyboard_shortcut ks;
 		int ks_type = 0;
 		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
 		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-			if(n == 3) {ks.value = str2; remove_blank_ends(ks.value);}
-			ks.type = (shortcut_type) ks_type;
-			ks.key = str1;
-			ks.new_action = false;
-			ks.action = NULL;
+			keyboard_shortcut *ks = new keyboard_shortcut;
+			if(n == 3) {ks->value = str2; remove_blank_ends(ks->value);}
+			ks->type = (shortcut_type) ks_type;
+			ks->key = str1;
+			ks->new_action = false;
+			ks->action = NULL;
 			keyboard_shortcuts.push_back(ks);
 		}
 	} else if(!is_workspace && svar == "custom_button_label") {
@@ -819,6 +819,7 @@ void QalculateQtSettings::loadPreferences() {
 	expression_history.clear();
 
 	default_shortcuts = true;
+	for(size_t i = 0; i < keyboard_shortcuts.size(); i++) delete keyboard_shortcuts[i];
 	keyboard_shortcuts.clear();
 	custom_buttons.clear();
 	custom_button_rows = 5;
@@ -884,8 +885,8 @@ void QalculateQtSettings::loadPreferences() {
 		v_pexact.push_back(true);
 	}
 
-	keyboard_shortcut ks;
-#define ADD_SHORTCUT(k, t, v) ks.key = k; ks.type = t; ks.value = v; ks.action = NULL; ks.new_action = false; keyboard_shortcuts.push_back(ks);
+	keyboard_shortcut *ks;
+#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type = t; ks->value = v; ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
 	if(default_shortcuts) {
 #ifdef _WIN32
 		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
@@ -1199,8 +1200,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		}
 		if(!default_shortcuts) {
 			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-				if(keyboard_shortcuts[i].value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type);
-				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i].key.toUtf8().data(), keyboard_shortcuts[i].type, keyboard_shortcuts[i].value.c_str());
+				if(keyboard_shortcuts[i]->value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type);
+				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type, keyboard_shortcuts[i]->value.c_str());
 			}
 		}
 		if(favourite_functions_changed) {
@@ -1755,6 +1756,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {return tr("Toggle custom keypad");}
 		case SHORTCUT_TYPE_KEYPAD: {return tr("Show/hide keypad");}
 		case SHORTCUT_TYPE_HISTORY_SEARCH: {return tr("Search history");}
+		case SHORTCUT_TYPE_HISTORY_CLEAR: {return tr("Clear history");}
 		case SHORTCUT_TYPE_MANAGE_VARIABLES: {return tr("Show variables");}
 		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {return tr("Show functions");}
 		case SHORTCUT_TYPE_MANAGE_UNITS: {return tr("Show units");}

@@ -1542,8 +1542,8 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 				break;
 			}
-			case Qt::Key_BraceLeft: {return;}
-			case Qt::Key_BraceRight: {return;}
+			/*case Qt::Key_BraceLeft: {return;}
+			case Qt::Key_BraceRight: {return;}*/
 		}
 	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
@@ -1996,7 +1996,7 @@ void ExpressionEdit::showCurrentStatus() {
 				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 				std::string result_nohtml = unhtmlize(result);
 				remove_spaces(result_nohtml);
-				if(!CALCULATOR->endTemporaryStopMessages() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
+				if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
 					str += "&nbsp;";
 					if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
 					else str += "= ";
@@ -2146,12 +2146,20 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	QString qtext = toPlainText();
 	std::string text = qtext.toStdString(), str_f;
 	if(text.find("#") != std::string::npos) {
-		std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options);
-		if(!to_str.empty() && text.empty()) {
+		bool double_tag = false;
+		std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options, &double_tag);
+		if(!to_str.empty() && text.empty() && double_tag) {
 			text = CALCULATOR->getFunctionById(FUNCTION_ID_MESSAGE)->referenceName();
 			text += "(";
-			text += to_str;
+			if(to_str.find("\"") == std::string::npos) {text += "\""; text += to_str; text += "\"";}
+			else if(to_str.find("\'") == std::string::npos) {text += "\'"; text += to_str; text += "\'";}
+			else text += to_str;
 			text += ")";
+		} else if(text.empty()) {
+			setStatusText("");
+			prev_parsed_expression = "";
+			expression_has_changed2 = false;
+			return;
 		}
 	}
 	if(text[0] == '/' && text.length() > 1) {
@@ -2173,6 +2181,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(show_tooltip) setStatusText(tr("M− (memory minus)"));
 		return;
 	}
+	gsub(ID_WRAP_LEFT, LEFT_PARENTHESIS, text);
+	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
 	transform_expression_for_equals_save(text, settings->evalops.parse_options);

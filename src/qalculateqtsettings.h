@@ -148,10 +148,11 @@ typedef enum {
 	SHORTCUT_TYPE_MODE,
 	SHORTCUT_TYPE_MENU,
 	SHORTCUT_TYPE_HELP,
-	SHORTCUT_TYPE_QUIT
+	SHORTCUT_TYPE_QUIT,
+	SHORTCUT_TYPE_HISTORY_CLEAR
 } shortcut_type;
 
-#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_QUIT
+#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_HISTORY_CLEAR
 
 #define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE)
 
@@ -278,7 +279,7 @@ class QalculateQtSettings : QObject {
 		std::vector<std::string> favourite_variables_pre;
 		std::vector<std::string> favourite_units_pre;
 		bool default_shortcuts;
-		std::vector<keyboard_shortcut> keyboard_shortcuts;
+		std::vector<keyboard_shortcut*> keyboard_shortcuts;
 		int custom_button_columns, custom_button_rows;
 		std::vector<custom_button> custom_buttons;
 		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;

@@ -680,7 +680,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
 	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad); hideNumpadAction = action;
-	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition()));
+	menu->addSeparator();
+	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -915,7 +916,7 @@ void QalculateWindow::loadShortcuts() {
 	rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack"));
 	rpnClearAction->setToolTip(tr("Clear the RPN stack"));
 	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
+		keyboardShortcutAdded(settings->keyboard_shortcuts[i]);
 	}
 }
 void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
@@ -935,7 +936,7 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	if(ks->type == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type == SHORTCUT_TYPE_STORE) {
-		storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+		storeAction->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
 		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
@@ -1212,6 +1213,11 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_HISTORY_SEARCH: {
 			historyView->findAction->trigger();
+			break;
+		}
+		case SHORTCUT_TYPE_HISTORY_CLEAR: {
+			historyView->editClear();
+			expressionEdit->clearHistory();
 			break;
 		}
 		case SHORTCUT_TYPE_MEMORY_CLEAR: {
@@ -3053,7 +3059,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				}
 				execute_str = CALCULATOR->getFunctionById(FUNCTION_ID_MESSAGE)->referenceName();
 				execute_str += "(";
-				execute_str += to_str;
+				if(to_str.find("\"") == std::string::npos) {execute_str += "\""; execute_str += to_str; execute_str += "\"";}
+				else if(to_str.find("\'") == std::string::npos) {execute_str += "\'"; execute_str += to_str; execute_str += "\'";}
+				else execute_str += to_str;
 				execute_str += ")";
 			} else {
 				CALCULATOR->message(MESSAGE_INFORMATION, to_str.c_str(), NULL);
@@ -3557,6 +3565,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				} else {
 					if(current_expr) expressionEdit->clear();
 				}
+			} else if(equalsIgnoreCase(str, "clear history")) {
+				historyView->clearAction->trigger();
+				expressionEdit->clearHistory();
+			} else if(equalsIgnoreCase(str, "clear")) {
+				expressionEdit->clear();
 			} else if(equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "exit")) {
 				qApp->closeAllWindows();
 				return;
@@ -4413,7 +4426,7 @@ void CommandThread::run() {
 void QalculateWindow::executeCommand(int command_type, bool show_result, std::string ceu_str, Unit *u, int run) {
 
 	if(run == 1) {
-	
+
 		if(expressionEdit->expressionHasChanged() && !settings->rpn_mode) {
 			calculateExpression();
 		}
@@ -5378,20 +5391,26 @@ bool QalculateWindow::askImplicit() {
 	grid->addWidget(new QLabel(tr("The expression is ambiguous.\nPlease select interpretation of expressions with implicit multiplication\n(this can later be changed in preferences).")), 0, 0, 1, 2);
 	QButtonGroup *group = new QButtonGroup(dialog);
 	group->setExclusive(true);
+	QLabel *label = new QLabel("<i>1/2x = 1/(2x)</i>");
+	int h = label->sizeHint().height();
 	QRadioButton *w_implicitfirst = new QRadioButton(tr("Implicit multiplication first"));
 	group->addButton(w_implicitfirst);
 	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) w_implicitfirst->setChecked(true);
-	grid->addWidget(w_implicitfirst, 1, 0);
-	grid->addWidget(new QLabel("<i>1/2x = 1/(2x)</i>"), 1, 1);
+	grid->addWidget(w_implicitfirst, 1, 0, Qt::AlignTop | Qt::AlignLeft);
+	w_implicitfirst->setMinimumHeight(h);
+	label->setText("<i>1/2x = 1/(2x)<br>5 m/2 s = (5 m)/(2 s)</i>");
+	grid->addWidget(label, 1, 1);
 	QRadioButton *w_conventional = new QRadioButton(tr("Conventional"));
 	group->addButton(w_conventional);
 	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL) w_conventional->setChecked(true);
-	grid->addWidget(w_conventional, 2, 0);
-	grid->addWidget(new QLabel("<i>1/2x = (1/2)x</i>"), 2, 1);
+	grid->addWidget(w_conventional, 2, 0, Qt::AlignTop | Qt::AlignLeft);
+	w_conventional->setMinimumHeight(h);
+	grid->addWidget(new QLabel("<i>1/2x = (1/2)x<br>5 m/2 s = (5 m/2)s</i>"), 2, 1);
 	QRadioButton *w_adaptive = new QRadioButton(tr("Adaptive"));
 	group->addButton(w_adaptive);
-	grid->addWidget(w_adaptive, 3, 0);
-	grid->addWidget(new QLabel("<i>1/2x = 1/(2x); 1/2 x = (1/2)x</i>"), 3, 1);
+	grid->addWidget(w_adaptive, 3, 0, Qt::AlignTop | Qt::AlignLeft);
+	w_adaptive->setMinimumHeight(h);
+	grid->addWidget(new QLabel("<i>1/2x = 1/(2x); 1/2 x = (1/2)x<br>5 m/2 s = (5 m)/(2 s)</i>"), 3, 1);
 	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_ADAPTIVE) w_adaptive->setChecked(true);
 	dialog->exec();
 	settings->implicit_question_asked = true;
@@ -5537,12 +5556,12 @@ void QalculateWindow::newFunction() {
 		updateFunctionsMenu();
 	}
 }
+
 void QalculateWindow::hideNumpad(bool b) {
 	keypad->hideNumpad(b);
 	settings->hide_numpad = b;
 	workspace_changed = true;
 }
-
 void QalculateWindow::resetKeypadPosition() {
 	keypadDock->setFloating(false);
 	if(dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea) {
@@ -5552,7 +5571,6 @@ void QalculateWindow::resetKeypadPosition() {
 		keypadDock->setVisible(b);
 	}
 }
-
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	if(v < 0) {
@@ -5568,12 +5586,14 @@ void QalculateWindow::keypadTypeActivated() {
 		keypadDock->raise();
 		settings->show_keypad = 1;
 	}
+	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	workspace_changed = true;
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
 	if(action) action->setChecked(true);
 	settings->show_keypad = b ? 1 : 0;
+	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);
@@ -5864,14 +5884,16 @@ void QalculateWindow::removeShortcutClicked() {
 	QTreeWidgetItem *item = shortcutList->currentItem();
 	if(!item) return;
 	keyboard_shortcut *ks = (keyboard_shortcut*) item->data(0, Qt::UserRole).value<void*>();
+	if(!ks) return;
 	keyboardShortcutRemoved(ks);
 	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-		if(&settings->keyboard_shortcuts[i] == ks) {
+		if(settings->keyboard_shortcuts[i] == ks) {
 			settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
 			break;
 		}
 	}
 	settings->default_shortcuts = false;
+	delete ks;
 	delete item;
 }
 void QalculateWindow::updateShortcutActionOK() {
@@ -5977,11 +5999,16 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		grid->addWidget(new QLabel(tr("Action:"), dialog), 0, 0);
 		shortcutActionList = new QListWidget(dialog);
 		grid->addWidget(shortcutActionList, 1, 0, 1, 2);
-		for(int i = SHORTCUT_TYPE_FUNCTION; i <= LAST_SHORTCUT_TYPE; i++) {
+		for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
 			if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), shortcutActionList);
 				item->setData(Qt::UserRole, i);
 				if((!ks && i == 0) || (ks && i == ks->type)) shortcutActionList->setCurrentItem(item);
+			}
+			if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
+				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR), shortcutActionList);
+				item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
+				if(ks && ks->type == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
 			}
 		}
 		shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());
@@ -6047,15 +6074,16 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 				continue;
 			}
 			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-				if(&settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i].key == key) {
-					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+				if(settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i]->key == key) {
+					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
 						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
-							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) &settings->keyboard_shortcuts[i]) {
+							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) settings->keyboard_shortcuts[i]) {
 								delete shortcutList->topLevelItem(index);
 								break;
 							}
 						}
-						keyboardShortcutRemoved(&settings->keyboard_shortcuts[i]);
+						keyboardShortcutRemoved(settings->keyboard_shortcuts[i]);
+						delete settings->keyboard_shortcuts[i];
 						settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
 						settings->default_shortcuts = false;
 						break;
@@ -6083,16 +6111,18 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 	return false;
 }
 void QalculateWindow::addShortcutClicked() {
-	keyboard_shortcut ks;
-	if(editKeyboardShortcut(&ks, NULL)) {
+	keyboard_shortcut *ks = new keyboard_shortcut;
+	if(editKeyboardShortcut(ks, NULL)) {
 		settings->keyboard_shortcuts.push_back(ks);
 		size_t i = settings->keyboard_shortcuts.size() - 1;
-		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
+		keyboardShortcutAdded(settings->keyboard_shortcuts[i]);
 		QTreeWidgetItem *item = new QTreeWidgetItem(shortcutList);
-		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
-		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
-		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i]->key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) settings->keyboard_shortcuts[i]));
 		settings->default_shortcuts = false;
+	} else {
+		delete ks;
 	}
 }
 void QalculateWindow::editShortcutClicked() {
@@ -6105,22 +6135,24 @@ void QalculateWindow::currentShortcutChanged(QTreeWidgetItem *item, QTreeWidgetI
 void QalculateWindow::shortcutDoubleClicked(QTreeWidgetItem *item, int c) {
 	if(!item) return;
 	keyboard_shortcut *ks_old = (keyboard_shortcut*) item->data(0, Qt::UserRole).value<void*>();
-	keyboard_shortcut ks;
-	if(editKeyboardShortcut(&ks, ks_old, c + 1)) {
+	keyboard_shortcut *ks = new keyboard_shortcut;
+	if(editKeyboardShortcut(ks, ks_old, c + 1)) {
 		keyboardShortcutRemoved(ks_old);
 		for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-			if(&settings->keyboard_shortcuts[i] == ks_old) {
+			if(settings->keyboard_shortcuts[i] == ks_old) {
 				settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
 				break;
 			}
 		}
 		settings->keyboard_shortcuts.push_back(ks);
 		size_t i = settings->keyboard_shortcuts.size() - 1;
-		keyboardShortcutAdded(&settings->keyboard_shortcuts[i]);
-		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
-		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
-		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+		keyboardShortcutAdded(settings->keyboard_shortcuts[i]);
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i]->key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) settings->keyboard_shortcuts[i]));
 		settings->default_shortcuts = false;
+	} else {
+		delete ks;
 	}
 }
 void QalculateWindow::editKeyboardShortcuts() {
@@ -6149,9 +6181,9 @@ void QalculateWindow::editKeyboardShortcuts() {
 	shortcutList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
 		QTreeWidgetItem *item = new QTreeWidgetItem(shortcutList);
-		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i].type, settings->keyboard_shortcuts[i].value));
-		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i].key).toString());
-		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) &settings->keyboard_shortcuts[i]));
+		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value));
+		item->setText(1, QKeySequence::fromString(settings->keyboard_shortcuts[i]->key).toString());
+		item->setData(0, Qt::UserRole, QVariant::fromValue((void*) settings->keyboard_shortcuts[i]));
 	}
 	shortcutList->setCurrentItem(NULL);
 	shortcutList->setSortingEnabled(true);
@@ -7240,7 +7272,7 @@ void QalculateWindow::executeFromFile(const QString &file) {
 		ispace = str.find_first_of(SPACES);
 		if(ispace == std::string::npos) scom = "";
 		else scom = str.substr(0, ispace);
-		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
+		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "clear") || equalsIgnoreCase(str, "clear history") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
 		if(!str.empty()) calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str, false);
 	}
 	expressionEdit->clear();
