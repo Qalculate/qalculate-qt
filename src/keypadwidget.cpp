@@ -668,10 +668,15 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	QListWidgetItem *item = new QListWidgetItem(tr("None"), actionList);
 	item->setData(Qt::UserRole, -1);
 	actionList->setCurrentItem(item);
-	for(int i = SHORTCUT_TYPE_FUNCTION; i <= LAST_SHORTCUT_TYPE; i++) {
+	for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
 		item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), actionList);
 		item->setData(Qt::UserRole, i);
 		if(i == type) actionList->setCurrentItem(item);
+		if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
+			item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_HISTORY_CLEAR), actionList);
+			item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
+			if(type == SHORTCUT_TYPE_HISTORY_CLEAR) actionList->setCurrentItem(item);
+		}
 	}
 	valueLabel = new QLabel(tr("Value:"), dialog);
 	actionList->setMinimumWidth(actionList->sizeHintForColumn(0) + actionList->frameWidth() * 2 + actionList->contentsMargins().left() + actionList->contentsMargins().right() + actionList->verticalScrollBar()->sizeHint().width());
