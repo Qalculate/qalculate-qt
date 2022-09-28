@@ -511,7 +511,28 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
 		str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) {
-			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"/>").arg(image).arg(fm.ascent());
+			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"").arg(image).arg(fm.ascent());
+			CALCULATOR->setExchangeRatesUsed(-100);
+			int i = CALCULATOR->exchangeRatesUsed();
+			CALCULATOR->setExchangeRatesUsed(-100);
+			if(i > 0) {
+				QString sources_str;
+				int n = 0;
+				if(i & 0b0001) {sources_str += "\\n"; sources_str += QString::fromStdString(CALCULATOR->getExchangeRatesUrl(1)); n++;}
+				if(i & 0b0010) {sources_str += "\\n"; sources_str += QString::fromStdString(CALCULATOR->getExchangeRatesUrl(2)); n++;}
+				if(i & 0b0100) {sources_str += "\\n"; sources_str += QString::fromStdString(CALCULATOR->getExchangeRatesUrl(3)); n++;}
+				if(i & 0b1000) {sources_str += "\\n"; sources_str += QString::fromStdString(CALCULATOR->getExchangeRatesUrl(4)); n++;}
+				if(n > 0) {
+					str += " alt=\"";
+					str += tr("Exchange rate source(s):", NULL, n);
+					str += sources_str;
+					str += "\\n(";
+					str += tr("updated %1").arg(QString::fromStdString(QalculateDateTime(CALCULATOR->getExchangeRatesTime(CALCULATOR->exchangeRatesUsed())).toISOString()));
+					str += ")";
+					str += "\"";
+				}
+			}
+			str += "/>";
 		}
 		str += "</a></td></tr>";
 		i_answer_pre = i_answer;
@@ -583,6 +604,27 @@ void HistoryView::addMessages() {
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
+	bool b_tooltip = false;
+	if(str.isEmpty() && e->pos().x() > width() - 100) {
+		QTextCharFormat format = cursorForPosition(e->pos()).charFormat();
+		if(format.isImageFormat() && format.toImageFormat().name().contains("/flags/") && e->pos().x() > width() - viewportMargins().right() - verticalScrollBar()->width() - QFontMetrics(font()).ascent() * 3) {
+			QTextCursor cur = cursorForPosition(e->pos());
+			cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+			QString str = cur.selection().toHtml();
+			int i = str.lastIndexOf(" alt=\"");
+			if(i >= 0) {
+				i += 6;
+				int i2 = str.indexOf("\"", i + 1);
+				if(i2 > i) {
+					str = str.mid(i, i2 - i);
+					str.replace("\\n", "\n");
+					QToolTip::showText(mapToGlobal(e->pos()), str);
+					b_tooltip = true;
+				}
+			}
+		}
+	}
+	if(!b_tooltip) QToolTip::hideText();
 	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
 	else viewport()->setCursor(Qt::PointingHandCursor);
 	QTextEdit::mouseMoveEvent(e);
