@@ -1413,6 +1413,18 @@ Do you want to overwrite the function?</source>
         <source>Search</source>
         <translation>Поиск</translation>
     </message>
+    <message numerus="yes">
+        <source>Exchange rate source(s):</source>
+        <translation>
+            <numerusform>Источник курсов валют:</numerusform>
+            <numerusform>Источники курсов валют:</numerusform>
+            <numerusform>Источники курсов валют:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>updated %1</source>
+        <translation>обновлены %1</translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>
@@ -3120,6 +3132,10 @@ You can get version %3 at %2.</source>
     <message>
         <source>Information</source>
         <translation>Информирование</translation>
+    </message>
+    <message>
+        <source>Clear history</source>
+        <translation type="unfinished">Очистить историю</translation>
     </message>
 </context>
 <context>
