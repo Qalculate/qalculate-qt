@@ -1831,7 +1831,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 }
 void ExpressionEdit::insertDate() {
 	QDialog *dialog = new QDialog(this, Qt::Popup);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	box->setContentsMargins(0, 0, 0, 0);
 	QCalendarWidget *w = new QCalendarWidget(dialog);
@@ -1845,7 +1845,7 @@ void ExpressionEdit::insertDate() {
 }
 void ExpressionEdit::insertMatrix() {
 	QDialog *dialog = new QDialog(this);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	dialog->setWindowTitle(tr("Matrix"));
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	MatrixWidget *w = new MatrixWidget(dialog);

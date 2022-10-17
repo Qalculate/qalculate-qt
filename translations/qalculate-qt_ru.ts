@@ -1421,9 +1421,13 @@ Do you want to overwrite the function?</source>
             <numerusform>Источники курсов валют:</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>updated %1</source>
-        <translation>обновлены %1</translation>
+        <translation type="unfinished">
+            <numerusform>обновлены %1</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

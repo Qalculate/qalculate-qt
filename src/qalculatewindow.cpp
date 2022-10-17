@@ -3566,7 +3566,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(current_expr) expressionEdit->clear();
 				}
 			} else if(equalsIgnoreCase(str, "clear history")) {
-				historyView->clearAction->trigger();
+				historyView->editClear();
 				expressionEdit->clearHistory();
 			} else if(equalsIgnoreCase(str, "clear")) {
 				expressionEdit->clear();
