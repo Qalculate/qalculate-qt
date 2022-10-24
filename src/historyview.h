@@ -32,7 +32,7 @@ class HistoryView : public QTextEdit {
 		virtual ~HistoryView();
 
 		ExpressionEdit *expressionEdit;
-		QAction *findAction, *clearAction;
+		QAction *findAction;
 		QDialog *searchDialog;
 
 		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
@@ -47,7 +47,7 @@ class HistoryView : public QTextEdit {
 		int i_pos;
 		int has_lock_symbol;
 		QMenu *cmenu;
-		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *protectAction, *movetotopAction;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
 		QColor prev_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;

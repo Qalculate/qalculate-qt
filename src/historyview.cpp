@@ -170,9 +170,6 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	findAction = new QAction(tr("Search…"), this);
 	addAction(findAction);
 	connect(findAction, SIGNAL(triggered()), this, SLOT(editFind()));
-	clearAction = new QAction(tr("Clear"), this);
-	addAction(clearAction);
-	connect(clearAction, SIGNAL(triggered()), this, SLOT(editClear()));
 }
 HistoryView::~HistoryView() {}
 
@@ -524,10 +521,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				if(i & 0b1000) {sources_str += "\\n"; sources_str += QString::fromStdString(CALCULATOR->getExchangeRatesUrl(4)); n++;}
 				if(n > 0) {
 					str += " alt=\"";
-					str += tr("Exchange rate source(s):", NULL, n);
+					str += tr("Exchange rate source(s):", "", n);
 					str += sources_str;
 					str += "\\n(";
-					str += tr("updated %1").arg(QString::fromStdString(QalculateDateTime(CALCULATOR->getExchangeRatesTime(CALCULATOR->exchangeRatesUsed())).toISOString()));
+					str += tr("updated %1", "", n).arg(QString::fromStdString(QalculateDateTime(CALCULATOR->getExchangeRatesTime(CALCULATOR->exchangeRatesUsed())).toISOString()));
 					str += ")";
 					str += "\"";
 				}
@@ -604,27 +601,33 @@ void HistoryView::addMessages() {
 }
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
 	bool b_tooltip = false;
-	if(str.isEmpty() && e->pos().x() > width() - 100) {
-		QTextCharFormat format = cursorForPosition(e->pos()).charFormat();
-		if(format.isImageFormat() && format.toImageFormat().name().contains("/flags/") && e->pos().x() > width() - viewportMargins().right() - verticalScrollBar()->width() - QFontMetrics(font()).ascent() * 3) {
-			QTextCursor cur = cursorForPosition(e->pos());
-			cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
-			QString str = cur.selection().toHtml();
-			int i = str.lastIndexOf(" alt=\"");
-			if(i >= 0) {
-				i += 6;
-				int i2 = str.indexOf("\"", i + 1);
-				if(i2 > i) {
-					str = str.mid(i, i2 - i);
-					str.replace("\\n", "\n");
-					QToolTip::showText(mapToGlobal(e->pos()), str);
-					b_tooltip = true;
+	if(str.isEmpty() && e->pos().x() > width() - 150) {
+		if(document()->documentLayout()->imageAt(e->pos()).indexOf(":/data/flags") == 0) {
+			QPoint p(viewport()->mapFromParent(e->pos()));
+			for(int n = 0; n < 5; n++) {
+				QTextCursor cur = cursorForPosition(p);
+				cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
+				QString str = cur.selection().toHtml();
+				int i = str.lastIndexOf(" alt=\"");
+				if(i >= 0) {
+					i += 6;
+					int i2 = str.indexOf("\"", i + 1);
+					if(i2 > i) {
+						str = str.mid(i, i2 - i);
+						str.replace("\\n", "\n");
+						QToolTip::showText(mapToGlobal(e->pos()), str);
+						b_tooltip = true;
+					}
+					break;
 				}
+				p.rx() += QFontMetrics(font()).ascent() / 2;
 			}
 		}
 	}
 	if(!b_tooltip) QToolTip::hideText();
+#endif
 	if(str.isEmpty()) viewport()->setCursor(Qt::IBeamCursor);
 	else viewport()->setCursor(Qt::PointingHandCursor);
 	QTextEdit::mouseMoveEvent(e);
@@ -891,7 +894,7 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 	if(value_index) *value_index = -1;
 	QString sref = anchorAt(pos);
 	if(sref.isEmpty()) {
-		QTextCursor cur = cursorForPosition(pos);
+		QTextCursor cur = cursorForPosition(viewport()->mapFromParent(pos));
 		cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
 		QString str = cur.selection().toHtml();
 		int i = str.lastIndexOf("<a name=\"");
@@ -902,7 +905,7 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 		}
 	}
 	if(sref.isEmpty()) {
-		QTextCursor cur = cursorForPosition(pos);
+		QTextCursor cur = cursorForPosition(viewport()->mapFromParent(pos));
 		cur.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
 		cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
 		QString str = cur.selection().toHtml();
@@ -959,7 +962,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		movetotopAction = cmenu->addAction(tr("Move to Top"), this, SLOT(editMoveToTop()));
 		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
-		cmenu->addAction(clearAction);
+		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
 	int i1 = -1, i2 = -1, i3 = -1;
 	context_pos = e->pos();
@@ -1019,7 +1022,7 @@ void HistoryView::editFind() {
 	}
 	searchDialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(searchDialog);
-	if(settings->always_on_top) searchDialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) searchDialog->setWindowFlags(searchDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	searchDialog->setWindowTitle(tr("Search"));
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Text:"), this), 0, 0);

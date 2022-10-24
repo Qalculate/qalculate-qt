@@ -500,7 +500,7 @@ void PreferencesDialog::titleChanged(int i) {
 void PreferencesDialog::resultFontClicked() {
 	QFont font; font.fromString(QString::fromStdString(settings->custom_result_font));
 	QFontDialog *dialog = new QFontDialog(font, this);
-	if(settings->always_on_top) dialog->setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	if(dialog->exec() == QDialog::Accepted) {
 		settings->save_custom_result_font = true;
 		settings->use_custom_result_font = true;
@@ -515,48 +515,51 @@ void PreferencesDialog::resultFontToggled(bool b) {
 	emit resultFontChanged();
 }
 void PreferencesDialog::expressionFontClicked() {
-	bool ok = true;
 	QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font));
-	font = QFontDialog::getFont(&ok, font);
-	if(ok) {
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
 		settings->save_custom_expression_font = true;
 		settings->use_custom_expression_font = true;
-		settings->custom_expression_font = font.toString().toStdString();
+		settings->custom_expression_font = dialog->selectedFont().toString().toStdString();
 		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_expression_font));
 		emit expressionFontChanged();
 	}
+	dialog->deleteLater();
 }
 void PreferencesDialog::expressionFontToggled(bool b) {
 	settings->use_custom_expression_font = b;
 	emit expressionFontChanged();
 }
 void PreferencesDialog::keypadFontClicked() {
-	bool ok = true;
 	QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font));
-	font = QFontDialog::getFont(&ok, font);
-	if(ok) {
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
 		settings->save_custom_keypad_font = true;
 		settings->use_custom_keypad_font = true;
-		settings->custom_keypad_font = font.toString().toStdString();
+		settings->custom_keypad_font = dialog->selectedFont().toString().toStdString();
 		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_keypad_font));
 		emit keypadFontChanged();
 	}
+	dialog->deleteLater();
 }
 void PreferencesDialog::keypadFontToggled(bool b) {
 	settings->use_custom_keypad_font = b;
 	emit keypadFontChanged();
 }
 void PreferencesDialog::appFontClicked() {
-	bool ok = true;
 	QFont font; font.fromString(QString::fromStdString(settings->custom_app_font));
-	font = QFontDialog::getFont(&ok, font);
-	if(ok) {
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
 		settings->save_custom_app_font = true;
 		settings->use_custom_app_font = true;
-		settings->custom_app_font = font.toString().toStdString();
+		settings->custom_app_font = dialog->selectedFont().toString().toStdString();
 		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_app_font));
 		emit appFontChanged();
 	}
+	dialog->deleteLater();
 }
 void PreferencesDialog::appFontToggled(bool b) {
 	settings->use_custom_app_font = b;
