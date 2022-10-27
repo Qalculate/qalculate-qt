@@ -1423,10 +1423,10 @@ Do you want to overwrite the function?</source>
     </message>
     <message numerus="yes">
         <source>updated %1</source>
-        <translation type="unfinished">
+        <translation>
+            <numerusform>обновлён %1</numerusform>
             <numerusform>обновлены %1</numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>обновлены %1</numerusform>
         </translation>
     </message>
 </context>
@@ -3139,7 +3139,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Clear history</source>
-        <translation type="unfinished">Очистить историю</translation>
+        <translation>Очистить историю</translation>
     </message>
 </context>
 <context>
