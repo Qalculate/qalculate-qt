@@ -1232,7 +1232,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Required</source>
-        <translation>Обязательный</translation>
+        <translation>Обязательно</translation>
     </message>
     <message>
         <source>Details</source>
@@ -4287,7 +4287,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Required</source>
-        <translation>Обязательный</translation>
+        <translation>Обязательно</translation>
     </message>
     <message>
         <source>Description</source>
