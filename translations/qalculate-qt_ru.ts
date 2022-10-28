@@ -1998,7 +1998,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>Никакой</translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <source>Monotonic</source>
