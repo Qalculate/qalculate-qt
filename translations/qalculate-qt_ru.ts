@@ -3943,7 +3943,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Основная</translation>
     </message>
     <message>
         <source>Programming</source>
