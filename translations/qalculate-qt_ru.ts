@@ -1232,7 +1232,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Required</source>
-        <translation>Обязательный</translation>
+        <translation>Обязательно</translation>
     </message>
     <message>
         <source>Details</source>
@@ -1998,7 +1998,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>None</source>
-        <translation>Никакой</translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <source>Monotonic</source>
@@ -3943,7 +3943,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>General</source>
-        <translation>Основное</translation>
+        <translation>Основная</translation>
     </message>
     <message>
         <source>Programming</source>
@@ -4287,7 +4287,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Required</source>
-        <translation>Обязательный</translation>
+        <translation>Обязательно</translation>
     </message>
     <message>
         <source>Description</source>
