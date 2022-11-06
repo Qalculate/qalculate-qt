@@ -268,26 +268,21 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 	}
 }
 
-class QalculateDockWidget : public QDockWidget {
+QalculateDockWidget::QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
+QalculateDockWidget::~QalculateDockWidget() {}
 
-	public:
+void QalculateDockWidget::keyPressEvent(QKeyEvent *e) {
+	QDockWidget::keyPressEvent(e);
+	if(!e->isAccepted() && isFloating()) {
+		expressionEdit->setFocus();
+		expressionEdit->keyPressEvent(e);
+	}
+}
+void QalculateDockWidget::closeEvent(QCloseEvent *e) {
+	emit dockClosed();
+	QDockWidget::closeEvent(e);
+}
 
-		QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
-		virtual ~QalculateDockWidget() {}
-
-	protected:
-
-		ExpressionEdit *expressionEdit;
-
-		void keyPressEvent(QKeyEvent *e) override {
-			QDockWidget::keyPressEvent(e);
-			if(!e->isAccepted() && isFloating()) {
-				expressionEdit->setFocus();
-				expressionEdit->keyPressEvent(e);
-			}
-		}
-
-};
 class QalculateTableWidget : public QTableWidget {
 
 	public:
@@ -835,7 +830,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
-	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
+	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
 
 	loadShortcuts();
 
@@ -849,6 +844,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
+	connect(rpnDock, SIGNAL(dockClosed()), this, SLOT(onRPNClosed()));
 	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(keypad, SIGNAL(shortcutClicked(int, const QString&)), this, SLOT(shortcutClicked(int, const QString&)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
@@ -5847,8 +5843,8 @@ void QalculateWindow::onPreferencesClosed() {
 	preferencesDialog = NULL;
 }
 void QalculateWindow::onResultFontChanged() {
-	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font);}
-	else historyView->setFont(QApplication::font());
+	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
+	else {historyView->setFont(QApplication::font());  rpnView->setFont(QApplication::font());}
 }
 void QalculateWindow::onExpressionFontChanged() {
 	if(settings->use_custom_expression_font) {
@@ -5875,6 +5871,7 @@ void QalculateWindow::onAppFontChanged() {
 		expressionEdit->updateCompletion();
 	}
 	if(!settings->use_custom_result_font) historyView->setFont(QApplication::font());
+	if(!settings->use_custom_result_font) rpnView->setFont(QApplication::font());
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
 }
 void QalculateWindow::onExpressionStatusModeChanged() {
@@ -7326,12 +7323,13 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
 			toAction->setEnabled(false);
-		} else {
-			normalModeActivated();
-			QAction *w = findChild<QAction*>("action_normalmode");
-			if(w) w->setChecked(true);
 		}
 	}
+}
+ void QalculateWindow::onRPNClosed() {
+	normalModeActivated();
+	QAction *w = findChild<QAction*>("action_normalmode");
+	if(w) w->setChecked(true);
 }
 void QalculateWindow::rpnModeActivated() {
 	if(settings->rpn_mode) {
