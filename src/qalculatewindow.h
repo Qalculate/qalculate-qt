@@ -16,6 +16,7 @@
 #include <QFont>
 #include <QSpinBox>
 #include <QTranslator>
+#include <QDockWidget>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -26,7 +27,6 @@ class HistoryView;
 class QSplitter;
 class QLabel;
 class KeypadWidget;
-class QDockWidget;
 class QAction;
 class QToolBar;
 class QTextEdit;
@@ -177,6 +177,7 @@ class QalculateWindow : public QMainWindow {
 		void onBasesActivated(bool);
 		void onBasesVisibilityChanged(bool);
 		void onRPNVisibilityChanged(bool);
+		void onRPNClosed();
 		void onExpressionChanged();
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
@@ -343,6 +344,28 @@ class MathSpinBox : public QSpinBox {
 	signals:
 
 		void returnPressed();
+
+};
+
+class QalculateDockWidget : public QDockWidget {
+
+	Q_OBJECT;
+
+	public:
+
+		QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget);
+		virtual ~QalculateDockWidget();
+
+	protected:
+
+		ExpressionEdit *expressionEdit;
+
+		void keyPressEvent(QKeyEvent *e) override;
+		void closeEvent(QCloseEvent *e) override;
+
+	signals:
+
+		void dockClosed();
 
 };
 
