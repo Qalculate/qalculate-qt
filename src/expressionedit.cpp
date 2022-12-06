@@ -117,7 +117,7 @@ void ExpressionTipLabel::reuseTip(const QString &text, const QPoint &pos) {
 	}
 	restartExpireTimer();
 }
-void  ExpressionTipLabel::updateSize(const QPoint &pos) {
+void ExpressionTipLabel::updateSize(const QPoint &pos) {
 	QFontMetrics fm(font());
 	QSize extra(1, 0);
 	if(fm.descent() == 2 && fm.ascent() >= 11) ++extra.rheight();
@@ -207,7 +207,13 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 		if(p.x() < screen.x()) p.setX(screen.x());
 		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
 	}
-	this->move(p);
+	if(p != this->pos() && this->isVisible()) {
+		this->hide();
+		this->move(p);
+		this->show();
+	} else {
+		this->move(p);
+	}
 	return true;
 }
 
@@ -847,6 +853,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completionView->setItemDelegateForColumn(0, delegate);
 	completionView->setItemDelegateForColumn(1, delegate);
 	completer->setPopup(completionView);
+	previous_pos = 0;
 	if(settings->completion_delay > 0) {
 		completionTimer = new QTimer(this);
 		completionTimer->setSingleShot(true);
@@ -2557,10 +2564,13 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 }
 
 void ExpressionEdit::onTextChanged() {
+	QString str = toPlainText();
+	if(str == previous_text && textCursor().position() == previous_pos) return;
+	previous_text = str;
+	previous_pos = textCursor().position();
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(block_text_change) return;
-	QString str = toPlainText();
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
 			expression_undo_buffer.push_back(QString());
@@ -2589,8 +2599,7 @@ void ExpressionEdit::onTextChanged() {
 		if(b && settings->completion_delay > 0) {
 			std::string prev_object_text = current_object_text;
 			setCurrentObject();
-			if(current_object_text.find(prev_object_text) != 0) {
-				hideCompletion();
+			if(current_object_text.find(prev_object_text) != 0 || (prev_object_text.empty() && !CALCULATOR->hasToExpression(str.toStdString(), true, settings->evalops))) {
 				b = false;
 			}
 		}
@@ -2607,8 +2616,12 @@ void ExpressionEdit::onTextChanged() {
 				completionTimer->setSingleShot(true);
 				connect(completionTimer, SIGNAL(timeout()), this, SLOT(complete()));
 			}
-			if(b2) complete();
-			else completionTimer->start(settings->completion_delay);
+			if(b2) {
+				complete();
+			} else {
+				hideCompletion();
+				completionTimer->start(settings->completion_delay);
+			}
 		} else {
 			complete(NULL, QPoint(), settings->completion_delay > 0);
 		}
@@ -2841,7 +2854,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 		MFROM_CLEANUP
 		return false;
 	}
-	
+
 	MFROM_CLEANUP
 	return true;
 }
