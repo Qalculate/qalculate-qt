@@ -207,7 +207,7 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 		if(p.x() < screen.x()) p.setX(screen.x());
 		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
 	}
-	if(p != this->pos() && this->isVisible()) {
+	if(settings->wayland_platform && p != this->pos() && this->isVisible()) {
 		this->hide();
 		this->move(p);
 		this->show();
@@ -839,7 +839,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completionModel->setSourceModel(sourceModel);
 	completer = new QCompleter(completionModel, this);
 	completer->setWidget(this);
-	completer->setMaxVisibleItems(20);
+	if(!settings->wayland_platform) completer->setMaxVisibleItems(20);
 	completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 	completer->setModel(completionModel);
 	completionView = new QTableView();
@@ -2831,15 +2831,23 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	if(completionModel->rowCount() > 0) {
 		completionView->resizeColumnsToContents();
 		completionView->resizeRowsToContents();
-		QRect rect;
-		if(pos.isNull()) {
-			rect = cursorRect();
+		if(settings->wayland_platform && pos.isNull()) {
+			int y = height() - frameWidth();
+			int h = completionView->sizeHint().height();
+			if(h > parentWidget()->height() - y) h = parentWidget()->height() - y;
+			completionView->setGeometry(QRect(mapToGlobal(QPoint(0, y)), QSize(width(), h)));
+			completionView->show();
 		} else {
-			rect.setTopLeft(mapFromGlobal(pos));
-			rect.setHeight(1);
+			QRect rect;
+			if(pos.isNull()) {
+				rect = cursorRect();
+			} else {
+				rect.setTopLeft(mapFromGlobal(pos));
+				rect.setHeight(1);
+			}
+			rect.setWidth(completionView->sizeHint().width());
+			completer->complete(rect);
 		}
-		rect.setWidth(completionView->sizeHint().width());
-		completer->complete(rect);
 		completionView->clearSelection();
 		completionView->setCurrentIndex(QModelIndex());
 		if(tipLabel && tipLabel->isVisible()) {

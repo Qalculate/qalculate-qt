@@ -120,6 +120,7 @@ QalculateQtSettings::QalculateQtSettings() {
 		}
 		fclose(file);
 	}
+	wayland_platform = qApp->platformName().contains("wayland");
 }
 QalculateQtSettings::~QalculateQtSettings() {}
 
