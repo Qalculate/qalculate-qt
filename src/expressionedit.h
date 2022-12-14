@@ -71,6 +71,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		QString current_history;
 		int history_index, undo_index;
 		int tabbed_index;
+		int previous_pos;
+		QString previous_text;
 		bool enable_tab;
 		
 		CompletionData *cdata;
