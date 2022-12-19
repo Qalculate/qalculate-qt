@@ -36,6 +36,7 @@
 #include <QStylePainter>
 #include <QMimeData>
 #include <QClipboard>
+#include <QScrollBar>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	include <QScreen>
 #else
@@ -207,10 +208,12 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 		if(p.x() < screen.x()) p.setX(screen.x());
 		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
 	}
-	if(settings->wayland_platform && p != this->pos() && this->isVisible()) {
-		this->hide();
-		this->move(p);
-		this->show();
+	if(settings->wayland_platform && this->isVisible()) {
+		if(p.y() != this->pos().y() || p.x() < this->pos().x()) {
+			this->hide();
+			this->move(p);
+			this->show();
+		}
 	} else {
 		this->move(p);
 	}
@@ -839,7 +842,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completionModel->setSourceModel(sourceModel);
 	completer = new QCompleter(completionModel, this);
 	completer->setWidget(this);
-	if(!settings->wayland_platform) completer->setMaxVisibleItems(20);
+	completer->setMaxVisibleItems(20);
 	completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 	completer->setModel(completionModel);
 	completionView = new QTableView();
@@ -971,10 +974,12 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						item->setData(ifont, Qt::FontRole); \
 						items.append(item); \
 						sourceModel->appendRow(items);
-						
+
+#define MAX_COMPLETION_LENGTH_1 (settings->wayland_platform ? 25 : 35)
+#define MAX_COMPLETION_LENGTH_2 (settings->wayland_platform ? 25 : 30)
 
 bool ellipsize_completion_names(std::string &str) {
-	if(str.length() < 50) return false;
+	if(str.length() < MAX_COMPLETION_LENGTH_1 + 15) return false;
 	size_t l = 0, l_insub = 0, first_i = 0;
 	bool insub = false;
 	for(size_t i = 0; i < str.length(); i++) {
@@ -986,7 +991,7 @@ bool ellipsize_completion_names(std::string &str) {
 			i = str.find('>', i + 1);
 			if(i == std::string::npos) break;
 		} else if((signed char) str[i] > 0 || (unsigned char) str[i] >= 0xC0) {
-			if(first_i > 0 && l >= 35 && (!insub || l - ((l - l_insub) * 6) / 10 >= 35) && i < str.length() - 2 && str[i + 1] != '<' && str[i + 1] != ')' && str[i + 1] != '(') {
+			if(first_i > 0 && l >= MAX_COMPLETION_LENGTH_1 && (!insub || l - ((l - l_insub) * 6) / 10 >= MAX_COMPLETION_LENGTH_1) && i < str.length() - 2 && str[i + 1] != '<' && str[i + 1] != ')' && str[i + 1] != '(') {
 				str = str.substr(0, i);
 				str += "…";
 				if(insub) str += "</sub>";
@@ -1121,7 +1126,7 @@ void ExpressionEdit::updateCompletion() {
 					if(((KnownVariable*) v)->isExpression()) {
 						ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 						title = QString::fromStdString(CALCULATOR->localizeExpression(((KnownVariable*) v)->expression(), pa));
-						if(title.length() > 30) {title = title.left(30); title += "…";}
+						if(title.length() > MAX_COMPLETION_LENGTH_2) {title = title.left(MAX_COMPLETION_LENGTH_2); title += "…";}
 						else if(!((KnownVariable*) v)->unit().empty() && ((KnownVariable*) v)->unit() != "auto") {title += " "; title += QString::fromStdString(((KnownVariable*) v)->unit());}
 					} else {
 						if(((KnownVariable*) v)->get().isMatrix()) {
@@ -1131,8 +1136,8 @@ void ExpressionEdit::updateCompletion() {
 						} else {
 							PrintOptions po;
 							po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
-							title = QString::fromStdString(CALCULATOR->print(((KnownVariable*) v)->get(), 30, po));
-							if(title.length() > 30) {title = title.left(30); title += "…";}
+							title = QString::fromStdString(CALCULATOR->print(((KnownVariable*) v)->get(), MAX_COMPLETION_LENGTH_2, po));
+							if(title.length() > MAX_COMPLETION_LENGTH_2) {title = title.left(MAX_COMPLETION_LENGTH_2); title += "…";}
 						}
 					}
 				} else {
@@ -1210,7 +1215,7 @@ void ExpressionEdit::updateCompletion() {
 						size_t i_slash = std::string::npos;
 						if(u->category().length() > 1) i_slash = u->category().rfind("/", u->category().length() - 2);
 						if(i_slash != std::string::npos) i_slash++;
-						if((size_t) title.length() + u->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < 35) {
+						if((size_t) title.length() + u->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < MAX_COMPLETION_LENGTH_1) {
 							title += " (";
 							if(i_slash == std::string::npos) title += QString::fromStdString(u->category());
 							else title += QString::fromStdString(u->category().substr(i_slash, u->category().length() - i_slash));
@@ -1245,7 +1250,7 @@ void ExpressionEdit::updateCompletion() {
 				if(i_slash != std::string::npos) i_slash++;
 				title = QString::fromStdString(cu->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				if(cu->isSIUnit() && !cu->category().empty()) {
-					if(title.length() + cu->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < 35 && title[title.length() - 1] != ')') {
+					if(title.length() + cu->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < MAX_COMPLETION_LENGTH_1 && title[title.length() - 1] != ')') {
 						title += " (";
 						if(i_slash == std::string::npos) title += QString::fromStdString(cu->category());
 						else title += QString::fromStdString(cu->category().substr(i_slash, cu->category().length() - i_slash));
@@ -1934,10 +1939,10 @@ void ExpressionEdit::enableIM() {
 	settings->enable_input_method = qobject_cast<QAction*>(sender())->isChecked();
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 }
-void ExpressionEdit::blockCompletion(bool b) {
+void ExpressionEdit::blockCompletion(bool b, bool h) {
 	if(b) {
 		if(completionTimer) completionTimer->stop();
-		completionView->hide();
+		if(h) completionView->hide();
 		completion_blocked++;
 	} else {
 		completion_blocked--;
@@ -2593,9 +2598,7 @@ void ExpressionEdit::onTextChanged() {
 	bool b = completionView->isVisible();
 	expression_has_changed2 = true;
 	displayParseStatus();
-	if(completion_blocked || !settings->enable_completion) {
-		hideCompletion();
-	} else {
+	if(!completion_blocked && settings->enable_completion) {
 		if(b && settings->completion_delay > 0) {
 			std::string prev_object_text = current_object_text;
 			setCurrentObject();
@@ -2829,15 +2832,9 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	completionModel->setFilter(current_object_text);
 	completionModel->sort(1);
 	if(completionModel->rowCount() > 0) {
-		completionView->resizeColumnsToContents();
 		completionView->resizeRowsToContents();
-		if(settings->wayland_platform && pos.isNull()) {
-			int y = height() - frameWidth();
-			int h = completionView->sizeHint().height();
-			if(h > parentWidget()->height() - y) h = parentWidget()->height() - y;
-			completionView->setGeometry(QRect(mapToGlobal(QPoint(0, y)), QSize(width(), h)));
-			completionView->show();
-		} else {
+		completionView->resizeColumnsToContents();
+		if(!settings->wayland_platform || !completionView->isVisible()) {
 			QRect rect;
 			if(pos.isNull()) {
 				rect = cursorRect();
@@ -2846,7 +2843,22 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 				rect.setHeight(1);
 			}
 			rect.setWidth(completionView->sizeHint().width());
+			if(settings->wayland_platform) {
+				QWidget *w = this;
+				while(w->parentWidget()) w = w->parentWidget();
+				int max_h = w->height() - mapTo(w, QPoint(0, rect.y() + rect.height())).y() - 3;
+				if(completionView->horizontalScrollBar()) max_h -= completionView->horizontalScrollBar()->sizeHint().height();
+				int n = max_h / ((QAbstractItemView*) completionView)->sizeHintForRow(0);
+				if(n > 20) n = 20;
+				else if(n < 5) n = 5;
+				completer->setMaxVisibleItems(n);
+			}
 			completer->complete(rect);
+		} else {
+			int h = (((QAbstractItemView*) completionView)->sizeHintForRow(0) * qMin(completer->maxVisibleItems(), completionModel->rowCount()) + 3) + 3;
+			QScrollBar *hsb = completionView->horizontalScrollBar();
+			if(hsb && hsb->isVisible()) h += hsb->sizeHint().height();
+			completionView->resize(qMax(completionView->sizeHint().width(), completionView->width()), h);
 		}
 		completionView->clearSelection();
 		completionView->setCurrentIndex(QModelIndex());

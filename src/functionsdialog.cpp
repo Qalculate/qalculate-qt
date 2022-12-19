@@ -512,7 +512,7 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 				}
 			}
 			deactivateButton->setEnabled(true);
-			applyButton->setEnabled(f->isActive() && (f->minargs() <= 1 || settings->rpn_mode));
+			applyButton->setEnabled(f->isActive() && ((f->minargs() <= 1 && f->id() != FUNCTION_ID_LOGN) || settings->rpn_mode));
 			descriptionView->setHtml(QString::fromStdString(str));
 			return;
 		}

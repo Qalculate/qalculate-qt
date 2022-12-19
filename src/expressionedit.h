@@ -138,7 +138,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void updateCompletion();
 		void setExpression(std::string);
 		void setExpression(const QString &str);
-		void blockCompletion(bool = true);
+		void blockCompletion(bool = true, bool = true);
 		void blockParseStatus(bool = true);
 		void blockUndo(bool = true);
 		void hideCompletion();
