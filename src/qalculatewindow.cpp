@@ -978,7 +978,6 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
 		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
 		case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
-		case SHORTCUT_TYPE_CONVERT: {action = toAction; break;}
 		case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
 		case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
 		case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
@@ -1025,8 +1024,6 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
 			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_CONVERT) {
-			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type == SHORTCUT_TYPE_MODE) {
 			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type == SHORTCUT_TYPE_MENU) {
@@ -1047,6 +1044,9 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
 	} else {
+		if(ks->type == SHORTCUT_TYPE_CONVERT) {
+			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		}
 		ks->new_action = true;
 		action = new QAction(this);
 		action->setShortcut(ks->key);
@@ -1131,6 +1131,10 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_CONVERT_TO: {
 			ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 			executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(value, pa));
+			break;
+		}
+		case SHORTCUT_TYPE_CONVERT: {
+			onToActivated(false);
 			break;
 		}
 		case SHORTCUT_TYPE_OPTIMAL_UNIT: {
@@ -1335,7 +1339,6 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_PERIODIC_TABLE: {periodicTableAction->trigger(); break;}
 		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {percentageAction->trigger(); break;}
 		case SHORTCUT_TYPE_NUMBER_BASES: {basesAction->trigger(); break;}
-		case SHORTCUT_TYPE_CONVERT: {toAction->trigger(); break;}
 		case SHORTCUT_TYPE_RPN_MODE: {rpnAction->trigger(); break;}
 		case SHORTCUT_TYPE_DEGREES: {degAction->trigger(); break;}
 		case SHORTCUT_TYPE_RADIANS: {radAction->trigger(); break;}
@@ -1742,11 +1745,13 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 				return;
 			}
 		}
-	} else if(f->id() == FUNCTION_ID_ROOT) {
+	} else if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN || (f->minargs() > 1 && ((f->getArgumentDefinition(2) && f->getArgumentDefinition(2)->type() == ARGUMENT_TYPE_INTEGER) xor (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER)))) {
 		size_t index = 2;
+		if(f->id() != FUNCTION_ID_ROOT && f->id() != FUNCTION_ID_LOGN && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER) index = 1;
 		Argument *arg_n = f->getArgumentDefinition(index);
-		MathSpinBox *spin = NULL;
 		if(arg_n) {
+			QLineEdit *entry = NULL;
+			MathSpinBox *spin = NULL;
 			QDialog *dialog = new QDialog(this);
 			if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
 			dialog->setWindowTitle(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)));
@@ -1764,24 +1769,34 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 					max = iarg->max()->intValue();
 				}
 			}
-			spin = new MathSpinBox();
-			spin->setRange(min, max);
-			if(!f->getDefaultValue(index).empty()) {
-				spin->setValue(s2i(f->getDefaultValue(index)));
-			} else if(f->id() == FUNCTION_ID_ROOT) {
-				spin->setValue(2);
-			} else if(!arg_n->zeroForbidden() && min <= 0 && max >= 0) {
-				spin->setValue(0);
-			} else {
-				if(max < 0) {
-					spin->setValue(max);
-				} else if(min <= 1) {
-					spin->setValue(1);
+			if(settings->evalops.parse_options.base != BASE_DECIMAL || f->id() == FUNCTION_ID_ROOT || arg_n->type() == ARGUMENT_TYPE_INTEGER) {
+				spin = new MathSpinBox(dialog);
+				spin->setRange(min, max);
+				if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN) {
+					spin->setValue(2);
+				} else if(!f->getDefaultValue(index).empty()) {
+					spin->setValue(s2i(f->getDefaultValue(index)));
+				} else if(!arg_n->zeroForbidden() && min <= 0 && max >= 0) {
+					spin->setValue(0);
 				} else {
-					spin->setValue(min);
+					if(max < 0) {
+						spin->setValue(max);
+					} else if(min <= 1) {
+						spin->setValue(1);
+					} else {
+						spin->setValue(min);
+					}
 				}
+				grid->addWidget(spin, 0, 1);
+				spin->setFocus();
+				connect(spin, SIGNAL(returnPressed()), dialog, SLOT(accept()));
+			} else {
+				entry = new MathLineEdit(dialog);
+				entry->setText(QString::fromStdString(f->getDefaultValue(index)));
+				grid->addWidget(entry, 0, 1);
+				entry->setFocus();
+				connect(entry, SIGNAL(returnPressed()), dialog, SLOT(accept()));
 			}
-			grid->addWidget(spin, 0, 1);
 			QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 			buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 			buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
@@ -1791,11 +1806,13 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 			if(dialog->exec() == QDialog::Accepted) {
 				sargs = QString::fromStdString(CALCULATOR->getComma());
 				sargs += " ";
-				if(settings->evalops.parse_options.base != BASE_DECIMAL) {
+				if(spin && settings->evalops.parse_options.base != BASE_DECIMAL) {
 					Number nr(spin->value(), 1);
 					sargs += QString::fromStdString(print_with_evalops(nr));
-				} else {
+				} else if(spin) {
 					sargs += spin->cleanText();
+				} else {
+					sargs += entry->text();
 				}
 				dialog->deleteLater();
 			} else {
@@ -5451,19 +5468,19 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	qApp->closeAllWindows();
 }
 
-void QalculateWindow::onToActivated() {
+void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
 	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
 	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
 		if(expressionEdit->complete(mstruct, pos)) return;
 	}
-	expressionEdit->blockCompletion();
+	expressionEdit->blockCompletion(true, button);
 	expressionEdit->blockParseStatus();
 	expressionEdit->moveCursor(QTextCursor::End);
 	expressionEdit->insertPlainText("➞");
 	expressionEdit->blockParseStatus(false);
 	expressionEdit->displayParseStatus(true, false);
-	expressionEdit->complete(NULL, pos);
+	expressionEdit->complete(NULL, button ? pos : QPoint());
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {

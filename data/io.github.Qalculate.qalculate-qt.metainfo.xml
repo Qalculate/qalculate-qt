@@ -68,6 +68,32 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="4.5.0" date="2022-12-19">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Use history font for RPN stack list</li>
+      <li>Use log() instead of log2() as alternative action on "ln" keypad button</li>
+      <li>Conversion to any type of expression (e.g. "1000 BTC to million USD")</li>
+      <li>Use current status of limit implicit multiplication setting during parsing of conversion expression</li>
+      <li>New SI prefixes (R, r, Q, q)</li>
+      <li>New units: ounce force (ozf), rack unit (U)</li>
+      <li>Use standard form (sorting) for polynomials</li>
+      <li>Improve consistency of behaviour when global units are replaced</li>
+      <li>More consistent addition of units to expression without units for unit conversion</li>
+      <li>Improvements and fixes for arg() and atan2() functions</li>
+      <li>Fix completion (including segfaults) and expression tooltip on Wayland</li>
+      <li>Fix RPN mode deactivated after application loses focus</li>
+      <li>Fix interpretation of Myr (megayear) and Gyr (gigayear)</li>
+      <li>Fix milli- and centimeter of water units</li>
+      <li>Fix genvector() with for negative step size or expression as step size/number of steps</li>
+      <li>Fix randuniform() function</li>
+      <li>Fix automatic/dual fraction format after conversion (e.g. "8 to score")</li>
+      <li>Fix inconsistently displayed parsing of "7d 5h" and similar</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
   <release version="4.4.0" date="2022-10-17">
    <description>
     <p>Changes:</p>

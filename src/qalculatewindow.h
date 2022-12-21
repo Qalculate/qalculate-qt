@@ -168,7 +168,7 @@ class QalculateWindow : public QMainWindow {
 		void onBaseClicked(int, bool);
 		void onFactorizeClicked();
 		void onExpandClicked();
-		void onToActivated();
+		void onToActivated(bool = true);
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void hideNumpad(bool);

@@ -228,11 +228,11 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setRichText("x<sup>y</sup>");
 	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true, settings->printops.use_unicode_signs)));
 	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 2);
-	f = CALCULATOR->getActiveFunction("log10"); f2 = CALCULATOR->getActiveFunction("log2");
-	if(f && f2) {
-		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, f2, "ln", c, 1);
+	f = CALCULATOR->getActiveFunction("log10");
+	if(f) {
+		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 1);
 	} else {
-		ITEM_BUTTON(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), "ln", c, 1);
+		ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 1);
 	}
 	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
 	if(f && f2) {
