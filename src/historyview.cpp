@@ -484,7 +484,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 		}
 		str += "</td><td style=\"text-align:right";
-		if(initial_load || w > width() * 2) {
+		if(initial_load || w > width() * 2 || !settings->format_result) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 2 > width()) {
 			str += "; font-size:large";
@@ -537,8 +537,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("\n", "<br>");
 	int i = 0;
 	if(!initial_load) {
-		s_text.replace("font-size:normal", "font-size:small ");
-		s_text.replace("width=\"2\"", "width=\"1\"");
+		if(!settings->format_result) {
+			s_text.replace("font-size:normal", "font-size:small ");
+			s_text.replace("width=\"2\"", "width=\"1\"");
+		}
 		while(true) {
 			i = s_text.indexOf("<img valign=\"top\"", i);
 			if(i < 0) break;
@@ -548,7 +550,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 	}
 	if(expression.empty() && parse.empty()) {
-		if(!initial_load) {
+		if(!initial_load && settings->format_result) {
 			i = 0;
 			while(true) {
 				i = s_text.indexOf("; font-size:x-large", i);
@@ -567,7 +569,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		s_text.insert(i_pos, str);
 	} else {
-		if(!initial_load) {
+		if(!initial_load && settings->format_result) {
 			s_text.remove("; font-size:x-large");
 			s_text.remove("; font-size:large");
 		}

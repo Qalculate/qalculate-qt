@@ -4752,7 +4752,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -4783,12 +4783,12 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 
 		if(!prepend_mstruct.isUndefined() && !CALCULATOR->aborted()) {
 			prepend_mstruct.format(po);
 			po.min_exp = 0;
-			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML));
+			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML));
 		}
 
 		if(!b_stack) {

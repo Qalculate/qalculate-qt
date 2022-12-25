@@ -84,6 +84,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++; styleCombo = combo;
 	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
 	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
+	BOX_G(tr("Format result"), settings->format_result, formatToggled(bool));
 	BOX_G1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool)); 
 	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l2->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
@@ -374,6 +375,10 @@ void PreferencesDialog::ignoreCommaToggled(bool b) {
 }
 void PreferencesDialog::colorizeToggled(bool b) {
 	settings->colorize_result = b;
+	emit resultDisplayUpdated();
+}
+void PreferencesDialog::formatToggled(bool b) {
+	settings->format_result = b;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::parsingModeChanged(int i) {
