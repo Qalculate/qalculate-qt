@@ -91,6 +91,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool parsed_had_errors, parsed_had_warnings;
 		int previous_epos;
 		bool parentheses_highlighted;
+		QRect prev_rect;
 
 		void setCurrentObject();
 		void setStatusText(const QString &text, bool is_expression = false);

@@ -852,7 +852,6 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completionView->horizontalHeader()->hide();
 	completionView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 	completionView->setSelectionMode(QAbstractItemView::SingleSelection);
-	completionView->horizontalHeader()->setStretchLastSection(true);
 	HTMLDelegate* delegate = new HTMLDelegate();
 	completionView->setItemDelegateForColumn(0, delegate);
 	completionView->setItemDelegateForColumn(1, delegate);
@@ -2648,7 +2647,6 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
-	int prev_object_start = current_object_start;
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
@@ -2836,32 +2834,15 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	if(completionModel->rowCount() > 0) {
 		completionView->resizeRowsToContents();
 		int c1_prev = completionView->columnWidth(0);
+		completionView->horizontalHeader()->setStretchLastSection(false);
 		completionView->resizeColumnsToContents();
-		if((!settings->wayland_platform && prev_object_start != current_object_start) || !completionView->isVisible()) {
-			QRect rect;
-			if(pos.isNull()) {
-				QTextCursor cur = textCursor();
-				if(current_object_start >= 0) cur.setPosition(current_object_start);
-				rect = cursorRect(cur);
-			} else {
-				rect.setTopLeft(mapFromGlobal(pos));
-				rect.setHeight(1);
-			}
-			rect.setWidth(completionView->sizeHint().width());
-			if(settings->wayland_platform) {
-				QWidget *w = this;
-				while(w->parentWidget()) w = w->parentWidget();
-				int max_h = w->height() - mapTo(w, QPoint(0, rect.y() + rect.height())).y() - 3;
-				if(completionView->horizontalScrollBar()) max_h -= completionView->horizontalScrollBar()->sizeHint().height();
-				int n = max_h / ((QAbstractItemView*) completionView)->sizeHintForRow(0);
-				if(n > 20) n = 20;
-				else if(n < 5) n = 5;
-				completer->setMaxVisibleItems(n);
-			}
-			completer->complete(rect);
-		} else {
-			int w = completionView->sizeHint().width();
-			if(completionView->width() > w) {
+		QRect rect;
+		int w = completionView->sizeHint().width();
+		if(pos.isNull()) {
+			QTextCursor cur = textCursor();
+			if(current_object_start >= 0) cur.setPosition(current_object_start);
+			rect = cursorRect(cur);
+			if(prev_rect == rect && completionView->isVisible() && completionView->width() > w) {
 				w = completionView->width();
 				int scr_w = 0;
 				if(completionView->verticalScrollBar() && completionView->verticalScrollBar()->isVisible()) scr_w = completionView->verticalScrollBar()->sizeHint().width();
@@ -2871,8 +2852,29 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 					} else {
 						completionView->setColumnWidth(0, (w - scr_w) - completionView->columnWidth(1));
 					}
+					completionView->horizontalHeader()->setStretchLastSection(true);
 				}
 			}
+		}
+		if(!settings->wayland_platform || !completionView->isVisible()) {
+			if(!pos.isNull()) {
+				rect.setTopLeft(mapFromGlobal(pos));
+				rect.setHeight(1);
+			}
+			prev_rect = rect;
+			rect.setWidth(w);
+			if(settings->wayland_platform) {
+				QWidget *win = this;
+				while(win->parentWidget()) win = win->parentWidget();
+				int max_h = win->height() - mapTo(win, QPoint(0, rect.y() + rect.height())).y() - 3;
+				if(completionView->horizontalScrollBar()) max_h -= completionView->horizontalScrollBar()->sizeHint().height();
+				int n = max_h / ((QAbstractItemView*) completionView)->sizeHintForRow(0);
+				if(n > 20) n = 20;
+				else if(n < 5) n = 5;
+				completer->setMaxVisibleItems(n);
+			}
+			completer->complete(rect);
+		} else {
 			int h = (((QAbstractItemView*) completionView)->sizeHintForRow(0) * qMin(completer->maxVisibleItems(), completionModel->rowCount()) + 3) + 3;
 			QScrollBar *hsb = completionView->horizontalScrollBar();
 			if(hsb && hsb->isVisible()) h += hsb->sizeHint().height();
