@@ -2585,6 +2585,10 @@ Do you want to overwrite the function?</source>
             <numerusform>%n дней</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Format result</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>

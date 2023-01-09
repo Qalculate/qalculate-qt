@@ -975,8 +975,8 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						items.append(item); \
 						sourceModel->appendRow(items);
 
-#define MAX_COMPLETION_LENGTH_1 (settings->wayland_platform ? 25 : 35)
-#define MAX_COMPLETION_LENGTH_2 (settings->wayland_platform ? 25 : 30)
+#define MAX_COMPLETION_LENGTH_1 25
+#define MAX_COMPLETION_LENGTH_2 25
 
 bool ellipsize_completion_names(std::string &str) {
 	if(str.length() < MAX_COMPLETION_LENGTH_1 + 15) return false;
@@ -2833,20 +2833,40 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	completionModel->sort(1);
 	if(completionModel->rowCount() > 0) {
 		completionView->resizeRowsToContents();
+		int c1_prev = completionView->columnWidth(0);
+		completionView->horizontalHeader()->setStretchLastSection(false);
 		completionView->resizeColumnsToContents();
+		QRect rect;
+		int w = completionView->sizeHint().width();
+		if(pos.isNull()) {
+			QTextCursor cur = textCursor();
+			if(current_object_start >= 0) cur.setPosition(current_object_start);
+			rect = cursorRect(cur);
+			if(prev_rect == rect && completionView->isVisible() && completionView->width() > w) {
+				w = completionView->width();
+				int scr_w = 0;
+				if(completionView->verticalScrollBar() && completionView->verticalScrollBar()->isVisible()) scr_w = completionView->verticalScrollBar()->sizeHint().width();
+				if(completionView->columnWidth(0) < c1_prev) {
+					if(completionView->columnWidth(1) <= (w - scr_w) - c1_prev) {
+						completionView->setColumnWidth(0, c1_prev);
+					} else {
+						completionView->setColumnWidth(0, (w - scr_w) - completionView->columnWidth(1));
+					}
+					completionView->horizontalHeader()->setStretchLastSection(true);
+				}
+			}
+		}
 		if(!settings->wayland_platform || !completionView->isVisible()) {
-			QRect rect;
-			if(pos.isNull()) {
-				rect = cursorRect();
-			} else {
+			if(!pos.isNull()) {
 				rect.setTopLeft(mapFromGlobal(pos));
 				rect.setHeight(1);
 			}
-			rect.setWidth(completionView->sizeHint().width());
+			prev_rect = rect;
+			rect.setWidth(w);
 			if(settings->wayland_platform) {
-				QWidget *w = this;
-				while(w->parentWidget()) w = w->parentWidget();
-				int max_h = w->height() - mapTo(w, QPoint(0, rect.y() + rect.height())).y() - 3;
+				QWidget *win = this;
+				while(win->parentWidget()) win = win->parentWidget();
+				int max_h = win->height() - mapTo(win, QPoint(0, rect.y() + rect.height())).y() - 3;
 				if(completionView->horizontalScrollBar()) max_h -= completionView->horizontalScrollBar()->sizeHint().height();
 				int n = max_h / ((QAbstractItemView*) completionView)->sizeHintForRow(0);
 				if(n > 20) n = 20;
@@ -2858,7 +2878,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 			int h = (((QAbstractItemView*) completionView)->sizeHintForRow(0) * qMin(completer->maxVisibleItems(), completionModel->rowCount()) + 3) + 3;
 			QScrollBar *hsb = completionView->horizontalScrollBar();
 			if(hsb && hsb->isVisible()) h += hsb->sizeHint().height();
-			completionView->resize(qMax(completionView->sizeHint().width(), completionView->width()), h);
+			completionView->resize(w, h);
 		}
 		completionView->clearSelection();
 		completionView->setCurrentIndex(QModelIndex());

@@ -219,6 +219,7 @@ class QalculateQtSettings : QObject {
 		bool enable_completion, enable_completion2;
 		int color;
 		bool colorize_result;
+		bool format_result;
 		bool first_time;
 		bool enable_input_method;
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;

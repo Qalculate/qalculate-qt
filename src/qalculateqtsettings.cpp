@@ -510,6 +510,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			palette = v;
 		} else if(svar == "color") {
 			colorize_result = v;
+		} else if(svar == "format") {
+			format_result = v;
 		} else if(svar == "ignore_locale") {
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
@@ -763,6 +765,7 @@ void QalculateQtSettings::loadPreferences() {
 	simplified_percentage = true;
 	color = 1;
 	colorize_result = true;
+	format_result = true;
 	chain_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
@@ -857,7 +860,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 4;
 	preferences_version[1] = 5;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -1157,6 +1160,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 #endif
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
+		if(!format_result) fprintf(file, "format=%i\n", format_result);
 		fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
 		fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
 		fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);

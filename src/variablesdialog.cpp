@@ -406,7 +406,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 					po.is_approximate = &is_approximate;
 					if(v->isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
 					else str += "= ";
-					str += CALCULATOR->print(((KnownVariable*) v)->get(), 1000, po, true, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+					str += CALCULATOR->print(((KnownVariable*) v)->get(), 1000, po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 				}
 			} else {
 				if(((UnknownVariable*) v)->assumptions()) {

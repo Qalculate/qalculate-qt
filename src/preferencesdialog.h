@@ -50,6 +50,7 @@ class PreferencesDialog : public QDialog {
 		void ignoreCommaToggled(bool);
 		void ignoreDotToggled(bool);
 		void colorizeToggled(bool);
+		void formatToggled(bool);
 		void parsingModeChanged(int);
 		void temperatureCalculationChanged(int);
 		void exratesToggled(bool);
