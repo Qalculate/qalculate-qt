@@ -177,12 +177,21 @@ void FunctionsDialog::newClicked() {
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
+			if(list.isEmpty()) {
+				list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				QTreeWidgetItem *i = new QTreeWidgetItem(categoriesView, list.isEmpty() ? NULL : list[0]);
+				i->setText(0, tr("Inactive"));
+				i->setText(1, "Inactive");
+			}
 		}
 		selected_item = f;
 		if(f->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+			if(list.isEmpty()) {
+				QStringList l; l << tr("Uncategorized"); l << "Uncategorized";
+				list = categoriesView->findItems("All", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
+			}
 		} else if(f->category() != CALCULATOR->temporaryCategory()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(f->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
@@ -226,12 +235,21 @@ void FunctionsDialog::editClicked() {
 			if(!list.isEmpty()) sourceModel->removeRow(list[0].row());
 		} else if(replaced_item && !replaced_item->isActive()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Inactive", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Inactive"); l << "Inactive"; new QTreeWidgetItem(categoriesView, l);}
+			if(list.isEmpty()) {
+				list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				QTreeWidgetItem *i = new QTreeWidgetItem(categoriesView, list.isEmpty() ? NULL : list[0]);
+				i->setText(0, tr("Inactive"));
+				i->setText(1, "Inactive");
+			}
 		}
 		selected_item = f;
 		if(f->category().empty()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems("Uncategorized", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
-			if(list.isEmpty()) {QStringList l; l << tr("Uncategorized"); l << "Uncategorized"; new QTreeWidgetItem(categoriesView->topLevelItem(2), l);}
+			if(list.isEmpty()) {
+				QStringList l; l << tr("Uncategorized"); l << "Uncategorized";
+				list = categoriesView->findItems("All", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
+			}
 		} else if(f->category() != CALCULATOR->temporaryCategory()) {
 			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(f->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
@@ -333,8 +351,12 @@ void FunctionsDialog::deactivateClicked() {
 		if(!list.isEmpty()) {
 			categoriesView->setCurrentItem(list[0], 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 		} else if(!f->isActive()) {
+			QList<QTreeWidgetItem*> list = categoriesView->findItems("User items", Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			QStringList l; l << tr("Inactive"); l << "Inactive";
-			categoriesView->setCurrentItem(new QTreeWidgetItem(categoriesView, l), 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+			QTreeWidgetItem *i = new QTreeWidgetItem(categoriesView, list.isEmpty() ? NULL : list[0]);
+			i->setText(0, tr("Inactive"));
+			i->setText(1, "Inactive");
+			categoriesView->setCurrentItem(i, 0, QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 		}
 		emit itemsChanged();
 	}
@@ -641,6 +663,14 @@ void FunctionsDialog::updateFunctions() {
 	if(selected_category == "User items") {
 		iter->setSelected(true);
 	}
+	if(has_inactive) {
+		//add "Inactive" category if there are inactive functions
+		l.clear(); l << tr("Inactive"); l << "Inactive";
+		iter = new QTreeWidgetItem(categoriesView, l);
+		if(selected_category == "Inactive") {
+			iter->setSelected(true);
+		}
+	}
 	l.clear(); l << tr("All", "All functions"); l << "All";
 	iter3 = new QTreeWidgetItem(categoriesView, l);
 	tree_struct *item, *item2;
@@ -687,14 +717,6 @@ void FunctionsDialog::updateFunctions() {
 		l.clear(); l << tr("Uncategorized"); l << "Uncategorized";
 		iter = new QTreeWidgetItem(iter3, l);
 		if(selected_category == "Uncategorized") {
-			iter->setSelected(true);
-		}
-	}
-	if(has_inactive) {
-		//add "Inactive" category if there are inactive functions
-		l.clear(); l << tr("Inactive"); l << "Inactive";
-		iter = new QTreeWidgetItem(categoriesView, l);
-		if(selected_category == "Inactive") {
 			iter->setSelected(true);
 		}
 	}
