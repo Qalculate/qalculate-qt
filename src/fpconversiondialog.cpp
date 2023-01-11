@@ -163,6 +163,8 @@ void FPConversionDialog::updateFields(int base) {
 		po.use_unicode_signs = settings->printops.use_unicode_signs;
 		po.lower_case_e = settings->printops.lower_case_e;
 		po.lower_case_numbers = settings->printops.lower_case_numbers;
+		po.custom_time_zone = settings->printops.custom_time_zone;
+		po.round_halfway_to_even = settings->printops.round_halfway_to_even;
 		po.base_display = BASE_DISPLAY_NONE;
 		po.abbreviate_names = settings->printops.abbreviate_names;
 		po.digit_grouping = settings->printops.digit_grouping;

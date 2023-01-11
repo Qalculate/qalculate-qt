@@ -47,6 +47,10 @@ bool title_matches(ExpressionItem *item, const std::string &str, size_t minlengt
 bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 
+#define RESET_SETTINGS_TZ 	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? TZ_TRUNCATE : 0);\
+				if(settings->use_duo_syms) settings->printops.custom_time_zone += TZ_DOZENAL;\
+				settings->printops.time_zone = TIME_ZONE_LOCAL;
+
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
@@ -211,6 +215,7 @@ class QalculateQtSettings : QObject {
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
 		int rounding_mode;
+		bool use_duo_syms;
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay;

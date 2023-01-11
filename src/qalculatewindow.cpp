@@ -2432,8 +2432,8 @@ void QalculateWindow::setOption(std::string str) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else if(v != settings->rounding_mode) {
 			settings->rounding_mode = v;
-			settings->printops.custom_time_zone = (v == 2 ? -21586 : 0);
 			settings->printops.round_halfway_to_even = (v == 1);
+			RESET_SETTINGS_TZ
 			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
@@ -2462,7 +2462,14 @@ void QalculateWindow::setOption(std::string str) {
 	else if(equalsIgnoreCase(svar, "simplified percentage") || svar == "percent") SET_BOOL_PT(settings->simplified_percentage)
 	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_D(settings->printops.lower_case_e)
 	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
-	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
+	else if(equalsIgnoreCase(svar, "duodecimal symbols") || svar == "duosyms") {
+		bool b = settings->use_duo_syms;
+		SET_BOOL(settings->use_duo_syms)
+		if(b != settings->use_duo_syms) {
+			RESET_SETTINGS_TZ
+			resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
 		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
 		if(v_i) {
 			bool b = v_i->hasName("j") > 0;
@@ -3661,6 +3668,14 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(to_str, "duo") || equalsIgnoreCase(to_str, "duodecimal") || equalsIgnoreCase(to_str, tr("duodecimal").toStdString())) {
 				to_base = BASE_DUODECIMAL;
 				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "doz") || equalsIgnoreCase(to_str, "dozenal")) {
+				to_base = BASE_DUODECIMAL;
+				if(!settings->use_duo_syms && settings->printops.time_zone != TIME_ZONE_CUSTOM) {
+					settings->use_duo_syms = true;
+					RESET_SETTINGS_TZ
+					settings->use_duo_syms = false;
+				}
+				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "bin") || equalsIgnoreCase(to_str, "binary") || equalsIgnoreCase(to_str, tr("binary").toStdString())) {
 				to_base = BASE_BINARY;
 				do_to = true;
@@ -3766,7 +3781,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -3777,7 +3792,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -4237,7 +4252,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
 		settings->evalops.parse_options.units_enabled = b_units_saved;
 		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-		settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+		RESET_SETTINGS_TZ
 		settings->printops.time_zone = TIME_ZONE_LOCAL;
 		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 		return;
@@ -4302,7 +4317,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
 	settings->evalops.parse_options.units_enabled = b_units_saved;
 	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+	RESET_SETTINGS_TZ
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
@@ -4723,6 +4738,8 @@ void ViewThread::run() {
 			po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;
 			po.lower_case_e = settings->printops.lower_case_e;
 			po.lower_case_numbers = settings->printops.lower_case_numbers;
+			po.custom_time_zone = settings->printops.custom_time_zone;
+			po.round_halfway_to_even = settings->printops.round_halfway_to_even;
 			po.base_display = settings->printops.base_display;
 			po.twos_complement = settings->printops.twos_complement;
 			po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;

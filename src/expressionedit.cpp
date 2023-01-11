@@ -2286,6 +2286,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		po.lower_case_e = settings->printops.lower_case_e;
 		po.lower_case_numbers = settings->printops.lower_case_numbers;
 		po.base_display = settings->printops.base_display;
+		po.custom_time_zone = settings->printops.custom_time_zone;
+		po.round_halfway_to_even = settings->printops.round_halfway_to_even;
 		po.twos_complement = settings->printops.twos_complement;
 		po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
 		po.base = settings->evalops.parse_options.base;
@@ -2361,6 +2363,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				} else if(equalsIgnoreCase(str_u, "dec") || equalsIgnoreCase(str_u, "decimal") || equalsIgnoreCase(str_u, tr("decimal").toStdString())) {
 					parsed_expression += tr("decimal number").toStdString();
 				} else if(equalsIgnoreCase(str_u, "duo") || equalsIgnoreCase(str_u, "duodecimal") || equalsIgnoreCase(str_u, tr("duodecimal").toStdString())) {
+					parsed_expression += tr("duodecimal number").toStdString();
+				} else if(equalsIgnoreCase(str_u, "doz") || equalsIgnoreCase(str_u, "dozenal")) {
 					parsed_expression += tr("duodecimal number").toStdString();
 				} else if(equalsIgnoreCase(str_u, "bin") || equalsIgnoreCase(str_u, "binary") || equalsIgnoreCase(str_u, tr("binary").toStdString())) {
 					parsed_expression += tr("binary number").toStdString();
