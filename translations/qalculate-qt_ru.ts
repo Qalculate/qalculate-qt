@@ -2587,11 +2587,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Format result</source>
-        <translation type="unfinished"></translation>
+        <translation>Форматировать результат</translation>
     </message>
     <message>
         <source>Use special duodecimal symbols</source>
-        <translation type="unfinished"></translation>
+        <translation>Использовать специальные двенадцатеричные символы</translation>
     </message>
 </context>
 <context>
