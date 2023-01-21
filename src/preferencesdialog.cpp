@@ -158,6 +158,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
+	BOX(tr("Use special duodecimal symbols"), settings->use_duo_syms, duodecimalSymbolsToggled(bool));
 	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
 	BOX(tr("Use Unicode division slash in output"), settings->printops.division_sign == DIVISION_SIGN_DIVISION_SLASH, divisionSlashToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
@@ -309,6 +310,11 @@ void PreferencesDialog::lowerCaseToggled(bool b) {
 	settings->printops.lower_case_numbers = b;
 	emit resultDisplayUpdated();
 }
+void PreferencesDialog::duodecimalSymbolsToggled(bool b) {
+	settings->use_duo_syms = b;
+	RESET_SETTINGS_TZ
+	emit resultDisplayUpdated();
+}
 void PreferencesDialog::multiplicationDotToggled(bool b) {
 	if(b) settings->printops.multiplication_sign = MULTIPLICATION_SIGN_ALTDOT;
 	else settings->printops.multiplication_sign = MULTIPLICATION_SIGN_X;
@@ -437,7 +443,7 @@ void PreferencesDialog::complexFormChanged(int i) {
 }
 void PreferencesDialog::roundingChanged(int i) {
 	settings->rounding_mode = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? -21586 : 0);
+	RESET_SETTINGS_TZ
 	settings->printops.round_halfway_to_even = (settings->rounding_mode == 1);
 	emit resultFormatUpdated();
 }

@@ -2589,6 +2589,10 @@ Do you want to overwrite the function?</source>
         <source>Format result</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use special duodecimal symbols</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
