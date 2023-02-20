@@ -244,35 +244,39 @@ bool last_is_operator(std::string str, bool allow_exp) {
 
 void fix_to_struct_qt(MathStructure &m) {
 	if(m.isPower() && m[0].isUnit()) {
-		if(m[0].prefix() == NULL && m[0].unit()->referenceName() == "g") {
-			m[0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(3));
-		} else if(m[0].unit() == CALCULATOR->u_euro) {
+		if(m[0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
 			Unit *u = CALCULATOR->getLocalCurrency();
 			if(u) m[0].setUnit(u);
 		}
+		if(m[0].prefix() == NULL && m[0].unit()->defaultPrefix() != 0) {
+			m[0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[0].unit()->defaultPrefix()));
+		}
 	} else if(m.isUnit()) {
-		if(m.prefix() == NULL && m.unit()->referenceName() == "g") {
-			m.setPrefix(CALCULATOR->getOptimalDecimalPrefix(3));
-		} else if(m.unit() == CALCULATOR->u_euro) {
+		if(m.unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
 			Unit *u = CALCULATOR->getLocalCurrency();
 			if(u) m.setUnit(u);
+		}
+		if(m.prefix() == NULL && m.unit()->defaultPrefix() != 0) {
+			m.setPrefix(CALCULATOR->getOptimalDecimalPrefix(m.unit()->defaultPrefix()));
 		}
 	} else {
 		for(size_t i = 0; i < m.size();) {
 			if(m[i].isUnit()) {
-				if(m[i].prefix() == NULL && m[i].unit()->referenceName() == "g") {
-					m[i].setPrefix(CALCULATOR->getOptimalDecimalPrefix(3));
-				} else if(m[i].unit() == CALCULATOR->u_euro) {
+				if(m[i].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
 					Unit *u = CALCULATOR->getLocalCurrency();
 					if(u) m[i].setUnit(u);
 				}
+				if(m[i].prefix() == NULL && m[i].unit()->defaultPrefix() != 0) {
+					m[i].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[i].unit()->defaultPrefix()));
+				}
 				i++;
 			} else if(m[i].isPower() && m[i][0].isUnit()) {
-				if(m[i][0].prefix() == NULL && m[i][0].unit()->referenceName() == "g") {
-					m[i][0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(3));
-				} else if(m[i][0].unit() == CALCULATOR->u_euro) {
+				if(m[i][0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
 					Unit *u = CALCULATOR->getLocalCurrency();
 					if(u) m[i][0].setUnit(u);
+				}
+				if(m[i][0].prefix() == NULL && m[i][0].unit()->defaultPrefix() != 0) {
+					m[i][0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[i][0].unit()->defaultPrefix()));
 				}
 				i++;
 			} else {
@@ -621,6 +625,10 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 									if(b_match && (!cu || (exp == 1 && cu->countUnits() == 1)) && ((!ename->case_sensitive && equalsIgnoreCase(*namestr, *cmpstr)) || (ename->case_sensitive && *namestr == *cmpstr))) b_match = 1;
 									if(b_match) {
 										if(icmp > 0 && !cu) {
+											if(CALCULATOR->getActiveVariable(str.substr(0, namestr->length() + (str.length() - cmpstr->length()))) || CALCULATOR->getActiveFunction(str.substr(0, namestr->length() + (str.length() - cmpstr->length())))) {
+												b_match = false;
+												continue;
+											}
 											prefix = cdata->prefixes[icmp - 1];
 											i_match = str.length() - cmpstr->length();
 										} else if(b_match > 1 && !cdata->editing_to_expression && item->isHidden() && str.length() == 1) {

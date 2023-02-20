@@ -537,7 +537,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("\n", "<br>");
 	int i = 0;
 	if(!initial_load) {
-		if(!settings->format_result) {
+		if(settings->format_result) {
 			s_text.replace("font-size:normal", "font-size:small ");
 			s_text.replace("width=\"2\"", "width=\"1\"");
 		}
