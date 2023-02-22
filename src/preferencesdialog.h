@@ -26,9 +26,9 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox;
+		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo, *parseCombo, *tcCombo;
+		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -84,6 +84,7 @@ class PreferencesDialog : public QDialog {
 		void appFontToggled(bool);
 		void darkModeToggled(bool);
 		void styleChanged(int);
+		void langChanged(int);
 		void factorizeToggled(bool);
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);

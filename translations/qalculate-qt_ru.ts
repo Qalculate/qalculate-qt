@@ -2593,6 +2593,18 @@ Do you want to overwrite the function?</source>
         <source>Use special duodecimal symbols</source>
         <translation>Использовать специальные двенадцатеричные символы</translation>
     </message>
+    <message>
+        <source>Language:</source>
+        <translation type="unfinished">Язык:</translation>
+    </message>
+    <message>
+        <source>Restart required</source>
+        <translation type="unfinished">Нужен е рестарт</translation>
+    </message>
+    <message>
+        <source>Please restart the program for the language change to take effect.</source>
+        <translation type="unfinished">Моля рестартирайте приложението за да влязат в сила промените на езика.</translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>

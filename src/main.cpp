@@ -61,6 +61,16 @@ int main(int argc, char **argv) {
 	QalculateTranslator eqtr;
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
+		if(!settings->custom_lang.isEmpty()) {
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
+#ifdef _WIN32
+			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
+#else
+			QString lang = settings->custom_lang;
+			if(lang.indexOf(".") < 0) lang += ".utf8";
+			setenv("LANG", lang.toLocal8Bit().data(), 1);
+#endif
+		}
 #ifndef TRANSLATIONS_DIR
 #	define TRANSLATIONS_DIR ":/translations"
 #endif
