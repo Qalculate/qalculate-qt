@@ -108,10 +108,12 @@ QalculateQtSettings::QalculateQtSettings() {
 			if(strcmp(line, "ignore_locale=1\n") == 0) {
 				ignore_locale = true;
 				b1 = true; if(b2) break;
-				break;
 			} else if(strcmp(line, "ignore_locale=0\n") == 0) {
 				b1 = true; if(b2) break;
-				break;
+			} else if(strlen(line) > 9 && strncmp(line, "language=", 9) == 0) {
+				custom_lang = (line + sizeof(char) * 9);
+				custom_lang.chop(1);
+				b1 = true; if(b2) break;
 			} else if(strcmp(line, "allow_multiple_instances=1\n") == 0) {
 				allow_multiple_instances = 1;
 				b2 = true; if(b1) break;
@@ -516,6 +518,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			colorize_result = v;
 		} else if(svar == "format") {
 			format_result = v;
+		} else if(svar == "language") {
+			custom_lang = QString::fromStdString(svalue);
 		} else if(svar == "ignore_locale") {
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
@@ -1126,6 +1130,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	fprintf(file, "version=%s\n", qApp->applicationVersion().toUtf8().data());
 	if(!is_workspace) {
 		fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
+		if(!custom_lang.isEmpty()) fprintf(file, "language=%s\n", custom_lang.toUtf8().data());
 		fprintf(file, "ignore_locale=%i\n", ignore_locale);
 		fprintf(file, "check_version=%i\n", check_version);
 		if(check_version) {

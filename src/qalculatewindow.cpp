@@ -3544,7 +3544,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					else if(equalsIgnoreCase(str1, "prefixes")) list_type = 'p';
 					if(list_type == 'c') {
 						openUnits();
-						unitsDialog->selectCategory(CALCULATOR->u_euro->category());
+						unitsDialog->selectCategory(CALCULATOR->getUnitById(UNIT_ID_EURO)->category());
 						unitsDialog->setSearch(QString::fromStdString(str2));
 					} else if(list_type == 'f') {
 						openFunctions();
@@ -6403,8 +6403,7 @@ void QalculateWindow::openUnits() {
 }
 void remove_nonunits(MathStructure &m) {
 	if(m.isUnit()) {
-		if(m.unit()->referenceName() == "g") m.setPrefix(CALCULATOR->getExactDecimalPrefix(3));
-		else if(m.unit()->referenceName() == "a") m.setPrefix(CALCULATOR->getExactDecimalPrefix(2));
+		if(m.unit()->defaultPrefix() != 0) m.setPrefix(CALCULATOR->getExactDecimalPrefix(m.unit()->defaultPrefix()));
 		else m.setPrefix(NULL);
 	}
 	if(m.size() > 0) {

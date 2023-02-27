@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QFontDialog>
 #include <QStyleFactory>
+#include <QMessageBox>
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -59,6 +60,39 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	int r = 0;
 	l2 = new QGridLayout(w1); l2->setSizeConstraint(QLayout::SetFixedSize);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
+	ignoreLocaleBox = box;
+	l2->addWidget(new QLabel(tr("Language:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Default"));
+	combo->addItem("Català");
+	combo->addItem("Deutsch");
+	combo->addItem("English");
+	combo->addItem("Español");
+	combo->addItem("Français");
+	combo->addItem("ქართული ენა");
+	combo->addItem("Nederlands");
+	combo->addItem("Português do Brasil");
+	combo->addItem("Русский");
+	combo->addItem("Slovenščina");
+	combo->addItem("Svenska");
+	combo->addItem("汉语");
+	QString lang = settings->custom_lang.left(2);
+	if(lang == "ca") combo->setCurrentIndex(1);
+	else if(lang == "de") combo->setCurrentIndex(2);
+	else if(lang == "en") combo->setCurrentIndex(3);
+	else if(lang == "es") combo->setCurrentIndex(4);
+	else if(lang == "fr") combo->setCurrentIndex(5);
+	else if(lang == "ka") combo->setCurrentIndex(6);
+	else if(lang == "nl") combo->setCurrentIndex(7);
+	else if(lang == "pt") combo->setCurrentIndex(8);
+	else if(lang == "ru") combo->setCurrentIndex(9);
+	else if(lang == "sl") combo->setCurrentIndex(10);
+	else if(lang == "sv") combo->setCurrentIndex(11);
+	else if(lang == "zh") combo->setCurrentIndex(12);
+	else combo->setCurrentIndex(0);
+	combo->setEnabled(!settings->ignore_locale);
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
+	l2->addWidget(combo, r, 1); r++; langCombo = combo;
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
@@ -276,6 +310,34 @@ PreferencesDialog::~PreferencesDialog() {}
 
 void PreferencesDialog::ignoreLocaleToggled(bool b) {
 	settings->ignore_locale = b;
+	if(settings->ignore_locale) {
+		langCombo->blockSignals(true);
+		langCombo->setCurrentIndex(0);
+		langCombo->blockSignals(false);
+	}
+	langCombo->setEnabled(!settings->ignore_locale);
+}
+void PreferencesDialog::langChanged(int i) {
+	switch(i) {
+		case 0: {settings->custom_lang = ""; break;}
+		case 1: {settings->custom_lang = "ca_ES"; break;}
+		case 2: {settings->custom_lang = "de_DE"; break;}
+		case 3: {settings->custom_lang = "en_US"; break;}
+		case 4: {settings->custom_lang = "es_ES"; break;}
+		case 5: {settings->custom_lang = "fr_FR"; break;}
+		case 6: {settings->custom_lang = "ka_GE"; break;}
+		case 7: {settings->custom_lang = "nl_NL"; break;}
+		case 8: {settings->custom_lang = "pt_BR"; break;}
+		case 9: {settings->custom_lang = "ru_RU"; break;}
+		case 10: {settings->custom_lang = "sl_SL"; break;}
+		case 11: {settings->custom_lang = "sv_SE"; break;}
+		case 12: {settings->custom_lang = "zh_CN"; break;}
+	}
+	if(!settings->custom_lang.isEmpty()) {
+		ignoreLocaleBox->setChecked(false);
+		settings->ignore_locale = false;
+	}
+	QMessageBox::information(this, tr("Restart required"), tr("Please restart the program for the language change to take effect."), QMessageBox::Close);
 }
 void PreferencesDialog::multipleInstancesToggled(bool b) {
 	settings->allow_multiple_instances = b;
