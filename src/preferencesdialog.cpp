@@ -61,7 +61,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2 = new QGridLayout(w1); l2->setSizeConstraint(QLayout::SetFixedSize);
 	BOX_G(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
 	ignoreLocaleBox = box;
-	l2->addWidget(new QLabel(tr("Language:"), this), r, 0);
+	QLabel *label = new QLabel(tr("Language:"), this);
+	l2->addWidget(label, r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Default"));
 	combo->addItem("Català");
@@ -93,6 +94,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setEnabled(!settings->ignore_locale);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
 	l2->addWidget(combo, r, 1); r++; langCombo = combo;
+#ifndef _WIN32
+	label->hide();
+	combo->hide();
+#endif
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));

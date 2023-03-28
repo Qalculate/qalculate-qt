@@ -249,7 +249,7 @@ void fix_to_struct_qt(MathStructure &m) {
 			if(u) m[0].setUnit(u);
 		}
 		if(m[0].prefix() == NULL && m[0].unit()->defaultPrefix() != 0) {
-			m[0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[0].unit()->defaultPrefix()));
+			m[0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[0].unit()->defaultPrefix()));
 		}
 	} else if(m.isUnit()) {
 		if(m.unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
@@ -257,7 +257,7 @@ void fix_to_struct_qt(MathStructure &m) {
 			if(u) m.setUnit(u);
 		}
 		if(m.prefix() == NULL && m.unit()->defaultPrefix() != 0) {
-			m.setPrefix(CALCULATOR->getOptimalDecimalPrefix(m.unit()->defaultPrefix()));
+			m.setPrefix(CALCULATOR->getExactDecimalPrefix(m.unit()->defaultPrefix()));
 		}
 	} else {
 		for(size_t i = 0; i < m.size();) {
@@ -267,7 +267,7 @@ void fix_to_struct_qt(MathStructure &m) {
 					if(u) m[i].setUnit(u);
 				}
 				if(m[i].prefix() == NULL && m[i].unit()->defaultPrefix() != 0) {
-					m[i].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[i].unit()->defaultPrefix()));
+					m[i].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i].unit()->defaultPrefix()));
 				}
 				i++;
 			} else if(m[i].isPower() && m[i][0].isUnit()) {
@@ -276,7 +276,7 @@ void fix_to_struct_qt(MathStructure &m) {
 					if(u) m[i][0].setUnit(u);
 				}
 				if(m[i][0].prefix() == NULL && m[i][0].unit()->defaultPrefix() != 0) {
-					m[i][0].setPrefix(CALCULATOR->getOptimalDecimalPrefix(m[i][0].unit()->defaultPrefix()));
+					m[i][0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i][0].unit()->defaultPrefix()));
 				}
 				i++;
 			} else {
@@ -1131,7 +1131,7 @@ void ExpressionEdit::updateCompletion() {
 			} else {
 				Variable *v = CALCULATOR->variables[i];
 				if(v->isKnown()) {
-					if(((KnownVariable*) v)->isExpression()) {
+					if(((KnownVariable*) v)->isExpression() && !v->isLocal()) {
 						ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
 						title = QString::fromStdString(CALCULATOR->localizeExpression(((KnownVariable*) v)->expression(), pa));
 						if(title.length() > MAX_COMPLETION_LENGTH_2) {title = title.left(MAX_COMPLETION_LENGTH_2); title += "…";}
@@ -1142,8 +1142,13 @@ void ExpressionEdit::updateCompletion() {
 						} else if(((KnownVariable*) v)->get().isVector()) {
 							title = tr("vector");
 						} else {
-							PrintOptions po;
+							PrintOptions po = settings->printops;
+							po.can_display_unicode_string_arg = (void*) completionView;
 							po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+							po.base = 10;
+							po.number_fraction_format = FRACTION_DECIMAL_EXACT;
+							po.allow_non_usable = true;
+							po.is_approximate = NULL;
 							title = QString::fromStdString(CALCULATOR->print(((KnownVariable*) v)->get(), MAX_COMPLETION_LENGTH_2, po));
 							if(title.length() > MAX_COMPLETION_LENGTH_2) {title = title.left(MAX_COMPLETION_LENGTH_2); title += "…";}
 						}

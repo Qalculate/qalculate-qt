@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
-	app.setApplicationVersion("4.5.1");
+	app.setApplicationVersion("4.6.0");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -65,12 +65,29 @@ int main(int argc, char **argv) {
 			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
 #ifdef _WIN32
 			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
+		} else {
+			ULONG nlang = 0;
+			DWORD n = 0;
+			if(GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &nlang, NULL, &n)) {
+				WCHAR wlocale[n];
+				if(GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &nlang, wlocale, &n)) {
+					std::string lang = utf8_encode(wlocale);
+					if(!lang.empty()) {
+						gsub("-", "_", lang);
+						if(lang != QLocale().name().toStdString()) {
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country()));
+						}
+						_putenv_s("LANG", lang.c_str());
+					}
+				}
+			}
+		}
 #else
 			QString lang = settings->custom_lang;
 			if(lang.indexOf(".") < 0) lang += ".utf8";
 			setenv("LANG", lang.toLocal8Bit().data(), 1);
-#endif
 		}
+#endif
 #ifndef TRANSLATIONS_DIR
 #	define TRANSLATIONS_DIR ":/translations"
 #endif
