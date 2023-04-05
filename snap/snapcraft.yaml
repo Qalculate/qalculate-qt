@@ -45,8 +45,6 @@ parts:
     source-tag: v4.6.0
     source-depth: 1
     plugin: autotools
-    configflags:
-      - --prefix=/usr
     build-environment:
       - CXXFLAGS: "$CXXFLAGS -fsigned-char"
     build-packages:
