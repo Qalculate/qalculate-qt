@@ -2599,11 +2599,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished">Требуется перезапуск</translation>
+        <translation>Требуется перезапуск</translation>
     </message>
     <message>
         <source>Please restart the program for the language change to take effect.</source>
-        <translation type="unfinished">Пожалуйста, перезапустите приложение, чтобы изменение языка вступили в силу.</translation>
+        <translation>Пожалуйста, перезапустите приложение, чтобы изменение языка вступили в силу.</translation>
     </message>
 </context>
 <context>
