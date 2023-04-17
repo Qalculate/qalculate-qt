@@ -2575,14 +2575,17 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
 		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
+		settings->evalops.parse_options.preserve_format = false;
 		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
+		settings->evalops.parse_options.preserve_format = false;
 		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+	} else {
+		settings->evalops.parse_options.preserve_format = false;
 	}
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-	settings->evalops.parse_options.preserve_format = false;
 }
 
 void ExpressionEdit::onTextChanged() {

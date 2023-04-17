@@ -5887,7 +5887,7 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation>base numérique %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation>Données de l&apos;objet</translation>
     </message>

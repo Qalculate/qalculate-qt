@@ -6441,7 +6441,7 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished">数字进制 %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation type="unfinished">数据对象</translation>
     </message>

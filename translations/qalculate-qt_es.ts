@@ -6392,7 +6392,7 @@ Do you want to overwrite the function?</source>
         <translation>base numérica %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation>Objeto de datos</translation>
     </message>

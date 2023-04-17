@@ -6584,7 +6584,7 @@ Möchten Sie die Funktion überschreiben?</translation>
         <translation type="unfinished">Zahlenbasis %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation type="unfinished">Datenobjekt</translation>
     </message>
