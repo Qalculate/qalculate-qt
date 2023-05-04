@@ -10460,7 +10460,7 @@ Möchten Sie die aktuelle Aktion (%1) ersetzen?</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="672"/>
         <source>Custom</source>
-        <translation type="unfinished">Bentutzerdefiniert</translation>
+        <translation type="unfinished">Benutzerdefiniert</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="674"/>
