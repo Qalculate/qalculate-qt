@@ -242,52 +242,6 @@ bool last_is_operator(std::string str, bool allow_exp) {
 	return false;
 }
 
-void fix_to_struct_qt(MathStructure &m) {
-	if(m.isPower() && m[0].isUnit()) {
-		if(m[0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-			Unit *u = CALCULATOR->getLocalCurrency();
-			if(u) m[0].setUnit(u);
-		}
-		if(m[0].prefix() == NULL && m[0].unit()->defaultPrefix() != 0) {
-			m[0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[0].unit()->defaultPrefix()));
-		}
-	} else if(m.isUnit()) {
-		if(m.unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-			Unit *u = CALCULATOR->getLocalCurrency();
-			if(u) m.setUnit(u);
-		}
-		if(m.prefix() == NULL && m.unit()->defaultPrefix() != 0) {
-			m.setPrefix(CALCULATOR->getExactDecimalPrefix(m.unit()->defaultPrefix()));
-		}
-	} else {
-		for(size_t i = 0; i < m.size();) {
-			if(m[i].isUnit()) {
-				if(m[i].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-					Unit *u = CALCULATOR->getLocalCurrency();
-					if(u) m[i].setUnit(u);
-				}
-				if(m[i].prefix() == NULL && m[i].unit()->defaultPrefix() != 0) {
-					m[i].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i].unit()->defaultPrefix()));
-				}
-				i++;
-			} else if(m[i].isPower() && m[i][0].isUnit()) {
-				if(m[i][0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-					Unit *u = CALCULATOR->getLocalCurrency();
-					if(u) m[i][0].setUnit(u);
-				}
-				if(m[i][0].prefix() == NULL && m[i][0].unit()->defaultPrefix() != 0) {
-					m[i][0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i][0].unit()->defaultPrefix()));
-				}
-				i++;
-			} else {
-				m.delChild(i + 1);
-			}
-		}
-		if(m.size() == 0) m.clear();
-		if(m.size() == 1) m.setToChild(1);
-	}
-}
-
 bool contains_imaginary_number(MathStructure &m) {
 	if(m.isNumber() && m.number().hasImaginaryPart()) return true;
 	for(size_t i = 0; i < m.size(); i++) {
@@ -2155,6 +2109,8 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	return true;
 }
 
+extern MathStructure get_units_for_parsed_expression(const MathStructure *parsed_struct, Unit *to_unit, const EvaluationOptions &eo, const MathStructure *mstruct = NULL);
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) return;
@@ -2497,29 +2453,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					if(v) {
 						mparse = v;
 					} else {
-						bool b_unit = mparse.containsType(STRUCT_UNIT, false, true, true);
 						CALCULATOR->beginTemporaryStopMessages();
 						CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
 						int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
-						if(i_error) {
-							ParseOptions pa = settings->evalops.parse_options;
-							pa.units_enabled = true;
-							CALCULATOR->parse(&mparse, str_u, pa);
-						} else {
-							if(i_warn > 0) had_warnings = true;
-							if(i_error > 0) had_errors = true;
-							mparse = cu.generateMathStructure(true);
-						}
-						mparse.format(po);
-						if(!had_to_conv && cu.countUnits() > 0 && !b_unit && !str_e.empty() && str_w.empty()) {
+						if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty() && str_w.empty()) {
 							CALCULATOR->beginTemporaryStopMessages();
-							MathStructure to_struct(&cu);
-							to_struct.unformat();
-							ApproximationMode abak = settings->evalops.approximation;
-							if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-							to_struct = CALCULATOR->convertToOptimalUnit(to_struct, settings->evalops, true);
-							settings->evalops.approximation = abak;
-							fix_to_struct_qt(to_struct);
+							MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
 							if(!to_struct.isZero()) {
 								mparse2 = new MathStructure();
 								CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
@@ -2534,6 +2473,16 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							}
 							CALCULATOR->endTemporaryStopMessages();
 						}
+						if(i_error) {
+							ParseOptions pa = settings->evalops.parse_options;
+							pa.units_enabled = true;
+							CALCULATOR->parse(&mparse, str_u, pa);
+						} else {
+							if(i_warn > 0) had_warnings = true;
+							if(i_error > 0) had_errors = true;
+							mparse = cu.generateMathStructure(true);
+						}
+						mparse.format(po);
 					}
 					CALCULATOR->beginTemporaryStopMessages();
 					parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);

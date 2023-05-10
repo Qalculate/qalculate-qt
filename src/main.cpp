@@ -210,6 +210,7 @@ int main(int argc, char **argv) {
 
 	CALCULATOR->loadLocalDefinitions();
 
+	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 
 	QalculateWindow *win = new QalculateWindow();

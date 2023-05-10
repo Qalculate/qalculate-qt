@@ -349,9 +349,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
 		}
 	} else if(svar == "angle_unit") {
-		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
+		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_CUSTOM) {
 			evalops.parse_options.angle_unit = (AngleUnit) v;
 		}
+	} else if(svar == "custom_angle_unit") {
+		custom_angle_unit = svalue;
 	} else if(svar == "functions_enabled") {
 		evalops.parse_options.functions_enabled = v;
 	} else if(svar == "variables_enabled") {
@@ -749,6 +751,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.parse_options.limit_implicit_multiplication = false;
 	evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
 	evalops.parse_options.angle_unit = ANGLE_UNIT_RADIANS;
+	custom_angle_unit = "";
 	evalops.parse_options.dot_as_separator = CALCULATOR->default_dot_as_separator;
 	evalops.parse_options.comma_as_separator = false;
 	evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
@@ -968,6 +971,13 @@ void QalculateQtSettings::loadPreferences() {
 		if(!loadWorkspace(current_workspace.c_str())) current_workspace = "";
 	}
 
+}
+void QalculateQtSettings::setCustomAngleUnit() {
+	if(!custom_angle_unit.empty()) {
+		CALCULATOR->setCustomAngleUnit(CALCULATOR->getActiveUnit(custom_angle_unit));
+		if(CALCULATOR->customAngleUnit()) custom_angle_unit = CALCULATOR->customAngleUnit()->referenceName();
+	}
+	if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
 }
 void QalculateQtSettings::updateFavourites() {
 	if(favourite_functions_pre.empty()) {
@@ -1305,6 +1315,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
 		fprintf(file, "structuring=%i\n", evalops.structuring);
 		fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
+		if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit()) fprintf(file, "custom_angle_unit=%s\n", CALCULATOR->customAngleUnit()->referenceName().c_str());
 		fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
 		fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
 		fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);

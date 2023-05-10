@@ -443,6 +443,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
 	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
+	action = menu->addAction("Other"); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setData(ANGLE_UNIT_CUSTOM); action->setVisible(false);
+	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM || settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
 
 	ADD_SECTION(tr("Approximation"));
 	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
@@ -2566,13 +2568,24 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "deg") || equalsIgnoreCase(svalue, "degrees")) v = ANGLE_UNIT_DEGREES;
 		else if(equalsIgnoreCase(svalue, "gra") || equalsIgnoreCase(svalue, "gradians")) v = ANGLE_UNIT_GRADIANS;
 		else if(equalsIgnoreCase(svalue, "none")) v = ANGLE_UNIT_NONE;
+		else if(equalsIgnoreCase(svalue, "custom")) v = ANGLE_UNIT_CUSTOM;
 		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
-		}
-		if(v < 0 || v > 3) {
-			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			QAction *w = find_child_data(this, "group_angleunit", v);
+			Unit *u = CALCULATOR->getActiveUnit(svalue);
+			if(u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1 && u->isActive() && u->isRegistered() && !u->isHidden()) {
+				if(u == CALCULATOR->getRadUnit()) v = ANGLE_UNIT_RADIANS;
+				else if(u == CALCULATOR->getGraUnit()) v = ANGLE_UNIT_GRADIANS;
+				else if(u == CALCULATOR->getDegUnit()) v = ANGLE_UNIT_DEGREES;
+				else {v = ANGLE_UNIT_CUSTOM; CALCULATOR->setCustomAngleUnit(u);}
+			}
+		}
+		if(v < 0 || v > 4) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) {
+			CALCULATOR->error(true, "Please specify a custom angle unit as argument (e.g. set angle arcsec).", NULL);
+		} else {
+			QAction *w = find_child_data(this, "group_angleunit", v == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : v);
 			if(w) w->setChecked(true);
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
@@ -7464,11 +7477,12 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 			w->setValue(CALCULATOR->getPrecision());
 			w->blockSignals(false);
 		}
+		settings->setCustomAngleUnit();
 		action = find_child_data(this, "group_type", CALCULATOR->defaultAssumptions()->type());
 		if(action) action->setChecked(true);
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) action->setChecked(true);
-		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
+		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : settings->evalops.parse_options.angle_unit);
 		if(action) action->setChecked(true);
 		action = NULL;
 		if(settings->dual_approximation < 0) action = findChild<QAction*>("action_autoappr");

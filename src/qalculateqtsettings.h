@@ -194,6 +194,7 @@ class QalculateQtSettings : QObject {
 		void updatePalette();
 		void updateMessagePrintOptions();
 		void updateFavourites();
+		void setCustomAngleUnit();
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
@@ -214,6 +215,7 @@ class QalculateQtSettings : QObject {
 		EvaluationOptions evalops;
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
+		std::string custom_angle_unit;
 		QString custom_lang;
 		int rounding_mode;
 		bool use_duo_syms;
