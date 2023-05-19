@@ -170,6 +170,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->replace_expression));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Automatically copy result"), settings->autocopy_result, autocopyResultToggled(bool));
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -680,6 +681,9 @@ void PreferencesDialog::closeEvent(QCloseEvent *e) {
 }
 void PreferencesDialog::replaceExpressionChanged(int i) {
 	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+}
+void PreferencesDialog::autocopyResultToggled(bool b) {
+	settings->autocopy_result = b;
 }
 void PreferencesDialog::historyExpressionChanged(int i) {
 	settings->history_expression_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();

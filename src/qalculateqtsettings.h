@@ -233,6 +233,7 @@ class QalculateQtSettings : QObject {
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
+		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
 		int show_keypad;

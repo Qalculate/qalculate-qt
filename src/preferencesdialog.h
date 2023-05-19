@@ -88,6 +88,7 @@ class PreferencesDialog : public QDialog {
 		void factorizeToggled(bool);
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);
+		void autocopyResultToggled(bool);
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
 		void historyExpressionChanged(int);

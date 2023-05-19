@@ -2964,10 +2964,12 @@ void ExpressionEdit::selectAll(bool b) {
 	if(b) {
 		cur.select(QTextCursor::Document);
 		setTextCursor(cur);
+		if(!document()->isEmpty()) QApplication::clipboard()->setText(toPlainText(), QClipboard::Selection);
 		cursor_has_moved = false;
 	} else if(cur.hasSelection()) {
 		cur.setPosition(cur.selectionEnd());
 		setTextCursor(cur);
+		if(!document()->isEmpty()) QApplication::clipboard()->clear(QClipboard::Selection);
 	}
 }
 void ExpressionEdit::insertBrackets() {

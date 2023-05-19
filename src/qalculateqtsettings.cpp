@@ -480,6 +480,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
+		} else if(svar == "autocopy_result") {
+			autocopy_result = v;
 		} else if(svar == "history_expression_type") {
 			history_expression_type = v;
 		} else if(svar == "window_geometry") {
@@ -812,6 +814,7 @@ void QalculateQtSettings::loadPreferences() {
 	light_style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
+	autocopy_result = false;
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
@@ -1196,6 +1199,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
+		fprintf(file, "autocopy_result=%i\n", autocopy_result);
 		fprintf(file, "history_expression_type=%i\n", history_expression_type);
 	}
 	if(read_default) {

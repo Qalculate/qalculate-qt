@@ -4371,6 +4371,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->setExpressionHasChanged(false);
+		if(settings->autocopy_result) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(result_text)));
 	}
 
 	if(CALCULATOR->checkSaveFunctionCalled()) {
