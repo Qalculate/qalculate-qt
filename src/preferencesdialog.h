@@ -93,6 +93,7 @@ class PreferencesDialog : public QDialog {
 		void clearHistoryToggled(bool);
 		void historyExpressionChanged(int);
 		void copyAsciiToggled(bool);
+		void copyAsciiWithoutUnitsToggled(bool);
 		void caretAsXorToggled(bool);
 
 	public:

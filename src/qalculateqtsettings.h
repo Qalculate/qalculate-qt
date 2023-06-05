@@ -35,7 +35,7 @@ std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);
 std::string unformat(std::string str, bool restorable = false);
-std::string uncolorize(std::string str);
+std::string uncolorize(std::string str, bool remove_class = true);
 std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
@@ -153,12 +153,16 @@ typedef enum {
 	SHORTCUT_TYPE_MENU,
 	SHORTCUT_TYPE_HELP,
 	SHORTCUT_TYPE_QUIT,
-	SHORTCUT_TYPE_HISTORY_CLEAR
+	SHORTCUT_TYPE_HISTORY_CLEAR,
+	SHORTCUT_TYPE_PRECISION,
+	SHORTCUT_TYPE_MIN_DECIMALS,
+	SHORTCUT_TYPE_MAX_DECIMALS,
+	SHORTCUT_TYPE_MINMAX_DECIMALS
 } shortcut_type;
 
-#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_HISTORY_CLEAR
+#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_MINMAX_DECIMALS
 
-#define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE)
+#define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE || x == SHORTCUT_TYPE_PRECISION || x == SHORTCUT_TYPE_MAX_DECIMALS || x == SHORTCUT_TYPE_MIN_DECIMALS || x == SHORTCUT_TYPE_MINMAX_DECIMALS)
 
 struct keyboard_shortcut {
 	QString key;
@@ -244,7 +248,7 @@ class QalculateQtSettings : QObject {
 		bool rpn_shown;
 		bool auto_calculate;
 		int history_expression_type;
-		bool copy_ascii;
+		bool copy_ascii, copy_ascii_without_units;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

@@ -647,6 +647,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			caret_as_xor = v;
 		} else if(svar == "copy_ascii") {
 			copy_ascii = v;
+		} else if(svar == "copy_ascii_without_units") {
+			copy_ascii_without_units = v;
 		} else if(svar == "decimal_comma") {
 			decimal_comma = v;
 			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
@@ -778,6 +780,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_shown = false;
 	caret_as_xor = false;
 	copy_ascii = false;
+	copy_ascii_without_units = false;
 	do_imaginary_j = false;
 	simplified_percentage = true;
 	color = 1;
@@ -1262,6 +1265,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 		fprintf(file, "copy_ascii=%i\n", copy_ascii);
+		fprintf(file, "copy_ascii_without_units=%i\n", copy_ascii_without_units);
 		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
@@ -1783,6 +1787,10 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
 		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
 		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}
+		case SHORTCUT_TYPE_PRECISION: {return tr("Set precision");}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {return tr("Toggle max decimals");}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {return tr("Toggle min decimals");}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {return tr("Toggle max/min decimals");}
 		case SHORTCUT_TYPE_RPN_MODE: {return tr("Toggle RPN mode");}
 		case SHORTCUT_TYPE_GENERAL_KEYPAD: {return tr("Show general keypad");}
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {return tr("Toggle programming keypad");}
@@ -1877,6 +1885,18 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
 			if(base == BASE_CUSTOM && nbase.isZero()) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported base."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_PRECISION: {}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			bool ok = false;
+			int v = value.toInt(&ok, 10);
+			if(!ok || v < -1 || (type == SHORTCUT_TYPE_PRECISION && v < 2)) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
 				return false;
 			}
 			break;

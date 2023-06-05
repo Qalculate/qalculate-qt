@@ -1245,7 +1245,15 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
 				if(settings->copy_ascii) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0], true))));
+					std::string str = settings->v_result[settings->v_result.size() - 1][0];
+					if(settings->copy_ascii_without_units) {
+						size_t i = str.find("<span style=\"color:#008000\">");
+						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+						if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+							str = str.substr(0, i);
+						}
+					}
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 				} else {
 					QMimeData *qm = new QMimeData();
 					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
@@ -1330,6 +1338,78 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {
 			QKeyEvent e(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
 			expressionEdit->keyPressEvent(&e);
+			break;
+		}
+		case SHORTCUT_TYPE_PRECISION: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_precision");
+			if(w) {
+				w->blockSignals(true);
+				w->setValue(v);
+				w->blockSignals(false);
+			}
+			CALCULATOR->setPrecision(v);
+			expressionCalculationUpdated();
+			break;
+		}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w) w->setValue(-1);
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_mindecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v)) {
+				if(w) w->setValue(0);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w1 = findChild<QSpinBox*>("spinbox_mindecimals");
+			QSpinBox *w2 = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w1) w1->blockSignals(true);
+			if(w2) w2->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v && settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w1) w1->setValue(0);
+				if(w2) w2->setValue(-1);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w1) w1->setValue(v);
+				if(w2) w2->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w1) w1->blockSignals(false);
+			if(w2) w2->blockSignals(false);
+			resultFormatUpdated(true);
 			break;
 		}
 		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {functionsAction->trigger(); break;}
@@ -4371,7 +4451,25 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->setExpressionHasChanged(false);
-		if(settings->autocopy_result) QApplication::clipboard()->setText(QString::fromStdString(unhtmlize(result_text)));
+		if(settings->autocopy_result) {
+			if(settings->copy_ascii) {
+				std::string str = result_text;
+				if(settings->copy_ascii_without_units) {
+					size_t i = str.find("<span style=\"color:#008000\">");
+					if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+					if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+						str = str.substr(0, i);
+					}
+				}
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(uncolorize(result_text)));
+				qm->setText(QString::fromStdString(unhtmlize(result_text)));
+				qm->setObjectName("history_result");
+				QApplication::clipboard()->setMimeData(qm);
+			}
+		}
 	}
 
 	if(CALCULATOR->checkSaveFunctionCalled()) {
@@ -4783,7 +4881,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, settings->format_result, settings->color, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -4814,12 +4912,12 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->color, TAG_TYPE_HTML);
 
 		if(!prepend_mstruct.isUndefined() && !CALCULATOR->aborted()) {
 			prepend_mstruct.format(po);
 			po.min_exp = 0;
-			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML));
+			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->color, TAG_TYPE_HTML));
 		}
 
 		if(!b_stack) {
@@ -6054,6 +6152,12 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR), shortcutActionList);
 				item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
 				if(ks && ks->type == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
+			} else if(i == SHORTCUT_TYPE_SIMPLE_NOTATION) {
+				for(int i2 = SHORTCUT_TYPE_PRECISION; i2 <= SHORTCUT_TYPE_MINMAX_DECIMALS; i2++) {
+					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
+					item->setData(Qt::UserRole, i2);
+					if((!ks && i2 == 0) || (ks && i2 == ks->type)) shortcutActionList->setCurrentItem(item);
+				}
 			}
 		}
 		shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());

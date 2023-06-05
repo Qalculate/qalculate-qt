@@ -1415,7 +1415,15 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Copy)) {
 		if(!textCursor().hasSelection() && !settings->v_result.empty()) {
 			if(settings->copy_ascii) {
-				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+				std::string str = settings->v_result[settings->v_result.size() - 1][0];
+				if(settings->copy_ascii_without_units) {
+					size_t i = str.find("<span style=\"color:#008000\">");
+					if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+					if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+						str = str.substr(0, i);
+					}
+				}
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 			} else {
 				QMimeData *qm = new QMimeData();
 				qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));

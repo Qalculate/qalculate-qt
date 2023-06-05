@@ -231,15 +231,17 @@ void replace_colors(std::string &str) {
 		gsub(":/icons/dark/actions", ":/icons/actions", str);
 	}
 }
-std::string uncolorize(std::string str) {
+std::string uncolorize(std::string str, bool remove_class) {
 	size_t i = 0;
 	while(true) {
 		i = str.find(" style=\"color:#", i);
 		if(i == std::string::npos) break;
 		str.erase(i, 22);
 	}
-	gsub(" class=\"nous\"", "", str);
-	gsub(" class=\"symbol\"", "", str);
+	if(remove_class) {
+		gsub(" class=\"nous\"", "", str);
+		gsub(" class=\"symbol\"", "", str);
+	}
 	i = 0;
 	size_t i2 = 0, i1 = 0;
 	int depth = 0;
@@ -415,7 +417,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += QString("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				if(pexact) str += "= ";
 				else str += SIGN_ALMOST_EQUAL " ";
-				str += QString::fromStdString(replace_parse_colors(parse));
+				if(!settings->colorize_result) str += QString::fromStdString(uncolorize(parse, false));
+				else str += QString::fromStdString(replace_parse_colors(parse));
 				str += "</a>";
 				str += "</i>";
 			} else {
@@ -426,7 +429,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		} else {
 			str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
-			str += QString::fromStdString(parse);
+			if(!settings->colorize_result) str += QString::fromStdString(uncolorize(parse, false));
+			else str += QString::fromStdString(parse);
 			str += "</a>";
 			if(b_parse_error && !expression.empty()) {
 				str += "&nbsp;&nbsp;&nbsp; ";
@@ -506,7 +510,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		if(b_exact > 0) str += "= ";
 		else if(b_exact == 0) str += SIGN_ALMOST_EQUAL " ";
-		str += QString::fromStdString(values[i]);
+		if(!settings->colorize_result) str += QString::fromStdString(uncolorize(values[i], false));
+		else str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) {
 			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"").arg(image).arg(fm.ascent());
 			CALCULATOR->setExchangeRatesUsed(-100);
@@ -1239,7 +1244,15 @@ void HistoryView::editCopy(int ascii) {
 		} else {
 			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) {
 				if(ascii) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[i1][i2], true))));
+					std::string str = settings->v_result[i1][i2];
+					if(settings->copy_ascii_without_units) {
+						size_t i = str.find("<span style=\"color:#008000\">");
+						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+						if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+							str = str.substr(0, i);
+						}
+					}
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 				} else {
 					QMimeData *qm = new QMimeData();
 					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2])));
