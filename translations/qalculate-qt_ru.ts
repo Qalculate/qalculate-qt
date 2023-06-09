@@ -3175,19 +3175,19 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Toggle precision</source>
-        <translation type="unfinished">Переключать точность</translation>
+        <translation>Переключить точность</translation>
     </message>
     <message>
         <source>Toggle max decimals</source>
-        <translation type="unfinished">Переключать максимальное количество десятичных знаков</translation>
+        <translation>Переключить максимальное количество десятичных знаков</translation>
     </message>
     <message>
         <source>Toggle min decimals</source>
-        <translation type="unfinished">Переключать минимальное количество десятичных знаков</translation>
+        <translation>Переключить минимальное количество десятичных знаков</translation>
     </message>
     <message>
         <source>Toggle max/min decimals</source>
-        <translation type="unfinished">Переключать максимальное/минимальное количество десятичных знаков</translation>
+        <translation>Переключить максимальное/минимальное количество десятичных знаков</translation>
     </message>
 </context>
 <context>
