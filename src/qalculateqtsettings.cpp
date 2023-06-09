@@ -194,13 +194,23 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		int ks_type = 0;
 		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
 		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-			keyboard_shortcut *ks = new keyboard_shortcut;
-			if(n == 3) {ks->value = str2; remove_blank_ends(ks->value);}
-			ks->type = (shortcut_type) ks_type;
-			ks->key = str1;
-			ks->new_action = false;
-			ks->action = NULL;
-			keyboard_shortcuts.push_back(ks);
+			keyboard_shortcut *ks = NULL;
+			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+				if(keyboard_shortcuts[i]->key == str1) {
+					ks = keyboard_shortcuts[i];
+					break;
+				}
+			}
+			if(!ks) {
+				ks = new keyboard_shortcut;
+				ks->key = str1;
+				ks->new_action = false;
+				ks->action = NULL;
+				keyboard_shortcuts.push_back(ks);
+			}
+			if(n == 3) {ks->value.push_back(str2); remove_blank_ends(ks->value[ks->value.size() - 1]);}
+			else ks->value.push_back("");
+			ks->type.push_back((shortcut_type) ks_type);
 		}
 	} else if(!is_workspace && svar == "custom_button_label") {
 		int c = 0, r = 0;
@@ -268,6 +278,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		printops.use_max_decimals = v;
 	} else if(svar == "precision") {
 		CALCULATOR->setPrecision(v);
+	} else if(svar == "previous_precision") {
+		previous_precision = v;
 	} else if(svar == "min_exp") {
 		printops.min_exp = v;
 	} else if(svar == "interval_arithmetic") {
@@ -689,6 +701,7 @@ void QalculateQtSettings::loadPreferences() {
 	f_answer = CALCULATOR->addFunction(new AnswerFunction());
 
 	CALCULATOR->setPrecision(10);
+	previous_precision = 0;
 	CALCULATOR->useIntervalArithmetic(true);
 	CALCULATOR->setTemperatureCalculationMode(TEMPERATURE_CALCULATION_HYBRID);
 	CALCULATOR->useBinaryPrefixes(0);
@@ -911,7 +924,7 @@ void QalculateQtSettings::loadPreferences() {
 	}
 
 	keyboard_shortcut *ks;
-#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type = t; ks->value = v; ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
+#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type.push_back(t); ks->value.push_back(v); ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
 	if(default_shortcuts) {
 #ifdef _WIN32
 		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
@@ -1235,8 +1248,10 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		}
 		if(!default_shortcuts) {
 			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-				if(keyboard_shortcuts[i]->value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type);
-				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type, keyboard_shortcuts[i]->value.c_str());
+				for(size_t i2 = 0; i2 < keyboard_shortcuts[i]->type.size(); i2++) {
+					if(keyboard_shortcuts[i]->value[i2].empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2]);
+					else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2], keyboard_shortcuts[i]->value[i2].c_str());
+				}
 			}
 		}
 		if(favourite_functions_changed) {
@@ -1284,6 +1299,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}
 	if(read_default) {
 		fprintf(file, "\n[Mode]\n");
@@ -1724,6 +1740,15 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	last_version_check_date.setToCurrentDate();
 }
 
+QString QalculateQtSettings::shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value) {
+	if(type.size() == 1) return shortcutText(type[0], value[0]);
+	QString str;
+	for(size_t i = 0; i < type.size(); i++) {
+		if(!str.isEmpty()) str += ", ";
+		str += shortcutText(type[i], value[i]);
+	}
+	return str;
+}
 QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 	if(type < 0) return QString();
 	switch(type) {
@@ -1787,7 +1812,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
 		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
 		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}
-		case SHORTCUT_TYPE_PRECISION: {return tr("Set precision");}
+		case SHORTCUT_TYPE_PRECISION: {return tr("Toggle precision");}
 		case SHORTCUT_TYPE_MAX_DECIMALS: {return tr("Toggle max decimals");}
 		case SHORTCUT_TYPE_MIN_DECIMALS: {return tr("Toggle min decimals");}
 		case SHORTCUT_TYPE_MINMAX_DECIMALS: {return tr("Toggle max/min decimals");}

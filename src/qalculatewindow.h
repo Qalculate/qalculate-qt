@@ -94,7 +94,8 @@ class QalculateWindow : public QMainWindow {
 		CalendarConversionDialog *calendarConversionDialog;
 		QDialog *shortcutsDialog, *shortcutActionDialog;
 		QComboBox *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
-		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton;
+		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton, *shortcutActionAddButton; keyboard_shortcut *edited_keyboard_shortcut;
+
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock, *rpnDock;
@@ -252,8 +253,9 @@ class QalculateWindow : public QMainWindow {
 		void editShortcutClicked();
 		void removeShortcutClicked();
 		void shortcutActionOKClicked();
+		void shortcutActionAddClicked();
 		void updateShortcutActionOK();
-		void currentShortcutActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void currentShortcutActionChanged();
 		void currentShortcutChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 		void shortcutDoubleClicked(QTreeWidgetItem*, int);
 		void saveWorkspace();

@@ -166,8 +166,8 @@ typedef enum {
 
 struct keyboard_shortcut {
 	QString key;
-	shortcut_type type;
-	std::string value;
+	std::vector<shortcut_type> type;
+	std::vector<std::string> value;
 	QAction *action;
 	bool new_action;
 };
@@ -205,6 +205,7 @@ class QalculateQtSettings : QObject {
 		bool isAnswerVariable(Variable *v);
 		QString shortcutTypeText(shortcut_type type);
 		QString shortcutText(int type, const std::string &value);
+		QString shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value);
 		bool testShortcutValue(int type, QString &value, QWidget *parent = NULL);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
@@ -219,6 +220,7 @@ class QalculateQtSettings : QObject {
 		EvaluationOptions evalops;
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
+		int previous_precision;
 		std::string custom_angle_unit;
 		QString custom_lang;
 		int rounding_mode;
