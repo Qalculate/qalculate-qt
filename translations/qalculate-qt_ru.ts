@@ -2605,6 +2605,14 @@ Do you want to overwrite the function?</source>
         <source>Please restart the program for the language change to take effect.</source>
         <translation>Пожалуйста, перезапустите приложение, чтобы изменение языка вступили в силу.</translation>
     </message>
+    <message>
+        <source>Automatically copy result</source>
+        <translation>Автоматически копировать результат</translation>
+    </message>
+    <message>
+        <source>Copy unformatted ASCII without units</source>
+        <translation>Копировать неформатированный ASCII без единиц измерения</translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -2731,6 +2739,10 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <source>Unsupported base.</source>
         <translation>Неподдерживаемое основание.</translation>
+    </message>
+    <message>
+        <source>Unsupported value.</source>
+        <translation>Неподдерживаемое значение.</translation>
     </message>
 </context>
 <context>
@@ -3160,6 +3172,22 @@ You can get version %3 at %2.</source>
     <message>
         <source>Clear history</source>
         <translation>Очистить историю</translation>
+    </message>
+    <message>
+        <source>Toggle precision</source>
+        <translation type="unfinished">Переключать точность</translation>
+    </message>
+    <message>
+        <source>Toggle max decimals</source>
+        <translation type="unfinished">Переключать максимальное количество десятичных знаков</translation>
+    </message>
+    <message>
+        <source>Toggle min decimals</source>
+        <translation type="unfinished">Переключать минимальное количество десятичных знаков</translation>
+    </message>
+    <message>
+        <source>Toggle max/min decimals</source>
+        <translation type="unfinished">Переключать максимальное/минимальное количество десятичных знаков</translation>
     </message>
 </context>
 <context>
@@ -4051,6 +4079,10 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>Error</source>
         <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Add Action (%1)</source>
+        <translation>Добавить действие (%1)</translation>
     </message>
 </context>
 <context>
