@@ -6499,7 +6499,7 @@ Voleu sobreescriure la funció?</translation>
         <translation>base numèrica %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation>Objecte de dades</translation>
     </message>

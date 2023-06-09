@@ -6584,7 +6584,7 @@ Möchten Sie die Funktion überschreiben?</translation>
         <translation type="unfinished">Zahlenbasis %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation type="unfinished">Datenobjekt</translation>
     </message>
@@ -10460,7 +10460,7 @@ Möchten Sie die aktuelle Aktion (%1) ersetzen?</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="672"/>
         <source>Custom</source>
-        <translation type="unfinished">Bentutzerdefiniert</translation>
+        <translation type="unfinished">Benutzerdefiniert</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="674"/>

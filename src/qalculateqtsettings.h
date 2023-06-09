@@ -35,7 +35,7 @@ std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);
 std::string unformat(std::string str, bool restorable = false);
-std::string uncolorize(std::string str);
+std::string uncolorize(std::string str, bool remove_class = true);
 std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);
 bool last_is_operator(std::string str, bool allow_exp = false);
@@ -153,17 +153,21 @@ typedef enum {
 	SHORTCUT_TYPE_MENU,
 	SHORTCUT_TYPE_HELP,
 	SHORTCUT_TYPE_QUIT,
-	SHORTCUT_TYPE_HISTORY_CLEAR
+	SHORTCUT_TYPE_HISTORY_CLEAR,
+	SHORTCUT_TYPE_PRECISION,
+	SHORTCUT_TYPE_MIN_DECIMALS,
+	SHORTCUT_TYPE_MAX_DECIMALS,
+	SHORTCUT_TYPE_MINMAX_DECIMALS
 } shortcut_type;
 
-#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_HISTORY_CLEAR
+#define LAST_SHORTCUT_TYPE SHORTCUT_TYPE_MINMAX_DECIMALS
 
-#define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE)
+#define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE || x == SHORTCUT_TYPE_PRECISION || x == SHORTCUT_TYPE_MAX_DECIMALS || x == SHORTCUT_TYPE_MIN_DECIMALS || x == SHORTCUT_TYPE_MINMAX_DECIMALS)
 
 struct keyboard_shortcut {
 	QString key;
-	shortcut_type type;
-	std::string value;
+	std::vector<shortcut_type> type;
+	std::vector<std::string> value;
 	QAction *action;
 	bool new_action;
 };
@@ -194,12 +198,14 @@ class QalculateQtSettings : QObject {
 		void updatePalette();
 		void updateMessagePrintOptions();
 		void updateFavourites();
+		void setCustomAngleUnit();
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
 		bool isAnswerVariable(Variable *v);
 		QString shortcutTypeText(shortcut_type type);
 		QString shortcutText(int type, const std::string &value);
+		QString shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value);
 		bool testShortcutValue(int type, QString &value, QWidget *parent = NULL);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
@@ -214,6 +220,8 @@ class QalculateQtSettings : QObject {
 		EvaluationOptions evalops;
 		PrintOptions printops;
 		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
+		int previous_precision;
+		std::string custom_angle_unit;
 		QString custom_lang;
 		int rounding_mode;
 		bool use_duo_syms;
@@ -231,6 +239,7 @@ class QalculateQtSettings : QObject {
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
 		int replace_expression;
+		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
 		int show_keypad;
@@ -241,7 +250,7 @@ class QalculateQtSettings : QObject {
 		bool rpn_shown;
 		bool auto_calculate;
 		int history_expression_type;
-		bool copy_ascii;
+		bool copy_ascii, copy_ascii_without_units;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;

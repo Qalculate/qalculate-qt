@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
-	app.setApplicationVersion("4.6.0");
+	app.setApplicationVersion("4.6.1");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -210,6 +210,7 @@ int main(int argc, char **argv) {
 
 	CALCULATOR->loadLocalDefinitions();
 
+	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 
 	QalculateWindow *win = new QalculateWindow();

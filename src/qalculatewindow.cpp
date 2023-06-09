@@ -443,6 +443,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
 	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
+	action = menu->addAction("Other"); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setData(ANGLE_UNIT_CUSTOM); action->setVisible(false);
+	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM || settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
 
 	ADD_SECTION(tr("Approximation"));
 	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
@@ -916,7 +918,7 @@ void QalculateWindow::loadShortcuts() {
 	}
 }
 void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
-	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+	if(ks->type[0] == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
 		expressionEdit->enableTabCompletion(false);
 		return;
 	}
@@ -929,122 +931,124 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	QList<QKeySequence> shortcuts = ks->action->shortcuts();
 	shortcuts.removeAll(QKeySequence::fromString(ks->key));
 	ks->action->setShortcuts(shortcuts);
-	if(ks->type == SHORTCUT_TYPE_PLOT && plotAction_t) {
+	if(ks->type[0] == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_STORE) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
 		storeAction->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
 		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
 		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_CONVERT) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
 		toAction->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MODE) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
 		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MENU) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
 		menuAction_t->setToolTip(tr("Menu") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
 		rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
 		rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
 		rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
 		rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
 		rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
 		rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
 		rpnClearAction->setToolTip(tr("Clear the RPN stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	}
 }
 void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
-	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+	if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
 		expressionEdit->enableTabCompletion(true);
 		ks->new_action = false;
 		return;
 	}
 	QAction *action = NULL;
-	switch(ks->type) {
-		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
-		case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
-		case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
-		case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
-		case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
-		case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
-		case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
-		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
-		case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
-		case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
-		case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
-		case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
-		case SHORTCUT_TYPE_GRADIANS: {action = graAction; break;}
-		case SHORTCUT_TYPE_NORMAL_NOTATION: {action = normalAction; break;}
-		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {action = sciAction; break;}
-		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {action = engAction; break;}
-		case SHORTCUT_TYPE_SIMPLE_NOTATION: {action = simpleAction; break;}
-		case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
-		case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
-		case SHORTCUT_TYPE_GENERAL_KEYPAD: {action = gKeypadAction; break;}
-		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
-		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
-		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
-		case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
-		case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
-		case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
-		case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
-		case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
-		case SHORTCUT_TYPE_HISTORY_SEARCH: {action = historyView->findAction; break;}
-		case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
-		case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
-		case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
-		case SHORTCUT_TYPE_RPN_DOWN: {action = rpnDownAction; break;}
-		case SHORTCUT_TYPE_RPN_SWAP: {action = rpnSwapAction; break;}
-		case SHORTCUT_TYPE_RPN_LASTX: {action = rpnLastxAction; break;}
-		case SHORTCUT_TYPE_RPN_COPY: {action = rpnCopyAction; break;}
-		case SHORTCUT_TYPE_RPN_DELETE: {action = rpnDeleteAction; break;}
-		case SHORTCUT_TYPE_RPN_CLEAR: {action = rpnClearAction; break;}
-		default: {}
+	if(ks->type.size() == 1) {
+		switch(ks->type[0]) {
+			case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
+			case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
+			case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
+			case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
+			case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
+			case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
+			case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
+			case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
+			case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
+			case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
+			case SHORTCUT_TYPE_GRADIANS: {action = graAction; break;}
+			case SHORTCUT_TYPE_NORMAL_NOTATION: {action = normalAction; break;}
+			case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {action = sciAction; break;}
+			case SHORTCUT_TYPE_ENGINEERING_NOTATION: {action = engAction; break;}
+			case SHORTCUT_TYPE_SIMPLE_NOTATION: {action = simpleAction; break;}
+			case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
+			case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
+			case SHORTCUT_TYPE_GENERAL_KEYPAD: {action = gKeypadAction; break;}
+			case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
+			case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
+			case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
+			case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
+			case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
+			case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
+			case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
+			case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
+			case SHORTCUT_TYPE_HISTORY_SEARCH: {action = historyView->findAction; break;}
+			case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
+			case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
+			case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
+			case SHORTCUT_TYPE_RPN_DOWN: {action = rpnDownAction; break;}
+			case SHORTCUT_TYPE_RPN_SWAP: {action = rpnSwapAction; break;}
+			case SHORTCUT_TYPE_RPN_LASTX: {action = rpnLastxAction; break;}
+			case SHORTCUT_TYPE_RPN_COPY: {action = rpnCopyAction; break;}
+			case SHORTCUT_TYPE_RPN_DELETE: {action = rpnDeleteAction; break;}
+			case SHORTCUT_TYPE_RPN_CLEAR: {action = rpnClearAction; break;}
+			default: {}
+		}
 	}
 	if(action) {
 		ks->new_action = false;
 		QList<QKeySequence> shortcuts = action->shortcuts();
 		shortcuts << QKeySequence::fromString(ks->key);
 		action->setShortcuts(shortcuts);
-		if(ks->type == SHORTCUT_TYPE_PLOT) {
+		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_STORE) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
 			storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
 			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
 			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MODE) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
 			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MENU) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
 			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
 			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
 			rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
 			rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
 			rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
 			rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
 			rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
 			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
 	} else {
-		if(ks->type == SHORTCUT_TYPE_CONVERT) {
+		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
 			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		}
 		ks->new_action = true;
@@ -1058,7 +1062,9 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 }
 void QalculateWindow::shortcutActivated() {
 	keyboard_shortcut *ks = (keyboard_shortcut*) qobject_cast<QAction*>(sender())->data().value<void*>();
-	triggerShortcut(ks->type, ks->value);
+	for(size_t i = 0; i < ks->type.size(); i++) {
+		triggerShortcut(ks->type[i], ks->value[i]);
+	}
 }
 void QalculateWindow::shortcutClicked(int type, const QString &value) {
 	triggerShortcut((shortcut_type) type, value.toStdString());
@@ -1243,7 +1249,15 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_COPY_RESULT: {
 			if(!settings->v_result.empty()) {
 				if(settings->copy_ascii) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0], true))));
+					std::string str = settings->v_result[settings->v_result.size() - 1][0];
+					if(settings->copy_ascii_without_units) {
+						size_t i = str.find("<span style=\"color:#008000\">");
+						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+						if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+							str = str.substr(0, i);
+						}
+					}
+					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 				} else {
 					QMimeData *qm = new QMimeData();
 					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
@@ -1328,6 +1342,84 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {
 			QKeyEvent e(QEvent::KeyPress, Qt::Key_PageUp, Qt::NoModifier);
 			expressionEdit->keyPressEvent(&e);
+			break;
+		}
+		case SHORTCUT_TYPE_PRECISION: {
+			int v = s2i(value);
+			if(settings->previous_precision > 0 && CALCULATOR->getPrecision() == v) {
+				v = settings->previous_precision;
+				settings->previous_precision = 0;
+			} else {
+				settings->previous_precision = CALCULATOR->getPrecision();
+			}
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_precision");
+			if(w) {
+				w->blockSignals(true);
+				w->setValue(v);
+				w->blockSignals(false);
+			}
+			CALCULATOR->setPrecision(v);
+			expressionCalculationUpdated();
+			break;
+		}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w) w->setValue(-1);
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_mindecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v)) {
+				if(w) w->setValue(0);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w1 = findChild<QSpinBox*>("spinbox_mindecimals");
+			QSpinBox *w2 = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w1) w1->blockSignals(true);
+			if(w2) w2->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v && settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w1) w1->setValue(0);
+				if(w2) w2->setValue(-1);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w1) w1->setValue(v);
+				if(w2) w2->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w1) w1->blockSignals(false);
+			if(w2) w2->blockSignals(false);
+			resultFormatUpdated(true);
 			break;
 		}
 		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {functionsAction->trigger(); break;}
@@ -2566,13 +2658,24 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "deg") || equalsIgnoreCase(svalue, "degrees")) v = ANGLE_UNIT_DEGREES;
 		else if(equalsIgnoreCase(svalue, "gra") || equalsIgnoreCase(svalue, "gradians")) v = ANGLE_UNIT_GRADIANS;
 		else if(equalsIgnoreCase(svalue, "none")) v = ANGLE_UNIT_NONE;
+		else if(equalsIgnoreCase(svalue, "custom")) v = ANGLE_UNIT_CUSTOM;
 		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
-		}
-		if(v < 0 || v > 3) {
-			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			QAction *w = find_child_data(this, "group_angleunit", v);
+			Unit *u = CALCULATOR->getActiveUnit(svalue);
+			if(u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1 && u->isActive() && u->isRegistered() && !u->isHidden()) {
+				if(u == CALCULATOR->getRadUnit()) v = ANGLE_UNIT_RADIANS;
+				else if(u == CALCULATOR->getGraUnit()) v = ANGLE_UNIT_GRADIANS;
+				else if(u == CALCULATOR->getDegUnit()) v = ANGLE_UNIT_DEGREES;
+				else {v = ANGLE_UNIT_CUSTOM; CALCULATOR->setCustomAngleUnit(u);}
+			}
+		}
+		if(v < 0 || v > 4) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) {
+			CALCULATOR->error(true, "Please specify a custom angle unit as argument (e.g. set angle arcsec).", NULL);
+		} else {
+			QAction *w = find_child_data(this, "group_angleunit", v == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : v);
 			if(w) w->setChecked(true);
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
@@ -2797,6 +2900,7 @@ void QalculateWindow::setOption(std::string str) {
 				w->blockSignals(false);
 			}
 			CALCULATOR->setPrecision(v);
+			settings->previous_precision = 0;
 			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "interval display") || svar == "ivdisp") {
@@ -4358,6 +4462,25 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->setExpressionHasChanged(false);
+		if(settings->autocopy_result) {
+			if(settings->copy_ascii) {
+				std::string str = result_text;
+				if(settings->copy_ascii_without_units) {
+					size_t i = str.find("<span style=\"color:#008000\">");
+					if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+					if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+						str = str.substr(0, i);
+					}
+				}
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(uncolorize(result_text)));
+				qm->setText(QString::fromStdString(unhtmlize(result_text)));
+				qm->setObjectName("history_result");
+				QApplication::clipboard()->setMimeData(qm);
+			}
+		}
 	}
 
 	if(CALCULATOR->checkSaveFunctionCalled()) {
@@ -4769,7 +4892,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, settings->format_result, settings->color, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -4800,12 +4923,12 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->color, TAG_TYPE_HTML);
 
 		if(!prepend_mstruct.isUndefined() && !CALCULATOR->aborted()) {
 			prepend_mstruct.format(po);
 			po.min_exp = 0;
-			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML));
+			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->color, TAG_TYPE_HTML));
 		}
 
 		if(!b_stack) {
@@ -5732,6 +5855,7 @@ void QalculateWindow::simpleActivated() {
 }
 void QalculateWindow::onPrecisionChanged(int v) {
 	CALCULATOR->setPrecision(v);
+	settings->previous_precision = 0;
 	expressionCalculationUpdated(500);
 }
 void QalculateWindow::onMinDecimalsChanged(int v) {
@@ -5929,21 +6053,51 @@ void QalculateWindow::removeShortcutClicked() {
 }
 void QalculateWindow::updateShortcutActionOK() {
 	QListWidgetItem *item = shortcutActionList->currentItem();
-	shortcutActionOKButton->setEnabled(item && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()));
+	if(!item || !item->isSelected()) {
+		shortcutActionOKButton->setEnabled(edited_keyboard_shortcut->type.size() > 0);
+		shortcutActionAddButton->setEnabled(false);
+	} else if(!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()) {
+		shortcutActionOKButton->setEnabled(true);
+		shortcutActionAddButton->setEnabled(true);
+	} else {
+		shortcutActionOKButton->setEnabled(false);
+		shortcutActionAddButton->setEnabled(false);
+	}
 }
 void QalculateWindow::shortcutActionOKClicked() {
 	QString value = shortcutActionValueEdit->currentText();
 	QListWidgetItem *item = shortcutActionList->currentItem();
-	if(!item) return;
+	if(!item || !item->isSelected()) {
+		if(edited_keyboard_shortcut->type.size() > 0) shortcutActionDialog->accept();
+		return;
+	}
 	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+		edited_keyboard_shortcut->value.push_back(shortcutActionValueEdit->currentText().trimmed().toStdString());
 		shortcutActionDialog->accept();
 	} else {
 		shortcutActionValueEdit->setFocus();
 	}
 	shortcutActionValueEdit->setCurrentText(value);
 }
-void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
-	if(!item || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+void QalculateWindow::shortcutActionAddClicked() {
+	QString value = shortcutActionValueEdit->currentText();
+	QListWidgetItem *item = shortcutActionList->currentItem();
+	if(!item || !item->isSelected()) return;
+	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+		edited_keyboard_shortcut->value.push_back(shortcutActionValueEdit->currentText().trimmed().toStdString());
+		shortcutActionValueEdit->clear();
+		shortcutActionList->setCurrentItem(NULL);
+		shortcutActionAddButton->setText(tr("Add Action (%1)").arg(edited_keyboard_shortcut->type.size() + 1));
+	} else {
+		shortcutActionValueEdit->setFocus();
+		shortcutActionValueEdit->setCurrentText(value);
+	}
+}
+void QalculateWindow::currentShortcutActionChanged() {
+	QListWidgetItem *item = shortcutActionList->currentItem();
+	if(!item || !item->isSelected() || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
 		shortcutActionValueEdit->clear();
 		shortcutActionValueEdit->clearEditText();
 		shortcutActionValueEdit->setEnabled(false);
@@ -5951,18 +6105,16 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 		return;
 	}
 	int i = item->data(Qt::UserRole).toInt();
-	int i_prev = -1;
-	if(item_prev) i_prev = item_prev->data(Qt::UserRole).toInt();
 	shortcutActionValueEdit->setEnabled(true);
 	shortcutActionValueLabel->setEnabled(true);
 	if(i == SHORTCUT_TYPE_FUNCTION || i == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
-		if(i_prev != SHORTCUT_TYPE_FUNCTION && i_prev != SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
+		QStringList citems;
+		for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+			MathFunction *f = CALCULATOR->functions[i];
+			if(f->isActive() && !f->isHidden()) citems << QString::fromStdString(f->referenceName());
+		}
+		if(shortcutActionValueEdit->count() != citems.count()) {
 			shortcutActionValueEdit->clear();
-			QStringList citems;
-			for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
-				MathFunction *f = CALCULATOR->functions[i];
-				if(f->isActive() && !f->isHidden()) citems << QString::fromStdString(f->referenceName());
-			}
 			citems.sort(Qt::CaseInsensitive);
 			shortcutActionValueEdit->addItems(citems);
 			shortcutActionValueEdit->clearEditText();
@@ -6019,6 +6171,9 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 	shortcutActionList = NULL;
 	shortcutActionValueEdit = NULL;
 	shortcutActionDialog = NULL;
+	new_ks->type.clear();
+	new_ks->value.clear();
+	edited_keyboard_shortcut = new_ks;
 	if(type != 2) {
 		dialog = new QDialog(this);
 		shortcutActionDialog = dialog;
@@ -6034,12 +6189,18 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), shortcutActionList);
 				item->setData(Qt::UserRole, i);
-				if((!ks && i == 0) || (ks && i == ks->type)) shortcutActionList->setCurrentItem(item);
+				if(new_ks->type.size() == 0 && ((!ks && i == 0) || (ks && i == ks->type[0]))) shortcutActionList->setCurrentItem(item);
 			}
 			if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR), shortcutActionList);
 				item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
-				if(ks && ks->type == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
+				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
+			} else if(i == SHORTCUT_TYPE_SIMPLE_NOTATION) {
+				for(int i2 = SHORTCUT_TYPE_PRECISION; i2 <= SHORTCUT_TYPE_MINMAX_DECIMALS; i2++) {
+					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
+					item->setData(Qt::UserRole, i2);
+					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
+				}
 			}
 		}
 		shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());
@@ -6053,92 +6214,91 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 		buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 		buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+		shortcutActionAddButton = buttonBox->addButton(tr("Add Action (%1)").arg(1), QDialogButtonBox::ApplyRole);
+		connect(shortcutActionAddButton, SIGNAL(clicked()), this, SLOT(shortcutActionAddClicked()));
 		box->addWidget(buttonBox);
 		connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(shortcutActionOKClicked()));
 		connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
-		connect(shortcutActionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateShortcutActionOK()));
-		connect(shortcutActionList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentShortcutActionChanged(QListWidgetItem*, QListWidgetItem*)));
+		connect(shortcutActionList, SIGNAL(itemSelectionChanged()), this, SLOT(currentShortcutActionChanged()), Qt::QueuedConnection);
+		connect(shortcutActionList, SIGNAL(itemSelectionChanged()), this, SLOT(updateShortcutActionOK()), Qt::QueuedConnection);
 		connect(shortcutActionValueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateShortcutActionOK()));
 		shortcutActionOKButton = buttonBox->button(QDialogButtonBox::Ok);
-		currentShortcutActionChanged(shortcutActionList->currentItem(), NULL);
-		if(ks) shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value));
+		currentShortcutActionChanged();
+		if(ks) shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value[0]));
 		updateShortcutActionOK();
 		shortcutActionList->setFocus();
 		dialog->resize(dialog->sizeHint().width(), dialog->sizeHint().width() * 1.25);
-	}
-	if(!dialog || dialog->exec() == QDialog::Accepted) {
-		if(dialog) dialog->deleteLater();
-		if(type == 1) {
-			new_ks->key = ks->key;
-			new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
-			new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
-			new_ks->action = NULL;
-			new_ks->new_action = false;
-			return true;
+		if(dialog->exec() != QDialog::Accepted) {
+			dialog->deleteLater();
+			return false;
 		}
-		dialog = new QDialog(this);
-		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-		dialog->setWindowTitle(tr("Set key combination"));
-		QVBoxLayout *box = new QVBoxLayout(dialog);
-		QGridLayout *grid = new QGridLayout();
-		grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
-		QKeySequenceEdit *keyEdit = new QalculateKeySequenceEdit(dialog);
-		grid->addWidget(keyEdit, 1, 0);
-		box->addLayout(grid);
-		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
-		box->addWidget(buttonBox);
-		connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
-		connect(keyEdit, SIGNAL(editingFinished()), dialog, SLOT(accept()));
-		keyEdit->setFocus();
-		while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
-			QString key = keyEdit->keySequence().toString();
-			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || 
+		dialog->deleteLater();
+	}
+	if(type == 1) {
+		new_ks->key = ks->key;
+		new_ks->action = NULL;
+		new_ks->new_action = false;
+		return true;
+	}
+	dialog = new QDialog(this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Set key combination"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	QGridLayout *grid = new QGridLayout();
+	grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
+	QKeySequenceEdit *keyEdit = new QalculateKeySequenceEdit(dialog);
+	grid->addWidget(keyEdit, 1, 0);
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	connect(keyEdit, SIGNAL(editingFinished()), dialog, SLOT(accept()));
+	keyEdit->setFocus();
+	while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
+		QString key = keyEdit->keySequence().toString();
+		if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll ||
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-			keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && keyEdit->keySequence()[0].key() != Qt::Key_Tab && keyEdit->keySequence()[0].key() != Qt::Key_Backtab && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+		keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && keyEdit->keySequence()[0].key() != Qt::Key_Tab && keyEdit->keySequence()[0].key() != Qt::Key_Backtab && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
 #else
-			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0] != Qt::Key_Tab && keyEdit->keySequence()[0] != Qt::Key_Backtab && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
+		(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0] != Qt::Key_Tab && keyEdit->keySequence()[0] != Qt::Key_Backtab && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
 #endif
-			) {
-				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
-				keyEdit->clear();
-				keyEdit->setFocus();
-				continue;
-			}
-			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-				if(settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i]->key == key) {
-					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
-						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
-							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) settings->keyboard_shortcuts[i]) {
-								delete shortcutList->topLevelItem(index);
-								break;
-							}
+		) {
+			QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
+			keyEdit->clear();
+			keyEdit->setFocus();
+			continue;
+		}
+		for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+			if(settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i]->key == key) {
+				if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+					for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
+						if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) settings->keyboard_shortcuts[i]) {
+							delete shortcutList->topLevelItem(index);
+							break;
 						}
-						keyboardShortcutRemoved(settings->keyboard_shortcuts[i]);
-						delete settings->keyboard_shortcuts[i];
-						settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
-						settings->default_shortcuts = false;
-						break;
-					} else {
-						dialog->deleteLater();
-						return false;
 					}
+					keyboardShortcutRemoved(settings->keyboard_shortcuts[i]);
+					delete settings->keyboard_shortcuts[i];
+					settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
+					settings->default_shortcuts = false;
+					break;
+				} else {
+					dialog->deleteLater();
+					return false;
 				}
 			}
-			new_ks->key = key;
-			if(shortcutActionList) {
-				new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
-				new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
-			} else {
-				new_ks->type = ks->type;
-				new_ks->value = ks->value;
-			}
-			new_ks->action = NULL;
-			new_ks->new_action = false;
-			dialog->deleteLater();
-			return true;
 		}
+		new_ks->key = key;
+		if(type == 2) {
+			new_ks->type = ks->type;
+			new_ks->value = ks->value;
+		}
+		new_ks->action = NULL;
+		new_ks->new_action = false;
+		dialog->deleteLater();
+		return true;
 	}
-	if(dialog) dialog->deleteLater();
+	dialog->deleteLater();
 	return false;
 }
 void QalculateWindow::addShortcutClicked() {
@@ -7464,11 +7624,12 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 			w->setValue(CALCULATOR->getPrecision());
 			w->blockSignals(false);
 		}
+		settings->setCustomAngleUnit();
 		action = find_child_data(this, "group_type", CALCULATOR->defaultAssumptions()->type());
 		if(action) action->setChecked(true);
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) action->setChecked(true);
-		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
+		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : settings->evalops.parse_options.angle_unit);
 		if(action) action->setChecked(true);
 		action = NULL;
 		if(settings->dual_approximation < 0) action = findChild<QAction*>("action_autoappr");

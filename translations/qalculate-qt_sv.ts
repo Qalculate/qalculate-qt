@@ -7545,7 +7545,7 @@ Vill du ersätta den?</translation>
         <translation>talbas %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation>Dataobjekt</translation>
     </message>

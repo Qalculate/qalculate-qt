@@ -194,13 +194,23 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		int ks_type = 0;
 		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
 		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-			keyboard_shortcut *ks = new keyboard_shortcut;
-			if(n == 3) {ks->value = str2; remove_blank_ends(ks->value);}
-			ks->type = (shortcut_type) ks_type;
-			ks->key = str1;
-			ks->new_action = false;
-			ks->action = NULL;
-			keyboard_shortcuts.push_back(ks);
+			keyboard_shortcut *ks = NULL;
+			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+				if(keyboard_shortcuts[i]->key == str1) {
+					ks = keyboard_shortcuts[i];
+					break;
+				}
+			}
+			if(!ks) {
+				ks = new keyboard_shortcut;
+				ks->key = str1;
+				ks->new_action = false;
+				ks->action = NULL;
+				keyboard_shortcuts.push_back(ks);
+			}
+			if(n == 3) {ks->value.push_back(str2); remove_blank_ends(ks->value[ks->value.size() - 1]);}
+			else ks->value.push_back("");
+			ks->type.push_back((shortcut_type) ks_type);
 		}
 	} else if(!is_workspace && svar == "custom_button_label") {
 		int c = 0, r = 0;
@@ -268,6 +278,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		printops.use_max_decimals = v;
 	} else if(svar == "precision") {
 		CALCULATOR->setPrecision(v);
+	} else if(svar == "previous_precision") {
+		previous_precision = v;
 	} else if(svar == "min_exp") {
 		printops.min_exp = v;
 	} else if(svar == "interval_arithmetic") {
@@ -349,9 +361,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
 		}
 	} else if(svar == "angle_unit") {
-		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
+		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_CUSTOM) {
 			evalops.parse_options.angle_unit = (AngleUnit) v;
 		}
+	} else if(svar == "custom_angle_unit") {
+		custom_angle_unit = svalue;
 	} else if(svar == "functions_enabled") {
 		evalops.parse_options.functions_enabled = v;
 	} else if(svar == "variables_enabled") {
@@ -478,6 +492,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
+		} else if(svar == "autocopy_result") {
+			autocopy_result = v;
 		} else if(svar == "history_expression_type") {
 			history_expression_type = v;
 		} else if(svar == "window_geometry") {
@@ -643,6 +659,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			caret_as_xor = v;
 		} else if(svar == "copy_ascii") {
 			copy_ascii = v;
+		} else if(svar == "copy_ascii_without_units") {
+			copy_ascii_without_units = v;
 		} else if(svar == "decimal_comma") {
 			decimal_comma = v;
 			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
@@ -683,6 +701,7 @@ void QalculateQtSettings::loadPreferences() {
 	f_answer = CALCULATOR->addFunction(new AnswerFunction());
 
 	CALCULATOR->setPrecision(10);
+	previous_precision = 0;
 	CALCULATOR->useIntervalArithmetic(true);
 	CALCULATOR->setTemperatureCalculationMode(TEMPERATURE_CALCULATION_HYBRID);
 	CALCULATOR->useBinaryPrefixes(0);
@@ -749,6 +768,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.parse_options.limit_implicit_multiplication = false;
 	evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
 	evalops.parse_options.angle_unit = ANGLE_UNIT_RADIANS;
+	custom_angle_unit = "";
 	evalops.parse_options.dot_as_separator = CALCULATOR->default_dot_as_separator;
 	evalops.parse_options.comma_as_separator = false;
 	evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
@@ -773,6 +793,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_shown = false;
 	caret_as_xor = false;
 	copy_ascii = false;
+	copy_ascii_without_units = false;
 	do_imaginary_j = false;
 	simplified_percentage = true;
 	color = 1;
@@ -809,6 +830,7 @@ void QalculateQtSettings::loadPreferences() {
 	light_style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
+	autocopy_result = false;
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
@@ -872,7 +894,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 4;
 	preferences_version[1] = 6;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -902,7 +924,7 @@ void QalculateQtSettings::loadPreferences() {
 	}
 
 	keyboard_shortcut *ks;
-#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type = t; ks->value = v; ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
+#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type.push_back(t); ks->value.push_back(v); ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
 	if(default_shortcuts) {
 #ifdef _WIN32
 		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
@@ -968,6 +990,13 @@ void QalculateQtSettings::loadPreferences() {
 		if(!loadWorkspace(current_workspace.c_str())) current_workspace = "";
 	}
 
+}
+void QalculateQtSettings::setCustomAngleUnit() {
+	if(!custom_angle_unit.empty()) {
+		CALCULATOR->setCustomAngleUnit(CALCULATOR->getActiveUnit(custom_angle_unit));
+		if(CALCULATOR->customAngleUnit()) custom_angle_unit = CALCULATOR->customAngleUnit()->referenceName();
+	}
+	if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
 }
 void QalculateQtSettings::updateFavourites() {
 	if(favourite_functions_pre.empty()) {
@@ -1186,6 +1215,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
+		fprintf(file, "autocopy_result=%i\n", autocopy_result);
 		fprintf(file, "history_expression_type=%i\n", history_expression_type);
 	}
 	if(read_default) {
@@ -1218,8 +1248,10 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		}
 		if(!default_shortcuts) {
 			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-				if(keyboard_shortcuts[i]->value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type);
-				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type, keyboard_shortcuts[i]->value.c_str());
+				for(size_t i2 = 0; i2 < keyboard_shortcuts[i]->type.size(); i2++) {
+					if(keyboard_shortcuts[i]->value[i2].empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2]);
+					else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2], keyboard_shortcuts[i]->value[i2].c_str());
+				}
 			}
 		}
 		if(favourite_functions_changed) {
@@ -1248,6 +1280,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
 		fprintf(file, "copy_ascii=%i\n", copy_ascii);
+		fprintf(file, "copy_ascii_without_units=%i\n", copy_ascii_without_units);
 		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
@@ -1266,6 +1299,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}
 	if(read_default) {
 		fprintf(file, "\n[Mode]\n");
@@ -1305,6 +1339,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
 		fprintf(file, "structuring=%i\n", evalops.structuring);
 		fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
+		if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit()) fprintf(file, "custom_angle_unit=%s\n", CALCULATOR->customAngleUnit()->referenceName().c_str());
 		fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
 		fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
 		fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);
@@ -1705,6 +1740,15 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	last_version_check_date.setToCurrentDate();
 }
 
+QString QalculateQtSettings::shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value) {
+	if(type.size() == 1) return shortcutText(type[0], value[0]);
+	QString str;
+	for(size_t i = 0; i < type.size(); i++) {
+		if(!str.isEmpty()) str += ", ";
+		str += shortcutText(type[i], value[i]);
+	}
+	return str;
+}
 QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 	if(type < 0) return QString();
 	switch(type) {
@@ -1768,6 +1812,10 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
 		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
 		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}
+		case SHORTCUT_TYPE_PRECISION: {return tr("Toggle precision");}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {return tr("Toggle max decimals");}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {return tr("Toggle min decimals");}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {return tr("Toggle max/min decimals");}
 		case SHORTCUT_TYPE_RPN_MODE: {return tr("Toggle RPN mode");}
 		case SHORTCUT_TYPE_GENERAL_KEYPAD: {return tr("Show general keypad");}
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {return tr("Toggle programming keypad");}
@@ -1862,6 +1910,18 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
 			if(base == BASE_CUSTOM && nbase.isZero()) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported base."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_PRECISION: {}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			bool ok = false;
+			int v = value.toInt(&ok, 10);
+			if(!ok || v < -1 || (type == SHORTCUT_TYPE_PRECISION && v < 2)) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
 				return false;
 			}
 			break;

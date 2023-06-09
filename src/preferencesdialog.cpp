@@ -170,6 +170,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->replace_expression));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Automatically copy result"), settings->autocopy_result, autocopyResultToggled(bool));
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -284,6 +285,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G(tr("Enable all SI-prefixes"), settings->printops.use_all_prefixes, allPrefixesToggled(bool));
 	BOX_G(tr("Enable denominator prefixes"), settings->printops.use_denominator_prefix, denominatorPrefixToggled(bool));
 	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool));
+	BOX_G(tr("Copy unformatted ASCII without units"), settings->copy_ascii_without_units, copyAsciiWithoutUnitsToggled(bool));
 	l2->addWidget(new QLabel(tr("Temperature calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Absolute"), TEMPERATURE_CALCULATION_ABSOLUTE);
@@ -448,7 +450,7 @@ void PreferencesDialog::ignoreCommaToggled(bool b) {
 }
 void PreferencesDialog::colorizeToggled(bool b) {
 	settings->colorize_result = b;
-	emit resultDisplayUpdated();
+	emit historyExpressionTypeChanged();
 }
 void PreferencesDialog::formatToggled(bool b) {
 	settings->format_result = b;
@@ -520,6 +522,9 @@ void PreferencesDialog::repeatingDecimalsToggled(bool b) {
 }
 void PreferencesDialog::copyAsciiToggled(bool b) {
 	settings->copy_ascii = b;
+}
+void PreferencesDialog::copyAsciiWithoutUnitsToggled(bool b) {
+	settings->copy_ascii_without_units = b;
 }
 void PreferencesDialog::caretAsXorToggled(bool b) {
 	settings->caret_as_xor = b;
@@ -680,6 +685,9 @@ void PreferencesDialog::closeEvent(QCloseEvent *e) {
 }
 void PreferencesDialog::replaceExpressionChanged(int i) {
 	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+}
+void PreferencesDialog::autocopyResultToggled(bool b) {
+	settings->autocopy_result = b;
 }
 void PreferencesDialog::historyExpressionChanged(int i) {
 	settings->history_expression_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();

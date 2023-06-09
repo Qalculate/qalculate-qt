@@ -6383,7 +6383,7 @@ Deseja sobrescrever a função?</translation>
         <translation>número base %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2783"/>
+        <location filename="../src/expressionedit.cpp" line="2786"/>
         <source>Data object</source>
         <translation>Onjeto de dados</translation>
     </message>
