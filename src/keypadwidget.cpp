@@ -592,7 +592,7 @@ void KeypadWidget::customActionOKClicked() {
 	valueEdit->setCurrentText(value);
 }
 void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
-	if(!item || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+	if(!item || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
 		valueEdit->clear();
 		valueEdit->clearEditText();
 		valueEdit->setEnabled(false);
@@ -638,8 +638,12 @@ void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidget
 			QStringList citems;
 			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			valueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
+			settings->updateActionValueTexts();
+			valueEdit->addItems(settings->copy_action_value_texts);
 		}
-		valueEdit->clearEditText();
+		if(i == SHORTCUT_TYPE_COPY_RESULT) valueEdit->setCurrentText(settings->copy_action_value_texts[0]);
+		else valueEdit->clearEditText();
 	}
 }
 
@@ -698,7 +702,15 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	connect(valueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateCustomActionOK()));
 	customOKButton = buttonBox->button(QDialogButtonBox::Ok);
 	currentCustomActionChanged(actionList->currentItem(), NULL);
-	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) valueEdit->setCurrentText(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString());
+	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) {
+		QString value = button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString();
+		if(type == SHORTCUT_TYPE_COPY_RESULT) {
+			int v = value.toInt();
+			if(v >= 0 && v < settings->copy_action_value_texts.size()) valueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+		} else {
+			valueEdit->setCurrentText(value);
+		}
+	}
 	customOKButton->setEnabled(false);
 	if(labelEdit) labelEdit->setFocus();
 	else actionList->setFocus();

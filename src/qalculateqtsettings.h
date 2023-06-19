@@ -164,6 +164,8 @@ typedef enum {
 
 #define SHORTCUT_REQUIRES_VALUE(x) (x == SHORTCUT_TYPE_FUNCTION || x == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG || x == SHORTCUT_TYPE_UNIT || x == SHORTCUT_TYPE_VARIABLE || x == SHORTCUT_TYPE_TEXT || x == SHORTCUT_TYPE_OPERATOR || x == SHORTCUT_TYPE_CONVERT_TO || x == SHORTCUT_TYPE_TO_NUMBER_BASE || x == SHORTCUT_TYPE_INPUT_BASE || x == SHORTCUT_TYPE_OUTPUT_BASE || x == SHORTCUT_TYPE_PRECISION || x == SHORTCUT_TYPE_MAX_DECIMALS || x == SHORTCUT_TYPE_MIN_DECIMALS || x == SHORTCUT_TYPE_MINMAX_DECIMALS)
 
+#define SHORTCUT_USES_VALUE(x) (SHORTCUT_REQUIRES_VALUE(x) || x == SHORTCUT_TYPE_COPY_RESULT)
+
 struct keyboard_shortcut {
 	QString key;
 	std::vector<shortcut_type> type;
@@ -206,6 +208,7 @@ class QalculateQtSettings : QObject {
 		QString shortcutTypeText(shortcut_type type);
 		QString shortcutText(int type, const std::string &value);
 		QString shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value);
+		void updateActionValueTexts();
 		bool testShortcutValue(int type, QString &value, QWidget *parent = NULL);
 		void checkVersion(bool force, QWidget *parent);
 		void autoUpdate(std::string new_version, QWidget *parent);
@@ -216,6 +219,7 @@ class QalculateQtSettings : QObject {
 		bool loadWorkspace(const char *filename);
 		bool saveWorkspace(const char *filename);
 		QString workspaceTitle();
+		QStringList copy_action_value_texts;
 
 		EvaluationOptions evalops;
 		PrintOptions printops;

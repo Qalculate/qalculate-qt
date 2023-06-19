@@ -1869,7 +1869,11 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 	}
 	return "-";
 }
-
+void QalculateQtSettings::updateActionValueTexts() {
+	if(copy_action_value_texts.isEmpty()) {
+		copy_action_value_texts << tr("Default") << tr("Formatted result") << tr("Unformatted ASCII result") << tr("Unformatted ASCII result without units") << tr("Formatted expression") << tr("Unformatted ASCII expression") << tr("Formatted expression + result") << tr("Unformatted ASCII expression + result") << tr("Unformatted ASCII expression + result without units");
+	}
+}
 bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w) {
 	switch(type) {
 		case SHORTCUT_TYPE_FUNCTION: {}
@@ -1918,10 +1922,31 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 		case SHORTCUT_TYPE_MIN_DECIMALS: {}
 		case SHORTCUT_TYPE_MAX_DECIMALS: {}
 		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			value = value.trimmed();
 			bool ok = false;
 			int v = value.toInt(&ok, 10);
 			if(!ok || v < -1 || (type == SHORTCUT_TYPE_PRECISION && v < 2)) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_COPY_RESULT: {
+			value = value.trimmed();
+			if(value.isEmpty()) break;
+			int v = -1;
+			if(value.length() > 1) {
+				updateActionValueTexts();
+				v = copy_action_value_texts.indexOf(value);
+				if(v >= 0) value = QString::number(v);
+			} else {
+				bool ok = false;
+				v = value.toInt(&ok, 10);
+				if(!ok) v = -1;
+			}
+			if(v < 0 || v > 8) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
+				value = "";
 				return false;
 			}
 			break;

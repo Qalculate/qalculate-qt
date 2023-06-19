@@ -1247,24 +1247,65 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			break;
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
-			if(!settings->v_result.empty()) {
-				if(settings->copy_ascii) {
+			if(settings->v_result.empty()) break;
+			int v = s2i(value);
+			if(v < 0 || v > 8) v = 0;
+			bool b_ascii = (v != 1 && v != 4 && v != 6 && (v != 0 || settings->copy_ascii));
+			bool b_nounits = (v == 3 || v == 8 || (v == 0 && settings->copy_ascii && settings->copy_ascii_without_units));
+			QString str_ascii, str_html;
+			if(v > 3) {
+				if(settings->history_expression_type == 1 && !settings->v_expression[settings->v_expression.size() - 1].empty()) {
+					if(b_ascii) {
+						str_ascii += QString::fromStdString(unformat(settings->v_expression[settings->v_expression.size() - 1]));
+					} else {
+						str_ascii += QString::fromStdString(settings->v_expression[settings->v_expression.size() - 1]);
+						if(v < 6) b_ascii = true;
+						else str_html += QString::fromStdString(settings->v_expression[settings->v_expression.size() - 1]);
+					}
+				} else {
+					if(b_ascii) {
+						str_ascii += QString::fromStdString(unformat(unhtmlize(settings->v_parse[settings->v_parse.size() - 1], true)));
+					} else {
+						str_html += QString::fromStdString(uncolorize(settings->v_parse[settings->v_parse.size() - 1]));
+						str_ascii += QString::fromStdString(unhtmlize(settings->v_parse[settings->v_parse.size() - 1]));
+					}
+				}
+			}
+			if(v <= 3 || v >= 6) {
+				if(b_ascii) {
+					if(v > 3) str_ascii += " = ";
 					std::string str = settings->v_result[settings->v_result.size() - 1][0];
-					if(settings->copy_ascii_without_units) {
+					if(b_nounits) {
 						size_t i = str.find("<span style=\"color:#008000\">");
 						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
 						if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
 							str = str.substr(0, i);
 						}
 					}
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
+					str_ascii += QString::fromStdString(unformat(unhtmlize(str, true))).trimmed();
 				} else {
-					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
-					qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
-					qm->setObjectName("history_result");
-					QApplication::clipboard()->setMimeData(qm);
+					if(v > 3) {
+						if(settings->v_exact[settings->v_exact.size() - 1][0]) {
+							str_html += " = ";
+							str_ascii += " = ";
+						} else {
+							str_html += " " SIGN_ALMOST_EQUAL " ";
+							str_ascii += " " SIGN_ALMOST_EQUAL " ";
+						}
+					}
+					str_html += QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0]));
+					str_ascii += QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]));
 				}
+			}
+			if(b_ascii) {
+				QApplication::clipboard()->setText(str_ascii);
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(str_html);
+				qm->setText(str_ascii);
+				if(v <= 3 || v >= 6) qm->setObjectName("history_result");
+				else qm->setObjectName("history_expression");
+				QApplication::clipboard()->setMimeData(qm);
 			}
 			break;
 		}
@@ -6073,12 +6114,17 @@ void QalculateWindow::shortcutActionOKClicked() {
 	}
 	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
 		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
-		edited_keyboard_shortcut->value.push_back(shortcutActionValueEdit->currentText().trimmed().toStdString());
+		edited_keyboard_shortcut->value.push_back(value.toStdString());
 		shortcutActionDialog->accept();
 	} else {
 		shortcutActionValueEdit->setFocus();
 	}
-	shortcutActionValueEdit->setCurrentText(value);
+	if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+		int v = value.toInt();
+		if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+	} else {
+		shortcutActionValueEdit->setCurrentText(value);
+	}
 }
 void QalculateWindow::shortcutActionAddClicked() {
 	QString value = shortcutActionValueEdit->currentText();
@@ -6086,18 +6132,23 @@ void QalculateWindow::shortcutActionAddClicked() {
 	if(!item || !item->isSelected()) return;
 	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
 		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
-		edited_keyboard_shortcut->value.push_back(shortcutActionValueEdit->currentText().trimmed().toStdString());
+		edited_keyboard_shortcut->value.push_back(value.toStdString());
 		shortcutActionValueEdit->clear();
 		shortcutActionList->setCurrentItem(NULL);
 		shortcutActionAddButton->setText(tr("Add Action (%1)").arg(edited_keyboard_shortcut->type.size() + 1));
 	} else {
 		shortcutActionValueEdit->setFocus();
-		shortcutActionValueEdit->setCurrentText(value);
+		if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+			int v = value.toInt();
+			if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+		} else {
+			shortcutActionValueEdit->setCurrentText(value);
+		}
 	}
 }
 void QalculateWindow::currentShortcutActionChanged() {
 	QListWidgetItem *item = shortcutActionList->currentItem();
-	if(!item || !item->isSelected() || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+	if(!item || !item->isSelected() || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
 		shortcutActionValueEdit->clear();
 		shortcutActionValueEdit->clearEditText();
 		shortcutActionValueEdit->setEnabled(false);
@@ -6141,8 +6192,12 @@ void QalculateWindow::currentShortcutActionChanged() {
 			QStringList citems;
 			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			shortcutActionValueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
+			settings->updateActionValueTexts();
+			shortcutActionValueEdit->addItems(settings->copy_action_value_texts);
 		}
-		shortcutActionValueEdit->clearEditText();
+		if(i == SHORTCUT_TYPE_COPY_RESULT) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[0]);
+		else shortcutActionValueEdit->clearEditText();
 	}
 }
 class QalculateKeySequenceEdit : public QKeySequenceEdit {
@@ -6224,7 +6279,14 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		connect(shortcutActionValueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateShortcutActionOK()));
 		shortcutActionOKButton = buttonBox->button(QDialogButtonBox::Ok);
 		currentShortcutActionChanged();
-		if(ks) shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value[0]));
+		if(ks) {
+			if(ks->type[0] == SHORTCUT_TYPE_COPY_RESULT) {
+				int v = s2i(ks->value[0]);
+				if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+			} else {
+				shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value[0]));
+			}
+		}
 		updateShortcutActionOK();
 		shortcutActionList->setFocus();
 		dialog->resize(dialog->sizeHint().width(), dialog->sizeHint().width() * 1.25);
