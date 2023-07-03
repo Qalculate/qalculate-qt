@@ -3189,6 +3189,38 @@ You can get version %3 at %2.</source>
         <source>Toggle max/min decimals</source>
         <translation>Переключить максимальное/минимальное количество десятичных знаков</translation>
     </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">По умолчанию</translation>
+    </message>
+    <message>
+        <source>Formatted result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII result without units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Formatted expression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII expression</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Formatted expression + result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII expression + result</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QalculateTranslator</name>
@@ -3556,7 +3588,7 @@ You can get version %3 at %2.</source>
     <message>
         <source>Other:</source>
         <comment>Number base</comment>
-        <translation>Другое:</translation>
+        <translation type="vanished">Другое:</translation>
     </message>
     <message>
         <source>Precision:</source>

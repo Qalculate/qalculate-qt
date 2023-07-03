@@ -52,6 +52,9 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QScrollBar>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QStyleHints>
+#endif
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -437,14 +440,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Angle Unit"));
 	w2 = fm1.boundingRect(tr("Angle Unit")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this); group->setObjectName("group_angleunit");
-	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action; action->setData(ANGLE_UNIT_RADIANS);
+	action = menu->addAction(tr("Radians"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action; action->setData(ANGLE_UNIT_RADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action; action->setData(ANGLE_UNIT_DEGREES);
+	action = menu->addAction(tr("Degrees"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action; action->setData(ANGLE_UNIT_DEGREES);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
+	action = menu->addAction(tr("Gradians"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
-	action = menu->addAction("Other"); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setData(ANGLE_UNIT_CUSTOM); action->setVisible(false);
-	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM || settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
+	menu2 = menu;
+	angleMenu = menu2->addMenu(tr("Other"));
+	menu = menu2;
 
 	ADD_SECTION(tr("Approximation"));
 	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
@@ -531,7 +535,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_E); if(settings->printops.base == BASE_E) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("√2", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_SQRT2); if(settings->printops.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
-	action = menu->addAction(tr("Other:", "Number base"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Custom:", "Number base"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customOutputBaseAction = action;
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
@@ -873,6 +877,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
 	connect(keypad, SIGNAL(factorizeClicked()), this, SLOT(onFactorizeClicked()));
 	connect(keypad, SIGNAL(expandClicked()), this, SLOT(onExpandClicked()));
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
+#endif
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -1505,6 +1512,24 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 bool sort_compare_item(ExpressionItem *o1, ExpressionItem *o2) {
 	return o1->title(true, settings->printops.use_unicode_signs) < o2->title(true, settings->printops.use_unicode_signs);
 }
+void QalculateWindow::updateAngleUnitsMenu() {
+	QActionGroup *group = findChild<QActionGroup*>("group_angleunit");
+	if(!group) return;
+	QMenu *menu = angleMenu;
+	QAction *action = NULL;
+	menu->clear();
+	Unit *u_rad = CALCULATOR->getRadUnit();
+	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+		if(CALCULATOR->units[i]->baseUnit() == u_rad) {
+			Unit *u = CALCULATOR->units[i];
+			if(u != u_rad && !u->isHidden() && u->isActive() && u->baseExponent() == 1 && !u->hasName("gra") && !u->hasName("deg")) {
+				action = menu->addAction(QString::fromStdString(u->title(true)), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_" + QString::fromStdString(u->referenceName())); action->setData(ANGLE_UNIT_CUSTOM); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit() == u) action->setChecked(true);
+			}
+		}
+	}
+	action = menu->addAction(tr("None"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_none"); action->setData(ANGLE_UNIT_NONE); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
+	action = menu->addAction(tr("Other")); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setVisible(false); action->setData(-1); if(!group->checkedAction()) action->setChecked(true);
+}
 void QalculateWindow::updateFunctionsMenu() {
 	functionsMenu->clear();
 	functionsMenu->addAction(tr("New Function…"), this, SLOT(newFunction()));
@@ -1540,6 +1565,7 @@ void QalculateWindow::updateUnitsMenu() {
 			action->setData(QVariant::fromValue((void*) settings->favourite_units[i]));
 		}
 	}
+	updateAngleUnitsMenu();
 }
 void QalculateWindow::updateVariablesMenu() {
 	variablesMenu->clear();
@@ -2716,7 +2742,12 @@ void QalculateWindow::setOption(std::string str) {
 		} else if(v == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) {
 			CALCULATOR->error(true, "Please specify a custom angle unit as argument (e.g. set angle arcsec).", NULL);
 		} else {
-			QAction *w = find_child_data(this, "group_angleunit", v == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : v);
+			QAction *w;
+			if(v == ANGLE_UNIT_CUSTOM) {
+				w = findChild<QAction*>("action_angle_unit" + QString::fromStdString(CALCULATOR->customAngleUnit()->referenceName()));
+			} else {
+				w = find_child_data(this, "group_angleunit", v);
+			}
 			if(w) w->setChecked(true);
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
@@ -5353,6 +5384,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 }
 
+void QalculateWindow::onColorSchemeChanged() {
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	settings->updatePalette(true);
+#endif
+}
 void QalculateWindow::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
 		QColor c = QApplication::palette().base().color();
@@ -5859,9 +5895,14 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool
 	return true;
 }
 
-void QalculateWindow::gradiansActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_GRADIANS; expressionFormatUpdated(true);}
-void QalculateWindow::radiansActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_RADIANS; expressionFormatUpdated(true);}
-void QalculateWindow::degreesActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_DEGREES; expressionFormatUpdated(true);}
+void QalculateWindow::angleUnitActivated() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	settings->evalops.parse_options.angle_unit = (AngleUnit) action->data().toInt();
+	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM) {
+		CALCULATOR->setCustomAngleUnit(CALCULATOR->getActiveUnit(action->objectName().mid(18).toStdString()));
+	}
+	expressionFormatUpdated(true);
+}
 void QalculateWindow::normalActivated() {
 	settings->printops.sort_options.minus_last = true;
 	settings->printops.min_exp = EXP_PRECISION;
@@ -7691,7 +7732,12 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		if(action) action->setChecked(true);
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) action->setChecked(true);
-		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE ? ANGLE_UNIT_CUSTOM : settings->evalops.parse_options.angle_unit);
+		if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) settings->evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
+		if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM) {
+			action = findChild<QAction*>("action_angle_unit" + QString::fromStdString(CALCULATOR->customAngleUnit()->referenceName()));
+		} else {
+			action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
+		}
 		if(action) action->setChecked(true);
 		action = NULL;
 		if(settings->dual_approximation < 0) action = findChild<QAction*>("action_autoappr");

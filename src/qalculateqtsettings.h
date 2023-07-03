@@ -197,7 +197,7 @@ class QalculateQtSettings : QObject {
 		void savePreferences(bool save_mode = true);
 		bool savePreferences(const char *filename, bool is_workspace = false, bool save_mode = true);
 		void updateStyle();
-		void updatePalette();
+		void updatePalette(bool force_update = false);
 		void updateMessagePrintOptions();
 		void updateFavourites();
 		void setCustomAngleUnit();
@@ -233,7 +233,7 @@ class QalculateQtSettings : QObject {
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay;
 		int completion_min, completion_min2;
-		int style, light_style, palette;
+		int style, palette;
 		bool enable_completion, enable_completion2;
 		int color;
 		bool colorize_result;

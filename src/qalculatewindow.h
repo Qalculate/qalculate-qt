@@ -104,7 +104,7 @@ class QalculateWindow : public QMainWindow {
 		QToolBar *tb;
 		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
 		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
-		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
+		QMenu *variablesMenu, *functionsMenu, *unitsMenu, *angleMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
 		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;
@@ -190,9 +190,7 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionFontChanged();
 		void onKeypadFontChanged();
 		void onAppFontChanged();
-		void gradiansActivated();
-		void radiansActivated();
-		void degreesActivated();
+		void angleUnitActivated();
 		void normalActivated();
 		void scientificActivated();
 		void engineeringActivated();
@@ -242,6 +240,7 @@ class QalculateWindow : public QMainWindow {
 		void functionActivated();
 		void unitActivated();
 		void variableActivated();
+		void updateAngleUnitsMenu();
 		void updateFunctionsMenu();
 		void updateUnitsMenu();
 		void updateVariablesMenu();
@@ -263,6 +262,7 @@ class QalculateWindow : public QMainWindow {
 		void openWorkspace();
 		void openDefaultWorkspace();
 		void openRecentWorkspace();
+		void onColorSchemeChanged();
 
 
 	public slots:

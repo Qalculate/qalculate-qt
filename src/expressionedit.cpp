@@ -2487,7 +2487,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							CALCULATOR->parse(&mparse, str_u, pa);
 						} else {
 							if(i_warn > 0) had_warnings = true;
-							if(i_error > 0) had_errors = true;
 							mparse = cu.generateMathStructure(true);
 						}
 						mparse.format(po);

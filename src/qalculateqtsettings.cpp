@@ -21,6 +21,9 @@
 #include <QColor>
 #include <QProgressDialog>
 #include <QKeySequence>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QStyleHints>
+#endif
 #include <QDebug>
 
 #define PREFERENCES_VERSION_BEFORE(i1, i2, i3) (preferences_version[0] < i1 || (preferences_version[0] == i1 && (preferences_version[1] < i2 || (preferences_version[1] == i2 && preferences_version[2] < i3))))
@@ -201,16 +204,22 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 					break;
 				}
 			}
-			if(!ks) {
-				ks = new keyboard_shortcut;
-				ks->key = str1;
-				ks->new_action = false;
-				ks->action = NULL;
-				keyboard_shortcuts.push_back(ks);
+			if(!ks || !PREFERENCES_VERSION_BEFORE(4, 7, 0)) {
+				if(!ks) {
+					ks = new keyboard_shortcut;
+					ks->key = str1;
+					ks->new_action = false;
+					ks->action = NULL;
+					keyboard_shortcuts.push_back(ks);
+				}
+				if(n == 3) {
+					ks->value.push_back(str2);
+					if(ks_type != SHORTCUT_TYPE_TEXT) remove_blank_ends(ks->value[ks->value.size() - 1]);
+				} else {
+					ks->value.push_back("");
+				}
+				ks->type.push_back((shortcut_type) ks_type);
 			}
-			if(n == 3) {ks->value.push_back(str2); remove_blank_ends(ks->value[ks->value.size() - 1]);}
-			else ks->value.push_back("");
-			ks->type.push_back((shortcut_type) ks_type);
 		}
 	} else if(!is_workspace && svar == "custom_button_label") {
 		int c = 0, r = 0;
@@ -255,8 +264,12 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			}
 			index--;
 			custom_buttons[index].type[bi] = cb_type;
-			if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
-			else custom_buttons[index].value[bi] = "";
+			if(n == 5) {
+				custom_buttons[index].value[bi] = str;
+				if(cb_type != SHORTCUT_TYPE_TEXT) remove_blank_ends(custom_buttons[index].value[bi]);
+			} else {
+				custom_buttons[index].value[bi] = "";
+			}
 		}
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 3) keypad_type = v;
@@ -525,11 +538,21 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "datasets_hsplitter_state") {
 			datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "style") {
+#if defined _WIN32
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0)) style = v;
+#else
 			style = v;
-		} else if(svar == "light_style") {
-			light_style = v;
+#endif
 		} else if(svar == "palette") {
+#ifdef _WIN32
+#if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0) || (v == 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)) palette = v;
+#	else
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0)) palette = v;
+#	endif
+#else
 			palette = v;
+#endif
 		} else if(svar == "color") {
 			colorize_result = v;
 		} else if(svar == "format") {
@@ -827,7 +850,6 @@ void QalculateQtSettings::loadPreferences() {
 	custom_keypad_font = "";
 	custom_app_font = "";
 	style = -1;
-	light_style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
 	autocopy_result = false;
@@ -893,8 +915,8 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 4;
-	preferences_version[1] = 6;
-	preferences_version[2] = 1;
+	preferences_version[1] = 7;
+	preferences_version[2] = 0;
 
 	if(file) {
 		char line[1000000L];
@@ -982,9 +1004,12 @@ void QalculateQtSettings::loadPreferences() {
 	v_memory->addName(ename);
 	CALCULATOR->addVariable(v_memory);
 
-	if(palette != 1) light_style = style;
+#ifdef _WIN32
+	updateStyle();
+#else
 	if(style >= 0) updateStyle();
 	else if(palette >= 0) updatePalette();
+#endif
 
 	if(!current_workspace.empty()) {
 		if(!loadWorkspace(current_workspace.c_str())) current_workspace = "";
@@ -1042,9 +1067,17 @@ void QalculateQtSettings::updateFavourites() {
 		}
 	}
 }
-void QalculateQtSettings::updatePalette() {
+
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+void QalculateQtSettings::updatePalette(bool force_update) {
+	if(!force_update && palette != 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark && (style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("Fusion", Qt::CaseInsensitive) == 0)) return;
+	QPalette p;
+	if(palette == 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+#else
+void QalculateQtSettings::updatePalette(bool) {
 	QPalette p;
 	if(palette == 1) {
+#endif
 		p.setColor(QPalette::Active, QPalette::Window, QColor(42, 46, 50));
 		p.setColor(QPalette::Active, QPalette::WindowText, QColor(252, 252, 252));
 		p.setColor(QPalette::Active, QPalette::Base, QColor(27, 30, 32));
@@ -1085,7 +1118,18 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Disabled, QPalette::ButtonText,QColor(101, 101, 101));
 		p.setColor(QPalette::Disabled, QPalette::BrightText, QColor(39, 174, 96));
 	} else {
+#ifdef _WIN32
+		QStyle *s = NULL;
+#if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+		if(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark || style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("windowsvista", Qt::CaseInsensitive) != 0) s = QStyleFactory::create("fusion");
+#else
+		s = QStyleFactory::create("fusion");
+#endif
+		if(!s) s = QApplication::style();
+		p = s->standardPalette();
+#else
 		p = QApplication::style()->standardPalette();
+#endif
 	}
 	QApplication::setPalette(p);
 }
@@ -1096,7 +1140,7 @@ void QalculateQtSettings::updateStyle() {
 	}
 #ifdef _WIN32
 	else {
-		QStyle *s = QStyleFactory::create("windowsvista");
+		QStyle *s = QStyleFactory::create("fusion");
 		if(s) QApplication::setStyle(s);
 	}
 #endif
@@ -1197,9 +1241,6 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "completion_min2=%i\n", completion_min2);
 		fprintf(file, "completion_delay=%i\n", completion_delay);
 		fprintf(file, "style=%i\n", style);
-#ifdef _WIN32
-		if(light_style != style && palette == 1) fprintf(file, "light_style=%i\n", light_style);
-#endif
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
@@ -1770,7 +1811,7 @@ QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 		}
 		default: {}
 	}
-	if(value.empty()) return shortcutTypeText((shortcut_type) type);
+	if(value.empty() || type == SHORTCUT_TYPE_COPY_RESULT) return shortcutTypeText((shortcut_type) type);
 	return tr("%1: %2").arg(shortcutTypeText((shortcut_type) type)).arg(QString::fromStdString(value));
 }
 QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
@@ -1871,14 +1912,14 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 }
 void QalculateQtSettings::updateActionValueTexts() {
 	if(copy_action_value_texts.isEmpty()) {
-		copy_action_value_texts << tr("Default") << tr("Formatted result") << tr("Unformatted ASCII result") << tr("Unformatted ASCII result without units") << tr("Formatted expression") << tr("Unformatted ASCII expression") << tr("Formatted expression + result") << tr("Unformatted ASCII expression + result") << tr("Unformatted ASCII expression + result without units");
+		copy_action_value_texts << tr("Default") << tr("Formatted result") << tr("Unformatted ASCII result") << tr("Unformatted ASCII result without units") << tr("Formatted expression") << tr("Unformatted ASCII expression") << tr("Formatted expression + result") << tr("Unformatted ASCII expression + result");
 	}
 }
 bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w) {
+	if(type != SHORTCUT_TYPE_TEXT) value = value.trimmed();
 	switch(type) {
 		case SHORTCUT_TYPE_FUNCTION: {}
 		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
-			value = value.trimmed();
 			if(value.length() > 2 && value.right(2) == "()") value.chop(2);
 			if(!CALCULATOR->getActiveFunction(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Function not found."), QMessageBox::Ok);
@@ -1887,7 +1928,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_VARIABLE: {
-			value = value.trimmed();
 			if(!CALCULATOR->getActiveVariable(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Variable not found."), QMessageBox::Ok);
 				return false;
@@ -1895,7 +1935,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_UNIT: {
-			value = value.trimmed();
 			if(!CALCULATOR->getActiveUnit(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
 				return false;
@@ -1903,13 +1942,11 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_OPERATOR: {
-			value = value.trimmed();
 			break;
 		}
 		case SHORTCUT_TYPE_TO_NUMBER_BASE: {}
 		case SHORTCUT_TYPE_INPUT_BASE: {}
 		case SHORTCUT_TYPE_OUTPUT_BASE: {
-			value = value.trimmed();
 			Number nbase; int base;
 			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
 			if(base == BASE_CUSTOM && nbase.isZero()) {
@@ -1922,7 +1959,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 		case SHORTCUT_TYPE_MIN_DECIMALS: {}
 		case SHORTCUT_TYPE_MAX_DECIMALS: {}
 		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
-			value = value.trimmed();
 			bool ok = false;
 			int v = value.toInt(&ok, 10);
 			if(!ok || v < -1 || (type == SHORTCUT_TYPE_PRECISION && v < 2)) {
@@ -1932,7 +1968,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
-			value = value.trimmed();
 			if(value.isEmpty()) break;
 			int v = -1;
 			if(value.length() > 1) {
@@ -1944,7 +1979,7 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 				v = value.toInt(&ok, 10);
 				if(!ok) v = -1;
 			}
-			if(v < 0 || v > 8) {
+			if(v < 0 || v > 7) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
 				value = "";
 				return false;

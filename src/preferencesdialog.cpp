@@ -23,6 +23,10 @@
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QMessageBox>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QApplication>
+#	include <QStyleHints>
+#endif
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -121,7 +125,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
 	l2->addWidget(combo, r, 1); r++; styleCombo = combo;
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	BOX_G(tr("Dark mode"), settings->palette == 1 || (settings->palette == -1 && QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark), darkModeToggled(bool));
+#else
 	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
+#endif
 	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX_G(tr("Format result"), settings->format_result, formatToggled(bool));
 	BOX_G1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool)); 
@@ -653,25 +661,24 @@ void PreferencesDialog::darkModeToggled(bool b) {
 	else settings->palette = -1;
 #ifdef _WIN32
 	if(b) {
-		if(styleCombo->currentIndex() == 0 || styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
+		if(styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
 			for(int i = 1; i < styleCombo->count(); i++) {
 				if(styleCombo->itemText(i).compare("Fusion", Qt::CaseInsensitive) == 0) {
-					int prev_style = settings->style;
 					styleCombo->setCurrentIndex(i);
-					settings->light_style = prev_style;
 					break;
 				}
 			}
 		}
-	} else if(settings->light_style != settings->style && styleCombo->currentText().compare("Fusion", Qt::CaseInsensitive) == 0) {
-		styleCombo->setCurrentIndex(settings->light_style < 0 ? 0 : settings->light_style + 1);
 	}
 #endif
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	settings->updatePalette(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark);
+#else
 	settings->updatePalette();
+#endif
 }
 void PreferencesDialog::styleChanged(int i) {
 	settings->style = i - 1;
-	settings->light_style = settings->style;
 	settings->updateStyle();
 }
 void PreferencesDialog::factorizeToggled(bool b) {
