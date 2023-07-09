@@ -193,6 +193,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G(tr("Simplified percentage calculation"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
+	BOX_G(tr("Interpret unrecognized symbols as variables"), settings->evalops.parse_options.unknowns_enabled, unknownsToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Variance formula"), INTERVAL_CALCULATION_VARIANCE_FORMULA);
@@ -264,6 +265,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l->addStretch(1);
 	l2 = new QGridLayout(w3); l2->setSizeConstraint(QLayout::SetFixedSize);
 	r = 0;
+	BOX_G(tr("Enable units"), settings->evalops.parse_options.units_enabled, unitsToggled(bool));
 	BOX_G(tr("Abbreviate names"), settings->printops.abbreviate_names, abbreviateNamesToggled(bool));
 	BOX_G(tr("Use binary prefixes for information units"), CALCULATOR->usesBinaryPrefixes() > 0, binaryPrefixesToggled(bool));
 	l2->addWidget(new QLabel(tr("Automatic unit conversion:"), this), r, 0);
@@ -489,6 +491,10 @@ void PreferencesDialog::exratesChanged(int i) {
 		exratesSpin->setPrefix(str.right(index));
 	}
 }
+void PreferencesDialog::unitsToggled(bool b) {
+	settings->evalops.parse_options.units_enabled = b;
+	emit expressionFormatUpdated(false);
+}
 void PreferencesDialog::binaryPrefixesToggled(bool b) {
 	CALCULATOR->useBinaryPrefixes(b ? 1 : 0);
 	emit resultFormatUpdated();
@@ -583,6 +589,10 @@ void PreferencesDialog::limitImplicitToggled(bool b) {
 	settings->evalops.parse_options.limit_implicit_multiplication = b;
 	settings->printops.limit_implicit_multiplication = b;
 	emit expressionFormatUpdated(true);
+}
+void PreferencesDialog::unknownsToggled(bool b) {
+	settings->evalops.parse_options.unknowns_enabled = b;
+	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::titleChanged(int i) {
 	settings->title_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();

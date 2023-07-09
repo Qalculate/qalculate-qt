@@ -53,9 +53,11 @@ class PreferencesDialog : public QDialog {
 		void colorizeToggled(bool);
 		void formatToggled(bool);
 		void parsingModeChanged(int);
+		void unknownsToggled(bool);
 		void temperatureCalculationChanged(int);
 		void exratesToggled(bool);
 		void exratesChanged(int);
+		void unitsToggled(bool);
 		void binaryPrefixesToggled(bool);
 		void readPrecisionToggled(bool);
 		void simplifiedPercentageToggled(bool);
