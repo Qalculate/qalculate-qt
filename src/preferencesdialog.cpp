@@ -117,6 +117,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->title_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(titleChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(new QLabel(tr("Tooltips:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Show all"), 1);
+	combo->addItem(tr("Hide in keypad"), 2);
+	combo->addItem(tr("Hide all"), 0);
+	combo->setCurrentIndex(combo->findData(settings->enable_tooltips));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(tooltipsChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Style:"), this), r, 0);
 	combo = new QComboBox(this);
 	QStringList list = QStyleFactory::keys();
@@ -368,6 +376,10 @@ void PreferencesDialog::keepAboveToggled(bool b) {
 	else setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
 	show();
 	emit alwaysOnTopChanged();
+}
+void PreferencesDialog::tooltipsChanged(int i) {
+	settings->enable_tooltips = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	emit enableTooltipsChanged();
 }
 void PreferencesDialog::expressionStatusToggled(bool b) {
 	settings->display_expression_status = b;

@@ -235,6 +235,7 @@ class QalculateQtSettings : QObject {
 		int completion_min, completion_min2;
 		int style, palette;
 		bool enable_completion, enable_completion2;
+		int enable_tooltips;
 		int color;
 		bool colorize_result;
 		bool format_result;

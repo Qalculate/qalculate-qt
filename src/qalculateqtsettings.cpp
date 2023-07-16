@@ -563,6 +563,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
 			if(v >= 0 && v <= 4) title_type = v;
+		} else if(svar == "enable_tooltips") {
+			enable_tooltips = v;
+			if(enable_tooltips < 0) enable_tooltips = 1;
+			else if(enable_tooltips > 2) enable_tooltips = 2;
 		} else if(svar == "auto_update_exchange_rates") {
 			auto_update_exchange_rates = v;
 		} else if(svar == "display_expression_status") {
@@ -822,6 +826,7 @@ void QalculateQtSettings::loadPreferences() {
 	color = 1;
 	colorize_result = true;
 	format_result = true;
+	enable_tooltips = 1;
 	chain_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
@@ -1233,6 +1238,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
 		fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 		fprintf(file, "enable_input_method=%i\n", enable_input_method);
+		fprintf(file, "enable_tooltips=%i\n", enable_tooltips);
 		fprintf(file, "display_expression_status=%i\n", display_expression_status);
 		fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
 		fprintf(file, "enable_completion=%i\n", enable_completion);

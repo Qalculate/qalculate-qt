@@ -36,6 +36,7 @@ class PreferencesDialog : public QDialog {
 
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
+		void tooltipsChanged(int);
 		void expressionStatusToggled(bool);
 		void statusDelayChanged(int);
 		void binTwosToggled(bool);
@@ -115,6 +116,7 @@ class PreferencesDialog : public QDialog {
 		void expressionCalculationUpdated(int);
 		void expressionFormatUpdated(bool);
 		void alwaysOnTopChanged();
+		void enableTooltipsChanged();
 		void titleTypeChanged();
 		void resultFontChanged();
 		void expressionFontChanged();

@@ -881,6 +881,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
 #endif
 
+	if(settings->enable_tooltips != 0) onEnableTooltipsChanged();
+
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
@@ -5384,6 +5386,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 }
 
+bool QalculateWindow::eventFilter(QObject*, QEvent *e) {
+	if(e->type() == QEvent::ToolTip) return true;
+	return false;
+}
+
 void QalculateWindow::onColorSchemeChanged() {
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 	settings->updatePalette(true);
@@ -6074,6 +6081,15 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 	if(periodicTableDialog) periodicTableDialog->onAlwaysOnTopChanged();
 	show();
 }
+void QalculateWindow::onEnableTooltipsChanged() {
+	if(settings->enable_tooltips == 0) qApp->installEventFilter(this);
+	else qApp->removeEventFilter(this);
+	QList<QAbstractButton*> buttons = keypad->findChildren<QAbstractButton*>();
+	for(int i = 0; i < buttons.count(); i++) {
+		if(settings->enable_tooltips > 1) buttons.at(i)->installEventFilter(this);
+		else buttons.at(i)->removeEventFilter(this);
+	}
+}
 void QalculateWindow::onTitleTypeChanged() {
 	title_modified = false;
 	updateWindowTitle(QString(), false, true);
@@ -6519,6 +6535,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
 	connect(preferencesDialog, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(preferencesDialog, SIGNAL(alwaysOnTopChanged()), this, SLOT(onAlwaysOnTopChanged()));
+	connect(preferencesDialog, SIGNAL(enableTooltipsChanged()), this, SLOT(onEnableTooltipsChanged()));
 	connect(preferencesDialog, SIGNAL(titleTypeChanged()), this, SLOT(onTitleTypeChanged()));
 	connect(preferencesDialog, SIGNAL(resultFontChanged()), this, SLOT(onResultFontChanged()));
 	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));

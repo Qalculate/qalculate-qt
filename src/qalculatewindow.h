@@ -128,6 +128,7 @@ class QalculateWindow : public QMainWindow {
 		bool askDot(const std::string&);
 		bool askImplicit();
 		void keyPressEvent(QKeyEvent*) override;
+		bool eventFilter(QObject*, QEvent*) override;
 		void closeEvent(QCloseEvent*) override;
 		void setPreviousExpression();
 		void setOption(std::string);
@@ -184,6 +185,7 @@ class QalculateWindow : public QMainWindow {
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);
 		void onAlwaysOnTopChanged();
+		void onEnableTooltipsChanged();
 		void onPreferencesClosed();
 		void onTitleTypeChanged();
 		void onResultFontChanged();
