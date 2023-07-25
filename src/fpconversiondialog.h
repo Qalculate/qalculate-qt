@@ -29,7 +29,9 @@ class FPConversionDialog : public QDialog {
 		QComboBox *formatCombo;
 		QLineEdit *valueEdit, *hexEdit, *exp2Edit, *decEdit, *errorEdit;
 		QTextEdit *binEdit;
-		int getBits();
+		unsigned int getBits();
+		unsigned int getExponentBits();
+		unsigned int getSignPosition();
 
 	protected slots:
 

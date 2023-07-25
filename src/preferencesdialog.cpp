@@ -378,7 +378,7 @@ void PreferencesDialog::keepAboveToggled(bool b) {
 	emit alwaysOnTopChanged();
 }
 void PreferencesDialog::tooltipsChanged(int i) {
-	settings->enable_tooltips = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	settings->enable_tooltips = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit enableTooltipsChanged();
 }
 void PreferencesDialog::expressionStatusToggled(bool b) {
@@ -480,7 +480,7 @@ void PreferencesDialog::formatToggled(bool b) {
 }
 void PreferencesDialog::parsingModeChanged(int i) {
 	settings->evalops.parse_options.parsing_mode = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	settings->implicit_question_asked = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST);
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) settings->implicit_question_asked = true;
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::temperatureCalculationChanged(int i) {

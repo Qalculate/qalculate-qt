@@ -35,6 +35,8 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	formatCombo->addItem(tr("64-bit (double precision)"));
 	formatCombo->addItem(tr("80-bit (x86 extended format)"));
 	formatCombo->addItem(tr("128-bit (quadruple precision)"));
+	formatCombo->addItem(tr("Microchip 24-bit"));
+	formatCombo->addItem(tr("Microchip 32-bit"));
 	formatCombo->setCurrentIndex(1);
 	grid->addWidget(new QLabel(tr("Decimal value"), this), 1, 0, Qt::AlignRight);
 	valueEdit = new MathLineEdit(this); valueEdit->setAlignment(Qt::AlignRight); grid->addWidget(valueEdit, 1, 1);
@@ -74,15 +76,27 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	box->setSizeConstraint(QLayout::SetFixedSize);
 }
 FPConversionDialog::~FPConversionDialog() {}
-int FPConversionDialog::getBits() {
+unsigned int FPConversionDialog::getBits() {
 	switch(formatCombo->currentIndex()) {
 		case 0: return 16;
 		case 1: return 32;
 		case 2: return 64;
 		case 3: return 80;
 		case 4: return 128;
+		case 5: return 24;
+		case 6: return 32;
 	}
 	return 32;
+}
+unsigned int FPConversionDialog::getExponentBits() {
+	int i = formatCombo->currentIndex();
+	if(i == 5) return 8;
+	return standard_expbits(getBits());
+}
+unsigned int FPConversionDialog::getSignPosition() {
+	int i = formatCombo->currentIndex();
+	if(i == 5 || i == 6) return 8;
+	return 0;
 }
 void FPConversionDialog::formatChanged() {
 	updateFields(10);
@@ -91,8 +105,9 @@ void FPConversionDialog::updateFields(int base) {
 	std::string sbin;
 	Number decnum;
 	bool use_decnum = false;
-	unsigned int bits = (unsigned int) getBits();
-	unsigned int expbits = standard_expbits(bits);
+	unsigned int bits = getBits();
+	unsigned int expbits = getExponentBits();
+	unsigned int sgnpos = getSignPosition();
 	if(base == 10) {
 		std::string str = valueEdit->text().toStdString();
 		remove_blank_ends(str);
@@ -107,11 +122,11 @@ void FPConversionDialog::updateFields(int base) {
 		MathStructure value;
 		CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
 		if(value.isNumber()) {
-			sbin = to_float(value.number(), bits, expbits);
+			sbin = to_float(value.number(), bits, expbits, sgnpos);
 			decnum = value.number();
 			use_decnum = true;
 		} else if(value.isUndefined()) {
-			sbin = to_float(nr_one_i, bits, expbits);
+			sbin = to_float(nr_one_i, bits, expbits, sgnpos);
 		} else {
 			sbin = "";
 		}
@@ -210,7 +225,7 @@ void FPConversionDialog::updateFields(int base) {
 		po.max_decimals = 50;
 		po.use_max_decimals = true;
 		Number value;
-		int ret = from_float(value, sbin, bits, expbits);
+		int ret = from_float(value, sbin, bits, expbits, sgnpos);
 		if(ret <= 0) {
 			decEdit->setText(ret < 0 ? "NaN" : "");
 			exp2Edit->setText(ret < 0 ? "NaN" : "");
