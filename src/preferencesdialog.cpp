@@ -106,6 +106,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	BOX_G(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
+	BOX_G(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -557,6 +558,9 @@ void PreferencesDialog::copyAsciiWithoutUnitsToggled(bool b) {
 }
 void PreferencesDialog::caretAsXorToggled(bool b) {
 	settings->caret_as_xor = b;
+}
+void PreferencesDialog::closeWithEscToggled(bool b) {
+	settings->close_with_esc = b;
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
 	if(b) settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;

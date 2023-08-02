@@ -1598,7 +1598,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 						}
 					}
 				} else if(document()->isEmpty()) {
-					qApp->closeAllWindows();
+					if(settings->close_with_esc) qApp->closeAllWindows();
 				} else {
 					clear();
 				}

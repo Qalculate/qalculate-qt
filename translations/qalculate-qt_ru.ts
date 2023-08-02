@@ -2653,6 +2653,10 @@ Do you want to overwrite the function?</source>
         <source>Allow concise uncertainty input</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Close application with Escape key</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>

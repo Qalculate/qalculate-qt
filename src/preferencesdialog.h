@@ -99,6 +99,7 @@ class PreferencesDialog : public QDialog {
 		void copyAsciiToggled(bool);
 		void copyAsciiWithoutUnitsToggled(bool);
 		void caretAsXorToggled(bool);
+		void closeWithEscToggled(bool);
 
 	public:
 

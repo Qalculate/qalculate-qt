@@ -256,6 +256,7 @@ class QalculateQtSettings : QObject {
 		bool auto_calculate;
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
+		bool close_with_esc;
 		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
