@@ -1131,6 +1131,14 @@ Do you want to overwrite the function?</source>
         <source>Conversion error</source>
         <translation>Ошибка преобразования</translation>
     </message>
+    <message>
+        <source>Microchip 24-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Microchip 32-bit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionEditDialog</name>
@@ -1769,7 +1777,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Unicode</source>
-        <translation>Юникод</translation>
+        <translation type="vanished">Юникод</translation>
     </message>
     <message>
         <source>Suffix</source>
@@ -2612,6 +2620,38 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Copy unformatted ASCII without units</source>
         <translation>Копировать неформатированный ASCII без единиц измерения</translation>
+    </message>
+    <message>
+        <source>Tooltips:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide in keypad</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interpret unrecognized symbols as variables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Concise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow concise uncertainty input</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

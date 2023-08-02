@@ -302,7 +302,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
 		} else {
 			v--;
-			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
+			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_RELATIVE) {
 				printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
 			}
 		}
@@ -454,6 +454,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 			evalops.interval_calculation = (IntervalCalculation) v;
 		}
+	} else if(svar == "concise_uncertainty_input") {
+		CALCULATOR->setConciseUncertaintyInputEnabled(v);
 	} else if(svar == "chain_mode") {
 		chain_mode = v;
 	} else if(svar == "rpn_mode") {
@@ -732,6 +734,7 @@ void QalculateQtSettings::loadPreferences() {
 	CALCULATOR->useIntervalArithmetic(true);
 	CALCULATOR->setTemperatureCalculationMode(TEMPERATURE_CALCULATION_HYBRID);
 	CALCULATOR->useBinaryPrefixes(0);
+	CALCULATOR->setConciseUncertaintyInputEnabled(false);
 
 	current_workspace = "";
 	save_workspace = -1;
@@ -1403,6 +1406,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
 		else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 		else fprintf(file, "approximation=%i\n", evalops.approximation);
+		fprintf(file, "concise_uncertainty_input=%i\n", CALCULATOR->conciseUncertaintyInputEnabled());
 		fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
 		fprintf(file, "rpn_mode=%i\n", rpn_mode);
 		fprintf(file, "chain_mode=%i\n", chain_mode);

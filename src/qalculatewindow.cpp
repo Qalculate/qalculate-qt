@@ -2755,7 +2755,14 @@ void QalculateWindow::setOption(std::string str) {
 			expressionFormatUpdated(true);
 		}
 	} else if(equalsIgnoreCase(svar, "caret as xor") || equalsIgnoreCase(svar, "xor^")) SET_BOOL_PT(settings->caret_as_xor)
-	else if(equalsIgnoreCase(svar, "parsing mode") || svar == "parse" || svar == "syntax") {
+	else if(equalsIgnoreCase(svar, "concise uncertainty") || equalsIgnoreCase(svar, "concise")) {
+		bool b = CALCULATOR->conciseUncertaintyInputEnabled();
+		SET_BOOL(b)
+		if(b != CALCULATOR->conciseUncertaintyInputEnabled()) {
+			CALCULATOR->setConciseUncertaintyInputEnabled(b);
+			expressionFormatUpdated(false);
+		}
+	} else if(equalsIgnoreCase(svar, "parsing mode") || svar == "parse" || svar == "syntax") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "adaptive")) v = PARSING_MODE_ADAPTIVE;
 		else if(equalsIgnoreCase(svalue, "implicit first")) v = PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST;
@@ -2986,6 +2993,8 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "midpoint")) v = INTERVAL_DISPLAY_MIDPOINT + 1;
 		else if(equalsIgnoreCase(svalue, "upper")) v = INTERVAL_DISPLAY_UPPER + 1;
 		else if(equalsIgnoreCase(svalue, "lower")) v = INTERVAL_DISPLAY_LOWER + 1;
+		else if(equalsIgnoreCase(svalue, "concise")) v = INTERVAL_DISPLAY_CONCISE + 1;
+		else if(equalsIgnoreCase(svalue, "relative")) v = INTERVAL_DISPLAY_RELATIVE + 1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
 		}
@@ -2995,7 +3004,7 @@ void QalculateWindow::setOption(std::string str) {
 			resultFormatUpdated();
 		} else {
 			v--;
-			if(v < INTERVAL_DISPLAY_SIGNIFICANT_DIGITS || v > INTERVAL_DISPLAY_UPPER) {
+			if(v < INTERVAL_DISPLAY_SIGNIFICANT_DIGITS || v > INTERVAL_DISPLAY_RELATIVE) {
 				CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 			} else {
 				settings->adaptive_interval_display = false;
@@ -5054,6 +5063,24 @@ void ViewThread::run() {
 	}
 }
 
+int intervals_are_relative(MathStructure &m) {
+	int ret = -1;
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_UNCERTAINTY && m.size() == 3) {
+		if(m[2].isOne() && m[1].isMultiplication() && m[1].size() > 1 && m[1].last().isVariable() && (m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD))) {
+			ret = 1;
+		} else {
+			return 0;
+		}
+	}
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_INTERVAL) return 0;
+	for(size_t i = 0; i < m.size(); i++) {
+		int ret_i = intervals_are_relative(m[i]);
+		if(ret_i == 0) return 0;
+		else if(ret_i > 0) ret = ret_i;
+	}
+	return ret;
+}
+
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
 
 	if(block_result_update) return;
@@ -5116,8 +5143,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				} else {
 					if(settings->adaptive_interval_display) {
 						QString expression_str = expressionEdit->toPlainText();
-						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-						else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
+						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) {
+							if(parsed_mstruct && intervals_are_relative(*parsed_mstruct) > 0) settings->printops.interval_display = INTERVAL_DISPLAY_RELATIVE;
+							else settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+						} else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
 						else settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
 					}
 				}

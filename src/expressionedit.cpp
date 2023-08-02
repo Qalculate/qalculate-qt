@@ -2623,6 +2623,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
+	completionView->setColumnHidden(0, mstruct_from != NULL);
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;

@@ -200,6 +200,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	BOX_G(tr("Simplified percentage calculation"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
+	BOX_G(tr("Allow concise uncertainty input"), CALCULATOR->conciseUncertaintyInputEnabled(), conciseUncertaintyInputToggled(bool));
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
 	BOX_G(tr("Interpret unrecognized symbols as variables"), settings->evalops.parse_options.unknowns_enabled, unknownsToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
@@ -245,6 +246,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Significant digits"), INTERVAL_DISPLAY_SIGNIFICANT_DIGITS);
 	combo->addItem(tr("Interval"), INTERVAL_DISPLAY_INTERVAL);
 	combo->addItem(tr("Plus/minus"), INTERVAL_DISPLAY_PLUSMINUS);
+	combo->addItem(tr("Relative"), INTERVAL_DISPLAY_RELATIVE);
+	combo->addItem(tr("Concise"), INTERVAL_DISPLAY_CONCISE);
 	combo->addItem(tr("Midpoint"), INTERVAL_DISPLAY_MIDPOINT);
 	combo->addItem(tr("Lower"), INTERVAL_DISPLAY_LOWER);
 	combo->addItem(tr("Upper"), INTERVAL_DISPLAY_UPPER);
@@ -596,6 +599,10 @@ void PreferencesDialog::intervalDisplayChanged(int i) {
 		settings->adaptive_interval_display = false;
 	}
 	emit resultFormatUpdated();
+}
+void PreferencesDialog::conciseUncertaintyInputToggled(bool b) {
+	CALCULATOR->setConciseUncertaintyInputEnabled(b);
+	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::limitImplicitToggled(bool b) {
 	settings->evalops.parse_options.limit_implicit_multiplication = b;

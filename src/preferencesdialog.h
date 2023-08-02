@@ -75,6 +75,7 @@ class PreferencesDialog : public QDialog {
 		void variableUnitsToggled(bool);
 		void groupingChanged(int);
 		void intervalDisplayChanged(int);
+		void conciseUncertaintyInputToggled(bool);
 		void limitImplicitToggled(bool);
 		void titleChanged(int);
 		void resultFontClicked();
