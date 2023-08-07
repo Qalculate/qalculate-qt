@@ -10747,26 +10747,31 @@ Deseja sobrescrevê-la?</translation>
         <translation type="unfinished">Sinal:</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="64"/>
+        <source>Temporary</source>
+        <translation type="unfinished">Temporária</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Uma unidade ou variável com o mesmo nome já existe.
 Deseja sobrescrevê-la?</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="200"/>
+        <location filename="../src/unknowneditdialog.cpp" line="212"/>
         <source>Edit Unknown Variable</source>
         <translation>Editar Variável Desconhecida</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="213"/>
+        <location filename="../src/unknowneditdialog.cpp" line="225"/>
         <source>New Unknown Variable</source>
         <translation>Nova variável desconhecida</translation>
     </message>

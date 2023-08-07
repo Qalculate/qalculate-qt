@@ -10876,26 +10876,31 @@ Voleu sobreescriure-la?</translation>
         <translation type="unfinished">Signe:</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="64"/>
+        <source>Temporary</source>
+        <translation type="unfinished">Temporal</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>Question</source>
         <translation type="unfinished">Pregunta</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Una unitat o variable amb el mateix nom ja existeix.
 Voleu sobreescriure-la?</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="200"/>
+        <location filename="../src/unknowneditdialog.cpp" line="212"/>
         <source>Edit Unknown Variable</source>
         <translation>Edició de variable desconeguda</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="213"/>
+        <location filename="../src/unknowneditdialog.cpp" line="225"/>
         <source>New Unknown Variable</source>
         <translation>Variable desconeguda nova</translation>
     </message>

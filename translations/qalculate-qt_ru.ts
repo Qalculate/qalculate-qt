@@ -4398,6 +4398,10 @@ Do you want to overwrite it?</source>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
+    <message>
+        <source>Temporary</source>
+        <translation type="unfinished">Временная</translation>
+    </message>
 </context>
 <context>
     <name>VariableEditDialog</name>

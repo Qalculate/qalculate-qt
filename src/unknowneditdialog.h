@@ -29,7 +29,7 @@ class UnknownEditDialog : public QDialog {
 	protected:
 
 		QLineEdit *nameEdit;
-		QCheckBox *customBox;
+		QCheckBox *customBox, *temporaryBox;
 		QComboBox *typeCombo, *signCombo;
 		QPushButton *okButton;
 		NamesEditDialog *namesEditDialog;
@@ -39,6 +39,7 @@ class UnknownEditDialog : public QDialog {
 	protected slots:
 
 		void onNameEdited(const QString&);
+		void onVariableChanged();
 		void onTypeChanged(int);
 		void onSignChanged(int);
 		void onCustomToggled(bool);

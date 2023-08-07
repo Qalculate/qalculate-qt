@@ -61,6 +61,9 @@ UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
 	signCombo->addItem("Negative", ASSUMPTION_SIGN_NEGATIVE);
 	signCombo->addItem("Non-positive", ASSUMPTION_SIGN_NONPOSITIVE);
 	grid->addWidget(signCombo, 3, 1);
+	temporaryBox = new QCheckBox(tr("Temporary"), this);
+	temporaryBox->setChecked(false);
+	grid->addWidget(temporaryBox, 4, 0, 1, 2, Qt::AlignRight);
 	typeCombo->setCurrentIndex(typeCombo->findData(CALCULATOR->defaultAssumptions()->type()));
 	signCombo->setCurrentIndex(signCombo->findData(CALCULATOR->defaultAssumptions()->sign()));
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, this);
@@ -72,6 +75,7 @@ UnknownEditDialog::UnknownEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
 	connect(signCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSignChanged(int)));
 	connect(customBox, SIGNAL(toggled(bool)), this, SLOT(onCustomToggled(bool)));
+	connect(temporaryBox, SIGNAL(clicked()), this, SLOT(onVariableChanged()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	okButton->setEnabled(false);
@@ -87,7 +91,7 @@ void UnknownEditDialog::editNames() {
 	namesEditDialog->exec();
 	nameEdit->setText(namesEditDialog->firstName());
 	name_edited = false;
-	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
+	onVariableChanged();
 }
 void UnknownEditDialog::onTypeChanged(int i) {
 	int t = typeCombo->itemData(i).toInt();
@@ -97,7 +101,7 @@ void UnknownEditDialog::onTypeChanged(int i) {
 		signCombo->setCurrentIndex(signCombo->findData(ASSUMPTION_SIGN_UNKNOWN));
 		signCombo->blockSignals(false);
 	}
-	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
+	onVariableChanged();
 }
 void UnknownEditDialog::onSignChanged(int i) {
 	int t = typeCombo->currentData().toInt();
@@ -107,12 +111,15 @@ void UnknownEditDialog::onSignChanged(int i) {
 		typeCombo->setCurrentIndex(typeCombo->findData(ASSUMPTION_TYPE_REAL));
 		typeCombo->blockSignals(false);
 	}
+	onVariableChanged();
+}
+void UnknownEditDialog::onVariableChanged() {
 	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
 }
 void UnknownEditDialog::onCustomToggled(bool b) {
 	typeCombo->setEnabled(b);
 	signCombo->setEnabled(b);
-	okButton->setEnabled(!nameEdit->text().trimmed().isEmpty());
+	onVariableChanged();
 }
 UnknownVariable *UnknownEditDialog::createVariable(ExpressionItem **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
@@ -138,7 +145,8 @@ UnknownVariable *UnknownEditDialog::createVariable(ExpressionItem **replaced_ite
 	v = new UnknownVariable("", "");
 	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
 	else NamesEditDialog::modifyName(v, nameEdit->text());
-	v->setCategory(CALCULATOR->getVariableById(VARIABLE_ID_X)->category());
+	if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
+	else v->setCategory(CALCULATOR->getVariableById(VARIABLE_ID_X)->category());
 	if(customBox->isChecked()) {
 		v->setAssumptions(new Assumptions());
 		v->assumptions()->setType((AssumptionType) typeCombo->currentData().toInt());
@@ -161,8 +169,12 @@ bool UnknownEditDialog::modifyVariable(UnknownVariable *v, ExpressionItem **repl
 			else if(var != v) *replaced_item = var;
 		}
 	}
-	if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
-	else NamesEditDialog::modifyName(v, nameEdit->text());
+	if(v->isLocal()) {
+		if(namesEditDialog) namesEditDialog->modifyNames(v, nameEdit->text());
+		else NamesEditDialog::modifyName(v, nameEdit->text());
+		if(temporaryBox->isChecked()) v->setCategory(CALCULATOR->temporaryCategory());
+		else if(v->category() == CALCULATOR->temporaryCategory()) v->setCategory(CALCULATOR->getVariableById(VARIABLE_ID_X)->category());
+	}
 	if(!customBox->isChecked()) {
 		v->setAssumptions(NULL);
 	} else {
@@ -176,13 +188,17 @@ void UnknownEditDialog::setVariable(UnknownVariable *v) {
 	o_variable = v;
 	name_edited = false;
 	nameEdit->setText(QString::fromStdString(v->getName(1).name));
+	nameEdit->setEnabled(v->isLocal());
 	if(namesEditDialog) namesEditDialog->setNames(v, nameEdit->text());
 	Assumptions *ass = v->assumptions();
 	customBox->setChecked(ass);
 	if(!ass) ass = CALCULATOR->defaultAssumptions();
 	typeCombo->setCurrentIndex(typeCombo->findData(ass->type()));
 	signCombo->setCurrentIndex(signCombo->findData(ass->sign()));
+	temporaryBox->setChecked(v->category() == CALCULATOR->temporaryCategory());
+	temporaryBox->setEnabled(v->isLocal());
 	okButton->setEnabled(false);
+
 }
 void UnknownEditDialog::onNameEdited(const QString &str) {
 	if(!str.trimmed().isEmpty() && !CALCULATOR->variableNameIsValid(str.trimmed().toStdString())) {

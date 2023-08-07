@@ -11003,14 +11003,19 @@ Möchten Sie sie überschreiben?</translation>
         <translation type="unfinished">Vorzeichen:</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="64"/>
+        <source>Temporary</source>
+        <translation type="unfinished">Temporär</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>Question</source>
         <translation type="unfinished">Frage</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Eine Einheit oder Variable mit demselben Namen ist bereits vorhanden.
@@ -11023,12 +11028,12 @@ Do you want to overwrite it?</source>
 Möchten Sie sie überschreiben?</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="200"/>
+        <location filename="../src/unknowneditdialog.cpp" line="212"/>
         <source>Edit Unknown Variable</source>
         <translation>Unbekannte Variable bearbeiten</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="213"/>
+        <location filename="../src/unknowneditdialog.cpp" line="225"/>
         <source>New Unknown Variable</source>
         <translation>Neue Unbekannte Variable</translation>
     </message>

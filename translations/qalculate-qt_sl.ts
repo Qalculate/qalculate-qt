@@ -10744,26 +10744,31 @@ Jo želite prepisati?</translation>
         <translation type="unfinished">Znak:</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="64"/>
+        <source>Temporary</source>
+        <translation type="unfinished">Začasno</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation type="unfinished">Enota ali spremenljivka s tem imenom že obstaja.
 Jo želite prepisati?</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="200"/>
+        <location filename="../src/unknowneditdialog.cpp" line="212"/>
         <source>Edit Unknown Variable</source>
         <translation type="unfinished">Uredi neznano spremenljivko</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="213"/>
+        <location filename="../src/unknowneditdialog.cpp" line="225"/>
         <source>New Unknown Variable</source>
         <translation type="unfinished">Nova neznana spremenljivka</translation>
     </message>

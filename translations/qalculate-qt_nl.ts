@@ -9691,26 +9691,31 @@ Wilt u die overschrijven?</translation>
         <translation type="unfinished">Teken:</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="64"/>
+        <source>Temporary</source>
+        <translation type="unfinished">Tijdelijk</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>Question</source>
         <translation type="unfinished">Vraag</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="122"/>
-        <location filename="../src/unknowneditdialog.cpp" line="155"/>
+        <location filename="../src/unknowneditdialog.cpp" line="129"/>
+        <location filename="../src/unknowneditdialog.cpp" line="163"/>
         <source>A unit or variable with the same name already exists.
 Do you want to overwrite it?</source>
         <translation>Er bestaat al een eenheid of variabele met deze naam.
 Wilt u die overschrijven?</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="200"/>
+        <location filename="../src/unknowneditdialog.cpp" line="212"/>
         <source>Edit Unknown Variable</source>
         <translation>Onbekende variabele bewerken</translation>
     </message>
     <message>
-        <location filename="../src/unknowneditdialog.cpp" line="213"/>
+        <location filename="../src/unknowneditdialog.cpp" line="225"/>
         <source>New Unknown Variable</source>
         <translation>Nieuwe onbekende variabele</translation>
     </message>

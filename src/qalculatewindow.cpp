@@ -5717,6 +5717,15 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	settings->savePreferences(settings->save_mode_on_exit);
 	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
 	CALCULATOR->abort();
+	CALCULATOR->terminateThreads();
+	if(commandThread->running) {
+		commandThread->write((int) 0);
+		commandThread->write(NULL);
+	}
+	if(viewThread->running) {
+		viewThread->write((int) 0);
+		viewThread->write(NULL);
+	}
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
 }
