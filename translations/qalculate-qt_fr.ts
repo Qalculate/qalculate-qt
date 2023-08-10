@@ -7307,7 +7307,7 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="62"/>
         <source>Parsing &amp;&amp; Calculation</source>
-        <translation type="unfinished">Ananyse et calcul</translation>
+        <translation type="unfinished">Analyse et calcul</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="66"/>
