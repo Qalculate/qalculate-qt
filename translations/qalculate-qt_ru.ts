@@ -1437,6 +1437,16 @@ Do you want to overwrite the function?</source>
             <numerusform>обновлены %1</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;,
+and press the enter key.</source>
+        <translation type="obsolete">Введите математическое выражение выше, например «5 + 2 / 3»,
+и нажмите клавишу ВВОД (Enter).</translation>
+    </message>
+    <message>
+        <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
+        <translation type="unfinished">Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>

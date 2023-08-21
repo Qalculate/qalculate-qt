@@ -683,7 +683,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	} else if(item && cdata->to_type == 5) {
 		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
 	} else if(item && cdata->to_type == 2 && str.empty() && cdata->current_from_struct) {
-		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger()) b_match = 2;
+		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger() && !cdata->current_from_struct->number().imaginaryPartIsNonZero()) b_match = 2;
 	} else if(prefix && cdata->to_type < 2) {
 		for(size_t name_i = 1; name_i <= prefix->countNames() && !b_match; name_i++) {
 			const std::string *pname = &prefix->getName(name_i).name;
@@ -819,6 +819,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completionView->setItemDelegateForColumn(1, delegate);
 	completionView->setItemDelegateForColumn(2, delegate);
 	completer->setPopup(completionView);
+	default_frame = -1;
 	previous_pos = 0;
 	if(settings->completion_delay > 0) {
 		completionTimer = new QTimer(this);
@@ -1186,10 +1187,9 @@ void ExpressionEdit::updateCompletion() {
 				}
 				if(u->title(false).empty()) {
 					if(name_has_formatting(ename_r)) title2 = QString::fromStdString(format_name(ename_r, TYPE_UNIT));
-					else QString::fromStdString(ename_r->name);
+					else title2 = QString::fromStdString(ename_r->name);
 				} else {
 					title2 = QString::fromStdString(u->title(false));
-
 					ename = &u->preferredInputName(true, settings->printops.use_unicode_signs, false, u->isCurrency(), &can_display_unicode_string_function, completionView);
 					if(ename->abbreviation) {
 						bool tp = title2[title2.length() - 1] == ')';
@@ -2635,7 +2635,7 @@ void ExpressionEdit::onTextChanged() {
 				completionTimer->start(settings->completion_delay);
 			}
 		} else {
-			complete(NULL, QPoint(), settings->completion_delay > 0);
+			complete(NULL, QRect(), settings->completion_delay > 0);
 		}
 	}
 	qApp->processEvents();
@@ -2652,13 +2652,20 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 	expression_has_changed = b;
 }
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
-bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bool current_object_is_set) {
+bool ExpressionEdit::complete(MathStructure *mstruct_from, const QRect &pos, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	Unit *from_unit_bak = cdata->current_from_unit;
-	completionView->setColumnHidden(0, mstruct_from != NULL);
-	completionView->setColumnHidden(1, mstruct_from != NULL);
-	completionView->setColumnHidden(2, mstruct_from == NULL);
+	completionView->setColumnHidden(0, !pos.isNull());
+	completionView->setColumnHidden(1, !pos.isNull());
+	completionView->setColumnHidden(2, pos.isNull());
+	if(!pos.isNull()) {
+		default_frame = completionView->frameStyle();
+		completionView->setFrameStyle(QFrame::NoFrame);
+	} else if(default_frame >= 0) {
+		completionView->setFrameStyle(default_frame);
+		default_frame = -1;
+	}
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
@@ -2870,11 +2877,10 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 		}
 		if(!settings->wayland_platform || !completionView->isVisible()) {
 			if(!pos.isNull()) {
-				rect.setTopLeft(mapFromGlobal(pos));
+				rect.setTopLeft(mapFromGlobal(pos.bottomLeft()));
 				rect.setHeight(1);
 			}
 			prev_rect = rect;
-			rect.setWidth(w);
 			if(settings->wayland_platform) {
 				QWidget *win = this;
 				while(win->parentWidget()) win = win->parentWidget();
@@ -2884,7 +2890,23 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 				if(n > 20) n = 20;
 				else if(n < 5) n = 5;
 				completer->setMaxVisibleItems(n);
+			} else if(!pos.isNull()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+				QScreen *scr = screen();
+#	else
+				QScreen *scr = QGuiApplication::screenAt(pos);
+#	endif
+				if(!scr) scr = QGuiApplication::primaryScreen();
+				QRect screen = scr->availableGeometry();
+#else
+				QRect screen = QApplication::desktop()->availableGeometry(this);
+#endif
+				if(pos.y() + completionView->height() > screen.y() + screen.height()) {
+					rect.setTopLeft(mapFromGlobal(pos.topLeft()));
+				}
 			}
+			rect.setWidth(w);
 			completer->complete(rect);
 		} else {
 			int h = (((QAbstractItemView*) completionView)->sizeHintForRow(0) * qMin(completer->maxVisibleItems(), completionModel->rowCount()) + 3) + 3;

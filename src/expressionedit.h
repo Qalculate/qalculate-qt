@@ -91,6 +91,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool parsed_had_errors, parsed_had_warnings;
 		int previous_epos;
 		bool parentheses_highlighted;
+		int default_frame;
 		QRect prev_rect;
 
 		void setCurrentObject();
@@ -154,7 +155,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void insertMatrix();
 		void enableTabCompletion(bool);
 		bool completeOrActivateFirst(bool = false);
-		bool complete(MathStructure* = NULL, const QPoint& = QPoint(), bool = false);
+		bool complete(MathStructure* = NULL, const QRect& = QRect(), bool = false);
 		void clearHistory();
 
 	signals:

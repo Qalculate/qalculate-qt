@@ -1107,7 +1107,12 @@ void FunctionEditDialog::argEditClicked() {
 	d->deleteLater();
 }
 void FunctionEditDialog::argDelClicked() {
-	argumentsModel->removeRow(argumentsView->selectionModel()->currentIndex().row());
+	int r = argumentsView->selectionModel()->currentIndex().row();
+	QStandardItem *item = argumentsModel->item(r, 0);
+	if(!item) return;
+	Argument *arg = (Argument*) item->data().value<void*>();
+	if(arg) delete arg;
+	argumentsModel->removeRow(r);
 	onFunctionChanged();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		QStandardItem *item = argumentsModel->item(i, 2);

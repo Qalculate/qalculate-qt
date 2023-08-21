@@ -342,6 +342,8 @@ void HistoryView::loadInitial() {
 			}
 		}
 		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	} else if(!settings->clear_history_on_exit) {
+		setHtml("<body color=\"" + textColor().name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
 	}
 }
 

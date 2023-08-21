@@ -762,7 +762,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	keypadDock->setObjectName("keypad-dock");
 	keypadDock->setWidget(keypad);
 	addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
-	keypadDock->hide();
 
 	QWidget *rpnWidget = new QWidget(this);
 	rpnDock = new QalculateDockWidget(tr("RPN Stack"), this, expressionEdit);
@@ -881,7 +880,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
 #endif
 
-	if(settings->enable_tooltips != 0) onEnableTooltipsChanged();
+	if(settings->enable_tooltips != 1) onEnableTooltipsChanged();
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -1525,7 +1524,7 @@ void QalculateWindow::updateAngleUnitsMenu() {
 		if(CALCULATOR->units[i]->baseUnit() == u_rad) {
 			Unit *u = CALCULATOR->units[i];
 			if(u != u_rad && !u->isHidden() && u->isActive() && u->baseExponent() == 1 && !u->hasName("gra") && !u->hasName("deg")) {
-				action = menu->addAction(QString::fromStdString(u->title(true)), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_" + QString::fromStdString(u->referenceName())); action->setData(ANGLE_UNIT_CUSTOM); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit() == u) action->setChecked(true);
+				action = menu->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) menu)), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_" + QString::fromStdString(u->referenceName())); action->setData(ANGLE_UNIT_CUSTOM); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit() == u) action->setChecked(true);
 			}
 		}
 	}
@@ -5732,7 +5731,8 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 
 void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
-	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
+	QRect rect = tb->widgetForAction(toAction)->geometry();
+	QRect pos = QRect(tb->mapToGlobal(rect.topLeft()), rect.size());
 	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
 		if(expressionEdit->complete(mstruct, pos)) return;
 	}
@@ -5742,7 +5742,7 @@ void QalculateWindow::onToActivated(bool button) {
 	expressionEdit->insertPlainText("➞");
 	expressionEdit->blockParseStatus(false);
 	expressionEdit->displayParseStatus(true, false);
-	expressionEdit->complete(NULL, button ? pos : QPoint());
+	expressionEdit->complete(NULL, button ? pos : QRect());
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {

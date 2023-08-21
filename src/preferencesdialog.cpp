@@ -104,9 +104,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 #endif
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
+	BOX_G(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	BOX_G(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
-	BOX_G(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	l2->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
