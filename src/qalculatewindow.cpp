@@ -345,11 +345,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	topLayout->setContentsMargins(0, 0, 0, 0);
 
 	tb = addToolBar("Toolbar");
+	tb->setContextMenuPolicy(Qt::CustomContextMenu);
 	tb->setObjectName("Toolbar");
-	tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	tb->setFloatable(false);
 	tb->setMovable(false);
 	tb->toggleViewAction()->setVisible(false);
+
+	tmenu = NULL;
+	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
 
 	ehSplitter = new QSplitter(Qt::Vertical, this);
 	topLayout->addWidget(ehSplitter, 1);
@@ -630,6 +634,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	menu->setMinimumWidth(w);
 	tb->addWidget(modeAction_t);
+	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
 	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
 	toAction->setEnabled(false);
@@ -654,7 +659,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	unitsAction_t->setMenu(unitsMenu);
 	tb->addAction(unitsAction_t);
 	if(CALCULATOR->canPlot()) {
-		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot Functions/Data"), this);
+		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot"), this);
 		connect(plotAction_t, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
 		tb->addAction(plotAction_t);
 	} else {
@@ -684,10 +689,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
+	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tb->addWidget(spacer);
 	tb->addWidget(menuAction_t);
+	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
 	expressionEdit = new ExpressionEdit(this, tb);
 	QFont font = expressionEdit->font();
@@ -904,6 +911,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 }
 QalculateWindow::~QalculateWindow() {}
+
+void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
+	if(!tmenu) {
+		tmenu = new QMenu(this);
+		tmenu->addAction(tr("Icons only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonIconOnly);
+		tmenu->addAction(tr("Text only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextOnly);
+		tmenu->addAction(tr("Text beside icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextBesideIcon);
+		tmenu->addAction(tr("Text under icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextUnderIcon);
+	}
+	tmenu->popup(tb->mapToGlobal(pos));
+}
+void QalculateWindow::setToolbarStyle() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	settings->toolbar_style = action->data().toInt();
+	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+}
 
 void QalculateWindow::loadShortcuts() {
 	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
@@ -1531,6 +1557,25 @@ void QalculateWindow::updateAngleUnitsMenu() {
 	action = menu->addAction(tr("None"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_none"); action->setData(ANGLE_UNIT_NONE); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
 	action = menu->addAction(tr("Other")); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setVisible(false); action->setData(-1); if(!group->checkedAction()) action->setChecked(true);
 }
+
+struct tree_struct_m {
+	std::string item;
+	std::list<tree_struct_m> items;
+	std::list<tree_struct_m>::iterator it;
+	std::list<tree_struct_m>::reverse_iterator rit;
+	std::vector<void*> objects;
+	tree_struct_m *parent;
+	void sort() {
+		items.sort();
+		for(std::list<tree_struct_m>::iterator it = items.begin(); it != items.end(); ++it) {
+			it->sort();
+		}
+	}
+	bool operator < (const tree_struct_m &s1) const {
+		return string_is_less(item, s1.item);
+	}
+};
+
 void QalculateWindow::updateFunctionsMenu() {
 	functionsMenu->clear();
 	functionsMenu->addAction(tr("New Function…"), this, SLOT(newFunction()));
@@ -1541,15 +1586,220 @@ void QalculateWindow::updateFunctionsMenu() {
 			i++;
 		}
 	}
-	if(!settings->favourite_functions.empty()) {
+	for(size_t i = 0; i < settings->recent_functions.size();) {
+		if(!CALCULATOR->stillHasFunction(settings->recent_functions[i]) || !settings->recent_functions[i]->isActive()) {
+			settings->recent_functions.erase(settings->recent_functions.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	favouriteFunctionActions.clear();
+	if(settings->show_all_functions) {
+
+		tree_struct_m function_cats;
+		std::vector<MathFunction*> user_functions;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		MathFunction *f = NULL;
+		function_cats.items.clear();
+		function_cats.objects.clear();
+		function_cats.parent = NULL;
+		user_functions.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+			if(CALCULATOR->functions[i]->isActive() && !CALCULATOR->functions[i]->isHidden()) {
+				if(CALCULATOR->functions[i]->isLocal() && !CALCULATOR->functions[i]->isBuiltin() && !CALCULATOR->functions[i]->isHidden()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_functions.size(); i3++) {
+						f = user_functions[i3];
+						if(string_is_less(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs), f->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_functions.insert(user_functions.begin() + i3, CALCULATOR->functions[i]);
+							break;
+						}
+					}
+					if(!b) user_functions.push_back(CALCULATOR->functions[i]);
+				}
+				tree_struct_m *item = &function_cats;
+				if(!CALCULATOR->functions[i]->category().empty()) {
+					cat = CALCULATOR->functions[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					f = (MathFunction*) item->objects[i3];
+					if(string_is_less(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs), f->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->functions[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->functions[i]);
+			}
+		}
+
+		function_cats.sort();}
+
 		functionsMenu->addSeparator();
+		favouriteFunctionsMenu = functionsMenu->addMenu(tr("Favorites"));
+		int first_index = 4;
+		QMenu *sub = functionsMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		MathFunction *f;
+		tree_struct_m *titem, *titem2;
+		function_cats.rit = function_cats.items.rbegin();
+		if(function_cats.rit != function_cats.items.rend()) {
+			titem = &*function_cats.rit;
+			++function_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_functions.empty()) {
+			sub = functionsMenu->addMenu(tr("User functions"));
+			for(size_t i = 0; i < user_functions.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+				action->setData(QVariant::fromValue((void*) user_functions[i]));
+			}
+			first_index++;
+		}
+		functionsMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().at(sub3 == functionsMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					f = (MathFunction*) titem->objects[i];
+					action = sub->addAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+					action->setData(QVariant::fromValue((void*) f));
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < function_cats.objects.size(); i++) {
+			f = (MathFunction*) function_cats.objects[i];
+			if(!f->isLocal()) {
+				action = sub->addAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+				action->setData(QVariant::fromValue((void*) f));
+			}
+		}
+	} else {
+		favouriteFunctionsMenu = functionsMenu;
+	}
+	updateFavouriteFunctions();
+	functionsMenu->addSeparator();
+	QAction *action = functionsMenu->addAction(tr("Use dialog"));
+	action->setCheckable(true);
+	action->setChecked(settings->use_function_dialog);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(useFunctionDialog(bool)));
+	action = functionsMenu->addAction(tr("Show all functions"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_functions);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllFunctions(bool)));
+}
+void QalculateWindow::useFunctionDialog(bool b) {
+	settings->use_function_dialog = b;
+}
+void QalculateWindow::showAllFunctions(bool b) {
+	settings->show_all_functions = b;
+	updateFunctionsMenu();
+}
+void QalculateWindow::updateFavouriteFunctions() {
+	for(int i = 0; i < favouriteFunctionActions.size(); i++) {
+		favouriteFunctionsMenu->removeAction(favouriteFunctionActions[i]);
+		favouriteFunctionActions[i]->deleteLater();
+	}
+	favouriteFunctionActions.clear();
+	if(!settings->favourite_functions.empty()) {
+		if(!settings->show_all_functions) favouriteFunctionsMenu->addSeparator();
 		std::sort(settings->favourite_functions.begin(), settings->favourite_functions.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
-			QAction *action = functionsMenu->addAction(QString::fromStdString(settings->favourite_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+			for(size_t i = 0; i < settings->recent_functions.size(); i++) {
+				if(settings->recent_functions[i] == settings->favourite_functions[i]) {
+					settings->recent_functions.erase(settings->recent_functions.begin() + i);
+					break;
+				}
+			}
+			QAction *action = favouriteFunctionsMenu->addAction(QString::fromStdString(settings->favourite_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
 			action->setData(QVariant::fromValue((void*) settings->favourite_functions[i]));
+			favouriteFunctionActions << action;
+		}
+	}
+	if(!settings->show_all_functions && !settings->recent_functions.empty()) {
+		if(!settings->favourite_functions.empty()) favouriteFunctionActions << functionsMenu->addSeparator();
+		for(size_t i = 0; i < settings->recent_functions.size(); i++) {
+			QAction *action = favouriteFunctionsMenu->addAction(QString::fromStdString(settings->recent_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+			action->setData(QVariant::fromValue((void*) settings->recent_functions[i]));
+			favouriteFunctionActions << action;
 		}
 	}
 }
+void QalculateWindow::addToRecentFunctions(MathFunction *f) {
+	for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+		if(settings->favourite_functions[i] == f) return;
+	}
+	for(size_t i = 0; i < settings->recent_functions.size(); i++) {
+		if(settings->recent_functions[i] == f) {
+			settings->recent_functions.erase(settings->recent_functions.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_functions.size() > 5) settings->recent_functions.pop_back();
+	settings->recent_functions.insert(settings->recent_functions.begin(), f);
+	updateFavouriteFunctions();
+}
+
 void QalculateWindow::updateUnitsMenu() {
 	unitsMenu->clear();
 	for(size_t i = 0; i < settings->favourite_units.size();) {
@@ -1559,14 +1809,252 @@ void QalculateWindow::updateUnitsMenu() {
 			i++;
 		}
 	}
+	for(size_t i = 0; i < settings->recent_units.size();) {
+		if(!CALCULATOR->stillHasUnit(settings->recent_units[i]) || !settings->recent_units[i]->isActive()) {
+			settings->recent_units.erase(settings->recent_units.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	favouriteUnitActions.clear();
+	if(settings->show_all_units) {
+
+		tree_struct_m unit_cats;
+		std::vector<Unit*> user_units;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		Unit *u = NULL;
+		unit_cats.items.clear();
+		unit_cats.objects.clear();
+		unit_cats.parent = NULL;
+		user_units.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+			if(CALCULATOR->units[i]->isActive() && (!CALCULATOR->units[i]->isHidden() || !CALCULATOR->units[i]->isCurrency())) {
+				if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isBuiltin()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_units.size(); i3++) {
+						u = user_units[i3];
+						if(string_is_less(CALCULATOR->units[i]->title(true, settings->printops.use_unicode_signs), u->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_units.insert(user_units.begin() + i3, CALCULATOR->units[i]);
+							break;
+						}
+					}
+					if(!b) user_units.push_back(CALCULATOR->units[i]);
+				}
+				tree_struct_m *item = &unit_cats;
+				if(!CALCULATOR->units[i]->category().empty()) {
+					cat = CALCULATOR->units[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					u = (Unit*) item->objects[i3];
+					if(string_is_less(CALCULATOR->units[i]->title(true, settings->printops.use_unicode_signs), u->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->units[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->units[i]);
+			}
+		}
+
+		unit_cats.sort();}
+
+		favouriteUnitsMenu = unitsMenu->addMenu(tr("Favorites"));
+		int first_index = 2;
+		QMenu *sub = unitsMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		Unit *u;
+		tree_struct_m *titem, *titem2;
+		unit_cats.rit = unit_cats.items.rbegin();
+		if(unit_cats.rit != unit_cats.items.rend()) {
+			titem = &*unit_cats.rit;
+			++unit_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_units.empty()) {
+			sub = unitsMenu->addMenu(tr("User units"));
+			for(size_t i = 0; i < user_units.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+				action->setData(QVariant::fromValue((void*) user_units[i]));
+			}
+			first_index++;
+		}
+		unitsMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().at(sub3 == unitsMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				bool is_currencies = false;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					u = (Unit*) titem->objects[i];
+					if(!is_currencies && u->isCurrency()) is_currencies = true;
+					if(!u->isHidden()) {
+						if(is_currencies && QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {
+							action = sub->addAction(QIcon(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png")), QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+						} else {
+							action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+						}
+						action->setData(QVariant::fromValue((void*) u));
+					}
+				}
+				if(is_currencies) {
+					sub = sub3->addMenu(tr("more"));
+					for(size_t i = 0; i < titem->objects.size(); i++) {
+						u = (Unit*) titem->objects[i];
+						if(u->isHidden()) {
+							if(QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {
+								action = sub->addAction(QIcon(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png")), QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+							} else {
+								action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+							}
+							action->setData(QVariant::fromValue((void*) u));
+						}
+					}
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < unit_cats.objects.size(); i++) {
+			u = (Unit*) unit_cats.objects[i];
+			if(!u->isLocal()) {
+				action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+				action->setData(QVariant::fromValue((void*) u));
+			}
+		}
+		unitsMenu->addSeparator();
+		sub = unitsMenu->addMenu(tr("Prefixes"));
+		int index = 0;
+		Prefix *p = CALCULATOR->getPrefix(index);
+		while(p) {
+			QString str = QString::fromStdString(p->preferredDisplayName(false, true, false, false, &can_display_unicode_string_function, (void*) this).name);
+			if(p->type() == PREFIX_DECIMAL) {
+				str += " (10^";
+				str += QString::number(((DecimalPrefix*) p)->exponent());
+				str += ")";
+			} else if(p->type() == PREFIX_BINARY) {
+				str += " (2^";
+				str += QString::number(((DecimalPrefix*) p)->exponent());
+				str += ")";
+			}
+			action = sub->addAction(str, this, SLOT(prefixActivated()));
+			action->setData(QVariant::fromValue((void*) p));
+			index++;
+			p = CALCULATOR->getPrefix(index);
+		}
+	} else {
+		favouriteUnitsMenu = unitsMenu;
+	}
+	updateFavouriteUnits();
+	unitsMenu->addSeparator();
+	QAction *action = unitsMenu->addAction(tr("Show all units"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_units);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllUnits(bool)));
+	updateAngleUnitsMenu();
+}
+void QalculateWindow::showAllUnits(bool b) {
+	settings->show_all_units = b;
+	updateUnitsMenu();
+}
+void QalculateWindow::updateFavouriteUnits() {
+	for(int i = 0; i < favouriteUnitActions.size(); i++) {
+		favouriteUnitsMenu->removeAction(favouriteUnitActions[i]);
+		favouriteUnitActions[i]->deleteLater();
+	}
+	favouriteUnitActions.clear();
 	if(!settings->favourite_units.empty()) {
 		std::sort(settings->favourite_units.begin(), settings->favourite_units.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
-			QAction *action = unitsMenu->addAction(QString::fromStdString(settings->favourite_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+			for(size_t i = 0; i < settings->recent_units.size(); i++) {
+				if(settings->recent_units[i] == settings->favourite_units[i]) {
+					settings->recent_units.erase(settings->recent_units.begin() + i);
+					break;
+				}
+			}
+			QAction *action = favouriteUnitsMenu->addAction(QString::fromStdString(settings->favourite_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
 			action->setData(QVariant::fromValue((void*) settings->favourite_units[i]));
+			favouriteUnitActions << action;
 		}
 	}
-	updateAngleUnitsMenu();
+	if(!settings->show_all_units && !settings->recent_units.empty()) {
+		if(!settings->favourite_units.empty()) favouriteUnitActions << unitsMenu->addSeparator();
+		for(size_t i = 0; i < settings->recent_units.size(); i++) {
+			QAction *action = favouriteUnitsMenu->addAction(QString::fromStdString(settings->recent_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+			action->setData(QVariant::fromValue((void*) settings->recent_units[i]));
+			favouriteUnitActions << action;
+		}
+	}
+}
+void QalculateWindow::addToRecentUnits(Unit *u) {
+	for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+		if(settings->favourite_units[i] == u) return;
+	}
+	for(size_t i = 0; i < settings->recent_units.size(); i++) {
+		if(settings->recent_units[i] == u) {
+			settings->recent_units.erase(settings->recent_units.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_units.size() > 5) settings->recent_units.pop_back();
+	settings->recent_units.insert(settings->recent_units.begin(), u);
+	updateFavouriteUnits();
 }
 void QalculateWindow::updateVariablesMenu() {
 	variablesMenu->clear();
@@ -1578,18 +2066,211 @@ void QalculateWindow::updateVariablesMenu() {
 			i++;
 		}
 	}
-	if(!settings->favourite_variables.empty()) {
-		bool b = false;
-		std::sort(settings->favourite_variables.begin(), settings->favourite_variables.end(), sort_compare_item);
-		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
-			if(CALCULATOR->stillHasVariable(settings->favourite_variables[i]) && settings->favourite_variables[i]->isActive()) {
-				if(!b) variablesMenu->addSeparator();
-				b = true;
-				QAction *action = variablesMenu->addAction(QString::fromStdString(settings->favourite_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
-				action->setData(QVariant::fromValue((void*) settings->favourite_variables[i]));
-			}
+	for(size_t i = 0; i < settings->recent_variables.size();) {
+		if(!CALCULATOR->stillHasVariable(settings->recent_variables[i]) || !settings->recent_variables[i]->isActive()) {
+			settings->recent_variables.erase(settings->recent_variables.begin() + i);
+		} else {
+			i++;
 		}
 	}
+	favouriteVariableActions.clear();
+	if(settings->show_all_variables) {
+
+		tree_struct_m variable_cats;
+		std::vector<Variable*> user_variables;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		Variable *v = NULL;
+		variable_cats.items.clear();
+		variable_cats.objects.clear();
+		variable_cats.parent = NULL;
+		user_variables.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+			if(CALCULATOR->variables[i]->isActive() && !CALCULATOR->variables[i]->isHidden()) {
+				if(CALCULATOR->variables[i]->isLocal() && !CALCULATOR->variables[i]->isBuiltin()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_variables.size(); i3++) {
+						v = user_variables[i3];
+						if(string_is_less(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs), v->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_variables.insert(user_variables.begin() + i3, CALCULATOR->variables[i]);
+							break;
+						}
+					}
+					if(!b) user_variables.push_back(CALCULATOR->variables[i]);
+				}
+				tree_struct_m *item = &variable_cats;
+				if(!CALCULATOR->variables[i]->category().empty()) {
+					cat = CALCULATOR->variables[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					v = (Variable*) item->objects[i3];
+					if(string_is_less(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs), v->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->variables[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->variables[i]);
+			}
+		}
+
+		variable_cats.sort();}
+
+		variablesMenu->addSeparator();
+		favouriteVariablesMenu = variablesMenu->addMenu(tr("Favorites"));
+		int first_index = 4;
+		QMenu *sub = variablesMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		Variable *v;
+		tree_struct_m *titem, *titem2;
+		variable_cats.rit = variable_cats.items.rbegin();
+		if(variable_cats.rit != variable_cats.items.rend()) {
+			titem = &*variable_cats.rit;
+			++variable_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_variables.empty()) {
+			sub = variablesMenu->addMenu(tr("User variables"));
+			for(size_t i = 0; i < user_variables.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action->setData(QVariant::fromValue((void*) user_variables[i]));
+			}
+			first_index++;
+		}
+		variablesMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().at(sub3 == variablesMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					v = (Variable*) titem->objects[i];
+					action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+					action->setData(QVariant::fromValue((void*) v));
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < variable_cats.objects.size(); i++) {
+			v = (Variable*) variable_cats.objects[i];
+			if(!v->isLocal()) {
+				action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action->setData(QVariant::fromValue((void*) v));
+			}
+		}
+	} else {
+		favouriteVariablesMenu = variablesMenu;
+	}
+	updateFavouriteVariables();
+	variablesMenu->addSeparator();
+	QAction *action = variablesMenu->addAction(tr("Show all variables"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_variables);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllVariables(bool)));
+}
+void QalculateWindow::showAllVariables(bool b) {
+	settings->show_all_variables = b;
+	updateVariablesMenu();
+}
+void QalculateWindow::updateFavouriteVariables() {
+	for(int i = 0; i < favouriteVariableActions.size(); i++) {
+		favouriteVariablesMenu->removeAction(favouriteVariableActions[i]);
+		favouriteVariableActions[i]->deleteLater();
+	}
+	favouriteVariableActions.clear();
+	if(!settings->favourite_variables.empty()) {
+		if(!settings->show_all_variables) favouriteVariablesMenu->addSeparator();
+		std::sort(settings->favourite_variables.begin(), settings->favourite_variables.end(), sort_compare_item);
+		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+			for(size_t i = 0; i < settings->recent_variables.size(); i++) {
+				if(settings->recent_variables[i] == settings->favourite_variables[i]) {
+					settings->recent_variables.erase(settings->recent_variables.begin() + i);
+					break;
+				}
+			}
+			QAction *action = favouriteVariablesMenu->addAction(QString::fromStdString(settings->favourite_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+			action->setData(QVariant::fromValue((void*) settings->favourite_variables[i]));
+			favouriteVariableActions << action;
+		}
+	}
+	if(!settings->show_all_variables && !settings->recent_variables.empty()) {
+		if(!settings->favourite_variables.empty()) favouriteVariableActions << variablesMenu->addSeparator();
+		for(size_t i = 0; i < settings->recent_variables.size(); i++) {
+			QAction *action = favouriteVariablesMenu->addAction(QString::fromStdString(settings->recent_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+			action->setData(QVariant::fromValue((void*) settings->recent_variables[i]));
+			favouriteVariableActions << action;
+		}
+	}
+}
+void QalculateWindow::addToRecentVariables(Variable *v) {
+	for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+		if(settings->favourite_variables[i] == v) return;
+	}
+	for(size_t i = 0; i < settings->recent_variables.size(); i++) {
+		if(settings->recent_variables[i] == v) {
+			settings->recent_variables.erase(settings->recent_variables.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_variables.size() > 5) settings->recent_variables.pop_back();
+	settings->recent_variables.insert(settings->recent_variables.begin(), v);
+	updateFavouriteVariables();
 }
 void QalculateWindow::variableActivated() {
 	onVariableClicked((Variable*) ((QAction*) sender())->data().value<void*>());
@@ -1597,8 +2278,17 @@ void QalculateWindow::variableActivated() {
 void QalculateWindow::unitActivated() {
 	onUnitActivated((Unit*) ((QAction*) sender())->data().value<void*>());
 }
+void QalculateWindow::prefixActivated() {
+	Prefix *p = (Prefix*) ((QAction*) sender())->data().value<void*>();
+	if(!p) return;
+	expressionEdit->blockCompletion();
+	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockCompletion(false);
+}
 void QalculateWindow::functionActivated() {
-	insertFunction((MathFunction*) ((QAction*) sender())->data().value<void*>(), this);
+	if(settings->use_function_dialog) insertFunction((MathFunction*) ((QAction*) sender())->data().value<void*>(), this);
+	else onFunctionClicked((MathFunction*) ((QAction*) sender())->data().value<void*>());
 }
 void QalculateWindow::registerUp() {
 	if(CALCULATOR->RPNStackSize() <= 1) return;
@@ -6654,9 +7344,13 @@ void QalculateWindow::openFunctions() {
 	}
 	functionsDialog = new FunctionsDialog();
 	connect(functionsDialog, SIGNAL(itemsChanged()), this, SLOT(onFunctionsChanged()));
+	connect(functionsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteFunctions()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
+	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(onInsertFunctionRequested(MathFunction*)));
+	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));
+	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	if(settings->always_on_top) functionsDialog->setWindowFlags(functionsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	functionsDialog->show();
 }
@@ -6679,9 +7373,11 @@ void QalculateWindow::openVariables() {
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
 	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(variablesDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteVariables()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
 	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
+	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(addToRecentVariables(Variable*)));
 	if(settings->always_on_top) variablesDialog->setWindowFlags(variablesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	variablesDialog->show();
 }
@@ -6711,9 +7407,11 @@ void QalculateWindow::openUnits() {
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
 	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(unitsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteUnits()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
 	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
 	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
+	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(addToRecentUnits(Unit*)));
 	connect(unitsDialog, SIGNAL(convertToUnitRequest(Unit*)), this, SLOT(convertToUnit(Unit*)));
 	connect(unitsDialog, SIGNAL(unitActivated(Unit*)), this, SLOT(onUnitActivated(Unit*)));
 	if(settings->always_on_top) unitsDialog->setWindowFlags(unitsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -6740,6 +7438,7 @@ void remove_nonunits(MathStructure &m) {
 void QalculateWindow::onUnitActivated(Unit *u) {
 	if(expressionEdit->expressionHasChanged() || settings->history_answer.empty() || ((settings->replace_expression != CLEAR_EXPRESSION || !expressionEdit->document()->isEmpty()) && (expressionEdit->document()->isEmpty() || expressionEdit->selectedText() != expressionEdit->toPlainText())) || !mstruct) {
 		onUnitClicked(u);
+		addToRecentUnits(u);
 	} else {
 		if(!mstruct->containsType(STRUCT_UNIT, true)) {
 			MathStructure m_u(u);

@@ -306,7 +306,7 @@ void FunctionsDialog::favouriteClicked() {
 		}
 	}
 	settings->favourite_functions_changed = true;
-	emit itemsChanged();
+	emit favouritesChanged();
 }
 void FunctionsDialog::delClicked() {
 	QModelIndex index = functionsView->selectionModel()->currentIndex();

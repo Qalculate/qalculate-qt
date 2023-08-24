@@ -184,12 +184,18 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(!is_workspace && svar == "favourite_function") {
 		favourite_functions_pre.push_back(svalue);
 		favourite_functions_changed = true;
+	} else if(!is_workspace && svar == "recent_function") {
+		recent_functions_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "favourite_unit") {
 		favourite_units_pre.push_back(svalue);
 		favourite_units_changed = true;
+	} else if(!is_workspace && svar == "recent_unit") {
+		recent_units_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "favourite_variable") {
 		favourite_variables_pre.push_back(svalue);
 		favourite_variables_changed = true;
+	} else if(!is_workspace && svar == "recent_variable") {
+		recent_variables_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "keyboard_shortcut") {
 		default_shortcuts = false;
 		char str1[svalue.length()];
@@ -271,8 +277,18 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 				custom_buttons[index].value[bi] = "";
 			}
 		}
+	} else if(!is_workspace && svar == "show_all_units") {
+		show_all_units = v;
+	} else if(!is_workspace && svar == "show_all_functions") {
+		show_all_functions = v;
+	} else if(!is_workspace && svar == "show_all_variables") {
+		show_all_variables = v;
+	} else if(!is_workspace && svar == "use_function_dialog") {
+		use_function_dialog = v;
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 3) keypad_type = v;
+	} else if(svar == "toolbar_style") {
+		if(v == Qt::ToolButtonIconOnly || v == Qt::ToolButtonTextOnly || v == Qt::ToolButtonTextBesideIcon || v == Qt::ToolButtonTextUnderIcon) toolbar_style = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
 	} else if(svar == "show_keypad") {
@@ -845,6 +861,7 @@ void QalculateQtSettings::loadPreferences() {
 	expression_status_delay = 1000;
 	prefixes_default = true;
 	keypad_type = 0;
+	toolbar_style = Qt::ToolButtonIconOnly;
 	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
@@ -902,6 +919,11 @@ void QalculateQtSettings::loadPreferences() {
 	favourite_functions_changed = false;
 	favourite_variables_changed = false;
 	favourite_units_changed = false;
+
+	show_all_functions = false;
+	show_all_variables = false;
+	show_all_units = false;
+	use_function_dialog = true;
 
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
@@ -1045,6 +1067,10 @@ void QalculateQtSettings::updateFavourites() {
 			if(f) favourite_functions.push_back(f);
 		}
 	}
+	for(size_t i = 0; i < recent_functions_pre.size(); i++) {
+		MathFunction *f = CALCULATOR->getActiveFunction(recent_functions_pre[i]);
+		if(f) recent_functions.push_back(f);
+	}
 	if(favourite_units_pre.empty()) {
 		const char *si_units[] = {"m", "kg_c", "s", "A", "K", "mol", "cd"};
 		for(size_t i = 0; i < 7; i++) {
@@ -1062,6 +1088,11 @@ void QalculateQtSettings::updateFavourites() {
 			if(u) favourite_units.push_back(u);
 		}
 	}
+	for(size_t i = 0; i < recent_units_pre.size(); i++) {
+		Unit *u = CALCULATOR->getActiveUnit(recent_units_pre[i]);
+		if(!u) u = CALCULATOR->getCompositeUnit(recent_units_pre[i]);
+		if(u) recent_units.push_back(u);
+	}
 	if(favourite_variables_pre.empty()) {
 		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_PI));
 		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_E));
@@ -1076,6 +1107,10 @@ void QalculateQtSettings::updateFavourites() {
 			Variable *v = CALCULATOR->getActiveVariable(favourite_variables_pre[i]);
 			if(v) favourite_variables.push_back(v);
 		}
+	}
+	for(size_t i = 0; i < recent_variables_pre.size(); i++) {
+		Variable *v = CALCULATOR->getActiveVariable(recent_variables_pre[i]);
+		if(v) recent_variables.push_back(v);
 	}
 }
 
@@ -1253,6 +1288,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "completion_min2=%i\n", completion_min2);
 		fprintf(file, "completion_delay=%i\n", completion_delay);
 		fprintf(file, "style=%i\n", style);
+		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
@@ -1281,6 +1317,10 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	}
 	if(!is_workspace) {
 		fprintf(file, "rpn_keys=%i\n", rpn_keys);
+		fprintf(file, "show_all_functions=%i\n", show_all_functions);
+		fprintf(file, "show_all_units=%i\n", show_all_units);
+		fprintf(file, "show_all_variables=%i\n", show_all_variables);
+		fprintf(file, "use_function_dialog=%i\n", use_function_dialog);
 		if(!current_workspace.empty()) fprintf(file, "last_workspace=%s\n", current_workspace.c_str());
 		if(save_workspace >= 0) fprintf(file, "save_workspace=%i\n", save_workspace);
 		for(size_t i = 0; i < recent_workspaces.size(); i++) {
@@ -1314,6 +1354,11 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				}
 			}
 		}
+		for(size_t i = 0; i < recent_functions.size(); i++) {
+			if(CALCULATOR->stillHasFunction(recent_functions[i]) && recent_functions[i]->isActive() && recent_functions[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_function=%s\n", recent_functions[i]->referenceName().c_str());
+			}
+		}
 		if(favourite_units_changed) {
 			for(size_t i = 0; i < favourite_units.size(); i++) {
 				if(CALCULATOR->stillHasUnit(favourite_units[i]) && favourite_units[i]->isActive() && favourite_units[i]->category() != CALCULATOR->temporaryCategory()) {
@@ -1321,11 +1366,21 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				}
 			}
 		}
+		for(size_t i = 0; i < recent_units.size(); i++) {
+			if(CALCULATOR->stillHasUnit(recent_units[i]) && recent_units[i]->isActive() && recent_units[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_unit=%s\n", recent_units[i]->referenceName().c_str());
+			}
+		}
 		if(favourite_variables_changed) {
 			for(size_t i = 0; i < favourite_variables.size(); i++) {
 				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {
 					fprintf(file, "favourite_variable=%s\n", favourite_variables[i]->referenceName().c_str());
 				}
+			}
+		}
+		for(size_t i = 0; i < recent_variables.size(); i++) {
+			if(CALCULATOR->stillHasVariable(recent_variables[i]) && recent_variables[i]->isActive() && recent_variables[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_variable=%s\n", recent_variables[i]->referenceName().c_str());
 			}
 		}
 		if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);

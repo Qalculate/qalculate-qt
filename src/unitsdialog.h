@@ -93,6 +93,7 @@ class UnitsDialog : public QDialog {
 	signals:
 
 		void itemsChanged();
+		void favouritesChanged();
 		void variableRemoved(Variable*);
 		void variableDeactivated(Variable*);
 		void insertUnitRequest(Unit*);

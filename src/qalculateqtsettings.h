@@ -247,6 +247,7 @@ class QalculateQtSettings : QObject {
 		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		int toolbar_style;
 		int show_keypad;
 		int show_bases;
 		bool hide_numpad;
@@ -295,17 +296,18 @@ class QalculateQtSettings : QObject {
 		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
 		std::vector<std::vector<size_t> > v_value;
-		std::vector<MathFunction*> favourite_functions;
-		std::vector<Variable*> favourite_variables;
-		std::vector<Unit*> favourite_units;
-		std::vector<std::string> favourite_functions_pre;
-		std::vector<std::string> favourite_variables_pre;
-		std::vector<std::string> favourite_units_pre;
+		std::vector<MathFunction*> favourite_functions, recent_functions;
+		std::vector<Variable*> favourite_variables, recent_variables;
+		std::vector<Unit*> favourite_units, recent_units;
+		std::vector<std::string> favourite_functions_pre, recent_functions_pre;
+		std::vector<std::string> favourite_variables_pre, recent_variables_pre;
+		std::vector<std::string> favourite_units_pre, recent_units_pre;
 		bool default_shortcuts;
 		std::vector<keyboard_shortcut*> keyboard_shortcuts;
 		int custom_button_columns, custom_button_rows;
 		std::vector<custom_button> custom_buttons;
 		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;
+		bool show_all_functions, show_all_variables, show_all_units, use_function_dialog;
 
 };
 

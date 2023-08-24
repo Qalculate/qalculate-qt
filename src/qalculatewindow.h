@@ -103,12 +103,14 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
 		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
+		QMenu *tmenu;
 		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
-		QMenu *variablesMenu, *functionsMenu, *unitsMenu, *angleMenu;
+		QMenu *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *favouriteFunctionsMenu, *unitsMenu, *favouriteUnitsMenu, *angleMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
 		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;
 		QList<QAction*> recentWSAction;
+		QList<QAction*> favouriteVariableActions, favouriteFunctionActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 		QTimer *ecTimer, *rfTimer;
 		QFont saved_app_font;
@@ -241,11 +243,22 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionStatusModeChanged();
 		void functionActivated();
 		void unitActivated();
+		void prefixActivated();
 		void variableActivated();
 		void updateAngleUnitsMenu();
 		void updateFunctionsMenu();
+		void useFunctionDialog(bool);
+		void showAllFunctions(bool);
+		void updateFavouriteFunctions();
+		void addToRecentFunctions(MathFunction*);
 		void updateUnitsMenu();
+		void showAllUnits(bool);
+		void updateFavouriteUnits();
+		void addToRecentUnits(Unit*);
 		void updateVariablesMenu();
+		void showAllVariables(bool);
+		void updateFavouriteVariables();
+		void addToRecentVariables(Variable*);
 		void shortcutActivated();
 		void shortcutClicked(int, const QString&);
 		void keyboardShortcutAdded(keyboard_shortcut *ks);
@@ -265,7 +278,8 @@ class QalculateWindow : public QMainWindow {
 		void openDefaultWorkspace();
 		void openRecentWorkspace();
 		void onColorSchemeChanged();
-
+		void showToolbarContextMenu(const QPoint&);
+		void setToolbarStyle();
 
 	public slots:
 
