@@ -13,14 +13,13 @@
 #define KEYPAD_WIDGET_H
 
 #include <QWidget>
-#include <QPushButton>
+#include <QToolButton>
 #include <QVector>
 
 #include <libqalculate/qalculate.h>
 
 class QTimer;
 class QStackedLayout;
-class QToolButton;
 class QLineEdit;
 class QComboBox;
 class QListWidget;
@@ -29,8 +28,9 @@ class QDialog;
 class QGridLayout;
 class QAction;
 class QLabel;
+class QPushButton;
 
-class KeypadButton : public QPushButton {
+class KeypadButton : public QToolButton {
 
 	Q_OBJECT
 
@@ -43,6 +43,7 @@ class KeypadButton : public QPushButton {
 		void setToolTip(const QString &s1, const QString &s2 = QString(), const QString &s3 = QString());
 		void setRichText(const QString &text);
 		const QString &richText() const;
+		void menuSet();
 
 	protected:
 
@@ -58,6 +59,8 @@ class KeypadButton : public QPushButton {
 	protected slots:
 
 		void longPressTimeout();
+		void menuOpened();
+		void menuClosed();
 
 	signals:
 
@@ -84,7 +87,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
 		QVector<QVector<KeypadButton*> > customButtons;
@@ -104,9 +107,11 @@ class KeypadWidget : public QWidget {
 	protected slots:
 
 		void onSymbolButtonClicked();
-		void onSymbolToolButtonClicked();
 		void onOperatorButtonClicked();
 		void onItemButtonClicked();
+		void onUnitItemClicked();
+		void onUnitButtonClicked2();
+		void onUnitButtonClicked3();
 		void onSymbolButtonClicked2();
 		void onOperatorButtonClicked2();
 		void onItemButtonClicked2();
@@ -138,6 +143,8 @@ class KeypadWidget : public QWidget {
 		void updateSymbols();
 		void setKeypadType(int);
 		void hideNumpad(bool);
+		void showSeparateKeypadMenuButtons(bool);
+		void updateVariables();
 
 	signals:
 
@@ -160,13 +167,18 @@ class KeypadWidget : public QWidget {
 		void MRClicked();
 		void MPlusClicked();
 		void MMinusClicked();
+		void storeClicked();
+		void newFunctionClicked();
 		void backspaceClicked();
 		void answerClicked();
 		void baseClicked(int, bool);
 		void factorizeClicked();
 		void expandClicked();
+		void expandPartialFractionsClicked();
 		void expressionCalculationUpdated(int);
 		void shortcutClicked(int, const QString&);
+		void openVariablesRequest();
+		void openUnitsRequest();
 
 };
 

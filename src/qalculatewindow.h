@@ -172,10 +172,12 @@ class QalculateWindow : public QMainWindow {
 		void onBaseClicked(int, bool);
 		void onFactorizeClicked();
 		void onExpandClicked();
+		void onExpandPartialFractionsClicked();
 		void onToActivated(bool = true);
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void hideNumpad(bool);
+		void showSeparateKeypadMenuButtons(bool);
 		void resetKeypadPosition();
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
@@ -280,6 +282,8 @@ class QalculateWindow : public QMainWindow {
 		void onColorSchemeChanged();
 		void showToolbarContextMenu(const QPoint&);
 		void setToolbarStyle();
+		void showKeypadContextMenu(const QPoint&);
+		void updateKeypadTitle();
 
 	public slots:
 
@@ -372,6 +376,7 @@ class QalculateDockWidget : public QDockWidget {
 	public:
 
 		QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget);
+		QalculateDockWidget(QWidget *parent, ExpressionEdit *editwidget);
 		virtual ~QalculateDockWidget();
 
 	protected:

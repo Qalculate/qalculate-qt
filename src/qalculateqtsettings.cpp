@@ -191,6 +191,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		favourite_units_changed = true;
 	} else if(!is_workspace && svar == "recent_unit") {
 		recent_units_pre.push_back(svalue);
+	} else if(!is_workspace && svar == "latest_button_unit") {
+		latest_button_unit = svalue;
 	} else if(!is_workspace && svar == "favourite_variable") {
 		favourite_variables_pre.push_back(svalue);
 		favourite_variables_changed = true;
@@ -289,6 +291,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= 0 && v <= 3) keypad_type = v;
 	} else if(svar == "toolbar_style") {
 		if(v == Qt::ToolButtonIconOnly || v == Qt::ToolButtonTextOnly || v == Qt::ToolButtonTextBesideIcon || v == Qt::ToolButtonTextUnderIcon) toolbar_style = v;
+	} else if(svar == "separate_keypad_menu_buttons") {
+		separate_keypad_menu_buttons = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
 	} else if(svar == "show_keypad") {
@@ -862,6 +866,7 @@ void QalculateQtSettings::loadPreferences() {
 	prefixes_default = true;
 	keypad_type = 0;
 	toolbar_style = Qt::ToolButtonIconOnly;
+	separate_keypad_menu_buttons = false;
 	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
@@ -1289,6 +1294,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "completion_delay=%i\n", completion_delay);
 		fprintf(file, "style=%i\n", style);
 		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
+		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
@@ -1371,6 +1377,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				fprintf(file, "recent_unit=%s\n", recent_units[i]->referenceName().c_str());
 			}
 		}
+		if(!latest_button_unit.empty()) fprintf(file, "latest_button_unit=%s\n", latest_button_unit.c_str());
 		if(favourite_variables_changed) {
 			for(size_t i = 0; i < favourite_variables.size(); i++) {
 				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {

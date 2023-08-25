@@ -247,6 +247,7 @@ class QalculateQtSettings : QObject {
 		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
+		bool separate_keypad_menu_buttons;
 		int toolbar_style;
 		int show_keypad;
 		int show_bases;
@@ -299,6 +300,7 @@ class QalculateQtSettings : QObject {
 		std::vector<MathFunction*> favourite_functions, recent_functions;
 		std::vector<Variable*> favourite_variables, recent_variables;
 		std::vector<Unit*> favourite_units, recent_units;
+		std::string latest_button_unit;
 		std::vector<std::string> favourite_functions_pre, recent_functions_pre;
 		std::vector<std::string> favourite_variables_pre, recent_variables_pre;
 		std::vector<std::string> favourite_units_pre, recent_units_pre;

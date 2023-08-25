@@ -22,6 +22,7 @@
 #include <QDockWidget>
 #include <QToolTip>
 #include <QToolBar>
+#include <QPushButton>
 #include <QAction>
 #include <QApplication>
 #include <QLineEdit>
@@ -272,6 +273,7 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 }
 
 QalculateDockWidget::QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
+QalculateDockWidget::QalculateDockWidget(QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(parent), expressionEdit(editwidget) {}
 QalculateDockWidget::~QalculateDockWidget() {}
 
 void QalculateDockWidget::keyPressEvent(QKeyEvent *e) {
@@ -643,7 +645,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this);
 	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
-	updateVariablesMenu();
 	storeAction->setMenu(variablesMenu);
 	tb->addAction(storeAction);
 	functionsAction_t = new QAction(LOAD_ICON("function"), tr("Functions"), this);
@@ -686,7 +687,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
 	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad); hideNumpadAction = action;
-	menu->addSeparator();
+	action = menu->addAction(tr("Separate Menu Buttons"), this, SLOT(showSeparateKeypadMenuButtons(bool))); action->setCheckable(true); action->setChecked(settings->separate_keypad_menu_buttons);
 	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
 	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
@@ -765,9 +766,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesDock->hide();
 
 	keypad = new KeypadWidget(this);
-	keypadDock = new QalculateDockWidget(tr("Keypad"), this, expressionEdit);
+	keypadDock = new QalculateDockWidget(this, expressionEdit);
 	keypadDock->setObjectName("keypad-dock");
 	keypadDock->setWidget(keypad);
+	updateKeypadTitle();
+	keypadDock->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(keypadDock, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showKeypadContextMenu(const QPoint&)));
 	addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
 
 	QWidget *rpnWidget = new QWidget(this);
@@ -814,6 +818,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rpnDock->setWidget(rpnWidget);
 	addDockWidget(Qt::TopDockWidgetArea, rpnDock);
 	if(!settings->rpn_mode) rpnDock->hide();
+
+	updateVariablesMenu();
 
 	QLocalServer::removeServer("qalculate-qt");
 	server = new QLocalServer(this);
@@ -879,10 +885,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(MCClicked()), this, SLOT(onMCClicked()));
 	connect(keypad, SIGNAL(MPlusClicked()), this, SLOT(onMPlusClicked()));
 	connect(keypad, SIGNAL(MMinusClicked()), this, SLOT(onMMinusClicked()));
+	connect(keypad, SIGNAL(storeClicked()), this, SLOT(onStoreActivated()));
+	connect(keypad, SIGNAL(newFunctionClicked()), this, SLOT(newFunction()));
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
 	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
 	connect(keypad, SIGNAL(factorizeClicked()), this, SLOT(onFactorizeClicked()));
 	connect(keypad, SIGNAL(expandClicked()), this, SLOT(onExpandClicked()));
+	connect(keypad, SIGNAL(expandPartialFractionsClicked()), this, SLOT(onExpandPartialFractionsClicked()));
+	connect(keypad, SIGNAL(openVariablesRequest()), this, SLOT(openVariables()));
+	connect(keypad, SIGNAL(openUnitsRequest()), this, SLOT(openUnits()));
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
 #endif
@@ -912,6 +923,19 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
+void QalculateWindow::updateKeypadTitle() {
+	QString str = tr("Keypad") + " (";
+	if(settings->keypad_type == KEYPAD_GENERAL) str += tr("General");
+	else if(settings->keypad_type == KEYPAD_PROGRAMMING) str += tr("Programming");
+	else if(settings->keypad_type == KEYPAD_ALGEBRA) str += tr("Algebra");
+	else if(settings->keypad_type == KEYPAD_CUSTOM) str += tr("Custom");
+	str += ")";
+	keypadDock->setWindowTitle(str);
+}
+void QalculateWindow::showKeypadContextMenu(const QPoint &pos) {
+	QPoint p = keypadDock->mapToGlobal(pos);
+	if(p.y() < keypad->mapToGlobal(QPoint(0, 0)).y()) keypadAction_t->menu()->popup(p);
+}
 void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
 	if(!tmenu) {
 		tmenu = new QMenu(this);
@@ -2218,6 +2242,7 @@ void QalculateWindow::updateVariablesMenu() {
 		favouriteVariablesMenu = variablesMenu;
 	}
 	updateFavouriteVariables();
+	keypad->updateVariables();
 	variablesMenu->addSeparator();
 	QAction *action = variablesMenu->addAction(tr("Show all variables"));
 	action->setCheckable(true);
@@ -2838,6 +2863,9 @@ void QalculateWindow::onFactorizeClicked() {
 }
 void QalculateWindow::onExpandClicked() {
 	executeCommand(COMMAND_EXPAND);
+}
+void QalculateWindow::onExpandPartialFractionsClicked() {
+	executeCommand(COMMAND_EXPAND_PARTIAL_FRACTIONS);
 }
 void QalculateWindow::serverNewConnection() {
 	socket = server->nextPendingConnection();
@@ -6527,6 +6555,10 @@ void QalculateWindow::hideNumpad(bool b) {
 	settings->hide_numpad = b;
 	workspace_changed = true;
 }
+void QalculateWindow::showSeparateKeypadMenuButtons(bool b) {
+	settings->separate_keypad_menu_buttons = b;
+	keypad->showSeparateKeypadMenuButtons(b);
+}
 void QalculateWindow::resetKeypadPosition() {
 	keypadDock->setFloating(false);
 	if(dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea) {
@@ -6550,6 +6582,7 @@ void QalculateWindow::keypadTypeActivated() {
 		keypadDock->setVisible(true);
 		keypadDock->raise();
 		settings->show_keypad = 1;
+		updateKeypadTitle();
 	}
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	workspace_changed = true;
@@ -8450,6 +8483,7 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);
 		keypad->setKeypadType(settings->keypad_type);
+		updateKeypadTitle();
 		keypad->hideNumpad(settings->hide_numpad);
 		if(preferencesDialog) {
 			preferencesDialog->hide();
