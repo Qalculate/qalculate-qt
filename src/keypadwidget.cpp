@@ -401,28 +401,32 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	std::string sunit = settings->latest_button_unit;
 	if(sunit.empty()) sunit = "m";
 	Unit *u = CALCULATOR->getActiveUnit(sunit);
-	button = new KeypadButton(QString::fromStdString(sunit), this); \
+	button = new KeypadButton(QString::fromStdString(sunit), this);
+	Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
 	button->setProperty(BUTTON_DATA, u ? QVariant::fromValue((void*) u) : QString::fromStdString(sunit));
+	button->setProperty(BUTTON_DATA2, QVariant::fromValue((void*) p1));
+	button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) p2));
 	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
 	connect(button, SIGNAL(clicked2()), this, SLOT(onUnitButtonClicked2()));
 	connect(button, SIGNAL(clicked3()), this, SLOT(onUnitButtonClicked3()));
 	grid->addWidget(button, c, 2, 1, 1);
 	unitButton = button;
-	bool p1 = false, p2 = false;
-	if(u && u->useWithPrefixesByDefault()) {
-		p1 = u->maxPreferredPrefix() >= 3;
-		p2 = u->minPreferredPrefix() <= -3;
-	}
-	if(p1) unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), "k" + QString::fromStdString(settings->latest_button_unit), p2 ? "m" + QString::fromStdString(settings->latest_button_unit) : QString());
-	else if(p2) unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), "m" + QString::fromStdString(settings->latest_button_unit));
-	else unitButton->setToolTip(u ? QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)) : "Meter");
+	unitButton->setToolTip(QString::fromStdString(u ? u->title(true, settings->printops.use_unicode_signs) : sunit), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
 	CREATE_MENU
-	const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "oC", "cd", "mol", "C", "Hz", "F", "S", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
-	for(size_t i = 0; i < 20; i++) {
+	const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
+	for(size_t i = 0; i < 15; i++) {
 		item = CALCULATOR->getActiveUnit(si_units[i]);
 		if(item) {
 			action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
 			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
+		}
+	}
+	menu->addSeparator();
+	for(int i = -9; i <= 12; i += 3) {
+		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+		if(p) {
+			action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
 		}
 	}
 	menu->addSeparator();
@@ -1087,6 +1091,7 @@ void KeypadWidget::showSeparateKeypadMenuButtons(bool b) {
 			buttons.at(i)->setPopupMode(b ? QToolButton::MenuButtonPopup : QToolButton::DelayedPopup);
 		}
 	}
+	repaint(geometry());
 }
 void KeypadWidget::updateBase() {
 	binButton->setChecked(settings->printops.base == 2 && settings->evalops.parse_options.base == 2);
@@ -1166,50 +1171,23 @@ void KeypadWidget::onItemButtonClicked() {
 	else if(item->type() == TYPE_VARIABLE) emit variableClicked((Variable*) item);
 	else if(item->type() == TYPE_UNIT) emit unitClicked((Unit*) item);
 }
+void KeypadWidget::onPrefixItemClicked() {
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA).value<void*>());
+}
 void KeypadWidget::onUnitItemClicked() {
 	Unit *u = (Unit*) sender()->property(BUTTON_DATA).value<void*>();
 	emit unitClicked(u);
 	settings->latest_button_unit = u->print(false, true, true);
 	unitButton->setText(QString::fromStdString(settings->latest_button_unit));
-	bool p1 = false, p2 = false;
-	if(u->useWithPrefixesByDefault()) {
-		p1 = u->maxPreferredPrefix() >= 3;
-		p2 = u->minPreferredPrefix() <= -3;
-	}
-	if(p1) unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), "k" + QString::fromStdString(settings->latest_button_unit), p2 ? "m" + QString::fromStdString(settings->latest_button_unit) : QString());
-	else if(p2) unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), "m" + QString::fromStdString(settings->latest_button_unit));
-	else unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)));
+	Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
+	unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
 	unitButton->setProperty(BUTTON_DATA, QVariant::fromValue((void*) u));
 }
 void KeypadWidget::onUnitButtonClicked2() {
-	Unit *u = (Unit*) sender()->property(BUTTON_DATA).value<void*>();
-	bool p1 = false, p2 = false;
-	if(u->useWithPrefixesByDefault()) {
-		p1 = u->maxPreferredPrefix() >= 3;
-		p2 = u->minPreferredPrefix() <= -3;
-	}
-	if(p1 || p2) {
-		CompositeUnit cu("", "");
-		cu.add(u, 1, CALCULATOR->getExactDecimalPrefix(p1 ? 3 : -3));
-		emit unitClicked(&cu);
-	} else {
-		emit unitClicked(u);
-	}
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA2).value<void*>());
 }
 void KeypadWidget::onUnitButtonClicked3() {
-	Unit *u = (Unit*) sender()->property(BUTTON_DATA).value<void*>();
-	bool p1 = false, p2 = false;
-	if(u->useWithPrefixesByDefault()) {
-		p1 = u->maxPreferredPrefix() >= 3;
-		p2 = u->minPreferredPrefix() <= -3;
-	}
-	if(p1 || p2) {
-		CompositeUnit cu("", "");
-		cu.add(u, 1, CALCULATOR->getExactDecimalPrefix(p2 ? -3 : 3));
-		emit unitClicked(&cu);
-	} else {
-		emit unitClicked(u);
-	}
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA3).value<void*>());
 }
 void KeypadWidget::onItemButtonClicked2() {
 	ExpressionItem *item = (ExpressionItem*) sender()->property(BUTTON_DATA2).value<void*>();
@@ -1278,7 +1256,7 @@ void KeypadButton::paintEvent(QPaintEvent *p) {
 		QPointF point = p->rect().center();
 		bool b_menu = (menu() && settings->separate_keypad_menu_buttons);
 		point.setY(point.y() - doc.size().height() / 2.0 + 2.0);
-		point.setX((point.x() - (b_menu ? 5 : 0)) - doc.size().width() / 2.0 + 2.0);
+		point.setX((point.x() - (b_menu ? 10 : 0)) - doc.size().width() / 2.0 + 2.0);
 		painter.translate(point);
 		painter.save();
 		doc.drawContents(&painter);
@@ -1287,7 +1265,7 @@ void KeypadButton::paintEvent(QPaintEvent *p) {
 }
 void KeypadButton::mousePressEvent(QMouseEvent *e) {
 	b_longpress = false;
-	if(e->button() == Qt::LeftButton && popupMode() == QToolButton::MenuButtonPopup) {
+	if(e->button() == Qt::LeftButton && (!menu() || popupMode() != QToolButton::DelayedPopup)) {
 		if(!longPressTimer) {
 			longPressTimer = new QTimer(this);
 			longPressTimer->setSingleShot(!b_autorepeat);

@@ -110,6 +110,7 @@ class KeypadWidget : public QWidget {
 		void onOperatorButtonClicked();
 		void onItemButtonClicked();
 		void onUnitItemClicked();
+		void onPrefixItemClicked();
 		void onUnitButtonClicked2();
 		void onUnitButtonClicked3();
 		void onSymbolButtonClicked2();
@@ -153,6 +154,7 @@ class KeypadWidget : public QWidget {
 		void functionClicked(MathFunction *f);
 		void variableClicked(Variable *v);
 		void unitClicked(Unit *u);
+		void prefixClicked(Prefix *p);
 		void delClicked();
 		void clearClicked();
 		void equalsClicked();

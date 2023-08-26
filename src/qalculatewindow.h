@@ -17,6 +17,7 @@
 #include <QSpinBox>
 #include <QTranslator>
 #include <QDockWidget>
+#include <QToolButton>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -30,7 +31,6 @@ class KeypadWidget;
 class QAction;
 class QToolBar;
 class QTextEdit;
-class QToolButton;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
@@ -102,9 +102,9 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
+		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t, *storeAction_t, *functionsAction_t, *unitsAction_t;
 		QMenu *tmenu;
-		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
+		QAction *toAction, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
 		QMenu *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *favouriteFunctionsMenu, *unitsMenu, *favouriteUnitsMenu, *angleMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
@@ -153,6 +153,7 @@ class QalculateWindow : public QMainWindow {
 		void onFunctionClicked(MathFunction*);
 		void onVariableClicked(Variable*);
 		void onUnitClicked(Unit*);
+		void onPrefixClicked(Prefix*);
 		void onClearClicked();
 		void onDelClicked();
 		void onEqualsClicked();
@@ -389,6 +390,29 @@ class QalculateDockWidget : public QDockWidget {
 	signals:
 
 		void dockClosed();
+
+};
+
+class QalculateToolButton : public QToolButton {
+
+	Q_OBJECT
+
+	public:
+
+		QalculateToolButton(QWidget *parent = NULL);
+		~QalculateToolButton();
+
+	protected:
+
+		QTimer *longPressTimer;
+		bool b_longpress;
+
+		void mouseReleaseEvent(QMouseEvent*) override;
+		void mousePressEvent(QMouseEvent*) override;
+
+	protected slots:
+
+		void longPressTimeout();
 
 };
 

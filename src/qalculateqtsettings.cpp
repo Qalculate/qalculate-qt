@@ -1007,6 +1007,9 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Ctrl+Enter", SHORTCUT_TYPE_APPROXIMATE, "")
 		ADD_SHORTCUT("Ctrl+Return", SHORTCUT_TYPE_APPROXIMATE, "")
 		ADD_SHORTCUT("Alt+M", SHORTCUT_TYPE_MODE, "")
+		ADD_SHORTCUT("Alt+F", SHORTCUT_TYPE_FUNCTIONS_MENU, "")
+		ADD_SHORTCUT("Alt+U", SHORTCUT_TYPE_UNITS_MENU, "")
+		ADD_SHORTCUT("Alt+V", SHORTCUT_TYPE_VARIABLES_MENU, "")
 		ADD_SHORTCUT("F10", SHORTCUT_TYPE_MENU, "")
 		ADD_SHORTCUT("Ctrl+)", SHORTCUT_TYPE_SMART_PARENTHESES, "")
 		ADD_SHORTCUT("Ctrl+(", SHORTCUT_TYPE_SMART_PARENTHESES, "")
@@ -1983,6 +1986,9 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_CALCULATE_EXPRESSION: {return tr("Calculate expression");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {return tr("Expression history next");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {return tr("Expression history previous");}
+		case SHORTCUT_TYPE_FUNCTIONS_MENU: {return tr("Open functions menu");}
+		case SHORTCUT_TYPE_UNITS_MENU: {return tr("Open units menu");}
+		case SHORTCUT_TYPE_VARIABLES_MENU: {return tr("Open variables menu");}
 	}
 	return "-";
 }

@@ -272,6 +272,41 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 	}
 }
 
+QalculateToolButton::QalculateToolButton(QWidget *parent) : QToolButton(parent), longPressTimer(NULL), b_longpress(false) {}
+QalculateToolButton::~QalculateToolButton() {}
+void QalculateToolButton::mousePressEvent(QMouseEvent *e) {
+	b_longpress = false;
+	if(e->button() == Qt::LeftButton) {
+		if(!longPressTimer) {
+			longPressTimer = new QTimer(this);
+			longPressTimer->setSingleShot(true);
+			connect(longPressTimer, SIGNAL(timeout()), this, SLOT(longPressTimeout()));
+		}
+		longPressTimer->start(500);
+	}
+	QToolButton::mousePressEvent(e);
+}
+void QalculateToolButton::longPressTimeout() {
+	b_longpress = true;
+	showMenu();
+}
+void QalculateToolButton::mouseReleaseEvent(QMouseEvent *e) {
+	if(e->button() == Qt::RightButton) {
+		showMenu();
+	} else {
+		if(longPressTimer && longPressTimer->isActive() && e->button() == Qt::LeftButton) {
+			longPressTimer->stop();
+		} else if(b_longpress && e->button() == Qt::LeftButton) {
+			b_longpress = false;
+			blockSignals(true);
+			QToolButton::mouseReleaseEvent(e);
+			blockSignals(false);
+			return;
+		}
+		QToolButton::mouseReleaseEvent(e);
+	}
+}
+
 QalculateDockWidget::QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
 QalculateDockWidget::QalculateDockWidget(QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(parent), expressionEdit(editwidget) {}
 QalculateDockWidget::~QalculateDockWidget() {}
@@ -642,23 +677,29 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	toAction->setEnabled(false);
 	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
 	tb->addAction(toAction);
-	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this);
-	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
+	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_ICON("document-save")); storeAction_t->setText(tr("Store"));
+	storeAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(storeAction_t, SIGNAL(clicked()), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
-	storeAction->setMenu(variablesMenu);
-	tb->addAction(storeAction);
-	functionsAction_t = new QAction(LOAD_ICON("function"), tr("Functions"), this);
-	connect(functionsAction_t, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
+	storeAction_t->setMenu(variablesMenu);
+	tb->addWidget(storeAction_t);
+	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	functionsAction_t = new QalculateToolButton(this); functionsAction_t->setIcon(LOAD_ICON("function")); functionsAction_t->setText(tr("Functions"));
+	functionsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(functionsAction_t, SIGNAL(clicked()), this, SLOT(openFunctions()));
 	functionsMenu = new QMenu(this);
 	updateFunctionsMenu();
 	functionsAction_t->setMenu(functionsMenu);
-	tb->addAction(functionsAction_t);
-	unitsAction_t = new QAction(LOAD_ICON("units"), tr("Units"), this);
-	connect(unitsAction_t, SIGNAL(triggered(bool)), this, SLOT(openUnits()));
+	tb->addWidget(functionsAction_t);
+	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	unitsAction_t = new QalculateToolButton(this); unitsAction_t->setIcon(LOAD_ICON("units")); unitsAction_t->setText(tr("Units"));
+	unitsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(unitsAction_t, SIGNAL(clicked()), this, SLOT(openUnits()));
 	unitsMenu = new QMenu(this);
 	updateUnitsMenu();
 	unitsAction_t->setMenu(unitsMenu);
-	tb->addAction(unitsAction_t);
+	tb->addWidget(unitsAction_t);
+	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	if(CALCULATOR->canPlot()) {
 		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot"), this);
 		connect(plotAction_t, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
@@ -870,6 +911,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
 	connect(keypad, SIGNAL(variableClicked(Variable*)), this, SLOT(onVariableClicked(Variable*)));
 	connect(keypad, SIGNAL(unitClicked(Unit*)), this, SLOT(onUnitClicked(Unit*)));
+	connect(keypad, SIGNAL(prefixClicked(Prefix*)), this, SLOT(onPrefixClicked(Prefix*)));
 	connect(keypad, SIGNAL(delClicked()), this, SLOT(onDelClicked()));
 	connect(keypad, SIGNAL(clearClicked()), this, SLOT(onClearClicked()));
 	connect(keypad, SIGNAL(equalsClicked()), this, SLOT(onEqualsClicked()));
@@ -937,6 +979,8 @@ void QalculateWindow::showKeypadContextMenu(const QPoint &pos) {
 	if(p.y() < keypad->mapToGlobal(QPoint(0, 0)).y()) keypadAction_t->menu()->popup(p);
 }
 void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
+	QWidget *w = tb->childAt(pos);
+	if(w == storeAction_t || w == functionsAction_t || w == unitsAction_t) return;
 	if(!tmenu) {
 		tmenu = new QMenu(this);
 		tmenu->addAction(tr("Icons only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonIconOnly);
@@ -951,15 +995,18 @@ void QalculateWindow::setToolbarStyle() {
 	settings->toolbar_style = action->data().toInt();
 	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 }
 
 void QalculateWindow::loadShortcuts() {
 	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
-	storeAction->setToolTip(tr("Store"));
-	unitsAction_t->setToolTip(tr("Units"));
-	functionsAction_t->setToolTip(tr("Functions"));
+	storeAction_t->setToolTip(tr("Store") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 	basesAction->setToolTip(tr("Number Bases"));
 	toAction->setToolTip(tr("Convert"));
 	menuAction_t->setToolTip(tr("Menu"));
@@ -992,11 +1039,11 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	if(ks->type[0] == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-		storeAction->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
@@ -1053,7 +1100,6 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 			case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
 			case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
 			case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
-			case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
 			case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
 			case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
 			case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
@@ -1078,18 +1124,12 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		action->setShortcuts(shortcuts);
 		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-			storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
 		} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
-			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
-			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
 			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
@@ -1106,6 +1146,13 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
 	} else {
+		if(ks->type[0] == SHORTCUT_TYPE_MODE) {
+			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
+			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
+			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+		}
 		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
 			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		}
@@ -1150,6 +1197,18 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_MODE: {
 			modeAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_FUNCTIONS_MENU: {
+			functionsAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_UNITS_MENU: {
+			unitsAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_VARIABLES_MENU: {
+			storeAction_t->showMenu();
 			break;
 		}
 		case SHORTCUT_TYPE_MENU: {
@@ -1544,7 +1603,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {pKeypadAction->trigger(); break;}
 		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {xKeypadAction->trigger(); break;}
 		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {cKeypadAction->trigger(); break;}
-		case SHORTCUT_TYPE_STORE: {storeAction->trigger(); break;}
+		case SHORTCUT_TYPE_STORE: {onStoreActivated(); break;}
 		case SHORTCUT_TYPE_NEW_VARIABLE: {newVariableAction->trigger(); break;}
 		case SHORTCUT_TYPE_NEW_FUNCTION: {newFunctionAction->trigger(); break;}
 		case SHORTCUT_TYPE_PLOT: {plotAction->trigger(); break;}
@@ -1726,6 +1785,7 @@ void QalculateWindow::updateFunctionsMenu() {
 		functionsMenu->addSeparator();
 		while(titem) {
 			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
 				sub3->insertMenu(sub3->actions().at(sub3 == functionsMenu ? first_index : 0), sub);
 				menus.push(sub);
@@ -1948,6 +2008,7 @@ void QalculateWindow::updateUnitsMenu() {
 		unitsMenu->addSeparator();
 		while(titem) {
 			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
 				sub3->insertMenu(sub3->actions().at(sub3 == unitsMenu ? first_index : 0), sub);
 				menus.push(sub);
@@ -2206,6 +2267,7 @@ void QalculateWindow::updateVariablesMenu() {
 		variablesMenu->addSeparator();
 		while(titem) {
 			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
 				sub3->insertMenu(sub3->actions().at(sub3 == variablesMenu ? first_index : 0), sub);
 				menus.push(sub);
@@ -2740,6 +2802,13 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 	} else {
 		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockCompletion(false);
+}
+void QalculateWindow::onPrefixClicked(Prefix *p) {
+	if(!p) return;
+	expressionEdit->blockCompletion();
+	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -6149,7 +6218,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		else settings->color = 1;
 		menuAction_t->setIcon(LOAD_ICON("menu"));
 		toAction->setIcon(LOAD_ICON("convert"));
-		storeAction->setIcon(LOAD_ICON("document-save"));
+		storeAction_t->setIcon(LOAD_ICON("document-save"));
 		functionsAction_t->setIcon(LOAD_ICON("function"));
 		unitsAction_t->setIcon(LOAD_ICON("units"));
 		if(plotAction_t) plotAction_t->setIcon(LOAD_ICON("plot"));
@@ -7070,6 +7139,12 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
 			} else if(i == SHORTCUT_TYPE_SIMPLE_NOTATION) {
 				for(int i2 = SHORTCUT_TYPE_PRECISION; i2 <= SHORTCUT_TYPE_MINMAX_DECIMALS; i2++) {
+					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
+					item->setData(Qt::UserRole, i2);
+					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
+				}
+			} else if(i == SHORTCUT_TYPE_MENU) {
+				for(int i2 = SHORTCUT_TYPE_FUNCTIONS_MENU; i2 <= SHORTCUT_TYPE_VARIABLES_MENU; i2++) {
 					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
 					item->setData(Qt::UserRole, i2);
 					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
