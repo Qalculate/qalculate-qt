@@ -26,6 +26,7 @@
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QScrollBar>
+#include <QWidgetAction>
 #include <QComboBox>
 #include <QDebug>
 
@@ -185,6 +186,19 @@
 						button->setPopupMode(settings->separate_keypad_menu_buttons ? QToolButton::MenuButtonPopup : QToolButton::DelayedPopup);\
 						button->menuSet();
 
+#define ADD_SECTION(str) \
+	if(!menu->style()->styleHint(QStyle::SH_Menu_SupportsSections)) { \
+		aw = new QWidgetAction(this); \
+		QLabel *label = new QLabel(str, this); \
+		label->setAlignment(Qt::AlignCenter); \
+		aw->setDefaultWidget(label); \
+		menu->addSeparator(); \
+		menu->addAction(aw); \
+		menu->addSeparator(); \
+	} else { \
+		menu->addSection(str); \
+	}
+
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
 	leftStack = new QStackedLayout();
@@ -201,8 +215,6 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	grid->setContentsMargins(0, 0, 0, 0);
 	KeypadButton *button;
 	QMenu *menu;
-	QAction *action;
-	ExpressionItem *item;
 	MathFunction *f, *f2;
 	int c = 0;
 	button = new KeypadButton("MS", this);
@@ -234,10 +246,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(newFunctionClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(newFunctionClicked()));
 	button->setToolTip(tr("Store"), tr("New function"));
-	storeButton = button;
 	grid->addWidget(button, c, 4, 1, 1);
 	CREATE_MENU
-	menu->addAction(tr("All variables"), this, SIGNAL(openVariablesRequest()));
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateStoreMenu()));
 	c++;
 	button = new KeypadButton("hyp");
 	button->setCheckable(true);
@@ -245,70 +256,28 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(toggled(bool)), this, SLOT(onHypToggled(bool)));
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SIN), CALCULATOR->getFunctionById(FUNCTION_ID_ASIN), tr("sin"), c, 1);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SIN))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINH))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASIN))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASINH))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINC))
-	MENU_ITEM(CALCULATOR->getActiveFunction("csc"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("csch"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arccsc"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arcsch"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SININT))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINHINT))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSinMenu()));
 	sinButton = button;
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_COS), CALCULATOR->getFunctionById(FUNCTION_ID_ACOS), tr("cos"), c, 2);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COS))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSH))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOS))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOSH))
-	MENU_ITEM(CALCULATOR->getActiveFunction("sec"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("sech"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arcsec"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arsech"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSINT))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSHINT))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateCosMenu()));
 	cosButton = button;
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_TAN), CALCULATOR->getFunctionById(FUNCTION_ID_ATAN), tr("tan"), c, 3);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TAN))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TANH))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATANH))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN2))
-	MENU_ITEM(CALCULATOR->getActiveFunction("cot"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("coth"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arccot"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("arcoth"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SININT))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINHINT))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateTanMenu()));
 	tanButton = button;
 	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getVariableById(VARIABLE_ID_EULER), SIGN_PI, c, 4);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getActiveVariable("pythagoras"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("golden"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("c"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("newtonian_constant"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("planck"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("boltzmann"))
-	MENU_ITEM(CALCULATOR->getActiveVariable("avogadro"))
-	menu->addSeparator();
-	menu->addAction(tr("All constants"), this, SIGNAL(openVariablesRequest()));
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePiMenu()));
 	c++;
 	OPERATOR_ITEM2_BUTTON("^", CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), c, 2);
 	button->setRichText("x<sup>y</sup>");
 	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true, settings->printops.use_unicode_signs)));
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE))
-	MENU_ITEM(CALCULATOR->getActiveFunction("exp10"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("exp2"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LAMBERT_W))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePowerMenu()));
 	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 1);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_CBRT))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ROOT))
-	MENU_ITEM(CALCULATOR->getActiveFunction("sqrtpi"))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSqrtMenu()));
 	f = CALCULATOR->getActiveFunction("log10");
 	if(f) {
 		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 0);
@@ -316,21 +285,14 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 0);
 	}
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getActiveFunction("log10"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("log2"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGN))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGINT))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateLnMenu()));
 	ITEM_OPERATOR_ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_I), "∠", CALCULATOR->getFunctionById(FUNCTION_ID_ARG), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i", c, 3);
 	imaginaryButton = button;
 	QFont ifont(button->font());
 	ifont.setStyle(QFont::StyleItalic);
 	button->setFont(ifont);
 	CREATE_MENU
-	MENU_SYMBOL("∠")
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_RE))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IM))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ARG))
-	MENU_ITEM(CALCULATOR->getActiveFunction("conj"))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateComplexMenu()));
 	f = CALCULATOR->getActiveFunction("cis");
 	if(f) {
 		ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), f, "e", c, 4);
@@ -338,9 +300,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		ITEM_BUTTON2(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), "e", c, 4);
 	}
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXP))
-	MENU_ITEM(f)
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXPINT))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateEMenu()));
 	c++;
 	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
 	if(f && f2) {
@@ -351,36 +311,19 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	}
 	button->setText("x!");
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MULTI_FACTORIAL))
-	MENU_ITEM(CALCULATOR->getActiveFunction("hyperfactorial"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("superfactorial"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("perm"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("comb"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("derangement"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_BINOMIAL))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateFactorialMenu()));
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SUM), CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT), "Σ", c, 1);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_FOR))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IF))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSumMenu()));
 	SYMBOL_BUTTON3("x", "y", "z", c, 2);
 	button->setToolTip(QString(), "<i>y</i>", "<i>z</i>");
 	button->setFont(ifont);
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Y))
-	MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Z))
-	MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_N))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateXMenu()));
 	SYMBOL_BUTTON("=", c, 3);
 	button->setRichText("<i>x</i> =");
 	CREATE_MENU
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))
-	MENU_ITEM(CALCULATOR->getActiveFunction("solve2"))
-	MENU_ITEM(CALCULATOR->getActiveFunction("linearfunction"))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_NEWTON_RAPHSON))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SECANT_METHOD))
-	MENU_ITEM(CALCULATOR->getActiveFunction("extremum"))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateEqualsMenu()));
 	button = new KeypadButton("<font size=\"-1\">a(x)<sup>b</sup></font>", this);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(factorizeClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(expandClicked()));
@@ -388,16 +331,17 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button->setToolTip(tr("Factorize"), tr("Expand"));
 	grid->addWidget(button, c, 4);
 	CREATE_MENU
-	menu->addAction(tr("Expand"), this, SIGNAL(expandClicked()));
-	menu->addAction(tr("Expand partial fractions"), this, SIGNAL(expandPartialFractionsClicked()));
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DIFFERENTIATE))
-	MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_INTEGRATE))
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateFactorizeMenu()));
 
 	c++;
 	SYMBOL_BUTTON2("%", "‰", c, 1);
 	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePercentageMenu()));
 	SYMBOL_ITEM2_BUTTON("±", CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY), CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL), c, 0);
 	button->setToolTip(tr("Uncertainty/interval"), tr("Relative error"), tr("Interval"));
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateIntervalMenu()));
 	std::string sunit = settings->latest_button_unit;
 	if(sunit.empty()) sunit = "m";
 	Unit *u = CALCULATOR->getActiveUnit(sunit);
@@ -413,24 +357,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	unitButton = button;
 	unitButton->setToolTip(QString::fromStdString(u ? u->title(true, settings->printops.use_unicode_signs) : sunit), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
 	CREATE_MENU
-	const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
-	for(size_t i = 0; i < 15; i++) {
-		item = CALCULATOR->getActiveUnit(si_units[i]);
-		if(item) {
-			action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
-			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
-		}
-	}
-	menu->addSeparator();
-	for(int i = -9; i <= 12; i += 3) {
-		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
-		if(p) {
-			action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
-			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
-		}
-	}
-	menu->addSeparator();
-	menu->addAction(tr("All units"), this, SIGNAL(openUnitsRequest()));
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateUnitsMenu()));
 	backButton = new KeypadButton(LOAD_ICON("go-back"), this, true);
 	backButton->setToolTip(tr("Move cursor left"), tr("Move cursor to start"));
 	connect(backButton, SIGNAL(clicked()), this, SIGNAL(leftClicked()));
@@ -513,32 +440,6 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		button->setMenu(menu);
 		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateAssumptions()));
 		menu->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Default assumptions"), this, SLOT(defaultAssumptionsActivated())); action->setProperty(BUTTON_DATA, id);
-		QActionGroup *group = new QActionGroup(this); group->setObjectName("group_type_" + button->text());
-		action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_NUMBER); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_REAL); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_RATIONAL); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_INTEGER); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_BOOLEAN); action->setProperty(BUTTON_DATA, id);
-		menu->addSeparator();
-		group = new QActionGroup(this); group->setObjectName("group_sign_" + button->text());
-		action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_UNKNOWN); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONZERO); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_POSITIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONNEGATIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NEGATIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONPOSITIVE);
 	}
 	SYMBOL_BUTTON("n", 0, 3);
 	SYMBOL_BUTTON2("=", SIGN_NOT_EQUAL, 1, 2);
@@ -730,8 +631,229 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 }
 KeypadWidget::~KeypadWidget() {}
 
-void KeypadWidget::updateVariables() {
-	QMenu *menu = storeButton->menu();
+void KeypadWidget::updateSinMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SIN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASIN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASINH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("csc"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("csch"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arccsc"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcsch"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINC))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SININT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINHINT))
+	}
+}
+void KeypadWidget::updateCosMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COS))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOS))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOSH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("sec"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("sech"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcsec"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arsech"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSINT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSHINT))
+	}
+}
+void KeypadWidget::updateTanMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TAN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TANH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATANH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("cot"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("coth"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arccot"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcoth"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN2))
+	}
+}
+void KeypadWidget::updatePiMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getActiveVariable("pythagoras"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("golden"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("c"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("newtonian_constant"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("planck"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("boltzmann"))
+		MENU_ITEM(CALCULATOR->getActiveVariable("avogadro"))
+		menu->addSeparator();
+		menu->addAction(tr("All constants"), this, SIGNAL(openVariablesRequest()));
+	}
+}
+void KeypadWidget::updateLnMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getActiveFunction("log10"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("log2"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGN))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGINT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_POLYLOG))
+	}
+}
+void KeypadWidget::updateSqrtMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_CBRT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ROOT))
+		MENU_ITEM(CALCULATOR->getActiveFunction("sqrtpi"))
+	}
+}
+void KeypadWidget::updatePowerMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE))
+		MENU_ITEM(CALCULATOR->getActiveFunction("exp10"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("exp2"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LAMBERT_W))
+	}
+}
+void KeypadWidget::updateEMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXP))
+		MENU_ITEM(CALCULATOR->getActiveFunction("cis"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXPINT))
+	}
+}
+void KeypadWidget::updateFactorialMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MULTI_FACTORIAL))
+		MENU_ITEM(CALCULATOR->getActiveFunction("hyperfactorial"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("superfactorial"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("perm"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("comb"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("derangement"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_BINOMIAL))
+	}
+}
+void KeypadWidget::updateSumMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_FOR))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IF))
+	}
+}
+void KeypadWidget::updateXMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Y))
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Z))
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_N))
+	}
+}
+void KeypadWidget::updateEqualsMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))
+		MENU_ITEM(CALCULATOR->getActiveFunction("solve2"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("linearfunction"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_NEWTON_RAPHSON))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SECANT_METHOD))
+		MENU_ITEM(CALCULATOR->getActiveFunction("extremum"))
+	}
+}
+void KeypadWidget::updateFactorizeMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		menu->addAction(tr("Expand"), this, SIGNAL(expandClicked()));
+		menu->addAction(tr("Expand partial fractions"), this, SIGNAL(expandPartialFractionsClicked()));
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DIFFERENTIATE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_INTEGRATE))
+	}
+}
+void KeypadWidget::updatePercentageMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE));
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD));
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_REM));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ABS));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GCD));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LCM));
+		menu->addSeparator();
+		action = menu->addAction(tr("Percentage Calculation Tool"), this, SIGNAL(openPercentageCalculationRequest()));
+	}
+}
+void KeypadWidget::updateUnitsMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
+		for(size_t i = 0; i < 15; i++) {
+			item = CALCULATOR->getActiveUnit(si_units[i]);
+			if(item) {
+				action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
+				action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
+			}
+		}
+		menu->addSeparator();
+		for(int i = -9; i <= 12; i += 3) {
+			Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+			if(p) {
+				action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+				action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+			}
+		}
+		menu->addSeparator();
+		menu->addAction(tr("All units"), this, SIGNAL(openUnitsRequest()));
+	}
+}
+void KeypadWidget::updateStoreMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
 	menu->clear();
 	QAction *action;
 	ExpressionItem *item;
@@ -1018,18 +1140,147 @@ void KeypadWidget::onCustomButtonClicked3() {
 		emit shortcutClicked(sender()->property(BUTTON_DATA2).toInt(), sender()->property(BUTTON_VALUE3).toString());
 	}
 }
+void KeypadWidget::intervalDisplayActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	if(v < 0) {
+		settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+		settings->adaptive_interval_display = true;
+	} else {
+		settings->printops.interval_display = (IntervalDisplay) v;
+		settings->adaptive_interval_display = false;
+	}
+	emit resultFormatUpdated(0);
+}
+void KeypadWidget::intervalCalculationActivated() {
+	settings->evalops.interval_calculation = (IntervalCalculation) qobject_cast<QAction*>(sender())->data().toInt();
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::conciseInputActivated() {
+	CALCULATOR->setConciseUncertaintyInputEnabled(!CALCULATOR->conciseUncertaintyInputEnabled());
+	emit expressionFormatUpdated(false);
+}
+void KeypadWidget::updateIntervalMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
+	QActionGroup *group;
+	QWidgetAction *aw;
+	if(menu->isEmpty()) {
+		ADD_SECTION(tr("Interval Display"));
+		group = new QActionGroup(this); group->setObjectName("group_interval_display");
+		action = menu->addAction(tr("Adaptive"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(-1);
+		action = menu->addAction(tr("Significant digits"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_SIGNIFICANT_DIGITS);
+		action = menu->addAction(tr("Interval"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_INTERVAL);
+		action = menu->addAction(tr("Plus/minus"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_PLUSMINUS);
+		action = menu->addAction(tr("Relative"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_RELATIVE);
+		action = menu->addAction(tr("Concise"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_CONCISE);
+		ADD_SECTION(tr("Interval Calculation"));
+		group = new QActionGroup(this); group->setObjectName("group_interval_calculation");
+		action = menu->addAction(tr("Variance formula"), this, SLOT(intervalCalculationActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_CALCULATION_VARIANCE_FORMULA);
+		action = menu->addAction(tr("Interval arithmetic"), this, SLOT(intervalCalculationActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_CALCULATION_INTERVAL_ARITHMETIC);
+		menu->addSeparator();
+		action = menu->addAction(tr("Allow concise uncertainty input"), this, SLOT(conciseInputActivated())); action->setCheckable(true); action->setObjectName("action_concise_input");
+	}
+	group = findChild<QActionGroup*>("group_interval_display");
+	if(!group) return;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == (settings->adaptive_interval_display ? -1 : settings->printops.interval_display)) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+	group = findChild<QActionGroup*>("group_interval_calculation");
+	if(!group) return;
+	actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == settings->evalops.interval_calculation) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+	action = findChild<QAction*>("action_concise_input");
+	if(action) action->setChecked(CALCULATOR->conciseUncertaintyInputEnabled());
+}
+void KeypadWidget::complexFormActivated() {
+	settings->evalops.complex_number_form = (ComplexNumberForm) qobject_cast<QAction*>(sender())->data().toInt();
+	settings->complex_angle_form = (settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS);
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::updateComplexMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	ExpressionItem *item;
+	QAction *action;
+	QActionGroup *group;
+	if(menu->isEmpty()) {
+		MENU_SYMBOL("∠")
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_RE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IM))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ARG))
+		MENU_ITEM(CALCULATOR->getActiveFunction("conj"))
+		menu->addSeparator();
+		menu = menu->addMenu(tr("Complex number form"));
+		group = new QActionGroup(this); group->setObjectName("group_complex_form");
+		action = menu->addAction(tr("Rectangular"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_RECTANGULAR);
+		action = menu->addAction(tr("Exponential"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_EXPONENTIAL);
+		action = menu->addAction(tr("Polar"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_POLAR);
+		action = menu->addAction(tr("Angle/phasor"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_CIS);
+	}
+	group = findChild<QActionGroup*>("group_complex_form");
+	if(!group) return;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == settings->evalops.complex_number_form) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+}
 void KeypadWidget::updateAssumptions() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
+	QActionGroup *group;
+	QString name;
+	QWidgetAction *aw;
 	int id = menu->property(BUTTON_DATA).toInt();
-	QActionGroup *group = NULL;
+	if(id == VARIABLE_ID_Y) name = "y";
+	else if(id == VARIABLE_ID_Z) name = "z";
+	else name = "x";
+	if(menu->isEmpty()) {
+		ADD_SECTION(tr("Type", "Assumptions type"));
+		group = new QActionGroup(this); group->setObjectName("group_type_" + name);
+		action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_NUMBER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_REAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_RATIONAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_INTEGER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_BOOLEAN); action->setProperty(BUTTON_DATA, id);
+		ADD_SECTION(tr("Sign", "Assumptions sign"));
+		group = new QActionGroup(this); group->setObjectName("group_sign_" + name);
+		action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_UNKNOWN); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONZERO); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_POSITIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONNEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONPOSITIVE);
+		menu->addSeparator();
+		action = menu->addAction(tr("Default assumptions"), this, SLOT(defaultAssumptionsActivated())); action->setProperty(BUTTON_DATA, id);
+	}
 	Variable *v = CALCULATOR->getVariableById(id);
 	if(!v || v->isKnown()) return;
 	UnknownVariable *uv = (UnknownVariable*) v;
 	Assumptions *ass = uv->assumptions();
 	if(!ass) ass = CALCULATOR->defaultAssumptions();
-	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_type_x");
-	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_type_y");
-	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_type_z");
+	group = findChild<QActionGroup*>("group_type_" + name);
 	if(!group) return;
 	QList<QAction*> actions = group->actions();
 	for(int i = 0; i < actions.count(); i++) {
@@ -1038,10 +1289,7 @@ void KeypadWidget::updateAssumptions() {
 			break;
 		}
 	}
-	group = NULL;
-	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_sign_x");
-	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_sign_y");
-	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_sign_z");
+	group = findChild<QActionGroup*>("group_sign_" + name);
 	if(!group) return;
 	actions = group->actions();
 	for(int i = 0; i < actions.count(); i++) {

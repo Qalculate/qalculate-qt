@@ -137,6 +137,28 @@ class KeypadWidget : public QWidget {
 		void updateCustomActionOK();
 		void customActionOKClicked();
 		void currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void intervalDisplayActivated();
+		void intervalCalculationActivated();
+		void conciseInputActivated();
+		void updateIntervalMenu();
+		void complexFormActivated();
+		void updateComplexMenu();
+		void updateStoreMenu();
+		void updateSinMenu();
+		void updateCosMenu();
+		void updateTanMenu();
+		void updatePiMenu();
+		void updateLnMenu();
+		void updateSqrtMenu();
+		void updatePowerMenu();
+		void updateEMenu();
+		void updateFactorialMenu();
+		void updateSumMenu();
+		void updateXMenu();
+		void updateEqualsMenu();
+		void updateFactorizeMenu();
+		void updatePercentageMenu();
+		void updateUnitsMenu();
 
 	public slots:
 
@@ -145,7 +167,6 @@ class KeypadWidget : public QWidget {
 		void setKeypadType(int);
 		void hideNumpad(bool);
 		void showSeparateKeypadMenuButtons(bool);
-		void updateVariables();
 
 	signals:
 
@@ -178,9 +199,12 @@ class KeypadWidget : public QWidget {
 		void expandClicked();
 		void expandPartialFractionsClicked();
 		void expressionCalculationUpdated(int);
+		void expressionFormatUpdated(bool);
+		void resultFormatUpdated(int);
 		void shortcutClicked(int, const QString&);
 		void openVariablesRequest();
 		void openUnitsRequest();
+		void openPercentageCalculationRequest();
 
 };
 

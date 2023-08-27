@@ -905,6 +905,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(dockClosed()), this, SLOT(onRPNClosed()));
 	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
+	connect(keypad, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
+	connect(keypad, SIGNAL(resultFormatUpdated(int)), this, SLOT(resultFormatUpdated(int)));
 	connect(keypad, SIGNAL(shortcutClicked(int, const QString&)), this, SLOT(shortcutClicked(int, const QString&)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
@@ -936,6 +938,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(expandPartialFractionsClicked()), this, SLOT(onExpandPartialFractionsClicked()));
 	connect(keypad, SIGNAL(openVariablesRequest()), this, SLOT(openVariables()));
 	connect(keypad, SIGNAL(openUnitsRequest()), this, SLOT(openUnits()));
+	connect(keypad, SIGNAL(openPercentageCalculationRequest()), this, SLOT(openPercentageCalculation()));
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
 #endif
@@ -1823,7 +1826,7 @@ void QalculateWindow::updateFunctionsMenu() {
 	}
 	updateFavouriteFunctions();
 	functionsMenu->addSeparator();
-	QAction *action = functionsMenu->addAction(tr("Use dialog"));
+	QAction *action = functionsMenu->addAction(tr("Open dialog"));
 	action->setCheckable(true);
 	action->setChecked(settings->use_function_dialog);
 	connect(action, SIGNAL(toggled(bool)), this, SLOT(useFunctionDialog(bool)));
@@ -2304,7 +2307,6 @@ void QalculateWindow::updateVariablesMenu() {
 		favouriteVariablesMenu = variablesMenu;
 	}
 	updateFavouriteVariables();
-	keypad->updateVariables();
 	variablesMenu->addSeparator();
 	QAction *action = variablesMenu->addAction(tr("Show all variables"));
 	action->setCheckable(true);
