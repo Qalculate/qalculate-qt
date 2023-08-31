@@ -266,7 +266,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	CREATE_MENU
 	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateTanMenu()));
 	tanButton = button;
-	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getVariableById(VARIABLE_ID_EULER), SIGN_PI, c, 4);
+	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_EULER), CALCULATOR->getVariableById(VARIABLE_ID_CATALAN), SIGN_PI, c, 4);
 	CREATE_MENU
 	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePiMenu()));
 	c++;
@@ -691,19 +691,49 @@ void KeypadWidget::updateTanMenu() {
 }
 void KeypadWidget::updatePiMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
 	if(menu->isEmpty()) {
-		ExpressionItem *item;
-		QAction *action;
-		MENU_ITEM(CALCULATOR->getActiveVariable("pythagoras"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("golden"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("c"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("newtonian_constant"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("planck"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("boltzmann"))
-		MENU_ITEM(CALCULATOR->getActiveVariable("avogadro"))
+		QMap<QString, ExpressionItem*> map;
+		Variable *v[9];
+		v[0] = CALCULATOR->getActiveVariable("apery");
+		v[1] = CALCULATOR->getVariableById(VARIABLE_ID_CATALAN);
+		v[2] = CALCULATOR->getVariableById(VARIABLE_ID_EULER);
+		v[3] = CALCULATOR->getActiveVariable("golden");
+		v[4] = CALCULATOR->getActiveVariable("omega");
+		v[5] = CALCULATOR->getActiveVariable("plastic");
+		v[6] = CALCULATOR->getActiveVariable("pythagoras");
+		for(size_t i = 0; i < 7; i++) {
+			if(v[i]) map[QString::fromStdString(v[i]->title(true, settings->printops.use_unicode_signs))] = v[i];
+		}
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+			action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+		menu->addSeparator();
+		map.clear();
+		v[0] = CALCULATOR->getActiveVariable("c");
+		v[1] = CALCULATOR->getActiveVariable("newtonian_constant");
+		v[2] = CALCULATOR->getActiveVariable("planck");
+		v[3] = CALCULATOR->getActiveVariable("boltzmann");
+		v[4] = CALCULATOR->getActiveVariable("avogadro");
+		v[5] = CALCULATOR->getActiveVariable("magnetic_constant");
+		v[6] = CALCULATOR->getActiveVariable("electric_constant");
+		v[7] = CALCULATOR->getActiveVariable("characteristic_impedance");
+		v[8] = CALCULATOR->getActiveVariable("standard_gravity");
+		for(size_t i = 0; i < 9; i++) {
+			if(v[i]) map[QString::fromStdString(v[i]->title(true, settings->printops.use_unicode_signs))] = v[i];
+		}
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+			action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+		menu->addSeparator();
+		action = menu->addAction(tr("Enable units in physical constants"), this, SLOT(variableUnitsActivated())); action->setCheckable(true); action->setObjectName("action_variable_units");
 		menu->addSeparator();
 		menu->addAction(tr("All constants"), this, SIGNAL(openVariablesRequest()));
 	}
+	action = findChild<QAction*>("action_variable_units");
+	if(action) action->setChecked(CALCULATOR->variableUnitsEnabled());
 }
 void KeypadWidget::updateLnMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
@@ -754,6 +784,7 @@ void KeypadWidget::updateFactorialMenu() {
 	if(menu->isEmpty()) {
 		ExpressionItem *item;
 		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GAMMA))
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL))
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MULTI_FACTORIAL))
 		MENU_ITEM(CALCULATOR->getActiveFunction("hyperfactorial"))
@@ -816,13 +847,13 @@ void KeypadWidget::updatePercentageMenu() {
 	if(menu->isEmpty()) {
 		ExpressionItem *item;
 		QAction *action;
-		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE));
-		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD));
-		menu->addSeparator();
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_REM));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ABS));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GCD));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LCM));
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE));
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD));
 		menu->addSeparator();
 		action = menu->addAction(tr("Percentage Calculation Tool"), this, SIGNAL(openPercentageCalculationRequest()));
 	}
@@ -832,13 +863,15 @@ void KeypadWidget::updateUnitsMenu() {
 	if(menu->isEmpty()) {
 		ExpressionItem *item;
 		QAction *action;
+		QMap<QString, ExpressionItem*> map;
 		const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
 		for(size_t i = 0; i < 15; i++) {
 			item = CALCULATOR->getActiveUnit(si_units[i]);
-			if(item) {
-				action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
-				action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
-			}
+			if(item) map[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
+		}
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+			action = menu->addAction(it.key(), this, SLOT(onUnitItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
 		}
 		menu->addSeparator();
 		for(int i = -9; i <= 12; i += 3) {
@@ -1158,6 +1191,10 @@ void KeypadWidget::intervalCalculationActivated() {
 void KeypadWidget::conciseInputActivated() {
 	CALCULATOR->setConciseUncertaintyInputEnabled(!CALCULATOR->conciseUncertaintyInputEnabled());
 	emit expressionFormatUpdated(false);
+}
+void KeypadWidget::variableUnitsActivated() {
+	CALCULATOR->setVariableUnitsEnabled(!CALCULATOR->variableUnitsEnabled());
+	emit expressionCalculationUpdated(0);
 }
 void KeypadWidget::updateIntervalMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());

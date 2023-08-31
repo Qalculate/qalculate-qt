@@ -140,6 +140,7 @@ class KeypadWidget : public QWidget {
 		void intervalDisplayActivated();
 		void intervalCalculationActivated();
 		void conciseInputActivated();
+		void variableUnitsActivated();
 		void updateIntervalMenu();
 		void complexFormActivated();
 		void updateComplexMenu();
