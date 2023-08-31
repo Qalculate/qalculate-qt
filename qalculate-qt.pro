@@ -2,6 +2,9 @@ VERSION = 4.8.0
 isEmpty(PREFIX) {
 	PREFIX = /usr/local
 }
+isEmpty(BINDIR) {
+	BINDIR = ${PREFIX}/bin
+}
 isEmpty(DESKTOP_DIR) {
 	DESKTOP_DIR = $$PREFIX/share/applications
 }
@@ -79,7 +82,7 @@ qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
-	target.path = $$PREFIX/bin
+	target.path = $$BINDIR
 
 	qm.files = 	translations/qalculate-qt_ca.qm \
 			translations/qalculate-qt_de.qm \
@@ -119,7 +122,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 	RESOURCES = icons.qrc flags.qrc
 } else {
 	RESOURCES = icons.qrc flags.qrc translations.qrc
-	target.path = $$PREFIX/bin
+	target.path = $$BINDIR
 	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 	appicon64.files = data/64/qalculate-qt.png
