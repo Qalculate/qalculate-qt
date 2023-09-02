@@ -866,7 +866,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	server = new QLocalServer(this);
 	server->listen("qalculate-qt");
 	connect(server, SIGNAL(newConnection()), this, SLOT(serverNewConnection()));
-	
+
 	mstruct = new MathStructure();
 	settings->current_result = NULL;
 	mstruct_exact.setUndefined();
@@ -1792,7 +1792,7 @@ void QalculateWindow::updateFunctionsMenu() {
 			if(!titem->items.empty() || !titem->objects.empty()) {
 				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
-				sub3->insertMenu(sub3->actions().at(sub3 == functionsMenu ? first_index : 0), sub);
+				sub3->insertMenu(sub3->actions().value(sub3 == functionsMenu ? first_index : 0), sub);
 				menus.push(sub);
 				sub3 = sub;
 				for(size_t i = 0; i < titem->objects.size(); i++) {
@@ -1857,18 +1857,19 @@ void QalculateWindow::updateFavouriteFunctions() {
 	if(!settings->favourite_functions.empty()) {
 		std::sort(settings->favourite_functions.begin(), settings->favourite_functions.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+			MathFunction *f = settings->favourite_functions[i];
 			if(!settings->show_all_functions) {
-				for(size_t i = 0; i < settings->recent_functions.size(); i++) {
-					if(settings->recent_functions[i] == settings->favourite_functions[i]) {
-						settings->recent_functions.erase(settings->recent_functions.begin() + i);
+				for(size_t i2 = 0; i2 < settings->recent_functions.size(); i2++) {
+					if(settings->recent_functions[i2] == f) {
+						settings->recent_functions.erase(settings->recent_functions.begin() + i2);
 						update_recent = true;
 						break;
 					}
 				}
 			}
-			QAction *action = new QAction(QString::fromStdString(settings->favourite_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteFunctionsMenu);
+			QAction *action = new QAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteFunctionsMenu);
 			connect(action, SIGNAL(triggered()), this, SLOT(functionActivated()));
-			action->setData(QVariant::fromValue((void*) settings->favourite_functions[i]));
+			action->setData(QVariant::fromValue((void*) f));
 			favouriteFunctionActions << action;
 		}
 		if(!settings->show_all_functions) {
@@ -2049,7 +2050,7 @@ void QalculateWindow::updateUnitsMenu() {
 			if(!titem->items.empty() || !titem->objects.empty()) {
 				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
-				sub3->insertMenu(sub3->actions().at(sub3 == unitsMenu ? first_index : 0), sub);
+				sub3->insertMenu(sub3->actions().value(sub3 == unitsMenu ? first_index : 0), sub);
 				menus.push(sub);
 				sub3 = sub;
 				bool is_currencies = false;
@@ -2158,9 +2159,9 @@ void QalculateWindow::updateFavouriteUnits() {
 		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
 			Unit *u = settings->favourite_units[i];
 			if(!settings->show_all_units) {
-				for(size_t i = 0; i < settings->recent_units.size(); i++) {
-					if(settings->recent_units[i] == u) {
-						settings->recent_units.erase(settings->recent_units.begin() + i);
+				for(size_t i2 = 0; i2 < settings->recent_units.size(); i2++) {
+					if(settings->recent_units[i2] == u) {
+						settings->recent_units.erase(settings->recent_units.begin() + i2);
 						update_recent = true;
 						break;
 					}
@@ -2175,9 +2176,9 @@ void QalculateWindow::updateFavouriteUnits() {
 			favouriteUnitActions << action;
 		}
 		if(!settings->show_all_units) {
-			QAction *action = new QAction(recentUnitsMenu);
+			QAction *action = new QAction(favouriteUnitsMenu);
 			action->setSeparator(true);
-			recentUnitActions << action;
+			favouriteUnitActions << action;
 		}
 	} else {
 		update_recent = true;
@@ -2357,7 +2358,7 @@ void QalculateWindow::updateVariablesMenu() {
 			if(!titem->items.empty() || !titem->objects.empty()) {
 				gsub("&", "&&", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
-				sub3->insertMenu(sub3->actions().at(sub3 == variablesMenu ? first_index : 0), sub);
+				sub3->insertMenu(sub3->actions().value(sub3 == variablesMenu ? first_index : 0), sub);
 				menus.push(sub);
 				sub3 = sub;
 				for(size_t i = 0; i < titem->objects.size(); i++) {
@@ -2415,18 +2416,19 @@ void QalculateWindow::updateFavouriteVariables() {
 	if(!settings->favourite_variables.empty()) {
 		std::sort(settings->favourite_variables.begin(), settings->favourite_variables.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+			Variable *v = settings->favourite_variables[i];
 			if(!settings->show_all_variables) {
-				for(size_t i = 0; i < settings->recent_variables.size(); i++) {
-					if(settings->recent_variables[i] == settings->favourite_variables[i]) {
-						settings->recent_variables.erase(settings->recent_variables.begin() + i);
+				for(size_t i2 = 0; i2 < settings->recent_variables.size(); i2++) {
+					if(settings->recent_variables[i2] == v) {
+						settings->recent_variables.erase(settings->recent_variables.begin() + i2);
 						update_recent = true;
 						break;
 					}
 				}
 			}
-			QAction *action = new QAction(QString::fromStdString(settings->favourite_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteVariablesMenu);
+			QAction *action = new QAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteVariablesMenu);
 			connect(action, SIGNAL(triggered()), this, SLOT(variableActivated()));
-			action->setData(QVariant::fromValue((void*) settings->favourite_variables[i]));
+			action->setData(QVariant::fromValue((void*) v));
 			favouriteVariableActions << action;
 		}
 		if(!settings->show_all_variables) {

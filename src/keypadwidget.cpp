@@ -164,7 +164,7 @@
 #define ITEM_BUTTON(o, x, r, c) 		ITEM_BUTTON3(o, o, o, x, r, c)
 #define ITEM_BUTTON2(o1, o2, x, r, c) 		ITEM_BUTTON3(o1, o2, o2, x, r, c)
 
-#define BASE_BUTTON(x, i, r, c)			button = new KeypadButton(x); \
+#define BASE_BUTTON(x, i, r, c)			button = new KeypadButton(x, this); \
 						button->setCheckable(true); \
 						grid->addWidget(button, r, c); \
 						button->setProperty(BUTTON_DATA, i); \
@@ -202,7 +202,10 @@
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
 	leftStack = new QStackedLayout();
-	box->addLayout(leftStack, 5 + (settings->custom_button_columns <= 5 ? 0 : (settings->custom_button_columns - 5) * 1.5));
+	int left_size = 5;
+	if(settings->separate_keypad_menu_buttons) left_size++;
+	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
+	box->addLayout(leftStack, left_size);
 	box->addSpacing(box->spacing());
 	numpad = new QWidget(this);
 	if(settings->hide_numpad) numpad->hide();
@@ -241,7 +244,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(MMinusClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(MMinusClicked()));
 	grid->addWidget(button, c, 3, 1, 1);
-	button = new KeypadButton(tr("STO"), this);
+	button = new KeypadButton("STO", this);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(storeClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(newFunctionClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(newFunctionClicked()));
@@ -1106,7 +1109,7 @@ void KeypadWidget::addCustomColumn() {
 		customGrid->setRowStretch(r, 1);
 	}
 	customGrid->setColumnStretch(c, 1);
-	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	updateStretch();
 	addColumnAction->setEnabled(settings->custom_button_columns < 100);
 	removeColumnAction->setEnabled(true);
 }
@@ -1145,7 +1148,7 @@ void KeypadWidget::removeCustomColumn() {
 		customButtons[c][r]->deleteLater();
 	}
 	customButtons.pop_back();
-	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	updateStretch();
 	addColumnAction->setEnabled(true);
 	removeColumnAction->setEnabled(settings->custom_button_columns > 1);
 }
@@ -1369,14 +1372,22 @@ void KeypadWidget::setKeypadType(int i) {
 void KeypadWidget::hideNumpad(bool b) {
 	numpad->setVisible(!b);
 }
+void KeypadWidget::updateStretch() {
+	int left_size = 5;
+	if(settings->separate_keypad_menu_buttons) left_size++;
+	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
+	((QBoxLayout*) layout())->setStretchFactor(leftStack, left_size);
+}
 void KeypadWidget::showSeparateKeypadMenuButtons(bool b) {
-	QList<QToolButton*> buttons = findChildren<QToolButton*>();
+	QList<KeypadButton*> buttons = findChildren<KeypadButton*>();
 	for(int i = 0; i < buttons.count(); i++) {
 		if(buttons.at(i) != customEditButton && buttons.at(i)->menu()) {
 			buttons.at(i)->setPopupMode(b ? QToolButton::MenuButtonPopup : QToolButton::DelayedPopup);
 		}
+		buttons.at(i)->updateSize();
 	}
-	repaint(geometry());
+	updateStretch();
+	QRect r = geometry(); r.moveTo(0, 0); repaint(r);
 }
 void KeypadWidget::updateBase() {
 	binButton->setChecked(settings->printops.base == 2 && settings->evalops.parse_options.base == 2);
@@ -1412,6 +1423,11 @@ void KeypadWidget::changeEvent(QEvent *e) {
 		backButton->setIcon(LOAD_ICON("go-back"));
 		forwardButton->setIcon(LOAD_ICON("go-forward"));
 		customEditButton->setIcon(LOAD_ICON("document-edit"));
+	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
+		QList<KeypadButton*> buttons = findChildren<KeypadButton*>();
+		for(int i = 0; i < buttons.count(); i++) {
+			buttons.at(i)->updateSize();
+		}
 	}
 	QWidget::changeEvent(e);
 }
@@ -1491,22 +1507,22 @@ KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat
 	setFocusPolicy(Qt::TabFocus);
 	if(text.contains("</")) richtext = text;
 	else setText(text);
-	QFontMetrics fm(font());
-	QSize size = fm.boundingRect("DEL").size();
-	size.setWidth(size.width() + 15); size.setHeight(size.height() + 10);
-	setMinimumSize(size);
+	updateSize();
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QToolButton(parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
 	setIcon(icon);
 	setFocusPolicy(Qt::TabFocus);
-	QFontMetrics fm(font());
-	QSize size = fm.boundingRect("DEL").size();
-	size.setWidth(size.width() + 15); size.setHeight(size.height() + 10);
-	setMinimumSize(size);
+	updateSize();
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::~KeypadButton() {}
+void KeypadButton::updateSize() {
+	QFontMetrics fm(font());
+	QSize size = fm.boundingRect("STO").size();
+	size.setWidth((size.width() * 1.5) + (settings->separate_keypad_menu_buttons && menu() ? 10 : 0)); size.setHeight(size.height() * 1.6);
+	setMinimumSize(size);
+}
 void KeypadButton::setRichText(const QString &text) {
 	richtext = text;
 	setText(QString());
@@ -1515,6 +1531,7 @@ const QString &KeypadButton::richText() const {
 	return richtext;
 }
 void KeypadButton::menuSet() {
+	if(settings->separate_keypad_menu_buttons) updateSize();
 	QString str = toolTip();
 	if(!str.isEmpty()) {
 		str.replace(tr("<i>Right-click/long press</i>: %1").arg(QString()), tr("<i>Right-click</i>: %1").arg(QString()));
@@ -1541,7 +1558,7 @@ void KeypadButton::paintEvent(QPaintEvent *p) {
 		QPointF point = p->rect().center();
 		bool b_menu = (menu() && settings->separate_keypad_menu_buttons);
 		point.setY(point.y() - doc.size().height() / 2.0 + 2.0);
-		point.setX((point.x() - (b_menu ? 10 : 0)) - doc.size().width() / 2.0 + 2.0);
+		point.setX((point.x() - (b_menu ? 6.0 : 0.0)) - doc.size().width() / 2.0 + 2.0);
 		painter.translate(point);
 		painter.save();
 		doc.drawContents(&painter);

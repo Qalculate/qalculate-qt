@@ -44,6 +44,7 @@ class KeypadButton : public QToolButton {
 		void setRichText(const QString &text);
 		const QString &richText() const;
 		void menuSet();
+		void updateSize();
 
 	protected:
 
@@ -103,6 +104,7 @@ class KeypadWidget : public QWidget {
 		bool b_edit;
 		void changeEvent(QEvent *e);
 		void editCustomAction(KeypadButton*, int);
+		void updateStretch();
 
 	protected slots:
 
