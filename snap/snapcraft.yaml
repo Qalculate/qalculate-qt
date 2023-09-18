@@ -1,6 +1,6 @@
 name: qalculate-qt
 title: Qalculate! (Qt)
-version: '4.8.0'
+version: '4.8.1'
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -42,7 +42,7 @@ apps:
 parts:
   libqalculate:
     source: https://github.com/Qalculate/libqalculate.git
-    source-tag: v4.8.0
+    source-tag: v4.8.1
     source-depth: 1
     plugin: autotools
     build-environment:
@@ -77,8 +77,8 @@ parts:
       - -usr/share/lintian
 
   qalculate-qt:
-    source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.8.0/qalculate-qt-4.8.0.tar.gz
-    source-checksum: sha512/a980f65048b3469521e8eedacee370ebab26505a67e5493a64f1d18aab6f65a83f9031a8827bd27c299154b34e2f2e65cf1357348c52e210105db92677935ec7
+    source: https://github.com/Qalculate/qalculate-qt/releases/download/v4.8.1/qalculate-qt-4.8.1.tar.gz
+    source-checksum: sha512/b1776b57ec268648a2375b3b5f94b7b3c01cccc3deb68ab57c0471200d7cfd1f94df7263d1be400d8af7e1f030aae34b828749a8f8b73cb51850d572c6d018e3
     plugin: qmake
     build-snaps:
       - kde-frameworks-5-core18-sdk

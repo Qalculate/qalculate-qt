@@ -289,6 +289,7 @@ class QalculateWindow : public QMainWindow {
 		void setToolbarStyle();
 		void showKeypadContextMenu(const QPoint&);
 		void updateKeypadTitle();
+		void keypadPreferencesChanged();
 
 	public slots:
 

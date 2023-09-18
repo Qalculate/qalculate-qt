@@ -201,7 +201,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	BOX_G(tr("Simplified percentage calculation"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
-	BOX_G(tr("Allow concise uncertainty input"), CALCULATOR->conciseUncertaintyInputEnabled(), conciseUncertaintyInputToggled(bool));
+	BOX_G(tr("Allow concise uncertainty input"), CALCULATOR->conciseUncertaintyInputEnabled(), conciseUncertaintyInputToggled(bool)); conciseUncertaintyInputBox = box;
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
 	BOX_G(tr("Interpret unrecognized symbols as variables"), settings->evalops.parse_options.unknowns_enabled, unknownsToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
@@ -211,6 +211,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.interval_calculation));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalCalculationChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	intervalCalculationCombo = combo;
 	BOX_G(tr("Factorize result"), settings->evalops.structuring == STRUCTURING_FACTORIZE, factorizeToggled(bool));
 	l2->setRowStretch(r, 1);
 	l = new QVBoxLayout(w2); l->setSizeConstraint(QLayout::SetFixedSize);
@@ -255,6 +256,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	if(settings->adaptive_interval_display) combo->setCurrentIndex(0);
 	else combo->setCurrentIndex(combo->findData(settings->printops.interval_display));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalDisplayChanged(int)));
+	intervalDisplayCombo = combo;
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Rounding:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -272,6 +274,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Angle/phasor"), COMPLEX_NUMBER_FORM_CIS);
 	combo->setCurrentIndex(combo->findData(settings->evalops.complex_number_form));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(complexFormChanged(int)));
+	complexFormCombo = combo;
 	l2->addWidget(combo, r, 1); r++;
 	l->addLayout(l2);
 	l->addStretch(1);
@@ -306,7 +309,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(prefixesChanged(int)));
 	BOX_G(tr("Enable all SI-prefixes"), settings->printops.use_all_prefixes, allPrefixesToggled(bool));
 	BOX_G(tr("Enable denominator prefixes"), settings->printops.use_denominator_prefix, denominatorPrefixToggled(bool));
-	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool));
+	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool)); variableUnitsBox = box;
 	BOX_G(tr("Copy unformatted ASCII without units"), settings->copy_ascii_without_units, copyAsciiWithoutUnitsToggled(bool));
 	l2->addWidget(new QLabel(tr("Temperature calculation:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -535,10 +538,20 @@ void PreferencesDialog::intervalCalculationChanged(int i) {
 	settings->evalops.interval_calculation = (IntervalCalculation) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit expressionCalculationUpdated(0);
 }
+void PreferencesDialog::updateIntervalCalculation() {
+	intervalCalculationCombo->blockSignals(true);
+	intervalCalculationCombo->setCurrentIndex(intervalCalculationCombo->findData(settings->evalops.interval_calculation));
+	intervalCalculationCombo->blockSignals(false);
+}
 void PreferencesDialog::complexFormChanged(int i) {
 	settings->evalops.complex_number_form = (ComplexNumberForm) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	settings->complex_angle_form = (settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS);
 	emit expressionCalculationUpdated(0);
+}
+void PreferencesDialog::updateComplexForm() {
+	complexFormCombo->blockSignals(true);
+	complexFormCombo->setCurrentIndex(complexFormCombo->findData(settings->evalops.complex_number_form));
+	complexFormCombo->blockSignals(false);
 }
 void PreferencesDialog::roundingChanged(int i) {
 	settings->rounding_mode = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
@@ -590,6 +603,11 @@ void PreferencesDialog::variableUnitsToggled(bool b) {
 	CALCULATOR->setVariableUnitsEnabled(b);
 	emit expressionCalculationUpdated(0);
 }
+void PreferencesDialog::updateVariableUnits() {
+	variableUnitsBox->blockSignals(true);
+	variableUnitsBox->setChecked(CALCULATOR->variableUnitsEnabled());
+	variableUnitsBox->blockSignals(false);
+}
 void PreferencesDialog::groupingChanged(int i) {
 	settings->printops.digit_grouping = (DigitGrouping) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultFormatUpdated();
@@ -604,9 +622,20 @@ void PreferencesDialog::intervalDisplayChanged(int i) {
 	}
 	emit resultFormatUpdated();
 }
+void PreferencesDialog::updateIntervalDisplay() {
+	intervalDisplayCombo->blockSignals(true);
+	if(settings->adaptive_interval_display) intervalDisplayCombo->setCurrentIndex(0);
+	else intervalDisplayCombo->setCurrentIndex(intervalDisplayCombo->findData(settings->printops.interval_display));
+	intervalDisplayCombo->blockSignals(false);
+}
 void PreferencesDialog::conciseUncertaintyInputToggled(bool b) {
 	CALCULATOR->setConciseUncertaintyInputEnabled(b);
 	emit expressionFormatUpdated(false);
+}
+void PreferencesDialog::updateConciseUncertaintyInput() {
+	conciseUncertaintyInputBox->blockSignals(true);
+	conciseUncertaintyInputBox->setChecked(CALCULATOR->conciseUncertaintyInputEnabled());
+	conciseUncertaintyInputBox->blockSignals(false);
 }
 void PreferencesDialog::limitImplicitToggled(bool b) {
 	settings->evalops.parse_options.limit_implicit_multiplication = b;

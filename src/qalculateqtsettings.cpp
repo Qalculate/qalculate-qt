@@ -954,7 +954,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 4;
 	preferences_version[1] = 8;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -1023,6 +1023,16 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
 	} else if(PREFERENCES_VERSION_BEFORE(4, 1, 2)) {
 		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
+	} else if(PREFERENCES_VERSION_BEFORE(4, 8, 1)) {
+		bool b1 = false, b2 = false, b3 = false;
+		for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+			if(keyboard_shortcuts[i]->key == "Alt+F") b1 = true;
+			else if(keyboard_shortcuts[i]->key == "Alt+U") b2 = true;
+			else if(keyboard_shortcuts[i]->key == "Alt+V") b3 = true;
+		}
+		if(!b1) {ADD_SHORTCUT("Alt+F", SHORTCUT_TYPE_FUNCTIONS_MENU, "")}
+		if(!b2) {ADD_SHORTCUT("Alt+U", SHORTCUT_TYPE_UNITS_MENU, "")}
+		if(!b3) {ADD_SHORTCUT("Alt+V", SHORTCUT_TYPE_VARIABLES_MENU, "")}
 	}
 
 	updateMessagePrintOptions();

@@ -907,6 +907,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(keypad, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
 	connect(keypad, SIGNAL(resultFormatUpdated(int)), this, SLOT(resultFormatUpdated(int)));
+	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(keypadPreferencesChanged()));
+	connect(keypad, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(keypadPreferencesChanged()));
+	connect(keypad, SIGNAL(resultFormatUpdated(int)), this, SLOT(keypadPreferencesChanged()));
 	connect(keypad, SIGNAL(shortcutClicked(int, const QString&)), this, SLOT(shortcutClicked(int, const QString&)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
@@ -968,6 +971,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
+void QalculateWindow::keypadPreferencesChanged() {
+	if(preferencesDialog) {
+		preferencesDialog->updateVariableUnits();
+		preferencesDialog->updateComplexForm();
+		preferencesDialog->updateIntervalDisplay();
+		preferencesDialog->updateIntervalCalculation();
+		preferencesDialog->updateConciseUncertaintyInput();
+	}
+}
 void QalculateWindow::updateKeypadTitle() {
 	QString str = tr("Keypad") + " (";
 	if(settings->keypad_type == KEYPAD_GENERAL) str += tr("General");
@@ -1007,9 +1019,9 @@ void QalculateWindow::setToolbarStyle() {
 
 void QalculateWindow::loadShortcuts() {
 	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
-	storeAction_t->setToolTip(tr("Store") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
-	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
-	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+	storeAction_t->setToolTip(tr("Store") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	basesAction->setToolTip(tr("Number Bases"));
 	toAction->setToolTip(tr("Convert"));
 	menuAction_t->setToolTip(tr("Menu"));
@@ -1042,11 +1054,11 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	if(ks->type[0] == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
@@ -1128,9 +1140,9 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
@@ -1154,7 +1166,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
 			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg("Open menu"));
+			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		}
 		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
 			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
@@ -1852,6 +1864,7 @@ void QalculateWindow::updateFavouriteFunctions() {
 		favouriteFunctionsMenu->removeAction(favouriteFunctionActions[i]);
 		favouriteFunctionActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_functions && favouriteFunctionActions.isEmpty();
 	favouriteFunctionActions.clear();
 	bool update_recent = false;
 	if(!settings->favourite_functions.empty()) {
@@ -1877,17 +1890,21 @@ void QalculateWindow::updateFavouriteFunctions() {
 			action->setSeparator(true);
 			favouriteFunctionActions << action;
 		}
-	} else {
-		update_recent = true;
+		if(update_recent) updateRecentFunctions();
+		favouriteFunctionsMenu->insertActions(settings->show_all_functions ? NULL : (recentFunctionActions.isEmpty() ?firstFunctionsMenuOptionAction : recentFunctionActions.at(0)), favouriteFunctionActions);
+		if(b_empty) {
+			favouriteFunctionsMenu->hide();
+			favouriteFunctionsMenu->show();
+			favouriteFunctionsMenu->hide();
+		}
 	}
-	if(update_recent) updateRecentFunctions();
-	favouriteFunctionsMenu->insertActions(settings->show_all_functions ? NULL : (recentFunctionActions.isEmpty() ? firstFunctionsMenuOptionAction : recentFunctionActions.at(0)), favouriteFunctionActions);
 }
 void QalculateWindow::updateRecentFunctions() {
 	for(int i = 0; i < recentFunctionActions.size(); i++) {
 		recentFunctionsMenu->removeAction(recentFunctionActions[i]);
 		recentFunctionActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_functions && recentFunctionActions.isEmpty();
 	recentFunctionActions.clear();
 	if(!settings->recent_functions.empty()) {
 		for(size_t i = 0; i < settings->recent_functions.size() && (i < 5 || settings->show_all_functions); i++) {
@@ -1902,6 +1919,11 @@ void QalculateWindow::updateRecentFunctions() {
 			recentFunctionActions << action;
 		}
 		recentFunctionsMenu->insertActions(settings->show_all_functions ? NULL : firstFunctionsMenuOptionAction, recentFunctionActions);
+		if(b_empty) {
+			recentFunctionsMenu->hide();
+			recentFunctionsMenu->show();
+			recentFunctionsMenu->hide();
+		}
 	}
 }
 void QalculateWindow::addToRecentFunctions(MathFunction *f) {
@@ -2152,6 +2174,7 @@ void QalculateWindow::updateFavouriteUnits() {
 		favouriteUnitsMenu->removeAction(favouriteUnitActions[i]);
 		favouriteUnitActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_units && favouriteUnitActions.isEmpty();
 	favouriteUnitActions.clear();
 	bool update_recent = false;
 	if(!settings->favourite_units.empty()) {
@@ -2180,17 +2203,21 @@ void QalculateWindow::updateFavouriteUnits() {
 			action->setSeparator(true);
 			favouriteUnitActions << action;
 		}
-	} else {
-		update_recent = true;
+		if(update_recent) updateRecentUnits();
+		favouriteUnitsMenu->insertActions(settings->show_all_units ? NULL : (recentUnitActions.isEmpty() ? firstUnitsMenuOptionAction : recentUnitActions.at(0)), favouriteUnitActions);
+		if(b_empty) {
+			favouriteUnitsMenu->hide();
+			favouriteUnitsMenu->show();
+			favouriteUnitsMenu->hide();
+		}
 	}
-	if(update_recent) updateRecentUnits();
-	favouriteUnitsMenu->insertActions(settings->show_all_units ? NULL : (recentUnitActions.isEmpty() ? firstUnitsMenuOptionAction : recentUnitActions.at(0)), favouriteUnitActions);
 }
 void QalculateWindow::updateRecentUnits() {
 	for(int i = 0; i < recentUnitActions.size(); i++) {
 		recentUnitsMenu->removeAction(recentUnitActions[i]);
 		recentUnitActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_units && recentUnitActions.isEmpty();
 	recentUnitActions.clear();
 	if(!settings->recent_units.empty()) {
 		for(size_t i = 0; i < settings->recent_units.size() && (i < 5 || settings->show_all_units); i++) {
@@ -2209,6 +2236,11 @@ void QalculateWindow::updateRecentUnits() {
 			recentUnitActions << action;
 		}
 		recentUnitsMenu->insertActions(settings->show_all_units ? NULL : firstUnitsMenuOptionAction, recentUnitActions);
+		if(b_empty) {
+			recentUnitsMenu->hide();
+			recentUnitsMenu->show();
+			recentUnitsMenu->hide();
+		}
 	}
 }
 void QalculateWindow::addToRecentUnits(Unit *u) {
@@ -2411,6 +2443,7 @@ void QalculateWindow::updateFavouriteVariables() {
 		favouriteVariablesMenu->removeAction(favouriteVariableActions[i]);
 		favouriteVariableActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_variables && favouriteVariableActions.isEmpty();
 	favouriteVariableActions.clear();
 	bool update_recent = false;
 	if(!settings->favourite_variables.empty()) {
@@ -2436,17 +2469,21 @@ void QalculateWindow::updateFavouriteVariables() {
 			action->setSeparator(true);
 			favouriteVariableActions << action;
 		}
-	} else {
-		update_recent = true;
+		if(update_recent) updateRecentVariables();
+		favouriteVariablesMenu->insertActions(settings->show_all_variables ? NULL : (recentVariableActions.isEmpty() ? firstVariablesMenuOptionAction : recentVariableActions.at(0)), favouriteVariableActions);
+		if(b_empty) {
+			favouriteVariablesMenu->hide();
+			favouriteVariablesMenu->show();
+			favouriteVariablesMenu->hide();
+		}
 	}
-	if(update_recent) updateRecentVariables();
-	favouriteVariablesMenu->insertActions(settings->show_all_variables ? NULL : (recentVariableActions.isEmpty() ? firstVariablesMenuOptionAction : recentVariableActions.at(0)), favouriteVariableActions);
 }
 void QalculateWindow::updateRecentVariables() {
 	for(int i = 0; i < recentVariableActions.size(); i++) {
 		recentVariablesMenu->removeAction(recentVariableActions[i]);
 		recentVariableActions[i]->deleteLater();
 	}
+	bool b_empty = settings->show_all_variables && recentVariableActions.isEmpty();
 	recentVariableActions.clear();
 	if(!settings->recent_variables.empty()) {
 		for(size_t i = 0; i < settings->recent_variables.size() && (i < 5 || settings->show_all_variables); i++) {
@@ -2461,6 +2498,11 @@ void QalculateWindow::updateRecentVariables() {
 			recentVariableActions << action;
 		}
 		recentVariablesMenu->insertActions(settings->show_all_variables ? NULL : firstVariablesMenuOptionAction, recentVariableActions);
+		if(b_empty) {
+			recentVariablesMenu->hide();
+			recentVariablesMenu->show();
+			recentVariablesMenu->hide();
+		}
 	}
 }
 void QalculateWindow::addToRecentVariables(Variable *v) {
@@ -2807,7 +2849,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 				return;
 			}
 		}
-	} else if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN || (f->minargs() > 1 && ((f->getArgumentDefinition(2) && f->getArgumentDefinition(2)->type() == ARGUMENT_TYPE_INTEGER) xor (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER)))) {
+	} else if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN || (f->minargs() == 2 && ((f->getArgumentDefinition(2) && f->getArgumentDefinition(2)->type() == ARGUMENT_TYPE_INTEGER) xor (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER)))) {
 		size_t index = 2;
 		if(f->id() != FUNCTION_ID_ROOT && f->id() != FUNCTION_ID_LOGN && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER) index = 1;
 		Argument *arg_n = f->getArgumentDefinition(index);
@@ -2895,7 +2937,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		}
 	} else if(cur.hasSelection()) {
 		do_exec = (!sargs.isEmpty() || minargs <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
-	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
+	} else if(cur.atEnd() && last_is_number(expressionEdit->toPlainText().toStdString())) {
 		expressionEdit->selectAll();
 		do_exec = !sargs.isEmpty() || minargs <= 1;
 	}

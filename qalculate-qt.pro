@@ -1,9 +1,9 @@
-VERSION = 4.8.0
+VERSION = 4.8.1
 isEmpty(PREFIX) {
 	PREFIX = /usr/local
 }
 isEmpty(BINDIR) {
-	BINDIR = ${PREFIX}/bin
+	BINDIR = $$PREFIX/bin
 }
 isEmpty(DESKTOP_DIR) {
 	DESKTOP_DIR = $$PREFIX/share/applications
@@ -49,35 +49,37 @@ SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/dataseteditdia
 
 LANGUAGES = ca de es fr nl pt_BR ru sl sv zh_CN
 
-#parameters: var, prepend, append
-defineReplace(prependAll) {
-	for(a,$$1):result += $$2$${a}$$3
-	return($$result)
-}
-
-TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
-		translations/qalculate-qt_de.ts \
-		translations/qalculate-qt_es.ts \
-		translations/qalculate-qt_fr.ts \
-		translations/qalculate-qt_nl.ts \
-		translations/qalculate-qt_pt_BR.ts \
-		translations/qalculate-qt_ru.ts \
-		translations/qalculate-qt_sl.ts \
-		translations/qalculate-qt_sv.ts \
-		translations/qalculate-qt_zh_CN.ts
-
-TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
-TRANSLATIONS_FILES =
-qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
-	qmfile = $$shadowed($$tsfile)
-	qmfile ~= s,.ts$,.qm,
-	qmdir = $$dirname(qmfile)
-	exists($$qmdir) {
-		mkpath($$qmdir)|error("Aborting.")
+!win32 {
+	#parameters: var, prepend, append
+	defineReplace(prependAll) {
+		for(a,$$1):result += $$2$${a}$$3
+		return($$result)
 	}
-	command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
-	system($$command)|error("Failed to run: $$command")
-	TRANSLATIONS_FILES += $$qmfile
+
+	TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
+			translations/qalculate-qt_de.ts \
+			translations/qalculate-qt_es.ts \
+			translations/qalculate-qt_fr.ts \
+			translations/qalculate-qt_nl.ts \
+			translations/qalculate-qt_pt_BR.ts \
+			translations/qalculate-qt_ru.ts \
+			translations/qalculate-qt_sl.ts \
+			translations/qalculate-qt_sv.ts \
+			translations/qalculate-qt_zh_CN.ts
+
+	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
+	TRANSLATIONS_FILES =
+	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
+		qmfile = $$shadowed($$tsfile)
+		qmfile ~= s,.ts$,.qm,
+		qmdir = $$dirname(qmfile)
+		exists($$qmdir) {
+			mkpath($$qmdir)|error("Aborting.")
+		}
+		command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+		system($$command)|error("Failed to run: $$command")
+		TRANSLATIONS_FILES += $$qmfile
+	}
 }
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {

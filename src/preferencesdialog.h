@@ -26,9 +26,9 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox;
+		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo;
+		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -110,6 +110,11 @@ class PreferencesDialog : public QDialog {
 		void updateParsingMode();
 		void updateTemperatureCalculation();
 		void updateExpressionStatus();
+		void updateVariableUnits();
+		void updateComplexForm();
+		void updateIntervalDisplay();
+		void updateIntervalCalculation();
+		void updateConciseUncertaintyInput();
 
 	signals:
 

@@ -244,7 +244,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(MMinusClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(MMinusClicked()));
 	grid->addWidget(button, c, 3, 1, 1);
-	button = new KeypadButton("STO", this);
+	//: Standard calculator button. Do not use more than three characters.
+	button = new KeypadButton(tr("STO"), this);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(storeClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(newFunctionClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(newFunctionClicked()));
@@ -811,12 +812,17 @@ void KeypadWidget::updateSumMenu() {
 }
 void KeypadWidget::updateXMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
-	if(menu->isEmpty()) {
-		ExpressionItem *item;
-		QAction *action;
-		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Y))
-		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_Z))
-		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_N))
+	menu->clear();
+	QAction *action;
+	QMap<QString, ExpressionItem*> map;
+	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+		if(!CALCULATOR->variables[i]->isKnown() && !CALCULATOR->variables[i]->isHidden() && CALCULATOR->variables[i]->isActive() && CALCULATOR->variables[i] != CALCULATOR->getVariableById(VARIABLE_ID_X)) {
+			map[QString::fromStdString(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs))] = CALCULATOR->variables[i];
+		}
+	}
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
 	}
 }
 void KeypadWidget::updateEqualsMenu() {
@@ -824,13 +830,18 @@ void KeypadWidget::updateEqualsMenu() {
 	if(menu->isEmpty()) {
 		ExpressionItem *item;
 		QAction *action;
+		MENU_SYMBOL(SIGN_NOT_EQUAL);
+		MENU_SYMBOL("<");
+		MENU_SYMBOL(SIGN_LESS_OR_EQUAL);
+		MENU_SYMBOL(">");
+		MENU_SYMBOL(SIGN_GREATER_OR_EQUAL);
+		menu->addSeparator();
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))
 		MENU_ITEM(CALCULATOR->getActiveFunction("solve2"))
 		MENU_ITEM(CALCULATOR->getActiveFunction("linearfunction"))
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE))
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_NEWTON_RAPHSON))
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SECANT_METHOD))
-		MENU_ITEM(CALCULATOR->getActiveFunction("extremum"))
 	}
 }
 void KeypadWidget::updateFactorizeMenu() {
@@ -850,10 +861,13 @@ void KeypadWidget::updatePercentageMenu() {
 	if(menu->isEmpty()) {
 		ExpressionItem *item;
 		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MOD));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_REM));
+		MENU_ITEM(CALCULATOR->getFunction("div"));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ABS));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GCD));
 		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LCM));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DIVISORS));
 		menu->addSeparator();
 		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE));
 		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD));
@@ -863,44 +877,83 @@ void KeypadWidget::updatePercentageMenu() {
 }
 void KeypadWidget::updateUnitsMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
-	if(menu->isEmpty()) {
-		ExpressionItem *item;
-		QAction *action;
-		QMap<QString, ExpressionItem*> map;
-		const char *si_units[] = {"m", "g", "s", "A", "K", "N", "Pa", "J", "W", "L", "V", "ohm", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
-		for(size_t i = 0; i < 15; i++) {
-			item = CALCULATOR->getActiveUnit(si_units[i]);
-			if(item) map[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
-		}
-		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
-			action = menu->addAction(it.key(), this, SLOT(onUnitItemClicked()));
-			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
-		}
-		menu->addSeparator();
-		for(int i = -9; i <= 12; i += 3) {
-			Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
-			if(p) {
-				action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
-				action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+	menu->clear();
+	ExpressionItem *item;
+	QAction *action;
+	QMap<QString, ExpressionItem*> map, map2;
+	const char *si_units[] = {"m", "g", "s", "A", "K", "J", "W", "L", "V", "ohm", "N", "Pa", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
+	size_t n = 0;
+	for(size_t i = 0; i < 5 && i < settings->recent_units.size(); i++) {
+		item = settings->recent_units[i];
+		action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
+		n++;
+	}
+	if(n > 0) menu->addSeparator();
+	for(size_t i = 0; i < 28; i++) {
+		item = CALCULATOR->getActiveUnit(si_units[i]);
+		for(size_t i = 0; item && i < 5 && i < settings->recent_units.size(); i++) {
+			if(item == settings->recent_units[i]) {
+				item = NULL;
+				break;
 			}
 		}
-		menu->addSeparator();
-		menu->addAction(tr("All units"), this, SIGNAL(openUnitsRequest()));
+		if(item) {
+			if(n >= 15) map2[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
+			else map[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
+			n++;
+		}
 	}
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onUnitItemClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+	}
+	if(!map2.isEmpty()) {
+		QMenu *menu2 = menu->addMenu(tr("more"));
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map2.constBegin(); it != map2.constEnd(); ++it) {
+			action = menu2->addAction(it.key(), this, SLOT(onUnitItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+	}
+	menu->addSeparator();
+	for(int i = -9; i <= 12; i += 3) {
+		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+		if(p) {
+			action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+		}
+	}
+	QMenu *menu2 = menu->addMenu(tr("more"));
+	for(int i = -30; i <= 30; i += 3) {
+		if(i == -9) i = -2;
+		else if(i == 1) i = -1;
+		else if(i == 2) i = 1;
+		else if(i == 4) i = 2;
+		else if(i == 5) i = 15;
+		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+		if(p) {
+			action = menu2->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+		}
+	}
+	menu->addSeparator();
+	menu->addAction(tr("All units"), this, SIGNAL(openUnitsRequest()));
 }
 void KeypadWidget::updateStoreMenu() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
 	menu->clear();
 	QAction *action;
-	ExpressionItem *item;
-	bool b = false;
+	QMap<QString, ExpressionItem*> map;
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
 		if(CALCULATOR->variables[i]->isLocal()) {
-			MENU_ITEM(CALCULATOR->variables[i]);
-			b = true;
+			map[QString::fromStdString(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs))] = CALCULATOR->variables[i];
 		}
 	}
-	if(b) menu->addSeparator();
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+	}
+	if(!map.isEmpty()) menu->addSeparator();
 	menu->addAction(tr("All variables"), this, SIGNAL(openVariablesRequest()));
 }
 void KeypadWidget::updateCustomActionOK() {
@@ -1478,11 +1531,13 @@ void KeypadWidget::onPrefixItemClicked() {
 void KeypadWidget::onUnitItemClicked() {
 	Unit *u = (Unit*) sender()->property(BUTTON_DATA).value<void*>();
 	emit unitClicked(u);
-	settings->latest_button_unit = u->print(false, true, true);
-	unitButton->setText(QString::fromStdString(settings->latest_button_unit));
-	Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
-	unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
-	unitButton->setProperty(BUTTON_DATA, QVariant::fromValue((void*) u));
+	if(unicode_length(u->print(false, true, true)) <= 3) {
+		settings->latest_button_unit = u->print(false, true, true);
+		unitButton->setText(QString::fromStdString(settings->latest_button_unit));
+		Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
+		unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
+		unitButton->setProperty(BUTTON_DATA, QVariant::fromValue((void*) u));
+	}
 }
 void KeypadWidget::onUnitButtonClicked2() {
 	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA2).value<void*>());
