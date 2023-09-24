@@ -138,4 +138,6 @@ unix:!android:!macx {
 	INSTALLS += man
 }
 
+macx: ICON = data/qalculate.icns
+
 win32: RC_FILE = winicon.rc
