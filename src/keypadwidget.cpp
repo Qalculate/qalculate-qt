@@ -1420,6 +1420,10 @@ void KeypadWidget::assumptionsSignActivated() {
 }
 void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
+	if(leftStack->currentIndex() == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
+		settings->programming_base_changed = false;
+		emit baseClicked(BASE_DECIMAL, true);
+	}
 	leftStack->setCurrentIndex(i);
 }
 void KeypadWidget::hideNumpad(bool b) {
@@ -1514,9 +1518,11 @@ void KeypadWidget::onOperatorButtonClicked3() {
 	emit operatorClicked(sender()->property(BUTTON_DATA3).toString());
 }
 void KeypadWidget::onBaseButtonClicked() {
+	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
 	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), true);
 }
 void KeypadWidget::onBaseButtonClicked2() {
+	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
 	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), false);
 }
 void KeypadWidget::onItemButtonClicked() {

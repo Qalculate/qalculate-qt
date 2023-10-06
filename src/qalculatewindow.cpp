@@ -6828,6 +6828,10 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	if(action) action->setChecked(true);
 	settings->show_keypad = b ? 1 : 0;
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
+	if(!b && settings->keypad_type == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
+		settings->programming_base_changed = false;
+		onBaseClicked(BASE_DECIMAL, true);
+	}
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);

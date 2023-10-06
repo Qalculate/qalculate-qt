@@ -26,6 +26,8 @@
 #endif
 #include <QDebug>
 
+#include "keypadwidget.h"
+
 #define PREFERENCES_VERSION_BEFORE(i1, i2, i3) (preferences_version[0] < i1 || (preferences_version[0] == i1 && (preferences_version[1] < i2 || (preferences_version[1] == i2 && preferences_version[2] < i3))))
 #define PREFERENCES_VERSION_AFTER(i1, i2, i3) (preferences_version[0] > i1 || (preferences_version[0] == i1 && (preferences_version[1] > i2 || (preferences_version[1] == i2 && preferences_version[2] > i3))))
 
@@ -289,6 +291,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		use_function_dialog = v;
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 3) keypad_type = v;
+	} else if(svar == "programming_base_changed") {
+		if(keypad_type == KEYPAD_PROGRAMMING && show_keypad) programming_base_changed = v;
 	} else if(svar == "toolbar_style") {
 		if(v == Qt::ToolButtonIconOnly || v == Qt::ToolButtonTextOnly || v == Qt::ToolButtonTextBesideIcon || v == Qt::ToolButtonTextUnderIcon) toolbar_style = v;
 	} else if(svar == "separate_keypad_menu_buttons") {
@@ -829,6 +833,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.interval_calculation = INTERVAL_CALCULATION_VARIANCE_FORMULA;
 
 	title_type = TITLE_APP;
+	programming_base_changed = false;
 	auto_calculate = true;
 	dot_question_asked = false;
 	implicit_question_asked = false;
@@ -1331,6 +1336,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	} else {
 		fprintf(file, "keypad_type=%i\n", keypad_type);
 		if(show_keypad >= 0) fprintf(file, "show_keypad=%i\n", show_keypad);
+		if(programming_base_changed) fprintf(file, "programming_base_changed=%i\n", programming_base_changed);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
 		fprintf(file, "show_bases=%i\n", show_bases);
 	}
@@ -2122,6 +2128,7 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	history_answer.clear();
 	current_result = NULL;
 	v_memory->set(m_zero);
+	programming_base_changed = false;
 	while(true) {
 		if(fgets(line, 1000000L, file) == NULL) break;
 		stmp = line;
