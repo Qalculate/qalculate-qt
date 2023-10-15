@@ -1226,7 +1226,7 @@ void KeypadWidget::onCustomButtonClicked3() {
 	if(b_edit || !sender()->property(BUTTON_DATA3).isValid() || sender()->property(BUTTON_DATA3).toInt() < 0) {
 		editCustomAction(button, 3);
 	} else {
-		emit shortcutClicked(sender()->property(BUTTON_DATA2).toInt(), sender()->property(BUTTON_VALUE3).toString());
+		emit shortcutClicked(sender()->property(BUTTON_DATA3).toInt(), sender()->property(BUTTON_VALUE3).toString());
 	}
 }
 void KeypadWidget::intervalDisplayActivated() {
