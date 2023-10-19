@@ -1787,7 +1787,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
 		pasteAction = cmenu->addAction(tr("Paste"), this, SLOT(paste()));
-		pasteAction->setShortcut(QKeySequence::Copy);
+		pasteAction->setShortcut(QKeySequence::Paste);
 		pasteAction->setShortcutContext(Qt::WidgetShortcut);
 		deleteAction = cmenu->addAction(tr("Delete"), this, SLOT(editDelete()));
 		deleteAction->setShortcut(QKeySequence::Delete);
