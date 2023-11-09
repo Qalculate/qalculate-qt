@@ -118,7 +118,8 @@ QString lastx_text;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
-bool to_fraction = false;
+int to_fraction = 0;
+long int to_fixed_fraction = 0;
 char to_prefix = 0;
 int to_base = 0;
 int to_caf = -1;
@@ -673,10 +674,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addWidget(modeAction_t);
 	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
-	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
-	toAction->setEnabled(false);
-	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
-	tb->addAction(toAction);
+	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_ICON("convert")); toAction_t->setText(tr("Convert"));
+	toAction_t->setEnabled(false);
+	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
+	toMenu = new QMenu(this);
+	tb->addWidget(toAction_t);
 	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_ICON("document-save")); storeAction_t->setText(tr("Store"));
 	storeAction_t->setPopupMode(QToolButton::MenuButtonPopup);
 	connect(storeAction_t, SIGNAL(clicked()), this, SLOT(onStoreActivated()));
@@ -1023,7 +1025,7 @@ void QalculateWindow::loadShortcuts() {
 	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	basesAction->setToolTip(tr("Number Bases"));
-	toAction->setToolTip(tr("Convert"));
+	toAction_t->setToolTip(tr("Convert"));
 	menuAction_t->setToolTip(tr("Menu"));
 	modeAction_t->setToolTip(tr("Mode"));
 	rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up"));
@@ -1062,7 +1064,7 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
-		toAction->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
 		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
@@ -1169,7 +1171,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		}
 		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
-			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+			toAction_t->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		}
 		ks->new_action = true;
 		action = new QAction(this);
@@ -4024,16 +4026,24 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "auto")) v = -1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
+		} else {
+			int tofr = 0;
+			long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(svalue), tofr, QString(), true);
+			if(fden != 0) {
+				if(tofr == 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				else v = FRACTION_COMBINED_FIXED_DENOMINATOR;
+				if(fden > 0) CALCULATOR->setFixedDenominator(fden);
+			}
 		}
-		if(v > FRACTION_COMBINED + 2) {
+		if(v > FRACTION_COMBINED_FIXED_DENOMINATOR + 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
-		} else if(v < 0 || v > FRACTION_COMBINED + 1) {
-			settings->printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
+		} else {
+			settings->printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL && v <= FRACTION_COMBINED_FIXED_DENOMINATOR);
 			if(v < 0) settings->dual_fraction = -1;
-			else if(v == FRACTION_COMBINED + 2) settings->dual_fraction = 1;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) settings->dual_fraction = 1;
 			else settings->dual_fraction = 0;
-			if(v == FRACTION_COMBINED + 1) v = FRACTION_FRACTIONAL;
-			else if(v < 0 || v == FRACTION_COMBINED + 2) v = FRACTION_DECIMAL;
+			if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL;
+			else if(v < 0 || v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_DECIMAL;
 			settings->printops.number_fraction_format = (NumberFractionFormat) v;
 			resultFormatUpdated();
 		}
@@ -4182,7 +4192,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(!do_stack) stack_index = 0;
 
 	if(execute_str.empty()) {
-		to_fraction = false; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
+		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
 	}
 	bool current_expr = false;
 	if(str.empty() && !do_mathoperation) {
@@ -5048,9 +5058,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					return;
 				}
 				do_to = true;
-			} else if(equalsIgnoreCase(to_str, "fraction") || equalsIgnoreCase(to_str, tr("fraction").toStdString())) {
-				do_to = true;
-				to_fraction = true;
 			} else if(equalsIgnoreCase(to_str, "factors") || equalsIgnoreCase(to_str, tr("factors").toStdString()) || equalsIgnoreCase(to_str, "factor")) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -5072,21 +5079,27 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
 				do_to = true;
-			} else if(from_str.empty()) {
-				b_busy--;
-				executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(to_str, settings->evalops.parse_options));
-				if(current_expr) setPreviousExpression();
-				return;
 			} else {
-				if(to_str[0] == '?') {
-					to_prefix = 1;
-				} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
-					to_prefix = to_str[0];
-
-				}
 				do_to = true;
-				if(!str_conv.empty()) str_conv += " to ";
-				str_conv += to_str;
+				long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(to_str), to_fraction, tr("fraction"));
+				if(fden != 0) {
+					if(fden < 0) to_fixed_fraction = 0;
+					else to_fixed_fraction = fden;
+				} else if(from_str.empty()) {
+					b_busy--;
+					executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(to_str, settings->evalops.parse_options));
+					if(current_expr) setPreviousExpression();
+					return;
+				} else {
+					if(to_str[0] == '?') {
+						to_prefix = 1;
+					} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
+						to_prefix = to_str[0];
+
+					}
+					if(!str_conv.empty()) str_conv += " to ";
+					str_conv += to_str;
+				}
 			}
 			if(str_left.empty()) break;
 			to_str = str_left;
@@ -5830,7 +5843,7 @@ bool contains_plot_or_save(const std::string &str) {
 }
 
 void QalculateWindow::onExpressionChanged() {
-	toAction->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
+	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
 	if(!expressionEdit->expressionHasChanged() || !basesDock->isVisible()) return;
 	MathStructure m;
 	EvaluationOptions eo = settings->evalops;
@@ -6128,11 +6141,13 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	bool save_den = settings->printops.use_denominator_prefix;
 	int save_bin = CALCULATOR->usesBinaryPrefixes();
 	NumberFractionFormat save_format = settings->printops.number_fraction_format;
+	long int save_fden = CALCULATOR->fixedDenominator();
 	bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
+	int save_dual = settings->dual_fraction;
 	bool do_to = false;
 
 	if(!do_stack) {
-		if(to_base != 0 || to_fraction || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
+		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
 			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
@@ -6143,9 +6158,17 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				}
 				do_to = true;
 			}
-			if(to_fraction && (settings->printops.restrict_fraction_length || settings->printops.number_fraction_format != FRACTION_COMBINED)) {
+			if(to_fixed_fraction >= 2) {
+				if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				else settings->printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
+				CALCULATOR->setFixedDenominator(to_fixed_fraction);
+				settings->dual_fraction = 0;
+				do_to = true;
+			} else if(to_fraction > 0 && (settings->printops.restrict_fraction_length || settings->printops.number_fraction_format != FRACTION_COMBINED)) {
 				settings->printops.restrict_fraction_length = false;
-				settings->printops.number_fraction_format = FRACTION_COMBINED;
+				if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
+				else settings->printops.number_fraction_format = FRACTION_COMBINED;
+				settings->dual_fraction = 0;
 				do_to = true;
 			}
 			if(to_caf >= 0 && to_caf != settings->complex_angle_form) {
@@ -6337,6 +6360,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		settings->printops.use_denominator_prefix = save_den;
 		CALCULATOR->useBinaryPrefixes(save_bin);
 		settings->printops.number_fraction_format = save_format;
+		CALCULATOR->setFixedDenominator(save_fden);
+		settings->dual_fraction = save_dual;
 		settings->printops.restrict_fraction_length = save_restrict_fraction_length;
 	}
 	settings->printops.prefix = NULL;
@@ -6384,7 +6409,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
 		menuAction_t->setIcon(LOAD_ICON("menu"));
-		toAction->setIcon(LOAD_ICON("convert"));
+		toAction_t->setIcon(LOAD_ICON("convert"));
 		storeAction_t->setIcon(LOAD_ICON("document-save"));
 		functionsAction_t->setIcon(LOAD_ICON("function"));
 		unitsAction_t->setIcon(LOAD_ICON("units"));
@@ -6685,23 +6710,31 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 
 void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
-	QRect rect = tb->widgetForAction(toAction)->geometry();
-	QRect pos = QRect(tb->mapToGlobal(rect.topLeft()), rect.size());
-	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
-		if(expressionEdit->complete(mstruct, pos)) return;
+	bool b_result = !expressionEdit->expressionHasChanged() && settings->current_result;
+	if(!b_result) {
+		expressionEdit->blockCompletion(true, button);
+		expressionEdit->blockParseStatus();
+		expressionEdit->moveCursor(QTextCursor::End);
+		expressionEdit->insertPlainText("➞");
+		expressionEdit->blockParseStatus(false);
+		expressionEdit->displayParseStatus(true, false);
 	}
-	expressionEdit->blockCompletion(true, button);
-	expressionEdit->blockParseStatus();
-	expressionEdit->moveCursor(QTextCursor::End);
-	expressionEdit->insertPlainText("➞");
-	expressionEdit->blockParseStatus(false);
-	expressionEdit->displayParseStatus(true, false);
-	expressionEdit->complete(NULL, button ? pos : QRect());
-	expressionEdit->blockCompletion(false);
+	if(b_result || button) {
+		expressionEdit->complete(b_result ? mstruct : NULL, toMenu);
+		if(!toMenu->isEmpty()) {
+			toAction_t->setMenu(toMenu);
+			toAction_t->showMenu();
+			toAction_t->setMenu(NULL);
+			toMenu->clear();
+		}
+	} else {
+		expressionEdit->complete();
+	}
+	if(!b_result) expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
-	if(str[str.length() - 1] == ' ') expressionEdit->insertPlainText(QString::fromStdString(str));
+	if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertPlainText(QString::fromStdString(str));
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::importCSV() {
@@ -8651,7 +8684,7 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
-			toAction->setEnabled(false);
+			toAction_t->setEnabled(false);
 		}
 	}
 }
@@ -8671,7 +8704,7 @@ void QalculateWindow::rpnModeActivated() {
 		if(!settings->rpn_shown) {rpnDock->setFloating(true); settings->rpn_shown = true;}
 		rpnDock->show();
 		rpnDock->raise();
-		toAction->setEnabled(false);
+		toAction_t->setEnabled(false);
 	}
 }
 void QalculateWindow::chainModeActivated() {

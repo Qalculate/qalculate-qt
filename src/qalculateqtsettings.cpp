@@ -74,6 +74,35 @@ bool item_in_calculator(ExpressionItem *item) {
 	return false;
 }
 
+long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, char sgn, const QString &localized_fraction, bool qalc_command) {
+	long int fden = 0;
+	if(!qalc_command && (equalsIgnoreCase(str, "fraction") || equalsIgnoreCase(str, localized_fraction.toStdString()))) {
+		fden = -1;
+	} else {
+		if(str.length() > 2 && str[0] == '1' && str[1] == '/' && str.find_first_not_of(NUMBERS SPACES, 2) == std::string::npos) {
+			fden = s2i(str.substr(2, str.length() - 2));
+		} else if(str == "3rds") {
+			fden = 3;
+		} else if(str == "halves") {
+			fden = 2;
+		} else if(str.length() > 3 && str.find("ths", str.length() - 3) != std::string::npos && str.find_first_not_of(NUMBERS SPACES) == str.length() - 3) {
+			fden = s2i(str.substr(0, str.length() - 3));
+		}
+	}
+	if(fden == 1) fden = 0;
+	if(fden != 0) {
+		if(sgn == '-') to_fraction = 2;
+		else to_fraction = 1;
+	}
+	return fden;
+}
+long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command) {
+	size_t n = 0;
+	if(str[0] == '-' || str[0] == '+') n = 1;
+	if(n > 0) return get_fixed_denominator_qt2(str.substr(n, str.length() - n), to_fraction, str[0], localized_fraction, qalc_command);
+	return get_fixed_denominator_qt2(str, to_fraction, 0, localized_fraction, qalc_command);
+}
+
 AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName(QApplication::tr("answer").toStdString(), 1);
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
@@ -356,10 +385,18 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(v == FRACTION_COMBINED + 2) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = 1;
+		} else if(v == FRACTION_COMBINED + 3) {
+			printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 4) {
+			printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
+			dual_fraction = 0;
 		} else if(v < 0) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = -1;
 		}
+	} else if(svar == "number_fraction_denominator") {
+		CALCULATOR->setFixedDenominator(v);
 	} else if(svar == "complex_number_form") {
 		if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
 			evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
@@ -1450,9 +1487,14 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "min_exp=%i\n", printops.min_exp);
 		fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
 		fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
-		if(dual_fraction < 0) fprintf(file, "number_fraction_format=%i\n", -1);
-		else if(dual_fraction > 0) fprintf(file, "number_fraction_format=%i\n", FRACTION_COMBINED + 2);
-		else fprintf(file, "number_fraction_format=%i\n", printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL ? FRACTION_COMBINED + 1 : printops.number_fraction_format);
+		int v = printops.number_fraction_format;
+		if(dual_fraction < 0) v = -1;
+		else if(dual_fraction > 0) v = FRACTION_COMBINED + 2;
+		else if(!printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL) v = FRACTION_COMBINED + 1;
+		else if(printops.number_fraction_format == FRACTION_FRACTIONAL_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 3;
+		else if(printops.number_fraction_format == FRACTION_COMBINED_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 4;
+		fprintf(file, "number_fraction_format=%i\n", v);
+		if(v > FRACTION_COMBINED + 2) fprintf(file, "number_fraction_denominator=%li\n", CALCULATOR->fixedDenominator());
 		fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
 		fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
 		fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);

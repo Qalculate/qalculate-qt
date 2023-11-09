@@ -102,10 +102,10 @@ class QalculateWindow : public QMainWindow {
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t, *storeAction_t, *functionsAction_t, *unitsAction_t;
+		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t, *storeAction_t, *functionsAction_t, *unitsAction_t, *toAction_t;
 		QMenu *tmenu;
-		QAction *toAction, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
-		QMenu *recentVariablesMenu, *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *recentFunctionsMenu, *favouriteFunctionsMenu, *unitsMenu, *recentUnitsMenu, *favouriteUnitsMenu, *angleMenu;
+		QAction *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
+		QMenu *recentVariablesMenu, *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *recentFunctionsMenu, *favouriteFunctionsMenu, *unitsMenu, *recentUnitsMenu, *favouriteUnitsMenu, *angleMenu, *toMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
 		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;

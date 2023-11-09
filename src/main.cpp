@@ -62,7 +62,11 @@ int main(int argc, char **argv) {
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
 		if(!settings->custom_lang.isEmpty()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().territory()));
+#else
 			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
+#endif
 #ifdef _WIN32
 			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
 		} else {
@@ -75,7 +79,11 @@ int main(int argc, char **argv) {
 					if(!lang.empty()) {
 						gsub("-", "_", lang);
 						if(lang != QLocale().name().toStdString()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory()));
+#else
 							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country()));
+#endif
 						}
 						_putenv_s("LANG", lang.c_str());
 					}

@@ -129,6 +129,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
 		void onCompletionHighlighted(const QModelIndex&);
+		void onCompletionMenuItemActivated();
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
@@ -155,7 +156,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void insertMatrix();
 		void enableTabCompletion(bool);
 		bool completeOrActivateFirst(bool = false);
-		bool complete(MathStructure* = NULL, const QRect& = QRect(), bool = false);
+		bool complete(MathStructure* = NULL, QMenu* = NULL, bool = false);
 		void clearHistory();
 
 	signals:

@@ -46,6 +46,7 @@ bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
 bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
 bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
+long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
 
 #define RESET_SETTINGS_TZ 	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? TZ_TRUNCATE : 0);\
 				if(settings->use_duo_syms) settings->printops.custom_time_zone += TZ_DOZENAL;\
