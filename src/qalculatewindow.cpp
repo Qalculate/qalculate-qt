@@ -3115,8 +3115,7 @@ void QalculateWindow::socketReadyRead() {
 	QString command = socket->readAll();
 	if(!command.isEmpty() && command[0] == '+') {
 		settings->window_state = saveState();
-		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
-		else settings->window_geometry = QByteArray();
+		settings->window_geometry = saveGeometry();
 		settings->splitter_state = ehSplitter->saveState();
 		settings->allow_multiple_instances = true;
 		settings->show_bases = basesDock->isVisible();
