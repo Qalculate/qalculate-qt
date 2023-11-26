@@ -81,6 +81,8 @@ long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, cha
 	} else {
 		if(str.length() > 2 && str[0] == '1' && str[1] == '/' && str.find_first_not_of(NUMBERS SPACES, 2) == std::string::npos) {
 			fden = s2i(str.substr(2, str.length() - 2));
+		} else if(str.length() > 1 && str[0] == '/' && str.find_first_not_of(NUMBERS SPACES, 1) == std::string::npos) {
+			fden = s2i(str.substr(1, str.length() - 1));
 		} else if(str == "3rds") {
 			fden = 3;
 		} else if(str == "halves") {
@@ -376,11 +378,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(svar == "number_fraction_format") {
 		if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
 			printops.number_fraction_format = (NumberFractionFormat) v;
-			printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
+			printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
 			dual_fraction = 0;
 		} else if(v == FRACTION_COMBINED + 1) {
 			printops.number_fraction_format = FRACTION_FRACTIONAL;
-			printops.restrict_fraction_length = false;
+			printops.restrict_fraction_length = PREFERENCES_VERSION_AFTER(4, 8, 1);
 			dual_fraction = 0;
 		} else if(v == FRACTION_COMBINED + 2) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
@@ -995,8 +997,8 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 4;
-	preferences_version[1] = 8;
-	preferences_version[2] = 1;
+	preferences_version[1] = 9;
+	preferences_version[2] = 0;
 
 	if(file) {
 		char line[1000000L];

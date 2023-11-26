@@ -937,7 +937,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(storeClicked()), this, SLOT(onStoreActivated()));
 	connect(keypad, SIGNAL(newFunctionClicked()), this, SLOT(newFunction()));
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
-	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
+	connect(keypad, SIGNAL(baseClicked(int, bool, bool)), this, SLOT(onBaseClicked(int, bool, bool)));
 	connect(keypad, SIGNAL(factorizeClicked()), this, SLOT(onFactorizeClicked()));
 	connect(keypad, SIGNAL(expandClicked()), this, SLOT(onExpandClicked()));
 	connect(keypad, SIGNAL(expandPartialFractionsClicked()), this, SLOT(onExpandPartialFractionsClicked()));
@@ -3079,7 +3079,7 @@ void QalculateWindow::onAnswerClicked() {
 		onInsertValueRequested(settings->history_answer.size());
 	}
 }
-void QalculateWindow::onBaseClicked(int v, bool b) {
+void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 	if(b && v != settings->evalops.parse_options.base) {
 		settings->evalops.parse_options.base = v;
 		QAction *action = find_child_data(this, "group_inbase", v);
@@ -3092,7 +3092,7 @@ void QalculateWindow::onBaseClicked(int v, bool b) {
 		to_bits = 0;
 		QAction *action = find_child_data(this, "group_outbase", v);
 		if(action) action->setChecked(true);
-		resultFormatUpdated();
+		if(b_update) resultFormatUpdated();
 	}
 	keypad->updateBase();
 }
@@ -4025,6 +4025,10 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "auto")) v = -1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
+			if(v == FRACTION_COMBINED + 1) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 1;
+			else if(v == FRACTION_COMBINED + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 2;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR;
 		} else {
 			int tofr = 0;
 			long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(svalue), tofr, QString(), true);
@@ -4037,7 +4041,7 @@ void QalculateWindow::setOption(std::string str) {
 		if(v > FRACTION_COMBINED_FIXED_DENOMINATOR + 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			settings->printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL && v <= FRACTION_COMBINED_FIXED_DENOMINATOR);
+			settings->printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
 			if(v < 0) settings->dual_fraction = -1;
 			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) settings->dual_fraction = 1;
 			else settings->dual_fraction = 0;
@@ -6046,6 +6050,14 @@ int intervals_are_relative(MathStructure &m) {
 	return ret;
 }
 
+bool contains_rand_function(const MathStructure &m) {
+	if(m.isFunction() && m.function()->category() == CALCULATOR->getFunctionById(FUNCTION_ID_RAND)->category()) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_rand_function(m[i])) return true;
+	}
+	return false;
+}
+
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
 
 	if(block_result_update) return;
@@ -6163,7 +6175,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				CALCULATOR->setFixedDenominator(to_fixed_fraction);
 				settings->dual_fraction = 0;
 				do_to = true;
-			} else if(to_fraction > 0 && (settings->printops.restrict_fraction_length || settings->printops.number_fraction_format != FRACTION_COMBINED)) {
+			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || settings->printops.restrict_fraction_length || (to_fraction != 2 && settings->printops.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && settings->printops.number_fraction_format != FRACTION_FRACTIONAL))) {
 				settings->printops.restrict_fraction_length = false;
 				if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
 				else settings->printops.number_fraction_format = FRACTION_COMBINED;
@@ -6331,7 +6343,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		size_t index = settings->v_expression.size();
 		while(index > 0 && settings->v_delexpression[index - 1]) index--;
 		bool b_add = true;
-		if(index > 0 && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1])) && alt_results.size() <= settings->v_result[index - 1].size()) {
+		if(index > 0 && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1] && !contains_rand_function(*parsed_mstruct))) && alt_results.size() <= settings->v_result[index - 1].size()) {
 			b_add = false;
 			for(size_t i = 0; i < alt_results.size(); i++) {
 				if(settings->v_delresult[index - 1][i] || settings->v_exact[index - 1][i] != (b_exact || i < alt_results.size() - 1) || settings->v_result[index - 1][i] != alt_results[i]) {
@@ -6710,8 +6722,14 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
 	bool b_result = !expressionEdit->expressionHasChanged() && settings->current_result;
-	if(!b_result) {
-		expressionEdit->blockCompletion(true, button);
+	bool b_addto = !b_result;
+	if(b_addto && button && CALCULATOR->hasToExpression(expressionEdit->toPlainText().toStdString(), true, settings->evalops)) {
+		std::string str = expressionEdit->toPlainText().toStdString(), to_str;
+		CALCULATOR->separateToExpression(str, to_str, settings->evalops, true, true);
+		if(to_str.empty()) b_addto = false;
+	}
+	if(!b_result) expressionEdit->blockCompletion(true, button);
+	if(b_addto) {
 		expressionEdit->blockParseStatus();
 		expressionEdit->moveCursor(QTextCursor::End);
 		expressionEdit->insertPlainText("➞");
@@ -6862,7 +6880,7 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	if(!b && settings->keypad_type == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
 		settings->programming_base_changed = false;
-		onBaseClicked(BASE_DECIMAL, true);
+		onBaseClicked(BASE_DECIMAL, true, false);
 	}
 }
 void QalculateWindow::onBasesActivated(bool b) {

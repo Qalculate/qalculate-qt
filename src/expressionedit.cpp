@@ -1200,13 +1200,14 @@ void ExpressionEdit::updateCompletion() {
 				} else {
 					title2 = QString::fromStdString(u->title(false));
 					ename = &u->preferredInputName(true, settings->printops.use_unicode_signs, false, u->isCurrency(), &can_display_unicode_string_function, completionView);
-					if(ename->abbreviation) {
+					if(ename->abbreviation && (!ename->suffix || (ename->name.length() > 5 && ename->name.find("_unit", ename->name.length() - 5) != std::string::npos))) {
 						bool tp = title2[title2.length() - 1] == ')';
 						title2 += " ";
 						if(!tp) title2 += "(";
 						if(name_has_formatting(ename)) title2 += QString::fromStdString(ename->formattedName(TYPE_UNIT, true, false, -1, true));
 						else title2 += QString::fromStdString(ename->name);
 						if(!tp) title2 += ")";
+						if(title2.contains("_")) title2 = QString::fromStdString(u->title(false));
 					}
 				}
 				title = QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
@@ -1262,7 +1263,7 @@ void ExpressionEdit::updateCompletion() {
 					if(str.find("<") == std::string::npos) {
 						title2 += QString::fromStdString(str);
 					} else {
-						title2 += QString::fromStdString(cu->print(po, false, TAG_TYPE_HTML, false, false));
+						title2 += QString::fromStdString(cu->print(po, true, TAG_TYPE_TERMINAL, false, false));
 					}
 				}
 				if(!tp) title2 += ")";

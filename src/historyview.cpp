@@ -314,7 +314,7 @@ void HistoryView::loadInitial() {
 	last_ref = "";
 	if(!settings->v_expression.empty()) {
 		for(size_t i = 0; i < settings->v_expression.size();) {
-			if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1])) {
+			if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos)) {
 				settings->v_delexpression.erase(settings->v_delexpression.begin() + i);
 				settings->v_expression.erase(settings->v_expression.begin() + i);
 				settings->v_parse.erase(settings->v_parse.begin() + i);

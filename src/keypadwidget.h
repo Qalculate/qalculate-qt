@@ -197,7 +197,7 @@ class KeypadWidget : public QWidget {
 		void newFunctionClicked();
 		void backspaceClicked();
 		void answerClicked();
-		void baseClicked(int, bool);
+		void baseClicked(int, bool, bool);
 		void factorizeClicked();
 		void expandClicked();
 		void expandPartialFractionsClicked();

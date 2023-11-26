@@ -170,7 +170,7 @@ class QalculateWindow : public QMainWindow {
 		void onMPlusClicked();
 		void onMMinusClicked();
 		void onAnswerClicked();
-		void onBaseClicked(int, bool);
+		void onBaseClicked(int, bool, bool);
 		void onFactorizeClicked();
 		void onExpandClicked();
 		void onExpandPartialFractionsClicked();

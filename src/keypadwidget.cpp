@@ -1422,7 +1422,7 @@ void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
 	if(leftStack->currentIndex() == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
 		settings->programming_base_changed = false;
-		emit baseClicked(BASE_DECIMAL, true);
+		emit baseClicked(BASE_DECIMAL, true, false);
 	}
 	leftStack->setCurrentIndex(i);
 }
@@ -1519,11 +1519,11 @@ void KeypadWidget::onOperatorButtonClicked3() {
 }
 void KeypadWidget::onBaseButtonClicked() {
 	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
-	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), true);
+	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), true, true);
 }
 void KeypadWidget::onBaseButtonClicked2() {
 	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
-	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), false);
+	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), false, true);
 }
 void KeypadWidget::onItemButtonClicked() {
 	ExpressionItem *item = (ExpressionItem*) sender()->property(BUTTON_DATA).value<void*>();
