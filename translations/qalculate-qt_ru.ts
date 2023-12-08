@@ -1440,12 +1440,6 @@ Do you want to overwrite the function?</source>
         </translation>
     </message>
     <message>
-        <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;,
-and press the enter key.</source>
-        <translation type="obsolete">Введите математическое выражение выше, например «5 + 2 / 3»,
-и нажмите клавишу ВВОД (Enter).</translation>
-    </message>
-    <message>
         <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
         <translation>Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
     </message>
