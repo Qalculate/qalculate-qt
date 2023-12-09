@@ -1664,7 +1664,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_Enter: {
 				if(completionView->isVisible() && completionView->currentIndex().isValid()) {
 					onCompletionActivated(completionView->currentIndex());
-				} else if(!document()->isEmpty()) {
+				} else if(settings->rpn_mode || !document()->isEmpty()) {
 					emit returnPressed();
 				}
 				return;
