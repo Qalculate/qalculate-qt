@@ -1133,11 +1133,13 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Microchip 24-bit</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Формат числа с плавающей точкой Microship (PIC16/17)</translatorcomment>
+        <translation>Микрочип 24-битный</translation>
     </message>
     <message>
         <source>Microchip 32-bit</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Формат числа с плавающей точкой Microship (PIC16/17)</translatorcomment>
+        <translation>Микрочип 32-битный</translation>
     </message>
 </context>
 <context>
@@ -1438,14 +1440,8 @@ Do you want to overwrite the function?</source>
         </translation>
     </message>
     <message>
-        <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;,
-and press the enter key.</source>
-        <translation type="obsolete">Введите математическое выражение выше, например «5 + 2 / 3»,
-и нажмите клавишу ВВОД (Enter).</translation>
-    </message>
-    <message>
         <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
-        <translation type="unfinished">Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
+        <translation>Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
     </message>
 </context>
 <context>
@@ -1464,11 +1460,11 @@ and press the enter key.</source>
     </message>
     <message>
         <source>&lt;i&gt;Long press&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Долгое нажатие&lt;/i&gt;: %1</translation>
+        <translation>&lt;i&gt;Долгое нажатие&lt;/i&gt;: %1</translation>
     </message>
     <message>
         <source>Open menu</source>
-        <translation type="unfinished">Открыть меню</translation>
+        <translation>Открыть меню</translation>
     </message>
 </context>
 <context>
@@ -1772,114 +1768,117 @@ and press the enter key.</source>
     </message>
     <message>
         <source>Store</source>
-        <translation type="unfinished">Сохранить</translation>
+        <translation>Сохранить</translation>
     </message>
     <message>
         <source>New function</source>
-        <translation type="unfinished">Новая функция</translation>
+        <translation>Новая функция</translation>
     </message>
     <message>
         <source>Expand partial fractions</source>
-        <translation type="unfinished">Развернуть частичные дроби</translation>
+        <translation>Развернуть частичные дроби</translation>
     </message>
     <message>
         <source>Enable units in physical constants</source>
-        <translation type="unfinished">Включить единицы измерения в физических константах</translation>
+        <translation>Включить единицы измерения в физических константах</translation>
     </message>
     <message>
         <source>All constants</source>
-        <translation type="unfinished">Все константы</translation>
+        <translation>Все константы</translation>
     </message>
     <message>
         <source>Percentage Calculation Tool</source>
-        <translation type="unfinished">Инструмент расчёта процентов</translation>
+        <translation>Инструмент расчёта процентов</translation>
     </message>
     <message>
         <source>more</source>
-        <translation type="unfinished">ещё</translation>
+        <translation>ещё</translation>
     </message>
     <message>
         <source>All units</source>
-        <translation type="unfinished">Все единицы</translation>
+        <translation>Все единицы</translation>
     </message>
     <message>
         <source>All variables</source>
-        <translation type="unfinished">Все переменные</translation>
+        <translation>Все переменные</translation>
     </message>
     <message>
         <source>Interval Display</source>
-        <translation type="unfinished">Отображение интервалов</translation>
+        <translation>Отображение интервалов</translation>
     </message>
     <message>
         <source>Adaptive</source>
-        <translation type="unfinished">Адаптивный</translation>
+        <translation>Адаптивный</translation>
     </message>
     <message>
         <source>Significant digits</source>
-        <translation type="unfinished">Значимые цифры</translation>
+        <translation>Значимые цифры</translation>
     </message>
     <message>
         <source>Plus/minus</source>
-        <translation type="unfinished">Плюс/минус</translation>
+        <translation>Плюс/минус</translation>
     </message>
     <message>
         <source>Relative</source>
-        <translation type="unfinished">Относительный</translation>
+        <translation>Относительный</translation>
     </message>
     <message>
         <source>Concise</source>
-        <translation type="unfinished"></translation>
+        <translation>Краткая</translation>
     </message>
     <message>
         <source>Interval Calculation</source>
-        <translation type="unfinished">Расчёт интервала</translation>
+        <translation>Расчёт интервала</translation>
     </message>
     <message>
         <source>Variance formula</source>
-        <translation type="unfinished">Формула дисперсии</translation>
+        <translation>Формула дисперсии</translation>
     </message>
     <message>
         <source>Interval arithmetic</source>
-        <translation type="unfinished">Арифметика интервалов</translation>
+        <translation>Арифметика интервалов</translation>
     </message>
     <message>
         <source>Allow concise uncertainty input</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить ввод краткой неопределенности</translation>
     </message>
     <message>
         <source>Complex number form</source>
-        <translation type="unfinished">Комплексная форма</translation>
+        <translation>Комплексная форма</translation>
     </message>
     <message>
         <source>Rectangular</source>
-        <translation type="unfinished">Прямоугольная</translation>
+        <translation>Прямоугольная</translation>
     </message>
     <message>
         <source>Exponential</source>
-        <translation type="unfinished">Экспоненциальная</translation>
+        <translation>Экспоненциальная</translation>
     </message>
     <message>
         <source>Polar</source>
-        <translation type="unfinished">Полярная</translation>
+        <translation>Полярная</translation>
     </message>
     <message>
         <source>Angle/phasor</source>
-        <translation type="unfinished">Угловая/векторная</translation>
+        <translation>Угловая/векторная</translation>
     </message>
     <message>
         <source>Type</source>
         <comment>Assumptions type</comment>
-        <translation type="unfinished">Тип</translation>
+        <translatorcomment>Тип предположений</translatorcomment>
+        <translation>Тип</translation>
     </message>
     <message>
         <source>Sign</source>
         <comment>Assumptions sign</comment>
-        <translation type="unfinished">Знак</translation>
+        <translatorcomment>Знак предположений</translatorcomment>
+        <translation>Знак</translation>
     </message>
     <message>
         <source>STO</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
-        <translation type="unfinished">СХР</translation>
+        <translatorcomment>Стандартная кнопка калькулятора. Не используйте более трёх символов.</translatorcomment>
+        <translation>СХР</translation>
     </message>
 </context>
 <context>
@@ -2752,39 +2751,39 @@ and press the enter key.</source>
     </message>
     <message>
         <source>Tooltips:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tooltips:</translation>
     </message>
     <message>
         <source>Show all</source>
-        <translation type="unfinished"></translation>
+        <translation>Показывать всё</translation>
     </message>
     <message>
         <source>Hide in keypad</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрывать на клавиатуре</translation>
     </message>
     <message>
         <source>Hide all</source>
-        <translation type="unfinished"></translation>
+        <translation>Скрывать всё</translation>
     </message>
     <message>
         <source>Interpret unrecognized symbols as variables</source>
-        <translation type="unfinished"></translation>
+        <translation>Интерпретировать нераспознанные символы как переменные</translation>
     </message>
     <message>
         <source>Concise</source>
-        <translation type="unfinished"></translation>
+        <translation>Краткая</translation>
     </message>
     <message>
         <source>Enable units</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить единицы измерений</translation>
     </message>
     <message>
         <source>Allow concise uncertainty input</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить ввод краткой неопределенности</translation>
     </message>
     <message>
         <source>Close application with Escape key</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрыть приложение клавишей Esc</translation>
     </message>
 </context>
 <context>
@@ -3364,47 +3363,47 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished">По умолчанию</translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <source>Formatted result</source>
-        <translation type="unfinished"></translation>
+        <translation>Форматированный результат</translation>
     </message>
     <message>
         <source>Unformatted ASCII result</source>
-        <translation type="unfinished"></translation>
+        <translation>Неформатированный ASCII результат</translation>
     </message>
     <message>
         <source>Unformatted ASCII result without units</source>
-        <translation type="unfinished"></translation>
+        <translation>Неформатированное ASCII выражение без единиц измерения</translation>
     </message>
     <message>
         <source>Formatted expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Форматированное выражение</translation>
     </message>
     <message>
         <source>Unformatted ASCII expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Неформатированное ASCII выражение</translation>
     </message>
     <message>
         <source>Formatted expression + result</source>
-        <translation type="unfinished"></translation>
+        <translation>Форматированное выражение + результат</translation>
     </message>
     <message>
         <source>Unformatted ASCII expression + result</source>
-        <translation type="unfinished"></translation>
+        <translation>Неформатированные ASCII выражение + результат</translation>
     </message>
     <message>
         <source>Open functions menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть меню функций</translation>
     </message>
     <message>
         <source>Open units menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть меню единиц измерения</translation>
     </message>
     <message>
         <source>Open variables menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть меню переменных</translation>
     </message>
 </context>
 <context>
@@ -4303,79 +4302,79 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Plot</source>
-        <translation type="unfinished">График</translation>
+        <translation>График</translation>
     </message>
     <message>
         <source>Separate Menu Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Отделить меню клавиш</translation>
     </message>
     <message>
         <source>Icons only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только значки</translation>
     </message>
     <message>
         <source>Text only</source>
-        <translation type="unfinished"></translation>
+        <translation>Только текст</translation>
     </message>
     <message>
         <source>Text beside icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Текст рядом со значками</translation>
     </message>
     <message>
         <source>Text under icons</source>
-        <translation type="unfinished"></translation>
+        <translation>Текст под значками</translation>
     </message>
     <message>
         <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Щелчок правой кнопкой/долгое нажатие&lt;/i&gt;: %1</translation>
+        <translation>&lt;i&gt;Щелчок правой кнопкой/долгое нажатие&lt;/i&gt;: %1</translation>
     </message>
     <message>
         <source>Favorites</source>
-        <translation type="unfinished">Избранное</translation>
+        <translation>Избранное</translation>
     </message>
     <message>
         <source>Recent</source>
-        <translation type="unfinished">Недавние</translation>
+        <translation>Недавние</translation>
     </message>
     <message>
         <source>User functions</source>
-        <translation type="unfinished">Пользовательские функции</translation>
+        <translation>Пользовательские функции</translation>
     </message>
     <message>
         <source>Open dialog</source>
-        <translation type="unfinished">Открыть диалоговое окно</translation>
+        <translation>Открыть диалоговое окно</translation>
     </message>
     <message>
         <source>Show all functions</source>
-        <translation type="unfinished">Показать все функции</translation>
+        <translation>Показать все функции</translation>
     </message>
     <message>
         <source>User units</source>
-        <translation type="unfinished">Пользовательские единицы</translation>
+        <translation>Пользовательские единицы</translation>
     </message>
     <message>
         <source>more</source>
-        <translation type="unfinished">ещё</translation>
+        <translation>ещё</translation>
     </message>
     <message>
         <source>Prefixes</source>
-        <translation type="unfinished">Префиксы</translation>
+        <translation>Префиксы</translation>
     </message>
     <message>
         <source>Show all units</source>
-        <translation type="unfinished">Показать все единицы измерения</translation>
+        <translation>Показать все единицы измерения</translation>
     </message>
     <message>
         <source>User variables</source>
-        <translation type="unfinished">Пользовательские переменные</translation>
+        <translation>Пользовательские переменные</translation>
     </message>
     <message>
         <source>Show all variables</source>
-        <translation type="unfinished">Показать все переменные</translation>
+        <translation>Показать все переменные</translation>
     </message>
     <message>
         <source>Open menu</source>
-        <translation type="unfinished">Открыть меню</translation>
+        <translation>Открыть меню</translation>
     </message>
 </context>
 <context>
@@ -4617,7 +4616,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Temporary</source>
-        <translation type="unfinished">Временная</translation>
+        <translation>Временная</translation>
     </message>
 </context>
 <context>
