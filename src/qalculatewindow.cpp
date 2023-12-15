@@ -5098,7 +5098,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						to_prefix = 1;
 					} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
 						to_prefix = to_str[0];
-
 					}
 					if(!str_conv.empty()) str_conv += " to ";
 					str_conv += to_str;
@@ -6058,6 +6057,14 @@ bool contains_rand_function(const MathStructure &m) {
 	return false;
 }
 
+bool contains_fraction_qt(const MathStructure &m) {
+	if(m.isNumber()) return !m.number().isInteger();
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_fraction_qt(m[i])) return true;
+	}
+	return false;
+}
+
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
 
 	if(block_result_update) return;
@@ -6170,7 +6177,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				do_to = true;
 			}
 			if(to_fixed_fraction >= 2) {
-				if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				if(to_fraction == 2 || (to_fraction < 0 && !contains_fraction_qt(*mstruct))) settings->printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
 				else settings->printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
 				CALCULATOR->setFixedDenominator(to_fixed_fraction);
 				settings->dual_fraction = 0;

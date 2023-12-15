@@ -220,6 +220,15 @@ int main(int argc, char **argv) {
 
 	CALCULATOR->loadLocalDefinitions();
 
+	Unit *u = CALCULATOR->getActiveUnit("L");
+	if(u) settings->volume_category = u->category();
+	u = CALCULATOR->getActiveUnit("teaspoon");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+	u = CALCULATOR->getActiveUnit("gal");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+	u = CALCULATOR->getActiveUnit("UK_gal");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+
 	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 

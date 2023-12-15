@@ -94,6 +94,7 @@ long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, cha
 	if(fden == 1) fden = 0;
 	if(fden != 0) {
 		if(sgn == '-') to_fraction = 2;
+		else if(fden > 0 && sgn == 0) to_fraction = -1;
 		else to_fraction = 1;
 	}
 	return fden;

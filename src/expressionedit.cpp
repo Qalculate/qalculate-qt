@@ -515,6 +515,13 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	int b_match = false;
 	size_t i_match = 0;
 	std::unordered_map<const ExpressionName*, std::string>::iterator cap_it;
+	std::string current_from_category = "";
+	if(cdata->to_type == 4) {
+		current_from_category = cdata->current_from_unit->category();
+		for(size_t i = 0; i < settings->alternative_volume_categories.size(); i++) {
+			if(cdata->current_from_unit->category() == settings->alternative_volume_categories[i]) {current_from_category = settings->volume_category; break;}
+		}
+	}
 	if(item && cdata->to_type < 2) {
 		if((cdata->editing_to_expression || !settings->evalops.parse_options.functions_enabled) && item->type() == TYPE_FUNCTION) {}
 		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && !((Variable*) item)->isKnown()))) {}
@@ -676,16 +683,24 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
 		}
 	} else if(item && cdata->to_type == 4) {
-		if(item->type() == TYPE_UNIT && cdata->current_from_unit && item->category() == cdata->current_from_unit->category()) {
-			QString qstr = index.data(Qt::DisplayRole).toString();
-			if(!qstr.isEmpty() && qstr[0] == '<') {
-				int i = qstr.indexOf("-) </font>");
-				if(i > 2) {
-					qstr = qstr.mid(i + 10);
-					sourceModel()->setData(index, qstr, Qt::DisplayRole);
+		if(item->type() == TYPE_UNIT && cdata->current_from_unit) {
+			if(item->category() == current_from_category) {
+				b_match = 2;
+			} else if(current_from_category == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_unit->system().find("Imperial") != std::string::npos)) {
+				for(size_t i = 0; i < settings->alternative_volume_categories.size(); i++) {
+					if(item->category() == settings->alternative_volume_categories[i]) {b_match = 2; break;}
 				}
 			}
-			b_match = 2;
+			if(b_match == 2) {
+				QString qstr = index.data(Qt::DisplayRole).toString();
+				if(!qstr.isEmpty() && qstr[0] == '<') {
+					int i = qstr.indexOf("-) </font>");
+					if(i > 2) {
+						qstr = qstr.mid(i + 10);
+						sourceModel()->setData(index, qstr, Qt::DisplayRole);
+					}
+				}
+			}
 		}
 	} else if(item && cdata->to_type == 5) {
 		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
@@ -2712,7 +2727,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool cur
 	if(current_object_start < 0) {
 		if(cdata->editing_to_expression && cdata->current_from_struct && (cdata->current_from_unit || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
 			cdata->to_type = 4;
-		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && (cdata->current_from_struct->isNumber() || cdata->current_from_struct->isAddition())) {
+		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 			cdata->to_type = 2;
 		} else if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET && cdata->current_function_index > 1) {
 			Argument *arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);

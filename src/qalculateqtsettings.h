@@ -277,6 +277,9 @@ class QalculateQtSettings : QObject {
 		QByteArray datasets_geometry, datasets_vsplitter_state, datasets_hsplitter_state;
 		bool wayland_platform;
 
+		std::string volume_category;
+		std::vector<std::string> alternative_volume_categories;
+
 		PlotLegendPlacement default_plot_legend_placement;
 		PlotStyle default_plot_style;
 		PlotSmoothing default_plot_smoothing;
