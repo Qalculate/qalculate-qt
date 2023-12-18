@@ -785,6 +785,10 @@ bool ExpressionProxyModel::lessThan(const QModelIndex &index1, const QModelIndex
 		int i2 = s2.data(MATCH_ROLE).toInt();
 		if(i1 < i2) return true;
 		if(i1 > i2) return false;
+		i1 = s1.data(TYPE_ROLE).toInt();
+		i2 = s2.data(TYPE_ROLE).toInt();
+		if(i1 >= 100 && i2 < 100) return true;
+		if(i2 >= 100 && i1 < 100) return false;
 	}
 	return QSortFilterProxyModel::lessThan(index1, index2);
 }
@@ -1389,6 +1393,8 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Octal Number"), 208, NULL)
 	COMPLETION_CONVERT_STRING("optimal")
 	COMPLETION_APPEND_C(str1, tr("Optimal Unit"), 100, NULL)
+	COMPLETION_CONVERT_STRING("prefix")
+	COMPLETION_APPEND_C(str1, tr("Optimal Prefix"), 103, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
 	COMPLETION_APPEND_C(str1, tr("Expanded Partial Fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
@@ -2307,7 +2313,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(!full_parsed) {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
 			last_is_space = is_in(SPACES, str_e[str_e.length() - 1]);
-			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
+			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, true, true);
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
@@ -2387,7 +2393,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure *mparse2 = NULL;
 			while(true) {
 				if(last_is_space) str_u += " ";
-				CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, false, false);
+				CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, true, false);
 				remove_blank_ends(str_u);
 				if(parsed_expression.empty()) {
 					parsed_expression += CALCULATOR->localToString(false);
@@ -2448,6 +2454,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("calendars").toStdString();
 				} else if(equalsIgnoreCase(str_u, "optimal") || equalsIgnoreCase(str_u, tr("optimal").toStdString())) {
 					parsed_expression += tr("optimal unit").toStdString();
+				} else if(equalsIgnoreCase(str_u, "prefix") || equalsIgnoreCase(str_u, tr("prefix").toStdString()) || str_u == "?" || (str_u.length() == 2 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd'))) {
+					parsed_expression += tr("optimal prefix").toStdString();
 				} else if(equalsIgnoreCase(str_u, "base") || equalsIgnoreCase(str_u, tr("base").toStdString())) {
 					parsed_expression += tr("base units").toStdString();
 				} else if(equalsIgnoreCase(str_u, "mixed") || equalsIgnoreCase(str_u, tr("mixed").toStdString())) {
@@ -2535,6 +2543,13 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					} else if(fden < 0) {
 						parsed_expression += tr("fraction").toStdString();
 					} else {
+						if(str_u[0] == '0' || str_u[0] == '?' || str_u[0] == '+' || str_u[0] == '-') {
+							str_u = str_u.substr(1, str_u.length() - 1);
+							remove_blank_ends(str_u);
+						} else if(str_u.length() > 1 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd')) {
+							str_u = str_u.substr(2, str_u.length() - 2);
+							remove_blank_ends(str_u);
+						}
 						Variable *v = CALCULATOR->getActiveVariable(str_u);
 						if(v && !v->isKnown()) v = NULL;
 						if(v && CALCULATOR->getActiveUnit(str_u)) v = NULL;
@@ -2571,9 +2586,13 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							}
 							mparse.format(po);
 						}
-						CALCULATOR->beginTemporaryStopMessages();
-						parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
-						CALCULATOR->endTemporaryStopMessages();
+						if(mparse.isZero() && CALCULATOR->getPrefix(str_u)) {
+							parsed_expression += CALCULATOR->getPrefix(str_u)->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
+						} else {
+							CALCULATOR->beginTemporaryStopMessages();
+							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
+							CALCULATOR->endTemporaryStopMessages();
+						}
 						if(had_to_conv && mparse2) {
 							mparse2->unref();
 							mparse2 = NULL;
@@ -2897,6 +2916,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool cur
 			hideCompletion();
 			HIDE_TOOLTIP
 			int r = 0;
+			bool b_separator = false;
 			QModelIndex index = completionModel->index(0, 2);
 			QString title, flag;
 			while(index.isValid()) {
@@ -2908,6 +2928,15 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool cur
 					title = title.left(i);
 				} else {
 					flag.clear();
+				}
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+				index = index.siblingAtColumn(0);
+#else
+				index = index.sibling(r, 0);
+#endif
+				if(!b_separator && r > 0 && index.data(TYPE_ROLE).toInt() < 100) {
+					menu->addSeparator();
+					b_separator = true;
 				}
 				QAction *action = menu->addAction(title, this, SLOT(onCompletionMenuItemActivated()));
 				action->setProperty("MODEL INDEX", index);

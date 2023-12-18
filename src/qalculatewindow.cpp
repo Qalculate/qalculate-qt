@@ -113,6 +113,7 @@ std::vector<std::string> alt_results;
 int b_busy = 0, block_result_update = 0;
 bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
+bool had_to_expression = false;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
 QString lastx_text;
 std::string command_convert_units_string;
@@ -129,7 +130,7 @@ std::string result_bin, result_oct, result_dec, result_hex;
 Number max_bases, min_bases;
 bool title_modified = false;
 
-extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1);
+extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1, bool converted = false);
 extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
 extern int has_information_unit(const MathStructure &m, bool top = true);
 extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
@@ -4783,7 +4784,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
 	MixedUnitsConversion save_mixed_units_conversion = settings->evalops.mixed_units_conversion;
 
-	bool had_to_expression = false;
+	had_to_expression = false;
 	std::string from_str = str;
 	bool last_is_space = !from_str.empty() && is_in(SPACES, from_str[from_str.length() - 1]);
 	if(execute_str.empty() && CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true, !do_stack)) {
@@ -5035,6 +5036,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_OPTIMAL_SI;
 				str_conv = "";
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "prefix") || equalsIgnoreCase(to_str, tr("prefix").toStdString())) {
+				settings->evalops.parse_options.units_enabled = true;
+				to_prefix = 1;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base").toStdString())) {
 				if(from_str.empty()) {
@@ -5974,7 +5979,7 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->color, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->color, TAG_TYPE_HTML, -1, had_to_expression);
 
 		if(!prepend_mstruct.isUndefined() && !CALCULATOR->aborted()) {
 			prepend_mstruct.format(po);
