@@ -483,12 +483,12 @@ struct CompletionData {
 	MathStructure *current_from_struct;
 	MathFunction *current_function;
 	int current_function_index;
-	Unit *current_from_unit;
+	std::vector<Unit*> current_from_units;
 	QModelIndex exact_prefix_match;
 	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1;
 	int to_type, highest_match;
 	Argument *arg;
-	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), current_from_unit(NULL), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
+	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
 	}
 };
 
@@ -515,11 +515,18 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	int b_match = false;
 	size_t i_match = 0;
 	std::unordered_map<const ExpressionName*, std::string>::iterator cap_it;
-	std::string current_from_category = "";
+	std::vector<std::string> current_from_categories;
 	if(cdata->to_type == 4) {
-		current_from_category = cdata->current_from_unit->category();
-		for(size_t i = 0; i < settings->alternative_volume_categories.size(); i++) {
-			if(cdata->current_from_unit->category() == settings->alternative_volume_categories[i]) {current_from_category = settings->volume_category; break;}
+		for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+			bool b = false;
+			for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
+				if(cdata->current_from_units[i]->category() == settings->alternative_volume_categories[i2]) {
+					current_from_categories.push_back(settings->volume_category);
+					b = true;
+					break;
+				}
+			}
+			if(!b) current_from_categories.push_back(cdata->current_from_units[i]->category());
 		}
 	}
 	if(item && cdata->to_type < 2) {
@@ -683,15 +690,19 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
 		}
 	} else if(item && cdata->to_type == 4) {
-		if(item->type() == TYPE_UNIT && cdata->current_from_unit) {
-			if(item->category() == current_from_category) {
-				b_match = 2;
-			} else if(current_from_category == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_unit->system().find("Imperial") != std::string::npos)) {
-				for(size_t i = 0; i < settings->alternative_volume_categories.size(); i++) {
-					if(item->category() == settings->alternative_volume_categories[i]) {b_match = 2; break;}
+		if(item->type() == TYPE_UNIT) {
+			for(size_t i = 0; i < current_from_categories.size(); i++) {
+				if(item->category() == current_from_categories[i]) {
+					b_match = 6;
+					break;
+				} else if(current_from_categories[i] == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_units[i]->system().find("Imperial") != std::string::npos)) {
+					for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
+						if(item->category() == settings->alternative_volume_categories[i2]) {b_match = 6; break;}
+					}
+					if(b_match == 6) break;
 				}
 			}
-			if(b_match == 2) {
+			if(b_match == 6) {
 				QString qstr = index.data(Qt::DisplayRole).toString();
 				if(!qstr.isEmpty() && qstr[0] == '<') {
 					int i = qstr.indexOf("-) </font>");
@@ -703,7 +714,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			}
 		}
 	} else if(item && cdata->to_type == 5) {
-		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
+		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 6;
 	} else if(item && cdata->to_type == 2 && str.empty() && cdata->current_from_struct) {
 		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger() && !cdata->current_from_struct->number().imaginaryPartIsNonZero()) b_match = 2;
 	} else if(prefix && cdata->to_type < 2) {
@@ -734,18 +745,34 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					b_match = 0;
 				} else if(p_type >= 100 && p_type < 200) {
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
-				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && cdata->current_from_unit) {
-					if(cdata->current_from_unit != CALCULATOR->getDegUnit()) b_match = 0;
+				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
+					bool b = false;
+					for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+						if(cdata->current_from_units[i] == CALCULATOR->getDegUnit()) {
+							b = true;
+							break;
+						}
+					}
+					if(!b) b_match = 0;
 				} else if(p_type > 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
 					if(!cdata->current_from_struct->isNumber() || (p_type > 290 && str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
 				} else if(p_type >= 200 && p_type <= 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
 					if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) b_match = 0;
 				} else if(p_type >= 300 && p_type < 400) {
-					if(p_type == 300) {
+					if(p_type == 300 || p_type == 302) {
 						if(!contains_rational_number(*cdata->current_from_struct)) b_match = 0;
 					} else if(p_type == 301) {
-						if((!cdata->current_from_struct->isNumber() || cdata->current_from_struct->number().isInteger() || cdata->current_from_struct->number().hasImaginaryPart()) && (!cdata->current_from_unit || cdata->current_from_unit->system().find("Imperial") == std::string::npos)) b_match = 0;
+						if((!cdata->current_from_struct->isNumber() || cdata->current_from_struct->number().isInteger() || cdata->current_from_struct->number().hasImaginaryPart())) {
+							bool b = false;
+							for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+								if(cdata->current_from_units[i]->system().find("Imperial") != std::string::npos) {
+									b = true;
+									break;
+								}
+							}
+							if(!b) b_match = 0;
+						}
 					} else {
 						if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					}
@@ -785,10 +812,6 @@ bool ExpressionProxyModel::lessThan(const QModelIndex &index1, const QModelIndex
 		int i2 = s2.data(MATCH_ROLE).toInt();
 		if(i1 < i2) return true;
 		if(i1 > i2) return false;
-		i1 = s1.data(TYPE_ROLE).toInt();
-		i2 = s2.data(TYPE_ROLE).toInt();
-		if(i1 >= 100 && i2 < 100) return true;
-		if(i2 >= 100 && i1 < 100) return false;
 	}
 	return QSortFilterProxyModel::lessThan(index1, index2);
 }
@@ -1381,6 +1404,8 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Fraction") + " (1/n)", 301, NULL)
 	COMPLETION_CONVERT_STRING("fraction")
 	COMPLETION_APPEND_C(str1, tr("Fraction"), 300, NULL)
+	COMPLETION_CONVERT_STRING("decimals")
+	COMPLETION_APPEND_C(str1, tr("Decimal Fraction"), 302, NULL)
 	COMPLETION_CONVERT_STRING("hexadecimal") str1 += " <i>"; str1 += "hex"; str1 += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Hexadecimal Number"), 216, NULL)
 	COMPLETION_CONVERT_STRING("latitude") str1 += " <i>"; str1 += "latitude2"; str1 += "</i>";
@@ -2196,6 +2221,44 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 
 extern MathStructure get_units_for_parsed_expression(const MathStructure *parsed_struct, Unit *to_unit, const EvaluationOptions &eo, const MathStructure *mstruct = NULL);
 
+void remove_non_units(MathStructure &m) {
+	if(m.isPower() && m[0].isUnit()) return;
+	if(m.size() > 0) {
+		for(size_t i = 0; i < m.size();) {
+			if(m[i].isFunction() || m[i].containsType(STRUCT_UNIT, true) <= 0) {
+				m.delChild(i + 1);
+			} else {
+				remove_non_units(m[i]);
+				i++;
+			}
+		}
+		if(m.size() == 0) m.clear();
+		else if(m.size() == 1) m.setToChild(1);
+	}
+}
+void find_matching_units(const MathStructure &m, std::vector<Unit*> &v, bool top = true) {
+	Unit *u = CALCULATOR->findMatchingUnit(m);
+	if(u) {
+		for(size_t i = 0; i < v.size(); i++) {
+			if(v[i] == u) return;
+		}
+		v.push_back(u);
+		return;
+	}
+	if(top) {
+		MathStructure m2(m);
+		remove_non_units(m2);
+		CALCULATOR->beginTemporaryStopMessages();
+		m2 = CALCULATOR->convertToOptimalUnit(m2);
+		CALCULATOR->endTemporaryStopMessages();
+		find_matching_units(m2, v, false);
+	} else {
+		for(size_t i = 0; i < m.size(); i++) {
+			find_matching_units(m[i], v, false);
+		}
+	}
+}
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) return;
@@ -2274,7 +2337,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	if(!cursor.atStart()) {
 		settings->evalops.parse_options.unended_function = &mfunc;
-		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_unit = NULL;}
+		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_units.clear();}
 		if(!cursor.atEnd()) {
 			str_e = CALCULATOR->unlocalizeExpression(qtext.left(cursor.position()).toStdString(), settings->evalops.parse_options);
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
@@ -2326,12 +2389,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					eo.expand = -2;
 					if(!CALCULATOR->calculate(cdata->current_from_struct, str_w.empty() ? str_e : str_e + "/." + str_w, 50, eo)) cdata->current_from_struct->setAborted();
-					cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+					find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
 				}
 			} else if(cdata->current_from_struct) {
 				cdata->current_from_struct->unref();
 				cdata->current_from_struct = NULL;
-				cdata->current_from_unit = NULL;
+				cdata->current_from_units.clear();
 			}
 		}
 		PrintOptions po;
@@ -2531,6 +2594,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += "+01";
 				} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 					parsed_expression += (tr("number base %1").arg(QString::fromStdString(to_str2))).toStdString();
+				} else if(equalsIgnoreCase(str_u, "decimals") || equalsIgnoreCase(str_u, tr("decimals").toStdString())) {
+					parsed_expression += tr("decimal fraction").toStdString();
 				} else {
 					int tofr = 0;
 					long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(str_u), tofr, tr("fraction"));
@@ -2550,12 +2615,18 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							str_u = str_u.substr(2, str_u.length() - 2);
 							remove_blank_ends(str_u);
 						}
-						Variable *v = CALCULATOR->getActiveVariable(str_u);
+						Unit *u = CALCULATOR->getActiveUnit(str_u);
+						if(!u) u = CALCULATOR->getCompositeUnit(str_u);
+						Variable *v = NULL;
+						if(!u) v = CALCULATOR->getActiveVariable(str_u);
 						if(v && !v->isKnown()) v = NULL;
-						if(v && CALCULATOR->getActiveUnit(str_u)) v = NULL;
-						if(v) {
+						Prefix *p = NULL;
+						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
+						if(u) {
+							mparse = u;
+						} else if(v) {
 							mparse = v;
-						} else {
+						} else if(!p) {
 							CALCULATOR->beginTemporaryStopMessages();
 							CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
 							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
@@ -2586,8 +2657,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							}
 							mparse.format(po);
 						}
-						if(mparse.isZero() && CALCULATOR->getPrefix(str_u)) {
-							parsed_expression += CALCULATOR->getPrefix(str_u)->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
+						if(p) {
+							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
 						} else {
 							CALCULATOR->beginTemporaryStopMessages();
 							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
@@ -2721,16 +2792,16 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 void ExpressionEdit::onCompletionMenuItemActivated() {
 	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
 }
-#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
+#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
-	Unit *from_unit_bak = cdata->current_from_unit;
+	std::vector<Unit*> from_units_bak = cdata->current_from_units;
 	completionView->setColumnHidden(2, true);
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
-		cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+		find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
 		cdata->editing_to_expression = true;
 		cdata->editing_to_expression1 = true;
 		current_object_start = -1;
@@ -2744,7 +2815,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool cur
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
-		if(cdata->editing_to_expression && cdata->current_from_struct && (cdata->current_from_unit || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
+		if(cdata->editing_to_expression && cdata->current_from_struct && (!cdata->current_from_units.empty() || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
 			cdata->to_type = 4;
 		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 			cdata->to_type = 2;
@@ -3714,7 +3785,7 @@ void ExpressionEdit::setCurrentObject() {
 					cdata->current_from_struct = settings->current_result;
 					if(cdata->current_from_struct) {
 						cdata->current_from_struct->ref();
-						cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+						find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
 					}
 				}
 				b_first = false;

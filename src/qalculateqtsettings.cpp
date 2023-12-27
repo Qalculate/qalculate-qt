@@ -1256,15 +1256,16 @@ void QalculateQtSettings::updateStyle() {
 	updatePalette();
 }
 
-void QalculateQtSettings::savePreferences(bool save_mode) {
+int QalculateQtSettings::savePreferences(bool save_mode) {
 	std::string homedir = getLocalDir();
 	recursiveMakeDir(homedir);
 	std::string filename = buildPath(homedir, "qalculate-qt.cfg");
 	while(!savePreferences(filename.c_str(), false, save_mode)) {
-		if(QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Retry | QMessageBox::Ignore) == QMessageBox::Ignore) {
-			break;
-		}
+		int answer = QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+		if(answer == QMessageBox::Ignore) return 0;
+		else if(answer == QMessageBox::Cancel) return -1;
 	}
+	return 1;
 }
 bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspace, bool) {
 	std::string shistory, smode, sgeneral;

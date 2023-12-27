@@ -5087,6 +5087,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
 				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "decimals") || equalsIgnoreCase(to_str, tr("decimals").toStdString())) {
+				to_fixed_fraction = 0;
+				to_fraction = 3;
+				do_to = true;
 			} else {
 				do_to = true;
 				long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(to_str), to_fraction, tr("fraction"));
@@ -6187,9 +6191,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				CALCULATOR->setFixedDenominator(to_fixed_fraction);
 				settings->dual_fraction = 0;
 				do_to = true;
-			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || settings->printops.restrict_fraction_length || (to_fraction != 2 && settings->printops.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && settings->printops.number_fraction_format != FRACTION_FRACTIONAL))) {
+			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || settings->printops.restrict_fraction_length || (to_fraction != 2 && settings->printops.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && settings->printops.number_fraction_format != FRACTION_FRACTIONAL) || (to_fraction == 3 && settings->printops.number_fraction_format != FRACTION_DECIMAL))) {
 				settings->printops.restrict_fraction_length = false;
-				if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
+				if(to_fraction == 3) settings->printops.number_fraction_format = FRACTION_DECIMAL;
+				else if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
 				else settings->printops.number_fraction_format = FRACTION_COMBINED;
 				settings->dual_fraction = 0;
 				do_to = true;
@@ -6715,8 +6720,14 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
 	settings->show_bases = basesDock->isVisible();
-	settings->savePreferences(settings->save_mode_on_exit);
-	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
+	if(settings->savePreferences(settings->save_mode_on_exit) < 0) return;
+	if(settings->save_defs_on_exit) {
+		while(!CALCULATOR->saveDefinitions()) {
+			int answer = QMessageBox::critical(this, tr("Error"), tr("Couldn't write definitions"), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+			if(answer == QMessageBox::Ignore) break;
+			else if(answer == QMessageBox::Cancel) return;
+		}
+	}
 	CALCULATOR->abort();
 	CALCULATOR->terminateThreads();
 	if(commandThread->running) {
@@ -8902,9 +8913,10 @@ int QalculateWindow::askSaveWorkspace() {
 	}
 	if(b == QMessageBox::Yes) {
 		settings->show_bases = basesDock->isVisible();
-		if(!settings->saveWorkspace(settings->current_workspace.c_str())) {
-			QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Ok);
-			return -1;
+		while(!settings->saveWorkspace(settings->current_workspace.c_str())) {
+			int answer = QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+			if(answer == QMessageBox::Ignore) return 0;
+			else if(answer == QMessageBox::Cancel) return -1;
 		}
 		workspace_changed = false;
 		if(b_noask) settings->save_workspace = 1;
@@ -8922,7 +8934,7 @@ void QalculateWindow::openRecentWorkspace() {
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
-		settings->savePreferences();
+		if(settings->savePreferences() < 0) return;
 	} else {
 		if(askSaveWorkspace() < 0) return;
 	}
@@ -8936,7 +8948,7 @@ void QalculateWindow::openWorkspace() {
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
-		settings->savePreferences();
+		if(settings->savePreferences() < 0) return;
 	} else {
 		if(askSaveWorkspace() < 0) return;
 	}

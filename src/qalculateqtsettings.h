@@ -198,7 +198,7 @@ class QalculateQtSettings : QObject {
 
 		void loadPreferences();
 		void readPreferenceValue(const std::string &svar, const std::string &svalue, bool is_workspace = false);
-		void savePreferences(bool save_mode = true);
+		int savePreferences(bool save_mode = true);
 		bool savePreferences(const char *filename, bool is_workspace = false, bool save_mode = true);
 		void updateStyle();
 		void updatePalette(bool force_update = false);
