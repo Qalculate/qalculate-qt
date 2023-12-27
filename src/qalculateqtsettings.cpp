@@ -1260,14 +1260,16 @@ void QalculateQtSettings::savePreferences(bool save_mode) {
 	std::string homedir = getLocalDir();
 	recursiveMakeDir(homedir);
 	std::string filename = buildPath(homedir, "qalculate-qt.cfg");
-	if(!savePreferences(filename.c_str(), false, save_mode)) {
-		QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Ok);
+	while(!savePreferences(filename.c_str(), false, save_mode)) {
+		if(QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Retry | QMessageBox::Ignore) == QMessageBox::Ignore) {
+			break;
+		}
 	}
 }
 bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspace, bool) {
 	std::string shistory, smode, sgeneral;
 	bool read_default = !is_workspace && !current_workspace.empty();
-	if(read_default) {
+	if(read_default && fileExists(filename)) {
 		FILE *file = fopen(filename, "r");
 		if(!file) return false;
 		char line[1000000L];
