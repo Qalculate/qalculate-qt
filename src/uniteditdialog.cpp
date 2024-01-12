@@ -219,7 +219,7 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 	} else {
 		u = new Unit();
 	}
-	if(namesEditDialog && typeCombo->currentIndex() != 2) {
+	if(namesEditDialog && typeCombo->currentIndex() == 2) {
 		namesEditDialog->modifyNames(u, nameEdit->text());
 	} else {
 		NamesEditDialog::modifyName(u, nameEdit->text());
@@ -297,7 +297,7 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 			break;
 		}
 	}
-	if(typeCombo->currentIndex() != 2) {
+	if(typeCombo->currentIndex() == 2) {
 		u->clearNames();
 		NamesEditDialog::modifyName(u, nameEdit->text());
 	} else if(namesEditDialog) {
