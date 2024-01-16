@@ -772,7 +772,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
-	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
 	QFontMetrics fm2(settings->use_custom_app_font ? appfont : binEdit->font());
 	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
@@ -806,6 +806,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesDock->setWidget(basesWidget);
 	addDockWidget(Qt::TopDockWidgetArea, basesDock);
 	basesDock->hide();
+	connect(binEdit, SIGNAL(linkActivated(const QString&)), this, SLOT(resultBasesLinkActivated(const QString&)));
 
 	keypad = new KeypadWidget(this);
 	keypadDock = new QalculateDockWidget(this, expressionEdit);
@@ -5775,6 +5776,7 @@ void QalculateWindow::updateResultBases() {
 	if(result_bin.length() == 79) {
 		QString sbin1 = QString::fromStdString(result_bin.substr(0, 39));
 		sbin1.replace(" ", "&nbsp;</td><td>");
+		int i1 = sbin1.length();
 		sbin1 += "</td></tr><tr>";
 		for(int i = 63; i > 31; i -= 8) {
 			sbin1 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
@@ -5784,6 +5786,7 @@ void QalculateWindow::updateResultBases() {
 		sbin1 += "</tr><tr><td>";
 		QString sbin2 = QString::fromStdString(result_bin.substr(40));
 		sbin2.replace(" ", "&nbsp;</td><td>");
+		int i2 = sbin2.length();
 		sbin2 += "</td></tr><tr>";
 		for(int i = 31; i >= 0; i -= 8) {
 			sbin2 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
@@ -5791,6 +5794,30 @@ void QalculateWindow::updateResultBases() {
 			sbin2 += "</font></td>";
 		}
 		sbin2 += "</tr><table>";
+		int n = 1;
+		QString link_color = binEdit->palette().text().color().name();
+		bool inhtml = false;
+		for(; i2 >= 0; i2--) {
+			if(sbin2[i2] == ">") {
+				inhtml = true;
+			} else if(sbin2[i2] == "<") {
+				inhtml = false;
+			} else if(!inhtml && (sbin2[i2] == "0" || sbin2[i2] == "1")) {
+				sbin2.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin2[i2]).arg(link_color));
+				n++;
+			}
+		}
+		inhtml = false;
+		for(; i1 >= 0; i1--) {
+			if(sbin1[i1] == ">") {
+				inhtml = true;
+			} else if(sbin1[i1] == "<") {
+				inhtml = false;
+			} else if(!inhtml && (sbin1[i1] == "0" || sbin1[i1] == "1")) {
+				sbin1.replace(i1, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin1[i1]).arg(link_color));
+				n++;
+			}
+		}
 		binEdit->setText("<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>" + sbin1 + sbin2);
 	} else {
 		binEdit->setText(QString::fromStdString(result_bin));
@@ -5798,6 +5825,18 @@ void QalculateWindow::updateResultBases() {
 	octEdit->setText(QString::fromStdString(result_oct));
 	decEdit->setText(QString::fromStdString(result_dec));
 	hexEdit->setText(QString::fromStdString(result_hex));
+}
+void QalculateWindow::resultBasesLinkActivated(const QString &s) {
+	size_t n = s.toInt();
+	n += (n - 1) / 4;
+	if(n > result_bin.length()) return;
+	n = result_bin.length() - n;
+	if(result_bin[n] == '0') result_bin[n] = '1';
+	else if(result_bin[n] == '1') result_bin[n] = '0';
+	int base_bak = settings->evalops.parse_options.base;
+	settings->evalops.parse_options.base = BASE_BINARY;
+	calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, result_bin);
+	settings->evalops.parse_options.base = base_bak;
 }
 
 void set_result_bases(const MathStructure &m) {

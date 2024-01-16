@@ -290,6 +290,7 @@ class QalculateWindow : public QMainWindow {
 		void showKeypadContextMenu(const QPoint&);
 		void updateKeypadTitle();
 		void keypadPreferencesChanged();
+		void resultBasesLinkActivated(const QString&);
 
 	public slots:
 
