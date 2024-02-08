@@ -244,6 +244,7 @@ bool last_is_operator(std::string str, bool allow_exp) {
 
 bool contains_imaginary_number(MathStructure &m) {
 	if(m.isNumber() && m.number().hasImaginaryPart()) return true;
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_CIS) return true;
 	for(size_t i = 0; i < m.size(); i++) {
 		if(contains_imaginary_number(m[i])) return true;
 	}
@@ -2236,7 +2237,7 @@ void remove_non_units(MathStructure &m) {
 		else if(m.size() == 1) m.setToChild(1);
 	}
 }
-void find_matching_units(const MathStructure &m, std::vector<Unit*> &v, bool top = true) {
+void find_matching_units(const MathStructure &m, const MathStructure *mparse, std::vector<Unit*> &v, bool top = true) {
 	Unit *u = CALCULATOR->findMatchingUnit(m);
 	if(u) {
 		for(size_t i = 0; i < v.size(); i++) {
@@ -2246,15 +2247,19 @@ void find_matching_units(const MathStructure &m, std::vector<Unit*> &v, bool top
 		return;
 	}
 	if(top) {
+		if(mparse && !m.containsType(STRUCT_UNIT, true) && (mparse->containsFunctionId(FUNCTION_ID_ASIN) || mparse->containsFunctionId(FUNCTION_ID_ACOS) || mparse->containsFunctionId(FUNCTION_ID_ATAN))) {
+			v.push_back(CALCULATOR->getRadUnit());
+			return;
+		}
 		MathStructure m2(m);
 		remove_non_units(m2);
 		CALCULATOR->beginTemporaryStopMessages();
 		m2 = CALCULATOR->convertToOptimalUnit(m2);
 		CALCULATOR->endTemporaryStopMessages();
-		find_matching_units(m2, v, false);
+		find_matching_units(m2, mparse, v, false);
 	} else {
 		for(size_t i = 0; i < m.size(); i++) {
-			find_matching_units(m[i], v, false);
+			find_matching_units(m[i], mparse, v, false);
 		}
 	}
 }
@@ -2389,7 +2394,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					eo.expand = -2;
 					if(!CALCULATOR->calculate(cdata->current_from_struct, str_w.empty() ? str_e : str_e + "/." + str_w, 50, eo)) cdata->current_from_struct->setAborted();
-					find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
+					find_matching_units(*cdata->current_from_struct, &mparse, cdata->current_from_units);
 				}
 			} else if(cdata->current_from_struct) {
 				cdata->current_from_struct->unref();
@@ -2400,11 +2405,10 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		PrintOptions po;
 		po.preserve_format = true;
 		po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && !CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;
-		po.lower_case_e = settings->printops.lower_case_e;
+		po.exp_display = settings->printops.exp_display;
 		po.lower_case_numbers = settings->printops.lower_case_numbers;
 		po.base_display = settings->printops.base_display;
-		po.custom_time_zone = settings->printops.custom_time_zone;
-		po.round_halfway_to_even = settings->printops.round_halfway_to_even;
+		po.rounding = settings->printops.rounding;
 		po.twos_complement = settings->printops.twos_complement;
 		po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
 		po.base = settings->evalops.parse_options.base;
@@ -2773,7 +2777,7 @@ void ExpressionEdit::onTextChanged() {
 				completionTimer->start(settings->completion_delay);
 			}
 		} else {
-			complete(NULL, NULL, settings->completion_delay > 0);
+			complete(NULL, NULL, NULL, settings->completion_delay > 0);
 		}
 	}
 	qApp->processEvents();
@@ -2793,7 +2797,7 @@ void ExpressionEdit::onCompletionMenuItemActivated() {
 	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
 }
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak;}
-bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool current_object_is_set) {
+bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	std::vector<Unit*> from_units_bak = cdata->current_from_units;
@@ -2801,7 +2805,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, QMenu *menu, bool cur
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
-		find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
+		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
 		cdata->editing_to_expression = true;
 		cdata->editing_to_expression1 = true;
 		current_object_start = -1;
@@ -3785,7 +3789,7 @@ void ExpressionEdit::setCurrentObject() {
 					cdata->current_from_struct = settings->current_result;
 					if(cdata->current_from_struct) {
 						cdata->current_from_struct->ref();
-						find_matching_units(*cdata->current_from_struct, cdata->current_from_units);
+						find_matching_units(*cdata->current_from_struct, NULL, cdata->current_from_units);
 					}
 				}
 				b_first = false;

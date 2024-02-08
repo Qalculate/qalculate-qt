@@ -48,10 +48,6 @@ bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
 
-#define RESET_SETTINGS_TZ 	settings->printops.custom_time_zone = (settings->rounding_mode == 2 ? TZ_TRUNCATE : 0);\
-				if(settings->use_duo_syms) settings->printops.custom_time_zone += TZ_DOZENAL;\
-				settings->printops.time_zone = TIME_ZONE_LOCAL;
-
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
@@ -233,7 +229,6 @@ class QalculateQtSettings : QObject {
 		std::string custom_angle_unit;
 		QString custom_lang;
 		int rounding_mode;
-		bool use_duo_syms;
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay;

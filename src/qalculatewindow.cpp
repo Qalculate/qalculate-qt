@@ -123,6 +123,7 @@ int to_fraction = 0;
 long int to_fixed_fraction = 0;
 char to_prefix = 0;
 int to_base = 0;
+bool to_duo_syms = false;
 int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
@@ -159,7 +160,9 @@ std::string print_with_evalops(const Number &nr) {
 	po.is_approximate = NULL;
 	po.base = settings->evalops.parse_options.base;
 	po.base_display = BASE_DISPLAY_NONE;
+	po.min_exp = EXP_NONE;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
+	po.hexadecimal_twos_complement = settings->evalops.parse_options.hexadecimal_twos_complement;
 	Number nr_base;
 	if(po.base == BASE_CUSTOM) {
 		nr_base = CALCULATOR->customOutputBase();
@@ -806,6 +809,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesDock->setWidget(basesWidget);
 	addDockWidget(Qt::TopDockWidgetArea, basesDock);
 	basesDock->hide();
+	basesMenu = NULL;
+	binEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(binEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	octEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(octEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	decEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(decEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	hexEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(hexEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
 	connect(binEdit, SIGNAL(linkActivated(const QString&)), this, SLOT(resultBasesLinkActivated(const QString&)));
 
 	keypad = new KeypadWidget(this);
@@ -1008,6 +1020,19 @@ void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
 		tmenu->addAction(tr("Text under icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextUnderIcon);
 	}
 	tmenu->popup(tb->mapToGlobal(pos));
+}
+void QalculateWindow::showBasesContextMenu(const QPoint &pos) {
+	if(((QLabel*) sender())->text().isEmpty()) return;
+	if(!basesMenu) {
+		basesMenu = new QMenu(this);
+		copyBasesAction = basesMenu->addAction(tr("Copy"), this, SLOT(copyBases()));
+	}
+	copyBasesAction->setData(QVariant::fromValue((void*) sender()));
+	basesMenu->popup(((QWidget*) sender())->mapToGlobal(pos));
+}
+void QalculateWindow::copyBases() {
+	QLabel *label = (QLabel*) copyBasesAction->data().value<void*>();
+	QApplication::clipboard()->setText(label->hasSelectedText() ? label->selectedText() : (label == binEdit ? QString::fromStdString(result_bin) : label->text()));
 }
 void QalculateWindow::setToolbarStyle() {
 	QAction *action = qobject_cast<QAction*>(sender());
@@ -2727,7 +2752,7 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		if(do_exec) expressionEdit->blockParseStatus(false);
 	} else if(str == "E" || str == "e") {
 		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
-		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : "E");
+		else expressionEdit->insertPlainText(settings->printops.exp_display == EXP_UPPERCASE_E ? "E" : "e");
 	} else {
 		if((str == "//" || (s != str && (s_low == "mod" || s_low == "rem"))) && (settings->rpn_mode || expressionEdit->document()->isEmpty() || settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN || (expressionEdit->textCursor().atStart() && !expressionEdit->textCursor().hasSelection()))) {
 			MathFunction *f;
@@ -3529,28 +3554,24 @@ void QalculateWindow::setOption(std::string str) {
 			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") {
-		bool b = settings->printops.round_halfway_to_even;
+		bool b = (settings->printops.rounding == ROUNDING_HALF_TO_EVEN);
 		SET_BOOL(b)
-		if(b != settings->printops.round_halfway_to_even || settings->rounding_mode == 2) {
-			settings->rounding_mode = b ? 0 : 1;
-			settings->printops.custom_time_zone = 0;
-			settings->printops.round_halfway_to_even = b;
+		if(b != (settings->printops.rounding == ROUNDING_HALF_TO_EVEN)) {
+			settings->printops.rounding = b ? ROUNDING_HALF_TO_EVEN : ROUNDING_HALF_AWAY_FROM_ZERO;
 			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "rounding")) {
 		int v = -1;
-		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even")) v = 1;
-		else if(equalsIgnoreCase(svalue, "standard")) v = 0;
-		else if(equalsIgnoreCase(svalue, "truncate")) v = 2;
+		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even")) v = ROUNDING_HALF_TO_EVEN;
+		else if(equalsIgnoreCase(svalue, "standard")) v = ROUNDING_HALF_AWAY_FROM_ZERO;
+		else if(equalsIgnoreCase(svalue, "truncate")) v = ROUNDING_TOWARD_ZERO;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
 		}
-		if(v < 0 || v > 2) {
+		if(v < ROUNDING_HALF_AWAY_FROM_ZERO || v > ROUNDING_DOWN) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
-		} else if(v != settings->rounding_mode) {
-			settings->rounding_mode = v;
-			settings->printops.round_halfway_to_even = (v == 1);
-			RESET_SETTINGS_TZ
+		} else if(v != settings->printops.rounding) {
+			settings->printops.rounding = (RoundingMode) v;
 			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
@@ -3577,16 +3598,16 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "short multiplication") || svar == "shortmul") SET_BOOL_D(settings->printops.short_multiplication)
 	else if(equalsIgnoreCase(svar, "simplified percentage") || svar == "percent") SET_BOOL_PT(settings->simplified_percentage)
-	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_D(settings->printops.lower_case_e)
-	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
-	else if(equalsIgnoreCase(svar, "duodecimal symbols") || svar == "duosyms") {
-		bool b = settings->use_duo_syms;
-		SET_BOOL(settings->use_duo_syms)
-		if(b != settings->use_duo_syms) {
-			RESET_SETTINGS_TZ
+	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") {
+		bool b = (settings->printops.exp_display == EXP_LOWERCASE_E);
+		SET_BOOL(b)
+		if(b != (settings->printops.exp_display == EXP_LOWERCASE_E)) {
+			settings->printops.exp_display = EXP_LOWERCASE_E;
 			resultDisplayUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
+	} else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
+	else if(equalsIgnoreCase(svar, "duodecimal symbols") || svar == "duosyms") SET_BOOL_D(settings->printops.duodecimal_symbols)
+	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
 		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
 		if(v_i) {
 			bool b = v_i->hasName("j") > 0;
@@ -3619,6 +3640,8 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_D(settings->printops.twos_complement)
 	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
+	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
+	else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
 	else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = DIGIT_GROUPING_NONE;
@@ -3904,17 +3927,26 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			settings->save_defs_on_exit = false;
 		}
-	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp") {
+	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp" || svar == "exp display") {
 		int v = -1;
 		bool valid = true;
-		if(equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
-		else if(equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
-		else if(equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
-		else if(empty_value || equalsIgnoreCase(svalue, "scientific")) v = EXP_SCIENTIFIC;
-		else if(equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
-		else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) v = s2i(svalue);
-		else valid = false;
-		if(valid) {
+		bool display = (svar == "exp display");
+		if(!display && equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
+		else if(!display && equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
+		else if(!display && equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
+		else if(!display && (empty_value || equalsIgnoreCase(svalue, "scientific"))) v = EXP_SCIENTIFIC;
+		else if(!display && equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
+		else if(svalue == "E") {v = EXP_UPPERCASE_E; display = 1;}
+		else if(svalue == "e") {v = EXP_LOWERCASE_E; display = 1;}
+		else if(empty_value || svalue == "10") {v = EXP_BASE10; display = 1;}
+		else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) {
+			v = s2i(svalue);
+			if(display) v--;
+		} else valid = false;
+		if(display && valid && (v >= EXP_UPPERCASE_E && v <= EXP_BASE10)) {
+			settings->printops.exp_display = (ExpDisplay) v;
+			resultDisplayUpdated();
+		} else if(!display && valid) {
 			settings->printops.min_exp = v;
 			QAction *action = find_child_data(this, "group_general", v);
 			if(action) {
@@ -4498,6 +4530,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(unitsDialog) unitsDialog->updateUnits();
 					if(current_expr) expressionEdit->clear();
 				} else {
+					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
 					if(f && f->isLocal()) {
 						f->destroy();
@@ -4505,6 +4538,31 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						if(functionsDialog) functionsDialog->updateFunctions();
 						if(current_expr) expressionEdit->clear();
 					} else {
+						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
+					}
+				}
+			} else if(equalsIgnoreCase(scom, "keep")) {
+				str = str.substr(ispace + 1, slen - (ispace + 1));
+				remove_blank_ends(str);
+				Variable *v = CALCULATOR->getActiveVariable(str);
+				bool b = v && v->isLocal();
+				if(b && v->category() == CALCULATOR->temporaryCategory()) {
+					v->setCategory("");
+					expressionEdit->updateCompletion();
+					if(variablesDialog) variablesDialog->updateVariables();
+					if(unitsDialog) unitsDialog->updateUnits();
+					if(current_expr) expressionEdit->clear();
+				} else {
+					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
+					MathFunction *f = CALCULATOR->getActiveFunction(str);
+					if(f && f->isLocal()) {
+						if(f->category() == CALCULATOR->temporaryCategory()) {
+							f->setCategory("");
+							expressionEdit->updateCompletion();
+							if(functionsDialog) functionsDialog->updateFunctions();
+							if(current_expr) expressionEdit->clear();
+						}
+					} else if(!b) {
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
 					}
 				}
@@ -4781,6 +4839,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	ComplexNumberForm cnf_bak = settings->evalops.complex_number_form;
+	ComplexNumberForm cnf = settings->evalops.complex_number_form;
+	bool delay_complex = false;
 	bool b_units_saved = settings->evalops.parse_options.units_enabled;
 	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
 	MixedUnitsConversion save_mixed_units_conversion = settings->evalops.mixed_units_conversion;
@@ -4822,14 +4882,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "duo") || equalsIgnoreCase(to_str, "duodecimal") || equalsIgnoreCase(to_str, tr("duodecimal").toStdString())) {
 				to_base = BASE_DUODECIMAL;
+				to_duo_syms = false;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "doz") || equalsIgnoreCase(to_str, "dozenal")) {
 				to_base = BASE_DUODECIMAL;
-				if(!settings->use_duo_syms && settings->printops.time_zone != TIME_ZONE_CUSTOM) {
-					settings->use_duo_syms = true;
-					RESET_SETTINGS_TZ
-					settings->use_duo_syms = false;
-				}
+				to_duo_syms = true;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "bin") || equalsIgnoreCase(to_str, "binary") || equalsIgnoreCase(to_str, tr("binary").toStdString())) {
 				to_base = BASE_BINARY;
@@ -4936,7 +4993,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -4947,7 +5003,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -4971,62 +5026,65 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_calendars = true;
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str, "rectangular") || equalsIgnoreCase(to_str, "cartesian") || equalsIgnoreCase(to_str, tr("rectangular").toStdString()) || equalsIgnoreCase(to_str, tr("cartesian").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			} else if(equalsIgnoreCase(to_str, "exponential") || equalsIgnoreCase(to_str, tr("exponential").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 			} else if(equalsIgnoreCase(to_str, "polar") || equalsIgnoreCase(to_str, tr("polar").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_POLAR;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_POLAR;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
-				to_caf = 0;
-				do_to = true;
+				cnf = COMPLEX_NUMBER_FORM_POLAR;
 			} else if(to_str == "cis") {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_CIS;
 			} else if(equalsIgnoreCase(to_str, "phasor") || equalsIgnoreCase(to_str, tr("phasor").toStdString()) || equalsIgnoreCase(to_str, "angle") || equalsIgnoreCase(to_str, tr("angle").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 				to_caf = 1;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_CIS;
 			} else if(equalsIgnoreCase(to_str, "optimal") || equalsIgnoreCase(to_str, tr("optimal").toStdString())) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -5087,6 +5145,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
+				to_duo_syms = false;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "decimals") || equalsIgnoreCase(to_str, tr("decimals").toStdString())) {
 				to_fixed_fraction = 0;
@@ -5109,6 +5168,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
 						to_prefix = to_str[0];
 					}
+					Unit *u = CALCULATOR->getActiveUnit(to_str);
+					if(delay_complex != (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS) && u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1) delay_complex = !delay_complex;
 					if(!str_conv.empty()) str_conv += " to ";
 					str_conv += to_str;
 				}
@@ -5130,6 +5191,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				}
 			}
 		}
+	}
+
+	if(!delay_complex || (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS)) {
+		settings->evalops.complex_number_form = cnf;
+		delay_complex = false;
+	} else {
+		settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 	}
 
 	if(execute_str.empty()) {
@@ -5343,6 +5411,22 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		if(title_set) updateWindowTitle();
 	}
 
+	if(delay_complex) {
+		settings->evalops.complex_number_form = cnf;
+		CALCULATOR->startControl(100);
+		if(!settings->rpn_mode) {
+			if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mstruct->complexToCisForm(settings->evalops);
+			else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mstruct->complexToPolarForm(settings->evalops);
+		} else if(!do_stack) {
+			MathStructure *mreg = CALCULATOR->getRPNRegister(do_stack ? stack_index + 1 : 1);
+			if(mreg) {
+				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mreg->complexToCisForm(settings->evalops);
+				else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mreg->complexToPolarForm(settings->evalops);
+			}
+		}
+		CALCULATOR->stopControl();
+	}
+
 	if(settings->rpn_mode && !do_stack) {
 		mstruct->unref();
 		mstruct = CALCULATOR->getRPNRegister(1);
@@ -5417,7 +5501,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
 		settings->evalops.parse_options.units_enabled = b_units_saved;
 		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-		RESET_SETTINGS_TZ
 		settings->printops.time_zone = TIME_ZONE_LOCAL;
 		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 		return;
@@ -5447,7 +5530,15 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		long int i_timeleft = 0;
 		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
 		if(i_timeleft > 0) {
+			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mstruct_exact, mstruct, original_expression, parsed_mstruct, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), i_timeleft, -1);
+			if(delay_complex && !mstruct_exact.isUndefined()) {
+				settings->evalops.complex_number_form = cnf;
+				CALCULATOR->startControl(100);
+				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mstruct_exact.complexToCisForm(settings->evalops);
+				else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mstruct_exact.complexToPolarForm(settings->evalops);
+				CALCULATOR->stopControl();
+			}
 		}
 	}
 
@@ -5482,7 +5573,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
 	settings->evalops.parse_options.units_enabled = b_units_saved;
 	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-	RESET_SETTINGS_TZ
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
@@ -5778,7 +5868,7 @@ void QalculateWindow::updateResultBases() {
 		sbin1.replace(" ", "&nbsp;</td><td>");
 		int i1 = sbin1.length();
 		sbin1 += "</td></tr><tr>";
-		for(int i = 63; i > 31; i -= 8) {
+		for(int i = 64; i > 32; i -= 8) {
 			sbin1 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
 			sbin1 += QString::number(i);
 			sbin1 += "</font></td>";
@@ -5788,7 +5878,7 @@ void QalculateWindow::updateResultBases() {
 		sbin2.replace(" ", "&nbsp;</td><td>");
 		int i2 = sbin2.length();
 		sbin2 += "</td></tr><tr>";
-		for(int i = 31; i >= 0; i -= 8) {
+		for(int i = 32; i > 0; i -= 8) {
 			sbin2 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
 			sbin2 += QString::number(i);
 			sbin2 += "</font></td>";
@@ -5833,10 +5923,16 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	n = result_bin.length() - n;
 	if(result_bin[n] == '0') result_bin[n] = '1';
 	else if(result_bin[n] == '1') result_bin[n] = '0';
-	int base_bak = settings->evalops.parse_options.base;
-	settings->evalops.parse_options.base = BASE_BINARY;
-	calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, result_bin);
-	settings->evalops.parse_options.base = base_bak;
+	ParseOptions pa;
+	pa.base = BASE_BINARY;
+	pa.twos_complement = true;
+	PrintOptions po;
+	po.base = settings->evalops.parse_options.base;
+	po.twos_complement = settings->evalops.parse_options.twos_complement;
+	po.min_exp = 0;
+	po.preserve_precision = true;
+	po.base_display = BASE_DISPLAY_NONE;
+	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
 }
 
 void set_result_bases(const MathStructure &m) {
@@ -5958,10 +6054,9 @@ void ViewThread::run() {
 			if(!read(&po.is_approximate)) break;
 			if(!read<bool>(&po.preserve_format)) break;
 			po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;
-			po.lower_case_e = settings->printops.lower_case_e;
+			po.exp_display = settings->printops.exp_display;
 			po.lower_case_numbers = settings->printops.lower_case_numbers;
-			po.custom_time_zone = settings->printops.custom_time_zone;
-			po.round_halfway_to_even = settings->printops.round_halfway_to_even;
+			po.rounding = settings->printops.rounding;
 			po.base_display = settings->printops.base_display;
 			po.twos_complement = settings->printops.twos_complement;
 			po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
@@ -6210,13 +6305,15 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	long int save_fden = CALCULATOR->fixedDenominator();
 	bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
 	int save_dual = settings->dual_fraction;
+	bool save_duo_syms = settings->printops.duodecimal_symbols;
 	bool do_to = false;
 
 	if(!do_stack) {
 		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
-			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()))) {
+			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms != settings->printops.duodecimal_symbols))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
+				settings->printops.duodecimal_symbols = to_duo_syms;
 				if(to_base == BASE_CUSTOM) {
 					custom_base_set = true;
 					save_nbase = CALCULATOR->customOutputBase();
@@ -6418,6 +6515,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	if(do_to) {
 		settings->complex_angle_form = caf_bak;
 		settings->printops.base = save_base;
+		settings->printops.duodecimal_symbols = save_duo_syms;
 		settings->printops.binary_bits = save_bits;
 		if(custom_base_set) CALCULATOR->setCustomOutputBase(save_nbase);
 		settings->printops.use_unit_prefixes = save_pre;
@@ -6799,7 +6897,7 @@ void QalculateWindow::onToActivated(bool button) {
 		expressionEdit->displayParseStatus(true, false);
 	}
 	if(b_result || button) {
-		expressionEdit->complete(b_result ? mstruct : NULL, toMenu);
+		expressionEdit->complete(b_result ? mstruct : NULL, b_result ? parsed_mstruct : NULL, toMenu);
 		if(!toMenu->isEmpty()) {
 			toAction_t->setMenu(toMenu);
 			toAction_t->showMenu();
@@ -8710,7 +8808,7 @@ void QalculateWindow::executeFromFile(const QString &file) {
 		ispace = str.find_first_of(SPACES);
 		if(ispace == std::string::npos) scom = "";
 		else scom = str.substr(0, ispace);
-		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "clear") || equalsIgnoreCase(str, "clear history") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
+		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "clear") || equalsIgnoreCase(str, "clear history") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "keep") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
 		if(!str.empty()) calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str, false);
 	}
 	expressionEdit->clear();

@@ -218,11 +218,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
-	BOX(tr("Use special duodecimal symbols"), settings->use_duo_syms, duodecimalSymbolsToggled(bool));
+	BOX(tr("Use special duodecimal symbols"), settings->printops.duodecimal_symbols, duodecimalSymbolsToggled(bool));
 	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
 	BOX(tr("Use Unicode division slash in output"), settings->printops.division_sign == DIVISION_SIGN_DIVISION_SLASH, divisionSlashToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
-	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
+	BOX(tr("Use E-notation instead of 10^n"), settings->printops.exp_display != EXP_BASE10, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
 	decimalCommaBox = box;
@@ -260,10 +260,18 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Rounding:"), this), r, 0);
 	combo = new QComboBox(this);
-	combo->addItem(tr("Round halfway numbers away from zero"), 0);
-	combo->addItem(tr("Round halfway numbers to even"), 1);
-	combo->addItem(tr("Truncate all numbers"), 2);
-	combo->setCurrentIndex(combo->findData(settings->rounding_mode));
+	combo->addItem(tr("Round halfway numbers away from zero"), ROUNDING_HALF_AWAY_FROM_ZERO);
+	combo->addItem(tr("Round halfway numbers to even"), ROUNDING_HALF_TO_EVEN);
+	combo->addItem(tr("Round halfway numbers to odd"), ROUNDING_HALF_TO_ODD);
+	combo->addItem(tr("Round halfway numbers toward zero"), ROUNDING_HALF_TOWARD_ZERO);
+	combo->addItem(tr("Round halfway numbers to random"), ROUNDING_HALF_RANDOM);
+	combo->addItem(tr("Round halfway numbers to up"), ROUNDING_HALF_UP);
+	combo->addItem(tr("Round halfway numbers to down"), ROUNDING_HALF_DOWN);
+	combo->addItem(tr("Round toward zero"), ROUNDING_TOWARD_ZERO);
+	combo->addItem(tr("Round away from zero"), ROUNDING_AWAY_FROM_ZERO);
+	combo->addItem(tr("Round up"), ROUNDING_UP);
+	combo->addItem(tr("Round down"), ROUNDING_DOWN);
+	combo->setCurrentIndex(combo->findData(settings->printops.rounding));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(roundingChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Complex number form:"), this), r, 0);
@@ -409,8 +417,7 @@ void PreferencesDialog::lowerCaseToggled(bool b) {
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::duodecimalSymbolsToggled(bool b) {
-	settings->use_duo_syms = b;
-	RESET_SETTINGS_TZ
+	settings->printops.duodecimal_symbols = b;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::multiplicationDotToggled(bool b) {
@@ -430,7 +437,8 @@ void PreferencesDialog::spellOutToggled(bool b) {
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::eToggled(bool b) {
-	settings->printops.lower_case_e = b;
+	if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
+	else settings->printops.exp_display = EXP_BASE10;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::imaginaryJToggled(bool b) {
@@ -554,9 +562,7 @@ void PreferencesDialog::updateComplexForm() {
 	complexFormCombo->blockSignals(false);
 }
 void PreferencesDialog::roundingChanged(int i) {
-	settings->rounding_mode = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	RESET_SETTINGS_TZ
-	settings->printops.round_halfway_to_even = (settings->rounding_mode == 1);
+	settings->printops.rounding = (RoundingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultFormatUpdated();
 }
 void PreferencesDialog::repeatingDecimalsToggled(bool b) {

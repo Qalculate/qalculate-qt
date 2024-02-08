@@ -156,7 +156,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void insertMatrix();
 		void enableTabCompletion(bool);
 		bool completeOrActivateFirst(bool = false);
-		bool complete(MathStructure* = NULL, QMenu* = NULL, bool = false);
+		bool complete(MathStructure* = NULL, MathStructure* = NULL, QMenu* = NULL, bool = false);
 		void clearHistory();
 
 	signals:

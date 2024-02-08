@@ -31,10 +31,6 @@
 #define PREFERENCES_VERSION_BEFORE(i1, i2, i3) (preferences_version[0] < i1 || (preferences_version[0] == i1 && (preferences_version[1] < i2 || (preferences_version[1] == i2 && preferences_version[2] < i3))))
 #define PREFERENCES_VERSION_AFTER(i1, i2, i3) (preferences_version[0] > i1 || (preferences_version[0] == i1 && (preferences_version[1] > i2 || (preferences_version[1] == i2 && preferences_version[2] > i3))))
 
-#define RESET_TZ 	printops.custom_time_zone = (rounding_mode == 2 ? TZ_TRUNCATE : 0);\
-			if(use_duo_syms) printops.custom_time_zone += TZ_DOZENAL;\
-			printops.time_zone = TIME_ZONE_LOCAL;
-
 extern int b_busy;
 
 bool can_display_unicode_string_function(const char*, void*) {
@@ -494,14 +490,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.digit_grouping = (DigitGrouping) v;
 		}
 	} else if(svar == "round_halfway_to_even") {
-		printops.round_halfway_to_even = v;
-		rounding_mode = (v ? 1 : 0);
-		RESET_TZ
+		if(v) printops.rounding = ROUNDING_HALF_TO_EVEN;
 	} else if(svar == "rounding_mode") {
-		if(v >= 0 && v <= 2) {
-			rounding_mode = v;
-			RESET_TZ
-			printops.round_halfway_to_even = (v == 1);
+		if(v >= ROUNDING_HALF_AWAY_FROM_ZERO && v <= ROUNDING_DOWN) {
+			if(!PREFERENCES_VERSION_AFTER(4, 9, 0) && v == 2) v = ROUNDING_TOWARD_ZERO;
+			printops.rounding = (RoundingMode) v;
 		}
 	} else if(svar == "approximation") {
 		if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
@@ -732,12 +725,14 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "use_unicode_signs") {
 			printops.use_unicode_signs = v;
 		} else if(svar == "e_notation") {
-			printops.lower_case_e = v;
+			if(!v) printops.exp_display = EXP_BASE10;
+			else printops.exp_display = EXP_LOWERCASE_E;
+		} else if(svar == "exp_display") {
+			if(v >= EXP_UPPERCASE_E && v <= EXP_BASE10) printops.exp_display = (ExpDisplay) v;
 		} else if(svar == "lower_case_numbers") {
 			printops.lower_case_numbers = v;
 		} else if(svar == "duodecimal_symbols") {
-			use_duo_syms = v;
-			RESET_TZ
+			printops.duodecimal_symbols = v;
 		} else if(svar == "imaginary_j") {
 			do_imaginary_j = v;
 		} else if(svar == "base_display") {
@@ -821,7 +816,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.indicate_infinite_series = false;
 	printops.show_ending_zeroes = true;
 	printops.round_halfway_to_even = false;
-	rounding_mode = 0;
+	printops.rounding = ROUNDING_HALF_AWAY_FROM_ZERO;
 	printops.number_fraction_format = FRACTION_DECIMAL;
 	printops.restrict_fraction_length = false;
 	printops.abbreviate_names = true;
@@ -837,7 +832,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.excessive_parenthesis = false;
 	printops.allow_non_usable = false;
 	printops.lower_case_numbers = false;
-	use_duo_syms = false;
+	printops.duodecimal_symbols = false;
 	printops.lower_case_e = false;
 	printops.base_display = BASE_DISPLAY_SUFFIX;
 	printops.twos_complement = true;
@@ -1467,8 +1462,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
 		fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
 		fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
-		fprintf(file, "duodecimal_symbols=%i\n", use_duo_syms);
-		fprintf(file, "e_notation=%i\n", printops.lower_case_e);
+		fprintf(file, "duodecimal_symbols=%i\n", printops.duodecimal_symbols);
+		fprintf(file, "exp_display=%i\n", printops.exp_display);
 		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 		fprintf(file, "base_display=%i\n", printops.base_display);
 		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
@@ -1535,7 +1530,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
 		fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
 		fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
-		fprintf(file, "rounding_mode=%i\n", rounding_mode);
+		fprintf(file, "rounding_mode=%i\n", printops.rounding);
 		if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
 		else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 		else fprintf(file, "approximation=%i\n", evalops.approximation);

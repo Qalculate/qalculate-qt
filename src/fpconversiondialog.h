@@ -27,7 +27,7 @@ class FPConversionDialog : public QDialog {
 	protected:
 
 		QComboBox *formatCombo;
-		QLineEdit *valueEdit, *hexEdit, *exp2Edit, *decEdit, *errorEdit;
+		QLineEdit *valueEdit, *hexEdit, *hexExp2Edit, *exp2Edit, *decEdit, *errorEdit;
 		QTextEdit *binEdit;
 		unsigned int getBits();
 		unsigned int getExponentBits();
