@@ -222,7 +222,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
 	BOX(tr("Use Unicode division slash in output"), settings->printops.division_sign == DIVISION_SIGN_DIVISION_SLASH, divisionSlashToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
-	BOX(tr("Use E-notation instead of 10^n"), settings->printops.exp_display != EXP_BASE10, eToggled(bool));
+	BOX(tr("Use E-notation instead of 10^n"), settings->printops.exp_display != EXP_POWER_OF_10, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
 	decimalCommaBox = box;
@@ -265,8 +265,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Round halfway numbers to odd"), ROUNDING_HALF_TO_ODD);
 	combo->addItem(tr("Round halfway numbers toward zero"), ROUNDING_HALF_TOWARD_ZERO);
 	combo->addItem(tr("Round halfway numbers to random"), ROUNDING_HALF_RANDOM);
-	combo->addItem(tr("Round halfway numbers to up"), ROUNDING_HALF_UP);
-	combo->addItem(tr("Round halfway numbers to down"), ROUNDING_HALF_DOWN);
+	combo->addItem(tr("Round halfway numbers up"), ROUNDING_HALF_UP);
+	combo->addItem(tr("Round halfway numbers down"), ROUNDING_HALF_DOWN);
 	combo->addItem(tr("Round toward zero"), ROUNDING_TOWARD_ZERO);
 	combo->addItem(tr("Round away from zero"), ROUNDING_AWAY_FROM_ZERO);
 	combo->addItem(tr("Round up"), ROUNDING_UP);
@@ -438,7 +438,7 @@ void PreferencesDialog::spellOutToggled(bool b) {
 }
 void PreferencesDialog::eToggled(bool b) {
 	if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
-	else settings->printops.exp_display = EXP_BASE10;
+	else settings->printops.exp_display = EXP_POWER_OF_10;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::imaginaryJToggled(bool b) {

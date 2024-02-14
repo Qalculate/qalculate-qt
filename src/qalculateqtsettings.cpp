@@ -725,10 +725,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "use_unicode_signs") {
 			printops.use_unicode_signs = v;
 		} else if(svar == "e_notation") {
-			if(!v) printops.exp_display = EXP_BASE10;
+			if(!v) printops.exp_display = EXP_POWER_OF_10;
 			else printops.exp_display = EXP_LOWERCASE_E;
 		} else if(svar == "exp_display") {
-			if(v >= EXP_UPPERCASE_E && v <= EXP_BASE10) printops.exp_display = (ExpDisplay) v;
+			if(v >= EXP_UPPERCASE_E && v <= EXP_POWER_OF_10) printops.exp_display = (ExpDisplay) v;
 		} else if(svar == "lower_case_numbers") {
 			printops.lower_case_numbers = v;
 		} else if(svar == "duodecimal_symbols") {
@@ -737,6 +737,9 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			do_imaginary_j = v;
 		} else if(svar == "base_display") {
 			if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_SUFFIX) printops.base_display = (BaseDisplay) v;
+		} else if(svar == "binary_bits") {
+			printops.binary_bits = v;
+			evalops.parse_options.binary_bits = v;
 		} else if(svar == "twos_complement") {
 			printops.twos_complement = v;
 		} else if(svar == "hexadecimal_twos_complement") {
@@ -1466,6 +1469,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "exp_display=%i\n", printops.exp_display);
 		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 		fprintf(file, "base_display=%i\n", printops.base_display);
+		if(printops.binary_bits != 0) fprintf(file, "binary_bits=%i\n", printops.binary_bits);
 		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
 		if(sinc_set) fprintf(file, "sinc_function=%i\n", CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->getDefaultValue(2) == "pi" ? 1 : 0);
 		fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);

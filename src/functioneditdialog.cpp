@@ -711,6 +711,7 @@ Argument *ArgumentEditDialog::createArgument() {
 	arg->setAlerts(testBox->isChecked());
 	arg->setZeroForbidden(zeroBox->isChecked());
 	arg->setMatrixAllowed(matrixBox->isChecked());
+	arg->setHandleVector(vectorBox->isChecked());
 	return arg;
 }
 void ArgumentEditDialog::typeChanged(int index) {
@@ -731,7 +732,7 @@ void ArgumentEditDialog::typeChanged(int index) {
 	includeMinBox->setEnabled(i == ARGUMENT_TYPE_NUMBER);
 	minBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
 	maxBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
-	vectorBox->setChecked(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
+	vectorBox->setChecked(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER || i == ARGUMENT_TYPE_TEXT || i == ARGUMENT_TYPE_DATE || i == ARGUMENT_TYPE_BOOLEAN);
 	matrixBox->setEnabled(i != ARGUMENT_TYPE_FREE && i != ARGUMENT_TYPE_MATRIX);
 	matrixBox->setChecked(i == ARGUMENT_TYPE_FREE || i == ARGUMENT_TYPE_MATRIX);
 }

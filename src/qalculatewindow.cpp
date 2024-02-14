@@ -3602,7 +3602,8 @@ void QalculateWindow::setOption(std::string str) {
 		bool b = (settings->printops.exp_display == EXP_LOWERCASE_E);
 		SET_BOOL(b)
 		if(b != (settings->printops.exp_display == EXP_LOWERCASE_E)) {
-			settings->printops.exp_display = EXP_LOWERCASE_E;
+			if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
+			else settings->printops.exp_display = EXP_UPPERCASE_E;
 			resultDisplayUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
@@ -3642,7 +3643,23 @@ void QalculateWindow::setOption(std::string str) {
 	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
 	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
 	else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
-	else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
+	else if(equalsIgnoreCase(svar, "binary bits") || svar == "bits") {
+		int v = -1;
+		if(empty_value) {
+			v = 0;
+		} else if(svalue.find_first_not_of(SPACES MINUS NUMBERS) == std::string::npos) {
+			v = s2i(svalue);
+			if(v < 0) v = 0;
+		}
+		if(v < 0 || v == 1) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else {
+			settings->printops.binary_bits = v;
+			settings->evalops.parse_options.binary_bits = v;
+			if(settings->evalops.parse_options.twos_complement || settings->evalops.parse_options.hexadecimal_twos_complement) expressionFormatUpdated(true);
+			else resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = DIGIT_GROUPING_NONE;
 		else if(equalsIgnoreCase(svalue, "none")) v = DIGIT_GROUPING_NONE;
@@ -3927,23 +3944,25 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			settings->save_defs_on_exit = false;
 		}
-	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp" || svar == "exp display") {
+	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp" || svar == "exp display" || svar == "edisp") {
 		int v = -1;
 		bool valid = true;
-		bool display = (svar == "exp display");
+		bool display = (svar == "exp display" || svar == "edisp");
 		if(!display && equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
 		else if(!display && equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
 		else if(!display && equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
 		else if(!display && (empty_value || equalsIgnoreCase(svalue, "scientific"))) v = EXP_SCIENTIFIC;
 		else if(!display && equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
-		else if(svalue == "E") {v = EXP_UPPERCASE_E; display = 1;}
-		else if(svalue == "e") {v = EXP_LOWERCASE_E; display = 1;}
-		else if(empty_value || svalue == "10") {v = EXP_BASE10; display = 1;}
-		else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) {
+		else if(svalue == "E" || (display && empty_value && settings->printops.exp_display == EXP_POWER_OF_10)) {v = EXP_UPPERCASE_E; display = true;}
+		else if(svalue == "e") {v = EXP_LOWERCASE_E; display = true;}
+		else if((display && svalue == "10") || (display && empty_value && settings->printops.exp_display != EXP_POWER_OF_10) || svalue == "pow" || svalue == "pow10" || equalsIgnoreCase(svalue, "power") || equalsIgnoreCase(svalue, "power of 10")) {
+			v = EXP_POWER_OF_10;
+			display = 1;
+		} else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) {
 			v = s2i(svalue);
-			if(display) v--;
+			if(display) v++;
 		} else valid = false;
-		if(display && valid && (v >= EXP_UPPERCASE_E && v <= EXP_BASE10)) {
+		if(display && valid && (v >= EXP_UPPERCASE_E && v <= EXP_POWER_OF_10)) {
 			settings->printops.exp_display = (ExpDisplay) v;
 			resultDisplayUpdated();
 		} else if(!display && valid) {
