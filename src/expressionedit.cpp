@@ -2437,20 +2437,22 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		po.spell_out_logical_operators = settings->printops.spell_out_logical_operators;
 		po.restrict_to_parent_precision = false;
 		po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-		if(str_e.empty()) {
+		if(!str_w.empty()) {
+			CALCULATOR->beginTemporaryStopMessages();
+			MathStructure mwhere;
+			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
+			mparse.format(po);
+			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression += CALCULATOR->localWhereString();
+			mwhere.format(po);
+			parsed_expression += mwhere.print(po, true, false, TAG_TYPE_HTML);
+			CALCULATOR->endTemporaryStopMessages();
+		} else if(str_e.empty()) {
 			parsed_expression = "";
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
 			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
-			CALCULATOR->endTemporaryStopMessages();
-		}
-		if(!str_w.empty()) {
-			CALCULATOR->parse(&mparse, str_w, settings->evalops.parse_options);
-			parsed_expression += CALCULATOR->localWhereString();
-			CALCULATOR->beginTemporaryStopMessages();
-			mparse.format(po);
-			parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
