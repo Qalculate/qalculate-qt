@@ -1080,6 +1080,30 @@ Do you want to overwrite the function?</source>
         <source>Use input method</source>
         <translation>Использовать метод ввода</translation>
     </message>
+    <message>
+        <source>Decimal Fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optimal Prefix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>prefix</source>
+        <translation type="unfinished">префикс</translation>
+    </message>
+    <message>
+        <source>optimal prefix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>decimals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>decimal fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1113,7 +1137,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Decimal value</source>
-        <translation>Десятичное значение</translation>
+        <translation type="vanished">Десятичное значение</translation>
     </message>
     <message>
         <source>Binary representation</source>
@@ -1140,6 +1164,10 @@ Do you want to overwrite the function?</source>
         <source>Microchip 32-bit</source>
         <translatorcomment>Формат числа с плавающей точкой Microship (PIC16/17)</translatorcomment>
         <translation>Микрочип 32-битный</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation type="unfinished">Значение</translation>
     </message>
 </context>
 <context>
@@ -2438,7 +2466,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Truncate all numbers</source>
-        <translation>Обрезать все числа</translation>
+        <translation type="vanished">Обрезать все числа</translation>
     </message>
     <message>
         <source>Read precision</source>
@@ -2784,6 +2812,42 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Close application with Escape key</source>
         <translation>Закрыть приложение клавишей Esc</translation>
+    </message>
+    <message>
+        <source>Round halfway numbers to odd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers toward zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers to random</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round toward zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round away from zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round down</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4375,6 +4439,18 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>Open menu</source>
         <translation>Открыть меню</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished">Копировать</translation>
+    </message>
+    <message>
+        <source>prefix</source>
+        <translation type="unfinished">префикс</translation>
+    </message>
+    <message>
+        <source>decimals</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -219,7 +219,7 @@ Unit *UnitEditDialog::createUnit(ExpressionItem **replaced_item) {
 	} else {
 		u = new Unit();
 	}
-	if(namesEditDialog && typeCombo->currentIndex() == 2) {
+	if(namesEditDialog && typeCombo->currentIndex() != 2) {
 		namesEditDialog->modifyNames(u, nameEdit->text());
 	} else {
 		NamesEditDialog::modifyName(u, nameEdit->text());

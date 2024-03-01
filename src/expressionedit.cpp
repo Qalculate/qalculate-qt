@@ -1,7 +1,7 @@
 /*
     Qalculate (QT UI)
 
-    Copyright (C) 2021  Hanna Knutsson (hanna.knutsson@protonmail.com)
+    Copyright (C) 2021-2024  Hanna Knutsson (hanna.knutsson@protonmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,8 +56,6 @@
 
 #include <unordered_map>
 std::unordered_map<const ExpressionName*, std::string> capitalized_names;
-
-extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
 
 class ExpressionTipLabel : public QLabel {
 
@@ -485,6 +483,7 @@ struct CompletionData {
 	MathFunction *current_function;
 	int current_function_index;
 	std::vector<Unit*> current_from_units;
+	std::vector<std::string> current_from_categories;
 	QModelIndex exact_prefix_match;
 	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1;
 	int to_type, highest_match;
@@ -516,20 +515,6 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 	int b_match = false;
 	size_t i_match = 0;
 	std::unordered_map<const ExpressionName*, std::string>::iterator cap_it;
-	std::vector<std::string> current_from_categories;
-	if(cdata->to_type == 4) {
-		for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
-			bool b = false;
-			for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
-				if(cdata->current_from_units[i]->category() == settings->alternative_volume_categories[i2]) {
-					current_from_categories.push_back(settings->volume_category);
-					b = true;
-					break;
-				}
-			}
-			if(!b) current_from_categories.push_back(cdata->current_from_units[i]->category());
-		}
-	}
 	if(item && cdata->to_type < 2) {
 		if((cdata->editing_to_expression || !settings->evalops.parse_options.functions_enabled) && item->type() == TYPE_FUNCTION) {}
 		else if(item->type() == TYPE_VARIABLE && (!settings->evalops.parse_options.variables_enabled || (cdata->editing_to_expression && !((Variable*) item)->isKnown()))) {}
@@ -692,11 +677,11 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		}
 	} else if(item && cdata->to_type == 4) {
 		if(item->type() == TYPE_UNIT) {
-			for(size_t i = 0; i < current_from_categories.size(); i++) {
-				if(item->category() == current_from_categories[i]) {
+			for(size_t i = 0; i < cdata->current_from_categories.size(); i++) {
+				if(item->category() == cdata->current_from_categories[i]) {
 					b_match = 6;
 					break;
-				} else if(current_from_categories[i] == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_units[i]->system().find("Imperial") != std::string::npos)) {
+				} else if(cdata->current_from_categories[i] == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_units[i]->system().find("Imperial") != std::string::npos)) {
 					for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
 						if(item->category() == settings->alternative_volume_categories[i2]) {b_match = 6; break;}
 					}
@@ -2073,28 +2058,26 @@ void ExpressionEdit::showCurrentStatus() {
 		QString str = current_status_text;
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
-		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000) {
+		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
 			std::string result = CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options);
 			remove_spaces(current_text);
-			if(!contains_plot_or_save(result)) {
-				CALCULATOR->beginTemporaryStopMessages();
-				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-				result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
-				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-				std::string result_nohtml = unhtmlize(result);
-				remove_spaces(result_nohtml);
-				if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
-					str += "&nbsp;";
-					if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
-					else str += "= ";
-					if(b_comp) str += "(";
-					str += QString::fromStdString(result);
-					if(b_comp) str += ")";
-					str_nohtml = "";
-				}
+			CALCULATOR->beginTemporaryStopMessages();
+			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+			result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
+			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+			std::string result_nohtml = unhtmlize(result);
+			remove_spaces(result_nohtml);
+			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
+				str += "&nbsp;";
+				if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
+				else str += "= ";
+				if(b_comp) str += "(";
+				str += QString::fromStdString(result);
+				if(b_comp) str += ")";
+				str_nohtml = "";
 			}
 		} else {
 			remove_spaces(current_text);
@@ -2220,8 +2203,6 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	return true;
 }
 
-extern MathStructure get_units_for_parsed_expression(const MathStructure *parsed_struct, Unit *to_unit, const EvaluationOptions &eo, const MathStructure *mstruct = NULL);
-
 void remove_non_units(MathStructure &m) {
 	if(m.isPower() && m[0].isUnit()) return;
 	if(m.size() > 0) {
@@ -2319,7 +2300,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
-	transform_expression_for_equals_save(text, settings->evalops.parse_options);
 	size_t i = text.find_first_of(SPACES LEFT_PARENTHESIS);
 	if(i != std::string::npos) {
 		str_f = text.substr(0, i);
@@ -2342,7 +2322,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	if(!cursor.atStart()) {
 		settings->evalops.parse_options.unended_function = &mfunc;
-		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_units.clear();}
+		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_units.clear(); cdata->current_from_categories.clear();}
 		if(!cursor.atEnd()) {
 			str_e = CALCULATOR->unlocalizeExpression(qtext.left(cursor.position()).toStdString(), settings->evalops.parse_options);
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
@@ -2355,6 +2335,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 		} else {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str_e, settings->evalops.parse_options);
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
 			b = CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops) || b;
 			if(!b) {
@@ -2380,6 +2361,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		parsed_expression_tooltip = "";
 		if(!full_parsed) {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str_e, settings->evalops.parse_options);
 			last_is_space = is_in(SPACES, str_e[str_e.length() - 1]);
 			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, true, true);
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
@@ -2395,11 +2377,13 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					eo.expand = -2;
 					if(!CALCULATOR->calculate(cdata->current_from_struct, str_w.empty() ? str_e : str_e + "/." + str_w, 50, eo)) cdata->current_from_struct->setAborted();
 					find_matching_units(*cdata->current_from_struct, &mparse, cdata->current_from_units);
+					cdata->current_from_categories.clear();
 				}
 			} else if(cdata->current_from_struct) {
 				cdata->current_from_struct->unref();
 				cdata->current_from_struct = NULL;
 				cdata->current_from_units.clear();
+				cdata->current_from_categories.clear();
 			}
 		}
 		PrintOptions po;
@@ -2798,16 +2782,18 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 void ExpressionEdit::onCompletionMenuItemActivated() {
 	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
 }
-#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak;}
+#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak; cdata->current_from_categories = from_cats_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	std::vector<Unit*> from_units_bak = cdata->current_from_units;
+	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
 	completionView->setColumnHidden(2, true);
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
 		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
+		cdata->current_from_categories.clear();
 		cdata->editing_to_expression = true;
 		cdata->editing_to_expression1 = true;
 		current_object_start = -1;
@@ -2850,6 +2836,19 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
+	}
+	if(cdata->to_type == 4 && cdata->current_from_categories.empty()) {
+		for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+			bool b = false;
+			for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
+				if(cdata->current_from_units[i]->category() == settings->alternative_volume_categories[i2]) {
+					cdata->current_from_categories.push_back(settings->volume_category);
+					b = true;
+					break;
+				}
+			}
+			if(!b) cdata->current_from_categories.push_back(cdata->current_from_units[i]->category());
+		}
 	}
 	cdata->exact_prefix_match = QModelIndex();
 	cdata->exact_match_found = false;
@@ -3792,6 +3791,7 @@ void ExpressionEdit::setCurrentObject() {
 					if(cdata->current_from_struct) {
 						cdata->current_from_struct->ref();
 						find_matching_units(*cdata->current_from_struct, NULL, cdata->current_from_units);
+						cdata->current_from_categories.clear();
 					}
 				}
 				b_first = false;

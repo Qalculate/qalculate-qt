@@ -1,7 +1,7 @@
 /*
     Qalculate (QT UI)
 
-    Copyright (C) 2021  Hanna Knutsson (hanna.knutsson@protonmail.com)
+    Copyright (C) 2021-2024  Hanna Knutsson (hanna.knutsson@protonmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -131,12 +131,6 @@ std::string result_bin, result_oct, result_dec, result_hex;
 Number max_bases, min_bases;
 bool title_modified = false;
 
-extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1, bool converted = false);
-extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
-extern int has_information_unit(const MathStructure &m, bool top = true);
-extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
-extern bool expression_contains_save_function(const std::string&, const ParseOptions&, bool = false);
-
 bool contains_unknown_variable(const MathStructure &m) {
 	if(m.isVariable()) return !m.variable()->isKnown();
 	for(size_t i = 0; i < m.size(); i++) {
@@ -160,9 +154,10 @@ std::string print_with_evalops(const Number &nr) {
 	po.is_approximate = NULL;
 	po.base = settings->evalops.parse_options.base;
 	po.base_display = BASE_DISPLAY_NONE;
-	po.min_exp = EXP_NONE;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
 	po.hexadecimal_twos_complement = settings->evalops.parse_options.hexadecimal_twos_complement;
+	if(((po.base == 2 && po.twos_complement) || (po.base == 16 && po.hexadecimal_twos_complement)) && nr.isNegative()) po.binary_bits = settings->evalops.parse_options.binary_bits;
+	po.min_exp = EXP_NONE;
 	Number nr_base;
 	if(po.base == BASE_CUSTOM) {
 		nr_base = CALCULATOR->customOutputBase();
@@ -3562,11 +3557,21 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "rounding")) {
 		int v = -1;
-		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even")) v = ROUNDING_HALF_TO_EVEN;
-		else if(equalsIgnoreCase(svalue, "standard")) v = ROUNDING_HALF_AWAY_FROM_ZERO;
-		else if(equalsIgnoreCase(svalue, "truncate")) v = ROUNDING_TOWARD_ZERO;
+		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even") || equalsIgnoreCase(svalue, "half to even")) v = ROUNDING_HALF_TO_EVEN;
+		else if(equalsIgnoreCase(svalue, "standard") || equalsIgnoreCase(svalue, "half away from zero")) v = ROUNDING_HALF_AWAY_FROM_ZERO;
+		else if(equalsIgnoreCase(svalue, "truncate") || equalsIgnoreCase(svalue, "toward zero")) v = ROUNDING_TOWARD_ZERO;
+		else if(equalsIgnoreCase(svalue, "half to odd")) v = ROUNDING_HALF_TO_ODD;
+		else if(equalsIgnoreCase(svalue, "half toward zero")) v = ROUNDING_HALF_TOWARD_ZERO;
+		else if(equalsIgnoreCase(svalue, "half random")) v = ROUNDING_HALF_RANDOM;
+		else if(equalsIgnoreCase(svalue, "half up")) v = ROUNDING_HALF_UP;
+		else if(equalsIgnoreCase(svalue, "half down")) v = ROUNDING_HALF_DOWN;
+		else if(equalsIgnoreCase(svalue, "up")) v = ROUNDING_UP;
+		else if(equalsIgnoreCase(svalue, "down")) v = ROUNDING_DOWN;
+		else if(equalsIgnoreCase(svalue, "away from zero")) v = ROUNDING_AWAY_FROM_ZERO;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
+			if(v == 2) v = ROUNDING_TOWARD_ZERO;
+			else if(v > 2 && v <= ROUNDING_TOWARD_ZERO) v--;
 		}
 		if(v < ROUNDING_HALF_AWAY_FROM_ZERO || v > ROUNDING_DOWN) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
@@ -5233,11 +5238,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
-	if(!do_stack && expression_contains_save_function(execute_str.empty() ? str : execute_str, settings->evalops.parse_options, true)) {
-		if(execute_str.empty()) execute_str = str;
-		transform_expression_for_equals_save(execute_str, settings->evalops.parse_options);
-	}
-
 	size_t stack_size = 0;
 
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
@@ -5266,6 +5266,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			else CALCULATOR->calculateRPN(op, 0, settings->evalops, parsed_mstruct);
 		} else {
 			std::string str2 = CALCULATOR->unlocalizeExpression(execute_str.empty() ? str : execute_str, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str2, settings->evalops.parse_options);
 			CALCULATOR->parseSigns(str2);
 			remove_blank_ends(str2);
 			MathStructure lastx_bak(lastx);
@@ -5394,6 +5395,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	} else {
 		original_expression = CALCULATOR->unlocalizeExpression(execute_str.empty() ? str : execute_str, settings->evalops.parse_options);
+		transform_expression_for_equals_save(original_expression, settings->evalops.parse_options);
 		CALCULATOR->calculate(mstruct, original_expression, 0, settings->evalops, parsed_mstruct, parsed_tostruct);
 	}
 
@@ -5999,7 +6001,7 @@ void set_result_bases(const MathStructure &m) {
 }
 
 bool contains_plot_or_save(const std::string &str) {
-	if(expression_contains_save_function(str, settings->evalops.parse_options, false)) return true;
+	if(expression_contains_save_function(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops.parse_options, false)) return true;
 	MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_PLOT);
 	for(size_t i = 1; f && i <= f->countNames(); i++) {
 		if(str.find(f->getName(i).name) != std::string::npos) return true;
