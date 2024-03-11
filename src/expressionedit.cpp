@@ -2240,7 +2240,9 @@ void find_matching_units(const MathStructure &m, const MathStructure *mparse, st
 		find_matching_units(m2, mparse, v, false);
 	} else {
 		for(size_t i = 0; i < m.size(); i++) {
-			find_matching_units(m[i], mparse, v, false);
+			if(!m.isFunction() || !m.function()->getArgumentDefinition(i + 1) || m.function()->getArgumentDefinition(i + 1)->type() != ARGUMENT_TYPE_ANGLE) {
+				find_matching_units(m[i], mparse, v, false);
+			}
 		}
 	}
 }

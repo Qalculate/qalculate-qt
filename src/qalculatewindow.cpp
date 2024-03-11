@@ -5909,22 +5909,22 @@ void QalculateWindow::updateResultBases() {
 		QString link_color = binEdit->palette().text().color().name();
 		bool inhtml = false;
 		for(; i2 >= 0; i2--) {
-			if(sbin2[i2] == ">") {
+			if(sbin2[i2] == '>') {
 				inhtml = true;
-			} else if(sbin2[i2] == "<") {
+			} else if(sbin2[i2] == '<') {
 				inhtml = false;
-			} else if(!inhtml && (sbin2[i2] == "0" || sbin2[i2] == "1")) {
+			} else if(!inhtml && (sbin2[i2] == '0' || sbin2[i2] == '1')) {
 				sbin2.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin2[i2]).arg(link_color));
 				n++;
 			}
 		}
 		inhtml = false;
 		for(; i1 >= 0; i1--) {
-			if(sbin1[i1] == ">") {
+			if(sbin1[i1] == '>') {
 				inhtml = true;
-			} else if(sbin1[i1] == "<") {
+			} else if(sbin1[i1] == '<') {
 				inhtml = false;
-			} else if(!inhtml && (sbin1[i1] == "0" || sbin1[i1] == "1")) {
+			} else if(!inhtml && (sbin1[i1] == '0' || sbin1[i1] == '1')) {
 				sbin1.replace(i1, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin1[i1]).arg(link_color));
 				n++;
 			}
