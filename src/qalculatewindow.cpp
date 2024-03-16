@@ -1,7 +1,7 @@
 /*
     Qalculate (QT UI)
 
-    Copyright (C) 2021  Hanna Knutsson (hanna.knutsson@protonmail.com)
+    Copyright (C) 2021-2024  Hanna Knutsson (hanna.knutsson@protonmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <QDockWidget>
 #include <QToolTip>
 #include <QToolBar>
+#include <QPushButton>
 #include <QAction>
 #include <QApplication>
 #include <QLineEdit>
@@ -52,6 +53,9 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QScrollBar>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QStyleHints>
+#endif
 #include <QDebug>
 
 #include "qalculatewindow.h"
@@ -109,26 +113,23 @@ std::vector<std::string> alt_results;
 int b_busy = 0, block_result_update = 0;
 bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
+bool had_to_expression = false;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
 QString lastx_text;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
-bool to_fraction = false;
+int to_fraction = 0;
+long int to_fixed_fraction = 0;
 char to_prefix = 0;
 int to_base = 0;
+bool to_duo_syms = false;
 int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
 Number max_bases, min_bases;
 bool title_modified = false;
-
-extern void print_dual(const MathStructure &mresult, const std::string &original_expression, const MathStructure &mparse, MathStructure &mexact, std::string &result_str, std::vector<std::string> &results_v, PrintOptions &po, const EvaluationOptions &evalops, AutomaticFractionFormat auto_frac, AutomaticApproximation auto_approx, bool cplx_angle = false, bool *exact_cmp = NULL, bool b_parsed = true, bool format = false, int colorize = 0, int tagtype = TAG_TYPE_HTML, int max_length = -1);
-extern void calculate_dual_exact(MathStructure &mstruct_exact, MathStructure *mstruct, const std::string &original_expression, const MathStructure *parsed_mstruct, EvaluationOptions &evalops, AutomaticApproximation auto_approx, int msecs = 0, int max_size = 10);
-extern int has_information_unit(const MathStructure &m, bool top = true);
-extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
-extern bool expression_contains_save_function(const std::string&, const ParseOptions&, bool = false);
 
 bool contains_unknown_variable(const MathStructure &m) {
 	if(m.isVariable()) return !m.variable()->isKnown();
@@ -154,6 +155,9 @@ std::string print_with_evalops(const Number &nr) {
 	po.base = settings->evalops.parse_options.base;
 	po.base_display = BASE_DISPLAY_NONE;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
+	po.hexadecimal_twos_complement = settings->evalops.parse_options.hexadecimal_twos_complement;
+	if(((po.base == 2 && po.twos_complement) || (po.base == 16 && po.hexadecimal_twos_complement)) && nr.isNegative()) po.binary_bits = settings->evalops.parse_options.binary_bits;
+	po.min_exp = EXP_NONE;
 	Number nr_base;
 	if(po.base == BASE_CUSTOM) {
 		nr_base = CALCULATOR->customOutputBase();
@@ -268,7 +272,43 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 	}
 }
 
+QalculateToolButton::QalculateToolButton(QWidget *parent) : QToolButton(parent), longPressTimer(NULL), b_longpress(false) {}
+QalculateToolButton::~QalculateToolButton() {}
+void QalculateToolButton::mousePressEvent(QMouseEvent *e) {
+	b_longpress = false;
+	if(e->button() == Qt::LeftButton) {
+		if(!longPressTimer) {
+			longPressTimer = new QTimer(this);
+			longPressTimer->setSingleShot(true);
+			connect(longPressTimer, SIGNAL(timeout()), this, SLOT(longPressTimeout()));
+		}
+		longPressTimer->start(500);
+	}
+	QToolButton::mousePressEvent(e);
+}
+void QalculateToolButton::longPressTimeout() {
+	b_longpress = true;
+	showMenu();
+}
+void QalculateToolButton::mouseReleaseEvent(QMouseEvent *e) {
+	if(e->button() == Qt::RightButton) {
+		showMenu();
+	} else {
+		if(longPressTimer && longPressTimer->isActive() && e->button() == Qt::LeftButton) {
+			longPressTimer->stop();
+		} else if(b_longpress && e->button() == Qt::LeftButton) {
+			b_longpress = false;
+			blockSignals(true);
+			QToolButton::mouseReleaseEvent(e);
+			blockSignals(false);
+			return;
+		}
+		QToolButton::mouseReleaseEvent(e);
+	}
+}
+
 QalculateDockWidget::QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
+QalculateDockWidget::QalculateDockWidget(QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(parent), expressionEdit(editwidget) {}
 QalculateDockWidget::~QalculateDockWidget() {}
 
 void QalculateDockWidget::keyPressEvent(QKeyEvent *e) {
@@ -342,11 +382,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	topLayout->setContentsMargins(0, 0, 0, 0);
 
 	tb = addToolBar("Toolbar");
+	tb->setContextMenuPolicy(Qt::CustomContextMenu);
 	tb->setObjectName("Toolbar");
-	tb->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	tb->setFloatable(false);
 	tb->setMovable(false);
 	tb->toggleViewAction()->setVisible(false);
+
+	tmenu = NULL;
+	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
 
 	ehSplitter = new QSplitter(Qt::Vertical, this);
 	topLayout->addWidget(ehSplitter, 1);
@@ -437,12 +481,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	ADD_SECTION(tr("Angle Unit"));
 	w2 = fm1.boundingRect(tr("Angle Unit")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this); group->setObjectName("group_angleunit");
-	action = menu->addAction(tr("Radians"), this, SLOT(radiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action; action->setData(ANGLE_UNIT_RADIANS);
+	action = menu->addAction(tr("Radians"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_radians"); radAction = action; action->setData(ANGLE_UNIT_RADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_RADIANS) action->setChecked(true);
-	action = menu->addAction(tr("Degrees"), this, SLOT(degreesActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action; action->setData(ANGLE_UNIT_DEGREES);
+	action = menu->addAction(tr("Degrees"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_degrees"); degAction = action; action->setData(ANGLE_UNIT_DEGREES);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_DEGREES) action->setChecked(true);
-	action = menu->addAction(tr("Gradians"), this, SLOT(gradiansActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
+	action = menu->addAction(tr("Gradians"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_gradians"); graAction = action; action->setData(ANGLE_UNIT_GRADIANS);
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
+	menu2 = menu;
+	angleMenu = menu2->addMenu(tr("Other"));
+	menu = menu2;
 
 	ADD_SECTION(tr("Approximation"));
 	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
@@ -529,7 +576,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_E); if(settings->printops.base == BASE_E) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("√2", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_SQRT2); if(settings->printops.base == BASE_SQRT2) {base_checked = true; action->setChecked(true);}
-	action = menu->addAction(tr("Other:", "Number base"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Custom:", "Number base"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_CUSTOM); if(!base_checked) action->setChecked(true); customOutputBaseAction = action;
 	aw = new QWidgetAction(this);
 	aww = new QWidget(this);
@@ -624,31 +671,36 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	menu->setMinimumWidth(w);
 	tb->addWidget(modeAction_t);
+	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
-	toAction = new QAction(LOAD_ICON("convert"), tr("Convert"), this);
-	toAction->setEnabled(false);
-	connect(toAction, SIGNAL(triggered(bool)), this, SLOT(onToActivated()));
-	tb->addAction(toAction);
-	storeAction = new QAction(LOAD_ICON("document-save"), tr("Store"), this);
-	connect(storeAction, SIGNAL(triggered(bool)), this, SLOT(onStoreActivated()));
+	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_ICON("convert")); toAction_t->setText(tr("Convert"));
+	toAction_t->setEnabled(false);
+	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
+	toMenu = new QMenu(this);
+	tb->addWidget(toAction_t);
+	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_ICON("document-save")); storeAction_t->setText(tr("Store"));
+	storeAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(storeAction_t, SIGNAL(clicked()), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
-	updateVariablesMenu();
-	storeAction->setMenu(variablesMenu);
-	tb->addAction(storeAction);
-	functionsAction_t = new QAction(LOAD_ICON("function"), tr("Functions"), this);
-	connect(functionsAction_t, SIGNAL(triggered(bool)), this, SLOT(openFunctions()));
+	storeAction_t->setMenu(variablesMenu);
+	tb->addWidget(storeAction_t);
+	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	functionsAction_t = new QalculateToolButton(this); functionsAction_t->setIcon(LOAD_ICON("function")); functionsAction_t->setText(tr("Functions"));
+	functionsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(functionsAction_t, SIGNAL(clicked()), this, SLOT(openFunctions()));
 	functionsMenu = new QMenu(this);
-	updateFunctionsMenu();
 	functionsAction_t->setMenu(functionsMenu);
-	tb->addAction(functionsAction_t);
-	unitsAction_t = new QAction(LOAD_ICON("units"), tr("Units"), this);
-	connect(unitsAction_t, SIGNAL(triggered(bool)), this, SLOT(openUnits()));
+	tb->addWidget(functionsAction_t);
+	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	unitsAction_t = new QalculateToolButton(this); unitsAction_t->setIcon(LOAD_ICON("units")); unitsAction_t->setText(tr("Units"));
+	unitsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
+	connect(unitsAction_t, SIGNAL(clicked()), this, SLOT(openUnits()));
 	unitsMenu = new QMenu(this);
-	updateUnitsMenu();
 	unitsAction_t->setMenu(unitsMenu);
-	tb->addAction(unitsAction_t);
+	tb->addWidget(unitsAction_t);
+	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	if(CALCULATOR->canPlot()) {
-		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot Functions/Data"), this);
+		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot"), this);
 		connect(plotAction_t, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
 		tb->addAction(plotAction_t);
 	} else {
@@ -675,13 +727,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
 	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad); hideNumpadAction = action;
-	menu->addSeparator();
+	action = menu->addAction(tr("Separate Menu Buttons"), this, SLOT(showSeparateKeypadMenuButtons(bool))); action->setCheckable(true); action->setChecked(settings->separate_keypad_menu_buttons);
 	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
+	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	QWidget *spacer = new QWidget();
 	spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tb->addWidget(spacer);
 	tb->addWidget(menuAction_t);
+	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
 	expressionEdit = new ExpressionEdit(this, tb);
 	QFont font = expressionEdit->font();
@@ -716,7 +770,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
-	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
+	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
 	QFontMetrics fm2(settings->use_custom_app_font ? appfont : binEdit->font());
 	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
@@ -750,13 +804,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesDock->setWidget(basesWidget);
 	addDockWidget(Qt::TopDockWidgetArea, basesDock);
 	basesDock->hide();
+	basesMenu = NULL;
+	binEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(binEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	octEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(octEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	decEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(decEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	hexEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(hexEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
+	connect(binEdit, SIGNAL(linkActivated(const QString&)), this, SLOT(resultBasesLinkActivated(const QString&)));
 
 	keypad = new KeypadWidget(this);
-	keypadDock = new QalculateDockWidget(tr("Keypad"), this, expressionEdit);
+	keypadDock = new QalculateDockWidget(this, expressionEdit);
 	keypadDock->setObjectName("keypad-dock");
 	keypadDock->setWidget(keypad);
+	updateKeypadTitle();
+	keypadDock->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(keypadDock, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showKeypadContextMenu(const QPoint&)));
 	addDockWidget(Qt::BottomDockWidgetArea, keypadDock);
-	keypadDock->hide();
 
 	QWidget *rpnWidget = new QWidget(this);
 	rpnDock = new QalculateDockWidget(tr("RPN Stack"), this, expressionEdit);
@@ -803,11 +869,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	addDockWidget(Qt::TopDockWidgetArea, rpnDock);
 	if(!settings->rpn_mode) rpnDock->hide();
 
+	updateVariablesMenu();
+	updateFunctionsMenu();
+	updateUnitsMenu();
+
 	QLocalServer::removeServer("qalculate-qt");
 	server = new QLocalServer(this);
 	server->listen("qalculate-qt");
 	connect(server, SIGNAL(newConnection()), this, SLOT(serverNewConnection()));
-	
+
 	mstruct = new MathStructure();
 	settings->current_result = NULL;
 	mstruct_exact.setUndefined();
@@ -846,12 +916,18 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(dockClosed()), this, SLOT(onRPNClosed()));
 	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
+	connect(keypad, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
+	connect(keypad, SIGNAL(resultFormatUpdated(int)), this, SLOT(resultFormatUpdated(int)));
+	connect(keypad, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(keypadPreferencesChanged()));
+	connect(keypad, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(keypadPreferencesChanged()));
+	connect(keypad, SIGNAL(resultFormatUpdated(int)), this, SLOT(keypadPreferencesChanged()));
 	connect(keypad, SIGNAL(shortcutClicked(int, const QString&)), this, SLOT(shortcutClicked(int, const QString&)));
 	connect(keypad, SIGNAL(symbolClicked(const QString&)), this, SLOT(onSymbolClicked(const QString&)));
 	connect(keypad, SIGNAL(operatorClicked(const QString&)), this, SLOT(onOperatorClicked(const QString&)));
 	connect(keypad, SIGNAL(functionClicked(MathFunction*)), this, SLOT(onFunctionClicked(MathFunction*)));
 	connect(keypad, SIGNAL(variableClicked(Variable*)), this, SLOT(onVariableClicked(Variable*)));
 	connect(keypad, SIGNAL(unitClicked(Unit*)), this, SLOT(onUnitClicked(Unit*)));
+	connect(keypad, SIGNAL(prefixClicked(Prefix*)), this, SLOT(onPrefixClicked(Prefix*)));
 	connect(keypad, SIGNAL(delClicked()), this, SLOT(onDelClicked()));
 	connect(keypad, SIGNAL(clearClicked()), this, SLOT(onClearClicked()));
 	connect(keypad, SIGNAL(equalsClicked()), this, SLOT(onEqualsClicked()));
@@ -867,10 +943,21 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(keypad, SIGNAL(MCClicked()), this, SLOT(onMCClicked()));
 	connect(keypad, SIGNAL(MPlusClicked()), this, SLOT(onMPlusClicked()));
 	connect(keypad, SIGNAL(MMinusClicked()), this, SLOT(onMMinusClicked()));
+	connect(keypad, SIGNAL(storeClicked()), this, SLOT(onStoreActivated()));
+	connect(keypad, SIGNAL(newFunctionClicked()), this, SLOT(newFunction()));
 	connect(keypad, SIGNAL(answerClicked()), this, SLOT(onAnswerClicked()));
-	connect(keypad, SIGNAL(baseClicked(int, bool)), this, SLOT(onBaseClicked(int, bool)));
+	connect(keypad, SIGNAL(baseClicked(int, bool, bool)), this, SLOT(onBaseClicked(int, bool, bool)));
 	connect(keypad, SIGNAL(factorizeClicked()), this, SLOT(onFactorizeClicked()));
 	connect(keypad, SIGNAL(expandClicked()), this, SLOT(onExpandClicked()));
+	connect(keypad, SIGNAL(expandPartialFractionsClicked()), this, SLOT(onExpandPartialFractionsClicked()));
+	connect(keypad, SIGNAL(openVariablesRequest()), this, SLOT(openVariables()));
+	connect(keypad, SIGNAL(openUnitsRequest()), this, SLOT(openUnits()));
+	connect(keypad, SIGNAL(openPercentageCalculationRequest()), this, SLOT(openPercentageCalculation()));
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	connect(QGuiApplication::styleHints(), SIGNAL(colorSchemeChanged(Qt::ColorScheme)), this, SLOT(onColorSchemeChanged()));
+#endif
+
+	if(settings->enable_tooltips != 1) onEnableTooltipsChanged();
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -895,13 +982,72 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 }
 QalculateWindow::~QalculateWindow() {}
 
+void QalculateWindow::keypadPreferencesChanged() {
+	if(preferencesDialog) {
+		preferencesDialog->updateVariableUnits();
+		preferencesDialog->updateComplexForm();
+		preferencesDialog->updateIntervalDisplay();
+		preferencesDialog->updateIntervalCalculation();
+		preferencesDialog->updateConciseUncertaintyInput();
+	}
+}
+void QalculateWindow::updateKeypadTitle() {
+	QString str = tr("Keypad") + " (";
+	if(settings->keypad_type == KEYPAD_GENERAL) str += tr("General");
+	else if(settings->keypad_type == KEYPAD_PROGRAMMING) str += tr("Programming");
+	else if(settings->keypad_type == KEYPAD_ALGEBRA) str += tr("Algebra");
+	else if(settings->keypad_type == KEYPAD_CUSTOM) str += tr("Custom");
+	str += ")";
+	keypadDock->setWindowTitle(str);
+}
+void QalculateWindow::showKeypadContextMenu(const QPoint &pos) {
+	QPoint p = keypadDock->mapToGlobal(pos);
+	if(p.y() < keypad->mapToGlobal(QPoint(0, 0)).y()) keypadAction_t->menu()->popup(p);
+}
+void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
+	QWidget *w = tb->childAt(pos);
+	if(w == storeAction_t || w == functionsAction_t || w == unitsAction_t) return;
+	if(!tmenu) {
+		tmenu = new QMenu(this);
+		tmenu->addAction(tr("Icons only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonIconOnly);
+		tmenu->addAction(tr("Text only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextOnly);
+		tmenu->addAction(tr("Text beside icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextBesideIcon);
+		tmenu->addAction(tr("Text under icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextUnderIcon);
+	}
+	tmenu->popup(tb->mapToGlobal(pos));
+}
+void QalculateWindow::showBasesContextMenu(const QPoint &pos) {
+	if(((QLabel*) sender())->text().isEmpty()) return;
+	if(!basesMenu) {
+		basesMenu = new QMenu(this);
+		copyBasesAction = basesMenu->addAction(tr("Copy"), this, SLOT(copyBases()));
+	}
+	copyBasesAction->setData(QVariant::fromValue((void*) sender()));
+	basesMenu->popup(((QWidget*) sender())->mapToGlobal(pos));
+}
+void QalculateWindow::copyBases() {
+	QLabel *label = (QLabel*) copyBasesAction->data().value<void*>();
+	QApplication::clipboard()->setText(label->hasSelectedText() ? label->selectedText() : (label == binEdit ? QString::fromStdString(result_bin) : label->text()));
+}
+void QalculateWindow::setToolbarStyle() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	settings->toolbar_style = action->data().toInt();
+	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	keypadAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+}
+
 void QalculateWindow::loadShortcuts() {
 	if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data"));
-	storeAction->setToolTip(tr("Store"));
-	unitsAction_t->setToolTip(tr("Units"));
-	functionsAction_t->setToolTip(tr("Functions"));
+	storeAction_t->setToolTip(tr("Store") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	basesAction->setToolTip(tr("Number Bases"));
-	toAction->setToolTip(tr("Convert"));
+	toAction_t->setToolTip(tr("Convert"));
 	menuAction_t->setToolTip(tr("Menu"));
 	modeAction_t->setToolTip(tr("Mode"));
 	rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up"));
@@ -916,7 +1062,7 @@ void QalculateWindow::loadShortcuts() {
 	}
 }
 void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
-	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+	if(ks->type[0] == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
 		expressionEdit->enableTabCompletion(false);
 		return;
 	}
@@ -929,123 +1075,125 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	QList<QKeySequence> shortcuts = ks->action->shortcuts();
 	shortcuts.removeAll(QKeySequence::fromString(ks->key));
 	ks->action->setShortcuts(shortcuts);
-	if(ks->type == SHORTCUT_TYPE_PLOT && plotAction_t) {
+	if(ks->type[0] == SHORTCUT_TYPE_PLOT && plotAction_t) {
 		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_STORE) {
-		storeAction->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
-		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
+		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
+		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_CONVERT) {
-		toAction->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MODE) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
+		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+	} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
 		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_MENU) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
 		menuAction_t->setToolTip(tr("Menu") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
 		rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
 		rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
 		rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
 		rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
 		rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
 		rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
-	} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
 		rpnClearAction->setToolTip(tr("Clear the RPN stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	}
 }
 void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
-	if(ks->type == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
+	if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_COMPLETE && ks->key == "Tab") {
 		expressionEdit->enableTabCompletion(true);
 		ks->new_action = false;
 		return;
 	}
 	QAction *action = NULL;
-	switch(ks->type) {
-		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
-		case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
-		case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
-		case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
-		case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
-		case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
-		case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
-		case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
-		case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
-		case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
-		case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
-		case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
-		case SHORTCUT_TYPE_GRADIANS: {action = graAction; break;}
-		case SHORTCUT_TYPE_NORMAL_NOTATION: {action = normalAction; break;}
-		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {action = sciAction; break;}
-		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {action = engAction; break;}
-		case SHORTCUT_TYPE_SIMPLE_NOTATION: {action = simpleAction; break;}
-		case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
-		case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
-		case SHORTCUT_TYPE_GENERAL_KEYPAD: {action = gKeypadAction; break;}
-		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
-		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
-		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
-		case SHORTCUT_TYPE_STORE: {action = storeAction; break;}
-		case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
-		case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
-		case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
-		case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
-		case SHORTCUT_TYPE_HISTORY_SEARCH: {action = historyView->findAction; break;}
-		case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
-		case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
-		case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
-		case SHORTCUT_TYPE_RPN_DOWN: {action = rpnDownAction; break;}
-		case SHORTCUT_TYPE_RPN_SWAP: {action = rpnSwapAction; break;}
-		case SHORTCUT_TYPE_RPN_LASTX: {action = rpnLastxAction; break;}
-		case SHORTCUT_TYPE_RPN_COPY: {action = rpnCopyAction; break;}
-		case SHORTCUT_TYPE_RPN_DELETE: {action = rpnDeleteAction; break;}
-		case SHORTCUT_TYPE_RPN_CLEAR: {action = rpnClearAction; break;}
-		default: {}
+	if(ks->type.size() == 1) {
+		switch(ks->type[0]) {
+			case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {action = functionsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_VARIABLES: {action = variablesAction; break;}
+			case SHORTCUT_TYPE_MANAGE_UNITS: {action = unitsAction; break;}
+			case SHORTCUT_TYPE_MANAGE_DATA_SETS: {action = datasetsAction; break;}
+			case SHORTCUT_TYPE_FLOATING_POINT: {action = fpAction; break;}
+			case SHORTCUT_TYPE_CALENDARS: {action = calendarsAction; break;}
+			case SHORTCUT_TYPE_PERIODIC_TABLE: {action = periodicTableAction; break;}
+			case SHORTCUT_TYPE_PERCENTAGE_TOOL: {action = percentageAction; break;}
+			case SHORTCUT_TYPE_NUMBER_BASES: {action = basesAction; break;}
+			case SHORTCUT_TYPE_RPN_MODE: {action = rpnAction; break;}
+			case SHORTCUT_TYPE_DEGREES: {action = degAction; break;}
+			case SHORTCUT_TYPE_RADIANS: {action = radAction; break;}
+			case SHORTCUT_TYPE_GRADIANS: {action = graAction; break;}
+			case SHORTCUT_TYPE_NORMAL_NOTATION: {action = normalAction; break;}
+			case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {action = sciAction; break;}
+			case SHORTCUT_TYPE_ENGINEERING_NOTATION: {action = engAction; break;}
+			case SHORTCUT_TYPE_SIMPLE_NOTATION: {action = simpleAction; break;}
+			case SHORTCUT_TYPE_CHAIN_MODE: {action = chainAction; break;}
+			case SHORTCUT_TYPE_KEYPAD: {action = keypadAction; break;}
+			case SHORTCUT_TYPE_GENERAL_KEYPAD: {action = gKeypadAction; break;}
+			case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {action = pKeypadAction; break;}
+			case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {action = xKeypadAction; break;}
+			case SHORTCUT_TYPE_CUSTOM_KEYPAD: {action = cKeypadAction; break;}
+			case SHORTCUT_TYPE_NEW_VARIABLE: {action = newVariableAction; break;}
+			case SHORTCUT_TYPE_NEW_FUNCTION: {action = newFunctionAction; break;}
+			case SHORTCUT_TYPE_PLOT: {action = plotAction; break;}
+			case SHORTCUT_TYPE_UPDATE_EXRATES: {action = exratesAction; break;}
+			case SHORTCUT_TYPE_HISTORY_SEARCH: {action = historyView->findAction; break;}
+			case SHORTCUT_TYPE_HELP: {action = helpAction; break;}
+			case SHORTCUT_TYPE_QUIT: {action = quitAction; break;}
+			case SHORTCUT_TYPE_RPN_UP: {action = rpnUpAction; break;}
+			case SHORTCUT_TYPE_RPN_DOWN: {action = rpnDownAction; break;}
+			case SHORTCUT_TYPE_RPN_SWAP: {action = rpnSwapAction; break;}
+			case SHORTCUT_TYPE_RPN_LASTX: {action = rpnLastxAction; break;}
+			case SHORTCUT_TYPE_RPN_COPY: {action = rpnCopyAction; break;}
+			case SHORTCUT_TYPE_RPN_DELETE: {action = rpnDeleteAction; break;}
+			case SHORTCUT_TYPE_RPN_CLEAR: {action = rpnClearAction; break;}
+			default: {}
+		}
 	}
 	if(action) {
 		ks->new_action = false;
 		QList<QKeySequence> shortcuts = action->shortcuts();
 		shortcuts << QKeySequence::fromString(ks->key);
 		action->setShortcuts(shortcuts);
-		if(ks->type == SHORTCUT_TYPE_PLOT) {
+		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_STORE) {
-			storeAction->setToolTip(tr("Store") + QString("(%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MANAGE_UNITS) {
-			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_NUMBER_BASES) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
+			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
+			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MODE) {
-			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_MENU) {
-			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_UP) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
 			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_DOWN) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
 			rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_SWAP) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
 			rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_DELETE) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
 			rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_LASTX) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
 			rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_COPY) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
 			rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
-		} else if(ks->type == SHORTCUT_TYPE_RPN_CLEAR) {
+		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
 			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
 	} else {
-		if(ks->type == SHORTCUT_TYPE_CONVERT) {
-			toAction->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		if(ks->type[0] == SHORTCUT_TYPE_MODE) {
+			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
+			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
+			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		}
+		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
+			toAction_t->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		}
 		ks->new_action = true;
 		action = new QAction(this);
@@ -1058,7 +1206,9 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 }
 void QalculateWindow::shortcutActivated() {
 	keyboard_shortcut *ks = (keyboard_shortcut*) qobject_cast<QAction*>(sender())->data().value<void*>();
-	triggerShortcut(ks->type, ks->value);
+	for(size_t i = 0; i < ks->type.size(); i++) {
+		triggerShortcut(ks->type[i], ks->value[i]);
+	}
 }
 void QalculateWindow::shortcutClicked(int type, const QString &value) {
 	triggerShortcut((shortcut_type) type, value.toStdString());
@@ -1086,6 +1236,18 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_MODE: {
 			modeAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_FUNCTIONS_MENU: {
+			functionsAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_UNITS_MENU: {
+			unitsAction_t->showMenu();
+			break;
+		}
+		case SHORTCUT_TYPE_VARIABLES_MENU: {
+			storeAction_t->showMenu();
 			break;
 		}
 		case SHORTCUT_TYPE_MENU: {
@@ -1241,16 +1403,65 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			break;
 		}
 		case SHORTCUT_TYPE_COPY_RESULT: {
-			if(!settings->v_result.empty()) {
-				if(settings->copy_ascii) {
-					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0], true))));
+			if(settings->v_result.empty()) break;
+			int v = s2i(value);
+			if(v < 0 || v > 8) v = 0;
+			bool b_ascii = (v != 1 && v != 4 && v != 6 && (v != 0 || settings->copy_ascii));
+			bool b_nounits = (v == 3 || v == 8 || (v == 0 && settings->copy_ascii && settings->copy_ascii_without_units));
+			QString str_ascii, str_html;
+			if(v > 3) {
+				if(settings->history_expression_type == 1 && !settings->v_expression[settings->v_expression.size() - 1].empty()) {
+					if(b_ascii) {
+						str_ascii += QString::fromStdString(unformat(settings->v_expression[settings->v_expression.size() - 1]));
+					} else {
+						str_ascii += QString::fromStdString(settings->v_expression[settings->v_expression.size() - 1]);
+						if(v < 6) b_ascii = true;
+						else str_html += QString::fromStdString(settings->v_expression[settings->v_expression.size() - 1]);
+					}
 				} else {
-					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
-					qm->setText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
-					qm->setObjectName("history_result");
-					QApplication::clipboard()->setMimeData(qm);
+					if(b_ascii) {
+						str_ascii += QString::fromStdString(unformat(unhtmlize(settings->v_parse[settings->v_parse.size() - 1], true)));
+					} else {
+						str_html += QString::fromStdString(uncolorize(settings->v_parse[settings->v_parse.size() - 1]));
+						str_ascii += QString::fromStdString(unhtmlize(settings->v_parse[settings->v_parse.size() - 1]));
+					}
 				}
+			}
+			if(v <= 3 || v >= 6) {
+				if(b_ascii) {
+					if(v > 3) str_ascii += " = ";
+					std::string str = settings->v_result[settings->v_result.size() - 1][0];
+					if(b_nounits) {
+						size_t i = str.find("<span style=\"color:#008000\">");
+						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+						if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+							str = str.substr(0, i);
+						}
+					}
+					str_ascii += QString::fromStdString(unformat(unhtmlize(str, true))).trimmed();
+				} else {
+					if(v > 3) {
+						if(settings->v_exact[settings->v_exact.size() - 1][0]) {
+							str_html += " = ";
+							str_ascii += " = ";
+						} else {
+							str_html += " " SIGN_ALMOST_EQUAL " ";
+							str_ascii += " " SIGN_ALMOST_EQUAL " ";
+						}
+					}
+					str_html += QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0]));
+					str_ascii += QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]));
+				}
+			}
+			if(b_ascii) {
+				QApplication::clipboard()->setText(str_ascii);
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(str_html);
+				qm->setText(str_ascii);
+				if(v <= 3 || v >= 6) qm->setObjectName("history_result");
+				else qm->setObjectName("history_expression");
+				QApplication::clipboard()->setMimeData(qm);
 			}
 			break;
 		}
@@ -1330,6 +1541,84 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			expressionEdit->keyPressEvent(&e);
 			break;
 		}
+		case SHORTCUT_TYPE_PRECISION: {
+			int v = s2i(value);
+			if(settings->previous_precision > 0 && CALCULATOR->getPrecision() == v) {
+				v = settings->previous_precision;
+				settings->previous_precision = 0;
+			} else {
+				settings->previous_precision = CALCULATOR->getPrecision();
+			}
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_precision");
+			if(w) {
+				w->blockSignals(true);
+				w->setValue(v);
+				w->blockSignals(false);
+			}
+			CALCULATOR->setPrecision(v);
+			expressionCalculationUpdated();
+			break;
+		}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w) w->setValue(-1);
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_mindecimals");
+			if(w) w->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v)) {
+				if(w) w->setValue(0);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+			} else {
+				if(w) w->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+			}
+			if(w) w->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			int v = s2i(value);
+			QSpinBox *w1 = findChild<QSpinBox*>("spinbox_mindecimals");
+			QSpinBox *w2 = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w1) w1->blockSignals(true);
+			if(w2) w2->blockSignals(true);
+			if(v < 0 || (settings->printops.use_min_decimals && settings->printops.min_decimals == v && settings->printops.use_max_decimals && settings->printops.max_decimals == v)) {
+				if(w1) w1->setValue(0);
+				if(w2) w2->setValue(-1);
+				settings->printops.use_min_decimals = false;
+				settings->printops.min_decimals = 0;
+				settings->printops.use_max_decimals = false;
+				settings->printops.max_decimals = -1;
+			} else {
+				if(w1) w1->setValue(v);
+				if(w2) w2->setValue(v);
+				settings->printops.use_min_decimals = true;
+				settings->printops.min_decimals = v;
+				settings->printops.use_max_decimals = true;
+				settings->printops.max_decimals = v;
+			}
+			if(w1) w1->blockSignals(false);
+			if(w2) w2->blockSignals(false);
+			resultFormatUpdated(true);
+			break;
+		}
 		case SHORTCUT_TYPE_MANAGE_FUNCTIONS: {functionsAction->trigger(); break;}
 		case SHORTCUT_TYPE_MANAGE_VARIABLES: {variablesAction->trigger(); break;}
 		case SHORTCUT_TYPE_MANAGE_UNITS: {unitsAction->trigger(); break;}
@@ -1353,7 +1642,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {pKeypadAction->trigger(); break;}
 		case SHORTCUT_TYPE_ALGEBRA_KEYPAD: {xKeypadAction->trigger(); break;}
 		case SHORTCUT_TYPE_CUSTOM_KEYPAD: {cKeypadAction->trigger(); break;}
-		case SHORTCUT_TYPE_STORE: {storeAction->trigger(); break;}
+		case SHORTCUT_TYPE_STORE: {onStoreActivated(); break;}
 		case SHORTCUT_TYPE_NEW_VARIABLE: {newVariableAction->trigger(); break;}
 		case SHORTCUT_TYPE_NEW_FUNCTION: {newFunctionAction->trigger(); break;}
 		case SHORTCUT_TYPE_PLOT: {plotAction->trigger(); break;}
@@ -1372,9 +1661,47 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 bool sort_compare_item(ExpressionItem *o1, ExpressionItem *o2) {
 	return o1->title(true, settings->printops.use_unicode_signs) < o2->title(true, settings->printops.use_unicode_signs);
 }
+void QalculateWindow::updateAngleUnitsMenu() {
+	QActionGroup *group = findChild<QActionGroup*>("group_angleunit");
+	if(!group) return;
+	QMenu *menu = angleMenu;
+	QAction *action = NULL;
+	menu->clear();
+	Unit *u_rad = CALCULATOR->getRadUnit();
+	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+		if(CALCULATOR->units[i]->baseUnit() == u_rad) {
+			Unit *u = CALCULATOR->units[i];
+			if(u != u_rad && !u->isHidden() && u->isActive() && u->baseExponent() == 1 && !u->hasName("gra") && !u->hasName("deg")) {
+				action = menu->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) menu)), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_" + QString::fromStdString(u->referenceName())); action->setData(ANGLE_UNIT_CUSTOM); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit() == u) action->setChecked(true);
+			}
+		}
+	}
+	action = menu->addAction(tr("None"), this, SLOT(angleUnitActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_none"); action->setData(ANGLE_UNIT_NONE); if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_NONE) action->setChecked(true);
+	action = menu->addAction(tr("Other")); action->setCheckable(true); group->addAction(action); action->setObjectName("action_angle_unit_other"); action->setVisible(false); action->setData(-1); if(!group->checkedAction()) action->setChecked(true);
+}
+
+struct tree_struct_m {
+	std::string item;
+	std::list<tree_struct_m> items;
+	std::list<tree_struct_m>::iterator it;
+	std::list<tree_struct_m>::reverse_iterator rit;
+	std::vector<void*> objects;
+	tree_struct_m *parent;
+	void sort() {
+		items.sort();
+		for(std::list<tree_struct_m>::iterator it = items.begin(); it != items.end(); ++it) {
+			it->sort();
+		}
+	}
+	bool operator < (const tree_struct_m &s1) const {
+		return string_is_less(item, s1.item);
+	}
+};
+
 void QalculateWindow::updateFunctionsMenu() {
 	functionsMenu->clear();
 	functionsMenu->addAction(tr("New Function…"), this, SLOT(newFunction()));
+	functionsMenu->addSeparator();
 	for(size_t i = 0; i < settings->favourite_functions.size();) {
 		if(!CALCULATOR->stillHasFunction(settings->favourite_functions[i]) || !settings->favourite_functions[i]->isActive()) {
 			settings->favourite_functions.erase(settings->favourite_functions.begin() + i);
@@ -1382,15 +1709,265 @@ void QalculateWindow::updateFunctionsMenu() {
 			i++;
 		}
 	}
-	if(!settings->favourite_functions.empty()) {
+	for(size_t i = 0; i < settings->recent_functions.size();) {
+		if(!CALCULATOR->stillHasFunction(settings->recent_functions[i]) || !settings->recent_functions[i]->isActive()) {
+			settings->recent_functions.erase(settings->recent_functions.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	favouriteFunctionActions.clear();
+	recentFunctionActions.clear();
+	if(settings->show_all_functions) {
+
+		tree_struct_m function_cats;
+		std::vector<MathFunction*> user_functions;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		MathFunction *f = NULL;
+		function_cats.items.clear();
+		function_cats.objects.clear();
+		function_cats.parent = NULL;
+		user_functions.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+			if(CALCULATOR->functions[i]->isActive() && !CALCULATOR->functions[i]->isHidden()) {
+				if(CALCULATOR->functions[i]->isLocal() && !CALCULATOR->functions[i]->isBuiltin() && !CALCULATOR->functions[i]->isHidden()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_functions.size(); i3++) {
+						f = user_functions[i3];
+						if(string_is_less(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs), f->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_functions.insert(user_functions.begin() + i3, CALCULATOR->functions[i]);
+							break;
+						}
+					}
+					if(!b) user_functions.push_back(CALCULATOR->functions[i]);
+				}
+				tree_struct_m *item = &function_cats;
+				if(!CALCULATOR->functions[i]->category().empty()) {
+					cat = CALCULATOR->functions[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					f = (MathFunction*) item->objects[i3];
+					if(string_is_less(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs), f->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->functions[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->functions[i]);
+			}
+		}
+
+		function_cats.sort();}
+
+		favouriteFunctionsMenu = functionsMenu->addMenu(tr("Favorites"));
+		recentFunctionsMenu = functionsMenu->addMenu(tr("Recent"));
+		int first_index = 5;
+		QMenu *sub = functionsMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		MathFunction *f;
+		tree_struct_m *titem, *titem2;
+		function_cats.rit = function_cats.items.rbegin();
+		if(function_cats.rit != function_cats.items.rend()) {
+			titem = &*function_cats.rit;
+			++function_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_functions.empty()) {
+			sub = functionsMenu->addMenu(tr("User functions"));
+			for(size_t i = 0; i < user_functions.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+				action->setData(QVariant::fromValue((void*) user_functions[i]));
+			}
+			first_index++;
+		}
 		functionsMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().value(sub3 == functionsMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					f = (MathFunction*) titem->objects[i];
+					action = sub->addAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+					action->setData(QVariant::fromValue((void*) f));
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < function_cats.objects.size(); i++) {
+			f = (MathFunction*) function_cats.objects[i];
+			if(!f->isLocal()) {
+				action = sub->addAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
+				action->setData(QVariant::fromValue((void*) f));
+			}
+		}
+		functionsMenu->addSeparator();
+	} else {
+		favouriteFunctionsMenu = functionsMenu;
+		recentFunctionsMenu = functionsMenu;
+	}
+	QAction *action = functionsMenu->addAction(tr("Open dialog"));
+	action->setCheckable(true);
+	action->setChecked(settings->use_function_dialog);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(useFunctionDialog(bool)));
+	firstFunctionsMenuOptionAction = action;
+	action = functionsMenu->addAction(tr("Show all functions"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_functions);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllFunctions(bool)));
+	updateRecentFunctions();
+	updateFavouriteFunctions();
+}
+void QalculateWindow::useFunctionDialog(bool b) {
+	settings->use_function_dialog = b;
+}
+void QalculateWindow::showAllFunctions(bool b) {
+	settings->show_all_functions = b;
+	updateFunctionsMenu();
+}
+void QalculateWindow::updateFavouriteFunctions() {
+	for(int i = 0; i < favouriteFunctionActions.size(); i++) {
+		favouriteFunctionsMenu->removeAction(favouriteFunctionActions[i]);
+		favouriteFunctionActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_functions && favouriteFunctionActions.isEmpty();
+	favouriteFunctionActions.clear();
+	bool update_recent = false;
+	if(!settings->favourite_functions.empty()) {
 		std::sort(settings->favourite_functions.begin(), settings->favourite_functions.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
-			QAction *action = functionsMenu->addAction(QString::fromStdString(settings->favourite_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(functionActivated()));
-			action->setData(QVariant::fromValue((void*) settings->favourite_functions[i]));
+			MathFunction *f = settings->favourite_functions[i];
+			if(!settings->show_all_functions) {
+				for(size_t i2 = 0; i2 < settings->recent_functions.size(); i2++) {
+					if(settings->recent_functions[i2] == f) {
+						settings->recent_functions.erase(settings->recent_functions.begin() + i2);
+						update_recent = true;
+						break;
+					}
+				}
+			}
+			QAction *action = new QAction(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteFunctionsMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(functionActivated()));
+			action->setData(QVariant::fromValue((void*) f));
+			favouriteFunctionActions << action;
+		}
+		if(!settings->show_all_functions) {
+			QAction *action = new QAction(favouriteFunctionsMenu);
+			action->setSeparator(true);
+			favouriteFunctionActions << action;
+		}
+		if(update_recent) updateRecentFunctions();
+		favouriteFunctionsMenu->insertActions(settings->show_all_functions ? NULL : (recentFunctionActions.isEmpty() ?firstFunctionsMenuOptionAction : recentFunctionActions.at(0)), favouriteFunctionActions);
+		if(b_empty) {
+			favouriteFunctionsMenu->hide();
+			favouriteFunctionsMenu->show();
+			favouriteFunctionsMenu->hide();
 		}
 	}
 }
+void QalculateWindow::updateRecentFunctions() {
+	for(int i = 0; i < recentFunctionActions.size(); i++) {
+		recentFunctionsMenu->removeAction(recentFunctionActions[i]);
+		recentFunctionActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_functions && recentFunctionActions.isEmpty();
+	recentFunctionActions.clear();
+	if(!settings->recent_functions.empty()) {
+		for(size_t i = 0; i < settings->recent_functions.size() && (i < 5 || settings->show_all_functions); i++) {
+			QAction *action = new QAction(QString::fromStdString(settings->recent_functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), recentFunctionsMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(functionActivated()));
+			action->setData(QVariant::fromValue((void*) settings->recent_functions[i]));
+			recentFunctionActions << action;
+		}
+		if(!settings->show_all_functions) {
+			QAction *action = new QAction(recentFunctionsMenu);
+			action->setSeparator(true);
+			recentFunctionActions << action;
+		}
+		recentFunctionsMenu->insertActions(settings->show_all_functions ? NULL : firstFunctionsMenuOptionAction, recentFunctionActions);
+		if(b_empty) {
+			recentFunctionsMenu->hide();
+			recentFunctionsMenu->show();
+			recentFunctionsMenu->hide();
+		}
+	}
+}
+void QalculateWindow::addToRecentFunctions(MathFunction *f) {
+	if(!settings->show_all_functions) {
+		for(size_t i = 0; i < settings->favourite_functions.size(); i++) {
+			if(settings->favourite_functions[i] == f) return;
+		}
+	}
+	for(size_t i = 0; i < settings->recent_functions.size(); i++) {
+		if(settings->recent_functions[i] == f) {
+			if(i == 0) return;
+			settings->recent_functions.erase(settings->recent_functions.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_functions.size() > 10) settings->recent_functions.pop_back();
+	settings->recent_functions.insert(settings->recent_functions.begin(), f);
+	updateRecentFunctions();
+}
+
 void QalculateWindow::updateUnitsMenu() {
 	unitsMenu->clear();
 	for(size_t i = 0; i < settings->favourite_units.size();) {
@@ -1400,17 +1977,317 @@ void QalculateWindow::updateUnitsMenu() {
 			i++;
 		}
 	}
+	for(size_t i = 0; i < settings->recent_units.size();) {
+		if(!CALCULATOR->stillHasUnit(settings->recent_units[i]) || !settings->recent_units[i]->isActive()) {
+			settings->recent_units.erase(settings->recent_units.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	favouriteUnitActions.clear();
+	recentUnitActions.clear();
+	if(settings->show_all_units) {
+
+		tree_struct_m unit_cats;
+		std::vector<Unit*> user_units;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		Unit *u = NULL;
+		unit_cats.items.clear();
+		unit_cats.objects.clear();
+		unit_cats.parent = NULL;
+		user_units.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+			if(CALCULATOR->units[i]->isActive() && (!CALCULATOR->units[i]->isHidden() || CALCULATOR->units[i]->isCurrency())) {
+				if(CALCULATOR->units[i]->isLocal() && !CALCULATOR->units[i]->isBuiltin()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_units.size(); i3++) {
+						u = user_units[i3];
+						if(string_is_less(CALCULATOR->units[i]->title(true, settings->printops.use_unicode_signs), u->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_units.insert(user_units.begin() + i3, CALCULATOR->units[i]);
+							break;
+						}
+					}
+					if(!b) user_units.push_back(CALCULATOR->units[i]);
+				}
+				tree_struct_m *item = &unit_cats;
+				if(!CALCULATOR->units[i]->category().empty()) {
+					cat = CALCULATOR->units[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					u = (Unit*) item->objects[i3];
+					if(string_is_less(CALCULATOR->units[i]->title(true, settings->printops.use_unicode_signs), u->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->units[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->units[i]);
+			}
+		}
+
+		unit_cats.sort();}
+
+		favouriteUnitsMenu = unitsMenu->addMenu(tr("Favorites"));
+		recentUnitsMenu = unitsMenu->addMenu(tr("Recent"));
+		int first_index = 3;
+		QMenu *sub = unitsMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		Unit *u;
+		tree_struct_m *titem, *titem2;
+		unit_cats.rit = unit_cats.items.rbegin();
+		if(unit_cats.rit != unit_cats.items.rend()) {
+			titem = &*unit_cats.rit;
+			++unit_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_units.empty()) {
+			sub = unitsMenu->addMenu(tr("User units"));
+			for(size_t i = 0; i < user_units.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+				action->setData(QVariant::fromValue((void*) user_units[i]));
+			}
+			first_index++;
+		}
+		unitsMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().value(sub3 == unitsMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				bool is_currencies = false;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					u = (Unit*) titem->objects[i];
+					if(!is_currencies && u->isCurrency()) is_currencies = true;
+					if(!u->isHidden()) {
+						action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+						action->setData(QVariant::fromValue((void*) u));
+					}
+				}
+				if(is_currencies) {
+					sub = sub3->addMenu(tr("more"));
+					connect(sub3, SIGNAL(aboutToShow()), this, SLOT(addCurrencyFlagsToMenu()));
+					connect(sub, SIGNAL(aboutToShow()), this, SLOT(addCurrencyFlagsToMenu()));
+					for(size_t i = 0; i < titem->objects.size(); i++) {
+						u = (Unit*) titem->objects[i];
+						if(u->isHidden()) {
+							action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+							action->setData(QVariant::fromValue((void*) u));
+						}
+					}
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < unit_cats.objects.size(); i++) {
+			u = (Unit*) unit_cats.objects[i];
+			if(!u->isLocal()) {
+				action = sub->addAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
+				action->setData(QVariant::fromValue((void*) u));
+			}
+		}
+		unitsMenu->addSeparator();
+		sub = unitsMenu->addMenu(tr("Prefixes"));
+		int index = 0;
+		Prefix *p = CALCULATOR->getPrefix(index);
+		while(p) {
+			QString str = QString::fromStdString(p->preferredDisplayName(false, true, false, false, &can_display_unicode_string_function, (void*) this).name);
+			if(p->type() == PREFIX_DECIMAL) {
+				str += " (10^";
+				str += QString::number(((DecimalPrefix*) p)->exponent());
+				str += ")";
+			} else if(p->type() == PREFIX_BINARY) {
+				str += " (2^";
+				str += QString::number(((DecimalPrefix*) p)->exponent());
+				str += ")";
+			}
+			action = sub->addAction(str, this, SLOT(prefixActivated()));
+			action->setData(QVariant::fromValue((void*) p));
+			index++;
+			p = CALCULATOR->getPrefix(index);
+		}
+		unitsMenu->addSeparator();
+	} else {
+		favouriteUnitsMenu = unitsMenu;
+		recentUnitsMenu = unitsMenu;
+	}
+	QAction *action = unitsMenu->addAction(tr("Show all units"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_units);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllUnits(bool)));
+	firstUnitsMenuOptionAction = action;
+	updateRecentUnits();
+	updateFavouriteUnits();
+	updateAngleUnitsMenu();
+}
+void QalculateWindow::addCurrencyFlagsToMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QList<QAction*> actions = menu->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		QAction *action = actions.at(i);
+		Unit *u = (Unit*) action->data().value<void*>();
+		if(u && u->isCurrency() && QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {
+			action->setIcon(QIcon(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png")));
+		}
+	}
+	disconnect(menu, SIGNAL(aboutToShow()), this, SLOT(addCurrencyFlagsToMenu()));
+}
+void QalculateWindow::showAllUnits(bool b) {
+	settings->show_all_units = b;
+	updateUnitsMenu();
+}
+void QalculateWindow::updateFavouriteUnits() {
+	for(int i = 0; i < favouriteUnitActions.size(); i++) {
+		favouriteUnitsMenu->removeAction(favouriteUnitActions[i]);
+		favouriteUnitActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_units && favouriteUnitActions.isEmpty();
+	favouriteUnitActions.clear();
+	bool update_recent = false;
 	if(!settings->favourite_units.empty()) {
 		std::sort(settings->favourite_units.begin(), settings->favourite_units.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
-			QAction *action = unitsMenu->addAction(QString::fromStdString(settings->favourite_units[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(unitActivated()));
-			action->setData(QVariant::fromValue((void*) settings->favourite_units[i]));
+			Unit *u = settings->favourite_units[i];
+			if(!settings->show_all_units) {
+				for(size_t i2 = 0; i2 < settings->recent_units.size(); i2++) {
+					if(settings->recent_units[i2] == u) {
+						settings->recent_units.erase(settings->recent_units.begin() + i2);
+						update_recent = true;
+						break;
+					}
+				}
+			}
+			QAction *action = new QAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteUnitsMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(unitActivated()));
+			if(u->isCurrency() && QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {
+				action->setIcon(QIcon(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png")));
+			}
+			action->setData(QVariant::fromValue((void*) u));
+			favouriteUnitActions << action;
+		}
+		if(!settings->show_all_units) {
+			QAction *action = new QAction(favouriteUnitsMenu);
+			action->setSeparator(true);
+			favouriteUnitActions << action;
+		}
+		if(update_recent) updateRecentUnits();
+		favouriteUnitsMenu->insertActions(settings->show_all_units ? NULL : (recentUnitActions.isEmpty() ? firstUnitsMenuOptionAction : recentUnitActions.at(0)), favouriteUnitActions);
+		if(b_empty) {
+			favouriteUnitsMenu->hide();
+			favouriteUnitsMenu->show();
+			favouriteUnitsMenu->hide();
 		}
 	}
+}
+void QalculateWindow::updateRecentUnits() {
+	for(int i = 0; i < recentUnitActions.size(); i++) {
+		recentUnitsMenu->removeAction(recentUnitActions[i]);
+		recentUnitActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_units && recentUnitActions.isEmpty();
+	recentUnitActions.clear();
+	if(!settings->recent_units.empty()) {
+		for(size_t i = 0; i < settings->recent_units.size() && (i < 5 || settings->show_all_units); i++) {
+			Unit *u = settings->recent_units[i];
+			QAction *action = new QAction(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), recentUnitsMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(unitActivated()));
+			if(u->isCurrency() && QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {
+				action->setIcon(QIcon(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png")));
+			}
+			action->setData(QVariant::fromValue((void*) u));
+			recentUnitActions << action;
+		}
+		if(!settings->show_all_units) {
+			QAction *action = new QAction(recentUnitsMenu);
+			action->setSeparator(true);
+			recentUnitActions << action;
+		}
+		recentUnitsMenu->insertActions(settings->show_all_units ? NULL : firstUnitsMenuOptionAction, recentUnitActions);
+		if(b_empty) {
+			recentUnitsMenu->hide();
+			recentUnitsMenu->show();
+			recentUnitsMenu->hide();
+		}
+	}
+}
+void QalculateWindow::addToRecentUnits(Unit *u) {
+	if(!settings->show_all_units) {
+		for(size_t i = 0; i < settings->favourite_units.size(); i++) {
+			if(settings->favourite_units[i] == u) return;
+		}
+	}
+	for(size_t i = 0; i < settings->recent_units.size(); i++) {
+		if(settings->recent_units[i] == u) {
+			if(i == 0) return;
+			settings->recent_units.erase(settings->recent_units.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_units.size() > 10) settings->recent_units.pop_back();
+	settings->recent_units.insert(settings->recent_units.begin(), u);
+	updateRecentUnits();
 }
 void QalculateWindow::updateVariablesMenu() {
 	variablesMenu->clear();
 	variablesMenu->addAction(variablesAction);
+	variablesMenu->addSeparator();
 	for(size_t i = 0; i < settings->favourite_variables.size();) {
 		if(!CALCULATOR->stillHasVariable(settings->favourite_variables[i]) || !settings->favourite_variables[i]->isActive()) {
 			settings->favourite_variables.erase(settings->favourite_variables.begin() + i);
@@ -1418,27 +2295,278 @@ void QalculateWindow::updateVariablesMenu() {
 			i++;
 		}
 	}
+	for(size_t i = 0; i < settings->recent_variables.size();) {
+		if(!CALCULATOR->stillHasVariable(settings->recent_variables[i]) || !settings->recent_variables[i]->isActive()) {
+			settings->recent_variables.erase(settings->recent_variables.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	favouriteVariableActions.clear();
+	recentVariableActions.clear();
+	if(settings->show_all_variables) {
+
+		tree_struct_m variable_cats;
+		std::vector<Variable*> user_variables;
+
+		{size_t cat_i, cat_i_prev;
+		bool b;
+		std::string str, cat, cat_sub;
+		Variable *v = NULL;
+		variable_cats.items.clear();
+		variable_cats.objects.clear();
+		variable_cats.parent = NULL;
+		user_variables.clear();
+		std::list<tree_struct_m>::iterator it;
+		for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+			if(CALCULATOR->variables[i]->isActive() && !CALCULATOR->variables[i]->isHidden()) {
+				if(CALCULATOR->variables[i]->isLocal() && !CALCULATOR->variables[i]->isBuiltin()) {
+					b = false;
+					for(size_t i3 = 0; i3 < user_variables.size(); i3++) {
+						v = user_variables[i3];
+						if(string_is_less(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs), v->title(true, settings->printops.use_unicode_signs))) {
+							b = true;
+							user_variables.insert(user_variables.begin() + i3, CALCULATOR->variables[i]);
+							break;
+						}
+					}
+					if(!b) user_variables.push_back(CALCULATOR->variables[i]);
+				}
+				tree_struct_m *item = &variable_cats;
+				if(!CALCULATOR->variables[i]->category().empty()) {
+					cat = CALCULATOR->variables[i]->category();
+					cat_i = cat.find("/"); cat_i_prev = 0;
+					b = false;
+					while(true) {
+						if(cat_i == std::string::npos) {
+							cat_sub = cat.substr(cat_i_prev, cat.length() - cat_i_prev);
+						} else {
+							cat_sub = cat.substr(cat_i_prev, cat_i - cat_i_prev);
+						}
+						b = false;
+						for(it = item->items.begin(); it != item->items.end(); ++it) {
+							if(cat_sub == it->item) {
+								item = &*it;
+								b = true;
+								break;
+							}
+						}
+						if(!b) {
+							tree_struct_m cat;
+							item->items.push_back(cat);
+							it = item->items.end();
+							--it;
+							it->parent = item;
+							item = &*it;
+							item->item = cat_sub;
+						}
+						if(cat_i == std::string::npos) {
+							break;
+						}
+						cat_i_prev = cat_i + 1;
+						cat_i = cat.find("/", cat_i_prev);
+					}
+				}
+				b = false;
+				for(size_t i3 = 0; i3 < item->objects.size(); i3++) {
+					v = (Variable*) item->objects[i3];
+					if(string_is_less(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs), v->title(true, settings->printops.use_unicode_signs))) {
+						b = true;
+						item->objects.insert(item->objects.begin() + i3, (void*) CALCULATOR->variables[i]);
+						break;
+					}
+				}
+				if(!b) item->objects.push_back((void*) CALCULATOR->variables[i]);
+			}
+		}
+
+		variable_cats.sort();}
+
+		favouriteVariablesMenu = variablesMenu->addMenu(tr("Favorites"));
+		recentVariablesMenu = variablesMenu->addMenu(tr("Recent"));
+		int first_index = 5;
+		QMenu *sub = variablesMenu, *sub2, *sub3;
+		QAction *action = NULL;
+		sub2 = sub;
+		Variable *v;
+		tree_struct_m *titem, *titem2;
+		variable_cats.rit = variable_cats.items.rbegin();
+		if(variable_cats.rit != variable_cats.items.rend()) {
+			titem = &*variable_cats.rit;
+			++variable_cats.rit;
+			titem->rit = titem->items.rbegin();
+		} else {
+			titem = NULL;
+		}
+		std::stack<QMenu*> menus;
+		menus.push(sub);
+		sub3 = sub;
+		if(!user_variables.empty()) {
+			sub = variablesMenu->addMenu(tr("User variables"));
+			for(size_t i = 0; i < user_variables.size(); i++) {
+				action = sub->addAction(QString::fromStdString(user_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action->setData(QVariant::fromValue((void*) user_variables[i]));
+			}
+			first_index++;
+		}
+		variablesMenu->addSeparator();
+		while(titem) {
+			if(!titem->items.empty() || !titem->objects.empty()) {
+				gsub("&", "&&", titem->item);
+				sub = new QMenu(QString::fromStdString(titem->item));
+				sub3->insertMenu(sub3->actions().value(sub3 == variablesMenu ? first_index : 0), sub);
+				menus.push(sub);
+				sub3 = sub;
+				for(size_t i = 0; i < titem->objects.size(); i++) {
+					v = (Variable*) titem->objects[i];
+					action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+					action->setData(QVariant::fromValue((void*) v));
+				}
+			} else {
+				titem = titem->parent;
+			}
+			while(titem && titem->rit == titem->items.rend()) {
+				titem = titem->parent;
+				menus.pop();
+				if(menus.size() > 0) sub3 = menus.top();
+			}
+			if(titem) {
+				titem2 = &*titem->rit;
+				++titem->rit;
+				titem = titem2;
+				titem->rit = titem->items.rbegin();
+			}
+		}
+		sub = sub2;
+		for(size_t i = 0; i < variable_cats.objects.size(); i++) {
+			v = (Variable*) variable_cats.objects[i];
+			if(!v->isLocal()) {
+				action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action->setData(QVariant::fromValue((void*) v));
+			}
+		}
+		variablesMenu->addSeparator();
+	} else {
+		favouriteVariablesMenu = variablesMenu;
+		recentVariablesMenu = variablesMenu;
+	}
+	QAction *action = variablesMenu->addAction(tr("Show all variables"));
+	action->setCheckable(true);
+	action->setChecked(settings->show_all_variables);
+	connect(action, SIGNAL(toggled(bool)), this, SLOT(showAllVariables(bool)));
+	firstVariablesMenuOptionAction = action;
+	updateRecentVariables();
+	updateFavouriteVariables();
+}
+void QalculateWindow::showAllVariables(bool b) {
+	settings->show_all_variables = b;
+	updateVariablesMenu();
+}
+void QalculateWindow::updateFavouriteVariables() {
+	for(int i = 0; i < favouriteVariableActions.size(); i++) {
+		favouriteVariablesMenu->removeAction(favouriteVariableActions[i]);
+		favouriteVariableActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_variables && favouriteVariableActions.isEmpty();
+	favouriteVariableActions.clear();
+	bool update_recent = false;
 	if(!settings->favourite_variables.empty()) {
-		bool b = false;
 		std::sort(settings->favourite_variables.begin(), settings->favourite_variables.end(), sort_compare_item);
 		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
-			if(CALCULATOR->stillHasVariable(settings->favourite_variables[i]) && settings->favourite_variables[i]->isActive()) {
-				if(!b) variablesMenu->addSeparator();
-				b = true;
-				QAction *action = variablesMenu->addAction(QString::fromStdString(settings->favourite_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
-				action->setData(QVariant::fromValue((void*) settings->favourite_variables[i]));
+			Variable *v = settings->favourite_variables[i];
+			if(!settings->show_all_variables) {
+				for(size_t i2 = 0; i2 < settings->recent_variables.size(); i2++) {
+					if(settings->recent_variables[i2] == v) {
+						settings->recent_variables.erase(settings->recent_variables.begin() + i2);
+						update_recent = true;
+						break;
+					}
+				}
 			}
+			QAction *action = new QAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), favouriteVariablesMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(variableActivated()));
+			action->setData(QVariant::fromValue((void*) v));
+			favouriteVariableActions << action;
+		}
+		if(!settings->show_all_variables) {
+			QAction *action = new QAction(favouriteVariablesMenu);
+			action->setSeparator(true);
+			favouriteVariableActions << action;
+		}
+		if(update_recent) updateRecentVariables();
+		favouriteVariablesMenu->insertActions(settings->show_all_variables ? NULL : (recentVariableActions.isEmpty() ? firstVariablesMenuOptionAction : recentVariableActions.at(0)), favouriteVariableActions);
+		if(b_empty) {
+			favouriteVariablesMenu->hide();
+			favouriteVariablesMenu->show();
+			favouriteVariablesMenu->hide();
 		}
 	}
 }
+void QalculateWindow::updateRecentVariables() {
+	for(int i = 0; i < recentVariableActions.size(); i++) {
+		recentVariablesMenu->removeAction(recentVariableActions[i]);
+		recentVariableActions[i]->deleteLater();
+	}
+	bool b_empty = settings->show_all_variables && recentVariableActions.isEmpty();
+	recentVariableActions.clear();
+	if(!settings->recent_variables.empty()) {
+		for(size_t i = 0; i < settings->recent_variables.size() && (i < 5 || settings->show_all_variables); i++) {
+			QAction *action = new QAction(QString::fromStdString(settings->recent_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), recentVariablesMenu);
+			connect(action, SIGNAL(triggered()), this, SLOT(variableActivated()));
+			action->setData(QVariant::fromValue((void*) settings->recent_variables[i]));
+			recentVariableActions << action;
+		}
+		if(!settings->show_all_variables) {
+			QAction *action = new QAction(recentVariablesMenu);
+			action->setSeparator(true);
+			recentVariableActions << action;
+		}
+		recentVariablesMenu->insertActions(settings->show_all_variables ? NULL : firstVariablesMenuOptionAction, recentVariableActions);
+		if(b_empty) {
+			recentVariablesMenu->hide();
+			recentVariablesMenu->show();
+			recentVariablesMenu->hide();
+		}
+	}
+}
+void QalculateWindow::addToRecentVariables(Variable *v) {
+	if(!settings->show_all_variables) {
+		for(size_t i = 0; i < settings->favourite_variables.size(); i++) {
+			if(settings->favourite_variables[i] == v) return;
+		}
+	}
+	for(size_t i = 0; i < settings->recent_variables.size(); i++) {
+		if(settings->recent_variables[i] == v) {
+			if(i == 0) return;
+			settings->recent_variables.erase(settings->recent_variables.begin() + i);
+			break;
+		}
+	}
+	if(settings->recent_variables.size() > 10) settings->recent_variables.pop_back();
+	settings->recent_variables.insert(settings->recent_variables.begin(), v);
+	updateRecentVariables();
+}
 void QalculateWindow::variableActivated() {
-	onVariableClicked((Variable*) ((QAction*) sender())->data().value<void*>());
+	Variable *v = (Variable*) ((QAction*) sender())->data().value<void*>();
+	onVariableClicked(v);
+	addToRecentVariables(v);
 }
 void QalculateWindow::unitActivated() {
 	onUnitActivated((Unit*) ((QAction*) sender())->data().value<void*>());
 }
+void QalculateWindow::prefixActivated() {
+	Prefix *p = (Prefix*) ((QAction*) sender())->data().value<void*>();
+	if(!p) return;
+	expressionEdit->blockCompletion();
+	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockCompletion(false);
+}
 void QalculateWindow::functionActivated() {
-	insertFunction((MathFunction*) ((QAction*) sender())->data().value<void*>(), this);
+	MathFunction *f = (MathFunction*) ((QAction*) sender())->data().value<void*>();
+	if(settings->use_function_dialog) insertFunction(f, this);
+	else onFunctionClicked(f);
+	addToRecentFunctions(f);
 }
 void QalculateWindow::registerUp() {
 	if(CALCULATOR->RPNStackSize() <= 1) return;
@@ -1619,7 +2747,7 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		if(do_exec) expressionEdit->blockParseStatus(false);
 	} else if(str == "E" || str == "e") {
 		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
-		else expressionEdit->insertPlainText(settings->printops.lower_case_e ? "e" : "E");
+		else expressionEdit->insertPlainText(settings->printops.exp_display == EXP_UPPERCASE_E ? "E" : "e");
 	} else {
 		if((str == "//" || (s != str && (s_low == "mod" || s_low == "rem"))) && (settings->rpn_mode || expressionEdit->document()->isEmpty() || settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN || (expressionEdit->textCursor().atStart() && !expressionEdit->textCursor().hasSelection()))) {
 			MathFunction *f;
@@ -1745,7 +2873,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 				return;
 			}
 		}
-	} else if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN || (f->minargs() > 1 && ((f->getArgumentDefinition(2) && f->getArgumentDefinition(2)->type() == ARGUMENT_TYPE_INTEGER) xor (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER)))) {
+	} else if(f->id() == FUNCTION_ID_ROOT || f->id() == FUNCTION_ID_LOGN || (f->minargs() == 2 && ((f->getArgumentDefinition(2) && f->getArgumentDefinition(2)->type() == ARGUMENT_TYPE_INTEGER) xor (f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER)))) {
 		size_t index = 2;
 		if(f->id() != FUNCTION_ID_ROOT && f->id() != FUNCTION_ID_LOGN && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->type() == ARGUMENT_TYPE_INTEGER) index = 1;
 		Argument *arg_n = f->getArgumentDefinition(index);
@@ -1833,7 +2961,7 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 		}
 	} else if(cur.hasSelection()) {
 		do_exec = (!sargs.isEmpty() || minargs <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
-	} else if(last_is_number(expressionEdit->toPlainText().toStdString())) {
+	} else if(cur.atEnd() && last_is_number(expressionEdit->toPlainText().toStdString())) {
 		expressionEdit->selectAll();
 		do_exec = !sargs.isEmpty() || minargs <= 1;
 	}
@@ -1865,6 +2993,13 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 	} else {
 		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
+	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+	expressionEdit->blockCompletion(false);
+}
+void QalculateWindow::onPrefixClicked(Prefix *p) {
+	if(!p) return;
+	expressionEdit->blockCompletion();
+	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -1966,7 +3101,7 @@ void QalculateWindow::onAnswerClicked() {
 		onInsertValueRequested(settings->history_answer.size());
 	}
 }
-void QalculateWindow::onBaseClicked(int v, bool b) {
+void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 	if(b && v != settings->evalops.parse_options.base) {
 		settings->evalops.parse_options.base = v;
 		QAction *action = find_child_data(this, "group_inbase", v);
@@ -1979,7 +3114,7 @@ void QalculateWindow::onBaseClicked(int v, bool b) {
 		to_bits = 0;
 		QAction *action = find_child_data(this, "group_outbase", v);
 		if(action) action->setChecked(true);
-		resultFormatUpdated();
+		if(b_update) resultFormatUpdated();
 	}
 	keypad->updateBase();
 }
@@ -1988,6 +3123,9 @@ void QalculateWindow::onFactorizeClicked() {
 }
 void QalculateWindow::onExpandClicked() {
 	executeCommand(COMMAND_EXPAND);
+}
+void QalculateWindow::onExpandPartialFractionsClicked() {
+	executeCommand(COMMAND_EXPAND_PARTIAL_FRACTIONS);
 }
 void QalculateWindow::serverNewConnection() {
 	socket = server->nextPendingConnection();
@@ -1999,8 +3137,7 @@ void QalculateWindow::socketReadyRead() {
 	QString command = socket->readAll();
 	if(!command.isEmpty() && command[0] == '+') {
 		settings->window_state = saveState();
-		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
-		else settings->window_geometry = QByteArray();
+		settings->window_geometry = saveGeometry();
 		settings->splitter_state = ehSplitter->saveState();
 		settings->allow_multiple_instances = true;
 		settings->show_bases = basesDock->isVisible();
@@ -2412,28 +3549,34 @@ void QalculateWindow::setOption(std::string str) {
 			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "round to even") || svar == "rndeven") {
-		bool b = settings->printops.round_halfway_to_even;
+		bool b = (settings->printops.rounding == ROUNDING_HALF_TO_EVEN);
 		SET_BOOL(b)
-		if(b != settings->printops.round_halfway_to_even || settings->rounding_mode == 2) {
-			settings->rounding_mode = b ? 0 : 1;
-			settings->printops.custom_time_zone = 0;
-			settings->printops.round_halfway_to_even = b;
+		if(b != (settings->printops.rounding == ROUNDING_HALF_TO_EVEN)) {
+			settings->printops.rounding = b ? ROUNDING_HALF_TO_EVEN : ROUNDING_HALF_AWAY_FROM_ZERO;
 			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "rounding")) {
 		int v = -1;
-		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even")) v = 1;
-		else if(equalsIgnoreCase(svalue, "standard")) v = 0;
-		else if(equalsIgnoreCase(svalue, "truncate")) v = 2;
+		if(equalsIgnoreCase(svalue, "even") || equalsIgnoreCase(svalue, "round to even") || equalsIgnoreCase(svalue, "half to even")) v = ROUNDING_HALF_TO_EVEN;
+		else if(equalsIgnoreCase(svalue, "standard") || equalsIgnoreCase(svalue, "half away from zero")) v = ROUNDING_HALF_AWAY_FROM_ZERO;
+		else if(equalsIgnoreCase(svalue, "truncate") || equalsIgnoreCase(svalue, "toward zero")) v = ROUNDING_TOWARD_ZERO;
+		else if(equalsIgnoreCase(svalue, "half to odd")) v = ROUNDING_HALF_TO_ODD;
+		else if(equalsIgnoreCase(svalue, "half toward zero")) v = ROUNDING_HALF_TOWARD_ZERO;
+		else if(equalsIgnoreCase(svalue, "half random")) v = ROUNDING_HALF_RANDOM;
+		else if(equalsIgnoreCase(svalue, "half up")) v = ROUNDING_HALF_UP;
+		else if(equalsIgnoreCase(svalue, "half down")) v = ROUNDING_HALF_DOWN;
+		else if(equalsIgnoreCase(svalue, "up")) v = ROUNDING_UP;
+		else if(equalsIgnoreCase(svalue, "down")) v = ROUNDING_DOWN;
+		else if(equalsIgnoreCase(svalue, "away from zero")) v = ROUNDING_AWAY_FROM_ZERO;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
+			if(v == 2) v = ROUNDING_TOWARD_ZERO;
+			else if(v > 2 && v <= ROUNDING_TOWARD_ZERO) v--;
 		}
-		if(v < 0 || v > 2) {
+		if(v < ROUNDING_HALF_AWAY_FROM_ZERO || v > ROUNDING_DOWN) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
-		} else if(v != settings->rounding_mode) {
-			settings->rounding_mode = v;
-			settings->printops.round_halfway_to_even = (v == 1);
-			RESET_SETTINGS_TZ
+		} else if(v != settings->printops.rounding) {
+			settings->printops.rounding = (RoundingMode) v;
 			resultFormatUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "rpn syntax") || svar == "rpnsyn") {
@@ -2460,16 +3603,17 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "short multiplication") || svar == "shortmul") SET_BOOL_D(settings->printops.short_multiplication)
 	else if(equalsIgnoreCase(svar, "simplified percentage") || svar == "percent") SET_BOOL_PT(settings->simplified_percentage)
-	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") SET_BOOL_D(settings->printops.lower_case_e)
-	else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
-	else if(equalsIgnoreCase(svar, "duodecimal symbols") || svar == "duosyms") {
-		bool b = settings->use_duo_syms;
-		SET_BOOL(settings->use_duo_syms)
-		if(b != settings->use_duo_syms) {
-			RESET_SETTINGS_TZ
+	else if(equalsIgnoreCase(svar, "lowercase e") || svar == "lowe") {
+		bool b = (settings->printops.exp_display == EXP_LOWERCASE_E);
+		SET_BOOL(b)
+		if(b != (settings->printops.exp_display == EXP_LOWERCASE_E)) {
+			if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
+			else settings->printops.exp_display = EXP_UPPERCASE_E;
 			resultDisplayUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
+	} else if(equalsIgnoreCase(svar, "lowercase numbers") || svar == "lownum") SET_BOOL_D(settings->printops.lower_case_numbers)
+	else if(equalsIgnoreCase(svar, "duodecimal symbols") || svar == "duosyms") SET_BOOL_D(settings->printops.duodecimal_symbols)
+	else if(equalsIgnoreCase(svar, "imaginary j") || svar == "imgj") {
 		Variable *v_i = CALCULATOR->getVariableById(VARIABLE_ID_I);
 		if(v_i) {
 			bool b = v_i->hasName("j") > 0;
@@ -2502,7 +3646,25 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_D(settings->printops.twos_complement)
 	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
-	else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
+	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
+	else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
+	else if(equalsIgnoreCase(svar, "binary bits") || svar == "bits") {
+		int v = -1;
+		if(empty_value) {
+			v = 0;
+		} else if(svalue.find_first_not_of(SPACES MINUS NUMBERS) == std::string::npos) {
+			v = s2i(svalue);
+			if(v < 0) v = 0;
+		}
+		if(v < 0 || v == 1) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else {
+			settings->printops.binary_bits = v;
+			settings->evalops.parse_options.binary_bits = v;
+			if(settings->evalops.parse_options.twos_complement || settings->evalops.parse_options.hexadecimal_twos_complement) expressionFormatUpdated(true);
+			else resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "digit grouping") || svar =="group") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = DIGIT_GROUPING_NONE;
 		else if(equalsIgnoreCase(svalue, "none")) v = DIGIT_GROUPING_NONE;
@@ -2566,19 +3728,42 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "deg") || equalsIgnoreCase(svalue, "degrees")) v = ANGLE_UNIT_DEGREES;
 		else if(equalsIgnoreCase(svalue, "gra") || equalsIgnoreCase(svalue, "gradians")) v = ANGLE_UNIT_GRADIANS;
 		else if(equalsIgnoreCase(svalue, "none")) v = ANGLE_UNIT_NONE;
+		else if(equalsIgnoreCase(svalue, "custom")) v = ANGLE_UNIT_CUSTOM;
 		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
-		}
-		if(v < 0 || v > 3) {
-			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
-			QAction *w = find_child_data(this, "group_angleunit", v);
+			Unit *u = CALCULATOR->getActiveUnit(svalue);
+			if(u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1 && u->isActive() && u->isRegistered() && !u->isHidden()) {
+				if(u == CALCULATOR->getRadUnit()) v = ANGLE_UNIT_RADIANS;
+				else if(u == CALCULATOR->getGraUnit()) v = ANGLE_UNIT_GRADIANS;
+				else if(u == CALCULATOR->getDegUnit()) v = ANGLE_UNIT_DEGREES;
+				else {v = ANGLE_UNIT_CUSTOM; CALCULATOR->setCustomAngleUnit(u);}
+			}
+		}
+		if(v < 0 || v > 4) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) {
+			CALCULATOR->error(true, "Please specify a custom angle unit as argument (e.g. set angle arcsec).", NULL);
+		} else {
+			QAction *w;
+			if(v == ANGLE_UNIT_CUSTOM) {
+				w = findChild<QAction*>("action_angle_unit" + QString::fromStdString(CALCULATOR->customAngleUnit()->referenceName()));
+			} else {
+				w = find_child_data(this, "group_angleunit", v);
+			}
 			if(w) w->setChecked(true);
 			settings->evalops.parse_options.angle_unit = (AngleUnit) v;
 			expressionFormatUpdated(true);
 		}
 	} else if(equalsIgnoreCase(svar, "caret as xor") || equalsIgnoreCase(svar, "xor^")) SET_BOOL_PT(settings->caret_as_xor)
-	else if(equalsIgnoreCase(svar, "parsing mode") || svar == "parse" || svar == "syntax") {
+	else if(equalsIgnoreCase(svar, "concise uncertainty") || equalsIgnoreCase(svar, "concise")) {
+		bool b = CALCULATOR->conciseUncertaintyInputEnabled();
+		SET_BOOL(b)
+		if(b != CALCULATOR->conciseUncertaintyInputEnabled()) {
+			CALCULATOR->setConciseUncertaintyInputEnabled(b);
+			expressionFormatUpdated(false);
+		}
+	} else if(equalsIgnoreCase(svar, "parsing mode") || svar == "parse" || svar == "syntax") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "adaptive")) v = PARSING_MODE_ADAPTIVE;
 		else if(equalsIgnoreCase(svalue, "implicit first")) v = PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST;
@@ -2764,17 +3949,28 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			settings->save_defs_on_exit = false;
 		}
-	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp") {
+	} else if(equalsIgnoreCase(svar, "scientific notation") || svar == "exp mode" || svar == "exp" || svar == "exp display" || svar == "edisp") {
 		int v = -1;
 		bool valid = true;
-		if(equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
-		else if(equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
-		else if(equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
-		else if(empty_value || equalsIgnoreCase(svalue, "scientific")) v = EXP_SCIENTIFIC;
-		else if(equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
-		else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) v = s2i(svalue);
-		else valid = false;
-		if(valid) {
+		bool display = (svar == "exp display" || svar == "edisp");
+		if(!display && equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
+		else if(!display && equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
+		else if(!display && equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
+		else if(!display && (empty_value || equalsIgnoreCase(svalue, "scientific"))) v = EXP_SCIENTIFIC;
+		else if(!display && equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
+		else if(svalue == "E" || (display && empty_value && settings->printops.exp_display == EXP_POWER_OF_10)) {v = EXP_UPPERCASE_E; display = true;}
+		else if(svalue == "e") {v = EXP_LOWERCASE_E; display = true;}
+		else if((display && svalue == "10") || (display && empty_value && settings->printops.exp_display != EXP_POWER_OF_10) || svalue == "pow" || svalue == "pow10" || equalsIgnoreCase(svalue, "power") || equalsIgnoreCase(svalue, "power of 10")) {
+			v = EXP_POWER_OF_10;
+			display = 1;
+		} else if(svalue.find_first_not_of(SPACES NUMBERS MINUS) == std::string::npos) {
+			v = s2i(svalue);
+			if(display) v++;
+		} else valid = false;
+		if(display && valid && (v >= EXP_UPPERCASE_E && v <= EXP_POWER_OF_10)) {
+			settings->printops.exp_display = (ExpDisplay) v;
+			resultDisplayUpdated();
+		} else if(!display && valid) {
 			settings->printops.min_exp = v;
 			QAction *action = find_child_data(this, "group_general", v);
 			if(action) {
@@ -2797,6 +3993,7 @@ void QalculateWindow::setOption(std::string str) {
 				w->blockSignals(false);
 			}
 			CALCULATOR->setPrecision(v);
+			settings->previous_precision = 0;
 			expressionCalculationUpdated();
 		}
 	} else if(equalsIgnoreCase(svar, "interval display") || svar == "ivdisp") {
@@ -2808,6 +4005,8 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "midpoint")) v = INTERVAL_DISPLAY_MIDPOINT + 1;
 		else if(equalsIgnoreCase(svalue, "upper")) v = INTERVAL_DISPLAY_UPPER + 1;
 		else if(equalsIgnoreCase(svalue, "lower")) v = INTERVAL_DISPLAY_LOWER + 1;
+		else if(equalsIgnoreCase(svalue, "concise")) v = INTERVAL_DISPLAY_CONCISE + 1;
+		else if(equalsIgnoreCase(svalue, "relative")) v = INTERVAL_DISPLAY_RELATIVE + 1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
 		}
@@ -2817,7 +4016,7 @@ void QalculateWindow::setOption(std::string str) {
 			resultFormatUpdated();
 		} else {
 			v--;
-			if(v < INTERVAL_DISPLAY_SIGNIFICANT_DIGITS || v > INTERVAL_DISPLAY_UPPER) {
+			if(v < INTERVAL_DISPLAY_SIGNIFICANT_DIGITS || v > INTERVAL_DISPLAY_RELATIVE) {
 				CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 			} else {
 				settings->adaptive_interval_display = false;
@@ -2884,16 +4083,28 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "auto")) v = -1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
+			if(v == FRACTION_COMBINED + 1) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 1;
+			else if(v == FRACTION_COMBINED + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 2;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR;
+		} else {
+			int tofr = 0;
+			long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(svalue), tofr, QString(), true);
+			if(fden != 0) {
+				if(tofr == 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				else v = FRACTION_COMBINED_FIXED_DENOMINATOR;
+				if(fden > 0) CALCULATOR->setFixedDenominator(fden);
+			}
 		}
-		if(v > FRACTION_COMBINED + 2) {
+		if(v > FRACTION_COMBINED_FIXED_DENOMINATOR + 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
-		} else if(v < 0 || v > FRACTION_COMBINED + 1) {
+		} else {
 			settings->printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
 			if(v < 0) settings->dual_fraction = -1;
-			else if(v == FRACTION_COMBINED + 2) settings->dual_fraction = 1;
+			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) settings->dual_fraction = 1;
 			else settings->dual_fraction = 0;
-			if(v == FRACTION_COMBINED + 1) v = FRACTION_FRACTIONAL;
-			else if(v < 0 || v == FRACTION_COMBINED + 2) v = FRACTION_DECIMAL;
+			if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL;
+			else if(v < 0 || v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_DECIMAL;
 			settings->printops.number_fraction_format = (NumberFractionFormat) v;
 			resultFormatUpdated();
 		}
@@ -3042,7 +4253,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(!do_stack) stack_index = 0;
 
 	if(execute_str.empty()) {
-		to_fraction = false; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
+		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
 	}
 	bool current_expr = false;
 	if(str.empty() && !do_mathoperation) {
@@ -3343,6 +4554,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(unitsDialog) unitsDialog->updateUnits();
 					if(current_expr) expressionEdit->clear();
 				} else {
+					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
 					if(f && f->isLocal()) {
 						f->destroy();
@@ -3350,6 +4562,31 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						if(functionsDialog) functionsDialog->updateFunctions();
 						if(current_expr) expressionEdit->clear();
 					} else {
+						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
+					}
+				}
+			} else if(equalsIgnoreCase(scom, "keep")) {
+				str = str.substr(ispace + 1, slen - (ispace + 1));
+				remove_blank_ends(str);
+				Variable *v = CALCULATOR->getActiveVariable(str);
+				bool b = v && v->isLocal();
+				if(b && v->category() == CALCULATOR->temporaryCategory()) {
+					v->setCategory("");
+					expressionEdit->updateCompletion();
+					if(variablesDialog) variablesDialog->updateVariables();
+					if(unitsDialog) unitsDialog->updateUnits();
+					if(current_expr) expressionEdit->clear();
+				} else {
+					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
+					MathFunction *f = CALCULATOR->getActiveFunction(str);
+					if(f && f->isLocal()) {
+						if(f->category() == CALCULATOR->temporaryCategory()) {
+							f->setCategory("");
+							expressionEdit->updateCompletion();
+							if(functionsDialog) functionsDialog->updateFunctions();
+							if(current_expr) expressionEdit->clear();
+						}
+					} else if(!b) {
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
 					}
 				}
@@ -3626,11 +4863,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	ComplexNumberForm cnf_bak = settings->evalops.complex_number_form;
+	ComplexNumberForm cnf = settings->evalops.complex_number_form;
+	bool delay_complex = false;
 	bool b_units_saved = settings->evalops.parse_options.units_enabled;
 	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
 	MixedUnitsConversion save_mixed_units_conversion = settings->evalops.mixed_units_conversion;
 
-	bool had_to_expression = false;
+	had_to_expression = false;
 	std::string from_str = str;
 	bool last_is_space = !from_str.empty() && is_in(SPACES, from_str[from_str.length() - 1]);
 	if(execute_str.empty() && CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true, !do_stack)) {
@@ -3667,14 +4906,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "duo") || equalsIgnoreCase(to_str, "duodecimal") || equalsIgnoreCase(to_str, tr("duodecimal").toStdString())) {
 				to_base = BASE_DUODECIMAL;
+				to_duo_syms = false;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "doz") || equalsIgnoreCase(to_str, "dozenal")) {
 				to_base = BASE_DUODECIMAL;
-				if(!settings->use_duo_syms && settings->printops.time_zone != TIME_ZONE_CUSTOM) {
-					settings->use_duo_syms = true;
-					RESET_SETTINGS_TZ
-					settings->use_duo_syms = false;
-				}
+				to_duo_syms = true;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "bin") || equalsIgnoreCase(to_str, "binary") || equalsIgnoreCase(to_str, tr("binary").toStdString())) {
 				to_base = BASE_BINARY;
@@ -3781,7 +5017,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -3792,7 +5027,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					setResult(NULL, true, false, false); if(current_expr) setPreviousExpression();
-					RESET_SETTINGS_TZ
 					settings->printops.time_zone = TIME_ZONE_LOCAL;
 					return;
 				}
@@ -3816,62 +5050,65 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_calendars = true;
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str, "rectangular") || equalsIgnoreCase(to_str, "cartesian") || equalsIgnoreCase(to_str, tr("rectangular").toStdString()) || equalsIgnoreCase(to_str, tr("cartesian").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			} else if(equalsIgnoreCase(to_str, "exponential") || equalsIgnoreCase(to_str, tr("exponential").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_EXPONENTIAL;
 			} else if(equalsIgnoreCase(to_str, "polar") || equalsIgnoreCase(to_str, tr("polar").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_POLAR;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_POLAR;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
-				to_caf = 0;
-				do_to = true;
+				cnf = COMPLEX_NUMBER_FORM_POLAR;
 			} else if(to_str == "cis") {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 				to_caf = 0;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_CIS;
 			} else if(equalsIgnoreCase(to_str, "phasor") || equalsIgnoreCase(to_str, tr("phasor").toStdString()) || equalsIgnoreCase(to_str, "angle") || equalsIgnoreCase(to_str, tr("angle").toStdString())) {
-				settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 				to_caf = 1;
 				do_to = true;
 				if(from_str.empty()) {
+					settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
 					b_busy--;
 					executeCommand(COMMAND_EVAL);
 					if(current_expr) setPreviousExpression();
 					settings->evalops.complex_number_form = cnf_bak;
 					return;
 				}
+				cnf = COMPLEX_NUMBER_FORM_CIS;
 			} else if(equalsIgnoreCase(to_str, "optimal") || equalsIgnoreCase(to_str, tr("optimal").toStdString())) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -3882,6 +5119,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_OPTIMAL_SI;
 				str_conv = "";
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "prefix") || equalsIgnoreCase(to_str, tr("prefix").toStdString())) {
+				settings->evalops.parse_options.units_enabled = true;
+				to_prefix = 1;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base").toStdString())) {
 				if(from_str.empty()) {
@@ -3908,9 +5149,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					return;
 				}
 				do_to = true;
-			} else if(equalsIgnoreCase(to_str, "fraction") || equalsIgnoreCase(to_str, tr("fraction").toStdString())) {
-				do_to = true;
-				to_fraction = true;
 			} else if(equalsIgnoreCase(to_str, "factors") || equalsIgnoreCase(to_str, tr("factors").toStdString()) || equalsIgnoreCase(to_str, "factor")) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -3931,22 +5169,34 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
+				to_duo_syms = false;
 				do_to = true;
-			} else if(from_str.empty()) {
-				b_busy--;
-				executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(to_str, settings->evalops.parse_options));
-				if(current_expr) setPreviousExpression();
-				return;
+			} else if(equalsIgnoreCase(to_str, "decimals") || equalsIgnoreCase(to_str, tr("decimals").toStdString())) {
+				to_fixed_fraction = 0;
+				to_fraction = 3;
+				do_to = true;
 			} else {
-				if(to_str[0] == '?') {
-					to_prefix = 1;
-				} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
-					to_prefix = to_str[0];
-
-				}
 				do_to = true;
-				if(!str_conv.empty()) str_conv += " to ";
-				str_conv += to_str;
+				long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(to_str), to_fraction, tr("fraction"));
+				if(fden != 0) {
+					if(fden < 0) to_fixed_fraction = 0;
+					else to_fixed_fraction = fden;
+				} else if(from_str.empty()) {
+					b_busy--;
+					executeCommand(COMMAND_CONVERT_STRING, true, CALCULATOR->unlocalizeExpression(to_str, settings->evalops.parse_options));
+					if(current_expr) setPreviousExpression();
+					return;
+				} else {
+					if(to_str[0] == '?') {
+						to_prefix = 1;
+					} else if(to_str.length() > 1 && to_str[1] == '?' && (to_str[0] == 'b' || to_str[0] == 'a' || to_str[0] == 'd')) {
+						to_prefix = to_str[0];
+					}
+					Unit *u = CALCULATOR->getActiveUnit(to_str);
+					if(delay_complex != (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS) && u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1) delay_complex = !delay_complex;
+					if(!str_conv.empty()) str_conv += " to ";
+					str_conv += to_str;
+				}
 			}
 			if(str_left.empty()) break;
 			to_str = str_left;
@@ -3967,6 +5217,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
+	if(!delay_complex || (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS)) {
+		settings->evalops.complex_number_form = cnf;
+		delay_complex = false;
+	} else {
+		settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
+	}
+
 	if(execute_str.empty()) {
 		size_t i = str.find_first_of(SPACES LEFT_PARENTHESIS);
 		if(i != std::string::npos) {
@@ -3979,11 +5236,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_expand = true;
 			}
 		}
-	}
-
-	if(!do_stack && expression_contains_save_function(execute_str.empty() ? str : execute_str, settings->evalops.parse_options, true)) {
-		if(execute_str.empty()) execute_str = str;
-		transform_expression_for_equals_save(execute_str, settings->evalops.parse_options);
 	}
 
 	size_t stack_size = 0;
@@ -4014,6 +5266,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			else CALCULATOR->calculateRPN(op, 0, settings->evalops, parsed_mstruct);
 		} else {
 			std::string str2 = CALCULATOR->unlocalizeExpression(execute_str.empty() ? str : execute_str, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str2, settings->evalops.parse_options);
 			CALCULATOR->parseSigns(str2);
 			remove_blank_ends(str2);
 			MathStructure lastx_bak(lastx);
@@ -4142,6 +5395,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	} else {
 		original_expression = CALCULATOR->unlocalizeExpression(execute_str.empty() ? str : execute_str, settings->evalops.parse_options);
+		transform_expression_for_equals_save(original_expression, settings->evalops.parse_options);
 		CALCULATOR->calculate(mstruct, original_expression, 0, settings->evalops, parsed_mstruct, parsed_tostruct);
 	}
 
@@ -4176,6 +5430,22 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		dialog->hide();
 		dialog->deleteLater();
 		if(title_set) updateWindowTitle();
+	}
+
+	if(delay_complex) {
+		settings->evalops.complex_number_form = cnf;
+		CALCULATOR->startControl(100);
+		if(!settings->rpn_mode) {
+			if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mstruct->complexToCisForm(settings->evalops);
+			else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mstruct->complexToPolarForm(settings->evalops);
+		} else if(!do_stack) {
+			MathStructure *mreg = CALCULATOR->getRPNRegister(do_stack ? stack_index + 1 : 1);
+			if(mreg) {
+				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mreg->complexToCisForm(settings->evalops);
+				else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mreg->complexToPolarForm(settings->evalops);
+			}
+		}
+		CALCULATOR->stopControl();
 	}
 
 	if(settings->rpn_mode && !do_stack) {
@@ -4252,7 +5522,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
 		settings->evalops.parse_options.units_enabled = b_units_saved;
 		settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-		RESET_SETTINGS_TZ
 		settings->printops.time_zone = TIME_ZONE_LOCAL;
 		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 		return;
@@ -4282,7 +5551,15 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		long int i_timeleft = 0;
 		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
 		if(i_timeleft > 0) {
+			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mstruct_exact, mstruct, original_expression, parsed_mstruct, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), i_timeleft, -1);
+			if(delay_complex && !mstruct_exact.isUndefined()) {
+				settings->evalops.complex_number_form = cnf;
+				CALCULATOR->startControl(100);
+				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mstruct_exact.complexToCisForm(settings->evalops);
+				else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mstruct_exact.complexToPolarForm(settings->evalops);
+				CALCULATOR->stopControl();
+			}
 		}
 	}
 
@@ -4317,7 +5594,6 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
 	settings->evalops.parse_options.units_enabled = b_units_saved;
 	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-	RESET_SETTINGS_TZ
 	settings->printops.time_zone = TIME_ZONE_LOCAL;
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
@@ -4358,6 +5634,25 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->setExpressionHasChanged(false);
+		if(settings->autocopy_result) {
+			if(settings->copy_ascii) {
+				std::string str = result_text;
+				if(settings->copy_ascii_without_units) {
+					size_t i = str.find("<span style=\"color:#008000\">");
+					if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+					if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+						str = str.substr(0, i);
+					}
+				}
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(uncolorize(result_text)));
+				qm->setText(QString::fromStdString(unhtmlize(result_text)));
+				qm->setObjectName("history_result");
+				QApplication::clipboard()->setMimeData(qm);
+			}
+		}
 	}
 
 	if(CALCULATOR->checkSaveFunctionCalled()) {
@@ -4592,8 +5887,9 @@ void QalculateWindow::updateResultBases() {
 	if(result_bin.length() == 79) {
 		QString sbin1 = QString::fromStdString(result_bin.substr(0, 39));
 		sbin1.replace(" ", "&nbsp;</td><td>");
+		int i1 = sbin1.length();
 		sbin1 += "</td></tr><tr>";
-		for(int i = 63; i > 31; i -= 8) {
+		for(int i = 64; i > 32; i -= 8) {
 			sbin1 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
 			sbin1 += QString::number(i);
 			sbin1 += "</font></td>";
@@ -4601,13 +5897,38 @@ void QalculateWindow::updateResultBases() {
 		sbin1 += "</tr><tr><td>";
 		QString sbin2 = QString::fromStdString(result_bin.substr(40));
 		sbin2.replace(" ", "&nbsp;</td><td>");
+		int i2 = sbin2.length();
 		sbin2 += "</td></tr><tr>";
-		for(int i = 31; i >= 0; i -= 8) {
+		for(int i = 32; i > 0; i -= 8) {
 			sbin2 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
 			sbin2 += QString::number(i);
 			sbin2 += "</font></td>";
 		}
 		sbin2 += "</tr><table>";
+		int n = 1;
+		QString link_color = binEdit->palette().text().color().name();
+		bool inhtml = false;
+		for(; i2 >= 0; i2--) {
+			if(sbin2[i2] == '>') {
+				inhtml = true;
+			} else if(sbin2[i2] == '<') {
+				inhtml = false;
+			} else if(!inhtml && (sbin2[i2] == '0' || sbin2[i2] == '1')) {
+				sbin2.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin2[i2]).arg(link_color));
+				n++;
+			}
+		}
+		inhtml = false;
+		for(; i1 >= 0; i1--) {
+			if(sbin1[i1] == '>') {
+				inhtml = true;
+			} else if(sbin1[i1] == '<') {
+				inhtml = false;
+			} else if(!inhtml && (sbin1[i1] == '0' || sbin1[i1] == '1')) {
+				sbin1.replace(i1, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin1[i1]).arg(link_color));
+				n++;
+			}
+		}
 		binEdit->setText("<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>" + sbin1 + sbin2);
 	} else {
 		binEdit->setText(QString::fromStdString(result_bin));
@@ -4615,6 +5936,24 @@ void QalculateWindow::updateResultBases() {
 	octEdit->setText(QString::fromStdString(result_oct));
 	decEdit->setText(QString::fromStdString(result_dec));
 	hexEdit->setText(QString::fromStdString(result_hex));
+}
+void QalculateWindow::resultBasesLinkActivated(const QString &s) {
+	size_t n = s.toInt();
+	n += (n - 1) / 4;
+	if(n > result_bin.length()) return;
+	n = result_bin.length() - n;
+	if(result_bin[n] == '0') result_bin[n] = '1';
+	else if(result_bin[n] == '1') result_bin[n] = '0';
+	ParseOptions pa;
+	pa.base = BASE_BINARY;
+	pa.twos_complement = true;
+	PrintOptions po;
+	po.base = settings->evalops.parse_options.base;
+	po.twos_complement = settings->evalops.parse_options.twos_complement;
+	po.min_exp = 0;
+	po.preserve_precision = true;
+	po.base_display = BASE_DISPLAY_NONE;
+	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
 }
 
 void set_result_bases(const MathStructure &m) {
@@ -4662,7 +6001,7 @@ void set_result_bases(const MathStructure &m) {
 }
 
 bool contains_plot_or_save(const std::string &str) {
-	if(expression_contains_save_function(str, settings->evalops.parse_options, false)) return true;
+	if(expression_contains_save_function(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops.parse_options, false)) return true;
 	MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_PLOT);
 	for(size_t i = 1; f && i <= f->countNames(); i++) {
 		if(str.find(f->getName(i).name) != std::string::npos) return true;
@@ -4671,7 +6010,7 @@ bool contains_plot_or_save(const std::string &str) {
 }
 
 void QalculateWindow::onExpressionChanged() {
-	toAction->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
+	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
 	if(!expressionEdit->expressionHasChanged() || !basesDock->isVisible()) return;
 	MathStructure m;
 	EvaluationOptions eo = settings->evalops;
@@ -4736,10 +6075,9 @@ void ViewThread::run() {
 			if(!read(&po.is_approximate)) break;
 			if(!read<bool>(&po.preserve_format)) break;
 			po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;
-			po.lower_case_e = settings->printops.lower_case_e;
+			po.exp_display = settings->printops.exp_display;
 			po.lower_case_numbers = settings->printops.lower_case_numbers;
-			po.custom_time_zone = settings->printops.custom_time_zone;
-			po.round_halfway_to_even = settings->printops.round_halfway_to_even;
+			po.rounding = settings->printops.rounding;
 			po.base_display = settings->printops.base_display;
 			po.twos_complement = settings->printops.twos_complement;
 			po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
@@ -4769,7 +6107,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
-			parsed_text = mp.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+			parsed_text = mp.print(po, settings->format_result, settings->color, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);
 			}
@@ -4800,12 +6138,12 @@ void ViewThread::run() {
 
 		po.allow_non_usable = true;
 
-		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+		print_dual(*mresult, original_expression, mparse ? *mparse : *parsed_mstruct, mstruct_exact, result_text, alt_results, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, mparse != NULL, settings->format_result, settings->color, TAG_TYPE_HTML, -1, had_to_expression);
 
 		if(!prepend_mstruct.isUndefined() && !CALCULATOR->aborted()) {
 			prepend_mstruct.format(po);
 			po.min_exp = 0;
-			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML));
+			alt_results.insert(alt_results.begin(), prepend_mstruct.print(po, settings->format_result, settings->color, TAG_TYPE_HTML));
 		}
 
 		if(!b_stack) {
@@ -4855,6 +6193,40 @@ void ViewThread::run() {
 		CALCULATOR->stopControl();
 
 	}
+}
+
+int intervals_are_relative(MathStructure &m) {
+	int ret = -1;
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_UNCERTAINTY && m.size() == 3) {
+		if(m[2].isOne() && m[1].isMultiplication() && m[1].size() > 1 && m[1].last().isVariable() && (m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD))) {
+			ret = 1;
+		} else {
+			return 0;
+		}
+	}
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_INTERVAL) return 0;
+	for(size_t i = 0; i < m.size(); i++) {
+		int ret_i = intervals_are_relative(m[i]);
+		if(ret_i == 0) return 0;
+		else if(ret_i > 0) ret = ret_i;
+	}
+	return ret;
+}
+
+bool contains_rand_function(const MathStructure &m) {
+	if(m.isFunction() && m.function()->category() == CALCULATOR->getFunctionById(FUNCTION_ID_RAND)->category()) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_rand_function(m[i])) return true;
+	}
+	return false;
+}
+
+bool contains_fraction_qt(const MathStructure &m) {
+	if(m.isNumber()) return !m.number().isInteger();
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_fraction_qt(m[i])) return true;
+	}
+	return false;
 }
 
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
@@ -4919,8 +6291,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				} else {
 					if(settings->adaptive_interval_display) {
 						QString expression_str = expressionEdit->toPlainText();
-						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-						else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
+						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) {
+							if(parsed_mstruct && intervals_are_relative(*parsed_mstruct) > 0) settings->printops.interval_display = INTERVAL_DISPLAY_RELATIVE;
+							else settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+						} else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
 						else settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
 					}
 				}
@@ -4949,14 +6323,18 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	bool save_den = settings->printops.use_denominator_prefix;
 	int save_bin = CALCULATOR->usesBinaryPrefixes();
 	NumberFractionFormat save_format = settings->printops.number_fraction_format;
+	long int save_fden = CALCULATOR->fixedDenominator();
 	bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
+	int save_dual = settings->dual_fraction;
+	bool save_duo_syms = settings->printops.duodecimal_symbols;
 	bool do_to = false;
 
 	if(!do_stack) {
-		if(to_base != 0 || to_fraction || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
-			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()))) {
+		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
+			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms != settings->printops.duodecimal_symbols))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
+				settings->printops.duodecimal_symbols = to_duo_syms;
 				if(to_base == BASE_CUSTOM) {
 					custom_base_set = true;
 					save_nbase = CALCULATOR->customOutputBase();
@@ -4964,9 +6342,18 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				}
 				do_to = true;
 			}
-			if(to_fraction && (settings->printops.restrict_fraction_length || settings->printops.number_fraction_format != FRACTION_COMBINED)) {
+			if(to_fixed_fraction >= 2) {
+				if(to_fraction == 2 || (to_fraction < 0 && !contains_fraction_qt(*mstruct))) settings->printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				else settings->printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
+				CALCULATOR->setFixedDenominator(to_fixed_fraction);
+				settings->dual_fraction = 0;
+				do_to = true;
+			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || settings->printops.restrict_fraction_length || (to_fraction != 2 && settings->printops.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && settings->printops.number_fraction_format != FRACTION_FRACTIONAL) || (to_fraction == 3 && settings->printops.number_fraction_format != FRACTION_DECIMAL))) {
 				settings->printops.restrict_fraction_length = false;
-				settings->printops.number_fraction_format = FRACTION_COMBINED;
+				if(to_fraction == 3) settings->printops.number_fraction_format = FRACTION_DECIMAL;
+				else if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
+				else settings->printops.number_fraction_format = FRACTION_COMBINED;
+				settings->dual_fraction = 0;
 				do_to = true;
 			}
 			if(to_caf >= 0 && to_caf != settings->complex_angle_form) {
@@ -5130,7 +6517,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		size_t index = settings->v_expression.size();
 		while(index > 0 && settings->v_delexpression[index - 1]) index--;
 		bool b_add = true;
-		if(index > 0 && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1])) && alt_results.size() <= settings->v_result[index - 1].size()) {
+		if(index > 0 && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1] && !contains_rand_function(*parsed_mstruct))) && alt_results.size() <= settings->v_result[index - 1].size()) {
 			b_add = false;
 			for(size_t i = 0; i < alt_results.size(); i++) {
 				if(settings->v_delresult[index - 1][i] || settings->v_exact[index - 1][i] != (b_exact || i < alt_results.size() - 1) || settings->v_result[index - 1][i] != alt_results[i]) {
@@ -5149,6 +6536,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	if(do_to) {
 		settings->complex_angle_form = caf_bak;
 		settings->printops.base = save_base;
+		settings->printops.duodecimal_symbols = save_duo_syms;
 		settings->printops.binary_bits = save_bits;
 		if(custom_base_set) CALCULATOR->setCustomOutputBase(save_nbase);
 		settings->printops.use_unit_prefixes = save_pre;
@@ -5158,6 +6546,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		settings->printops.use_denominator_prefix = save_den;
 		CALCULATOR->useBinaryPrefixes(save_bin);
 		settings->printops.number_fraction_format = save_format;
+		CALCULATOR->setFixedDenominator(save_fden);
+		settings->dual_fraction = save_dual;
 		settings->printops.restrict_fraction_length = save_restrict_fraction_length;
 	}
 	settings->printops.prefix = NULL;
@@ -5189,14 +6579,24 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 }
 
+bool QalculateWindow::eventFilter(QObject*, QEvent *e) {
+	if(e->type() == QEvent::ToolTip) return true;
+	return false;
+}
+
+void QalculateWindow::onColorSchemeChanged() {
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	settings->updatePalette(true);
+#endif
+}
 void QalculateWindow::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
 		QColor c = QApplication::palette().base().color();
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
 		menuAction_t->setIcon(LOAD_ICON("menu"));
-		toAction->setIcon(LOAD_ICON("convert"));
-		storeAction->setIcon(LOAD_ICON("document-save"));
+		toAction_t->setIcon(LOAD_ICON("convert"));
+		storeAction_t->setIcon(LOAD_ICON("document-save"));
 		functionsAction_t->setIcon(LOAD_ICON("function"));
 		unitsAction_t->setIcon(LOAD_ICON("units"));
 		if(plotAction_t) plotAction_t->setIcon(LOAD_ICON("plot"));
@@ -5478,31 +6878,61 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	else settings->window_geometry = QByteArray();
 	settings->splitter_state = ehSplitter->saveState();
 	settings->show_bases = basesDock->isVisible();
-	settings->savePreferences(settings->save_mode_on_exit);
-	if(settings->save_defs_on_exit) CALCULATOR->saveDefinitions();
+	if(settings->savePreferences(settings->save_mode_on_exit) < 0) return;
+	if(settings->save_defs_on_exit) {
+		while(!CALCULATOR->saveDefinitions()) {
+			int answer = QMessageBox::critical(this, tr("Error"), tr("Couldn't write definitions"), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+			if(answer == QMessageBox::Ignore) break;
+			else if(answer == QMessageBox::Cancel) return;
+		}
+	}
 	CALCULATOR->abort();
+	CALCULATOR->terminateThreads();
+	if(commandThread->running) {
+		commandThread->write((int) 0);
+		commandThread->write(NULL);
+	}
+	if(viewThread->running) {
+		viewThread->write((int) 0);
+		viewThread->write(NULL);
+	}
 	QMainWindow::closeEvent(e);
 	qApp->closeAllWindows();
 }
 
 void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
-	QPoint pos = tb->mapToGlobal(tb->widgetForAction(toAction)->geometry().topRight());
-	if(!expressionEdit->expressionHasChanged() && settings->current_result) {
-		if(expressionEdit->complete(mstruct, pos)) return;
+	bool b_result = !expressionEdit->expressionHasChanged() && settings->current_result;
+	bool b_addto = !b_result;
+	if(b_addto && button && CALCULATOR->hasToExpression(expressionEdit->toPlainText().toStdString(), true, settings->evalops)) {
+		std::string str = expressionEdit->toPlainText().toStdString(), to_str;
+		CALCULATOR->separateToExpression(str, to_str, settings->evalops, true, true);
+		if(to_str.empty()) b_addto = false;
 	}
-	expressionEdit->blockCompletion(true, button);
-	expressionEdit->blockParseStatus();
-	expressionEdit->moveCursor(QTextCursor::End);
-	expressionEdit->insertPlainText("➞");
-	expressionEdit->blockParseStatus(false);
-	expressionEdit->displayParseStatus(true, false);
-	expressionEdit->complete(NULL, button ? pos : QPoint());
-	expressionEdit->blockCompletion(false);
+	if(!b_result) expressionEdit->blockCompletion(true, button);
+	if(b_addto) {
+		expressionEdit->blockParseStatus();
+		expressionEdit->moveCursor(QTextCursor::End);
+		expressionEdit->insertPlainText("➞");
+		expressionEdit->blockParseStatus(false);
+		expressionEdit->displayParseStatus(true, false);
+	}
+	if(b_result || button) {
+		expressionEdit->complete(b_result ? mstruct : NULL, b_result ? parsed_mstruct : NULL, toMenu);
+		if(!toMenu->isEmpty()) {
+			toAction_t->setMenu(toMenu);
+			toAction_t->showMenu();
+			toAction_t->setMenu(NULL);
+			toMenu->clear();
+		}
+	} else {
+		expressionEdit->complete();
+	}
+	if(!b_result) expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
-	if(str[str.length() - 1] == ' ') expressionEdit->insertPlainText(QString::fromStdString(str));
+	if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertPlainText(QString::fromStdString(str));
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::importCSV() {
@@ -5592,6 +7022,10 @@ void QalculateWindow::hideNumpad(bool b) {
 	settings->hide_numpad = b;
 	workspace_changed = true;
 }
+void QalculateWindow::showSeparateKeypadMenuButtons(bool b) {
+	settings->separate_keypad_menu_buttons = b;
+	keypad->showSeparateKeypadMenuButtons(b);
+}
 void QalculateWindow::resetKeypadPosition() {
 	keypadDock->setFloating(false);
 	if(dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea) {
@@ -5615,6 +7049,7 @@ void QalculateWindow::keypadTypeActivated() {
 		keypadDock->setVisible(true);
 		keypadDock->raise();
 		settings->show_keypad = 1;
+		updateKeypadTitle();
 	}
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	workspace_changed = true;
@@ -5624,6 +7059,10 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	if(action) action->setChecked(true);
 	settings->show_keypad = b ? 1 : 0;
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
+	if(!b && settings->keypad_type == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
+		settings->programming_base_changed = false;
+		onBaseClicked(BASE_DECIMAL, true, false);
+	}
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);
@@ -5695,9 +7134,14 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool
 	return true;
 }
 
-void QalculateWindow::gradiansActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_GRADIANS; expressionFormatUpdated(true);}
-void QalculateWindow::radiansActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_RADIANS; expressionFormatUpdated(true);}
-void QalculateWindow::degreesActivated() {settings->evalops.parse_options.angle_unit = ANGLE_UNIT_DEGREES; expressionFormatUpdated(true);}
+void QalculateWindow::angleUnitActivated() {
+	QAction *action = qobject_cast<QAction*>(sender());
+	settings->evalops.parse_options.angle_unit = (AngleUnit) action->data().toInt();
+	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM) {
+		CALCULATOR->setCustomAngleUnit(CALCULATOR->getActiveUnit(action->objectName().mid(18).toStdString()));
+	}
+	expressionFormatUpdated(true);
+}
 void QalculateWindow::normalActivated() {
 	settings->printops.sort_options.minus_last = true;
 	settings->printops.min_exp = EXP_PRECISION;
@@ -5732,6 +7176,7 @@ void QalculateWindow::simpleActivated() {
 }
 void QalculateWindow::onPrecisionChanged(int v) {
 	CALCULATOR->setPrecision(v);
+	settings->previous_precision = 0;
 	expressionCalculationUpdated(500);
 }
 void QalculateWindow::onMinDecimalsChanged(int v) {
@@ -5868,6 +7313,15 @@ void QalculateWindow::onAlwaysOnTopChanged() {
 	if(periodicTableDialog) periodicTableDialog->onAlwaysOnTopChanged();
 	show();
 }
+void QalculateWindow::onEnableTooltipsChanged() {
+	if(settings->enable_tooltips == 0) qApp->installEventFilter(this);
+	else qApp->removeEventFilter(this);
+	QList<QAbstractButton*> buttons = keypad->findChildren<QAbstractButton*>();
+	for(int i = 0; i < buttons.count(); i++) {
+		if(settings->enable_tooltips > 1) buttons.at(i)->installEventFilter(this);
+		else buttons.at(i)->removeEventFilter(this);
+	}
+}
 void QalculateWindow::onTitleTypeChanged() {
 	title_modified = false;
 	updateWindowTitle(QString(), false, true);
@@ -5929,21 +7383,61 @@ void QalculateWindow::removeShortcutClicked() {
 }
 void QalculateWindow::updateShortcutActionOK() {
 	QListWidgetItem *item = shortcutActionList->currentItem();
-	shortcutActionOKButton->setEnabled(item && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()));
+	if(!item || !item->isSelected()) {
+		shortcutActionOKButton->setEnabled(edited_keyboard_shortcut->type.size() > 0);
+		shortcutActionAddButton->setEnabled(false);
+	} else if(!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()) {
+		shortcutActionOKButton->setEnabled(true);
+		shortcutActionAddButton->setEnabled(true);
+	} else {
+		shortcutActionOKButton->setEnabled(false);
+		shortcutActionAddButton->setEnabled(false);
+	}
 }
 void QalculateWindow::shortcutActionOKClicked() {
 	QString value = shortcutActionValueEdit->currentText();
 	QListWidgetItem *item = shortcutActionList->currentItem();
-	if(!item) return;
+	if(!item || !item->isSelected()) {
+		if(edited_keyboard_shortcut->type.size() > 0) shortcutActionDialog->accept();
+		return;
+	}
 	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+		edited_keyboard_shortcut->value.push_back(value.toStdString());
 		shortcutActionDialog->accept();
 	} else {
 		shortcutActionValueEdit->setFocus();
 	}
-	shortcutActionValueEdit->setCurrentText(value);
+	if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+		int v = value.toInt();
+		if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+	} else {
+		shortcutActionValueEdit->setCurrentText(value);
+	}
 }
-void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
-	if(!item || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+void QalculateWindow::shortcutActionAddClicked() {
+	QString value = shortcutActionValueEdit->currentText();
+	QListWidgetItem *item = shortcutActionList->currentItem();
+	if(!item || !item->isSelected()) return;
+	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+		edited_keyboard_shortcut->value.push_back(value.toStdString());
+		shortcutActionValueEdit->clear();
+		shortcutActionList->setCurrentItem(NULL);
+		shortcutActionAddButton->setText(tr("Add Action (%1)").arg(edited_keyboard_shortcut->type.size() + 1));
+	} else {
+		shortcutActionValueEdit->setFocus();
+		if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+			int v = value.toInt();
+			if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+		} else {
+			shortcutActionValueEdit->setCurrentText(value);
+		}
+	}
+}
+void QalculateWindow::currentShortcutActionChanged() {
+	QListWidgetItem *item = shortcutActionList->currentItem();
+	if(!item || !item->isSelected() || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
 		shortcutActionValueEdit->clear();
 		shortcutActionValueEdit->clearEditText();
 		shortcutActionValueEdit->setEnabled(false);
@@ -5951,18 +7445,16 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 		return;
 	}
 	int i = item->data(Qt::UserRole).toInt();
-	int i_prev = -1;
-	if(item_prev) i_prev = item_prev->data(Qt::UserRole).toInt();
 	shortcutActionValueEdit->setEnabled(true);
 	shortcutActionValueLabel->setEnabled(true);
 	if(i == SHORTCUT_TYPE_FUNCTION || i == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
-		if(i_prev != SHORTCUT_TYPE_FUNCTION && i_prev != SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
+		QStringList citems;
+		for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
+			MathFunction *f = CALCULATOR->functions[i];
+			if(f->isActive() && !f->isHidden()) citems << QString::fromStdString(f->referenceName());
+		}
+		if(shortcutActionValueEdit->count() != citems.count()) {
 			shortcutActionValueEdit->clear();
-			QStringList citems;
-			for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
-				MathFunction *f = CALCULATOR->functions[i];
-				if(f->isActive() && !f->isHidden()) citems << QString::fromStdString(f->referenceName());
-			}
 			citems.sort(Qt::CaseInsensitive);
 			shortcutActionValueEdit->addItems(citems);
 			shortcutActionValueEdit->clearEditText();
@@ -5989,8 +7481,12 @@ void QalculateWindow::currentShortcutActionChanged(QListWidgetItem *item, QListW
 			QStringList citems;
 			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			shortcutActionValueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
+			settings->updateActionValueTexts();
+			shortcutActionValueEdit->addItems(settings->copy_action_value_texts);
 		}
-		shortcutActionValueEdit->clearEditText();
+		if(i == SHORTCUT_TYPE_COPY_RESULT) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[0]);
+		else shortcutActionValueEdit->clearEditText();
 	}
 }
 class QalculateKeySequenceEdit : public QKeySequenceEdit {
@@ -6019,6 +7515,9 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 	shortcutActionList = NULL;
 	shortcutActionValueEdit = NULL;
 	shortcutActionDialog = NULL;
+	new_ks->type.clear();
+	new_ks->value.clear();
+	edited_keyboard_shortcut = new_ks;
 	if(type != 2) {
 		dialog = new QDialog(this);
 		shortcutActionDialog = dialog;
@@ -6034,12 +7533,24 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 			if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), shortcutActionList);
 				item->setData(Qt::UserRole, i);
-				if((!ks && i == 0) || (ks && i == ks->type)) shortcutActionList->setCurrentItem(item);
+				if(new_ks->type.size() == 0 && ((!ks && i == 0) || (ks && i == ks->type[0]))) shortcutActionList->setCurrentItem(item);
 			}
 			if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
 				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR), shortcutActionList);
 				item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
-				if(ks && ks->type == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
+				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
+			} else if(i == SHORTCUT_TYPE_SIMPLE_NOTATION) {
+				for(int i2 = SHORTCUT_TYPE_PRECISION; i2 <= SHORTCUT_TYPE_MINMAX_DECIMALS; i2++) {
+					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
+					item->setData(Qt::UserRole, i2);
+					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
+				}
+			} else if(i == SHORTCUT_TYPE_MENU) {
+				for(int i2 = SHORTCUT_TYPE_FUNCTIONS_MENU; i2 <= SHORTCUT_TYPE_VARIABLES_MENU; i2++) {
+					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
+					item->setData(Qt::UserRole, i2);
+					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
+				}
 			}
 		}
 		shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());
@@ -6053,92 +7564,98 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 		buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 		buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+		shortcutActionAddButton = buttonBox->addButton(tr("Add Action (%1)").arg(1), QDialogButtonBox::ApplyRole);
+		connect(shortcutActionAddButton, SIGNAL(clicked()), this, SLOT(shortcutActionAddClicked()));
 		box->addWidget(buttonBox);
 		connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(shortcutActionOKClicked()));
 		connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
-		connect(shortcutActionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateShortcutActionOK()));
-		connect(shortcutActionList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentShortcutActionChanged(QListWidgetItem*, QListWidgetItem*)));
+		connect(shortcutActionList, SIGNAL(itemSelectionChanged()), this, SLOT(currentShortcutActionChanged()), Qt::QueuedConnection);
+		connect(shortcutActionList, SIGNAL(itemSelectionChanged()), this, SLOT(updateShortcutActionOK()), Qt::QueuedConnection);
 		connect(shortcutActionValueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateShortcutActionOK()));
 		shortcutActionOKButton = buttonBox->button(QDialogButtonBox::Ok);
-		currentShortcutActionChanged(shortcutActionList->currentItem(), NULL);
-		if(ks) shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value));
+		currentShortcutActionChanged();
+		if(ks) {
+			if(ks->type[0] == SHORTCUT_TYPE_COPY_RESULT) {
+				int v = s2i(ks->value[0]);
+				if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+			} else {
+				shortcutActionValueEdit->setCurrentText(QString::fromStdString(ks->value[0]));
+			}
+		}
 		updateShortcutActionOK();
 		shortcutActionList->setFocus();
 		dialog->resize(dialog->sizeHint().width(), dialog->sizeHint().width() * 1.25);
-	}
-	if(!dialog || dialog->exec() == QDialog::Accepted) {
-		if(dialog) dialog->deleteLater();
-		if(type == 1) {
-			new_ks->key = ks->key;
-			new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
-			new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
-			new_ks->action = NULL;
-			new_ks->new_action = false;
-			return true;
+		if(dialog->exec() != QDialog::Accepted) {
+			dialog->deleteLater();
+			return false;
 		}
-		dialog = new QDialog(this);
-		if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-		dialog->setWindowTitle(tr("Set key combination"));
-		QVBoxLayout *box = new QVBoxLayout(dialog);
-		QGridLayout *grid = new QGridLayout();
-		grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
-		QKeySequenceEdit *keyEdit = new QalculateKeySequenceEdit(dialog);
-		grid->addWidget(keyEdit, 1, 0);
-		box->addLayout(grid);
-		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
-		box->addWidget(buttonBox);
-		connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
-		connect(keyEdit, SIGNAL(editingFinished()), dialog, SLOT(accept()));
-		keyEdit->setFocus();
-		while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
-			QString key = keyEdit->keySequence().toString();
-			if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll || 
+		dialog->deleteLater();
+	}
+	if(type == 1) {
+		new_ks->key = ks->key;
+		new_ks->action = NULL;
+		new_ks->new_action = false;
+		return true;
+	}
+	dialog = new QDialog(this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Set key combination"));
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	QGridLayout *grid = new QGridLayout();
+	grid->addWidget(new QLabel("<i>" + tr("Press the key combination you wish to use for the action.") + "</i>", dialog), 0, 0);
+	QKeySequenceEdit *keyEdit = new QalculateKeySequenceEdit(dialog);
+	grid->addWidget(keyEdit, 1, 0);
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel, Qt::Horizontal, dialog);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	connect(keyEdit, SIGNAL(editingFinished()), dialog, SLOT(accept()));
+	keyEdit->setFocus();
+	while(dialog->exec() == QDialog::Accepted && !keyEdit->keySequence().isEmpty()) {
+		QString key = keyEdit->keySequence().toString();
+		if(keyEdit->keySequence() == QKeySequence::Undo || keyEdit->keySequence() == QKeySequence::Redo || keyEdit->keySequence() == QKeySequence::Copy || keyEdit->keySequence() == QKeySequence::Paste || keyEdit->keySequence() == QKeySequence::Delete || keyEdit->keySequence() == QKeySequence::Cut || keyEdit->keySequence() == QKeySequence::SelectAll ||
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-			keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && keyEdit->keySequence()[0].key() != Qt::Key_Tab && keyEdit->keySequence()[0].key() != Qt::Key_Backtab && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
+		keyEdit->keySequence() == QKeySequence::Backspace || (keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0].keyboardModifiers() == Qt::NoModifier && keyEdit->keySequence()[0].key() != Qt::Key_Tab && keyEdit->keySequence()[0].key() != Qt::Key_Backtab && (keyEdit->keySequence()[0].key() < Qt::Key_F1 || (keyEdit->keySequence()[0].key() >= Qt::Key_Space && keyEdit->keySequence()[0].key() <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0].key() >= Qt::Key_Multi_key && keyEdit->keySequence()[0].key() < Qt::Key_Back)))
 #else
-			(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0] != Qt::Key_Tab && keyEdit->keySequence()[0] != Qt::Key_Backtab && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
+		(keyEdit->keySequence().count() == 1 && keyEdit->keySequence()[0] != Qt::Key_Tab && keyEdit->keySequence()[0] != Qt::Key_Backtab && (keyEdit->keySequence()[0] < Qt::Key_F1 || (keyEdit->keySequence()[0] >= Qt::Key_Space && keyEdit->keySequence()[0] <= Qt::Key_ydiaeresis) || (keyEdit->keySequence()[0] >= Qt::Key_Multi_key && keyEdit->keySequence()[0] < Qt::Key_Back)))
 #endif
-			) {
-				QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
-				keyEdit->clear();
-				keyEdit->setFocus();
-				continue;
-			}
-			for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
-				if(settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i]->key == key) {
-					if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
-						for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
-							if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) settings->keyboard_shortcuts[i]) {
-								delete shortcutList->topLevelItem(index);
-								break;
-							}
+		) {
+			QMessageBox::critical(this, tr("Error"), tr("Reserved key combination"), QMessageBox::Ok);
+			keyEdit->clear();
+			keyEdit->setFocus();
+			continue;
+		}
+		for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
+			if(settings->keyboard_shortcuts[i] != ks && settings->keyboard_shortcuts[i]->key == key) {
+				if(QMessageBox::question(this, tr("Question"), tr("The key combination is already in use.\nDo you wish to replace the current action (%1)?").arg(settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value)), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+					for(int index = 0; index < shortcutList->topLevelItemCount(); index++) {
+						if(shortcutList->topLevelItem(index)->data(0, Qt::UserRole).value<void*>() == (void*) settings->keyboard_shortcuts[i]) {
+							delete shortcutList->topLevelItem(index);
+							break;
 						}
-						keyboardShortcutRemoved(settings->keyboard_shortcuts[i]);
-						delete settings->keyboard_shortcuts[i];
-						settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
-						settings->default_shortcuts = false;
-						break;
-					} else {
-						dialog->deleteLater();
-						return false;
 					}
+					keyboardShortcutRemoved(settings->keyboard_shortcuts[i]);
+					delete settings->keyboard_shortcuts[i];
+					settings->keyboard_shortcuts.erase(settings->keyboard_shortcuts.begin() + i);
+					settings->default_shortcuts = false;
+					break;
+				} else {
+					dialog->deleteLater();
+					return false;
 				}
 			}
-			new_ks->key = key;
-			if(shortcutActionList) {
-				new_ks->type = (shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt();
-				new_ks->value = shortcutActionValueEdit->currentText().trimmed().toStdString();
-			} else {
-				new_ks->type = ks->type;
-				new_ks->value = ks->value;
-			}
-			new_ks->action = NULL;
-			new_ks->new_action = false;
-			dialog->deleteLater();
-			return true;
 		}
+		new_ks->key = key;
+		if(type == 2) {
+			new_ks->type = ks->type;
+			new_ks->value = ks->value;
+		}
+		new_ks->action = NULL;
+		new_ks->new_action = false;
+		dialog->deleteLater();
+		return true;
 	}
-	if(dialog) dialog->deleteLater();
+	dialog->deleteLater();
 	return false;
 }
 void QalculateWindow::addShortcutClicked() {
@@ -6256,6 +7773,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(expressionFormatUpdated(bool)), this, SLOT(expressionFormatUpdated(bool)));
 	connect(preferencesDialog, SIGNAL(expressionCalculationUpdated(int)), this, SLOT(expressionCalculationUpdated(int)));
 	connect(preferencesDialog, SIGNAL(alwaysOnTopChanged()), this, SLOT(onAlwaysOnTopChanged()));
+	connect(preferencesDialog, SIGNAL(enableTooltipsChanged()), this, SLOT(onEnableTooltipsChanged()));
 	connect(preferencesDialog, SIGNAL(titleTypeChanged()), this, SLOT(onTitleTypeChanged()));
 	connect(preferencesDialog, SIGNAL(resultFontChanged()), this, SLOT(onResultFontChanged()));
 	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));
@@ -6336,9 +7854,13 @@ void QalculateWindow::openFunctions() {
 	}
 	functionsDialog = new FunctionsDialog();
 	connect(functionsDialog, SIGNAL(itemsChanged()), this, SLOT(onFunctionsChanged()));
+	connect(functionsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteFunctions()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
+	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(onInsertFunctionRequested(MathFunction*)));
+	connect(functionsDialog, SIGNAL(insertFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(onCalculateFunctionRequested(MathFunction*)));
+	connect(functionsDialog, SIGNAL(calculateFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
 	if(settings->always_on_top) functionsDialog->setWindowFlags(functionsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	functionsDialog->show();
 }
@@ -6361,9 +7883,11 @@ void QalculateWindow::openVariables() {
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
 	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(variablesDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteVariables()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
 	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(onVariableClicked(Variable*)));
+	connect(variablesDialog, SIGNAL(insertVariableRequest(Variable*)), this, SLOT(addToRecentVariables(Variable*)));
 	if(settings->always_on_top) variablesDialog->setWindowFlags(variablesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	variablesDialog->show();
 }
@@ -6393,9 +7917,11 @@ void QalculateWindow::openUnits() {
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
 	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
 	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(unitsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteUnits()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
 	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
 	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(onUnitClicked(Unit*)));
+	connect(unitsDialog, SIGNAL(insertUnitRequest(Unit*)), this, SLOT(addToRecentUnits(Unit*)));
 	connect(unitsDialog, SIGNAL(convertToUnitRequest(Unit*)), this, SLOT(convertToUnit(Unit*)));
 	connect(unitsDialog, SIGNAL(unitActivated(Unit*)), this, SLOT(onUnitActivated(Unit*)));
 	if(settings->always_on_top) unitsDialog->setWindowFlags(unitsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -6422,6 +7948,7 @@ void remove_nonunits(MathStructure &m) {
 void QalculateWindow::onUnitActivated(Unit *u) {
 	if(expressionEdit->expressionHasChanged() || settings->history_answer.empty() || ((settings->replace_expression != CLEAR_EXPRESSION || !expressionEdit->document()->isEmpty()) && (expressionEdit->document()->isEmpty() || expressionEdit->selectedText() != expressionEdit->toPlainText())) || !mstruct) {
 		onUnitClicked(u);
+		addToRecentUnits(u);
 	} else {
 		if(!mstruct->containsType(STRUCT_UNIT, true)) {
 			MathStructure m_u(u);
@@ -7302,7 +8829,7 @@ void QalculateWindow::executeFromFile(const QString &file) {
 		ispace = str.find_first_of(SPACES);
 		if(ispace == std::string::npos) scom = "";
 		else scom = str.substr(0, ispace);
-		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "clear") || equalsIgnoreCase(str, "clear history") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
+		if(equalsIgnoreCase(str, "exrates") || equalsIgnoreCase(str, "stack") || equalsIgnoreCase(str, "swap") || equalsIgnoreCase(str, "rotate") || equalsIgnoreCase(str, "copy") || equalsIgnoreCase(str, "clear stack") || equalsIgnoreCase(str, "exact") || equalsIgnoreCase(str, "approximate") || equalsIgnoreCase(str, "approx") || equalsIgnoreCase(str, "factor") || equalsIgnoreCase(str, "partial fraction") || equalsIgnoreCase(str, "simplify") || equalsIgnoreCase(str, "expand") || equalsIgnoreCase(str, "mode") || equalsIgnoreCase(str, "help") || equalsIgnoreCase(str, "?") || equalsIgnoreCase(str, "list") || equalsIgnoreCase(str, "exit") || equalsIgnoreCase(str, "quit") || equalsIgnoreCase(str, "clear") || equalsIgnoreCase(str, "clear history") || equalsIgnoreCase(scom, "variable") || equalsIgnoreCase(scom, "function") || equalsIgnoreCase(scom, "set") || equalsIgnoreCase(scom, "save") || equalsIgnoreCase(scom, "store") || equalsIgnoreCase(scom, "swap") || equalsIgnoreCase(scom, "delete") || equalsIgnoreCase(scom, "keep") || equalsIgnoreCase(scom, "assume") || equalsIgnoreCase(scom, "base") || equalsIgnoreCase(scom, "rpn") || equalsIgnoreCase(scom, "move") || equalsIgnoreCase(scom, "rotate") || equalsIgnoreCase(scom, "copy") || equalsIgnoreCase(scom, "pop") || equalsIgnoreCase(scom, "convert") || (equalsIgnoreCase(scom, "to") && scom != "to") || equalsIgnoreCase(scom, "list") || equalsIgnoreCase(scom, "find") || equalsIgnoreCase(scom, "info") || equalsIgnoreCase(scom, "help")) str.insert(0, 1, '/');
 		if(!str.empty()) calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str, false);
 	}
 	expressionEdit->clear();
@@ -7355,7 +8882,7 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
-			toAction->setEnabled(false);
+			toAction_t->setEnabled(false);
 		}
 	}
 }
@@ -7375,7 +8902,7 @@ void QalculateWindow::rpnModeActivated() {
 		if(!settings->rpn_shown) {rpnDock->setFloating(true); settings->rpn_shown = true;}
 		rpnDock->show();
 		rpnDock->raise();
-		toAction->setEnabled(false);
+		toAction_t->setEnabled(false);
 	}
 }
 void QalculateWindow::chainModeActivated() {
@@ -7433,6 +8960,7 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);
 		keypad->setKeypadType(settings->keypad_type);
+		updateKeypadTitle();
 		keypad->hideNumpad(settings->hide_numpad);
 		if(preferencesDialog) {
 			preferencesDialog->hide();
@@ -7464,11 +8992,17 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 			w->setValue(CALCULATOR->getPrecision());
 			w->blockSignals(false);
 		}
+		settings->setCustomAngleUnit();
 		action = find_child_data(this, "group_type", CALCULATOR->defaultAssumptions()->type());
 		if(action) action->setChecked(true);
 		action = find_child_data(this, "group_sign", CALCULATOR->defaultAssumptions()->sign());
 		if(action) action->setChecked(true);
-		action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
+		if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) settings->evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
+		if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM) {
+			action = findChild<QAction*>("action_angle_unit" + QString::fromStdString(CALCULATOR->customAngleUnit()->referenceName()));
+		} else {
+			action = find_child_data(this, "group_angleunit", settings->evalops.parse_options.angle_unit);
+		}
 		if(action) action->setChecked(true);
 		action = NULL;
 		if(settings->dual_approximation < 0) action = findChild<QAction*>("action_autoappr");
@@ -7537,9 +9071,10 @@ int QalculateWindow::askSaveWorkspace() {
 	}
 	if(b == QMessageBox::Yes) {
 		settings->show_bases = basesDock->isVisible();
-		if(!settings->saveWorkspace(settings->current_workspace.c_str())) {
-			QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Ok);
-			return -1;
+		while(!settings->saveWorkspace(settings->current_workspace.c_str())) {
+			int answer = QMessageBox::critical(this, tr("Error"), tr("Couldn't save workspace"), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+			if(answer == QMessageBox::Ignore) return 0;
+			else if(answer == QMessageBox::Cancel) return -1;
 		}
 		workspace_changed = false;
 		if(b_noask) settings->save_workspace = 1;
@@ -7557,7 +9092,7 @@ void QalculateWindow::openRecentWorkspace() {
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
-		settings->savePreferences();
+		if(settings->savePreferences() < 0) return;
 	} else {
 		if(askSaveWorkspace() < 0) return;
 	}
@@ -7571,7 +9106,7 @@ void QalculateWindow::openWorkspace() {
 		if(height() != DEFAULT_HEIGHT || width() != DEFAULT_WIDTH) settings->window_geometry = saveGeometry();
 		else settings->window_geometry = QByteArray();
 		settings->splitter_state = ehSplitter->saveState();
-		settings->savePreferences();
+		if(settings->savePreferences() < 0) return;
 	} else {
 		if(askSaveWorkspace() < 0) return;
 	}

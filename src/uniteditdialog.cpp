@@ -297,7 +297,7 @@ Unit *UnitEditDialog::modifyUnit(Unit *u, ExpressionItem **replaced_item) {
 			break;
 		}
 	}
-	if(typeCombo->currentIndex() != 2) {
+	if(typeCombo->currentIndex() == 2) {
 		u->clearNames();
 		NamesEditDialog::modifyName(u, nameEdit->text());
 	} else if(namesEditDialog) {

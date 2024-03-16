@@ -85,6 +85,7 @@ class VariablesDialog : public QDialog {
 	signals:
 
 		void itemsChanged();
+		void favouritesChanged();
 		void unitRemoved(Unit*);
 		void unitDeactivated(Unit*);
 		void applyVariableRequest(Variable*);

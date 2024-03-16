@@ -17,6 +17,7 @@
 #include <QSpinBox>
 #include <QTranslator>
 #include <QDockWidget>
+#include <QToolButton>
 #include <libqalculate/qalculate.h>
 
 class QLocalSocket;
@@ -30,7 +31,6 @@ class KeypadWidget;
 class QAction;
 class QToolBar;
 class QTextEdit;
-class QToolButton;
 class QTimer;
 class PreferencesDialog;
 class FunctionsDialog;
@@ -94,20 +94,23 @@ class QalculateWindow : public QMainWindow {
 		CalendarConversionDialog *calendarConversionDialog;
 		QDialog *shortcutsDialog, *shortcutActionDialog;
 		QComboBox *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
-		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton;
+		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton, *shortcutActionAddButton; keyboard_shortcut *edited_keyboard_shortcut;
+
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock, *rpnDock;
 		QLabel *binEdit, *octEdit, *decEdit, *hexEdit;
 		QLabel *binLabel, *octLabel, *decLabel, *hexLabel;
 		QToolBar *tb;
-		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t;
-		QAction *toAction, *storeAction, *functionsAction_t, *unitsAction_t, *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction;
-		QMenu *variablesMenu, *functionsMenu, *unitsMenu;
+		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t, *storeAction_t, *functionsAction_t, *unitsAction_t, *toAction_t;
+		QMenu *tmenu, *basesMenu;
+		QAction *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *hideNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction, *copyBasesAction;
+		QMenu *recentVariablesMenu, *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *recentFunctionsMenu, *favouriteFunctionsMenu, *unitsMenu, *recentUnitsMenu, *favouriteUnitsMenu, *angleMenu, *toMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
 		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;
-		QList<QAction*> recentWSAction;
+		QAction *firstFunctionsMenuOptionAction, *firstVariablesMenuOptionAction, *firstUnitsMenuOptionAction;
+		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
 		QTimer *ecTimer, *rfTimer;
 		QFont saved_app_font;
@@ -127,6 +130,7 @@ class QalculateWindow : public QMainWindow {
 		bool askDot(const std::string&);
 		bool askImplicit();
 		void keyPressEvent(QKeyEvent*) override;
+		bool eventFilter(QObject*, QEvent*) override;
 		void closeEvent(QCloseEvent*) override;
 		void setPreviousExpression();
 		void setOption(std::string);
@@ -149,6 +153,7 @@ class QalculateWindow : public QMainWindow {
 		void onFunctionClicked(MathFunction*);
 		void onVariableClicked(Variable*);
 		void onUnitClicked(Unit*);
+		void onPrefixClicked(Prefix*);
 		void onClearClicked();
 		void onDelClicked();
 		void onEqualsClicked();
@@ -165,13 +170,15 @@ class QalculateWindow : public QMainWindow {
 		void onMPlusClicked();
 		void onMMinusClicked();
 		void onAnswerClicked();
-		void onBaseClicked(int, bool);
+		void onBaseClicked(int, bool, bool);
 		void onFactorizeClicked();
 		void onExpandClicked();
+		void onExpandPartialFractionsClicked();
 		void onToActivated(bool = true);
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void hideNumpad(bool);
+		void showSeparateKeypadMenuButtons(bool);
 		void resetKeypadPosition();
 		void onKeypadVisibilityChanged(bool);
 		void onBasesActivated(bool);
@@ -183,15 +190,14 @@ class QalculateWindow : public QMainWindow {
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);
 		void onAlwaysOnTopChanged();
+		void onEnableTooltipsChanged();
 		void onPreferencesClosed();
 		void onTitleTypeChanged();
 		void onResultFontChanged();
 		void onExpressionFontChanged();
 		void onKeypadFontChanged();
 		void onAppFontChanged();
-		void gradiansActivated();
-		void radiansActivated();
-		void degreesActivated();
+		void angleUnitActivated();
 		void normalActivated();
 		void scientificActivated();
 		void engineeringActivated();
@@ -240,10 +246,26 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionStatusModeChanged();
 		void functionActivated();
 		void unitActivated();
+		void prefixActivated();
 		void variableActivated();
+		void updateAngleUnitsMenu();
 		void updateFunctionsMenu();
+		void useFunctionDialog(bool);
+		void showAllFunctions(bool);
+		void updateFavouriteFunctions();
+		void updateRecentFunctions();
+		void addToRecentFunctions(MathFunction*);
 		void updateUnitsMenu();
+		void addCurrencyFlagsToMenu();
+		void showAllUnits(bool);
+		void updateFavouriteUnits();
+		void updateRecentUnits();
+		void addToRecentUnits(Unit*);
 		void updateVariablesMenu();
+		void showAllVariables(bool);
+		void updateFavouriteVariables();
+		void updateRecentVariables();
+		void addToRecentVariables(Variable*);
 		void shortcutActivated();
 		void shortcutClicked(int, const QString&);
 		void keyboardShortcutAdded(keyboard_shortcut *ks);
@@ -252,8 +274,9 @@ class QalculateWindow : public QMainWindow {
 		void editShortcutClicked();
 		void removeShortcutClicked();
 		void shortcutActionOKClicked();
+		void shortcutActionAddClicked();
 		void updateShortcutActionOK();
-		void currentShortcutActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void currentShortcutActionChanged();
 		void currentShortcutChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 		void shortcutDoubleClicked(QTreeWidgetItem*, int);
 		void saveWorkspace();
@@ -261,7 +284,15 @@ class QalculateWindow : public QMainWindow {
 		void openWorkspace();
 		void openDefaultWorkspace();
 		void openRecentWorkspace();
-
+		void onColorSchemeChanged();
+		void showToolbarContextMenu(const QPoint&);
+		void setToolbarStyle();
+		void showKeypadContextMenu(const QPoint&);
+		void updateKeypadTitle();
+		void keypadPreferencesChanged();
+		void resultBasesLinkActivated(const QString&);
+		void showBasesContextMenu(const QPoint&);
+		void copyBases();
 
 	public slots:
 
@@ -354,6 +385,7 @@ class QalculateDockWidget : public QDockWidget {
 	public:
 
 		QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget);
+		QalculateDockWidget(QWidget *parent, ExpressionEdit *editwidget);
 		virtual ~QalculateDockWidget();
 
 	protected:
@@ -366,6 +398,29 @@ class QalculateDockWidget : public QDockWidget {
 	signals:
 
 		void dockClosed();
+
+};
+
+class QalculateToolButton : public QToolButton {
+
+	Q_OBJECT
+
+	public:
+
+		QalculateToolButton(QWidget *parent = NULL);
+		~QalculateToolButton();
+
+	protected:
+
+		QTimer *longPressTimer;
+		bool b_longpress;
+
+		void mouseReleaseEvent(QMouseEvent*) override;
+		void mousePressEvent(QMouseEvent*) override;
+
+	protected slots:
+
+		void longPressTimeout();
 
 };
 

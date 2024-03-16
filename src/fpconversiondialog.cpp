@@ -35,8 +35,10 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	formatCombo->addItem(tr("64-bit (double precision)"));
 	formatCombo->addItem(tr("80-bit (x86 extended format)"));
 	formatCombo->addItem(tr("128-bit (quadruple precision)"));
+	formatCombo->addItem(tr("Microchip 24-bit"));
+	formatCombo->addItem(tr("Microchip 32-bit"));
 	formatCombo->setCurrentIndex(1);
-	grid->addWidget(new QLabel(tr("Decimal value"), this), 1, 0, Qt::AlignRight);
+	grid->addWidget(new QLabel(tr("Value"), this), 1, 0, Qt::AlignRight);
 	valueEdit = new MathLineEdit(this); valueEdit->setAlignment(Qt::AlignRight); grid->addWidget(valueEdit, 1, 1);
 	QLabel *label = new QLabel(tr("Binary representation"), this);
 	label->setMinimumHeight(valueEdit->sizeHint().height());
@@ -56,10 +58,11 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	grid->addWidget(new QLabel(tr("Hexadecimal representation"), this), 3, 0, Qt::AlignRight);
 	hexEdit = new QLineEdit(this); hexEdit->setAlignment(Qt::AlignRight); grid->addWidget(hexEdit, 3, 1);
 	grid->addWidget(new QLabel(tr("Floating point value"), this), 4, 0, Qt::AlignRight);
-	exp2Edit = new QLineEdit(this); exp2Edit->setAlignment(Qt::AlignRight); grid->addWidget(exp2Edit, 4, 1); exp2Edit->setReadOnly(true);
-	decEdit = new QLineEdit(this); decEdit->setAlignment(Qt::AlignRight); grid->addWidget(decEdit, 5, 1); decEdit->setReadOnly(true);
-	grid->addWidget(new QLabel(tr("Conversion error"), this), 6, 0, Qt::AlignRight);
-	errorEdit = new QLineEdit(this); errorEdit->setAlignment(Qt::AlignRight); grid->addWidget(errorEdit, 6, 1); errorEdit->setReadOnly(true);
+	hexExp2Edit = new QLineEdit(this); hexExp2Edit->setAlignment(Qt::AlignRight); grid->addWidget(hexExp2Edit, 4, 1); hexExp2Edit->setReadOnly(true);
+	exp2Edit = new QLineEdit(this); exp2Edit->setAlignment(Qt::AlignRight); grid->addWidget(exp2Edit, 5, 1); exp2Edit->setReadOnly(true);
+	decEdit = new QLineEdit(this); decEdit->setAlignment(Qt::AlignRight); grid->addWidget(decEdit, 6, 1); decEdit->setReadOnly(true);
+	grid->addWidget(new QLabel(tr("Conversion error"), this), 7, 0, Qt::AlignRight);
+	errorEdit = new QLineEdit(this); errorEdit->setAlignment(Qt::AlignRight); grid->addWidget(errorEdit, 7, 1); errorEdit->setReadOnly(true);
 	valueEdit->setFocus();
 	grid->setColumnStretch(1, 1);
 	box->addLayout(grid);
@@ -74,15 +77,27 @@ FPConversionDialog::FPConversionDialog(QWidget *parent) : QDialog(parent) {
 	box->setSizeConstraint(QLayout::SetFixedSize);
 }
 FPConversionDialog::~FPConversionDialog() {}
-int FPConversionDialog::getBits() {
+unsigned int FPConversionDialog::getBits() {
 	switch(formatCombo->currentIndex()) {
 		case 0: return 16;
 		case 1: return 32;
 		case 2: return 64;
 		case 3: return 80;
 		case 4: return 128;
+		case 5: return 24;
+		case 6: return 32;
 	}
 	return 32;
+}
+unsigned int FPConversionDialog::getExponentBits() {
+	int i = formatCombo->currentIndex();
+	if(i == 5) return 8;
+	return standard_expbits(getBits());
+}
+unsigned int FPConversionDialog::getSignPosition() {
+	int i = formatCombo->currentIndex();
+	if(i == 5 || i == 6) return 8;
+	return 0;
 }
 void FPConversionDialog::formatChanged() {
 	updateFields(10);
@@ -91,8 +106,9 @@ void FPConversionDialog::updateFields(int base) {
 	std::string sbin;
 	Number decnum;
 	bool use_decnum = false;
-	unsigned int bits = (unsigned int) getBits();
-	unsigned int expbits = standard_expbits(bits);
+	unsigned int bits = getBits();
+	unsigned int expbits = getExponentBits();
+	unsigned int sgnpos = getSignPosition();
 	if(base == 10) {
 		std::string str = valueEdit->text().toStdString();
 		remove_blank_ends(str);
@@ -107,11 +123,11 @@ void FPConversionDialog::updateFields(int base) {
 		MathStructure value;
 		CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
 		if(value.isNumber()) {
-			sbin = to_float(value.number(), bits, expbits);
+			sbin = to_float(value.number(), bits, expbits, sgnpos);
 			decnum = value.number();
 			use_decnum = true;
 		} else if(value.isUndefined()) {
-			sbin = to_float(nr_one_i, bits, expbits);
+			sbin = to_float(nr_one_i, bits, expbits, sgnpos);
 		} else {
 			sbin = "";
 		}
@@ -153,6 +169,7 @@ void FPConversionDialog::updateFields(int base) {
 		if(base != 10) valueEdit->clear();
 		if(base != 16) hexEdit->clear();
 		if(base != 2) binEdit->clear();
+		hexExp2Edit->clear();
 		exp2Edit->clear();
 		decEdit->clear();
 		errorEdit->clear();
@@ -161,10 +178,9 @@ void FPConversionDialog::updateFields(int base) {
 		po.number_fraction_format = FRACTION_DECIMAL;
 		po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
 		po.use_unicode_signs = settings->printops.use_unicode_signs;
-		po.lower_case_e = settings->printops.lower_case_e;
+		po.exp_display = settings->printops.exp_display;
 		po.lower_case_numbers = settings->printops.lower_case_numbers;
-		po.custom_time_zone = settings->printops.custom_time_zone;
-		po.round_halfway_to_even = settings->printops.round_halfway_to_even;
+		po.rounding = settings->printops.rounding;
 		po.base_display = BASE_DISPLAY_NONE;
 		po.abbreviate_names = settings->printops.abbreviate_names;
 		po.digit_grouping = settings->printops.digit_grouping;
@@ -210,9 +226,10 @@ void FPConversionDialog::updateFields(int base) {
 		po.max_decimals = 50;
 		po.use_max_decimals = true;
 		Number value;
-		int ret = from_float(value, sbin, bits, expbits);
+		int ret = from_float(value, sbin, bits, expbits, sgnpos);
 		if(ret <= 0) {
 			decEdit->setText(ret < 0 ? "NaN" : "");
+			hexExp2Edit->setText(ret < 0 ? "NaN" : "");
 			exp2Edit->setText(ret < 0 ? "NaN" : "");
 			errorEdit->clear();
 			if(base != 10) valueEdit->setText(QString::fromStdString(m_undefined.print(po)));
@@ -225,12 +242,13 @@ void FPConversionDialog::updateFields(int base) {
 			expbias--;
 			bool subnormal = exponent.isZero();
 			exponent -= expbias;
-			std::string sfloat;
+			std::string sfloat, sfloathex;
 			bool b_approx = false;
 			po.is_approximate = &b_approx;
 			if(exponent > expbias) {
 				if(sbin[0] != '0') sfloat = nr_minus_inf.print(po);
 				else sfloat = nr_plus_inf.print(po);
+				sfloathex = sfloat;
 			} else {
 				if(subnormal) exponent++;
 				if(subnormal) significand.set(std::string("0.") + sbin.substr(1 + expbits), pa);
@@ -246,9 +264,27 @@ void FPConversionDialog::updateFields(int base) {
 					sfloat += "2^";
 					sfloat += exponent.print(po);
 				}
-				po.min_exp = exp_bak;
 				if(b_approx) sfloat.insert(0, SIGN_ALMOST_EQUAL " ");
+				b_approx = false;
+				po.base = 16;
+				po.lower_case_numbers = true;
+				po.decimalpoint_sign = ".";
+				if(significand.isNegative()) {
+					significand.negate();
+					sfloathex = "-";
+				}
+				sfloathex += "0x";
+				sfloathex += significand.print(po);
+				po.base = 10;
+				sfloathex += 'p';
+				if(sfloathex == "0") sfloathex += "-1";
+				else sfloathex += exponent.print(po);
+				if(b_approx) sfloat.insert(0, SIGN_ALMOST_EQUAL " ");
+				po.decimalpoint_sign = settings->printops.decimalpoint_sign;
+				po.lower_case_numbers = false;
+				po.min_exp = exp_bak;
 			}
+			hexExp2Edit->setText(QString::fromStdString(sfloathex));
 			exp2Edit->setText(QString::fromStdString(sfloat));
 			b_approx = false;
 			std::string svalue = value.print(po);

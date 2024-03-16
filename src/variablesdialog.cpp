@@ -353,7 +353,7 @@ void VariablesDialog::favouriteClicked() {
 		}
 	}
 	settings->favourite_variables_changed = true;
-	emit itemsChanged();
+	emit favouritesChanged();
 }
 void VariablesDialog::delClicked() {
 	QModelIndex index = variablesView->selectionModel()->currentIndex();

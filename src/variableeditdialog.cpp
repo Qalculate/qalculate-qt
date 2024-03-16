@@ -254,6 +254,15 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 				value_str += SIGN_PLUSMINUS;
 				value_str += settings->localizeExpression(v->uncertainty());
 			}
+		} else if(v->isApproximate() && value_str.find(CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL)->referenceName()) == std::string::npos && value_str.find("±") == std::string::npos && value_str.find("+/-") == std::string::npos) {
+			PrintOptions po = settings->printops;
+			po.is_approximate = NULL;
+			po.allow_non_usable = false;
+			po.preserve_precision = true;
+			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
+			if(po.number_fraction_format == FRACTION_DECIMAL) po.number_fraction_format = FRACTION_DECIMAL_EXACT;
+			po.base = 10;
+			value_str = CALCULATOR->print(v->get(), 1000, po);
 		}
 		if(!v->unit().empty() && v->unit() != "auto") {
 			value_str += " ";

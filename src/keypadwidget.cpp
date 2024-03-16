@@ -22,10 +22,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QActionGroup>
-#include <QToolButton>
 #include <QDialog>
+#include <QPushButton>
 #include <QDialogButtonBox>
 #include <QScrollBar>
+#include <QWidgetAction>
 #include <QComboBox>
 #include <QDebug>
 
@@ -163,7 +164,7 @@
 #define ITEM_BUTTON(o, x, r, c) 		ITEM_BUTTON3(o, o, o, x, r, c)
 #define ITEM_BUTTON2(o1, o2, x, r, c) 		ITEM_BUTTON3(o1, o2, o2, x, r, c)
 
-#define BASE_BUTTON(x, i, r, c)			button = new KeypadButton(x); \
+#define BASE_BUTTON(x, i, r, c)			button = new KeypadButton(x, this); \
 						button->setCheckable(true); \
 						grid->addWidget(button, r, c); \
 						button->setProperty(BUTTON_DATA, i); \
@@ -171,10 +172,40 @@
 						connect(button, SIGNAL(clicked2()), this, SLOT(onBaseButtonClicked2())); \
 						connect(button, SIGNAL(clicked3()), this, SLOT(onBaseButtonClicked2()));
 
+#define MENU_ITEM(x)				item = x;\
+						if(item) {\
+							action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onItemButtonClicked()));\
+							action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));\
+						}
+
+#define MENU_SYMBOL(x)				action = menu->addAction(x, this, SLOT(onSymbolButtonClicked()));\
+						action->setProperty(BUTTON_DATA, x);
+
+#define CREATE_MENU				menu = new QMenu(this);\
+						button->setMenu(menu);\
+						button->setPopupMode(settings->separate_keypad_menu_buttons ? QToolButton::MenuButtonPopup : QToolButton::DelayedPopup);\
+						button->menuSet();
+
+#define ADD_SECTION(str) \
+	if(!menu->style()->styleHint(QStyle::SH_Menu_SupportsSections)) { \
+		aw = new QWidgetAction(this); \
+		QLabel *label = new QLabel(str, this); \
+		label->setAlignment(Qt::AlignCenter); \
+		aw->setDefaultWidget(label); \
+		menu->addSeparator(); \
+		menu->addAction(aw); \
+		menu->addSeparator(); \
+	} else { \
+		menu->addSection(str); \
+	}
+
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *box = new QHBoxLayout(this);
 	leftStack = new QStackedLayout();
-	box->addLayout(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	int left_size = 5;
+	if(settings->separate_keypad_menu_buttons) left_size++;
+	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
+	box->addLayout(leftStack, left_size);
 	box->addSpacing(box->spacing());
 	numpad = new QWidget(this);
 	if(settings->hide_numpad) numpad->hide();
@@ -186,6 +217,7 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	QGridLayout *grid = new QGridLayout(keypadG);
 	grid->setContentsMargins(0, 0, 0, 0);
 	KeypadButton *button;
+	QMenu *menu;
 	MathFunction *f, *f2;
 	int c = 0;
 	button = new KeypadButton("MS", this);
@@ -212,28 +244,68 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(MMinusClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(MMinusClicked()));
 	grid->addWidget(button, c, 3, 1, 1);
+	//: Standard calculator button. Do not use more than three characters.
+	button = new KeypadButton(tr("STO"), this);
+	connect(button, SIGNAL(clicked()), this, SIGNAL(storeClicked()));
+	connect(button, SIGNAL(clicked2()), this, SIGNAL(newFunctionClicked()));
+	connect(button, SIGNAL(clicked3()), this, SIGNAL(newFunctionClicked()));
+	button->setToolTip(tr("Store"), tr("New function"));
+	grid->addWidget(button, c, 4, 1, 1);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateStoreMenu()));
 	c++;
 	button = new KeypadButton("hyp");
 	button->setCheckable(true);
 	grid->addWidget(button, c, 0, 1, 1);
 	connect(button, SIGNAL(toggled(bool)), this, SLOT(onHypToggled(bool)));
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SIN), CALCULATOR->getFunctionById(FUNCTION_ID_ASIN), tr("sin"), c, 1);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSinMenu()));
 	sinButton = button;
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_COS), CALCULATOR->getFunctionById(FUNCTION_ID_ACOS), tr("cos"), c, 2);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateCosMenu()));
 	cosButton = button;
 	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_TAN), CALCULATOR->getFunctionById(FUNCTION_ID_ATAN), tr("tan"), c, 3);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateTanMenu()));
 	tanButton = button;
+	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_EULER), CALCULATOR->getVariableById(VARIABLE_ID_CATALAN), SIGN_PI, c, 4);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePiMenu()));
 	c++;
-	OPERATOR_ITEM2_BUTTON("^", CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), c, 3);
+	OPERATOR_ITEM2_BUTTON("^", CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), c, 2);
 	button->setRichText("x<sup>y</sup>");
 	button->setToolTip(tr("Exponentiation"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE)->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_EXP)->title(true, settings->printops.use_unicode_signs)));
-	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 2);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePowerMenu()));
+	ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_SQRT), CALCULATOR->getFunctionById(FUNCTION_ID_CBRT), CALCULATOR->getFunctionById(FUNCTION_ID_ROOT), SIGN_SQRT, c, 1);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSqrtMenu()));
 	f = CALCULATOR->getActiveFunction("log10");
 	if(f) {
-		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 1);
+		ITEM_BUTTON3(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), f, CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 0);
 	} else {
-		ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 1);
+		ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_LOG), CALCULATOR->getFunctionById(FUNCTION_ID_LOGN), "ln", c, 0);
 	}
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateLnMenu()));
+	ITEM_OPERATOR_ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_I), "∠", CALCULATOR->getFunctionById(FUNCTION_ID_ARG), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i", c, 3);
+	imaginaryButton = button;
+	QFont ifont(button->font());
+	ifont.setStyle(QFont::StyleItalic);
+	button->setFont(ifont);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateComplexMenu()));
+	f = CALCULATOR->getActiveFunction("cis");
+	if(f) {
+		ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), f, "e", c, 4);
+	} else {
+		ITEM_BUTTON2(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), "e", c, 4);
+	}
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateEMenu()));
+	c++;
 	f = CALCULATOR->getActiveFunction("perm"); f2 = CALCULATOR->getActiveFunction("comb");
 	if(f && f2) {
 		OPERATOR_ITEM2_BUTTON("!", f, f2, c, 0);
@@ -242,36 +314,67 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 		OPERATOR_BUTTON("!", c, 0);
 	}
 	button->setText("x!");
-	c++;
-	ITEM_BUTTON3(CALCULATOR->getVariableById(VARIABLE_ID_PI), CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getVariableById(VARIABLE_ID_EULER), SIGN_PI, c, 3);
-	ITEM_OPERATOR_ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_I), "∠", CALCULATOR->getFunctionById(FUNCTION_ID_ARG), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i", c, 2);
-	imaginaryButton = button;
-	QFont ifont(button->font());
-	ifont.setStyle(QFont::StyleItalic);
-	button->setFont(ifont);
-	SYMBOL_BUTTON3("x", "y", "z", c, 0);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateFactorialMenu()));
+	ITEM_BUTTON2(CALCULATOR->getFunctionById(FUNCTION_ID_SUM), CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT), "Σ", c, 1);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateSumMenu()));
+	SYMBOL_BUTTON3("x", "y", "z", c, 2);
 	button->setToolTip(QString(), "<i>y</i>", "<i>z</i>");
 	button->setFont(ifont);
-	SYMBOL_BUTTON("=", c, 1);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateXMenu()));
+	SYMBOL_BUTTON("=", c, 3);
 	button->setRichText("<i>x</i> =");
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateEqualsMenu()));
+	button = new KeypadButton("<font size=\"-1\">a(x)<sup>b</sup></font>", this);
+	connect(button, SIGNAL(clicked()), this, SIGNAL(factorizeClicked()));
+	connect(button, SIGNAL(clicked2()), this, SIGNAL(expandClicked()));
+	connect(button, SIGNAL(clicked3()), this, SIGNAL(expandClicked()));
+	button->setToolTip(tr("Factorize"), tr("Expand"));
+	grid->addWidget(button, c, 4);
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateFactorizeMenu()));
+
 	c++;
 	SYMBOL_BUTTON2("%", "‰", c, 1);
 	button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePercentageMenu()));
 	SYMBOL_ITEM2_BUTTON("±", CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY), CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL), c, 0);
 	button->setToolTip(tr("Uncertainty/interval"), tr("Relative error"), tr("Interval"));
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateIntervalMenu()));
+	std::string sunit = settings->latest_button_unit;
+	if(sunit.empty()) sunit = "m";
+	Unit *u = CALCULATOR->getActiveUnit(sunit);
+	button = new KeypadButton(QString::fromStdString(sunit), this);
+	Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
+	button->setProperty(BUTTON_DATA, u ? QVariant::fromValue((void*) u) : QString::fromStdString(sunit));
+	button->setProperty(BUTTON_DATA2, QVariant::fromValue((void*) p1));
+	button->setProperty(BUTTON_DATA3, QVariant::fromValue((void*) p2));
+	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
+	connect(button, SIGNAL(clicked2()), this, SLOT(onUnitButtonClicked2()));
+	connect(button, SIGNAL(clicked3()), this, SLOT(onUnitButtonClicked3()));
+	grid->addWidget(button, c, 2, 1, 1);
+	unitButton = button;
+	unitButton->setToolTip(QString::fromStdString(u ? u->title(true, settings->printops.use_unicode_signs) : sunit), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
+	CREATE_MENU
+	connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateUnitsMenu()));
 	backButton = new KeypadButton(LOAD_ICON("go-back"), this, true);
 	backButton->setToolTip(tr("Move cursor left"), tr("Move cursor to start"));
 	connect(backButton, SIGNAL(clicked()), this, SIGNAL(leftClicked()));
 	connect(backButton, SIGNAL(clicked2()), this, SIGNAL(startClicked()));
 	connect(backButton, SIGNAL(clicked3()), this, SIGNAL(startClicked()));
-	grid->addWidget(backButton, c, 2, 1, 1);
+	grid->addWidget(backButton, c, 3, 1, 1);
 	forwardButton = new KeypadButton(LOAD_ICON("go-forward"), this, true);
 	forwardButton->setToolTip(tr("Move cursor right"), tr("Move cursor to end"));
 	connect(forwardButton, SIGNAL(clicked()), this, SIGNAL(rightClicked()));
 	connect(forwardButton, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
 	connect(forwardButton, SIGNAL(clicked3()), this, SIGNAL(endClicked()));
-	grid->addWidget(forwardButton, c, 3, 1, 1);
-	for(c = 0; c < 4; c++) grid->setColumnStretch(c, 1);
+	grid->addWidget(forwardButton, c, 4, 1, 1);
+	for(c = 0; c < 5; c++) grid->setColumnStretch(c, 1);
 	for(int r = 0; r < 5; r++) grid->setRowStretch(r, 1);
 
 	QWidget *keypadP = new QWidget(this);
@@ -331,53 +434,16 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	grid = new QGridLayout(keypadX);
 	grid->setContentsMargins(0, 0, 0, 0);
 	for(size_t i = 0; i < 3; i++) {
-		QToolButton *tb = new QToolButton(this);
-		tb->setText(i == 0 ? "x" : (i == 1 ? "y" : "z"));
-		tb->setFocusPolicy(Qt::TabFocus);
-		QFontMetrics fm(tb->font());
-		QSize size = fm.boundingRect("DEL").size();
-		size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
-		tb->setMinimumSize(size);
-		tb->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+		SYMBOL_BUTTON((i == 0 ? "x" : (i == 1 ? "y" : "z")), 0, i);
 		int id = 0;
 		if(i == 0) id = VARIABLE_ID_X;
 		else if(i == 1) id = VARIABLE_ID_Y;
 		else if(i == 2) id = VARIABLE_ID_Z;
-		tb->setFont(ifont);
-		QMenu *menu = new QMenu(this);
-		tb->setMenu(menu);
-		tb->setPopupMode(QToolButton::MenuButtonPopup);
-		connect(tb, SIGNAL(clicked()), this, SLOT(onSymbolToolButtonClicked()));
-		grid->addWidget(tb, 0, i);
-		menu->addSeparator();
+		button->setFont(ifont);
+		menu = new QMenu(this);
+		button->setMenu(menu);
 		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateAssumptions()));
 		menu->setProperty(BUTTON_DATA, id);
-		QAction *action = menu->addAction(tr("Default assumptions"), this, SLOT(defaultAssumptionsActivated())); action->setProperty(BUTTON_DATA, id);
-		QActionGroup *group = new QActionGroup(this); group->setObjectName("group_type_" + tb->text());
-		action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_NUMBER); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_REAL); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_RATIONAL); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_INTEGER); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_TYPE_BOOLEAN); action->setProperty(BUTTON_DATA, id);
-		menu->addSeparator();
-		group = new QActionGroup(this); group->setObjectName("group_sign_" + tb->text());
-		action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_UNKNOWN); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONZERO); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_POSITIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONNEGATIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NEGATIVE); action->setProperty(BUTTON_DATA, id);
-		action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
-		action->setData(ASSUMPTION_SIGN_NONPOSITIVE);
 	}
 	SYMBOL_BUTTON("n", 0, 3);
 	SYMBOL_BUTTON2("=", SIGN_NOT_EQUAL, 1, 2);
@@ -393,8 +459,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	button = new KeypadButton("<font size=\"-1\">a(x)<sup>b</sup></font>", this);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(factorizeClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(expandClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(expandClicked()));
-	button->setToolTip(tr("Factorize"), tr("Expand"));
+	connect(button, SIGNAL(clicked3()), this, SIGNAL(expandPartialFractionsClicked()));
+	button->setToolTip(tr("Factorize"), tr("Expand"), tr("Expand partial fractions"));
 	grid->addWidget(button, 3, 3);
 	ITEM_BUTTON(CALCULATOR->getVariableById(VARIABLE_ID_PI), SIGN_PI, 1, 0);
 	ITEM_BUTTON2(CALCULATOR->getVariableById(VARIABLE_ID_E), CALCULATOR->getFunctionById(FUNCTION_ID_EXP), "e", 1, 1);
@@ -410,16 +476,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	grid = new QGridLayout(keypadC);
 	grid->setContentsMargins(0, 0, 0, 0);
 	customGrid = grid;
-	customEditButton = new QToolButton(this);
-	customEditButton->setIcon(LOAD_ICON("document-edit"));
-	customEditButton->setFocusPolicy(Qt::TabFocus);
+	customEditButton = new KeypadButton(LOAD_ICON("document-edit"), this);
 	customEditButton->setCheckable(true);
-	QFontMetrics fm(customEditButton->font());
-	QSize size = fm.boundingRect("DEL").size();
-	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
-	customEditButton->setMinimumSize(size);
-	customEditButton->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-	QMenu *menu = new QMenu(this);
+	menu = new QMenu(this);
 	addColumnAction = menu->addAction(tr("Add column"), this, SLOT(addCustomColumn())); addColumnAction->setEnabled(settings->custom_button_columns < 100);
 	addRowAction = menu->addAction(tr("Add row"), this, SLOT(addCustomRow())); addRowAction->setEnabled(settings->custom_button_rows < 100);
 	removeColumnAction = menu->addAction(tr("Remove column"), this, SLOT(removeCustomColumn())); removeColumnAction->setEnabled(settings->custom_button_columns > 1);
@@ -576,6 +635,327 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 }
 KeypadWidget::~KeypadWidget() {}
 
+void KeypadWidget::updateSinMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SIN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASIN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ASINH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("csc"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("csch"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arccsc"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcsch"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINC))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SININT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SINHINT))
+	}
+}
+void KeypadWidget::updateCosMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COS))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOS))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ACOSH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("sec"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("sech"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcsec"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arsech"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSINT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_COSHINT))
+	}
+}
+void KeypadWidget::updateTanMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TAN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_TANH))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATANH))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("cot"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("coth"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arccot"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("arcoth"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ATAN2))
+	}
+}
+void KeypadWidget::updatePiMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
+	if(menu->isEmpty()) {
+		QMap<QString, ExpressionItem*> map;
+		Variable *v[9];
+		v[0] = CALCULATOR->getActiveVariable("apery");
+		v[1] = CALCULATOR->getVariableById(VARIABLE_ID_CATALAN);
+		v[2] = CALCULATOR->getVariableById(VARIABLE_ID_EULER);
+		v[3] = CALCULATOR->getActiveVariable("golden");
+		v[4] = CALCULATOR->getActiveVariable("omega");
+		v[5] = CALCULATOR->getActiveVariable("plastic");
+		v[6] = CALCULATOR->getActiveVariable("pythagoras");
+		for(size_t i = 0; i < 7; i++) {
+			if(v[i]) map[QString::fromStdString(v[i]->title(true, settings->printops.use_unicode_signs))] = v[i];
+		}
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+			action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+		menu->addSeparator();
+		map.clear();
+		v[0] = CALCULATOR->getActiveVariable("c");
+		v[1] = CALCULATOR->getActiveVariable("newtonian_constant");
+		v[2] = CALCULATOR->getActiveVariable("planck");
+		v[3] = CALCULATOR->getActiveVariable("boltzmann");
+		v[4] = CALCULATOR->getActiveVariable("avogadro");
+		v[5] = CALCULATOR->getActiveVariable("magnetic_constant");
+		v[6] = CALCULATOR->getActiveVariable("electric_constant");
+		v[7] = CALCULATOR->getActiveVariable("characteristic_impedance");
+		v[8] = CALCULATOR->getActiveVariable("standard_gravity");
+		for(size_t i = 0; i < 9; i++) {
+			if(v[i]) map[QString::fromStdString(v[i]->title(true, settings->printops.use_unicode_signs))] = v[i];
+		}
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+			action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+		menu->addSeparator();
+		action = menu->addAction(tr("Enable units in physical constants"), this, SLOT(variableUnitsActivated())); action->setCheckable(true); action->setObjectName("action_variable_units");
+		menu->addSeparator();
+		menu->addAction(tr("All constants"), this, SIGNAL(openVariablesRequest()));
+	}
+	action = findChild<QAction*>("action_variable_units");
+	if(action) action->setChecked(CALCULATOR->variableUnitsEnabled());
+}
+void KeypadWidget::updateLnMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getActiveFunction("log10"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("log2"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGN))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LOGINT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_POLYLOG))
+	}
+}
+void KeypadWidget::updateSqrtMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_CBRT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ROOT))
+		MENU_ITEM(CALCULATOR->getActiveFunction("sqrtpi"))
+	}
+}
+void KeypadWidget::updatePowerMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SQUARE))
+		MENU_ITEM(CALCULATOR->getActiveFunction("exp10"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("exp2"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LAMBERT_W))
+	}
+}
+void KeypadWidget::updateEMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXP))
+		MENU_ITEM(CALCULATOR->getActiveFunction("cis"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_EXPINT))
+	}
+}
+void KeypadWidget::updateFactorialMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GAMMA))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DOUBLE_FACTORIAL))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MULTI_FACTORIAL))
+		MENU_ITEM(CALCULATOR->getActiveFunction("hyperfactorial"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("superfactorial"))
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getActiveFunction("perm"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("comb"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("derangement"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_BINOMIAL))
+	}
+}
+void KeypadWidget::updateSumMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_PRODUCT))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_FOR))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IF))
+	}
+}
+void KeypadWidget::updateXMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	menu->clear();
+	QAction *action;
+	QMap<QString, ExpressionItem*> map;
+	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+		if(!CALCULATOR->variables[i]->isKnown() && !CALCULATOR->variables[i]->isHidden() && CALCULATOR->variables[i]->isActive() && CALCULATOR->variables[i] != CALCULATOR->getVariableById(VARIABLE_ID_X)) {
+			map[QString::fromStdString(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs))] = CALCULATOR->variables[i];
+		}
+	}
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+	}
+}
+void KeypadWidget::updateEqualsMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_SYMBOL(SIGN_NOT_EQUAL);
+		MENU_SYMBOL("<");
+		MENU_SYMBOL(SIGN_LESS_OR_EQUAL);
+		MENU_SYMBOL(">");
+		MENU_SYMBOL(SIGN_GREATER_OR_EQUAL);
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))
+		MENU_ITEM(CALCULATOR->getActiveFunction("solve2"))
+		MENU_ITEM(CALCULATOR->getActiveFunction("linearfunction"))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_D_SOLVE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_NEWTON_RAPHSON))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_SECANT_METHOD))
+	}
+}
+void KeypadWidget::updateFactorizeMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		menu->addAction(tr("Expand"), this, SIGNAL(expandClicked()));
+		menu->addAction(tr("Expand partial fractions"), this, SIGNAL(expandPartialFractionsClicked()));
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DIFFERENTIATE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_INTEGRATE))
+	}
+}
+void KeypadWidget::updatePercentageMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	if(menu->isEmpty()) {
+		ExpressionItem *item;
+		QAction *action;
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_MOD));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_REM));
+		MENU_ITEM(CALCULATOR->getFunction("div"));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ABS));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_GCD));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_LCM));
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_DIVISORS));
+		menu->addSeparator();
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE));
+		MENU_ITEM(CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD));
+		menu->addSeparator();
+		action = menu->addAction(tr("Percentage Calculation Tool"), this, SIGNAL(openPercentageCalculationRequest()));
+	}
+}
+void KeypadWidget::updateUnitsMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	menu->clear();
+	ExpressionItem *item;
+	QAction *action;
+	QMap<QString, ExpressionItem*> map, map2;
+	const char *si_units[] = {"m", "g", "s", "A", "K", "J", "W", "L", "V", "ohm", "N", "Pa", "C", "F", "S", "oC", "Hz", "cd", "mol", "Wb", "T", "H", "lm", "lx", "Bq", "Gy", "Sv", "kat"};
+	size_t n = 0;
+	for(size_t i = 0; i < 5 && i < settings->recent_units.size(); i++) {
+		item = settings->recent_units[i];
+		action = menu->addAction(QString::fromStdString(item->title(true, settings->printops.use_unicode_signs)), this, SLOT(onUnitItemClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) item));
+		n++;
+	}
+	if(n > 0) menu->addSeparator();
+	for(size_t i = 0; i < 28; i++) {
+		item = CALCULATOR->getActiveUnit(si_units[i]);
+		for(size_t i = 0; item && i < 5 && i < settings->recent_units.size(); i++) {
+			if(item == settings->recent_units[i]) {
+				item = NULL;
+				break;
+			}
+		}
+		if(item) {
+			if(n >= 15) map2[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
+			else map[QString::fromStdString(item->title(true, settings->printops.use_unicode_signs))] = item;
+			n++;
+		}
+	}
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onUnitItemClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+	}
+	if(!map2.isEmpty()) {
+		QMenu *menu2 = menu->addMenu(tr("more"));
+		for(QMap<QString, ExpressionItem*>::const_iterator it = map2.constBegin(); it != map2.constEnd(); ++it) {
+			action = menu2->addAction(it.key(), this, SLOT(onUnitItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+		}
+	}
+	menu->addSeparator();
+	for(int i = -9; i <= 12; i += 3) {
+		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+		if(p) {
+			action = menu->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+		}
+	}
+	QMenu *menu2 = menu->addMenu(tr("more"));
+	for(int i = -30; i <= 30; i += 3) {
+		if(i == -9) i = -2;
+		else if(i == 1) i = -1;
+		else if(i == 2) i = 1;
+		else if(i == 4) i = 2;
+		else if(i == 5) i = 15;
+		Prefix *p = CALCULATOR->getExactDecimalPrefix(i);
+		if(p) {
+			action = menu2->addAction(QString::fromStdString(p->longName(true, true)), this, SLOT(onPrefixItemClicked()));
+			action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) p));
+		}
+	}
+	menu->addSeparator();
+	menu->addAction(tr("All units"), this, SIGNAL(openUnitsRequest()));
+}
+void KeypadWidget::updateStoreMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	menu->clear();
+	QAction *action;
+	QMap<QString, ExpressionItem*> map;
+	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
+		if(CALCULATOR->variables[i]->isLocal()) {
+			map[QString::fromStdString(CALCULATOR->variables[i]->title(true, settings->printops.use_unicode_signs))] = CALCULATOR->variables[i];
+		}
+	}
+	for(QMap<QString, ExpressionItem*>::const_iterator it = map.constBegin(); it != map.constEnd(); ++it) {
+		action = menu->addAction(it.key(), this, SLOT(onItemButtonClicked()));
+		action->setProperty(BUTTON_DATA, QVariant::fromValue((void*) it.value()));
+	}
+	if(!map.isEmpty()) menu->addSeparator();
+	menu->addAction(tr("All variables"), this, SIGNAL(openVariablesRequest()));
+}
 void KeypadWidget::updateCustomActionOK() {
 	QListWidgetItem *item = actionList->currentItem();
 	customOKButton->setEnabled(item && (item->data(Qt::UserRole).toInt() < 0 || ((!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !valueEdit->currentText().isEmpty()))));
@@ -592,7 +972,7 @@ void KeypadWidget::customActionOKClicked() {
 	valueEdit->setCurrentText(value);
 }
 void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
-	if(!item || !SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt())) {
+	if(!item || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
 		valueEdit->clear();
 		valueEdit->clearEditText();
 		valueEdit->setEnabled(false);
@@ -638,8 +1018,12 @@ void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidget
 			QStringList citems;
 			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			valueEdit->addItems(citems);
+		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
+			settings->updateActionValueTexts();
+			valueEdit->addItems(settings->copy_action_value_texts);
 		}
-		valueEdit->clearEditText();
+		if(i == SHORTCUT_TYPE_COPY_RESULT) valueEdit->setCurrentText(settings->copy_action_value_texts[0]);
+		else valueEdit->clearEditText();
 	}
 }
 
@@ -698,7 +1082,15 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	connect(valueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateCustomActionOK()));
 	customOKButton = buttonBox->button(QDialogButtonBox::Ok);
 	currentCustomActionChanged(actionList->currentItem(), NULL);
-	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) valueEdit->setCurrentText(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString());
+	if(button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).isValid()) {
+		QString value = button->property(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE)).toString();
+		if(type == SHORTCUT_TYPE_COPY_RESULT) {
+			int v = value.toInt();
+			if(v >= 0 && v < settings->copy_action_value_texts.size()) valueEdit->setCurrentText(settings->copy_action_value_texts[v]);
+		} else {
+			valueEdit->setCurrentText(value);
+		}
+	}
 	customOKButton->setEnabled(false);
 	if(labelEdit) labelEdit->setFocus();
 	else actionList->setFocus();
@@ -724,7 +1116,7 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 		index--;
 		custom_button *cb = &settings->custom_buttons[index];
 		cb->type[i - 1] = actionList->currentItem()->data(Qt::UserRole).toInt();
-		cb->value[i - 1] = valueEdit->currentText().trimmed().toStdString();
+		cb->value[i - 1] = valueEdit->currentText().toStdString();
 		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentItem()->data(Qt::UserRole).toInt());
 		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->currentText());
 		button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
@@ -770,7 +1162,7 @@ void KeypadWidget::addCustomColumn() {
 		customGrid->setRowStretch(r, 1);
 	}
 	customGrid->setColumnStretch(c, 1);
-	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	updateStretch();
 	addColumnAction->setEnabled(settings->custom_button_columns < 100);
 	removeColumnAction->setEnabled(true);
 }
@@ -809,46 +1201,179 @@ void KeypadWidget::removeCustomColumn() {
 		customButtons[c][r]->deleteLater();
 	}
 	customButtons.pop_back();
-	((QBoxLayout*) layout())->setStretchFactor(leftStack, 4 + (settings->custom_button_columns <= 4 ? 0 : (settings->custom_button_columns - 4) * 1.5));
+	updateStretch();
 	addColumnAction->setEnabled(true);
 	removeColumnAction->setEnabled(settings->custom_button_columns > 1);
 }
 void KeypadWidget::onCustomButtonClicked() {
 	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
-	if(b_edit || !button->property(BUTTON_DATA).isValid() || button->property(BUTTON_DATA).toInt() < 0) {
+	if(b_edit || !sender()->property(BUTTON_DATA).isValid() || sender()->property(BUTTON_DATA).toInt() < 0) {
 		editCustomAction(button, 1);
 	} else {
-		emit shortcutClicked(button->property(BUTTON_DATA).toInt(), button->property(BUTTON_VALUE).toString());
+		emit shortcutClicked(sender()->property(BUTTON_DATA).toInt(), sender()->property(BUTTON_VALUE).toString());
 	}
 }
 void KeypadWidget::onCustomButtonClicked2() {
 	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
-	if(b_edit || !button->property(BUTTON_DATA2).isValid() || button->property(BUTTON_DATA2).toInt() < 0) {
+	if(b_edit || !sender()->property(BUTTON_DATA2).isValid() || sender()->property(BUTTON_DATA2).toInt() < 0) {
 		editCustomAction(button, 2);
 	} else {
-		emit shortcutClicked(button->property(BUTTON_DATA2).toInt(), button->property(BUTTON_VALUE2).toString());
+		emit shortcutClicked(sender()->property(BUTTON_DATA2).toInt(), sender()->property(BUTTON_VALUE2).toString());
 	}
 }
 void KeypadWidget::onCustomButtonClicked3() {
 	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
-	if(b_edit || !button->property(BUTTON_DATA3).isValid() || button->property(BUTTON_DATA3).toInt() < 0) {
+	if(b_edit || !sender()->property(BUTTON_DATA3).isValid() || sender()->property(BUTTON_DATA3).toInt() < 0) {
 		editCustomAction(button, 3);
 	} else {
-		emit shortcutClicked(button->property(BUTTON_DATA2).toInt(), button->property(BUTTON_VALUE3).toString());
+		emit shortcutClicked(sender()->property(BUTTON_DATA3).toInt(), sender()->property(BUTTON_VALUE3).toString());
+	}
+}
+void KeypadWidget::intervalDisplayActivated() {
+	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	if(v < 0) {
+		settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+		settings->adaptive_interval_display = true;
+	} else {
+		settings->printops.interval_display = (IntervalDisplay) v;
+		settings->adaptive_interval_display = false;
+	}
+	emit resultFormatUpdated(0);
+}
+void KeypadWidget::intervalCalculationActivated() {
+	settings->evalops.interval_calculation = (IntervalCalculation) qobject_cast<QAction*>(sender())->data().toInt();
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::conciseInputActivated() {
+	CALCULATOR->setConciseUncertaintyInputEnabled(!CALCULATOR->conciseUncertaintyInputEnabled());
+	emit expressionFormatUpdated(false);
+}
+void KeypadWidget::variableUnitsActivated() {
+	CALCULATOR->setVariableUnitsEnabled(!CALCULATOR->variableUnitsEnabled());
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::updateIntervalMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
+	QActionGroup *group;
+	QWidgetAction *aw;
+	if(menu->isEmpty()) {
+		ADD_SECTION(tr("Interval Display"));
+		group = new QActionGroup(this); group->setObjectName("group_interval_display");
+		action = menu->addAction(tr("Adaptive"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(-1);
+		action = menu->addAction(tr("Significant digits"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_SIGNIFICANT_DIGITS);
+		action = menu->addAction(tr("Interval"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_INTERVAL);
+		action = menu->addAction(tr("Plus/minus"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_PLUSMINUS);
+		action = menu->addAction(tr("Relative"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_RELATIVE);
+		action = menu->addAction(tr("Concise"), this, SLOT(intervalDisplayActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_DISPLAY_CONCISE);
+		ADD_SECTION(tr("Interval Calculation"));
+		group = new QActionGroup(this); group->setObjectName("group_interval_calculation");
+		action = menu->addAction(tr("Variance formula"), this, SLOT(intervalCalculationActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_CALCULATION_VARIANCE_FORMULA);
+		action = menu->addAction(tr("Interval arithmetic"), this, SLOT(intervalCalculationActivated())); action->setCheckable(true); group->addAction(action); action->setData(INTERVAL_CALCULATION_INTERVAL_ARITHMETIC);
+		menu->addSeparator();
+		action = menu->addAction(tr("Allow concise uncertainty input"), this, SLOT(conciseInputActivated())); action->setCheckable(true); action->setObjectName("action_concise_input");
+	}
+	group = findChild<QActionGroup*>("group_interval_display");
+	if(!group) return;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == (settings->adaptive_interval_display ? -1 : settings->printops.interval_display)) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+	group = findChild<QActionGroup*>("group_interval_calculation");
+	if(!group) return;
+	actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == settings->evalops.interval_calculation) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
+	}
+	action = findChild<QAction*>("action_concise_input");
+	if(action) action->setChecked(CALCULATOR->conciseUncertaintyInputEnabled());
+}
+void KeypadWidget::complexFormActivated() {
+	settings->evalops.complex_number_form = (ComplexNumberForm) qobject_cast<QAction*>(sender())->data().toInt();
+	settings->complex_angle_form = (settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS);
+	emit expressionCalculationUpdated(0);
+}
+void KeypadWidget::updateComplexMenu() {
+	QMenu *menu = qobject_cast<QMenu*>(sender());
+	ExpressionItem *item;
+	QAction *action;
+	QActionGroup *group;
+	if(menu->isEmpty()) {
+		MENU_SYMBOL("∠")
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_RE))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_IM))
+		MENU_ITEM(CALCULATOR->getFunctionById(FUNCTION_ID_ARG))
+		MENU_ITEM(CALCULATOR->getActiveFunction("conj"))
+		menu->addSeparator();
+		menu = menu->addMenu(tr("Complex number form"));
+		group = new QActionGroup(this); group->setObjectName("group_complex_form");
+		action = menu->addAction(tr("Rectangular"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_RECTANGULAR);
+		action = menu->addAction(tr("Exponential"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_EXPONENTIAL);
+		action = menu->addAction(tr("Polar"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_POLAR);
+		action = menu->addAction(tr("Angle/phasor"), this, SLOT(complexFormActivated())); action->setCheckable(true); group->addAction(action); action->setData(COMPLEX_NUMBER_FORM_CIS);
+	}
+	group = findChild<QActionGroup*>("group_complex_form");
+	if(!group) return;
+	QList<QAction*> actions = group->actions();
+	for(int i = 0; i < actions.count(); i++) {
+		if(actions.at(i)->data().toInt() == settings->evalops.complex_number_form) {
+			actions.at(i)->setChecked(true);
+			break;
+		}
 	}
 }
 void KeypadWidget::updateAssumptions() {
 	QMenu *menu = qobject_cast<QMenu*>(sender());
+	QAction *action;
+	QActionGroup *group;
+	QString name;
+	QWidgetAction *aw;
 	int id = menu->property(BUTTON_DATA).toInt();
-	QActionGroup *group = NULL;
+	if(id == VARIABLE_ID_Y) name = "y";
+	else if(id == VARIABLE_ID_Z) name = "z";
+	else name = "x";
+	if(menu->isEmpty()) {
+		ADD_SECTION(tr("Type", "Assumptions type"));
+		group = new QActionGroup(this); group->setObjectName("group_type_" + name);
+		action = menu->addAction(tr("Number"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_NUMBER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Real"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_REAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Rational"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_RATIONAL); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Integer"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_INTEGER); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Boolean"), this, SLOT(assumptionsTypeActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_TYPE_BOOLEAN); action->setProperty(BUTTON_DATA, id);
+		ADD_SECTION(tr("Sign", "Assumptions sign"));
+		group = new QActionGroup(this); group->setObjectName("group_sign_" + name);
+		action = menu->addAction(tr("Unknown", "Unknown assumptions sign"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_UNKNOWN); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-zero"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONZERO); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_POSITIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONNEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Negative"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NEGATIVE); action->setProperty(BUTTON_DATA, id);
+		action = menu->addAction(tr("Non-positive"), this, SLOT(assumptionsSignActivated())); action->setCheckable(true); group->addAction(action);
+		action->setData(ASSUMPTION_SIGN_NONPOSITIVE);
+		menu->addSeparator();
+		action = menu->addAction(tr("Default assumptions"), this, SLOT(defaultAssumptionsActivated())); action->setProperty(BUTTON_DATA, id);
+	}
 	Variable *v = CALCULATOR->getVariableById(id);
 	if(!v || v->isKnown()) return;
 	UnknownVariable *uv = (UnknownVariable*) v;
 	Assumptions *ass = uv->assumptions();
 	if(!ass) ass = CALCULATOR->defaultAssumptions();
-	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_type_x");
-	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_type_y");
-	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_type_z");
+	group = findChild<QActionGroup*>("group_type_" + name);
 	if(!group) return;
 	QList<QAction*> actions = group->actions();
 	for(int i = 0; i < actions.count(); i++) {
@@ -857,10 +1382,7 @@ void KeypadWidget::updateAssumptions() {
 			break;
 		}
 	}
-	group = NULL;
-	if(id == VARIABLE_ID_X) group = findChild<QActionGroup*>("group_sign_x");
-	else if(id == VARIABLE_ID_Y) group = findChild<QActionGroup*>("group_sign_y");
-	else if(id == VARIABLE_ID_Z) group = findChild<QActionGroup*>("group_sign_z");
+	group = findChild<QActionGroup*>("group_sign_" + name);
 	if(!group) return;
 	actions = group->actions();
 	for(int i = 0; i < actions.count(); i++) {
@@ -898,10 +1420,31 @@ void KeypadWidget::assumptionsSignActivated() {
 }
 void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
+	if(leftStack->currentIndex() == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
+		settings->programming_base_changed = false;
+		emit baseClicked(BASE_DECIMAL, true, false);
+	}
 	leftStack->setCurrentIndex(i);
 }
 void KeypadWidget::hideNumpad(bool b) {
 	numpad->setVisible(!b);
+}
+void KeypadWidget::updateStretch() {
+	int left_size = 5;
+	if(settings->separate_keypad_menu_buttons) left_size++;
+	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
+	((QBoxLayout*) layout())->setStretchFactor(leftStack, left_size);
+}
+void KeypadWidget::showSeparateKeypadMenuButtons(bool b) {
+	QList<KeypadButton*> buttons = findChildren<KeypadButton*>();
+	for(int i = 0; i < buttons.count(); i++) {
+		if(buttons.at(i) != customEditButton && buttons.at(i)->menu()) {
+			buttons.at(i)->setPopupMode(b ? QToolButton::MenuButtonPopup : QToolButton::DelayedPopup);
+		}
+		buttons.at(i)->updateSize();
+	}
+	updateStretch();
+	QRect r = geometry(); r.moveTo(0, 0); repaint(r);
 }
 void KeypadWidget::updateBase() {
 	binButton->setChecked(settings->printops.base == 2 && settings->evalops.parse_options.base == 2);
@@ -937,6 +1480,11 @@ void KeypadWidget::changeEvent(QEvent *e) {
 		backButton->setIcon(LOAD_ICON("go-back"));
 		forwardButton->setIcon(LOAD_ICON("go-forward"));
 		customEditButton->setIcon(LOAD_ICON("document-edit"));
+	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
+		QList<KeypadButton*> buttons = findChildren<KeypadButton*>();
+		for(int i = 0; i < buttons.count(); i++) {
+			buttons.at(i)->updateSize();
+		}
 	}
 	QWidget::changeEvent(e);
 }
@@ -952,81 +1500,90 @@ void KeypadWidget::onHypToggled(bool b) {
 	}
 }
 void KeypadWidget::onSymbolButtonClicked() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit symbolClicked(button->property(BUTTON_DATA).toString());
-}
-void KeypadWidget::onSymbolToolButtonClicked() {
-	QToolButton *button = qobject_cast<QToolButton*>(sender());
-	emit symbolClicked(button->text());
+	emit symbolClicked(sender()->property(BUTTON_DATA).toString());
 }
 void KeypadWidget::onSymbolButtonClicked2() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit symbolClicked(button->property(BUTTON_DATA2).toString());
+	emit symbolClicked(sender()->property(BUTTON_DATA2).toString());
 }
 void KeypadWidget::onSymbolButtonClicked3() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit symbolClicked(button->property(BUTTON_DATA3).toString());
+	emit symbolClicked(sender()->property(BUTTON_DATA3).toString());
 }
 void KeypadWidget::onOperatorButtonClicked() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit operatorClicked(button->property(BUTTON_DATA).toString());
+	emit operatorClicked(sender()->property(BUTTON_DATA).toString());
 }
 void KeypadWidget::onOperatorButtonClicked2() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit operatorClicked(button->property(BUTTON_DATA2).toString());
+	emit operatorClicked(sender()->property(BUTTON_DATA2).toString());
 }
 void KeypadWidget::onOperatorButtonClicked3() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit operatorClicked(button->property(BUTTON_DATA3).toString());
+	emit operatorClicked(sender()->property(BUTTON_DATA3).toString());
 }
 void KeypadWidget::onBaseButtonClicked() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit baseClicked(button->property(BUTTON_DATA).toInt(), true);
+	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
+	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), true, true);
 }
 void KeypadWidget::onBaseButtonClicked2() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	emit baseClicked(button->property(BUTTON_DATA).toInt(), false);
+	settings->programming_base_changed = settings->programming_base_changed || (settings->printops.base == BASE_DECIMAL && settings->evalops.parse_options.base == BASE_DECIMAL);
+	emit baseClicked(sender()->property(BUTTON_DATA).toInt(), false, true);
 }
 void KeypadWidget::onItemButtonClicked() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	ExpressionItem *item = (ExpressionItem*) button->property(BUTTON_DATA).value<void*>();
+	ExpressionItem *item = (ExpressionItem*) sender()->property(BUTTON_DATA).value<void*>();
 	if(item->type() == TYPE_FUNCTION) emit functionClicked((MathFunction*) item);
 	else if(item->type() == TYPE_VARIABLE) emit variableClicked((Variable*) item);
 	else if(item->type() == TYPE_UNIT) emit unitClicked((Unit*) item);
 }
+void KeypadWidget::onPrefixItemClicked() {
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA).value<void*>());
+}
+void KeypadWidget::onUnitItemClicked() {
+	Unit *u = (Unit*) sender()->property(BUTTON_DATA).value<void*>();
+	emit unitClicked(u);
+	if(unicode_length(u->print(false, true, true)) <= 3) {
+		settings->latest_button_unit = u->print(false, true, true);
+		unitButton->setText(QString::fromStdString(settings->latest_button_unit));
+		Prefix *p1 = CALCULATOR->getExactDecimalPrefix(-3), *p2 = CALCULATOR->getExactDecimalPrefix(3);
+		unitButton->setToolTip(QString::fromStdString(u->title(true, settings->printops.use_unicode_signs)), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
+		unitButton->setProperty(BUTTON_DATA, QVariant::fromValue((void*) u));
+	}
+}
+void KeypadWidget::onUnitButtonClicked2() {
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA2).value<void*>());
+}
+void KeypadWidget::onUnitButtonClicked3() {
+	emit prefixClicked((Prefix*) sender()->property(BUTTON_DATA3).value<void*>());
+}
 void KeypadWidget::onItemButtonClicked2() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	ExpressionItem *item = (ExpressionItem*) button->property(BUTTON_DATA2).value<void*>();
+	ExpressionItem *item = (ExpressionItem*) sender()->property(BUTTON_DATA2).value<void*>();
 	if(item->type() == TYPE_FUNCTION) emit functionClicked((MathFunction*) item);
 	else if(item->type() == TYPE_VARIABLE) emit variableClicked((Variable*) item);
 	else if(item->type() == TYPE_UNIT) emit unitClicked((Unit*) item);
 }
 void KeypadWidget::onItemButtonClicked3() {
-	QPushButton *button = qobject_cast<QPushButton*>(sender());
-	ExpressionItem *item = (ExpressionItem*) button->property(BUTTON_DATA3).value<void*>();
+	ExpressionItem *item = (ExpressionItem*) sender()->property(BUTTON_DATA3).value<void*>();
 	if(item->type() == TYPE_FUNCTION) emit functionClicked((MathFunction*) item);
 	else if(item->type() == TYPE_VARIABLE) emit variableClicked((Variable*) item);
 	else if(item->type() == TYPE_UNIT) emit unitClicked((Unit*) item);
 }
 
-KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat) : QPushButton(text.contains("</") ? QString() : text, parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
+KeypadButton::KeypadButton(const QString &text, QWidget *parent, bool autorepeat) : QToolButton(parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
 	setFocusPolicy(Qt::TabFocus);
 	if(text.contains("</")) richtext = text;
-	QFontMetrics fm(font());
-	QSize size = fm.boundingRect("DEL").size();
-	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
-	setMinimumSize(size);
+	else setText(text);
+	updateSize();
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
-KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QPushButton(icon, QString(), parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
+KeypadButton::KeypadButton(const QIcon &icon, QWidget *parent, bool autorepeat) : QToolButton(parent), longPressTimer(NULL), b_longpress(false), b_autorepeat(autorepeat) {
+	setIcon(icon);
 	setFocusPolicy(Qt::TabFocus);
-	QFontMetrics fm(font());
-	QSize size = fm.boundingRect("DEL").size();
-	size.setWidth(size.width() + 10); size.setHeight(size.height() + 10);
-	setMinimumSize(size);
+	updateSize();
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 }
 KeypadButton::~KeypadButton() {}
+void KeypadButton::updateSize() {
+	QFontMetrics fm(font());
+	QSize size = fm.boundingRect("STO").size();
+	size.setWidth((size.width() * 1.5) + (settings->separate_keypad_menu_buttons && menu() ? 10 : 0)); size.setHeight(size.height() * 1.6);
+	setMinimumSize(size);
+}
 void KeypadButton::setRichText(const QString &text) {
 	richtext = text;
 	setText(QString());
@@ -1034,8 +1591,25 @@ void KeypadButton::setRichText(const QString &text) {
 const QString &KeypadButton::richText() const {
 	return richtext;
 }
+void KeypadButton::menuSet() {
+	if(settings->separate_keypad_menu_buttons) updateSize();
+	QString str = toolTip();
+	if(!str.isEmpty()) {
+		str.replace(tr("<i>Right-click/long press</i>: %1").arg(QString()), tr("<i>Right-click</i>: %1").arg(QString()));
+		str += "<br>";
+	}
+	str += tr("<i>Long press</i>: %1").arg(tr("Open menu"));
+	QToolButton::setToolTip(str);
+	connect(menu(), SIGNAL(aboutToShow()), this, SLOT(menuOpened()));
+	connect(menu(), SIGNAL(aboutToHide()), this, SLOT(menuClosed()));
+}
+void KeypadButton::menuOpened() {
+	if(longPressTimer && longPressTimer->isActive()) longPressTimer->stop();
+}
+void KeypadButton::menuClosed() {
+}
 void KeypadButton::paintEvent(QPaintEvent *p) {
-	QPushButton::paintEvent(p);
+	QToolButton::paintEvent(p);
 	if(!richtext.isEmpty()) {
 		QPainter painter(this);
 		QTextDocument doc;
@@ -1043,8 +1617,9 @@ void KeypadButton::paintEvent(QPaintEvent *p) {
 		QFont f = font();
 		doc.setDefaultFont(f);
 		QPointF point = p->rect().center();
+		bool b_menu = (menu() && settings->separate_keypad_menu_buttons);
 		point.setY(point.y() - doc.size().height() / 2.0 + 2.0);
-		point.setX(point.x() - doc.size().width() / 2.0 + 2.0);
+		point.setX((point.x() - (b_menu ? 6.0 : 0.0)) - doc.size().width() / 2.0 + 2.0);
 		painter.translate(point);
 		painter.save();
 		doc.drawContents(&painter);
@@ -1052,7 +1627,8 @@ void KeypadButton::paintEvent(QPaintEvent *p) {
 	}
 }
 void KeypadButton::mousePressEvent(QMouseEvent *e) {
-	if(e->button() == Qt::LeftButton) {
+	b_longpress = false;
+	if(e->button() == Qt::LeftButton && (!menu() || popupMode() != QToolButton::DelayedPopup)) {
 		if(!longPressTimer) {
 			longPressTimer = new QTimer(this);
 			longPressTimer->setSingleShot(!b_autorepeat);
@@ -1060,11 +1636,17 @@ void KeypadButton::mousePressEvent(QMouseEvent *e) {
 		}
 		longPressTimer->start(b_autorepeat ? 250 : 500);
 	}
-	QPushButton::mousePressEvent(e);
+	QToolButton::mousePressEvent(e);
 }
 void KeypadButton::longPressTimeout() {
-	if(b_autorepeat) emit clicked();
-	else emit clicked2();
+	b_longpress = true;
+	if(menu()) {
+		showMenu();
+	} else if(b_autorepeat) {
+		emit clicked();
+	} else {
+		emit clicked2();
+	}
 }
 void KeypadButton::mouseReleaseEvent(QMouseEvent *e) {
 	if(e->button() == Qt::RightButton) {
@@ -1072,11 +1654,16 @@ void KeypadButton::mouseReleaseEvent(QMouseEvent *e) {
 	} else if(e->button() == Qt::MiddleButton) {
 		emit clicked3();
 	} else {
-		if(b_longpress && e->button() == Qt::LeftButton) {b_longpress = false; return;}
 		if(longPressTimer && longPressTimer->isActive() && e->button() == Qt::LeftButton) {
 			longPressTimer->stop();
+		} else if(b_longpress && e->button() == Qt::LeftButton) {
+			b_longpress = false;
+			blockSignals(true);
+			QToolButton::mouseReleaseEvent(e);
+			blockSignals(false);
+			return;
 		}
-		QPushButton::mouseReleaseEvent(e);
+		QToolButton::mouseReleaseEvent(e);
 	}
 }
 void KeypadButton::setToolTip(const QString &s1, const QString &s2, const QString &s3) {
@@ -1091,7 +1678,7 @@ void KeypadButton::setToolTip(const QString &s1, const QString &s2, const QStrin
 		if(!str.isEmpty()) str += "<br>";
 		str += tr("<i>Middle-click</i>: %1").arg(s3);
 	}
-	QPushButton::setToolTip(str);
+	QToolButton::setToolTip(str);
 }
 
 

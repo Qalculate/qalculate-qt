@@ -46,7 +46,7 @@
  </description>
  <screenshots>
   <screenshot type="default">
-   <image>https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png</image>
+   <image>https://raw.githubusercontent.com/Qalculate/qalculate-qt/master/data/io.github.Qalculate.qalculate-qt.png</image>
    <caption>The main window with keypad visible</caption>
   </screenshot>
  </screenshots>
@@ -55,7 +55,9 @@
  <url type="help">https://qalculate.github.io/manual/index.html</url>
  <url type="donation">https://www.paypal.me/HannaKnutsson</url>
  <url type="translate">https://github.com/Qalculate/libqalculate/blob/master/README.translate</url>
- <developer_name>Hanna Knutsson</developer_name>
+ <developer id="io.github.Qalculate">
+  <name>Hanna Knutsson</name>
+ </developer>
  <content_rating type="oars-1.0"/>
  <kudos>
   <kudo>HiDpiIcon</kudo>
@@ -68,6 +70,159 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="5.0.0" date="2024-03-11">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Detection of potential spelling mistakes (a warning will be shown)</li>
+      <li>Add support for n...m, j:k, and j:i:k syntax, for sequence of numbers, e.g. 1...3 = (1:3) = (1:1:3) = [1  2  3] (note that brackets may be required for colon syntax to avoid conflict with time format)</li>
+      <li>Improved "where" operator, including improved output of parsed expression, support for previously undefined variable names, and assignments before expression (e.g. "a=2, b=2, a^b")</li>
+      <li>Click on binary digit in bases dock to flip bit</li>
+      <li>Improvements/fixes to conversion completion and menus</li>
+      <li>Add retry and cancel buttons to error dialog after failure to save preferences, definitions, or workspace</li>
+      <li>Add last result to stack when pressing Enter with empty expression (was unintentionally disabled)</li>
+      <li>More rounding methods</li>
+      <li>New units: LightSecond, LightMinute, and LightHour</li>
+      <li>New functions: bitget(), bitset(), setbits(), integerDigits(), digitGet(), digitSet(), flip(), colon(), and foreach()</li>
+      <li>Support for hexadecimal floating-point literals using 0x...p... notation (0x1.4p3 = 0x1.4 * 2^3 = 10)</li>
+      <li>Add support for "decimals" "to"-conversion (display as decimal fraction)</li>
+      <li>Allow plot grid values higher than 1 (true) to specify line width</li>
+      <li>Improve handling of zero solution and initial guess in newtonsolve() and secantsolve(), and check validity of solution</li>
+      <li>Change handling a vectors in multiple function arguments (of non-vector type) - return vector instead of matrix, require equal number of elements, and use the same vector index for all arguments for each function instance (e.g. atan2([1  2], [3  4]) = [atan2(1, 3)  atan(2 4)]</li>
+      <li>Set handle vector property by default, for text, date, and boolean arguments, and for arguments, in global non-builtin functions, without specified type, and enable parsing of vectors for text arguments</li>
+      <li>Do not apply "read precision" setting to exponents for values with units</li>
+      <li>Change from line to point (or dot) plot style for data with many discontinuous points</li>
+      <li>lambertw(x*e^x, 0)=x if x>=-1</li>
+      <li>Use parentheses for number with scientific notation in more cases</li>
+      <li>Fix x and y reversed for paired matrix when using plot dialog</li>
+      <li>Fix saving of handle vector function argument property</li>
+      <li>Fix saving of multiple names after editing of existing unit</li>
+      <li>Fix saving of preferences when a workspace, other than the default, is currently open and the general preferences file does not exist</li>
+      <li>Fix dsolve(diff(y, x) = y), and similar</li>
+      <li>Fix log(1, 1) (undefined)</li>
+      <li>Fix "to"-conversion to prefix and add "prefix" conversion option (for optimal prefix)</li>
+      <li>Fix segfault in newtonsolve() and secantsolve() when equation does not contain variable</li>
+      <li>Fix conversion to angle unit for complex angle, cis and polar forms</li>
+      <li>Exchange rates fixes</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.9.0" date="2023-11-27">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Support for specifying a fixed denominator for display of fractions (e.g. "0.3 ft ➞ 1/8 ≈ (3 + 5/8) in")</li>
+      <li>Restore decimal number base after closing programming keypad</li>
+      <li>Improve appearance of conversion menu</li>
+      <li>Save position of main window even if size has not changed from the default</li>
+      <li>Always add result to history (even if identical to previous) if expression contains a function generating a random number</li>
+      <li>Prefer capitalized function name (over name with underscore), when completing function name</li>
+      <li>Return gcd of numerators divided by lcm of denominators in gcd() with non-integer rational numbers, and vice versa for lcm()</li>
+      <li>Add units for mean Gregorian and tropical years</li>
+      <li>Ignore underscore in number</li>
+      <li>Replace defunct exchange rates source and fix bitcoin exchange rate</li>
+      <li>Fix custom middle click button action</li>
+      <li>Fix immediate calculation after selecting to-conversion completion</li>
+      <li>Fix asin(x)=a, acos(x)=a, and atan(x)=a, when a contains an angle unit and default angle unit is set</li>
+      <li>Fix output of value converted to unit expression with numerical multiplier in denominator, e.g. "➞ L/(100 km)"</li>
+      <li>Fix segfault when trying to solve "(x*sqrt(x)-y*sqrt(y))/(sqrt(x)-sqrt(y))=x+sqrt(x*y)+y"</li>
+      <li>Fix parsing of case insensitive object name ending with Unicode character when followed by another Unicode character in expression, e.g. "микрометр"</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.8.1" date="2023-09-18">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Fix besselj() and bessely()</li>
+      <li>Fix display of matrices and vectors with complex number form other than rectangular (default)</li>
+      <li>Fix conflict between decibel units (e.g. "0dB") and duodecimal 0d… syntax (now requires at least two digits)</li>
+      <li>Fixes for title options in plot() function</li>
+      <li>Add additional buttons and button menus to general keypad</li>
+      <li>Add option to show all functions, units, and variables in tool button menus</li>
+      <li>Add recently used objects to functions, units, and variables menus</li>
+      <li>Add option to bypass dialog for functions in menu</li>
+      <li>Add option, in context menu, to display text for tool buttons</li>
+      <li>Open functions, units, and variables tool button menus using long-press or right-click (in addition to arrow button), and add keyboard shortcuts</li>
+      <li>Use keypad tool button menu as context menu and show keypad type in title bar of keypad</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.8.0" date="2023-08-21">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Add option to disable tooltips in keypad or everywhere</li>
+      <li>Add option to disable units and to interpret unrecognized symbols as variables (unknowns) to preferences</li>
+      <li>Make closing of application with Escape key optional and disabled by default</li>
+      <li>Hide name column in conversion list when applied to current result</li>
+      <li>Add temporary option to unknown variable edit dialog</li>
+      <li>Add Microship (PIC16/17) 24 and 32 bit floating point formats</li>
+      <li>Add support for specifying position of sign bit in floating point functions</li>
+      <li>Concise (e.g. "1.2345(67)") and relative (e.g. "5+/-2%") notation for output and input (disabled by default for concise notation) of interval</li>
+      <li>Round high precision intervals enclosing integers for integer arguments</li>
+      <li>Optimize rest of unit expression when converting to partial (insufficient) expression (e.g. 18MA×100ns to J = 1.8 J/V)</li>
+      <li>New derived units: Debye, C·m, Daraf, F^-1, V/C, N/C, kcal, kcal/g, kJ</li>
+      <li>Use international foot as base unit for rod</li>
+      <li>Fix fibonacci() for non-integers and recursive use</li>
+      <li>Fix conversion options presented for speed units (and possibly other)</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.7.0" date="2023-07-03">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Allow multiple actions for keyboard shortcuts</li>
+      <li>Add toggle precision, and min, max, or min and max decimals to available shortcut and button actions</li>
+      <li>Add option to exclude units for unformatted ASCII copy</li>
+      <li>Fix copy unformatted ASCII when local digit group separator is same as selected decimal separator</li>
+      <li>Add option to automatically copy result</li>
+      <li>Add optional value to copy result action, allowing expression copy and formatting selection</li>
+      <li>Always set (primary) selection clipboard contents when whole expression is selected or selection is cleared, e.g. after calculation</li>
+      <li>Support for custom default angle unit, e.g. turn, arcsec, arcmin</li>
+      <li>Append default angle unit (instead of always radians) when converting value without unit to angle unit</li>
+      <li>More consistent addition and removal of angle unit from function arguments</li>
+      <li>Always interpret ./, .*, and .^ as entrywise operators if user intention is unclear</li>
+      <li>Change order of operations to place entrywise and ordinary operators on the same precedence level</li>
+      <li>Add function, kron(), for Kronecker product, and constants for Pauli matrices</li>
+      <li>Add radius to planets dataset and update other properties</li>
+      <li>Support replacement of unknown variables within variable values</li>
+      <li>Fix besselj(0, 0)</li>
+      <li>Fix incomplete calculation in tan() with try exact approximation</li>
+      <li>Fix 0/0=0 equality (do not return true) and output of 2/0 (and similar)</li>
+      <li>Fixes and improvements for newtonsolve() and secantsolve()</li>
+      <li>Fix segfault when MathStructure is deleted after Calculator, and in destructor of calculated DynamicVariable (called from Calculator destructor)</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
+  <release version="4.6.1" date="2023-04-17">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Improve abortion of slow calculations</li>
+      <li>Fix segfault and inconsistent behaviour in calculation of a^n mod b when n is negative</li>
+      <li>Add modular exponentiation function, powmod(), with support for calculation of modular inverse</li>
+      <li>Do not make any difference between row and column vectors in magnitude(), norm(), and dot() functions</li>
+      <li>Fix division and exponentiation of scalar by matrix/vector, e.g. 4./[8 4.5]</li>
+      <li>Improve parsing of element-wise operators with comma as decimal separator</li>
+      <li>Fix rref() with different units for different elements</li>
+      <li>Fix segfault with empty vector in uncertainty calculation</li>
+      <li>Fix segfault trying to solve cbrt(x)^(1/3)-x=0</li>
+      <li>Fix segfault in handling of vector variable with uncertainty</li>
+      <li>Fix segfault in function assignment with equals sign (e.g. F()=...), when an object with the same name already exists</li>
+      <li>Fix segfaults in some corner cases</li>
+      <li>Fix internal id does not exist error</li>
+      <li>Fix erroneous simplification of sin(x)^2*y-cos(x)*sin(x)^2*y</li>
+      <li>Do not try to calculate norm() and magnitude() for matrices</li>
+      <li>Fix some memory leaks</li>
+      <li>Fix order of argument titles in csum() function</li>
+     </ul>
+   </description>
+  </release>
   <release version="4.6.0" date="2023-03-06">
    <description>
     <p>Changes:</p>

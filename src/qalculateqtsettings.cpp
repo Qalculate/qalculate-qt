@@ -21,14 +21,15 @@
 #include <QColor>
 #include <QProgressDialog>
 #include <QKeySequence>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QStyleHints>
+#endif
 #include <QDebug>
+
+#include "keypadwidget.h"
 
 #define PREFERENCES_VERSION_BEFORE(i1, i2, i3) (preferences_version[0] < i1 || (preferences_version[0] == i1 && (preferences_version[1] < i2 || (preferences_version[1] == i2 && preferences_version[2] < i3))))
 #define PREFERENCES_VERSION_AFTER(i1, i2, i3) (preferences_version[0] > i1 || (preferences_version[0] == i1 && (preferences_version[1] > i2 || (preferences_version[1] == i2 && preferences_version[2] > i3))))
-
-#define RESET_TZ 	printops.custom_time_zone = (rounding_mode == 2 ? TZ_TRUNCATE : 0);\
-			if(use_duo_syms) printops.custom_time_zone += TZ_DOZENAL;\
-			printops.time_zone = TIME_ZONE_LOCAL;
 
 extern int b_busy;
 
@@ -67,6 +68,38 @@ bool item_in_calculator(ExpressionItem *item) {
 	if(item->type() == TYPE_UNIT) return CALCULATOR->hasUnit((Unit*) item);
 	if(item->type() == TYPE_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
 	return false;
+}
+
+long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, char sgn, const QString &localized_fraction, bool qalc_command) {
+	long int fden = 0;
+	if(!qalc_command && (equalsIgnoreCase(str, "fraction") || equalsIgnoreCase(str, localized_fraction.toStdString()))) {
+		fden = -1;
+	} else {
+		if(str.length() > 2 && str[0] == '1' && str[1] == '/' && str.find_first_not_of(NUMBERS SPACES, 2) == std::string::npos) {
+			fden = s2i(str.substr(2, str.length() - 2));
+		} else if(str.length() > 1 && str[0] == '/' && str.find_first_not_of(NUMBERS SPACES, 1) == std::string::npos) {
+			fden = s2i(str.substr(1, str.length() - 1));
+		} else if(str == "3rds") {
+			fden = 3;
+		} else if(str == "halves") {
+			fden = 2;
+		} else if(str.length() > 3 && str.find("ths", str.length() - 3) != std::string::npos && str.find_first_not_of(NUMBERS SPACES) == str.length() - 3) {
+			fden = s2i(str.substr(0, str.length() - 3));
+		}
+	}
+	if(fden == 1) fden = 0;
+	if(fden != 0) {
+		if(sgn == '-') to_fraction = 2;
+		else if(fden > 0 && sgn == 0) to_fraction = -1;
+		else to_fraction = 1;
+	}
+	return fden;
+}
+long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command) {
+	size_t n = 0;
+	if(str[0] == '-' || str[0] == '+') n = 1;
+	if(n > 0) return get_fixed_denominator_qt2(str.substr(n, str.length() - n), to_fraction, str[0], localized_fraction, qalc_command);
+	return get_fixed_denominator_qt2(str, to_fraction, 0, localized_fraction, qalc_command);
 }
 
 AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
@@ -181,12 +214,20 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(!is_workspace && svar == "favourite_function") {
 		favourite_functions_pre.push_back(svalue);
 		favourite_functions_changed = true;
+	} else if(!is_workspace && svar == "recent_function") {
+		recent_functions_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "favourite_unit") {
 		favourite_units_pre.push_back(svalue);
 		favourite_units_changed = true;
+	} else if(!is_workspace && svar == "recent_unit") {
+		recent_units_pre.push_back(svalue);
+	} else if(!is_workspace && svar == "latest_button_unit") {
+		latest_button_unit = svalue;
 	} else if(!is_workspace && svar == "favourite_variable") {
 		favourite_variables_pre.push_back(svalue);
 		favourite_variables_changed = true;
+	} else if(!is_workspace && svar == "recent_variable") {
+		recent_variables_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "keyboard_shortcut") {
 		default_shortcuts = false;
 		char str1[svalue.length()];
@@ -194,13 +235,29 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		int ks_type = 0;
 		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
 		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
-			keyboard_shortcut *ks = new keyboard_shortcut;
-			if(n == 3) {ks->value = str2; remove_blank_ends(ks->value);}
-			ks->type = (shortcut_type) ks_type;
-			ks->key = str1;
-			ks->new_action = false;
-			ks->action = NULL;
-			keyboard_shortcuts.push_back(ks);
+			keyboard_shortcut *ks = NULL;
+			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+				if(keyboard_shortcuts[i]->key == str1) {
+					ks = keyboard_shortcuts[i];
+					break;
+				}
+			}
+			if(!ks || !PREFERENCES_VERSION_BEFORE(4, 7, 0)) {
+				if(!ks) {
+					ks = new keyboard_shortcut;
+					ks->key = str1;
+					ks->new_action = false;
+					ks->action = NULL;
+					keyboard_shortcuts.push_back(ks);
+				}
+				if(n == 3) {
+					ks->value.push_back(str2);
+					if(ks_type != SHORTCUT_TYPE_TEXT) remove_blank_ends(ks->value[ks->value.size() - 1]);
+				} else {
+					ks->value.push_back("");
+				}
+				ks->type.push_back((shortcut_type) ks_type);
+			}
 		}
 	} else if(!is_workspace && svar == "custom_button_label") {
 		int c = 0, r = 0;
@@ -245,11 +302,29 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			}
 			index--;
 			custom_buttons[index].type[bi] = cb_type;
-			if(n == 5) {custom_buttons[index].value[bi] = str; remove_blank_ends(custom_buttons[index].value[bi]);}
-			else custom_buttons[index].value[bi] = "";
+			if(n == 5) {
+				custom_buttons[index].value[bi] = str;
+				if(cb_type != SHORTCUT_TYPE_TEXT) remove_blank_ends(custom_buttons[index].value[bi]);
+			} else {
+				custom_buttons[index].value[bi] = "";
+			}
 		}
+	} else if(!is_workspace && svar == "show_all_units") {
+		show_all_units = v;
+	} else if(!is_workspace && svar == "show_all_functions") {
+		show_all_functions = v;
+	} else if(!is_workspace && svar == "show_all_variables") {
+		show_all_variables = v;
+	} else if(!is_workspace && svar == "use_function_dialog") {
+		use_function_dialog = v;
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 3) keypad_type = v;
+	} else if(svar == "programming_base_changed") {
+		if(keypad_type == KEYPAD_PROGRAMMING && show_keypad) programming_base_changed = v;
+	} else if(svar == "toolbar_style") {
+		if(v == Qt::ToolButtonIconOnly || v == Qt::ToolButtonTextOnly || v == Qt::ToolButtonTextBesideIcon || v == Qt::ToolButtonTextUnderIcon) toolbar_style = v;
+	} else if(svar == "separate_keypad_menu_buttons") {
+		separate_keypad_menu_buttons = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
 	} else if(svar == "show_keypad") {
@@ -268,6 +343,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		printops.use_max_decimals = v;
 	} else if(svar == "precision") {
 		CALCULATOR->setPrecision(v);
+	} else if(svar == "previous_precision") {
+		previous_precision = v;
 	} else if(svar == "min_exp") {
 		printops.min_exp = v;
 	} else if(svar == "interval_arithmetic") {
@@ -277,7 +354,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS; adaptive_interval_display = true;
 		} else {
 			v--;
-			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_UPPER) {
+			if(v >= INTERVAL_DISPLAY_SIGNIFICANT_DIGITS && v <= INTERVAL_DISPLAY_RELATIVE) {
 				printops.interval_display = (IntervalDisplay) v; adaptive_interval_display = false;
 			}
 		}
@@ -298,19 +375,27 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(svar == "number_fraction_format") {
 		if(v >= FRACTION_DECIMAL && v <= FRACTION_COMBINED) {
 			printops.number_fraction_format = (NumberFractionFormat) v;
-			printops.restrict_fraction_length = (v >= FRACTION_FRACTIONAL);
+			printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
 			dual_fraction = 0;
 		} else if(v == FRACTION_COMBINED + 1) {
 			printops.number_fraction_format = FRACTION_FRACTIONAL;
-			printops.restrict_fraction_length = false;
+			printops.restrict_fraction_length = PREFERENCES_VERSION_AFTER(4, 8, 1);
 			dual_fraction = 0;
 		} else if(v == FRACTION_COMBINED + 2) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = 1;
+		} else if(v == FRACTION_COMBINED + 3) {
+			printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+			dual_fraction = 0;
+		} else if(v == FRACTION_COMBINED + 4) {
+			printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
+			dual_fraction = 0;
 		} else if(v < 0) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = -1;
 		}
+	} else if(svar == "number_fraction_denominator") {
+		CALCULATOR->setFixedDenominator(v);
 	} else if(svar == "complex_number_form") {
 		if(v == COMPLEX_NUMBER_FORM_CIS + 1) {
 			evalops.complex_number_form = COMPLEX_NUMBER_FORM_CIS;
@@ -349,9 +434,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.allow_factorization = (evalops.structuring == STRUCTURING_FACTORIZE);
 		}
 	} else if(svar == "angle_unit") {
-		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_GRADIANS) {
+		if(v >= ANGLE_UNIT_NONE && v <= ANGLE_UNIT_CUSTOM) {
 			evalops.parse_options.angle_unit = (AngleUnit) v;
 		}
+	} else if(svar == "custom_angle_unit") {
+		custom_angle_unit = svalue;
 	} else if(svar == "functions_enabled") {
 		evalops.parse_options.functions_enabled = v;
 	} else if(svar == "variables_enabled") {
@@ -403,14 +490,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.digit_grouping = (DigitGrouping) v;
 		}
 	} else if(svar == "round_halfway_to_even") {
-		printops.round_halfway_to_even = v;
-		rounding_mode = (v ? 1 : 0);
-		RESET_TZ
+		if(v) printops.rounding = ROUNDING_HALF_TO_EVEN;
 	} else if(svar == "rounding_mode") {
-		if(v >= 0 && v <= 2) {
-			rounding_mode = v;
-			RESET_TZ
-			printops.round_halfway_to_even = (v == 1);
+		if(v >= ROUNDING_HALF_AWAY_FROM_ZERO && v <= ROUNDING_DOWN) {
+			if(!PREFERENCES_VERSION_AFTER(4, 9, 0) && v == 2) v = ROUNDING_TOWARD_ZERO;
+			printops.rounding = (RoundingMode) v;
 		}
 	} else if(svar == "approximation") {
 		if(v >= APPROXIMATION_EXACT && v <= APPROXIMATION_APPROXIMATE) {
@@ -427,6 +511,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v >= INTERVAL_CALCULATION_NONE && v <= INTERVAL_CALCULATION_SIMPLE_INTERVAL_ARITHMETIC) {
 			evalops.interval_calculation = (IntervalCalculation) v;
 		}
+	} else if(svar == "concise_uncertainty_input") {
+		CALCULATOR->setConciseUncertaintyInputEnabled(v);
 	} else if(svar == "chain_mode") {
 		chain_mode = v;
 	} else if(svar == "rpn_mode") {
@@ -478,6 +564,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
+		} else if(svar == "autocopy_result") {
+			autocopy_result = v;
 		} else if(svar == "history_expression_type") {
 			history_expression_type = v;
 		} else if(svar == "window_geometry") {
@@ -509,11 +597,21 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "datasets_hsplitter_state") {
 			datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "style") {
+#if defined _WIN32
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0)) style = v;
+#else
 			style = v;
-		} else if(svar == "light_style") {
-			light_style = v;
+#endif
 		} else if(svar == "palette") {
+#ifdef _WIN32
+#if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0) || (v == 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark)) palette = v;
+#	else
+			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0)) palette = v;
+#	endif
+#else
 			palette = v;
+#endif
 		} else if(svar == "color") {
 			colorize_result = v;
 		} else if(svar == "format") {
@@ -524,6 +622,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
 			if(v >= 0 && v <= 4) title_type = v;
+		} else if(svar == "enable_tooltips") {
+			enable_tooltips = v;
+			if(enable_tooltips < 0) enable_tooltips = 1;
+			else if(enable_tooltips > 2) enable_tooltips = 2;
 		} else if(svar == "auto_update_exchange_rates") {
 			auto_update_exchange_rates = v;
 		} else if(svar == "display_expression_status") {
@@ -623,16 +725,21 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "use_unicode_signs") {
 			printops.use_unicode_signs = v;
 		} else if(svar == "e_notation") {
-			printops.lower_case_e = v;
+			if(!v) printops.exp_display = EXP_POWER_OF_10;
+			else printops.exp_display = EXP_LOWERCASE_E;
+		} else if(svar == "exp_display") {
+			if(v >= EXP_UPPERCASE_E && v <= EXP_POWER_OF_10) printops.exp_display = (ExpDisplay) v;
 		} else if(svar == "lower_case_numbers") {
 			printops.lower_case_numbers = v;
 		} else if(svar == "duodecimal_symbols") {
-			use_duo_syms = v;
-			RESET_TZ
+			printops.duodecimal_symbols = v;
 		} else if(svar == "imaginary_j") {
 			do_imaginary_j = v;
 		} else if(svar == "base_display") {
 			if(v >= BASE_DISPLAY_NONE && v <= BASE_DISPLAY_SUFFIX) printops.base_display = (BaseDisplay) v;
+		} else if(svar == "binary_bits") {
+			printops.binary_bits = v;
+			evalops.parse_options.binary_bits = v;
 		} else if(svar == "twos_complement") {
 			printops.twos_complement = v;
 		} else if(svar == "hexadecimal_twos_complement") {
@@ -641,8 +748,12 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.spell_out_logical_operators = v;
 		} else if(svar == "caret_as_xor") {
 			caret_as_xor = v;
+		} else if(svar == "close_with_esc") {
+			close_with_esc = v;
 		} else if(svar == "copy_ascii") {
 			copy_ascii = v;
+		} else if(svar == "copy_ascii_without_units") {
+			copy_ascii_without_units = v;
 		} else if(svar == "decimal_comma") {
 			decimal_comma = v;
 			if(v == 0) CALCULATOR->useDecimalPoint(evalops.parse_options.comma_as_separator);
@@ -683,9 +794,11 @@ void QalculateQtSettings::loadPreferences() {
 	f_answer = CALCULATOR->addFunction(new AnswerFunction());
 
 	CALCULATOR->setPrecision(10);
+	previous_precision = 0;
 	CALCULATOR->useIntervalArithmetic(true);
 	CALCULATOR->setTemperatureCalculationMode(TEMPERATURE_CALCULATION_HYBRID);
 	CALCULATOR->useBinaryPrefixes(0);
+	CALCULATOR->setConciseUncertaintyInputEnabled(false);
 
 	current_workspace = "";
 	save_workspace = -1;
@@ -706,7 +819,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.indicate_infinite_series = false;
 	printops.show_ending_zeroes = true;
 	printops.round_halfway_to_even = false;
-	rounding_mode = 0;
+	printops.rounding = ROUNDING_HALF_AWAY_FROM_ZERO;
 	printops.number_fraction_format = FRACTION_DECIMAL;
 	printops.restrict_fraction_length = false;
 	printops.abbreviate_names = true;
@@ -722,7 +835,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.excessive_parenthesis = false;
 	printops.allow_non_usable = false;
 	printops.lower_case_numbers = false;
-	use_duo_syms = false;
+	printops.duodecimal_symbols = false;
 	printops.lower_case_e = false;
 	printops.base_display = BASE_DISPLAY_SUFFIX;
 	printops.twos_complement = true;
@@ -749,6 +862,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.parse_options.limit_implicit_multiplication = false;
 	evalops.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
 	evalops.parse_options.angle_unit = ANGLE_UNIT_RADIANS;
+	custom_angle_unit = "";
 	evalops.parse_options.dot_as_separator = CALCULATOR->default_dot_as_separator;
 	evalops.parse_options.comma_as_separator = false;
 	evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
@@ -757,6 +871,7 @@ void QalculateQtSettings::loadPreferences() {
 	evalops.interval_calculation = INTERVAL_CALCULATION_VARIANCE_FORMULA;
 
 	title_type = TITLE_APP;
+	programming_base_changed = false;
 	auto_calculate = true;
 	dot_question_asked = false;
 	implicit_question_asked = false;
@@ -768,16 +883,19 @@ void QalculateQtSettings::loadPreferences() {
 	dual_fraction = -1;
 	dual_approximation = -1;
 	auto_update_exchange_rates = 7;
+	close_with_esc = false;
 	rpn_mode = false;
 	rpn_keys = true;
 	rpn_shown = false;
 	caret_as_xor = false;
 	copy_ascii = false;
+	copy_ascii_without_units = false;
 	do_imaginary_j = false;
 	simplified_percentage = true;
 	color = 1;
 	colorize_result = true;
 	format_result = true;
+	enable_tooltips = 1;
 	chain_mode = false;
 	enable_input_method = false;
 	enable_completion = true;
@@ -790,6 +908,8 @@ void QalculateQtSettings::loadPreferences() {
 	expression_status_delay = 1000;
 	prefixes_default = true;
 	keypad_type = 0;
+	toolbar_style = Qt::ToolButtonIconOnly;
+	separate_keypad_menu_buttons = false;
 	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
@@ -806,9 +926,9 @@ void QalculateQtSettings::loadPreferences() {
 	custom_keypad_font = "";
 	custom_app_font = "";
 	style = -1;
-	light_style = -1;
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
+	autocopy_result = false;
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
@@ -848,6 +968,11 @@ void QalculateQtSettings::loadPreferences() {
 	favourite_variables_changed = false;
 	favourite_units_changed = false;
 
+	show_all_functions = false;
+	show_all_variables = false;
+	show_all_units = false;
+	use_function_dialog = true;
+
 	FILE *file = NULL;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	file = fopen(filename.c_str(), "r");
@@ -870,8 +995,8 @@ void QalculateQtSettings::loadPreferences() {
 	default_plot_complex = -1;
 	max_plot_time = 5;
 
-	preferences_version[0] = 4;
-	preferences_version[1] = 6;
+	preferences_version[0] = 5;
+	preferences_version[1] = 0;
 	preferences_version[2] = 0;
 
 	if(file) {
@@ -902,7 +1027,7 @@ void QalculateQtSettings::loadPreferences() {
 	}
 
 	keyboard_shortcut *ks;
-#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type = t; ks->value = v; ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
+#define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type.push_back(t); ks->value.push_back(v); ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
 	if(default_shortcuts) {
 #ifdef _WIN32
 		ADD_SHORTCUT("Ctrl+Q", SHORTCUT_TYPE_QUIT, "")
@@ -925,6 +1050,9 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Ctrl+Enter", SHORTCUT_TYPE_APPROXIMATE, "")
 		ADD_SHORTCUT("Ctrl+Return", SHORTCUT_TYPE_APPROXIMATE, "")
 		ADD_SHORTCUT("Alt+M", SHORTCUT_TYPE_MODE, "")
+		ADD_SHORTCUT("Alt+F", SHORTCUT_TYPE_FUNCTIONS_MENU, "")
+		ADD_SHORTCUT("Alt+U", SHORTCUT_TYPE_UNITS_MENU, "")
+		ADD_SHORTCUT("Alt+V", SHORTCUT_TYPE_VARIABLES_MENU, "")
 		ADD_SHORTCUT("F10", SHORTCUT_TYPE_MENU, "")
 		ADD_SHORTCUT("Ctrl+)", SHORTCUT_TYPE_SMART_PARENTHESES, "")
 		ADD_SHORTCUT("Ctrl+(", SHORTCUT_TYPE_SMART_PARENTHESES, "")
@@ -938,6 +1066,16 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
 	} else if(PREFERENCES_VERSION_BEFORE(4, 1, 2)) {
 		ADD_SHORTCUT("Tab", SHORTCUT_TYPE_COMPLETE, "")
+	} else if(PREFERENCES_VERSION_BEFORE(4, 8, 1)) {
+		bool b1 = false, b2 = false, b3 = false;
+		for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
+			if(keyboard_shortcuts[i]->key == "Alt+F") b1 = true;
+			else if(keyboard_shortcuts[i]->key == "Alt+U") b2 = true;
+			else if(keyboard_shortcuts[i]->key == "Alt+V") b3 = true;
+		}
+		if(!b1) {ADD_SHORTCUT("Alt+F", SHORTCUT_TYPE_FUNCTIONS_MENU, "")}
+		if(!b2) {ADD_SHORTCUT("Alt+U", SHORTCUT_TYPE_UNITS_MENU, "")}
+		if(!b3) {ADD_SHORTCUT("Alt+V", SHORTCUT_TYPE_VARIABLES_MENU, "")}
 	}
 
 	updateMessagePrintOptions();
@@ -960,14 +1098,24 @@ void QalculateQtSettings::loadPreferences() {
 	v_memory->addName(ename);
 	CALCULATOR->addVariable(v_memory);
 
-	if(palette != 1) light_style = style;
+#ifdef _WIN32
+	updateStyle();
+#else
 	if(style >= 0) updateStyle();
 	else if(palette >= 0) updatePalette();
+#endif
 
 	if(!current_workspace.empty()) {
 		if(!loadWorkspace(current_workspace.c_str())) current_workspace = "";
 	}
 
+}
+void QalculateQtSettings::setCustomAngleUnit() {
+	if(!custom_angle_unit.empty()) {
+		CALCULATOR->setCustomAngleUnit(CALCULATOR->getActiveUnit(custom_angle_unit));
+		if(CALCULATOR->customAngleUnit()) custom_angle_unit = CALCULATOR->customAngleUnit()->referenceName();
+	}
+	if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
 }
 void QalculateQtSettings::updateFavourites() {
 	if(favourite_functions_pre.empty()) {
@@ -979,6 +1127,10 @@ void QalculateQtSettings::updateFavourites() {
 			MathFunction *f = CALCULATOR->getActiveFunction(favourite_functions_pre[i]);
 			if(f) favourite_functions.push_back(f);
 		}
+	}
+	for(size_t i = 0; i < recent_functions_pre.size(); i++) {
+		MathFunction *f = CALCULATOR->getActiveFunction(recent_functions_pre[i]);
+		if(f) recent_functions.push_back(f);
 	}
 	if(favourite_units_pre.empty()) {
 		const char *si_units[] = {"m", "kg_c", "s", "A", "K", "mol", "cd"};
@@ -997,6 +1149,11 @@ void QalculateQtSettings::updateFavourites() {
 			if(u) favourite_units.push_back(u);
 		}
 	}
+	for(size_t i = 0; i < recent_units_pre.size(); i++) {
+		Unit *u = CALCULATOR->getActiveUnit(recent_units_pre[i]);
+		if(!u) u = CALCULATOR->getCompositeUnit(recent_units_pre[i]);
+		if(u) recent_units.push_back(u);
+	}
 	if(favourite_variables_pre.empty()) {
 		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_PI));
 		favourite_variables.push_back(CALCULATOR->getVariableById(VARIABLE_ID_E));
@@ -1012,10 +1169,22 @@ void QalculateQtSettings::updateFavourites() {
 			if(v) favourite_variables.push_back(v);
 		}
 	}
+	for(size_t i = 0; i < recent_variables_pre.size(); i++) {
+		Variable *v = CALCULATOR->getActiveVariable(recent_variables_pre[i]);
+		if(v) recent_variables.push_back(v);
+	}
 }
-void QalculateQtSettings::updatePalette() {
+
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+void QalculateQtSettings::updatePalette(bool force_update) {
+	if(!force_update && palette != 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark && (style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("Fusion", Qt::CaseInsensitive) == 0)) return;
+	QPalette p;
+	if(palette == 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
+#else
+void QalculateQtSettings::updatePalette(bool) {
 	QPalette p;
 	if(palette == 1) {
+#endif
 		p.setColor(QPalette::Active, QPalette::Window, QColor(42, 46, 50));
 		p.setColor(QPalette::Active, QPalette::WindowText, QColor(252, 252, 252));
 		p.setColor(QPalette::Active, QPalette::Base, QColor(27, 30, 32));
@@ -1056,7 +1225,18 @@ void QalculateQtSettings::updatePalette() {
 		p.setColor(QPalette::Disabled, QPalette::ButtonText,QColor(101, 101, 101));
 		p.setColor(QPalette::Disabled, QPalette::BrightText, QColor(39, 174, 96));
 	} else {
+#ifdef _WIN32
+		QStyle *s = NULL;
+#if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+		if(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark || style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("windowsvista", Qt::CaseInsensitive) != 0) s = QStyleFactory::create("fusion");
+#else
+		s = QStyleFactory::create("fusion");
+#endif
+		if(!s) s = QApplication::style();
+		p = s->standardPalette();
+#else
 		p = QApplication::style()->standardPalette();
+#endif
 	}
 	QApplication::setPalette(p);
 }
@@ -1067,25 +1247,28 @@ void QalculateQtSettings::updateStyle() {
 	}
 #ifdef _WIN32
 	else {
-		QStyle *s = QStyleFactory::create("windowsvista");
+		QStyle *s = QStyleFactory::create("fusion");
 		if(s) QApplication::setStyle(s);
 	}
 #endif
 	updatePalette();
 }
 
-void QalculateQtSettings::savePreferences(bool save_mode) {
+int QalculateQtSettings::savePreferences(bool save_mode) {
 	std::string homedir = getLocalDir();
 	recursiveMakeDir(homedir);
 	std::string filename = buildPath(homedir, "qalculate-qt.cfg");
-	if(!savePreferences(filename.c_str(), false, save_mode)) {
-		QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Ok);
+	while(!savePreferences(filename.c_str(), false, save_mode)) {
+		int answer = QMessageBox::critical(NULL, QApplication::tr("Error"), QApplication::tr("Couldn't write preferences to\n%1").arg(QString::fromStdString(filename)), QMessageBox::Retry | QMessageBox::Ignore | QMessageBox::Cancel);
+		if(answer == QMessageBox::Ignore) return 0;
+		else if(answer == QMessageBox::Cancel) return -1;
 	}
+	return 1;
 }
 bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspace, bool) {
 	std::string shistory, smode, sgeneral;
 	bool read_default = !is_workspace && !current_workspace.empty();
-	if(read_default) {
+	if(read_default && fileExists(filename)) {
 		FILE *file = fopen(filename, "r");
 		if(!file) return false;
 		char line[1000000L];
@@ -1160,6 +1343,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
 		fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
 		fprintf(file, "enable_input_method=%i\n", enable_input_method);
+		fprintf(file, "enable_tooltips=%i\n", enable_tooltips);
 		fprintf(file, "display_expression_status=%i\n", display_expression_status);
 		fprintf(file, "expression_status_delay=%i\n", expression_status_delay);
 		fprintf(file, "enable_completion=%i\n", enable_completion);
@@ -1168,9 +1352,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "completion_min2=%i\n", completion_min2);
 		fprintf(file, "completion_delay=%i\n", completion_delay);
 		fprintf(file, "style=%i\n", style);
-#ifdef _WIN32
-		if(light_style != style && palette == 1) fprintf(file, "light_style=%i\n", light_style);
-#endif
+		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
+		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
@@ -1186,6 +1369,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
+		fprintf(file, "autocopy_result=%i\n", autocopy_result);
 		fprintf(file, "history_expression_type=%i\n", history_expression_type);
 	}
 	if(read_default) {
@@ -1193,11 +1377,16 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	} else {
 		fprintf(file, "keypad_type=%i\n", keypad_type);
 		if(show_keypad >= 0) fprintf(file, "show_keypad=%i\n", show_keypad);
+		if(programming_base_changed) fprintf(file, "programming_base_changed=%i\n", programming_base_changed);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
 		fprintf(file, "show_bases=%i\n", show_bases);
 	}
 	if(!is_workspace) {
 		fprintf(file, "rpn_keys=%i\n", rpn_keys);
+		fprintf(file, "show_all_functions=%i\n", show_all_functions);
+		fprintf(file, "show_all_units=%i\n", show_all_units);
+		fprintf(file, "show_all_variables=%i\n", show_all_variables);
+		fprintf(file, "use_function_dialog=%i\n", use_function_dialog);
 		if(!current_workspace.empty()) fprintf(file, "last_workspace=%s\n", current_workspace.c_str());
 		if(save_workspace >= 0) fprintf(file, "save_workspace=%i\n", save_workspace);
 		for(size_t i = 0; i < recent_workspaces.size(); i++) {
@@ -1218,8 +1407,10 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		}
 		if(!default_shortcuts) {
 			for(size_t i = 0; i < keyboard_shortcuts.size(); i++) {
-				if(keyboard_shortcuts[i]->value.empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type);
-				else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type, keyboard_shortcuts[i]->value.c_str());
+				for(size_t i2 = 0; i2 < keyboard_shortcuts[i]->type.size(); i2++) {
+					if(keyboard_shortcuts[i]->value[i2].empty()) fprintf(file, "keyboard_shortcut=%s %i\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2]);
+					else fprintf(file, "keyboard_shortcut=%s %i %s\n", keyboard_shortcuts[i]->key.toUtf8().data(), keyboard_shortcuts[i]->type[i2], keyboard_shortcuts[i]->value[i2].c_str());
+				}
 			}
 		}
 		if(favourite_functions_changed) {
@@ -1229,6 +1420,11 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				}
 			}
 		}
+		for(size_t i = 0; i < recent_functions.size(); i++) {
+			if(CALCULATOR->stillHasFunction(recent_functions[i]) && recent_functions[i]->isActive() && recent_functions[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_function=%s\n", recent_functions[i]->referenceName().c_str());
+			}
+		}
 		if(favourite_units_changed) {
 			for(size_t i = 0; i < favourite_units.size(); i++) {
 				if(CALCULATOR->stillHasUnit(favourite_units[i]) && favourite_units[i]->isActive() && favourite_units[i]->category() != CALCULATOR->temporaryCategory()) {
@@ -1236,6 +1432,12 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				}
 			}
 		}
+		for(size_t i = 0; i < recent_units.size(); i++) {
+			if(CALCULATOR->stillHasUnit(recent_units[i]) && recent_units[i]->isActive() && recent_units[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_unit=%s\n", recent_units[i]->referenceName().c_str());
+			}
+		}
+		if(!latest_button_unit.empty()) fprintf(file, "latest_button_unit=%s\n", latest_button_unit.c_str());
 		if(favourite_variables_changed) {
 			for(size_t i = 0; i < favourite_variables.size(); i++) {
 				if(CALCULATOR->stillHasVariable(favourite_variables[i]) && favourite_variables[i]->isActive() && favourite_variables[i]->category() != CALCULATOR->temporaryCategory()) {
@@ -1243,11 +1445,18 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 				}
 			}
 		}
+		for(size_t i = 0; i < recent_variables.size(); i++) {
+			if(CALCULATOR->stillHasVariable(recent_variables[i]) && recent_variables[i]->isActive() && recent_variables[i]->category() != CALCULATOR->temporaryCategory()) {
+				fprintf(file, "recent_variable=%s\n", recent_variables[i]->referenceName().c_str());
+			}
+		}
 		if(default_bits >= 0) fprintf(file, "bit_width=%i\n", default_bits);
 		if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+		fprintf(file, "close_with_esc=%i\n", close_with_esc);
 		fprintf(file, "copy_ascii=%i\n", copy_ascii);
+		fprintf(file, "copy_ascii_without_units=%i\n", copy_ascii_without_units);
 		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
@@ -1256,16 +1465,18 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
 		fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
 		fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
-		fprintf(file, "duodecimal_symbols=%i\n", use_duo_syms);
-		fprintf(file, "e_notation=%i\n", printops.lower_case_e);
+		fprintf(file, "duodecimal_symbols=%i\n", printops.duodecimal_symbols);
+		fprintf(file, "exp_display=%i\n", printops.exp_display);
 		fprintf(file, "imaginary_j=%i\n", CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0);
 		fprintf(file, "base_display=%i\n", printops.base_display);
+		if(printops.binary_bits != 0) fprintf(file, "binary_bits=%i\n", printops.binary_bits);
 		if(tc_set) fprintf(file, "temperature_calculation=%i\n", CALCULATOR->getTemperatureCalculationMode());
 		if(sinc_set) fprintf(file, "sinc_function=%i\n", CALCULATOR->getFunctionById(FUNCTION_ID_SINC)->getDefaultValue(2) == "pi" ? 1 : 0);
 		fprintf(file, "auto_update_exchange_rates=%i\n", auto_update_exchange_rates);
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}
 	if(read_default) {
 		fprintf(file, "\n[Mode]\n");
@@ -1281,9 +1492,14 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "min_exp=%i\n", printops.min_exp);
 		fprintf(file, "negative_exponents=%i\n", printops.negative_exponents);
 		fprintf(file, "sort_minus_last=%i\n", printops.sort_options.minus_last);
-		if(dual_fraction < 0) fprintf(file, "number_fraction_format=%i\n", -1);
-		else if(dual_fraction > 0) fprintf(file, "number_fraction_format=%i\n", FRACTION_COMBINED + 2);
-		else fprintf(file, "number_fraction_format=%i\n", printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL ? FRACTION_COMBINED + 1 : printops.number_fraction_format);
+		int v = printops.number_fraction_format;
+		if(dual_fraction < 0) v = -1;
+		else if(dual_fraction > 0) v = FRACTION_COMBINED + 2;
+		else if(!printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL) v = FRACTION_COMBINED + 1;
+		else if(printops.number_fraction_format == FRACTION_FRACTIONAL_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 3;
+		else if(printops.number_fraction_format == FRACTION_COMBINED_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 4;
+		fprintf(file, "number_fraction_format=%i\n", v);
+		if(v > FRACTION_COMBINED + 2) fprintf(file, "number_fraction_denominator=%li\n", CALCULATOR->fixedDenominator());
 		fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
 		fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
 		fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);
@@ -1305,6 +1521,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "warn_about_denominators_assumed_nonzero=%i\n", evalops.warn_about_denominators_assumed_nonzero);
 		fprintf(file, "structuring=%i\n", evalops.structuring);
 		fprintf(file, "angle_unit=%i\n", evalops.parse_options.angle_unit);
+		if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && CALCULATOR->customAngleUnit()) fprintf(file, "custom_angle_unit=%s\n", CALCULATOR->customAngleUnit()->referenceName().c_str());
 		fprintf(file, "functions_enabled=%i\n", evalops.parse_options.functions_enabled);
 		fprintf(file, "variables_enabled=%i\n", evalops.parse_options.variables_enabled);
 		fprintf(file, "calculate_functions=%i\n", evalops.calculate_functions);
@@ -1317,10 +1534,11 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "allow_infinite=%i\n", evalops.allow_infinite);
 		fprintf(file, "indicate_infinite_series=%i\n", printops.indicate_infinite_series);
 		fprintf(file, "show_ending_zeroes=%i\n", printops.show_ending_zeroes);
-		fprintf(file, "rounding_mode=%i\n", rounding_mode);
+		fprintf(file, "rounding_mode=%i\n", printops.rounding);
 		if(dual_approximation < 0) fprintf(file, "approximation=%i\n", -1);
 		else if(dual_approximation > 0) fprintf(file, "approximation=%i\n", APPROXIMATION_APPROXIMATE + 1);
 		else fprintf(file, "approximation=%i\n", evalops.approximation);
+		fprintf(file, "concise_uncertainty_input=%i\n", CALCULATOR->conciseUncertaintyInputEnabled());
 		fprintf(file, "interval_calculation=%i\n", evalops.interval_calculation);
 		fprintf(file, "rpn_mode=%i\n", rpn_mode);
 		fprintf(file, "chain_mode=%i\n", chain_mode);
@@ -1705,6 +1923,15 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	last_version_check_date.setToCurrentDate();
 }
 
+QString QalculateQtSettings::shortcutText(const std::vector<shortcut_type> &type, const std::vector<std::string> &value) {
+	if(type.size() == 1) return shortcutText(type[0], value[0]);
+	QString str;
+	for(size_t i = 0; i < type.size(); i++) {
+		if(!str.isEmpty()) str += ", ";
+		str += shortcutText(type[i], value[i]);
+	}
+	return str;
+}
 QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 	if(type < 0) return QString();
 	switch(type) {
@@ -1726,7 +1953,7 @@ QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 		}
 		default: {}
 	}
-	if(value.empty()) return shortcutTypeText((shortcut_type) type);
+	if(value.empty() || type == SHORTCUT_TYPE_COPY_RESULT) return shortcutTypeText((shortcut_type) type);
 	return tr("%1: %2").arg(shortcutTypeText((shortcut_type) type)).arg(QString::fromStdString(value));
 }
 QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
@@ -1768,6 +1995,10 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
 		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
 		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}
+		case SHORTCUT_TYPE_PRECISION: {return tr("Toggle precision");}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {return tr("Toggle max decimals");}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {return tr("Toggle min decimals");}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {return tr("Toggle max/min decimals");}
 		case SHORTCUT_TYPE_RPN_MODE: {return tr("Toggle RPN mode");}
 		case SHORTCUT_TYPE_GENERAL_KEYPAD: {return tr("Show general keypad");}
 		case SHORTCUT_TYPE_PROGRAMMING_KEYPAD: {return tr("Toggle programming keypad");}
@@ -1818,15 +2049,22 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_CALCULATE_EXPRESSION: {return tr("Calculate expression");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_NEXT: {return tr("Expression history next");}
 		case SHORTCUT_TYPE_EXPRESSION_HISTORY_PREVIOUS: {return tr("Expression history previous");}
+		case SHORTCUT_TYPE_FUNCTIONS_MENU: {return tr("Open functions menu");}
+		case SHORTCUT_TYPE_UNITS_MENU: {return tr("Open units menu");}
+		case SHORTCUT_TYPE_VARIABLES_MENU: {return tr("Open variables menu");}
 	}
 	return "-";
 }
-
+void QalculateQtSettings::updateActionValueTexts() {
+	if(copy_action_value_texts.isEmpty()) {
+		copy_action_value_texts << tr("Default") << tr("Formatted result") << tr("Unformatted ASCII result") << tr("Unformatted ASCII result without units") << tr("Formatted expression") << tr("Unformatted ASCII expression") << tr("Formatted expression + result") << tr("Unformatted ASCII expression + result");
+	}
+}
 bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w) {
+	if(type != SHORTCUT_TYPE_TEXT) value = value.trimmed();
 	switch(type) {
 		case SHORTCUT_TYPE_FUNCTION: {}
 		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
-			value = value.trimmed();
 			if(value.length() > 2 && value.right(2) == "()") value.chop(2);
 			if(!CALCULATOR->getActiveFunction(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Function not found."), QMessageBox::Ok);
@@ -1835,7 +2073,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_VARIABLE: {
-			value = value.trimmed();
 			if(!CALCULATOR->getActiveVariable(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Variable not found."), QMessageBox::Ok);
 				return false;
@@ -1843,7 +2080,6 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_UNIT: {
-			value = value.trimmed();
 			if(!CALCULATOR->getActiveUnit(value.toStdString())) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
 				return false;
@@ -1851,17 +2087,46 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 			break;
 		}
 		case SHORTCUT_TYPE_OPERATOR: {
-			value = value.trimmed();
 			break;
 		}
 		case SHORTCUT_TYPE_TO_NUMBER_BASE: {}
 		case SHORTCUT_TYPE_INPUT_BASE: {}
 		case SHORTCUT_TYPE_OUTPUT_BASE: {
-			value = value.trimmed();
 			Number nbase; int base;
 			base_from_string(value.toStdString(), base, nbase, type == SHORTCUT_TYPE_INPUT_BASE);
 			if(base == BASE_CUSTOM && nbase.isZero()) {
 				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported base."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_PRECISION: {}
+		case SHORTCUT_TYPE_MIN_DECIMALS: {}
+		case SHORTCUT_TYPE_MAX_DECIMALS: {}
+		case SHORTCUT_TYPE_MINMAX_DECIMALS: {
+			bool ok = false;
+			int v = value.toInt(&ok, 10);
+			if(!ok || v < -1 || (type == SHORTCUT_TYPE_PRECISION && v < 2)) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
+				return false;
+			}
+			break;
+		}
+		case SHORTCUT_TYPE_COPY_RESULT: {
+			if(value.isEmpty()) break;
+			int v = -1;
+			if(value.length() > 1) {
+				updateActionValueTexts();
+				v = copy_action_value_texts.indexOf(value);
+				if(v >= 0) value = QString::number(v);
+			} else {
+				bool ok = false;
+				v = value.toInt(&ok, 10);
+				if(!ok) v = -1;
+			}
+			if(v < 0 || v > 7) {
+				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unsupported value."), QMessageBox::Ok);
+				value = "";
 				return false;
 			}
 			break;
@@ -1910,6 +2175,7 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	history_answer.clear();
 	current_result = NULL;
 	v_memory->set(m_zero);
+	programming_base_changed = false;
 	while(true) {
 		if(fgets(line, 1000000L, file) == NULL) break;
 		stmp = line;

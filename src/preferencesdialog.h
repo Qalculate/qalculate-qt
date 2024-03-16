@@ -26,9 +26,9 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox;
+		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo;
+		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -36,6 +36,7 @@ class PreferencesDialog : public QDialog {
 
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
+		void tooltipsChanged(int);
 		void expressionStatusToggled(bool);
 		void statusDelayChanged(int);
 		void binTwosToggled(bool);
@@ -53,9 +54,11 @@ class PreferencesDialog : public QDialog {
 		void colorizeToggled(bool);
 		void formatToggled(bool);
 		void parsingModeChanged(int);
+		void unknownsToggled(bool);
 		void temperatureCalculationChanged(int);
 		void exratesToggled(bool);
 		void exratesChanged(int);
+		void unitsToggled(bool);
 		void binaryPrefixesToggled(bool);
 		void readPrecisionToggled(bool);
 		void simplifiedPercentageToggled(bool);
@@ -72,6 +75,7 @@ class PreferencesDialog : public QDialog {
 		void variableUnitsToggled(bool);
 		void groupingChanged(int);
 		void intervalDisplayChanged(int);
+		void conciseUncertaintyInputToggled(bool);
 		void limitImplicitToggled(bool);
 		void titleChanged(int);
 		void resultFontClicked();
@@ -88,11 +92,14 @@ class PreferencesDialog : public QDialog {
 		void factorizeToggled(bool);
 		void rpnKeysToggled(bool);
 		void replaceExpressionChanged(int);
+		void autocopyResultToggled(bool);
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
 		void historyExpressionChanged(int);
 		void copyAsciiToggled(bool);
+		void copyAsciiWithoutUnitsToggled(bool);
 		void caretAsXorToggled(bool);
+		void closeWithEscToggled(bool);
 
 	public:
 
@@ -103,6 +110,11 @@ class PreferencesDialog : public QDialog {
 		void updateParsingMode();
 		void updateTemperatureCalculation();
 		void updateExpressionStatus();
+		void updateVariableUnits();
+		void updateComplexForm();
+		void updateIntervalDisplay();
+		void updateIntervalCalculation();
+		void updateConciseUncertaintyInput();
 
 	signals:
 
@@ -111,6 +123,7 @@ class PreferencesDialog : public QDialog {
 		void expressionCalculationUpdated(int);
 		void expressionFormatUpdated(bool);
 		void alwaysOnTopChanged();
+		void enableTooltipsChanged();
 		void titleTypeChanged();
 		void resultFontChanged();
 		void expressionFontChanged();

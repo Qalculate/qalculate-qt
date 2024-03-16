@@ -1080,6 +1080,30 @@ Do you want to overwrite the function?</source>
         <source>Use input method</source>
         <translation>Использовать метод ввода</translation>
     </message>
+    <message>
+        <source>Decimal Fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optimal Prefix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>prefix</source>
+        <translation type="unfinished">префикс</translation>
+    </message>
+    <message>
+        <source>optimal prefix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>decimals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>decimal fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1113,7 +1137,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Decimal value</source>
-        <translation>Десятичное значение</translation>
+        <translation type="vanished">Десятичное значение</translation>
     </message>
     <message>
         <source>Binary representation</source>
@@ -1130,6 +1154,20 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Conversion error</source>
         <translation>Ошибка преобразования</translation>
+    </message>
+    <message>
+        <source>Microchip 24-bit</source>
+        <translatorcomment>Формат числа с плавающей точкой Microship (PIC16/17)</translatorcomment>
+        <translation>Микрочип 24-битный</translation>
+    </message>
+    <message>
+        <source>Microchip 32-bit</source>
+        <translatorcomment>Формат числа с плавающей точкой Microship (PIC16/17)</translatorcomment>
+        <translation>Микрочип 32-битный</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation type="unfinished">Значение</translation>
     </message>
 </context>
 <context>
@@ -1429,6 +1467,10 @@ Do you want to overwrite the function?</source>
             <numerusform>обновлены %1</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
+        <translation>Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>
@@ -1443,6 +1485,14 @@ Do you want to overwrite the function?</source>
     <message>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
+    </message>
+    <message>
+        <source>&lt;i&gt;Long press&lt;/i&gt;: %1</source>
+        <translation>&lt;i&gt;Долгое нажатие&lt;/i&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Open menu</source>
+        <translation>Открыть меню</translation>
     </message>
 </context>
 <context>
@@ -1744,6 +1794,120 @@ Do you want to overwrite the function?</source>
         <source>Division</source>
         <translation>Деление</translation>
     </message>
+    <message>
+        <source>Store</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <source>New function</source>
+        <translation>Новая функция</translation>
+    </message>
+    <message>
+        <source>Expand partial fractions</source>
+        <translation>Развернуть частичные дроби</translation>
+    </message>
+    <message>
+        <source>Enable units in physical constants</source>
+        <translation>Включить единицы измерения в физических константах</translation>
+    </message>
+    <message>
+        <source>All constants</source>
+        <translation>Все константы</translation>
+    </message>
+    <message>
+        <source>Percentage Calculation Tool</source>
+        <translation>Инструмент расчёта процентов</translation>
+    </message>
+    <message>
+        <source>more</source>
+        <translation>ещё</translation>
+    </message>
+    <message>
+        <source>All units</source>
+        <translation>Все единицы</translation>
+    </message>
+    <message>
+        <source>All variables</source>
+        <translation>Все переменные</translation>
+    </message>
+    <message>
+        <source>Interval Display</source>
+        <translation>Отображение интервалов</translation>
+    </message>
+    <message>
+        <source>Adaptive</source>
+        <translation>Адаптивный</translation>
+    </message>
+    <message>
+        <source>Significant digits</source>
+        <translation>Значимые цифры</translation>
+    </message>
+    <message>
+        <source>Plus/minus</source>
+        <translation>Плюс/минус</translation>
+    </message>
+    <message>
+        <source>Relative</source>
+        <translation>Относительный</translation>
+    </message>
+    <message>
+        <source>Concise</source>
+        <translation>Краткая</translation>
+    </message>
+    <message>
+        <source>Interval Calculation</source>
+        <translation>Расчёт интервала</translation>
+    </message>
+    <message>
+        <source>Variance formula</source>
+        <translation>Формула дисперсии</translation>
+    </message>
+    <message>
+        <source>Interval arithmetic</source>
+        <translation>Арифметика интервалов</translation>
+    </message>
+    <message>
+        <source>Allow concise uncertainty input</source>
+        <translation>Разрешить ввод краткой неопределенности</translation>
+    </message>
+    <message>
+        <source>Complex number form</source>
+        <translation>Комплексная форма</translation>
+    </message>
+    <message>
+        <source>Rectangular</source>
+        <translation>Прямоугольная</translation>
+    </message>
+    <message>
+        <source>Exponential</source>
+        <translation>Экспоненциальная</translation>
+    </message>
+    <message>
+        <source>Polar</source>
+        <translation>Полярная</translation>
+    </message>
+    <message>
+        <source>Angle/phasor</source>
+        <translation>Угловая/векторная</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>Assumptions type</comment>
+        <translatorcomment>Тип предположений</translatorcomment>
+        <translation>Тип</translation>
+    </message>
+    <message>
+        <source>Sign</source>
+        <comment>Assumptions sign</comment>
+        <translatorcomment>Знак предположений</translatorcomment>
+        <translation>Знак</translation>
+    </message>
+    <message>
+        <source>STO</source>
+        <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
+        <translatorcomment>Стандартная кнопка калькулятора. Не используйте более трёх символов.</translatorcomment>
+        <translation>СХР</translation>
+    </message>
 </context>
 <context>
     <name>NamesEditDialog</name>
@@ -1769,7 +1933,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Unicode</source>
-        <translation>Юникод</translation>
+        <translation type="vanished">Юникод</translation>
     </message>
     <message>
         <source>Suffix</source>
@@ -2302,7 +2466,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Truncate all numbers</source>
-        <translation>Обрезать все числа</translation>
+        <translation type="vanished">Обрезать все числа</translation>
     </message>
     <message>
         <source>Read precision</source>
@@ -2599,11 +2763,91 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished">Требуется перезапуск</translation>
+        <translation>Требуется перезапуск</translation>
     </message>
     <message>
         <source>Please restart the program for the language change to take effect.</source>
-        <translation type="unfinished">Пожалуйста, перезапустите приложение, чтобы изменение языка вступили в силу.</translation>
+        <translation>Пожалуйста, перезапустите приложение, чтобы изменение языка вступили в силу.</translation>
+    </message>
+    <message>
+        <source>Automatically copy result</source>
+        <translation>Автоматически копировать результат</translation>
+    </message>
+    <message>
+        <source>Copy unformatted ASCII without units</source>
+        <translation>Копировать неформатированный ASCII без единиц измерения</translation>
+    </message>
+    <message>
+        <source>Tooltips:</source>
+        <translation>Tooltips:</translation>
+    </message>
+    <message>
+        <source>Show all</source>
+        <translation>Показывать всё</translation>
+    </message>
+    <message>
+        <source>Hide in keypad</source>
+        <translation>Скрывать на клавиатуре</translation>
+    </message>
+    <message>
+        <source>Hide all</source>
+        <translation>Скрывать всё</translation>
+    </message>
+    <message>
+        <source>Interpret unrecognized symbols as variables</source>
+        <translation>Интерпретировать нераспознанные символы как переменные</translation>
+    </message>
+    <message>
+        <source>Concise</source>
+        <translation>Краткая</translation>
+    </message>
+    <message>
+        <source>Enable units</source>
+        <translation>Включить единицы измерений</translation>
+    </message>
+    <message>
+        <source>Allow concise uncertainty input</source>
+        <translation>Разрешить ввод краткой неопределенности</translation>
+    </message>
+    <message>
+        <source>Close application with Escape key</source>
+        <translation>Закрыть приложение клавишей Esc</translation>
+    </message>
+    <message>
+        <source>Round halfway numbers to odd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers toward zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers to random</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round halfway numbers down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round toward zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round away from zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Round down</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2731,6 +2975,10 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <source>Unsupported base.</source>
         <translation>Неподдерживаемое основание.</translation>
+    </message>
+    <message>
+        <source>Unsupported value.</source>
+        <translation>Неподдерживаемое значение.</translation>
     </message>
 </context>
 <context>
@@ -3161,6 +3409,66 @@ You can get version %3 at %2.</source>
         <source>Clear history</source>
         <translation>Очистить историю</translation>
     </message>
+    <message>
+        <source>Toggle precision</source>
+        <translation>Переключить точность</translation>
+    </message>
+    <message>
+        <source>Toggle max decimals</source>
+        <translation>Переключить максимальное количество десятичных знаков</translation>
+    </message>
+    <message>
+        <source>Toggle min decimals</source>
+        <translation>Переключить минимальное количество десятичных знаков</translation>
+    </message>
+    <message>
+        <source>Toggle max/min decimals</source>
+        <translation>Переключить максимальное/минимальное количество десятичных знаков</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>По умолчанию</translation>
+    </message>
+    <message>
+        <source>Formatted result</source>
+        <translation>Форматированный результат</translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII result</source>
+        <translation>Неформатированный ASCII результат</translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII result without units</source>
+        <translation>Неформатированное ASCII выражение без единиц измерения</translation>
+    </message>
+    <message>
+        <source>Formatted expression</source>
+        <translation>Форматированное выражение</translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII expression</source>
+        <translation>Неформатированное ASCII выражение</translation>
+    </message>
+    <message>
+        <source>Formatted expression + result</source>
+        <translation>Форматированное выражение + результат</translation>
+    </message>
+    <message>
+        <source>Unformatted ASCII expression + result</source>
+        <translation>Неформатированные ASCII выражение + результат</translation>
+    </message>
+    <message>
+        <source>Open functions menu</source>
+        <translation>Открыть меню функций</translation>
+    </message>
+    <message>
+        <source>Open units menu</source>
+        <translation>Открыть меню единиц измерения</translation>
+    </message>
+    <message>
+        <source>Open variables menu</source>
+        <translation>Открыть меню переменных</translation>
+    </message>
 </context>
 <context>
     <name>QalculateTranslator</name>
@@ -3528,7 +3836,7 @@ You can get version %3 at %2.</source>
     <message>
         <source>Other:</source>
         <comment>Number base</comment>
-        <translation>Другое:</translation>
+        <translation type="vanished">Другое:</translation>
     </message>
     <message>
         <source>Precision:</source>
@@ -4052,6 +4360,98 @@ Do you wish to replace the current action (%1)?</source>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
+    <message>
+        <source>Add Action (%1)</source>
+        <translation>Добавить действие (%1)</translation>
+    </message>
+    <message>
+        <source>Plot</source>
+        <translation>График</translation>
+    </message>
+    <message>
+        <source>Separate Menu Buttons</source>
+        <translation>Отделить меню клавиш</translation>
+    </message>
+    <message>
+        <source>Icons only</source>
+        <translation>Только значки</translation>
+    </message>
+    <message>
+        <source>Text only</source>
+        <translation>Только текст</translation>
+    </message>
+    <message>
+        <source>Text beside icons</source>
+        <translation>Текст рядом со значками</translation>
+    </message>
+    <message>
+        <source>Text under icons</source>
+        <translation>Текст под значками</translation>
+    </message>
+    <message>
+        <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
+        <translation>&lt;i&gt;Щелчок правой кнопкой/долгое нажатие&lt;/i&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Favorites</source>
+        <translation>Избранное</translation>
+    </message>
+    <message>
+        <source>Recent</source>
+        <translation>Недавние</translation>
+    </message>
+    <message>
+        <source>User functions</source>
+        <translation>Пользовательские функции</translation>
+    </message>
+    <message>
+        <source>Open dialog</source>
+        <translation>Открыть диалоговое окно</translation>
+    </message>
+    <message>
+        <source>Show all functions</source>
+        <translation>Показать все функции</translation>
+    </message>
+    <message>
+        <source>User units</source>
+        <translation>Пользовательские единицы</translation>
+    </message>
+    <message>
+        <source>more</source>
+        <translation>ещё</translation>
+    </message>
+    <message>
+        <source>Prefixes</source>
+        <translation>Префиксы</translation>
+    </message>
+    <message>
+        <source>Show all units</source>
+        <translation>Показать все единицы измерения</translation>
+    </message>
+    <message>
+        <source>User variables</source>
+        <translation>Пользовательские переменные</translation>
+    </message>
+    <message>
+        <source>Show all variables</source>
+        <translation>Показать все переменные</translation>
+    </message>
+    <message>
+        <source>Open menu</source>
+        <translation>Открыть меню</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished">Копировать</translation>
+    </message>
+    <message>
+        <source>prefix</source>
+        <translation type="unfinished">префикс</translation>
+    </message>
+    <message>
+        <source>decimals</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UnitEditDialog</name>
@@ -4289,6 +4689,10 @@ Do you want to overwrite it?</source>
     <message>
         <source>Question</source>
         <translation>Вопрос</translation>
+    </message>
+    <message>
+        <source>Temporary</source>
+        <translation>Временная</translation>
     </message>
 </context>
 <context>

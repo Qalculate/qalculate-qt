@@ -13,14 +13,13 @@
 #define KEYPAD_WIDGET_H
 
 #include <QWidget>
-#include <QPushButton>
+#include <QToolButton>
 #include <QVector>
 
 #include <libqalculate/qalculate.h>
 
 class QTimer;
 class QStackedLayout;
-class QToolButton;
 class QLineEdit;
 class QComboBox;
 class QListWidget;
@@ -29,8 +28,9 @@ class QDialog;
 class QGridLayout;
 class QAction;
 class QLabel;
+class QPushButton;
 
-class KeypadButton : public QPushButton {
+class KeypadButton : public QToolButton {
 
 	Q_OBJECT
 
@@ -43,6 +43,8 @@ class KeypadButton : public QPushButton {
 		void setToolTip(const QString &s1, const QString &s2 = QString(), const QString &s3 = QString());
 		void setRichText(const QString &text);
 		const QString &richText() const;
+		void menuSet();
+		void updateSize();
 
 	protected:
 
@@ -58,6 +60,8 @@ class KeypadButton : public QPushButton {
 	protected slots:
 
 		void longPressTimeout();
+		void menuOpened();
+		void menuClosed();
 
 	signals:
 
@@ -84,7 +88,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
 		QVector<QVector<KeypadButton*> > customButtons;
@@ -100,13 +104,17 @@ class KeypadWidget : public QWidget {
 		bool b_edit;
 		void changeEvent(QEvent *e);
 		void editCustomAction(KeypadButton*, int);
+		void updateStretch();
 
 	protected slots:
 
 		void onSymbolButtonClicked();
-		void onSymbolToolButtonClicked();
 		void onOperatorButtonClicked();
 		void onItemButtonClicked();
+		void onUnitItemClicked();
+		void onPrefixItemClicked();
+		void onUnitButtonClicked2();
+		void onUnitButtonClicked3();
 		void onSymbolButtonClicked2();
 		void onOperatorButtonClicked2();
 		void onItemButtonClicked2();
@@ -131,6 +139,29 @@ class KeypadWidget : public QWidget {
 		void updateCustomActionOK();
 		void customActionOKClicked();
 		void currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void intervalDisplayActivated();
+		void intervalCalculationActivated();
+		void conciseInputActivated();
+		void variableUnitsActivated();
+		void updateIntervalMenu();
+		void complexFormActivated();
+		void updateComplexMenu();
+		void updateStoreMenu();
+		void updateSinMenu();
+		void updateCosMenu();
+		void updateTanMenu();
+		void updatePiMenu();
+		void updateLnMenu();
+		void updateSqrtMenu();
+		void updatePowerMenu();
+		void updateEMenu();
+		void updateFactorialMenu();
+		void updateSumMenu();
+		void updateXMenu();
+		void updateEqualsMenu();
+		void updateFactorizeMenu();
+		void updatePercentageMenu();
+		void updateUnitsMenu();
 
 	public slots:
 
@@ -138,6 +169,7 @@ class KeypadWidget : public QWidget {
 		void updateSymbols();
 		void setKeypadType(int);
 		void hideNumpad(bool);
+		void showSeparateKeypadMenuButtons(bool);
 
 	signals:
 
@@ -146,6 +178,7 @@ class KeypadWidget : public QWidget {
 		void functionClicked(MathFunction *f);
 		void variableClicked(Variable *v);
 		void unitClicked(Unit *u);
+		void prefixClicked(Prefix *p);
 		void delClicked();
 		void clearClicked();
 		void equalsClicked();
@@ -160,13 +193,21 @@ class KeypadWidget : public QWidget {
 		void MRClicked();
 		void MPlusClicked();
 		void MMinusClicked();
+		void storeClicked();
+		void newFunctionClicked();
 		void backspaceClicked();
 		void answerClicked();
-		void baseClicked(int, bool);
+		void baseClicked(int, bool, bool);
 		void factorizeClicked();
 		void expandClicked();
+		void expandPartialFractionsClicked();
 		void expressionCalculationUpdated(int);
+		void expressionFormatUpdated(bool);
+		void resultFormatUpdated(int);
 		void shortcutClicked(int, const QString&);
+		void openVariablesRequest();
+		void openUnitsRequest();
+		void openPercentageCalculationRequest();
 
 };
 

@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
-	app.setApplicationVersion("4.6.0");
+	app.setApplicationVersion("5.0.0");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -62,7 +62,11 @@ int main(int argc, char **argv) {
 	app.installTranslator(&eqtr);
 	if(!settings->ignore_locale) {
 		if(!settings->custom_lang.isEmpty()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().territory()));
+#else
 			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
+#endif
 #ifdef _WIN32
 			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
 		} else {
@@ -75,7 +79,11 @@ int main(int argc, char **argv) {
 					if(!lang.empty()) {
 						gsub("-", "_", lang);
 						if(lang != QLocale().name().toStdString()) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory()));
+#else
 							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country()));
+#endif
 						}
 						_putenv_s("LANG", lang.c_str());
 					}
@@ -178,7 +186,9 @@ int main(int argc, char **argv) {
 		}
 	}
 
+#ifndef __APPLE__
 	app.setWindowIcon(LOAD_APP_ICON("qalculate-qt"));
+#endif
 
 	new Calculator(settings->ignore_locale);
 
@@ -210,6 +220,16 @@ int main(int argc, char **argv) {
 
 	CALCULATOR->loadLocalDefinitions();
 
+	Unit *u = CALCULATOR->getActiveUnit("L");
+	if(u) settings->volume_category = u->category();
+	u = CALCULATOR->getActiveUnit("teaspoon");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+	u = CALCULATOR->getActiveUnit("gal");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+	u = CALCULATOR->getActiveUnit("UK_gal");
+	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
+
+	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 
 	QalculateWindow *win = new QalculateWindow();

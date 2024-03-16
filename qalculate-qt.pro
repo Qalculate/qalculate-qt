@@ -1,6 +1,9 @@
-VERSION = 4.6.0
+VERSION = 5.0.0
 isEmpty(PREFIX) {
 	PREFIX = /usr/local
+}
+isEmpty(BINDIR) {
+	BINDIR = $$PREFIX/bin
 }
 isEmpty(DESKTOP_DIR) {
 	DESKTOP_DIR = $$PREFIX/share/applications
@@ -46,40 +49,42 @@ SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/dataseteditdia
 
 LANGUAGES = ca de es fr nl pt_BR ru sl sv zh_CN
 
-#parameters: var, prepend, append
-defineReplace(prependAll) {
-	for(a,$$1):result += $$2$${a}$$3
-	return($$result)
-}
-
-TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
-		translations/qalculate-qt_de.ts \
-		translations/qalculate-qt_es.ts \
-		translations/qalculate-qt_fr.ts \
-		translations/qalculate-qt_nl.ts \
-		translations/qalculate-qt_pt_BR.ts \
-		translations/qalculate-qt_ru.ts \
-		translations/qalculate-qt_sl.ts \
-		translations/qalculate-qt_sv.ts \
-		translations/qalculate-qt_zh_CN.ts
-
-TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
-TRANSLATIONS_FILES =
-qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
-	qmfile = $$shadowed($$tsfile)
-	qmfile ~= s,.ts$,.qm,
-	qmdir = $$dirname(qmfile)
-	exists($$qmdir) {
-		mkpath($$qmdir)|error("Aborting.")
+!win32 {
+	#parameters: var, prepend, append
+	defineReplace(prependAll) {
+		for(a,$$1):result += $$2$${a}$$3
+		return($$result)
 	}
-	command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
-	system($$command)|error("Failed to run: $$command")
-	TRANSLATIONS_FILES += $$qmfile
+
+	TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
+			translations/qalculate-qt_de.ts \
+			translations/qalculate-qt_es.ts \
+			translations/qalculate-qt_fr.ts \
+			translations/qalculate-qt_nl.ts \
+			translations/qalculate-qt_pt_BR.ts \
+			translations/qalculate-qt_ru.ts \
+			translations/qalculate-qt_sl.ts \
+			translations/qalculate-qt_sv.ts \
+			translations/qalculate-qt_zh_CN.ts
+
+	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
+	TRANSLATIONS_FILES =
+	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
+		qmfile = $$shadowed($$tsfile)
+		qmfile ~= s,.ts$,.qm,
+		qmdir = $$dirname(qmfile)
+		exists($$qmdir) {
+			mkpath($$qmdir)|error("Aborting.")
+		}
+		command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+		system($$command)|error("Failed to run: $$command")
+		TRANSLATIONS_FILES += $$qmfile
+	}
 }
 
 unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
-	target.path = $$PREFIX/bin
+	target.path = $$BINDIR
 
 	qm.files = 	translations/qalculate-qt_ca.qm \
 			translations/qalculate-qt_de.qm \
@@ -119,7 +124,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 	RESOURCES = icons.qrc flags.qrc
 } else {
 	RESOURCES = icons.qrc flags.qrc translations.qrc
-	target.path = $$PREFIX/bin
+	target.path = $$BINDIR
 	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
 	desktop.path = $$DESKTOP_DIR
 	appicon64.files = data/64/qalculate-qt.png
@@ -132,5 +137,7 @@ unix:!android:!macx {
 	man.path = $$MAN_DIR/man1
 	INSTALLS += man
 }
+
+macx: ICON = data/qalculate.icns
 
 win32: RC_FILE = winicon.rc

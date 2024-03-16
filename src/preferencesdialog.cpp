@@ -23,6 +23,10 @@
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QMessageBox>
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+#	include <QApplication>
+#	include <QStyleHints>
+#endif
 #include <QDebug>
 
 #include "qalculateqtsettings.h"
@@ -100,6 +104,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 #endif
 	BOX_G(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX_G(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
+	BOX_G(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX_G(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	BOX_G(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
 	BOX_G(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
@@ -113,6 +118,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->title_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(titleChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	l2->addWidget(new QLabel(tr("Tooltips:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Show all"), 1);
+	combo->addItem(tr("Hide in keypad"), 2);
+	combo->addItem(tr("Hide all"), 0);
+	combo->setCurrentIndex(combo->findData(settings->enable_tooltips));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(tooltipsChanged(int)));
+	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Style:"), this), r, 0);
 	combo = new QComboBox(this);
 	QStringList list = QStyleFactory::keys();
@@ -121,7 +134,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
 	l2->addWidget(combo, r, 1); r++; styleCombo = combo;
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	BOX_G(tr("Dark mode"), settings->palette == 1 || (settings->palette == -1 && QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark), darkModeToggled(bool));
+#else
 	BOX_G(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
+#endif
 	BOX_G(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX_G(tr("Format result"), settings->format_result, formatToggled(bool));
 	BOX_G1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool)); 
@@ -170,6 +187,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->replace_expression));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(replaceExpressionChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	BOX_G(tr("Automatically copy result"), settings->autocopy_result, autocopyResultToggled(bool));
 	l2->addWidget(new QLabel(tr("Parsing mode:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), PARSING_MODE_ADAPTIVE);
@@ -183,7 +201,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l2->addWidget(combo, r, 1); r++;
 	BOX_G(tr("Simplified percentage calculation"), settings->simplified_percentage, simplifiedPercentageToggled(bool));
 	BOX_G(tr("Read precision"), settings->evalops.parse_options.read_precision != DONT_READ_PRECISION, readPrecisionToggled(bool));
+	BOX_G(tr("Allow concise uncertainty input"), CALCULATOR->conciseUncertaintyInputEnabled(), conciseUncertaintyInputToggled(bool)); conciseUncertaintyInputBox = box;
 	BOX_G(tr("Limit implicit multiplication"), settings->evalops.parse_options.limit_implicit_multiplication, limitImplicitToggled(bool));
+	BOX_G(tr("Interpret unrecognized symbols as variables"), settings->evalops.parse_options.unknowns_enabled, unknownsToggled(bool));
 	l2->addWidget(new QLabel(tr("Interval calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Variance formula"), INTERVAL_CALCULATION_VARIANCE_FORMULA);
@@ -191,17 +211,18 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->evalops.interval_calculation));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalCalculationChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
+	intervalCalculationCombo = combo;
 	BOX_G(tr("Factorize result"), settings->evalops.structuring == STRUCTURING_FACTORIZE, factorizeToggled(bool));
 	l2->setRowStretch(r, 1);
 	l = new QVBoxLayout(w2); l->setSizeConstraint(QLayout::SetFixedSize);
 	BOX(tr("Binary two's complement representation"), settings->printops.twos_complement, binTwosToggled(bool));
 	BOX(tr("Hexadecimal two's complement representation"), settings->printops.hexadecimal_twos_complement, hexTwosToggled(bool));
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
-	BOX(tr("Use special duodecimal symbols"), settings->use_duo_syms, duodecimalSymbolsToggled(bool));
+	BOX(tr("Use special duodecimal symbols"), settings->printops.duodecimal_symbols, duodecimalSymbolsToggled(bool));
 	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
 	BOX(tr("Use Unicode division slash in output"), settings->printops.division_sign == DIVISION_SIGN_DIVISION_SLASH, divisionSlashToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
-	BOX(tr("Use E-notation instead of 10^n"), settings->printops.lower_case_e, eToggled(bool));
+	BOX(tr("Use E-notation instead of 10^n"), settings->printops.exp_display != EXP_POWER_OF_10, eToggled(bool));
 	BOX(tr("Use 'j' as imaginary unit"), CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0, imaginaryJToggled(bool));
 	BOX(tr("Use comma as decimal separator"), CALCULATOR->getDecimalPoint() == COMMA, decimalCommaToggled(bool));
 	decimalCommaBox = box;
@@ -227,19 +248,30 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Significant digits"), INTERVAL_DISPLAY_SIGNIFICANT_DIGITS);
 	combo->addItem(tr("Interval"), INTERVAL_DISPLAY_INTERVAL);
 	combo->addItem(tr("Plus/minus"), INTERVAL_DISPLAY_PLUSMINUS);
+	combo->addItem(tr("Relative"), INTERVAL_DISPLAY_RELATIVE);
+	combo->addItem(tr("Concise"), INTERVAL_DISPLAY_CONCISE);
 	combo->addItem(tr("Midpoint"), INTERVAL_DISPLAY_MIDPOINT);
 	combo->addItem(tr("Lower"), INTERVAL_DISPLAY_LOWER);
 	combo->addItem(tr("Upper"), INTERVAL_DISPLAY_UPPER);
 	if(settings->adaptive_interval_display) combo->setCurrentIndex(0);
 	else combo->setCurrentIndex(combo->findData(settings->printops.interval_display));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(intervalDisplayChanged(int)));
+	intervalDisplayCombo = combo;
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Rounding:"), this), r, 0);
 	combo = new QComboBox(this);
-	combo->addItem(tr("Round halfway numbers away from zero"), 0);
-	combo->addItem(tr("Round halfway numbers to even"), 1);
-	combo->addItem(tr("Truncate all numbers"), 2);
-	combo->setCurrentIndex(combo->findData(settings->rounding_mode));
+	combo->addItem(tr("Round halfway numbers away from zero"), ROUNDING_HALF_AWAY_FROM_ZERO);
+	combo->addItem(tr("Round halfway numbers to even"), ROUNDING_HALF_TO_EVEN);
+	combo->addItem(tr("Round halfway numbers to odd"), ROUNDING_HALF_TO_ODD);
+	combo->addItem(tr("Round halfway numbers toward zero"), ROUNDING_HALF_TOWARD_ZERO);
+	combo->addItem(tr("Round halfway numbers to random"), ROUNDING_HALF_RANDOM);
+	combo->addItem(tr("Round halfway numbers up"), ROUNDING_HALF_UP);
+	combo->addItem(tr("Round halfway numbers down"), ROUNDING_HALF_DOWN);
+	combo->addItem(tr("Round toward zero"), ROUNDING_TOWARD_ZERO);
+	combo->addItem(tr("Round away from zero"), ROUNDING_AWAY_FROM_ZERO);
+	combo->addItem(tr("Round up"), ROUNDING_UP);
+	combo->addItem(tr("Round down"), ROUNDING_DOWN);
+	combo->setCurrentIndex(combo->findData(settings->printops.rounding));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(roundingChanged(int)));
 	l2->addWidget(combo, r, 1); r++;
 	l2->addWidget(new QLabel(tr("Complex number form:"), this), r, 0);
@@ -250,11 +282,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Angle/phasor"), COMPLEX_NUMBER_FORM_CIS);
 	combo->setCurrentIndex(combo->findData(settings->evalops.complex_number_form));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(complexFormChanged(int)));
+	complexFormCombo = combo;
 	l2->addWidget(combo, r, 1); r++;
 	l->addLayout(l2);
 	l->addStretch(1);
 	l2 = new QGridLayout(w3); l2->setSizeConstraint(QLayout::SetFixedSize);
 	r = 0;
+	BOX_G(tr("Enable units"), settings->evalops.parse_options.units_enabled, unitsToggled(bool));
 	BOX_G(tr("Abbreviate names"), settings->printops.abbreviate_names, abbreviateNamesToggled(bool));
 	BOX_G(tr("Use binary prefixes for information units"), CALCULATOR->usesBinaryPrefixes() > 0, binaryPrefixesToggled(bool));
 	l2->addWidget(new QLabel(tr("Automatic unit conversion:"), this), r, 0);
@@ -283,7 +317,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(prefixesChanged(int)));
 	BOX_G(tr("Enable all SI-prefixes"), settings->printops.use_all_prefixes, allPrefixesToggled(bool));
 	BOX_G(tr("Enable denominator prefixes"), settings->printops.use_denominator_prefix, denominatorPrefixToggled(bool));
-	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool));
+	BOX_G(tr("Enable units in physical constants"), CALCULATOR->variableUnitsEnabled(), variableUnitsToggled(bool)); variableUnitsBox = box;
+	BOX_G(tr("Copy unformatted ASCII without units"), settings->copy_ascii_without_units, copyAsciiWithoutUnitsToggled(bool));
 	l2->addWidget(new QLabel(tr("Temperature calculation:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Absolute"), TEMPERATURE_CALCULATION_ABSOLUTE);
@@ -357,6 +392,10 @@ void PreferencesDialog::keepAboveToggled(bool b) {
 	show();
 	emit alwaysOnTopChanged();
 }
+void PreferencesDialog::tooltipsChanged(int i) {
+	settings->enable_tooltips = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	emit enableTooltipsChanged();
+}
 void PreferencesDialog::expressionStatusToggled(bool b) {
 	settings->display_expression_status = b;
 	statusDelayWidget->setEnabled(b);
@@ -378,8 +417,7 @@ void PreferencesDialog::lowerCaseToggled(bool b) {
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::duodecimalSymbolsToggled(bool b) {
-	settings->use_duo_syms = b;
-	RESET_SETTINGS_TZ
+	settings->printops.duodecimal_symbols = b;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::multiplicationDotToggled(bool b) {
@@ -399,7 +437,8 @@ void PreferencesDialog::spellOutToggled(bool b) {
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::eToggled(bool b) {
-	settings->printops.lower_case_e = b;
+	if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
+	else settings->printops.exp_display = EXP_POWER_OF_10;
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::imaginaryJToggled(bool b) {
@@ -448,7 +487,7 @@ void PreferencesDialog::ignoreCommaToggled(bool b) {
 }
 void PreferencesDialog::colorizeToggled(bool b) {
 	settings->colorize_result = b;
-	emit resultDisplayUpdated();
+	emit historyExpressionTypeChanged();
 }
 void PreferencesDialog::formatToggled(bool b) {
 	settings->format_result = b;
@@ -456,7 +495,7 @@ void PreferencesDialog::formatToggled(bool b) {
 }
 void PreferencesDialog::parsingModeChanged(int i) {
 	settings->evalops.parse_options.parsing_mode = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	settings->implicit_question_asked = (settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST);
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) settings->implicit_question_asked = true;
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::temperatureCalculationChanged(int i) {
@@ -478,6 +517,10 @@ void PreferencesDialog::exratesChanged(int i) {
 	} else {
 		exratesSpin->setPrefix(str.right(index));
 	}
+}
+void PreferencesDialog::unitsToggled(bool b) {
+	settings->evalops.parse_options.units_enabled = b;
+	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::binaryPrefixesToggled(bool b) {
 	CALCULATOR->useBinaryPrefixes(b ? 1 : 0);
@@ -503,15 +546,23 @@ void PreferencesDialog::intervalCalculationChanged(int i) {
 	settings->evalops.interval_calculation = (IntervalCalculation) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit expressionCalculationUpdated(0);
 }
+void PreferencesDialog::updateIntervalCalculation() {
+	intervalCalculationCombo->blockSignals(true);
+	intervalCalculationCombo->setCurrentIndex(intervalCalculationCombo->findData(settings->evalops.interval_calculation));
+	intervalCalculationCombo->blockSignals(false);
+}
 void PreferencesDialog::complexFormChanged(int i) {
 	settings->evalops.complex_number_form = (ComplexNumberForm) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	settings->complex_angle_form = (settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS);
 	emit expressionCalculationUpdated(0);
 }
+void PreferencesDialog::updateComplexForm() {
+	complexFormCombo->blockSignals(true);
+	complexFormCombo->setCurrentIndex(complexFormCombo->findData(settings->evalops.complex_number_form));
+	complexFormCombo->blockSignals(false);
+}
 void PreferencesDialog::roundingChanged(int i) {
-	settings->rounding_mode = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	RESET_SETTINGS_TZ
-	settings->printops.round_halfway_to_even = (settings->rounding_mode == 1);
+	settings->printops.rounding = (RoundingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultFormatUpdated();
 }
 void PreferencesDialog::repeatingDecimalsToggled(bool b) {
@@ -521,8 +572,14 @@ void PreferencesDialog::repeatingDecimalsToggled(bool b) {
 void PreferencesDialog::copyAsciiToggled(bool b) {
 	settings->copy_ascii = b;
 }
+void PreferencesDialog::copyAsciiWithoutUnitsToggled(bool b) {
+	settings->copy_ascii_without_units = b;
+}
 void PreferencesDialog::caretAsXorToggled(bool b) {
 	settings->caret_as_xor = b;
+}
+void PreferencesDialog::closeWithEscToggled(bool b) {
+	settings->close_with_esc = b;
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
 	if(b) settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
@@ -552,6 +609,11 @@ void PreferencesDialog::variableUnitsToggled(bool b) {
 	CALCULATOR->setVariableUnitsEnabled(b);
 	emit expressionCalculationUpdated(0);
 }
+void PreferencesDialog::updateVariableUnits() {
+	variableUnitsBox->blockSignals(true);
+	variableUnitsBox->setChecked(CALCULATOR->variableUnitsEnabled());
+	variableUnitsBox->blockSignals(false);
+}
 void PreferencesDialog::groupingChanged(int i) {
 	settings->printops.digit_grouping = (DigitGrouping) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultFormatUpdated();
@@ -566,10 +628,29 @@ void PreferencesDialog::intervalDisplayChanged(int i) {
 	}
 	emit resultFormatUpdated();
 }
+void PreferencesDialog::updateIntervalDisplay() {
+	intervalDisplayCombo->blockSignals(true);
+	if(settings->adaptive_interval_display) intervalDisplayCombo->setCurrentIndex(0);
+	else intervalDisplayCombo->setCurrentIndex(intervalDisplayCombo->findData(settings->printops.interval_display));
+	intervalDisplayCombo->blockSignals(false);
+}
+void PreferencesDialog::conciseUncertaintyInputToggled(bool b) {
+	CALCULATOR->setConciseUncertaintyInputEnabled(b);
+	emit expressionFormatUpdated(false);
+}
+void PreferencesDialog::updateConciseUncertaintyInput() {
+	conciseUncertaintyInputBox->blockSignals(true);
+	conciseUncertaintyInputBox->setChecked(CALCULATOR->conciseUncertaintyInputEnabled());
+	conciseUncertaintyInputBox->blockSignals(false);
+}
 void PreferencesDialog::limitImplicitToggled(bool b) {
 	settings->evalops.parse_options.limit_implicit_multiplication = b;
 	settings->printops.limit_implicit_multiplication = b;
 	emit expressionFormatUpdated(true);
+}
+void PreferencesDialog::unknownsToggled(bool b) {
+	settings->evalops.parse_options.unknowns_enabled = b;
+	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::titleChanged(int i) {
 	settings->title_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
@@ -648,25 +729,24 @@ void PreferencesDialog::darkModeToggled(bool b) {
 	else settings->palette = -1;
 #ifdef _WIN32
 	if(b) {
-		if(styleCombo->currentIndex() == 0 || styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
+		if(styleCombo->currentText().compare("windowsvista", Qt::CaseInsensitive) == 0) {
 			for(int i = 1; i < styleCombo->count(); i++) {
 				if(styleCombo->itemText(i).compare("Fusion", Qt::CaseInsensitive) == 0) {
-					int prev_style = settings->style;
 					styleCombo->setCurrentIndex(i);
-					settings->light_style = prev_style;
 					break;
 				}
 			}
 		}
-	} else if(settings->light_style != settings->style && styleCombo->currentText().compare("Fusion", Qt::CaseInsensitive) == 0) {
-		styleCombo->setCurrentIndex(settings->light_style < 0 ? 0 : settings->light_style + 1);
 	}
 #endif
+#if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+	settings->updatePalette(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark);
+#else
 	settings->updatePalette();
+#endif
 }
 void PreferencesDialog::styleChanged(int i) {
 	settings->style = i - 1;
-	settings->light_style = settings->style;
 	settings->updateStyle();
 }
 void PreferencesDialog::factorizeToggled(bool b) {
@@ -680,6 +760,9 @@ void PreferencesDialog::closeEvent(QCloseEvent *e) {
 }
 void PreferencesDialog::replaceExpressionChanged(int i) {
 	settings->replace_expression = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+}
+void PreferencesDialog::autocopyResultToggled(bool b) {
+	settings->autocopy_result = b;
 }
 void PreferencesDialog::historyExpressionChanged(int i) {
 	settings->history_expression_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();

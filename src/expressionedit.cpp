@@ -1,7 +1,7 @@
 /*
     Qalculate (QT UI)
 
-    Copyright (C) 2021  Hanna Knutsson (hanna.knutsson@protonmail.com)
+    Copyright (C) 2021-2024  Hanna Knutsson (hanna.knutsson@protonmail.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,8 +56,6 @@
 
 #include <unordered_map>
 std::unordered_map<const ExpressionName*, std::string> capitalized_names;
-
-extern bool transform_expression_for_equals_save(std::string&, const ParseOptions&);
 
 class ExpressionTipLabel : public QLabel {
 
@@ -242,54 +240,9 @@ bool last_is_operator(std::string str, bool allow_exp) {
 	return false;
 }
 
-void fix_to_struct_qt(MathStructure &m) {
-	if(m.isPower() && m[0].isUnit()) {
-		if(m[0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-			Unit *u = CALCULATOR->getLocalCurrency();
-			if(u) m[0].setUnit(u);
-		}
-		if(m[0].prefix() == NULL && m[0].unit()->defaultPrefix() != 0) {
-			m[0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[0].unit()->defaultPrefix()));
-		}
-	} else if(m.isUnit()) {
-		if(m.unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-			Unit *u = CALCULATOR->getLocalCurrency();
-			if(u) m.setUnit(u);
-		}
-		if(m.prefix() == NULL && m.unit()->defaultPrefix() != 0) {
-			m.setPrefix(CALCULATOR->getExactDecimalPrefix(m.unit()->defaultPrefix()));
-		}
-	} else {
-		for(size_t i = 0; i < m.size();) {
-			if(m[i].isUnit()) {
-				if(m[i].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-					Unit *u = CALCULATOR->getLocalCurrency();
-					if(u) m[i].setUnit(u);
-				}
-				if(m[i].prefix() == NULL && m[i].unit()->defaultPrefix() != 0) {
-					m[i].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i].unit()->defaultPrefix()));
-				}
-				i++;
-			} else if(m[i].isPower() && m[i][0].isUnit()) {
-				if(m[i][0].unit() == CALCULATOR->getUnitById(UNIT_ID_EURO)) {
-					Unit *u = CALCULATOR->getLocalCurrency();
-					if(u) m[i][0].setUnit(u);
-				}
-				if(m[i][0].prefix() == NULL && m[i][0].unit()->defaultPrefix() != 0) {
-					m[i][0].setPrefix(CALCULATOR->getExactDecimalPrefix(m[i][0].unit()->defaultPrefix()));
-				}
-				i++;
-			} else {
-				m.delChild(i + 1);
-			}
-		}
-		if(m.size() == 0) m.clear();
-		if(m.size() == 1) m.setToChild(1);
-	}
-}
-
 bool contains_imaginary_number(MathStructure &m) {
 	if(m.isNumber() && m.number().hasImaginaryPart()) return true;
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_CIS) return true;
 	for(size_t i = 0; i < m.size(); i++) {
 		if(contains_imaginary_number(m[i])) return true;
 	}
@@ -323,16 +276,23 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 		if(i1 >= str1.length()) break;
 		if(((signed char) str1[i1] < 0 && i1 + 1 < str1.length()) || ((signed char) str2[i2] < 0 && i2 + 1 < str2.length())) {
 			size_t iu1 = 1, iu2 = 1;
+			size_t n1 = 1, n2 = 1;
 			if((signed char) str1[i1] < 0) {
 				while(iu1 + i1 < str1.length() && (signed char) str1[i1 + iu1] < 0) {
+					if((unsigned char) str1[i1 + iu1] >= 0xC0) n1++;
 					iu1++;
 				}
 			}
 			if((signed char) str2[i2] < 0) {
 				while(iu2 + i2 < str2.length() && (signed char) str2[i2 + iu2] < 0) {
+					if((unsigned char) str2[i2 + iu2] >= 0xC0) {
+						if(n1 == n2) break;
+						n2++;
+					}
 					iu2++;
 				}
 			}
+			if(n1 != n2) return false;
 			bool isequal = (iu1 == iu2);
 			if(isequal) {
 				for(size_t i = 0; i < iu1; i++) {
@@ -522,12 +482,13 @@ struct CompletionData {
 	MathStructure *current_from_struct;
 	MathFunction *current_function;
 	int current_function_index;
-	Unit *current_from_unit;
+	std::vector<Unit*> current_from_units;
+	std::vector<std::string> current_from_categories;
 	QModelIndex exact_prefix_match;
 	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1;
 	int to_type, highest_match;
 	Argument *arg;
-	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), current_from_unit(NULL), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
+	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
 	}
 };
 
@@ -715,21 +676,33 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
 		}
 	} else if(item && cdata->to_type == 4) {
-		if(item->type() == TYPE_UNIT && cdata->current_from_unit && item->category() == cdata->current_from_unit->category()) {
-			QString qstr = index.data(Qt::DisplayRole).toString();
-			if(!qstr.isEmpty() && qstr[0] == '<') {
-				int i = qstr.indexOf("-) </font>");
-				if(i > 2) {
-					qstr = qstr.mid(i + 10);
-					sourceModel()->setData(index, qstr, Qt::DisplayRole);
+		if(item->type() == TYPE_UNIT) {
+			for(size_t i = 0; i < cdata->current_from_categories.size(); i++) {
+				if(item->category() == cdata->current_from_categories[i]) {
+					b_match = 6;
+					break;
+				} else if(cdata->current_from_categories[i] == settings->volume_category && (((Unit*) item)->system() != "Imperial" || cdata->current_from_units[i]->system().find("Imperial") != std::string::npos)) {
+					for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
+						if(item->category() == settings->alternative_volume_categories[i2]) {b_match = 6; break;}
+					}
+					if(b_match == 6) break;
 				}
 			}
-			b_match = 2;
+			if(b_match == 6) {
+				QString qstr = index.data(Qt::DisplayRole).toString();
+				if(!qstr.isEmpty() && qstr[0] == '<') {
+					int i = qstr.indexOf("-) </font>");
+					if(i > 2) {
+						qstr = qstr.mid(i + 10);
+						sourceModel()->setData(index, qstr, Qt::DisplayRole);
+					}
+				}
+			}
 		}
 	} else if(item && cdata->to_type == 5) {
-		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 2;
+		if(item->type() == TYPE_UNIT && ((Unit*) item)->isCurrency() && (!item->isHidden() || item == CALCULATOR->getLocalCurrency())) b_match = 6;
 	} else if(item && cdata->to_type == 2 && str.empty() && cdata->current_from_struct) {
-		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger()) b_match = 2;
+		if(item->type() == TYPE_VARIABLE && (item == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || item == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) && cdata->current_from_struct->isNumber() && !cdata->current_from_struct->isInteger() && !cdata->current_from_struct->number().imaginaryPartIsNonZero()) b_match = 2;
 	} else if(prefix && cdata->to_type < 2) {
 		for(size_t name_i = 1; name_i <= prefix->countNames() && !b_match; name_i++) {
 			const std::string *pname = &prefix->getName(name_i).name;
@@ -758,16 +731,34 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					b_match = 0;
 				} else if(p_type >= 100 && p_type < 200) {
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
-				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && cdata->current_from_unit) {
-					if(cdata->current_from_unit != CALCULATOR->getDegUnit()) b_match = 0;
+				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
+					bool b = false;
+					for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+						if(cdata->current_from_units[i] == CALCULATOR->getDegUnit()) {
+							b = true;
+							break;
+						}
+					}
+					if(!b) b_match = 0;
 				} else if(p_type > 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
 					if(!cdata->current_from_struct->isNumber() || (p_type > 290 && str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
 				} else if(p_type >= 200 && p_type <= 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
 					if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) b_match = 0;
 				} else if(p_type >= 300 && p_type < 400) {
-					if(p_type == 300) {
+					if(p_type == 300 || p_type == 302) {
 						if(!contains_rational_number(*cdata->current_from_struct)) b_match = 0;
+					} else if(p_type == 301) {
+						if((!cdata->current_from_struct->isNumber() || cdata->current_from_struct->number().isInteger() || cdata->current_from_struct->number().hasImaginaryPart())) {
+							bool b = false;
+							for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+								if(cdata->current_from_units[i]->system().find("Imperial") != std::string::npos) {
+									b = true;
+									break;
+								}
+							}
+							if(!b) b_match = 0;
+						}
 					} else {
 						if(!cdata->current_from_struct->isNumber()) b_match = 0;
 					}
@@ -846,7 +837,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	setUndoRedoEnabled(false);
 	completionModel = new ExpressionProxyModel(cdata, this);
 	sourceModel = new QStandardItemModel(this);
-	sourceModel->setColumnCount(2);
+	sourceModel->setColumnCount(3);
 	completionModel->setSourceModel(sourceModel);
 	completer = new QCompleter(completionModel, this);
 	completer->setWidget(this);
@@ -863,7 +854,9 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	HTMLDelegate* delegate = new HTMLDelegate();
 	completionView->setItemDelegateForColumn(0, delegate);
 	completionView->setItemDelegateForColumn(1, delegate);
+	completionView->setItemDelegateForColumn(2, delegate);
 	completer->setPopup(completionView);
+	default_frame = -1;
 	previous_pos = 0;
 	if(settings->completion_delay > 0) {
 		completionTimer = new QTimer(this);
@@ -921,7 +914,7 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 	return false;
 }
 
-#define COMPLETION_APPEND_M(x, y, z, m)		items.clear(); \
+#define COMPLETION_APPEND_M(x, y, z, m)		{items.clear(); \
 						QStandardItem *item = new QStandardItem(x); \
 						if(m) { \
 							QFont font = completionView->font(); \
@@ -938,10 +931,42 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						item = new QStandardItem(y); \
 						item->setData(ifont, Qt::FontRole); \
 						items.append(item); \
-						sourceModel->appendRow(items);
+						sourceModel->appendRow(items);}
 
-#define COMPLETION_APPEND(x, y, z, p) 		items.clear(); \
-						{QStandardItem *item = new QStandardItem(x); \
+#define COMPLETION_APPEND_2(x, y, y2, z, p)	{items.clear(); \
+						QStandardItem *item = new QStandardItem(x); \
+						item->setData(completionView->font(), Qt::FontRole); \
+						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
+						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
+						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
+						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
+						items.append(item); \
+						item = new QStandardItem(y); \
+						item->setData(ifont, Qt::FontRole); \
+						items.append(item); \
+						item = new QStandardItem(y2); \
+						items.append(item); \
+						sourceModel->appendRow(items);}
+
+#define COMPLETION_APPEND_C(x, y, z, p)		COMPLETION_APPEND_2(x, y, y, z, p)
+
+#define COMPLETION_APPEND_T(x, y, z, p, t)	{items.clear(); \
+						QStandardItem *item = new QStandardItem(x); \
+						item->setData(completionView->font(), Qt::FontRole); \
+						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
+						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
+						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
+						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
+						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
+						items.append(item); \
+						item = new QStandardItem(y); \
+						item->setData(ifont, Qt::FontRole); \
+						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
+						items.append(item); \
+						sourceModel->appendRow(items);}
+
+#define COMPLETION_APPEND(x, y, z, p) 		{items.clear(); \
+						QStandardItem *item = new QStandardItem(x); \
 						item->setData(completionView->font(), Qt::FontRole); \
 						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
 						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
@@ -953,35 +978,9 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						items.append(item); \
 						sourceModel->appendRow(items);}
 
-#define COMPLETION_APPEND_T(x, y, z, p, t) 	items.clear(); \
-						QStandardItem *item = new QStandardItem(x); \
-						item->setData(completionView->font(), Qt::FontRole); \
-						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
-						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
-						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
-						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
-						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
-						items.append(item); \
-						item = new QStandardItem(y); \
-						item->setData(ifont, Qt::FontRole); \
-						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
-						items.append(item); \
-						sourceModel->appendRow(items);
-
-#define COMPLETION_APPEND_FLAG(x, y, z, p)	items.clear(); \
-						QStandardItem *item = new QStandardItem(x); \
-						item->setData(completionView->font(), Qt::FontRole); \
-						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
-						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
-						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
-						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
-						items.append(item); \
-						if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) item = new QStandardItem(y); \
-						else if(flagheight <= 0) item = new QStandardItem(QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName()))); \
-						else item = new QStandardItem(QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName()))); \
-						item->setData(ifont, Qt::FontRole); \
-						items.append(item); \
-						sourceModel->appendRow(items);
+#define COMPLETION_APPEND_FLAG(x, y, y2, z, p)	if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {COMPLETION_APPEND_2(x, y, y2, z, p)} \
+						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
+						else {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
 
 #define MAX_COMPLETION_LENGTH_1 25
 #define MAX_COMPLETION_LENGTH_2 25
@@ -1048,21 +1047,22 @@ void ExpressionEdit::updateCompletion() {
 	sourceModel->clear();
 	capitalized_names.clear();
 	std::string str, strs;
-	QString title;
+	QString title, title2;
 	QList<QStandardItem *> items;
 	QFont ifont(completionView->font());
 	QFontMetrics fm(ifont);
 	int flagheight = fm.ascent();
 	ifont.setStyle(QFont::StyleItalic);
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
-		if(CALCULATOR->functions[i]->isActive()) {
+		MathFunction *f = CALCULATOR->functions[i];
+		if(f->isActive()) {
 			const ExpressionName *ename, *ename_r;
-			ename_r = &CALCULATOR->functions[i]->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
+			ename_r = &f->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
 			if(name_has_formatting(ename_r)) str = format_name(ename_r, TYPE_FUNCTION);
 			else str = ename_r->name;
 			str += "()";
-			for(size_t name_i = 1; name_i <= CALCULATOR->functions[i]->countNames(); name_i++) {
-				ename = &CALCULATOR->functions[i]->getName(name_i);
+			for(size_t name_i = 1; name_i <= f->countNames(); name_i++) {
+				ename = &f->getName(name_i);
 				if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), this))) {
 					str += " <i>";
 					if(name_has_formatting(ename)) str += format_name(ename, TYPE_FUNCTION);
@@ -1071,16 +1071,17 @@ void ExpressionEdit::updateCompletion() {
 				}
 			}
 			ellipsize_completion_names(str);
-			COMPLETION_APPEND_T(QString::fromStdString(str), QString::fromStdString(CALCULATOR->functions[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView)), 1, CALCULATOR->functions[i], QString::fromStdString(CALCULATOR->functions[i]->description()))
+			COMPLETION_APPEND_T(QString::fromStdString(str), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView)), 1, f, QString::fromStdString(f->description()))
 		}
 	}
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
-		if(CALCULATOR->variables[i]->isActive()) {
+		Variable *v = CALCULATOR->variables[i];
+		if(v->isActive()) {
 			const ExpressionName *ename, *ename_r;
 			bool b = false;
-			ename_r = &CALCULATOR->variables[i]->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
-			for(size_t name_i = 1; name_i <= CALCULATOR->variables[i]->countNames(); name_i++) {
-				ename = &CALCULATOR->variables[i]->getName(name_i);
+			ename_r = &v->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
+			for(size_t name_i = 1; name_i <= v->countNames(); name_i++) {
+				ename = &v->getName(name_i);
 				if(ename && ename != ename_r && !ename->completion_only && !ename->plural && (!ename->unicode || can_display_unicode_string_function(ename->name.c_str(), completionView))) {
 					if(!b) {
 						if(name_has_formatting(ename_r)) {
@@ -1126,10 +1127,9 @@ void ExpressionEdit::updateCompletion() {
 				}
 			}
 			ellipsize_completion_names(str);
-			if(!CALCULATOR->variables[i]->title(false).empty()) {
-				COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), QString::fromStdString(CALCULATOR->variables[i]->title()), 1, CALCULATOR->variables[i])
+			if(!v->title(false).empty()) {
+				title = QString::fromStdString(v->title(false));
 			} else {
-				Variable *v = CALCULATOR->variables[i];
 				if(v->isKnown()) {
 					if(((KnownVariable*) v)->isExpression() && !v->isLocal()) {
 						ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
@@ -1179,8 +1179,10 @@ void ExpressionEdit::updateCompletion() {
 						title = tr("default assumptions");
 					}
 				}
-				COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), title, 1, CALCULATOR->variables[i])
 			}
+			if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT)) COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title + " (%)", 1, v)
+			else if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title + " (‰)", 1, v)
+			else COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), title, 1, v)
 		}
 	}
 	PrintOptions po = settings->printops;
@@ -1214,15 +1216,31 @@ void ExpressionEdit::updateCompletion() {
 						str += "</i>";
 					}
 				}
-				if(name_has_formatting(ename_r)) {
+				if(!b && name_has_formatting(ename_r)) {
 					str = format_name(ename_r, TYPE_UNIT);
 					b = true;
 				} else {
 					ellipsize_completion_names(str);
 				}
+				if(u->title(false).empty()) {
+					if(name_has_formatting(ename_r)) title2 = QString::fromStdString(format_name(ename_r, TYPE_UNIT));
+					else title2 = QString::fromStdString(ename_r->name);
+				} else {
+					title2 = QString::fromStdString(u->title(false));
+					ename = &u->preferredInputName(true, settings->printops.use_unicode_signs, false, u->isCurrency(), &can_display_unicode_string_function, completionView);
+					if(ename->abbreviation && (!ename->suffix || (ename->name.length() > 5 && ename->name.find("_unit", ename->name.length() - 5) != std::string::npos))) {
+						bool tp = title2[title2.length() - 1] == ')';
+						title2 += " ";
+						if(!tp) title2 += "(";
+						if(name_has_formatting(ename)) title2 += QString::fromStdString(ename->formattedName(TYPE_UNIT, true, false, -1, true));
+						else title2 += QString::fromStdString(ename->name);
+						if(!tp) title2 += ")";
+						if(title2.contains("_")) title2 = QString::fromStdString(u->title(false));
+					}
+				}
 				title = QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				if(u->isCurrency()) {
-					COMPLETION_APPEND_FLAG(QString::fromStdString(b ? str : ename_r->name), title, 1, u)
+					COMPLETION_APPEND_FLAG(QString::fromStdString(b ? str : ename_r->name), title, title2, 1, u)
 				} else {
 					if(u->isSIUnit() && !u->category().empty() && title[title.length() - 1] != ')') {
 						size_t i_slash = std::string::npos;
@@ -1235,10 +1253,15 @@ void ExpressionEdit::updateCompletion() {
 							title += ")";
 						}
 					}
-					COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), title, 1, u)
+					COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title2.isEmpty() ? title : title2, 1, u)
 				}
 			} else if(!u->isHidden()) {
 				CompositeUnit *cu = (CompositeUnit*) u;
+				title = QString::fromStdString(cu->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
+				title2 = title;
+				bool tp = title2[title2.length() - 1] == ')';
+				title2 += " ";
+				if(!tp) title2 += "(";
 				Prefix *prefix = NULL;
 				int exp = 1;
 				if(cu->countUnits() == 1 && (u = cu->get(1, &exp, &prefix)) != NULL && prefix != NULL && exp == 1) {
@@ -1250,18 +1273,31 @@ void ExpressionEdit::updateCompletion() {
 							bool b_italic = !str.empty();
 							if(b_italic) str += " <i>";
 							str += ename->formattedName(-1, false, true);
-							str += u->preferredInputName(name_i != 1, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView).formattedName(TYPE_UNIT, true, true);
+							const ExpressionName *ename2 = &u->preferredInputName(name_i != 1, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
+							str += ename2->formattedName(TYPE_UNIT, true, true);
 							if(b_italic) str += "</i>";
+							if(!b_italic) {
+								if(str.find("<") == std::string::npos) {
+									title2 += QString::fromStdString(str);
+								} else {
+									title2 += QString::fromStdString(ename->formattedName(TYPE_UNIT, true, false, -1, true) + ename2->formattedName(TYPE_UNIT, true, false, -1, true));
+								}
+							}
 						}
 					}
 					ellipsize_completion_names(str);
 				} else {
 					str = cu->print(po, true, TAG_TYPE_HTML, true, false);
+					if(str.find("<") == std::string::npos) {
+						title2 += QString::fromStdString(str);
+					} else {
+						title2 += QString::fromStdString(cu->print(po, true, TAG_TYPE_TERMINAL, false, false));
+					}
 				}
+				if(!tp) title2 += ")";
 				size_t i_slash = std::string::npos;
 				if(cu->category().length() > 1) i_slash = cu->category().rfind("/", cu->category().length() - 2);
 				if(i_slash != std::string::npos) i_slash++;
-				title = QString::fromStdString(cu->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				if(cu->isSIUnit() && !cu->category().empty()) {
 					if(title.length() + cu->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < MAX_COMPLETION_LENGTH_1 && title[title.length() - 1] != ')') {
 						title += " (";
@@ -1273,7 +1309,7 @@ void ExpressionEdit::updateCompletion() {
 						else title = QString::fromStdString(cu->category().substr(i_slash, cu->category().length() - i_slash));
 					}
 				}
-				COMPLETION_APPEND(QString::fromStdString(str), title, 1, cu)
+				COMPLETION_APPEND_2(QString::fromStdString(str), title, title2, 1, cu)
 			}
 		}
 	}
@@ -1316,70 +1352,76 @@ void ExpressionEdit::updateCompletion() {
 #define COMPLETION_CONVERT_STRING(x) str1 = tr(x); if(str1 != x) {str1 += " <i>"; str1 += x; str1 += "</i>";}
 #define COMPLETION_CONVERT_STRING2(x, y) str1 = tr(x); if(str1 != x) {str1 += " <i>"; str1 += x; str1 += "</i>";} str2 = tr(y); str1 += " <i>"; str1 += str2; str1 += "</i>"; if(str2 != y) {str1 += " <i>"; str1 += y; str1 += "</i>";}
 	COMPLETION_CONVERT_STRING2("angle", "phasor")
-	COMPLETION_APPEND(str1, tr("Complex Angle/Phasor Notation"), 400, NULL)
+	COMPLETION_APPEND_C(str1, tr("Complex Angle/Phasor Notation"), 400, NULL)
 	/*COMPLETION_CONVERT_STRING("bases")
-	COMPLETION_APPEND(str1, tr("Number bases"), 201, NULL)*/
+	COMPLETION_APPEND_C(str1, tr("Number bases"), 201, NULL)*/
 	COMPLETION_CONVERT_STRING("base")
-	COMPLETION_APPEND(str1, tr("Base units"), 101, NULL)
+	COMPLETION_APPEND_C(str1, tr("Base units"), 101, NULL)
 	COMPLETION_CONVERT_STRING("base ")
-	COMPLETION_APPEND(str1, tr("Number Base"), 200, NULL)
-	COMPLETION_APPEND("bcd", tr("Binary-Coded Decimal"), 285, NULL)
+	COMPLETION_APPEND_C(str1, tr("Number Base"), 200, NULL)
+	COMPLETION_APPEND_C("bcd", tr("Binary-Coded Decimal"), 285, NULL)
 	COMPLETION_CONVERT_STRING("bijective")
-	COMPLETION_APPEND(str1, tr("Bijective Base-26"), 290, NULL)
+	COMPLETION_APPEND_C(str1, tr("Bijective Base-26"), 290, NULL)
 	COMPLETION_CONVERT_STRING("binary") str1 += " <i>"; str1 += "bin"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Binary Number"), 202, NULL)
+	COMPLETION_APPEND_C(str1, tr("Binary Number"), 202, NULL)
 	COMPLETION_CONVERT_STRING("calendars")
-	COMPLETION_APPEND(str1, tr("Calendars"), 500, NULL)
+	COMPLETION_APPEND_C(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
-	COMPLETION_APPEND(str1, tr("Complex cis Form"), 401, NULL)
+	COMPLETION_APPEND_C(str1, tr("Complex cis Form"), 401, NULL)
 	COMPLETION_CONVERT_STRING("decimal") str1 += " <i>"; str1 += "dec"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Decimal Number"), 210, NULL)
+	COMPLETION_APPEND_C(str1, tr("Decimal Number"), 210, NULL)
 	COMPLETION_CONVERT_STRING("duodecimal") str1 += " <i>"; str1 += "duo"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Duodecimal Number"), 212, NULL)
+	COMPLETION_APPEND_C(str1, tr("Duodecimal Number"), 212, NULL)
 	COMPLETION_CONVERT_STRING("exponential")
-	COMPLETION_APPEND(str1, tr("Complex Exponential Form"), 402, NULL)
+	COMPLETION_APPEND_C(str1, tr("Complex Exponential Form"), 402, NULL)
 	COMPLETION_CONVERT_STRING("factors")
-	COMPLETION_APPEND(str1, tr("Factors"), 600, NULL)
+	COMPLETION_APPEND_C(str1, tr("Factors"), 600, NULL)
 	COMPLETION_CONVERT_STRING("fp16") str1 += " <i>"; str1 += "binary16"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("16-bit Floating Point Binary Format"), 310, NULL)
+	COMPLETION_APPEND_C(str1, tr("16-bit Floating Point Binary Format"), 310, NULL)
 	COMPLETION_CONVERT_STRING("fp32") str1 += " <i>"; str1 += "binary32"; str1 += "</i>"; str1 += " <i>"; str1 += "float"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("32-bit Floating Point Binary Format"), 311, NULL)
+	COMPLETION_APPEND_C(str1, tr("32-bit Floating Point Binary Format"), 311, NULL)
 	COMPLETION_CONVERT_STRING("fp64") str1 += " <i>"; str1 += "binary64"; str1 += "</i>"; str1 += " <i>"; str1 += "double"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("64-bit Floating Point Binary Format"), 312, NULL)
+	COMPLETION_APPEND_C(str1, tr("64-bit Floating Point Binary Format"), 312, NULL)
 	COMPLETION_CONVERT_STRING("fp80");
-	COMPLETION_APPEND(str1, tr("80-bit (x86) Floating Point Binary Format"), 313, NULL)
+	COMPLETION_APPEND_C(str1, tr("80-bit (x86) Floating Point Binary Format"), 313, NULL)
 	COMPLETION_CONVERT_STRING("fp128") str1 += " <i>"; str1 += "binary128"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("128-bit Floating Point Binary Format"), 314, NULL)
+	COMPLETION_APPEND_C(str1, tr("128-bit Floating Point Binary Format"), 314, NULL)
+	COMPLETION_CONVERT_STRING("1/")
+	COMPLETION_APPEND_C(str1, tr("Fraction") + " (1/n)", 301, NULL)
 	COMPLETION_CONVERT_STRING("fraction")
-	COMPLETION_APPEND(str1, tr("Fraction"), 300, NULL)
+	COMPLETION_APPEND_C(str1, tr("Fraction"), 300, NULL)
+	COMPLETION_CONVERT_STRING("decimals")
+	COMPLETION_APPEND_C(str1, tr("Decimal Fraction"), 302, NULL)
 	COMPLETION_CONVERT_STRING("hexadecimal") str1 += " <i>"; str1 += "hex"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Hexadecimal Number"), 216, NULL)
+	COMPLETION_APPEND_C(str1, tr("Hexadecimal Number"), 216, NULL)
 	COMPLETION_CONVERT_STRING("latitude") str1 += " <i>"; str1 += "latitude2"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Latitude"), 294, NULL)
+	COMPLETION_APPEND_C(str1, tr("Latitude"), 294, NULL)
 	COMPLETION_CONVERT_STRING("longitude") str1 += " <i>"; str1 += "longitude2"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Longitude"), 294, NULL)
+	COMPLETION_APPEND_C(str1, tr("Longitude"), 294, NULL)
 	COMPLETION_CONVERT_STRING("mixed")
-	COMPLETION_APPEND(str1, tr("Mixed Units"), 102, NULL)
+	COMPLETION_APPEND_C(str1, tr("Mixed Units"), 102, NULL)
 	COMPLETION_CONVERT_STRING("octal") str1 += " <i>"; str1 += "oct"; str1 += "</i>";
-	COMPLETION_APPEND(str1, tr("Octal Number"), 208, NULL)
+	COMPLETION_APPEND_C(str1, tr("Octal Number"), 208, NULL)
 	COMPLETION_CONVERT_STRING("optimal")
-	COMPLETION_APPEND(str1, tr("Optimal Unit"), 100, NULL)
+	COMPLETION_APPEND_C(str1, tr("Optimal Unit"), 100, NULL)
+	COMPLETION_CONVERT_STRING("prefix")
+	COMPLETION_APPEND_C(str1, tr("Optimal Prefix"), 103, NULL)
 	COMPLETION_CONVERT_STRING("partial fraction")
-	COMPLETION_APPEND(str1, tr("Expanded Partial Fractions"), 601, NULL)
+	COMPLETION_APPEND_C(str1, tr("Expanded Partial Fractions"), 601, NULL)
 	COMPLETION_CONVERT_STRING("polar")
-	COMPLETION_APPEND(str1, tr("Complex Polar Form"), 403, NULL)
+	COMPLETION_APPEND_C(str1, tr("Complex Polar Form"), 403, NULL)
 	COMPLETION_CONVERT_STRING2("rectangular", "cartesian")
-	COMPLETION_APPEND(str1, tr("Complex Rectangular Form"), 404, NULL)
+	COMPLETION_APPEND_C(str1, tr("Complex Rectangular Form"), 404, NULL)
 	COMPLETION_CONVERT_STRING("roman")
-	COMPLETION_APPEND(str1, tr("Roman Numerals"), 280, NULL)
+	COMPLETION_APPEND_C(str1, tr("Roman Numerals"), 280, NULL)
 	COMPLETION_CONVERT_STRING("sexagesimal") str += " <i>"; str += "sexa"; str += "</i>"; str += " <i>"; str += "sexa2"; str += "</i>"; str += " <i>"; str += "sexa3"; str += "</i>";
-	COMPLETION_APPEND(str1, tr("Sexagesimal Number"), 292, NULL)
+	COMPLETION_APPEND_C(str1, tr("Sexagesimal Number"), 292, NULL)
 	COMPLETION_CONVERT_STRING("time")
-	COMPLETION_APPEND(str1, tr("Time Format"), 293, NULL)
+	COMPLETION_APPEND_C(str1, tr("Time Format"), 293, NULL)
 	COMPLETION_CONVERT_STRING("unicode")
-	COMPLETION_APPEND(str1, tr("Unicode"), 281, NULL)
+	COMPLETION_APPEND_C(str1, tr("Unicode"), 281, NULL)
 	COMPLETION_CONVERT_STRING("utc")
-	COMPLETION_APPEND(str1, tr("UTC Time Zone"), 501, NULL)
+	COMPLETION_APPEND_C(str1, tr("UTC Time Zone"), 501, NULL)
 }
 
 void ExpressionEdit::setExpression(std::string str) {
@@ -1461,7 +1503,15 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->matches(QKeySequence::Copy)) {
 		if(!textCursor().hasSelection() && !settings->v_result.empty()) {
 			if(settings->copy_ascii) {
-				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(settings->v_result[settings->v_result.size() - 1][0]))));
+				std::string str = settings->v_result[settings->v_result.size() - 1][0];
+				if(settings->copy_ascii_without_units) {
+					size_t i = str.find("<span style=\"color:#008000\">");
+					if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
+					if(i != std::string::npos && str.find("</span>", i) == str.length() - 7) {
+						str = str.substr(0, i);
+					}
+				}
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 			} else {
 				QMimeData *qm = new QMimeData();
 				qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[settings->v_result.size() - 1][0])));
@@ -1636,7 +1686,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 						}
 					}
 				} else if(document()->isEmpty()) {
-					qApp->closeAllWindows();
+					if(settings->close_with_esc) qApp->closeAllWindows();
 				} else {
 					clear();
 				}
@@ -1646,7 +1696,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			case Qt::Key_Enter: {
 				if(completionView->isVisible() && completionView->currentIndex().isValid()) {
 					onCompletionActivated(completionView->currentIndex());
-				} else if(!document()->isEmpty()) {
+				} else if(settings->rpn_mode || !document()->isEmpty()) {
 					emit returnPressed();
 				}
 				return;
@@ -1792,7 +1842,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setShortcutContext(Qt::WidgetShortcut);
 		pasteAction = cmenu->addAction(tr("Paste"), this, SLOT(paste()));
-		pasteAction->setShortcut(QKeySequence::Copy);
+		pasteAction->setShortcut(QKeySequence::Paste);
 		pasteAction->setShortcutContext(Qt::WidgetShortcut);
 		deleteAction = cmenu->addAction(tr("Delete"), this, SLOT(editDelete()));
 		deleteAction->setShortcut(QKeySequence::Delete);
@@ -2008,28 +2058,26 @@ void ExpressionEdit::showCurrentStatus() {
 		QString str = current_status_text;
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
-		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000) {
+		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
 			std::string result = CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options);
 			remove_spaces(current_text);
-			if(!contains_plot_or_save(result)) {
-				CALCULATOR->beginTemporaryStopMessages();
-				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-				result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
-				if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-				std::string result_nohtml = unhtmlize(result);
-				remove_spaces(result_nohtml);
-				if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
-					str += "&nbsp;";
-					if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
-					else str += "= ";
-					if(b_comp) str += "(";
-					str += QString::fromStdString(result);
-					if(b_comp) str += ")";
-					str_nohtml = "";
-				}
+			CALCULATOR->beginTemporaryStopMessages();
+			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+			result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
+			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+			std::string result_nohtml = unhtmlize(result);
+			remove_spaces(result_nohtml);
+			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
+				str += "&nbsp;";
+				if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
+				else str += "= ";
+				if(b_comp) str += "(";
+				str += QString::fromStdString(result);
+				if(b_comp) str += ")";
+				str_nohtml = "";
 			}
 		} else {
 			remove_spaces(current_text);
@@ -2155,6 +2203,50 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	return true;
 }
 
+void remove_non_units(MathStructure &m) {
+	if(m.isPower() && m[0].isUnit()) return;
+	if(m.size() > 0) {
+		for(size_t i = 0; i < m.size();) {
+			if(m[i].isFunction() || m[i].containsType(STRUCT_UNIT, true) <= 0) {
+				m.delChild(i + 1);
+			} else {
+				remove_non_units(m[i]);
+				i++;
+			}
+		}
+		if(m.size() == 0) m.clear();
+		else if(m.size() == 1) m.setToChild(1);
+	}
+}
+void find_matching_units(const MathStructure &m, const MathStructure *mparse, std::vector<Unit*> &v, bool top = true) {
+	Unit *u = CALCULATOR->findMatchingUnit(m);
+	if(u) {
+		for(size_t i = 0; i < v.size(); i++) {
+			if(v[i] == u) return;
+		}
+		v.push_back(u);
+		return;
+	}
+	if(top) {
+		if(mparse && !m.containsType(STRUCT_UNIT, true) && (mparse->containsFunctionId(FUNCTION_ID_ASIN) || mparse->containsFunctionId(FUNCTION_ID_ACOS) || mparse->containsFunctionId(FUNCTION_ID_ATAN))) {
+			v.push_back(CALCULATOR->getRadUnit());
+			return;
+		}
+		MathStructure m2(m);
+		remove_non_units(m2);
+		CALCULATOR->beginTemporaryStopMessages();
+		m2 = CALCULATOR->convertToOptimalUnit(m2);
+		CALCULATOR->endTemporaryStopMessages();
+		find_matching_units(m2, mparse, v, false);
+	} else {
+		for(size_t i = 0; i < m.size(); i++) {
+			if(!m.isFunction() || !m.function()->getArgumentDefinition(i + 1) || m.function()->getArgumentDefinition(i + 1)->type() != ARGUMENT_TYPE_ANGLE) {
+				find_matching_units(m[i], mparse, v, false);
+			}
+		}
+	}
+}
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) return;
@@ -2210,7 +2302,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
-	transform_expression_for_equals_save(text, settings->evalops.parse_options);
 	size_t i = text.find_first_of(SPACES LEFT_PARENTHESIS);
 	if(i != std::string::npos) {
 		str_f = text.substr(0, i);
@@ -2233,7 +2324,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 	if(!cursor.atStart()) {
 		settings->evalops.parse_options.unended_function = &mfunc;
-		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_unit = NULL;}
+		if(cdata->current_from_struct) {cdata->current_from_struct->unref(); cdata->current_from_struct = NULL; cdata->current_from_units.clear(); cdata->current_from_categories.clear();}
 		if(!cursor.atEnd()) {
 			str_e = CALCULATOR->unlocalizeExpression(qtext.left(cursor.position()).toStdString(), settings->evalops.parse_options);
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
@@ -2246,6 +2337,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 		} else {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str_e, settings->evalops.parse_options);
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
 			b = CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops) || b;
 			if(!b) {
@@ -2271,8 +2363,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		parsed_expression_tooltip = "";
 		if(!full_parsed) {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
+			transform_expression_for_equals_save(str_e, settings->evalops.parse_options);
 			last_is_space = is_in(SPACES, str_e[str_e.length() - 1]);
-			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
+			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, true, true);
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
@@ -2285,22 +2378,23 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 					eo.expand = -2;
 					if(!CALCULATOR->calculate(cdata->current_from_struct, str_w.empty() ? str_e : str_e + "/." + str_w, 50, eo)) cdata->current_from_struct->setAborted();
-					cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+					find_matching_units(*cdata->current_from_struct, &mparse, cdata->current_from_units);
+					cdata->current_from_categories.clear();
 				}
 			} else if(cdata->current_from_struct) {
 				cdata->current_from_struct->unref();
 				cdata->current_from_struct = NULL;
-				cdata->current_from_unit = NULL;
+				cdata->current_from_units.clear();
+				cdata->current_from_categories.clear();
 			}
 		}
 		PrintOptions po;
 		po.preserve_format = true;
 		po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && !CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;
-		po.lower_case_e = settings->printops.lower_case_e;
+		po.exp_display = settings->printops.exp_display;
 		po.lower_case_numbers = settings->printops.lower_case_numbers;
 		po.base_display = settings->printops.base_display;
-		po.custom_time_zone = settings->printops.custom_time_zone;
-		po.round_halfway_to_even = settings->printops.round_halfway_to_even;
+		po.rounding = settings->printops.rounding;
 		po.twos_complement = settings->printops.twos_complement;
 		po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
 		po.base = settings->evalops.parse_options.base;
@@ -2329,20 +2423,22 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		po.spell_out_logical_operators = settings->printops.spell_out_logical_operators;
 		po.restrict_to_parent_precision = false;
 		po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-		if(str_e.empty()) {
+		if(!str_w.empty()) {
+			CALCULATOR->beginTemporaryStopMessages();
+			MathStructure mwhere;
+			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
+			mparse.format(po);
+			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression += CALCULATOR->localWhereString();
+			mwhere.format(po);
+			parsed_expression += mwhere.print(po, true, false, TAG_TYPE_HTML);
+			CALCULATOR->endTemporaryStopMessages();
+		} else if(str_e.empty()) {
 			parsed_expression = "";
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
 			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
-			CALCULATOR->endTemporaryStopMessages();
-		}
-		if(!str_w.empty()) {
-			CALCULATOR->parse(&mparse, str_w, settings->evalops.parse_options);
-			parsed_expression += CALCULATOR->localWhereString();
-			CALCULATOR->beginTemporaryStopMessages();
-			mparse.format(po);
-			parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
@@ -2352,7 +2448,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure *mparse2 = NULL;
 			while(true) {
 				if(last_is_space) str_u += " ";
-				CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, false, false);
+				CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, true, false);
 				remove_blank_ends(str_u);
 				if(parsed_expression.empty()) {
 					parsed_expression += CALCULATOR->localToString(false);
@@ -2413,12 +2509,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("calendars").toStdString();
 				} else if(equalsIgnoreCase(str_u, "optimal") || equalsIgnoreCase(str_u, tr("optimal").toStdString())) {
 					parsed_expression += tr("optimal unit").toStdString();
+				} else if(equalsIgnoreCase(str_u, "prefix") || equalsIgnoreCase(str_u, tr("prefix").toStdString()) || str_u == "?" || (str_u.length() == 2 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd'))) {
+					parsed_expression += tr("optimal prefix").toStdString();
 				} else if(equalsIgnoreCase(str_u, "base") || equalsIgnoreCase(str_u, tr("base").toStdString())) {
 					parsed_expression += tr("base units").toStdString();
 				} else if(equalsIgnoreCase(str_u, "mixed") || equalsIgnoreCase(str_u, tr("mixed").toStdString())) {
 					parsed_expression += tr("mixed units").toStdString();
-				} else if(equalsIgnoreCase(str_u, "fraction") || equalsIgnoreCase(str_u, tr("fraction").toStdString())) {
-					parsed_expression += tr("fraction").toStdString();
 				} else if(equalsIgnoreCase(str_u, "factors") || equalsIgnoreCase(str_u, tr("factors").toStdString()) || equalsIgnoreCase(str_u, "factor")) {
 					parsed_expression += tr("factors").toStdString();
 				} else if(equalsIgnoreCase(str_u, "partial fraction") || equalsIgnoreCase(str_u, tr("partial fraction").toStdString())) {
@@ -2490,59 +2586,82 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += "+01";
 				} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
 					parsed_expression += (tr("number base %1").arg(QString::fromStdString(to_str2))).toStdString();
+				} else if(equalsIgnoreCase(str_u, "decimals") || equalsIgnoreCase(str_u, tr("decimals").toStdString())) {
+					parsed_expression += tr("decimal fraction").toStdString();
 				} else {
-					Variable *v = CALCULATOR->getActiveVariable(str_u);
-					if(v && !v->isKnown()) v = NULL;
-					if(v && CALCULATOR->getActiveUnit(str_u)) v = NULL;
-					if(v) {
-						mparse = v;
+					int tofr = 0;
+					long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(str_u), tofr, tr("fraction"));
+					if(fden > 0) {
+						parsed_expression += tr("fraction").toStdString();
+						parsed_expression += " (";
+						parsed_expression += "1/";
+						parsed_expression += i2s(fden);
+						parsed_expression += ")";
+					} else if(fden < 0) {
+						parsed_expression += tr("fraction").toStdString();
 					} else {
-						bool b_unit = mparse.containsType(STRUCT_UNIT, false, true, true);
-						CALCULATOR->beginTemporaryStopMessages();
-						CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
-						int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
-						if(i_error) {
-							ParseOptions pa = settings->evalops.parse_options;
-							pa.units_enabled = true;
-							CALCULATOR->parse(&mparse, str_u, pa);
-						} else {
-							if(i_warn > 0) had_warnings = true;
-							if(i_error > 0) had_errors = true;
-							mparse = cu.generateMathStructure(true);
+						if(str_u[0] == '0' || str_u[0] == '?' || str_u[0] == '+' || str_u[0] == '-') {
+							str_u = str_u.substr(1, str_u.length() - 1);
+							remove_blank_ends(str_u);
+						} else if(str_u.length() > 1 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd')) {
+							str_u = str_u.substr(2, str_u.length() - 2);
+							remove_blank_ends(str_u);
 						}
-						mparse.format(po);
-						if(!had_to_conv && cu.countUnits() > 0 && !b_unit && !str_e.empty() && str_w.empty()) {
+						Unit *u = CALCULATOR->getActiveUnit(str_u);
+						if(!u) u = CALCULATOR->getCompositeUnit(str_u);
+						Variable *v = NULL;
+						if(!u) v = CALCULATOR->getActiveVariable(str_u);
+						if(v && !v->isKnown()) v = NULL;
+						Prefix *p = NULL;
+						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
+						if(u) {
+							mparse = u;
+						} else if(v) {
+							mparse = v;
+						} else if(!p) {
 							CALCULATOR->beginTemporaryStopMessages();
-							MathStructure to_struct(&cu);
-							to_struct.unformat();
-							ApproximationMode abak = settings->evalops.approximation;
-							if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-							to_struct = CALCULATOR->convertToOptimalUnit(to_struct, settings->evalops, true);
-							settings->evalops.approximation = abak;
-							fix_to_struct_qt(to_struct);
-							if(!to_struct.isZero()) {
-								mparse2 = new MathStructure();
-								CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
-								po.preserve_format = false;
-								to_struct.format(po);
-								po.preserve_format = true;
-								if(to_struct.isMultiplication() && to_struct.size() >= 2) {
-									if(to_struct[0].isOne()) to_struct.delChild(1, true);
-									else if(to_struct[1].isOne()) to_struct.delChild(2, true);
+							CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
+							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
+							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty() && str_w.empty()) {
+								CALCULATOR->beginTemporaryStopMessages();
+								MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
+								if(!to_struct.isZero()) {
+									mparse2 = new MathStructure();
+									CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
+									po.preserve_format = false;
+									to_struct.format(po);
+									po.preserve_format = true;
+									if(to_struct.isMultiplication() && to_struct.size() >= 2) {
+										if(to_struct[0].isOne()) to_struct.delChild(1, true);
+										else if(to_struct[1].isOne()) to_struct.delChild(2, true);
+									}
+									mparse2->multiply(to_struct);
 								}
-								mparse2->multiply(to_struct);
+								CALCULATOR->endTemporaryStopMessages();
 							}
+							if(i_error) {
+								ParseOptions pa = settings->evalops.parse_options;
+								pa.units_enabled = true;
+								CALCULATOR->parse(&mparse, str_u, pa);
+							} else {
+								if(i_warn > 0) had_warnings = true;
+								mparse = cu.generateMathStructure(true);
+							}
+							mparse.format(po);
+						}
+						if(p) {
+							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
+						} else {
+							CALCULATOR->beginTemporaryStopMessages();
+							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 							CALCULATOR->endTemporaryStopMessages();
 						}
+						if(had_to_conv && mparse2) {
+							mparse2->unref();
+							mparse2 = NULL;
+						}
+						had_to_conv = true;
 					}
-					CALCULATOR->beginTemporaryStopMessages();
-					parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
-					CALCULATOR->endTemporaryStopMessages();
-					if(had_to_conv && mparse2) {
-						mparse2->unref();
-						mparse2 = NULL;
-					}
-					had_to_conv = true;
 				}
 				if(str_u2.empty()) break;
 				str_u = str_u2;
@@ -2575,14 +2694,17 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
 		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
+		settings->evalops.parse_options.preserve_format = false;
 		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
+		settings->evalops.parse_options.preserve_format = false;
 		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+	} else {
+		settings->evalops.parse_options.preserve_format = false;
 	}
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-	settings->evalops.parse_options.preserve_format = false;
 }
 
 void ExpressionEdit::onTextChanged() {
@@ -2643,7 +2765,7 @@ void ExpressionEdit::onTextChanged() {
 				completionTimer->start(settings->completion_delay);
 			}
 		} else {
-			complete(NULL, QPoint(), settings->completion_delay > 0);
+			complete(NULL, NULL, NULL, settings->completion_delay > 0);
 		}
 	}
 	qApp->processEvents();
@@ -2659,31 +2781,37 @@ bool ExpressionEdit::expressionHasChanged() {
 void ExpressionEdit::setExpressionHasChanged(bool b) {
 	expression_has_changed = b;
 }
-#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_unit = from_unit_bak;}
-bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bool current_object_is_set) {
+void ExpressionEdit::onCompletionMenuItemActivated() {
+	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
+}
+#define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak; cdata->current_from_categories = from_cats_bak;}
+bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
-	Unit *from_unit_bak = cdata->current_from_unit;
+	std::vector<Unit*> from_units_bak = cdata->current_from_units;
+	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
+	completionView->setColumnHidden(2, true);
 	if(mstruct_from) {
 		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
-		cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
+		cdata->current_from_categories.clear();
 		cdata->editing_to_expression = true;
 		cdata->editing_to_expression1 = true;
 		current_object_start = -1;
 		current_object_end = -1;
 		current_object_text = "";
 	} else {
-		if(pos.isNull()) do_completion_signal = 0;
+		if(!menu) do_completion_signal = 0;
 		else do_completion_signal = -1;
 		if(!current_object_is_set) setCurrentObject();
 	}
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
-		if(cdata->editing_to_expression && cdata->current_from_struct && (cdata->current_from_unit || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
+		if(cdata->editing_to_expression && cdata->current_from_struct && (!cdata->current_from_units.empty() || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
 			cdata->to_type = 4;
-		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && (cdata->current_from_struct->isNumber() || cdata->current_from_struct->isAddition())) {
+		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 			cdata->to_type = 2;
 		} else if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET && cdata->current_function_index > 1) {
 			Argument *arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
@@ -2710,6 +2838,19 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
+	}
+	if(cdata->to_type == 4 && cdata->current_from_categories.empty()) {
+		for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+			bool b = false;
+			for(size_t i2 = 0; i2 < settings->alternative_volume_categories.size(); i2++) {
+				if(cdata->current_from_units[i]->category() == settings->alternative_volume_categories[i2]) {
+					cdata->current_from_categories.push_back(settings->volume_category);
+					b = true;
+					break;
+				}
+			}
+			if(!b) cdata->current_from_categories.push_back(cdata->current_from_units[i]->category());
+		}
 	}
 	cdata->exact_prefix_match = QModelIndex();
 	cdata->exact_match_found = false;
@@ -2849,37 +2990,65 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 	completionModel->setFilter(current_object_text);
 	completionModel->sort(1);
 	if(completionModel->rowCount() > 0) {
+		if(menu) {
+			hideCompletion();
+			HIDE_TOOLTIP
+			int r = 0;
+			bool b_separator = false;
+			QModelIndex index = completionModel->index(0, 2);
+			QString title, flag;
+			while(index.isValid()) {
+				title = index.data().toString();
+				int i = title.indexOf("<img src=\""), i2 = -1;
+				if(i >= 0) i2 = title.indexOf("\"/>", i + 10);
+				if(i2 >= 0) {
+					flag = title.mid(i + 10, i2 - (i + 10));
+					title = title.left(i);
+				} else {
+					flag.clear();
+				}
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+				index = index.siblingAtColumn(0);
+#else
+				index = index.sibling(r, 0);
+#endif
+				if(!b_separator && r > 0 && index.data(TYPE_ROLE).toInt() < 100) {
+					menu->addSeparator();
+					b_separator = true;
+				}
+				QAction *action = menu->addAction(title, this, SLOT(onCompletionMenuItemActivated()));
+				action->setProperty("MODEL INDEX", index);
+				if(!flag.isEmpty()) action->setIcon(QIcon(flag));
+				r++;
+				index = index.sibling(r, 2);
+			}
+			MFROM_CLEANUP
+			return true;
+		}
 		completionView->resizeRowsToContents();
 		int c1_prev = completionView->columnWidth(0);
 		completionView->horizontalHeader()->setStretchLastSection(false);
 		completionView->resizeColumnsToContents();
 		QRect rect;
 		int w = completionView->sizeHint().width();
-		if(pos.isNull()) {
-			QTextCursor cur = textCursor();
-			if(current_object_start >= 0) cur.setPosition(current_object_start);
-			rect = cursorRect(cur);
-			if(prev_rect == rect && completionView->isVisible() && completionView->width() > w) {
-				w = completionView->width();
-				int scr_w = 0;
-				if(completionView->verticalScrollBar() && completionView->verticalScrollBar()->isVisible()) scr_w = completionView->verticalScrollBar()->sizeHint().width();
-				if(completionView->columnWidth(0) < c1_prev) {
-					if(completionView->columnWidth(1) <= (w - scr_w) - c1_prev) {
-						completionView->setColumnWidth(0, c1_prev);
-					} else {
-						completionView->setColumnWidth(0, (w - scr_w) - completionView->columnWidth(1));
-					}
-					completionView->horizontalHeader()->setStretchLastSection(true);
+		QTextCursor cur = textCursor();
+		if(current_object_start >= 0) cur.setPosition(current_object_start);
+		rect = cursorRect(cur);
+		if(prev_rect == rect && completionView->isVisible() && completionView->width() > w) {
+			w = completionView->width();
+			int scr_w = 0;
+			if(completionView->verticalScrollBar() && completionView->verticalScrollBar()->isVisible()) scr_w = completionView->verticalScrollBar()->sizeHint().width();
+			if(completionView->columnWidth(0) < c1_prev) {
+				if(completionView->columnWidth(1) <= (w - scr_w) - c1_prev) {
+					completionView->setColumnWidth(0, c1_prev);
+				} else {
+					completionView->setColumnWidth(0, (w - scr_w) - completionView->columnWidth(1));
 				}
+				completionView->horizontalHeader()->setStretchLastSection(true);
 			}
 		}
 		if(!settings->wayland_platform || !completionView->isVisible()) {
-			if(!pos.isNull()) {
-				rect.setTopLeft(mapFromGlobal(pos));
-				rect.setHeight(1);
-			}
 			prev_rect = rect;
-			rect.setWidth(w);
 			if(settings->wayland_platform) {
 				QWidget *win = this;
 				while(win->parentWidget()) win = win->parentWidget();
@@ -2890,6 +3059,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 				else if(n < 5) n = 5;
 				completer->setMaxVisibleItems(n);
 			}
+			rect.setWidth(w);
 			completer->complete(rect);
 		} else {
 			int h = (((QAbstractItemView*) completionView)->sizeHintForRow(0) * qMin(completer->maxVisibleItems(), completionModel->rowCount()) + 3) + 3;
@@ -2900,8 +3070,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, const QPoint &pos, bo
 		completionView->clearSelection();
 		completionView->setCurrentIndex(QModelIndex());
 		if(tipLabel && tipLabel->isVisible()) {
-			if(!pos.isNull()) {HIDE_TOOLTIP}
-			else if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->geometry())) HIDE_TOOLTIP
+			if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->geometry())) HIDE_TOOLTIP
 		} else if(toolTipTimer && toolTipTimer->isActive()) {
 			toolTipTimer->start(settings->expression_status_delay);
 		}
@@ -3012,10 +3181,12 @@ void ExpressionEdit::selectAll(bool b) {
 	if(b) {
 		cur.select(QTextCursor::Document);
 		setTextCursor(cur);
+		if(!document()->isEmpty()) QApplication::clipboard()->setText(toPlainText(), QClipboard::Selection);
 		cursor_has_moved = false;
 	} else if(cur.hasSelection()) {
 		cur.setPosition(cur.selectionEnd());
 		setTextCursor(cur);
+		if(!document()->isEmpty()) QApplication::clipboard()->clear(QClipboard::Selection);
 	}
 }
 void ExpressionEdit::insertBrackets() {
@@ -3278,7 +3449,6 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	if(i_type == 3 && p) return;
 	if(p_type == 1) item = (ExpressionItem*) p;
 	else if(p_type == 2) prefix = (Prefix*) p;
-	else if(p_type >= 100) p_type = 0;
 	if(item && item->type() == TYPE_UNIT && ((Unit*) item)->subtype() == SUBTYPE_COMPOSITE_UNIT && (((CompositeUnit*) item)->countUnits() > 1 || !((CompositeUnit*) item)->get(1, &exp, &prefix) || exp != 1)) {
 		PrintOptions po = settings->printops;
 		po.can_display_unicode_string_arg = (void*) this;
@@ -3394,7 +3564,20 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 				}
 				if(ename) {
 					bool b = false;
-					if(str2.length() <= ename->name.length()) {
+					std::unordered_map<const ExpressionName*, std::string>::iterator cap_it = capitalized_names.find(ename);
+					if(cap_it != capitalized_names.end() && str2.length() <= cap_it->second.length()) {
+						b = true;
+						for(size_t i = 0; i < str2.length(); i++) {
+							if(cap_it->second[i] != str2[i]) {
+								if(i_type != 1 || !equalsIgnoreCase(cap_it->second, str2)) {
+									b = false;
+								}
+								break;
+							}
+						}
+					}
+					if(b) cap_str = cap_it->second;
+					if(!b && str2.length() <= ename->name.length()) {
 						b = true;
 						for(size_t i = 0; i < str2.length(); i++) {
 							if(ename->name[i] != str2[i]) {
@@ -3404,21 +3587,6 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 								break;
 							}
 						}
-					}
-					if(!b) {
-						std::unordered_map<const ExpressionName*, std::string>::iterator cap_it = capitalized_names.find(ename);
-						if(cap_it != capitalized_names.end() && str2.length() <= cap_it->second.length()) {
-							b = true;
-							for(size_t i = 0; i < str2.length(); i++) {
-								if(cap_it->second[i] != str2[i]) {
-									if(i_type != 1 || !equalsIgnoreCase(cap_it->second, str2)) {
-										b = false;
-									}
-									break;
-								}
-							}
-						}
-						if(b) cap_str = cap_it->second;
 					}
 					if(!b) ename = NULL;
 				}
@@ -3551,14 +3719,15 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 		setTextCursor(c);
 	}
 	current_object_start = cos_bak;
-	current_object_end = current_object_start + unicode_length(str);
 	blockCompletion(false);
 	if((do_completion_signal < 0 || (!item && !prefix)) && cdata->editing_to_expression && (current_object_end < 0 || current_object_end == text.length())) {
-		if(str[str.length() - 1] != ' ') {
+		if(str[str.length() - 1] != ' ' && str[str.length() - 1] != '/') {
+			current_object_end = current_object_start + unicode_length(str);
 			emit returnPressed();
 			return;
 		}
 	}
+	current_object_end = current_object_start + unicode_length(str);
 	cdata->current_function = settings->f_answer;
 	displayParseStatus();
 }
@@ -3623,7 +3792,8 @@ void ExpressionEdit::setCurrentObject() {
 					cdata->current_from_struct = settings->current_result;
 					if(cdata->current_from_struct) {
 						cdata->current_from_struct->ref();
-						cdata->current_from_unit = CALCULATOR->findMatchingUnit(*cdata->current_from_struct);
+						find_matching_units(*cdata->current_from_struct, NULL, cdata->current_from_units);
+						cdata->current_from_categories.clear();
 					}
 				}
 				b_first = false;

@@ -485,7 +485,7 @@ void UnitsDialog::favouriteClicked() {
 		}
 	}
 	settings->favourite_units_changed = true;
-	emit itemsChanged();
+	emit favouritesChanged();
 }
 void UnitsDialog::delClicked() {
 	QModelIndex index = unitsView->selectionModel()->currentIndex();

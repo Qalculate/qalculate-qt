@@ -270,16 +270,15 @@ NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QD
 		namesModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 		namesModel->setHorizontalHeaderItem(1, new QStandardItem(tr("Reference")));
 	} else {
-		namesModel->setColumnCount(9);
+		namesModel->setColumnCount(8);
 		namesModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Name")));
 		namesModel->setHorizontalHeaderItem(1, new QStandardItem(tr("Abbreviation")));
 		namesModel->setHorizontalHeaderItem(2, new QStandardItem(tr("Plural")));
 		namesModel->setHorizontalHeaderItem(3, new QStandardItem(tr("Reference")));
 		namesModel->setHorizontalHeaderItem(4, new QStandardItem(tr("Avoid input")));
-		namesModel->setHorizontalHeaderItem(5, new QStandardItem(tr("Unicode")));
-		namesModel->setHorizontalHeaderItem(6, new QStandardItem(tr("Suffix")));
-		namesModel->setHorizontalHeaderItem(7, new QStandardItem(tr("Case sensitive")));
-		namesModel->setHorizontalHeaderItem(8, new QStandardItem(tr("Completion only")));
+		namesModel->setHorizontalHeaderItem(5, new QStandardItem(tr("Suffix")));
+		namesModel->setHorizontalHeaderItem(6, new QStandardItem(tr("Case sensitive")));
+		namesModel->setHorizontalHeaderItem(7, new QStandardItem(tr("Completion only")));
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
 #	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 		QScreen *scr = screen();
@@ -332,7 +331,6 @@ void NamesEditDialog::setNames(ExpressionItem *o, const QString &str) {
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->plural ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->reference ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->avoid_input ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
-		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->unicode ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->suffix ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->case_sensitive ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
 		item = new QStandardItem(); item->setEditable(false); item->setCheckable(true); item->setCheckState(ename->completion_only ? Qt::Checked : Qt::Unchecked); if(read_only) {item->setFlags(item->flags() & ~Qt::ItemIsUserCheckable);} item->setTextAlignment(Qt::AlignCenter); items.append(item);
@@ -370,10 +368,15 @@ void NamesEditDialog::modifyNames(ExpressionItem *o, const QString &str) {
 			ename.plural = (namesModel->item(i, 2)->checkState() == Qt::Checked);
 			ename.reference = (namesModel->item(i, 3)->checkState() == Qt::Checked);
 			ename.avoid_input = (namesModel->item(i, 4)->checkState() == Qt::Checked);
-			ename.unicode = (namesModel->item(i, 5)->checkState() == Qt::Checked);
-			ename.suffix = (namesModel->item(i, 6)->checkState() == Qt::Checked);
-			ename.case_sensitive = (namesModel->item(i, 7)->checkState() == Qt::Checked);
-			ename.completion_only = (namesModel->item(i, 8)->checkState() == Qt::Checked);
+			ename.unicode = false;
+			for(size_t i2 = 0; i2 < ename.name.length(); i2++) {
+				if((unsigned char) ename.name[i] >= 0xC0) {
+					ename.unicode = true;
+				}
+			}
+			ename.suffix = (namesModel->item(i, 5)->checkState() == Qt::Checked);
+			ename.case_sensitive = (namesModel->item(i, 6)->checkState() == Qt::Checked);
+			ename.completion_only = (namesModel->item(i, 7)->checkState() == Qt::Checked);
 			o->addName(ename);
 		}
 	}
@@ -708,6 +711,7 @@ Argument *ArgumentEditDialog::createArgument() {
 	arg->setAlerts(testBox->isChecked());
 	arg->setZeroForbidden(zeroBox->isChecked());
 	arg->setMatrixAllowed(matrixBox->isChecked());
+	arg->setHandleVector(vectorBox->isChecked());
 	return arg;
 }
 void ArgumentEditDialog::typeChanged(int index) {
@@ -728,7 +732,7 @@ void ArgumentEditDialog::typeChanged(int index) {
 	includeMinBox->setEnabled(i == ARGUMENT_TYPE_NUMBER);
 	minBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
 	maxBox->setEnabled(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
-	vectorBox->setChecked(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER);
+	vectorBox->setChecked(i == ARGUMENT_TYPE_NUMBER || i == ARGUMENT_TYPE_INTEGER || i == ARGUMENT_TYPE_TEXT || i == ARGUMENT_TYPE_DATE || i == ARGUMENT_TYPE_BOOLEAN);
 	matrixBox->setEnabled(i != ARGUMENT_TYPE_FREE && i != ARGUMENT_TYPE_MATRIX);
 	matrixBox->setChecked(i == ARGUMENT_TYPE_FREE || i == ARGUMENT_TYPE_MATRIX);
 }
@@ -949,7 +953,7 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	else NamesEditDialog::modifyName(f, nameEdit->text());
-	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), settings->evalops.parse_options);
+	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
 	fix_expression(str);
 	((UserFunction*) f)->setFormula(str);
 	CALCULATOR->addFunction(f);
@@ -1104,7 +1108,12 @@ void FunctionEditDialog::argEditClicked() {
 	d->deleteLater();
 }
 void FunctionEditDialog::argDelClicked() {
-	argumentsModel->removeRow(argumentsView->selectionModel()->currentIndex().row());
+	int r = argumentsView->selectionModel()->currentIndex().row();
+	QStandardItem *item = argumentsModel->item(r, 0);
+	if(!item) return;
+	Argument *arg = (Argument*) item->data().value<void*>();
+	if(arg) delete arg;
+	argumentsModel->removeRow(r);
 	onFunctionChanged();
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
 		QStandardItem *item = argumentsModel->item(i, 2);
