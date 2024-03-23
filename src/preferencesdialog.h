@@ -41,6 +41,9 @@ class PreferencesDialog : public QDialog {
 		void statusDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
+		void binTwosInputToggled(bool);
+		void hexTwosInputToggled(bool);
+		void bitsChanged(int);
 		void lowerCaseToggled(bool);
 		void duodecimalSymbolsToggled(bool);
 		void multiplicationDotToggled(bool);
@@ -131,6 +134,7 @@ class PreferencesDialog : public QDialog {
 		void appFontChanged();
 		void symbolsUpdated();
 		void historyExpressionTypeChanged();
+		void binaryBitsChanged();
 		void dialogClosed();
 
 };

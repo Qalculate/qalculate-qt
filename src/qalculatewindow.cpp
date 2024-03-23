@@ -128,6 +128,7 @@ int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
+bool bases_is_result = false;
 Number max_bases, min_bases;
 bool title_modified = false;
 
@@ -354,6 +355,11 @@ class QalculateTableWidget : public QTableWidget {
 	} else { \
 		menu->addSection(str); \
 	}
+
+#define SET_BINARY_BITS \
+	int binary_bits = settings->printops.binary_bits;\
+	if(binary_bits <= 0) binary_bits = 64;\
+	else if(binary_bits > 32 && binary_bits % 32 != 0) binary_bits += (32 - binary_bits % 32);
 
 QalculateWindow::QalculateWindow() : QMainWindow() {
 
@@ -772,12 +778,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	binEdit = new QLabel();
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
-	QFontMetrics fm2(settings->use_custom_app_font ? appfont : binEdit->font());
-	binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
-	binEdit->setMinimumHeight(fm2.lineSpacing() * 4 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	updateBinEditSize(settings->use_custom_app_font ? &appfont : NULL);
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
+	QFontMetrics fm2(settings->use_custom_app_font ? appfont : octEdit->font());
 	octEdit->setAlignment(Qt::AlignRight);
 	octEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	octEdit->setFocusPolicy(Qt::NoFocus);
@@ -794,10 +799,19 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	hexEdit->setFocusPolicy(Qt::NoFocus);
 	hexEdit->setMinimumHeight(fm2.lineSpacing());
-	result_bin = "0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000";
+	SET_BINARY_BITS
+	result_bin = "";
+	result_hex = "";
+	for(int i = binary_bits; i > 0; i -= 4) {
+		if(i < binary_bits) result_bin += " ";
+		result_bin += "0000";
+	}
+	for(int i = binary_bits > 128 ? 128 : binary_bits; i > 0; i -= 8) {
+		if(i < binary_bits) result_hex += " ";
+		result_hex += "00";
+	}
 	result_oct = "0";
 	result_dec = "0";
-	result_hex = "00 00 00 00 00 00 00 00";
 	updateResultBases();
 	basesGrid->addWidget(hexEdit, 3, 1);
 	basesGrid->setRowStretch(4, 1);
@@ -2832,12 +2846,12 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 			combo->addItem("256", 256);
 			combo->addItem("512", 512);
 			combo->addItem("1024", 1024);
-			int i = combo->findData(settings->default_bits);
+			int i = combo->findData(settings->default_bits >= 0 ? settings->default_bits : (settings->evalops.parse_options.binary_bits > 0 ? settings->evalops.parse_options.binary_bits : 32));
 			if(i < 0) i = 2;
 			combo->setCurrentIndex(i);
 			grid->addWidget(combo, arg_steps ? 1 : 0, 1);
 			QCheckBox *button = new QCheckBox(QString::fromStdString(arg_signed->name()));
-			button->setChecked(settings->default_signed > 0 || (settings->default_signed < 0 && f->id() == FUNCTION_ID_CIRCULAR_SHIFT));
+			button->setChecked(settings->default_signed > 0 || (settings->default_signed < 0 && (settings->evalops.parse_options.twos_complement || (f->id() == FUNCTION_ID_CIRCULAR_SHIFT && settings->printops.twos_complement))));
 			grid->addWidget(button, arg_steps ? 2 : 1, 0, 2, 1, Qt::AlignRight);
 			QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 			buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
@@ -3646,8 +3660,10 @@ void QalculateWindow::setOption(std::string str) {
 		}
 	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_D(settings->printops.twos_complement)
 	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
-	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
-	else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
+	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") {
+		SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
+		if(settings->evalops.parse_options.twos_complement != settings->default_signed) settings->default_signed = -1;
+	} else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
 	else if(equalsIgnoreCase(svar, "binary bits") || svar == "bits") {
 		int v = -1;
 		if(empty_value) {
@@ -3661,6 +3677,7 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			settings->printops.binary_bits = v;
 			settings->evalops.parse_options.binary_bits = v;
+			settings->default_bits = -1;
 			if(settings->evalops.parse_options.twos_complement || settings->evalops.parse_options.hexadecimal_twos_complement) expressionFormatUpdated(true);
 			else resultDisplayUpdated();
 		}
@@ -5884,52 +5901,45 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 }
 
 void QalculateWindow::updateResultBases() {
-	if(result_bin.length() == 79) {
-		QString sbin1 = QString::fromStdString(result_bin.substr(0, 39));
-		sbin1.replace(" ", "&nbsp;</td><td>");
-		int i1 = sbin1.length();
-		sbin1 += "</td></tr><tr>";
-		for(int i = 64; i > 32; i -= 8) {
-			sbin1 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
-			sbin1 += QString::number(i);
-			sbin1 += "</font></td>";
-		}
-		sbin1 += "</tr><tr><td>";
-		QString sbin2 = QString::fromStdString(result_bin.substr(40));
-		sbin2.replace(" ", "&nbsp;</td><td>");
-		int i2 = sbin2.length();
-		sbin2 += "</td></tr><tr>";
-		for(int i = 32; i > 0; i -= 8) {
-			sbin2 += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
-			sbin2 += QString::number(i);
-			sbin2 += "</font></td>";
-		}
-		sbin2 += "</tr><table>";
-		int n = 1;
+	SET_BINARY_BITS
+	if(result_bin.length() == (size_t) binary_bits + (binary_bits / 4) - 1) {
+		QString sbin = "<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>", sbin_i;
+		int i2 = 0;
+		size_t pos = 0;
 		QString link_color = binEdit->palette().text().color().name();
-		bool inhtml = false;
-		for(; i2 >= 0; i2--) {
-			if(sbin2[i2] == '>') {
-				inhtml = true;
-			} else if(sbin2[i2] == '<') {
-				inhtml = false;
-			} else if(!inhtml && (sbin2[i2] == '0' || sbin2[i2] == '1')) {
-				sbin2.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin2[i2]).arg(link_color));
-				n++;
+		for(int i = binary_bits; i >= 0; i -= 8) {
+			if(i % 32 == 0 || i == binary_bits) {
+				if(!sbin_i.isEmpty()) {
+					bool inhtml = false;
+					int n = i + 1;
+					for(; i2 >= 0; i2--) {
+						if(sbin_i[i2] == '>') {
+							inhtml = true;
+						} else if(sbin_i[i2] == '<') {
+							inhtml = false;
+						} else if(!inhtml && (sbin_i[i2] == '0' || sbin_i[i2] == '1')) {
+							sbin_i.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
+							n++;
+						}
+					}
+					if(pos > 39) sbin += "</td></tr><tr>";
+					sbin += sbin_i;
+				}
+				if(i == 0) break;
+				if(binary_bits <= 32) sbin_i = QString::fromStdString(result_bin);
+				else sbin_i = QString::fromStdString(result_bin.substr(pos, pos > 0 ? 40 : 39));
+				if(pos == 0) pos = 39;
+				else pos += 40;
+				sbin_i.replace(" ", "&nbsp;</td><td>");
+				sbin_i += "</td></tr><tr>";
+				i2 = sbin_i.length();
 			}
+			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
+			sbin_i += QString::number(i);
+			sbin_i += "</font></td>";
 		}
-		inhtml = false;
-		for(; i1 >= 0; i1--) {
-			if(sbin1[i1] == '>') {
-				inhtml = true;
-			} else if(sbin1[i1] == '<') {
-				inhtml = false;
-			} else if(!inhtml && (sbin1[i1] == '0' || sbin1[i1] == '1')) {
-				sbin1.replace(i1, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin1[i1]).arg(link_color));
-				n++;
-			}
-		}
-		binEdit->setText("<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>" + sbin1 + sbin2);
+		sbin += "</tr><table>";
+		binEdit->setText(sbin);
 	} else {
 		binEdit->setText(QString::fromStdString(result_bin));
 	}
@@ -5958,7 +5968,8 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 
 void set_result_bases(const MathStructure &m) {
 	result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
-	if(max_bases.isZero()) {max_bases = 2; max_bases ^= 64; min_bases = 2; min_bases ^= 32; min_bases.negate();}
+	SET_BINARY_BITS
+	if(max_bases.isZero()) {max_bases = 2; max_bases ^= (binary_bits > 128 ? 128 : binary_bits); min_bases = 2; min_bases ^= (binary_bits > 128 ? 64 : binary_bits / 2); min_bases.negate();}
 	if(!CALCULATOR->aborted() && ((m.isNumber() && m.number() < max_bases && m.number() > min_bases) || (m.isNegate() && m[0].isNumber() && m[0].number() < max_bases && m[0].number() > min_bases))) {
 		Number nr;
 		if(m.isNumber()) {
@@ -5975,10 +5986,11 @@ void set_result_bases(const MathStructure &m) {
 		po.base_display = BASE_DISPLAY_NORMAL;
 		po.min_exp = 0;
 		po.base = 2;
-		po.binary_bits = 64;
+		po.binary_bits = binary_bits;
 		result_bin = nr.print(po);
-		if(result_bin.length() > 80 && result_bin.find("1") >= 80) result_bin.erase(0, 80);
+		if(result_bin.length() > po.binary_bits + (po.binary_bits / 4) && result_bin.find("1") >= po.binary_bits + (po.binary_bits / 4)) result_bin.erase(0, po.binary_bits + (po.binary_bits / 4));
 		po.base = 8;
+		if(po.binary_bits > 128) po.binary_bits = 128;
 		result_oct = nr.print(po);
 		size_t i = result_oct.find_first_of(NUMBERS);
 		if(i != std::string::npos && result_oct.length() > i + 1 && result_oct[i] == '0' && is_in(NUMBERS, result_oct[i + 1])) result_oct.erase(i, 1);
@@ -6011,7 +6023,15 @@ bool contains_plot_or_save(const std::string &str) {
 
 void QalculateWindow::onExpressionChanged() {
 	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
-	if(!expressionEdit->expressionHasChanged() || !basesDock->isVisible()) return;
+	if(!basesDock->isVisible()) return;
+	if(!expressionEdit->expressionHasChanged()) {
+		if(!result_bin.empty() && !bases_is_result && expressionEdit->document()->isEmpty()) {
+			set_result_bases(m_zero);
+			bases_is_result = false;
+			updateResultBases();
+		}
+		return;
+	}
 	MathStructure m;
 	EvaluationOptions eo = settings->evalops;
 	eo.structuring = STRUCTURING_NONE;
@@ -6020,6 +6040,7 @@ void QalculateWindow::onExpressionChanged() {
 	eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 	eo.expand = -2;
 	CALCULATOR->beginTemporaryStopMessages();
+	bases_is_result = false;
 	std::string str = expressionEdit->toPlainText().toStdString();
 	if(contains_plot_or_save(str) || !CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
 		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
@@ -6028,6 +6049,18 @@ void QalculateWindow::onExpressionChanged() {
 	}
 	CALCULATOR->endTemporaryStopMessages();
 	updateResultBases();
+}
+
+void QalculateWindow::onBinaryBitsChanged() {
+	if(basesDock->isVisible() && bases_is_result && settings->current_result) {
+		CALCULATOR->beginTemporaryStopMessages();
+		set_result_bases(*settings->current_result);
+		CALCULATOR->endTemporaryStopMessages();
+		updateResultBases();
+	} else {
+		onExpressionChanged();
+	}
+	updateBinEditSize();
 }
 
 std::string ellipsize_result(const std::string &result_text, size_t length) {
@@ -6148,6 +6181,7 @@ void ViewThread::run() {
 
 		if(!b_stack) {
 			set_result_bases(*mresult);
+			bases_is_result = true;
 		}
 
 		for(size_t i = 0; i < alt_results.size();) {
@@ -6611,17 +6645,29 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		rpnDeleteAction->setIcon(LOAD_ICON("edit-delete"));
 		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
-		QFontMetrics fm2(QApplication::font());
-		binEdit->setMinimumWidth(fm2.boundingRect("0000 0000 0000 0000 0000 0000 0000 0000").width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
-		binEdit->setMinimumHeight(fm2.lineSpacing() * 4 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+		QFont font(QApplication::font());
+		updateBinEditSize(&font);
 		if(!settings->use_custom_expression_font) {
-			QFont font = QApplication::font();
 			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
 			else font.setPointSize(font.pointSize() * 1.35);
 			expressionEdit->setFont(font);
 		}
 	}
 	QMainWindow::changeEvent(e);
+}
+
+void QalculateWindow::updateBinEditSize(QFont *font) {
+	QFontMetrics fm2(font ? *font : binEdit->font());
+	SET_BINARY_BITS
+	int rows = binary_bits / 32;
+	if(binary_bits % 32 > 0) rows++;
+	QString row_string;
+	for(int i = binary_bits > 32 ? 32 : binary_bits; i > 0; i -= 4) {
+		if(i < 32 && i < binary_bits) row_string += " ";
+		row_string += "0000";
+	}
+	binEdit->setMinimumWidth(fm2.boundingRect(row_string).width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
+	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
 }
 
 void QalculateWindow::fetchExchangeRates() {
@@ -7781,6 +7827,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), this, SLOT(loadInitialHistory()));
+	connect(preferencesDialog, SIGNAL(binaryBitsChanged()), this, SLOT(onBinaryBitsChanged()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

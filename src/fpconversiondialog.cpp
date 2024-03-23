@@ -269,6 +269,7 @@ void FPConversionDialog::updateFields(int base) {
 				po.base = 16;
 				po.lower_case_numbers = true;
 				po.decimalpoint_sign = ".";
+				po.use_unicode_signs = false;
 				if(significand.isNegative()) {
 					significand.negate();
 					sfloathex = "-";
@@ -283,6 +284,7 @@ void FPConversionDialog::updateFields(int base) {
 				po.decimalpoint_sign = settings->printops.decimalpoint_sign;
 				po.lower_case_numbers = false;
 				po.min_exp = exp_bak;
+				po.use_unicode_signs = settings->printops.use_unicode_signs;
 			}
 			hexExp2Edit->setText(QString::fromStdString(sfloathex));
 			exp2Edit->setText(QString::fromStdString(sfloat));

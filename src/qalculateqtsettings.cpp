@@ -744,6 +744,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.twos_complement = v;
 		} else if(svar == "hexadecimal_twos_complement") {
 			printops.hexadecimal_twos_complement = v;
+		} else if(svar == "twos_complement_input") {
+			evalops.parse_options.twos_complement = v;
+		} else if(svar == "hexadecimal_twos_complement_input") {
+			evalops.parse_options.hexadecimal_twos_complement = v;
 		} else if(svar == "spell_out_logical_operators") {
 			printops.spell_out_logical_operators = v;
 		} else if(svar == "caret_as_xor") {

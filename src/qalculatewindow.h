@@ -148,6 +148,8 @@ class QalculateWindow : public QMainWindow {
 
 	protected slots:
 
+		void updateBinEditSize(QFont* = NULL);
+		void onBinaryBitsChanged();
 		void onSymbolClicked(const QString&);
 		void onOperatorClicked(const QString&);
 		void onFunctionClicked(MathFunction*);
