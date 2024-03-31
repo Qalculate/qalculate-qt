@@ -39,16 +39,16 @@ class HistoryView : public QTextEdit {
 		void addMessages();
 		void loadInitial();
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
-		void replaceColors(QString&);
+		void replaceColors(QString&, QColor prev_text_color = QColor());
 
 	protected:
 
-		QString s_text;
-		int i_pos;
+		QString s_text, previous_html;
+		int i_pos, i_pos_p, previous_cursor;
 		int has_lock_symbol;
 		QMenu *cmenu;
 		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
-		QColor prev_color;
+		QColor text_color;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
 		size_t last_ans;

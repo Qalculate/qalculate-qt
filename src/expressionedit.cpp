@@ -2107,7 +2107,8 @@ void ExpressionEdit::setStatusText(const QString &text, bool is_expression) {
 	} else if(settings->display_expression_status) {
 		current_status_text = text;
 		current_status_is_expression = is_expression;
-		if(settings->expression_status_delay > 0 && (!tipLabel || !tipLabel->isVisible())) {
+		if(settings->expression_status_delay > 0) {
+			if(tipLabel && tipLabel->isVisible()) tipLabel->hideTip();
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
 				toolTipTimer->setSingleShot(true);

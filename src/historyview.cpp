@@ -151,8 +151,10 @@ QString unhtmlize(QString str, bool b_ascii) {
 	return str;
 }
 
-HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
+HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent) {
 	i_pos = 0;
+	i_pos_p = 0;
+	previous_cursor = 0;
 	last_ans = 0;
 #ifdef _WIN32
 	has_lock_symbol = 1;
@@ -163,8 +165,8 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
 	document()->addResource(QTextDocument::ImageResource, QUrl("data://img1px.png"), QVariant(img1px));
-	setTextColor(palette().text().color());
-	prev_color = textColor();
+	text_color = palette().text().color();
+	setTextColor(text_color);
 	cmenu = NULL;
 	searchDialog = NULL;
 	findAction = new QAction(tr("Search…"), this);
@@ -173,7 +175,7 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent), i_pos(0) {
 }
 HistoryView::~HistoryView() {}
 
-void HistoryView::replaceColors(QString &s_text) {
+void HistoryView::replaceColors(QString &s_text, QColor prev_text_color) {
 	if(settings->color == 2) {
 		s_text.replace("color: #585858", "color: #AAAAAA");
 		s_text.replace("color: #800000", "color: #FFAAAA");
@@ -190,7 +192,7 @@ void HistoryView::replaceColors(QString &s_text) {
 		s_text.replace("color:#666699", "color:#AA8888");
 		s_text.replace("color:#669966", "color:#99BB99");
 		s_text.replace("color: #666666", "color: #AAAAAA");
-		s_text.replace(prev_color.name(QColor::HexRgb), textColor().name(QColor::HexRgb));
+		s_text.replace(prev_text_color.name(QColor::HexRgb), text_color.name(QColor::HexRgb));
 		s_text.replace(":/icons/actions", ":/icons/dark/actions");
 	} else {
 		s_text.replace("color: #AAAAAA", "color: #585858");
@@ -208,7 +210,7 @@ void HistoryView::replaceColors(QString &s_text) {
 		s_text.replace("color:#AA8888", "color:#666699");
 		s_text.replace("color:#99BB99", "color:#669966");
 		s_text.replace("color: #AAAAAA", "color: #666666");
-		s_text.replace(prev_color.name(QColor::HexRgb), textColor().name(QColor::HexRgb));
+		s_text.replace(prev_text_color.name(QColor::HexRgb), text_color.name(QColor::HexRgb));
 		s_text.replace(":/icons/dark/actions", ":/icons/actions");
 	}
 }
@@ -310,6 +312,8 @@ void remove_top_border(QString &s_text) {
 void HistoryView::loadInitial() {
 	s_text.clear();
 	i_pos = 0;
+	previous_html.clear();
+	i_pos_p = 0;
 	last_ans = 0;
 	last_ref = "";
 	if(!settings->v_expression.empty()) {
@@ -341,9 +345,9 @@ void HistoryView::loadInitial() {
 				}
 			}
 		}
-		setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+		setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 	} else if(!settings->clear_history_on_exit) {
-		setHtml("<body color=\"" + textColor().name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
+		setHtml("<body color=\"" + text_color.name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
 	}
 }
 
@@ -391,7 +395,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
-		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(textColor().name());
+		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_parse.push_back(parse);
@@ -464,7 +468,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	str += serror;
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
-	if(!expression.empty() || !parse.empty()) i_pos = str.length();
+	if(!expression.empty() || !parse.empty()) {
+		i_pos = str.length();
+		if(!initial_load) i_pos_p = i_pos;
+	}
 	size_t i_answer_pre = 0;
 	for(size_t i = 0; i < values.size(); i++) {
 		if(initial_load && settings->v_delresult[index][i]) continue;
@@ -476,7 +483,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w); str += "\">";
 		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
 		if(i_answer != 0 && i_answer != i_answer_pre) {
-			if(!initial_load && expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) s_text.remove(last_ref);
+			if(!initial_load && expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) {
+				s_text.remove(last_ref);
+				previous_html.remove(last_ref);
+			}
 			QString sref;
 			if(settings->color == 2) {
 				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
@@ -544,63 +554,98 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("\n", "<br>");
 	int i = 0;
 	if(!initial_load) {
+		s_text.remove(0, previous_html.length());
 		if(settings->format_result) {
-			s_text.replace("font-size:normal", "font-size:small ");
-			s_text.replace("width=\"2\"", "width=\"1\"");
+			previous_html.replace("font-size:normal", "font-size:small ");
+			previous_html.replace("width=\"2\"", "width=\"1\"");
 		}
 		while(true) {
-			i = s_text.indexOf("<img valign=\"top\"", i);
+			i = previous_html.indexOf("<img valign=\"top\"", i);
 			if(i < 0) break;
-			int i2 = s_text.indexOf(">", i);
-			s_text.remove(i, i2 - i + 1);
-			if(i < i_pos) i_pos -= (i2 - i + 1);
+			int i2 = previous_html.indexOf(">", i);
+			previous_html.remove(i, i2 - i + 1);
+			if(i < i_pos_p) i_pos_p -= (i2 - i + 1);
 		}
+		QTextCursor cur = textCursor();
+		cur.setPosition(previous_cursor);
+		cur.setPosition(0, QTextCursor::KeepAnchor);
+		setTextCursor(cur);
+		cur.deleteChar();
 	}
 	if(expression.empty() && parse.empty()) {
 		if(!initial_load && settings->format_result) {
 			i = 0;
 			while(true) {
-				i = s_text.indexOf("; font-size:x-large", i);
+				i = previous_html.indexOf("; font-size:x-large", i);
 				if(i < 0) break;
-				s_text.remove(i, 19);
-				if(i < i_pos) i_pos -= 19;
+				previous_html.remove(i, 19);
+				if(i < i_pos_p) i_pos_p -= 19;
 			}
 			i = 0;
 			while(true) {
-				i = s_text.indexOf("; font-size:large", i);
+				i = previous_html.indexOf("; font-size:large", i);
 				if(i < 0) break;
-				s_text.remove(i, 17);
-				if(i < i_pos) i_pos -= 17;
+				previous_html.remove(i, 17);
+				if(i < i_pos_p) i_pos_p -= 17;
 			}
 			i = 0;
 		}
-		s_text.insert(i_pos, str);
-	} else {
-		if(!initial_load && settings->format_result) {
-			s_text.remove("; font-size:x-large");
-			s_text.remove("; font-size:large");
+		if(initial_load) {
+			s_text.insert(i_pos, str);
+		} else {
+			QTextCursor cur = textCursor();
+			cur.setPosition(0);
+			setTextCursor(cur);
+			previous_html.insert(i_pos_p, str);
+			insertHtml("<table width=\"100%\">" + previous_html + "</table>");
+			s_text.insert(0, previous_html);
+			previous_cursor = textCursor().position();
 		}
-		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
-		replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+	} else {
+		if(initial_load || previous_html.isEmpty()) {
+			replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
+			replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+			if(!initial_load) setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+		} else {
+			if(settings->format_result) {
+				previous_html.remove("; font-size:x-large");
+				previous_html.remove("; font-size:large");
+			}
+			replace_one(previous_html, "border-top: 0px none", "border-top: 1px dashed");
+			replace_one(previous_html, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+			s_text.insert(0, previous_html);
+			insertHtml("<table width=\"100%\">" + previous_html + "</table>");
+		}
+		if(!initial_load) {
+			QTextCursor cur = textCursor();
+			cur.setPosition(0);
+			setTextCursor(cur);
+			insertHtml("<table width=\"100%\">" + str + "</table>");
+			previous_html = str;
+			previous_cursor = textCursor().position();
+		}
 		s_text.insert(0, str);
 	}
-	if(!initial_load) setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
-		setTextColor(palette().text().color());
+		QColor prev_text_color = text_color;
+		text_color = palette().text().color();
+		setTextColor(text_color);
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
 			replace_colors(settings->v_parse[i]);
 			for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
 				replace_colors(settings->v_result[i][i2]);
 			}
 		}
-
+		settings->current_result = NULL;
+		previous_html.clear();
+		i_pos_p = 0;
+		previous_cursor = 0;
 		if(!s_text.isEmpty()) {
-			replaceColors(s_text);
-			setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+			replaceColors(s_text, prev_text_color);
+			setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 		}
-		prev_color = textColor();
 	}
 	QTextEdit::changeEvent(e);
 }
@@ -762,7 +807,11 @@ void HistoryView::editClear() {
 		}
 	}
 	remove_top_border(s_text);
-	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	settings->current_result = NULL;
+	previous_html.clear();
+	i_pos_p = 0;
+	previous_cursor = 0;
+	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::editMoveToTop() {
 	int i1 = -1, i2 = -1;
@@ -812,7 +861,10 @@ void HistoryView::editMoveToTop() {
 		remove_top_border(s_text);
 	}
 	settings->current_result = NULL;
-	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	previous_html.clear();
+	i_pos_p = 0;
+	previous_cursor = 0;
+	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
@@ -862,7 +914,11 @@ void HistoryView::editRemove() {
 	}
 	if(i1 == 0) settings->current_result = NULL;
 	int vpos = verticalScrollBar()->value();
-	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	settings->current_result = NULL;
+	previous_html.clear();
+	i_pos_p = 0;
+	previous_cursor = 0;
+	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 	verticalScrollBar()->setValue(vpos);
 }
 void HistoryView::editProtect() {
@@ -895,7 +951,11 @@ void HistoryView::editProtect() {
 			}
 		}
 	}
-	setHtml("<body color=\"" + textColor().name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	settings->current_result = NULL;
+	previous_html.clear();
+	i_pos_p = 0;
+	previous_cursor = 0;
+	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
 }
 void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index, QString *anchorstr) {
 	*expression_index = -1;
