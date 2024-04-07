@@ -15,11 +15,13 @@
 #include <QPalette>
 #include <QStyle>
 #include <QStyleFactory>
+#include <QDesktopServices>
 #include <QWidget>
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QColor>
 #include <QProgressDialog>
+#include <QPushButton>
 #include <QKeySequence>
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 #	include <QStyleHints>
@@ -1905,7 +1907,8 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 	}
 	std::string new_version;
 #ifdef _WIN32
-	int ret = checkAvailableVersion("windows", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
+	std::string url;
+	int ret = checkAvailableVersion("windows", qApp->applicationVersion().toUtf8().data(), &new_version, &url, force ? 10 : 5);
 #else
 	int ret = checkAvailableVersion("qalculate-qt", qApp->applicationVersion().toUtf8().data(), &new_version, force ? 10 : 5);
 #endif
@@ -1921,7 +1924,19 @@ void QalculateQtSettings::checkVersion(bool force, QWidget *parent) {
 			autoUpdate(new_version);
 		}
 #else
+#	ifdef _WIN32
+		QMessageBox *dialog = new QMessageBox(QMessageBox::Information, tr("Information"), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>", QMessageBox::Ok, parent);
+		if(always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+		QAbstractButton *downloadButton = NULL;
+		if(!url.empty()) dialog->addButton(tr("Download"), QMessageBox::YesRole);
+		dialog->exec();
+		if(!url.empty() && dialog->clickedButton() == downloadButton) {
+			QDesktopServices::openUrl(QUrl(QString::fromStdString(url)));
+		}
+		dialog->deleteLater();
+#	else
 		QMessageBox::information(parent, tr("Information"), "<div>" + tr("A new version of %1 is available.\n\nYou can get version %3 at %2.").arg("Qalculate!").arg("<a href=\"https://qalculate.github.io/downloads.html\">qalculate.github.io</a>").arg(QString::fromStdString(new_version)) + "</div>");
+#	endif
 #endif
 	}
 	last_version_check_date.setToCurrentDate();

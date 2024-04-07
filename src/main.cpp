@@ -47,6 +47,12 @@ QTranslator translator, translator_qt, translator_qtbase;
 
 int main(int argc, char **argv) {
 
+#ifdef _WIN32
+	if(!qEnvironmentVariableIsSet("QT_QPA_PLATFORM")) {
+		qputenv("QT_QPA_PLATFORM", "windows:altgr");
+	}
+#endif
+
 	QApplication app(argc, argv);
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");

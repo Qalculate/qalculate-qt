@@ -855,6 +855,10 @@ void HistoryView::editMoveToTop() {
 		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
 		PASTE_H
 		replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+		if(settings->format_result) {
+			s_text.remove("; font-size:x-large");
+			s_text.remove("; font-size:large");
+		}
 		if(index1 > 0) new_text += s_text.left(index1);
 		if(index2 >= 0) new_text += s_text.mid(index2);
 		s_text = new_text;
