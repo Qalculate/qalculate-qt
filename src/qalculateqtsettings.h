@@ -300,6 +300,8 @@ class QalculateQtSettings : QObject {
 		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
 		std::vector<std::vector<size_t> > v_value;
+		std::vector<QString> v_messages;
+		std::vector<bool> v_parseerror;
 		std::vector<MathFunction*> favourite_functions, recent_functions;
 		std::vector<Variable*> favourite_variables, recent_variables;
 		std::vector<Unit*> favourite_units, recent_units;

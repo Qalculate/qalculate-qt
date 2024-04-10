@@ -185,6 +185,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		v_exact.push_back(std::vector<int>());
 		v_delresult.push_back(std::vector<bool>());
 		v_value.push_back(std::vector<size_t>());
+		v_messages.push_back("");
+		v_parseerror.push_back(false);
 	} else if(svar == "history_parse") {
 		if(v_expression.size() > v_parse.size()) {
 			v_parse.push_back(svalue);
@@ -958,6 +960,8 @@ void QalculateQtSettings::loadPreferences() {
 	v_exact.clear();
 	v_pexact.clear();
 	v_delresult.clear();
+	v_messages.clear();
+	v_parseerror.clear();
 	expression_history.clear();
 
 	default_shortcuts = true;
@@ -2174,6 +2178,8 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	v_value.clear();
 	v_protected.clear();
 	v_delexpression.clear();
+	v_messages.clear();
+	v_parseerror.clear();
 	v_result.clear();
 	v_exact.clear();
 	v_pexact.clear();

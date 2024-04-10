@@ -298,56 +298,63 @@ void replace_one(QString &str, const QString &origstr, const QString &newstr, bo
 	}
 }
 
-void remove_top_border(QString &s_text) {
-	if(!s_text.isEmpty() && s_text.indexOf("border-top: 0px none") < 0) {
-		replace_one(s_text, "border-top: 1px dashed", "border-top: 0px none");
-		int index_a = s_text.indexOf("padding-top: ") + strlen("padding-top: ");
-		int index_b = s_text.indexOf("px", index_a);
-		if(index_b >= 0) {
-			s_text.replace(index_a, index_b - index_a, "0");
-		}
-	}
-}
-
-void HistoryView::loadInitial() {
+void HistoryView::loadInitial(bool reload) {
 	s_text.clear();
 	i_pos = 0;
 	previous_html.clear();
 	i_pos_p = 0;
 	last_ans = 0;
 	last_ref = "";
-	if(!settings->v_expression.empty()) {
-		for(size_t i = 0; i < settings->v_expression.size();) {
-			if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos)) {
-				settings->v_delexpression.erase(settings->v_delexpression.begin() + i);
-				settings->v_expression.erase(settings->v_expression.begin() + i);
-				settings->v_parse.erase(settings->v_parse.begin() + i);
-				settings->v_result.erase(settings->v_result.begin() + i);
-				settings->v_delresult.erase(settings->v_delresult.begin() + i);
-				settings->v_protected.erase(settings->v_protected.begin() + i);
-				settings->v_exact.erase(settings->v_exact.begin() + i);
-				settings->v_pexact.erase(settings->v_pexact.begin() + i);
-				settings->v_value.erase(settings->v_value.begin() + i);
-			} else {
-				addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, true, i);
-				i++;
-			}
+	for(size_t i = 0; i < settings->v_expression.size();) {
+		if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos)) {
+			settings->v_delexpression.erase(settings->v_delexpression.begin() + i);
+			settings->v_expression.erase(settings->v_expression.begin() + i);
+			settings->v_parse.erase(settings->v_parse.begin() + i);
+			settings->v_result.erase(settings->v_result.begin() + i);
+			settings->v_delresult.erase(settings->v_delresult.begin() + i);
+			settings->v_protected.erase(settings->v_protected.begin() + i);
+			settings->v_exact.erase(settings->v_exact.begin() + i);
+			settings->v_pexact.erase(settings->v_pexact.begin() + i);
+			settings->v_value.erase(settings->v_value.begin() + i);
+			settings->v_messages.erase(settings->v_messages.begin() + i);
+			settings->v_parseerror.erase(settings->v_parseerror.begin() + i);
+		} else {
+			i++;
 		}
 	}
-
-	if(!s_text.isEmpty()) {
-		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
-			replaceColors(s_text);
-			for(size_t i = 0; i < settings->v_expression.size(); i++) {
-				replace_colors(settings->v_parse[i]);
-				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-					replace_colors(settings->v_result[i][i2]);
+	if(settings->v_expression.empty()) {
+		if(!settings->clear_history_on_exit && !reload) {
+			setHtml("<body color=\"" + text_color.name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
+		} else {
+			setHtml("<body color=\"" + text_color.name() + "\"></body>");
+		}
+	} else {
+		size_t i = 0;
+		for(; i < settings->v_expression.size() - 1; i++) {
+			if(!settings->v_messages[i].isEmpty()) replaceColors(settings->v_messages[i]);
+			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, 1, i);
+		}
+		if(!s_text.isEmpty()) {
+			if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
+				replaceColors(s_text);
+				for(size_t i = 0; i < settings->v_expression.size(); i++) {
+					replace_colors(settings->v_parse[i]);
+					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+						replace_colors(settings->v_result[i][i2]);
+					}
 				}
 			}
+			setHtml("<body color=\"" + text_color.name() + "\">" + s_text + "</body>");
 		}
-		setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
-	} else if(!settings->clear_history_on_exit) {
-		setHtml("<body color=\"" + text_color.name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
+		if(!settings->v_messages[i].isEmpty()) {
+			replaceColors(settings->v_messages[i]);
+			if(!reload || settings->history_answer.empty() || !settings->current_result) {
+				settings->current_result = NULL;
+				settings->v_messages[i].replace("font-size:normal", "font-size:small ");
+				settings->v_messages[i].replace("width=\"2\"", "width=\"1\"");
+			}
+		}
+		addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload && !settings->history_answer.empty() && settings->current_result ? 2 : 1, i);
 	}
 }
 
@@ -355,10 +362,10 @@ void HistoryView::loadInitial() {
 	int paste_h = fm.ascent() * 0.75; \
 	if(paste_h < 12) paste_h = 12;
 
-void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, bool initial_load, size_t index) {
+void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, int initial_load, size_t index) {
 	if(initial_load && settings->v_delexpression[index]) return;
 	QString serror;
-	bool b_parse_error = false;
+	bool b_parse_error = (initial_load && !expression.empty() && settings->v_parseerror[index] && !settings->v_messages[index].isEmpty());
 	if(!initial_load && CALCULATOR->message()) {
 		do {
 			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
@@ -395,13 +402,16 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
-		str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
+		if(initial_load && index != settings->v_expression.size() - 1) str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
+		else str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
 		if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_parse.push_back(parse);
 			settings->v_pexact.push_back(pexact);
 			settings->v_protected.push_back(false);
 			settings->v_delexpression.push_back(false);
+			settings->v_messages.push_back(serror);
+			settings->v_parseerror.push_back(b_parse_error);
 			settings->v_result.push_back(values);
 			settings->v_exact.push_back(std::vector<int>());
 			settings->v_delresult.push_back(std::vector<bool>());
@@ -465,12 +475,16 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_delresult[settings->v_delresult.size() - 1].insert(settings->v_delresult[settings->v_delresult.size() - 1].begin(), false);
 			settings->v_value[settings->v_value.size() - 1].insert(settings->v_value[settings->v_value.size() - 1].begin(), dual_approx && i == 1 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 		}
+		if(!serror.isEmpty()) {
+			settings->v_messages[settings->v_messages.size() - 1] += serror;
+		}
 	}
 	str += serror;
+	if(initial_load) str += settings->v_messages[index];
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
 	if(!expression.empty() || !parse.empty()) {
 		i_pos = str.length();
-		if(!initial_load) i_pos_p = i_pos;
+		if(initial_load != 1) i_pos_p = i_pos;
 	}
 	size_t i_answer_pre = 0;
 	for(size_t i = 0; i < values.size(); i++) {
@@ -484,7 +498,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
 		if(i_answer != 0 && i_answer != i_answer_pre) {
 			if(!initial_load && expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) {
-				s_text.remove(last_ref);
 				previous_html.remove(last_ref);
 			}
 			QString sref;
@@ -493,14 +506,23 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			} else {
 				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			}
-			str += sref;
-			if(!dual_approx || i == values.size()) {
+			bool b = true;
+			if(initial_load) {
+				for(size_t i2 = 0; i2 < i; i2++) {
+					if(settings->v_value[index][i2] == i_answer) {
+						b = false;
+					}
+				}
+			}
+			if(b) str += sref;
+			if((initial_load > 1 && i == 0) || (!initial_load && (!dual_approx || i == values.size() - 1))) {
 				last_ans = i_answer;
 				last_ref = sref;
 			}
 		}
 		str += "</td><td style=\"text-align:right";
-		if(initial_load || w > width() * 2 || !settings->format_result) {
+		if(initial_load > 1 && i > 0 && i_answer <= i_answer_pre) initial_load = 1;
+		if(initial_load == 1 || w > width() * 2 || !settings->format_result) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 2 > width()) {
 			str += "; font-size:large";
@@ -509,7 +531,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "; font-size:x-large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		}
-		if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 2);
+		if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 4);
 		str += "\">";
 		int b_exact = 1;
 		if(initial_load) {
@@ -554,7 +576,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("\n", "<br>");
 	int i = 0;
 	if(!initial_load) {
-		s_text.remove(0, previous_html.length());
 		if(settings->format_result) {
 			previous_html.replace("font-size:normal", "font-size:small ");
 			previous_html.replace("width=\"2\"", "width=\"1\"");
@@ -598,25 +619,32 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			setTextCursor(cur);
 			previous_html.insert(i_pos_p, str);
 			insertHtml("<table width=\"100%\">" + previous_html + "</table>");
-			s_text.insert(0, previous_html);
 			previous_cursor = textCursor().position();
 		}
 	} else {
-		if(initial_load || previous_html.isEmpty()) {
-			replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
-			replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
-			if(!initial_load) setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
-		} else {
-			if(settings->format_result) {
-				previous_html.remove("; font-size:x-large");
-				previous_html.remove("; font-size:large");
+		if(initial_load) {
+			if(index == settings->v_expression.size() - 1) {
+				QTextCursor cur = textCursor();
+				cur.setPosition(0);
+				setTextCursor(cur);
+				insertHtml("<table width=\"100%\">" + str + "</table>");
+				previous_html = str;
+				previous_cursor = textCursor().position();
+			} else {
+				s_text.insert(0, "<table width=\"100%\">" + str + "</table>");
 			}
-			replace_one(previous_html, "border-top: 0px none", "border-top: 1px dashed");
-			replace_one(previous_html, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
-			s_text.insert(0, previous_html);
-			insertHtml("<table width=\"100%\">" + previous_html + "</table>");
-		}
-		if(!initial_load) {
+		} else {
+			if(previous_html.isEmpty()) {
+				setHtml("<body color=\"" + text_color.name() + "\"></body>");
+			} else {
+				if(settings->format_result) {
+					previous_html.remove("; font-size:x-large");
+					previous_html.remove("; font-size:large");
+				}
+				replace_one(previous_html, "border-top: 0px none", "border-top: 1px dashed");
+				replace_one(previous_html, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+				insertHtml("<table width=\"100%\">" + previous_html + "</table>");
+			}
 			QTextCursor cur = textCursor();
 			cur.setPosition(0);
 			setTextCursor(cur);
@@ -624,12 +652,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			previous_html = str;
 			previous_cursor = textCursor().position();
 		}
-		s_text.insert(0, str);
 	}
 }
 void HistoryView::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
-		QColor prev_text_color = text_color;
 		text_color = palette().text().color();
 		setTextColor(text_color);
 		for(size_t i = 0; i < settings->v_expression.size(); i++) {
@@ -638,14 +664,7 @@ void HistoryView::changeEvent(QEvent *e) {
 				replace_colors(settings->v_result[i][i2]);
 			}
 		}
-		settings->current_result = NULL;
-		previous_html.clear();
-		i_pos_p = 0;
-		previous_cursor = 0;
-		if(!s_text.isEmpty()) {
-			replaceColors(s_text, prev_text_color);
-			setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
-		}
+		reloadHistory();
 	}
 	QTextEdit::changeEvent(e);
 }
@@ -794,29 +813,16 @@ void HistoryView::editClear() {
 				settings->current_result = NULL;
 			}
 			settings->v_delexpression[i1] = true;
-			int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
-			if(index < 0) index = s_text.indexOf("<a name=\"e" + QString::number(i1) + "\"");
-			if(index >= 0) {
-				int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
-				int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
-				QString new_text;
-				if(index1 > 0) new_text = s_text.left(index1);
-				if(index2 >= 0) new_text += s_text.mid(index2);
-				s_text = new_text;
-			}
 		}
 	}
-	remove_top_border(s_text);
-	settings->current_result = NULL;
-	previous_html.clear();
-	i_pos_p = 0;
-	previous_cursor = 0;
-	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	verticalScrollBar()->setValue(0);
+	reloadHistory();
 }
 void HistoryView::editMoveToTop() {
 	int i1 = -1, i2 = -1;
-	indexAtPos(context_pos, &i1, &i2, NULL, NULL);
+	indexAtPos(context_pos, &i1, &i2);
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
+	settings->current_result = NULL;
 	settings->v_delexpression[i1] = true;
 	settings->v_expression.push_back(settings->v_expression[i1]);
 	settings->v_parse.push_back(settings->v_parse[i1]);
@@ -826,54 +832,20 @@ void HistoryView::editMoveToTop() {
 	settings->v_result.push_back(settings->v_result[i1]);
 	settings->v_exact.push_back(settings->v_exact[i1]);
 	settings->v_delresult.push_back(settings->v_delresult[i1]);
-	int index = s_text.indexOf("<a name=\"" + QString::number(i1) + "\"");
-	if(index < 0) index = s_text.indexOf("<a name=\"e" + QString::number(i1) + "\"");
-	if(index >= 0) {
-		int index2 = s_text.indexOf("<tr><td colspan=\"2\"", index);
-		int index1 = s_text.lastIndexOf("<tr><td colspan=\"2\"", index);
-		QString new_text = s_text.mid(index1, index2 - index1);
-		int index_a = new_text.indexOf("<a name=\"");
-		bool b_expr = true;
-		while(index_a >= 0 && index_a + 9 < new_text.length() - 1) {
-			index_a += 9;
-			int index_b = -1;
-			if(b_expr) {
-				index_b = new_text.indexOf("\"", index_a);
-			} else {
-				index_b = new_text.indexOf(":", index_a);
-				if(new_text[index_a] == '#' || new_text[index_a] == 'p') {
-					if(index_b < 0) break;
-					index_a = index_b + 1;
-					index_b = new_text.indexOf(":", index_b + 1);
-				}
-			}
-			if(index_b < 0) break;
-			new_text.replace(index_a, index_b - index_a, QString::number(settings->v_expression.size() - 1));
-			index_a = new_text.indexOf("<a name=\"", index_b + 1);
-			b_expr = false;
-		}
-		replace_one(s_text, "border-top: 0px none", "border-top: 1px dashed");
-		PASTE_H
-		replace_one(s_text, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
-		if(settings->format_result) {
-			s_text.remove("; font-size:x-large");
-			s_text.remove("; font-size:large");
-		}
-		if(index1 > 0) new_text += s_text.left(index1);
-		if(index2 >= 0) new_text += s_text.mid(index2);
-		s_text = new_text;
-		remove_top_border(s_text);
-	}
-	settings->current_result = NULL;
-	previous_html.clear();
-	i_pos_p = 0;
-	previous_cursor = 0;
-	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	settings->v_value.push_back(settings->v_value[i1]);
+	settings->v_messages.push_back(settings->v_messages[i1]);
+	settings->v_parseerror.push_back(settings->v_parseerror[i1]);
+	verticalScrollBar()->setValue(0);
+	reloadHistory();
+}
+void HistoryView::reloadHistory() {
+	int vpos = verticalScrollBar()->value();
+	loadInitial(true);
+	verticalScrollBar()->setValue(vpos);
 }
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
-	QString sref;
-	indexAtPos(context_pos, &i1, &i2, NULL, &sref);
+	indexAtPos(context_pos, &i1, &i2);
 	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
 	if(i2 >= 0 && i2 < (int) settings->v_delresult[i1].size()) {
 		settings->v_delresult[i1][i2] = true;
@@ -883,46 +855,10 @@ void HistoryView::editRemove() {
 		}
 		if(b) i2 = -1;
 	}
-	if(i2 < 0) {
-		sref = QString::number(i1);
-		settings->v_delexpression[i1] = true;
-	}
-	int index = s_text.indexOf("<a name=\"" + sref + "\"");
-	if(index < 0 && i2 < 0) {
-		sref = "e" + QString::number(i1);
-		index = s_text.indexOf("<a name=\"" + sref + "\"");
-	}
-	if(index >= 0) {
-		int index2 = s_text.indexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "</a></td></tr>", index);
-		if(index2 >= 0) index2 += (i2 < 0 ? 0 : 14);
-		int index1 = s_text.lastIndexOf(i2 < 0 ? "<tr><td colspan=\"2\"" : "<tr", index);
-		QString new_text;
-		if(index1 > 0) new_text = s_text.left(index1);
-		if(i2 >= 0) {
-			bool b = true;
-			for(size_t i = i2; i < settings->v_delresult[i1].size(); i++) {
-				if(!settings->v_delresult[i1][i]) {b = false; break;}
-			}
-			if(b) {
-				PASTE_H
-				int index_a = new_text.lastIndexOf("<td style=\"text-align:right") + strlen("<td style=\"text-align:right");
-				index_a = new_text.indexOf("\"", index_a);
-				if(index_a >= 0) new_text.insert(index_a, "; padding-bottom: " + QString::number(paste_h / 2) + "px");
-			}
-		}
-		if(index2 >= 0) new_text += s_text.mid(index2);
-		s_text = new_text;
-		if(i2 < 0) {
-			remove_top_border(s_text);
-		}
-	}
+	if(i2 < 0) settings->v_delexpression[i1] = true;
 	if(i1 == 0) settings->current_result = NULL;
 	int vpos = verticalScrollBar()->value();
-	settings->current_result = NULL;
-	previous_html.clear();
-	i_pos_p = 0;
-	previous_cursor = 0;
-	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	reloadHistory();
 	verticalScrollBar()->setValue(vpos);
 }
 void HistoryView::editProtect() {
@@ -930,36 +866,10 @@ void HistoryView::editProtect() {
 	indexAtPos(context_pos, &i1, &i2);
 	if(i1 < 0 || i1 >= (int) settings->v_protected.size()) return;
 	settings->v_protected[i1] = protectAction->isChecked();
-	QString sref = QString::number(i1);
-	int index = s_text.indexOf("<a name=\"" + sref + "\"");
-	if(index < 0) {
-		sref = "e" + QString::number(i1);
-		index = s_text.indexOf("<a name=\"" + sref + "\"");
-	}
-	if(index > 0) {
-		int index2 = s_text.indexOf("</td>", index);
-		if(index2 > 0) {
-			if(protectAction->isChecked()) {
-				if(has_lock_symbol < 0) {
-					QFontDatabase database;
-					if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
-					else has_lock_symbol = 0;
-				}
-				if(has_lock_symbol) s_text.insert(index2, " <small><sup>🔒</sup></small>");
-				else s_text.insert(index2, " <small><sup>[P]</sup></small>");
-			} else {
-				index = s_text.indexOf(has_lock_symbol ? " <small><sup>🔒</sup></small>" : " <small><sup>[P]</sup></small>", index);
-				if(index > 0) {
-					s_text.remove(index, index2 - index);
-				}
-			}
-		}
-	}
-	settings->current_result = NULL;
-	previous_html.clear();
-	i_pos_p = 0;
-	previous_cursor = 0;
-	setHtml("<body color=\"" + text_color.name() + "\"><table width=\"100%\">" + s_text + "</table></body>");
+	if(i1 == 0) settings->current_result = NULL;
+	int vpos = verticalScrollBar()->value();
+	reloadHistory();
+	verticalScrollBar()->setValue(vpos);
 }
 void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index, QString *anchorstr) {
 	*expression_index = -1;
@@ -1040,7 +950,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	int i1 = -1, i2 = -1, i3 = -1;
 	context_pos = e->pos();
 	indexAtPos(context_pos, &i1, &i2, &i3);
-	selectAllAction->setEnabled(!s_text.isEmpty());
+	selectAllAction->setEnabled(!document()->isEmpty());
 	protectAction->setChecked(i1 >= 0 && i1 < (int) settings->v_protected.size() && settings->v_protected[i1]);
 	if(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection()) {
 		insertValueAction->setEnabled(i3 >= 0);
@@ -1068,7 +978,13 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		insertValueAction->setEnabled(false);
 		insertTextAction->setEnabled(false);
 	}
-	clearAction->setEnabled(!s_text.isEmpty());
+	clearAction->setEnabled(false);
+	for(size_t i = 0; i < settings->v_delexpression.size(); i++) {
+		if(!settings->v_delexpression[i]) {
+			clearAction->setEnabled(true);
+			break;
+		}
+	}
 	cmenu->popup(e->globalPos());
 }
 void HistoryView::doFind() {

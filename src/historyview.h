@@ -35,9 +35,9 @@ class HistoryView : public QTextEdit {
 		QAction *findAction;
 		QDialog *searchDialog;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, int initial_load = 0, size_t index = 0);
 		void addMessages();
-		void loadInitial();
+		void loadInitial(bool reload = false);
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
 		void replaceColors(QString&, QColor prev_text_color = QColor());
 
@@ -78,6 +78,7 @@ class HistoryView : public QTextEdit {
 		void editProtect();
 		void editFind();
 		void editMoveToTop();
+		void reloadHistory();
 
 	signals:
 
