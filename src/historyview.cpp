@@ -161,6 +161,7 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent) {
 #else
 	has_lock_symbol = -1;
 #endif
+	initial_loaded = false;
 	setReadOnly(true);
 	QImage img1px(1, 1, QImage::Format_ARGB32);
 	img1px.fill(Qt::transparent);
@@ -299,19 +300,18 @@ void replace_one(QString &str, const QString &origstr, const QString &newstr, bo
 }
 
 void HistoryView::loadInitial(bool reload) {
+	if(reload && !initial_loaded) return;
 	s_text.clear();
 	i_pos = 0;
 	previous_html.clear();
 	i_pos_p = 0;
 	last_ans = 0;
 	last_ref = "";
-	for(size_t i = 0; i < settings->v_expression.size();) {
-		if(settings->v_delexpression[i] || (i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_delresult[i] == settings->v_delresult[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos)) {
-			settings->v_delexpression.erase(settings->v_delexpression.begin() + i);
+	for(size_t i = 0; i < settings->v_expression.size() && !reload;) {
+		if(i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos) {
 			settings->v_expression.erase(settings->v_expression.begin() + i);
 			settings->v_parse.erase(settings->v_parse.begin() + i);
 			settings->v_result.erase(settings->v_result.begin() + i);
-			settings->v_delresult.erase(settings->v_delresult.begin() + i);
 			settings->v_protected.erase(settings->v_protected.begin() + i);
 			settings->v_exact.erase(settings->v_exact.begin() + i);
 			settings->v_pexact.erase(settings->v_pexact.begin() + i);
@@ -356,6 +356,9 @@ void HistoryView::loadInitial(bool reload) {
 		}
 		addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload && !settings->history_answer.empty() && settings->current_result ? 2 : 1, i);
 	}
+	initial_loaded = true;
+	QFontMetrics fm(font());
+	prev_fonti = fm.boundingRect("Öy");
 }
 
 #define PASTE_H QFontMetrics fm(font()); \
@@ -363,7 +366,6 @@ void HistoryView::loadInitial(bool reload) {
 	if(paste_h < 12) paste_h = 12;
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, int initial_load, size_t index) {
-	if(initial_load && settings->v_delexpression[index]) return;
 	QString serror;
 	bool b_parse_error = (initial_load && !expression.empty() && settings->v_parseerror[index] && !settings->v_messages[index].isEmpty());
 	if(!initial_load && CALCULATOR->message()) {
@@ -409,16 +411,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_parse.push_back(parse);
 			settings->v_pexact.push_back(pexact);
 			settings->v_protected.push_back(false);
-			settings->v_delexpression.push_back(false);
 			settings->v_messages.push_back(serror);
 			settings->v_parseerror.push_back(b_parse_error);
 			settings->v_result.push_back(values);
 			settings->v_exact.push_back(std::vector<int>());
-			settings->v_delresult.push_back(std::vector<bool>());
 			settings->v_value.push_back(std::vector<size_t>());
 			for(size_t i = 0; i < values.size(); i++) {
 				settings->v_exact[settings->v_exact.size() - 1].push_back(exact || i < values.size() - 1);
-				settings->v_delresult[settings->v_delresult.size() - 1].push_back(false);
 				settings->v_value[settings->v_value.size() - 1].push_back(dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 			}
 		}
@@ -472,7 +471,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		for(size_t i = values.size(); i > 0; i--) {
 			settings->v_result[settings->v_result.size() - 1].insert(settings->v_result[settings->v_result.size() - 1].begin(), values[i - 1]);
 			settings->v_exact[settings->v_exact.size() - 1].insert(settings->v_exact[settings->v_exact.size() - 1].begin(), exact || i < values.size());
-			settings->v_delresult[settings->v_delresult.size() - 1].insert(settings->v_delresult[settings->v_delresult.size() - 1].begin(), false);
 			settings->v_value[settings->v_value.size() - 1].insert(settings->v_value[settings->v_value.size() - 1].begin(), dual_approx && i == 1 ? settings->history_answer.size() - 1 : settings->history_answer.size());
 		}
 		if(!serror.isEmpty()) {
@@ -488,7 +486,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	size_t i_answer_pre = 0;
 	for(size_t i = 0; i < values.size(); i++) {
-		if(initial_load && settings->v_delresult[index][i]) continue;
 		size_t i_answer = 0;
 		if(initial_load) i_answer = settings->v_value[index][i];
 		else i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
@@ -665,6 +662,11 @@ void HistoryView::changeEvent(QEvent *e) {
 			}
 		}
 		reloadHistory();
+	} else if(e->type() == QEvent::FontChange) {
+		QFontMetrics fm(font());
+		if(fm.boundingRect("Öy") != prev_fonti) {
+			reloadHistory();
+		}
 	}
 	QTextEdit::changeEvent(e);
 }
@@ -807,12 +809,20 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 	}
 }
 void HistoryView::editClear() {
-	for(size_t i1 = 0; i1 < settings->v_protected.size(); i1++) {
+	for(size_t i1 = 0; i1 < settings->v_protected.size();) {
 		if(!settings->v_protected[i1]) {
-			if(i1 == settings->v_protected.size() - 1) {
-				settings->current_result = NULL;
-			}
-			settings->v_delexpression[i1] = true;
+			if(i1 == settings->v_protected.size() - 1) settings->current_result = NULL;
+			settings->v_expression.erase(settings->v_expression.begin() + i1);
+			settings->v_parse.erase(settings->v_parse.begin() + i1);
+			settings->v_result.erase(settings->v_result.begin() + i1);
+			settings->v_protected.erase(settings->v_protected.begin() + i1);
+			settings->v_exact.erase(settings->v_exact.begin() + i1);
+			settings->v_pexact.erase(settings->v_pexact.begin() + i1);
+			settings->v_value.erase(settings->v_value.begin() + i1);
+			settings->v_messages.erase(settings->v_messages.begin() + i1);
+			settings->v_parseerror.erase(settings->v_parseerror.begin() + i1);
+		} else {
+			i1++;
 		}
 	}
 	verticalScrollBar()->setValue(0);
@@ -821,20 +831,26 @@ void HistoryView::editClear() {
 void HistoryView::editMoveToTop() {
 	int i1 = -1, i2 = -1;
 	indexAtPos(context_pos, &i1, &i2);
-	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
+	if(i1 < 0 || i1 >= (int) settings->v_expression.size()) return;
 	settings->current_result = NULL;
-	settings->v_delexpression[i1] = true;
 	settings->v_expression.push_back(settings->v_expression[i1]);
 	settings->v_parse.push_back(settings->v_parse[i1]);
 	settings->v_pexact.push_back(settings->v_pexact[i1]);
 	settings->v_protected.push_back(settings->v_protected[i1]);
-	settings->v_delexpression.push_back(false);
 	settings->v_result.push_back(settings->v_result[i1]);
 	settings->v_exact.push_back(settings->v_exact[i1]);
-	settings->v_delresult.push_back(settings->v_delresult[i1]);
 	settings->v_value.push_back(settings->v_value[i1]);
 	settings->v_messages.push_back(settings->v_messages[i1]);
 	settings->v_parseerror.push_back(settings->v_parseerror[i1]);
+	settings->v_expression.erase(settings->v_expression.begin() + i1);
+	settings->v_parse.erase(settings->v_parse.begin() + i1);
+	settings->v_result.erase(settings->v_result.begin() + i1);
+	settings->v_protected.erase(settings->v_protected.begin() + i1);
+	settings->v_exact.erase(settings->v_exact.begin() + i1);
+	settings->v_pexact.erase(settings->v_pexact.begin() + i1);
+	settings->v_value.erase(settings->v_value.begin() + i1);
+	settings->v_messages.erase(settings->v_messages.begin() + i1);
+	settings->v_parseerror.erase(settings->v_parseerror.begin() + i1);
 	verticalScrollBar()->setValue(0);
 	reloadHistory();
 }
@@ -846,17 +862,26 @@ void HistoryView::reloadHistory() {
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
 	indexAtPos(context_pos, &i1, &i2);
-	if(i1 < 0 || i1 >= (int) settings->v_delexpression.size()) return;
-	if(i2 >= 0 && i2 < (int) settings->v_delresult[i1].size()) {
-		settings->v_delresult[i1][i2] = true;
-		bool b = true;
-		for(size_t i = 0; i < settings->v_delresult[i1].size(); i++) {
-			if(!settings->v_delresult[i1][i]) {b = false; break;}
+	if(i1 < 0 || i1 >= (int) settings->v_expression.size()) return;
+	if(i2 >= 0 && i2 < (int) settings->v_result[i1].size()) {
+		if(settings->v_result[i1].size() == 1) {
+			i2 = -1;
+		} else {
+			settings->v_result[i1].erase(settings->v_result[i1].begin() + i2);
 		}
-		if(b) i2 = -1;
 	}
-	if(i2 < 0) settings->v_delexpression[i1] = true;
-	if(i1 == 0) settings->current_result = NULL;
+	if(i2 < 0) {
+		if((size_t) i1 == settings->v_expression.size() - 1) settings->current_result = NULL;
+		settings->v_expression.erase(settings->v_expression.begin() + i1);
+		settings->v_parse.erase(settings->v_parse.begin() + i1);
+		settings->v_result.erase(settings->v_result.begin() + i1);
+		settings->v_protected.erase(settings->v_protected.begin() + i1);
+		settings->v_exact.erase(settings->v_exact.begin() + i1);
+		settings->v_pexact.erase(settings->v_pexact.begin() + i1);
+		settings->v_value.erase(settings->v_value.begin() + i1);
+		settings->v_messages.erase(settings->v_messages.begin() + i1);
+		settings->v_parseerror.erase(settings->v_parseerror.begin() + i1);
+	}
 	int vpos = verticalScrollBar()->value();
 	reloadHistory();
 	verticalScrollBar()->setValue(vpos);
@@ -960,14 +985,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		copyAsciiAction->setEnabled(true);
 		delAction->setEnabled(true);
 		protectAction->setEnabled(true);
-		bool b = false;
-		for(size_t i = i1; i < settings->v_delexpression.size(); i++) {
-			if(!settings->v_delexpression[i]) {
-				b = true;
-				break;
-			}
-		}
-		movetotopAction->setEnabled(b);
+		movetotopAction->setEnabled(!settings->v_expression.empty());
 	} else {
 		copyAction->setEnabled(textCursor().hasSelection());
 		copyFormattedAction->setEnabled(textCursor().hasSelection());
@@ -978,13 +996,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		insertValueAction->setEnabled(false);
 		insertTextAction->setEnabled(false);
 	}
-	clearAction->setEnabled(false);
-	for(size_t i = 0; i < settings->v_delexpression.size(); i++) {
-		if(!settings->v_delexpression[i]) {
-			clearAction->setEnabled(true);
-			break;
-		}
-	}
+	clearAction->setEnabled(!settings->v_expression.empty());
 	cmenu->popup(e->globalPos());
 }
 void HistoryView::doFind() {

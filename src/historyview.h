@@ -49,10 +49,12 @@ class HistoryView : public QTextEdit {
 		QMenu *cmenu;
 		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
 		QColor text_color;
+		QRect prev_fonti;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
 		size_t last_ans;
 		QString last_ref;
+		bool initial_loaded;
 
 		void mouseDoubleClickEvent(QMouseEvent *e) override;
 		void mouseReleaseEvent(QMouseEvent *e) override;

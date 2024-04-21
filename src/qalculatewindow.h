@@ -129,6 +129,7 @@ class QalculateWindow : public QMainWindow {
 		bool askSinc(MathStructure&);
 		bool askDot(const std::string&);
 		bool askImplicit();
+		bool askPercent();
 		void keyPressEvent(QKeyEvent*) override;
 		bool eventFilter(QObject*, QEvent*) override;
 		void closeEvent(QCloseEvent*) override;
@@ -199,6 +200,7 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionFontChanged();
 		void onKeypadFontChanged();
 		void onAppFontChanged();
+		void onAppFontTimer();
 		void angleUnitActivated();
 		void normalActivated();
 		void scientificActivated();

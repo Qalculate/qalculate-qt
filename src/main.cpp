@@ -238,6 +238,10 @@ int main(int argc, char **argv) {
 	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 
+	QColor c = QApplication::palette().base().color();
+	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
+	else settings->color = 1;
+
 	QalculateWindow *win = new QalculateWindow();
 	if(parser->value(tOption).isEmpty()) {
 		win->updateWindowTitle(QString(), false, true);
@@ -263,10 +267,7 @@ int main(int argc, char **argv) {
 
 	settings->checkVersion(false, win);
 
-	QColor c = QApplication::palette().base().color();
-	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
-	else settings->color = 1;
-	win->loadInitialHistory();
+	if(!settings->use_custom_app_font) win->loadInitialHistory();
 
 	return app.exec();
 

@@ -987,7 +987,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->use_custom_app_font) {
 		QTimer *timer = new QTimer();
 		timer->setSingleShot(true);
-		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontChanged()));
+		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontTimer()));
 		timer->start(1);
 	} else {
 		expressionEdit->updateCompletion();
@@ -5261,6 +5261,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	parsed_tostruct->setUndefined();
 	CALCULATOR->resetExchangeRatesUsed();
+	CALCULATOR->setSimplifiedPercentageUsed(false);
 	if(do_stack) {
 		stack_size = CALCULATOR->RPNStackSize();
 		if(do_mathoperation && f) {
@@ -5532,7 +5533,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
-	if(!do_mathoperation && (askTC(*parsed_mstruct) || askSinc(*parsed_mstruct) || askSinc(*mstruct) || (check_exrates && settings->checkExchangeRates(this)))) {
+	if(!do_mathoperation && (askTC(*parsed_mstruct) || askSinc(*parsed_mstruct) || askSinc(*mstruct) || askPercent() || (check_exrates && settings->checkExchangeRates(this)))) {
 		b_busy--;
 		calculateExpression(force, do_mathoperation, op, f, settings->rpn_mode, stack_index, saved_execute_str, str, false);
 		settings->evalops.complex_number_form = cnf_bak;
@@ -6549,12 +6550,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		int b_exact = (update_parse || !prev_approximate) && (exact_comparison || (!(*settings->printops.is_approximate) && !mstruct->isApproximate()));
 		if(alt_results.size() == 1 && (mstruct->isComparison() || ((mstruct->isLogicalAnd() || mstruct->isLogicalOr()) && mstruct->containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || result_text.find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
 		size_t index = settings->v_expression.size();
-		while(index > 0 && settings->v_delexpression[index - 1]) index--;
 		bool b_add = true;
 		if(index > 0 && settings->current_result && !CALCULATOR->message() && (!update_parse || (settings->history_answer.size() > (mstruct_exact.isUndefined() ? 1 : 2) && !settings->rpn_mode && mstruct->equals(*settings->history_answer[settings->history_answer.size() - 1], true, true) && (mstruct_exact.isUndefined() || (settings->history_answer.size() > 1 && mstruct_exact.equals(*settings->history_answer[settings->history_answer.size() - 2], true, true))) && parsed_text == settings->v_parse[index - 1] && prev_result_text == settings->v_expression[index - 1] && parsed_approx != settings->v_pexact[index - 1] && !contains_rand_function(*parsed_mstruct))) && alt_results.size() <= settings->v_result[index - 1].size()) {
 			b_add = false;
 			for(size_t i = 0; i < alt_results.size(); i++) {
-				if(settings->v_delresult[index - 1][i] || settings->v_exact[index - 1][i] != (b_exact || i < alt_results.size() - 1) || settings->v_result[index - 1][i] != alt_results[i]) {
+				if(settings->v_exact[index - 1][i] != (b_exact || i < alt_results.size() - 1) || settings->v_result[index - 1][i] != alt_results[i]) {
 					b_add = true; break;
 				}
 			}
@@ -6901,6 +6901,37 @@ bool QalculateWindow::askImplicit() {
 	if(preferencesDialog) preferencesDialog->updateParsingMode();
 	dialog->deleteLater();
 	return pm_bak != settings->evalops.parse_options.parsing_mode;
+}
+bool QalculateWindow::askPercent() {
+	if(settings->simplified_percentage >= 0 || !CALCULATOR->simplifiedPercentageUsed()) return false;
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Percentage Interpretation"));
+	QGridLayout *grid = new QGridLayout();
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	box->addWidget(buttonBox);
+	grid->addWidget(new QLabel(tr("Please select interpretation of percentage addition")), 0, 0, 1, 2);
+	QButtonGroup *group = new QButtonGroup(dialog);
+	group->setExclusive(true);
+	QRadioButton *w_1 = new QRadioButton(tr("Add percentage of original value"));
+	group->addButton(w_1);
+	grid->addWidget(w_1, 1, 0, Qt::AlignTop);
+	std::string s_eg = "<i>100 + 10% = 100 "; s_eg += settings->multiplicationSign(); s_eg += " 110% = 110</i>)";
+	grid->addWidget(new QLabel(QString::fromStdString(s_eg)), 1, 1);
+	QRadioButton *w_0 = new QRadioButton(tr("Add percentage multiplied by 1/100"));
+	group->addButton(w_0);
+	grid->addWidget(w_0, 2, 0, Qt::AlignTop);
+	s_eg = "<i>100 + 10% = 100 + (10 "; s_eg += settings->multiplicationSign(); s_eg += " 0.01) = 100.1</i>)";
+	grid->addWidget(new QLabel(QString::fromStdString(CALCULATOR->localizeExpression(s_eg, settings->evalops.parse_options))), 2, 1);
+	w_1->setChecked(true);
+	dialog->exec();
+	if(w_0->isChecked()) settings->simplified_percentage = 0;
+	else settings->simplified_percentage = 1;
+	dialog->deleteLater();
+	return settings->simplified_percentage == 0;
 }
 
 void QalculateWindow::keyPressEvent(QKeyEvent *e) {
@@ -7379,7 +7410,6 @@ void QalculateWindow::onPreferencesClosed() {
 void QalculateWindow::onResultFontChanged() {
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
 	else {historyView->setFont(QApplication::font());  rpnView->setFont(QApplication::font());}
-	historyView->reloadHistory();
 }
 void QalculateWindow::onExpressionFontChanged() {
 	if(settings->use_custom_expression_font) {
@@ -7395,6 +7425,10 @@ void QalculateWindow::onKeypadFontChanged() {
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	else keypad->setFont(QApplication::font());
 }
+void QalculateWindow::onAppFontTimer() {
+	onAppFontChanged();
+	loadInitialHistory();
+}
 void QalculateWindow::onAppFontChanged() {
 	if(settings->use_custom_app_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_app_font)); QApplication::setFont(font);}
 	else QApplication::setFont(saved_app_font);
@@ -7408,7 +7442,6 @@ void QalculateWindow::onAppFontChanged() {
 	if(!settings->use_custom_result_font) {
 		historyView->setFont(QApplication::font());
 		rpnView->setFont(QApplication::font());
-		historyView->reloadHistory();
 	}
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
 }

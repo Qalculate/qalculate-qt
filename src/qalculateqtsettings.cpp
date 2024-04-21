@@ -179,11 +179,9 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	int v = s2i(svalue);
 	if(svar == "history_expression" || svar == "history_expression*") {
 		v_expression.push_back(svalue);
-		v_delexpression.push_back(false);
 		v_protected.push_back(svar[svar.length() - 1] == '*');
 		v_result.push_back(std::vector<std::string>());
 		v_exact.push_back(std::vector<int>());
-		v_delresult.push_back(std::vector<bool>());
 		v_value.push_back(std::vector<size_t>());
 		v_messages.push_back("");
 		v_parseerror.push_back(false);
@@ -206,7 +204,6 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(!v_result.empty()) {
 			v_result[v_result.size() - 1].push_back(svalue);
 			v_value[v_value.size() - 1].push_back(0);
-			v_delresult[v_result.size() - 1].push_back(false);
 			if(v_exact[v_exact.size() - 1].size() < v_result[v_result.size() - 1].size()) {
 				v_exact[v_exact.size() - 1].push_back(svar.length() < 20);
 			}
@@ -528,6 +525,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		evalops.parse_options.parsing_mode = (ParsingMode) v;
 		if(evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) implicit_question_asked = true;
 	} else if(svar == "simplified_percentage") {
+		if(v > 0 && !PREFERENCES_VERSION_AFTER(5, 0, 0)) v = -1;
 		simplified_percentage = v;
 	} else if(svar == "default_assumption_type") {
 		if(v >= ASSUMPTION_TYPE_NONE && v <= ASSUMPTION_TYPE_BOOLEAN) {
@@ -899,7 +897,7 @@ void QalculateQtSettings::loadPreferences() {
 	copy_ascii = false;
 	copy_ascii_without_units = false;
 	do_imaginary_j = false;
-	simplified_percentage = true;
+	simplified_percentage = -1;
 	color = 1;
 	colorize_result = true;
 	format_result = true;
@@ -955,11 +953,9 @@ void QalculateQtSettings::loadPreferences() {
 	v_parse.clear();
 	v_value.clear();
 	v_protected.clear();
-	v_delexpression.clear();
 	v_result.clear();
 	v_exact.clear();
 	v_pexact.clear();
-	v_delresult.clear();
 	v_messages.clear();
 	v_parseerror.clear();
 	expression_history.clear();
@@ -1601,7 +1597,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 			}
 			size_t i_first = i;
 			for(i = 0; i < v_expression.size(); i++) {
-				if((i >= i_first || v_protected[i]) && !v_delexpression[i]) {
+				if(i >= i_first || v_protected[i]) {
 					if(v_expression[i].empty()) {
 						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_parse[i].c_str());
 						else fprintf(file, "history_expression=%s\n", v_parse[i].c_str());
@@ -1615,22 +1611,20 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					}
 					n++;
 					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
-						if(!v_delresult[i][i2]) {
-							if(v_exact[i][i2]) fprintf(file, "history_result");
-							else fprintf(file, "history_result_approximate");
-							if(v_result[i][i2].length() > 6000 && !v_protected[i]) {
-								std::string str = unhtmlize(v_result[i][i2]);
-								if(str.length() > 5000) {
-									int index = 50;
-									while(index >= 0 && (signed char) str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
-									gsub("\n", "<br>", str);
-									fprintf(file,  "=%s …\n", str.substr(0, index + 1).c_str());
-								} else {
-									fprintf(file, "=%s\n", v_result[i][i2].c_str());
-								}
+						if(v_exact[i][i2]) fprintf(file, "history_result");
+						else fprintf(file, "history_result_approximate");
+						if(v_result[i][i2].length() > 6000 && !v_protected[i]) {
+							std::string str = unhtmlize(v_result[i][i2]);
+							if(str.length() > 5000) {
+								int index = 50;
+								while(index >= 0 && (signed char) str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+								gsub("\n", "<br>", str);
+								fprintf(file,  "=%s …\n", str.substr(0, index + 1).c_str());
 							} else {
 								fprintf(file, "=%s\n", v_result[i][i2].c_str());
 							}
+						} else {
+							fprintf(file, "=%s\n", v_result[i][i2].c_str());
 						}
 					}
 				}
@@ -2177,13 +2171,11 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	v_parse.clear();
 	v_value.clear();
 	v_protected.clear();
-	v_delexpression.clear();
 	v_messages.clear();
 	v_parseerror.clear();
 	v_result.clear();
 	v_exact.clear();
 	v_pexact.clear();
-	v_delresult.clear();
 	expression_history.clear();
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
 		if(CALCULATOR->variables[i]->isLocal() && CALCULATOR->variables[i]->category() == CALCULATOR->temporaryCategory()) CALCULATOR->variables[i]->destroy();

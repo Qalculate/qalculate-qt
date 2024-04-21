@@ -2617,13 +2617,30 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
 						if(u) {
 							mparse = u;
+							if(!had_to_conv && !str_e.empty()) {
+								CALCULATOR->beginTemporaryStopMessages();
+								MathStructure to_struct = get_units_for_parsed_expression(&mparse, u, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
+								if(!to_struct.isZero()) {
+									mparse2 = new MathStructure();
+									CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
+									po.preserve_format = false;
+									to_struct.format(po);
+									po.preserve_format = true;
+									if(to_struct.isMultiplication() && to_struct.size() >= 2) {
+										if(to_struct[0].isOne()) to_struct.delChild(1, true);
+										else if(to_struct[1].isOne()) to_struct.delChild(2, true);
+									}
+									mparse2->multiply(to_struct);
+								}
+								CALCULATOR->endTemporaryStopMessages();
+							}
 						} else if(v) {
 							mparse = v;
 						} else if(!p) {
 							CALCULATOR->beginTemporaryStopMessages();
 							CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
 							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
-							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty() && str_w.empty()) {
+							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty()) {
 								CALCULATOR->beginTemporaryStopMessages();
 								MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
 								if(!to_struct.isZero()) {
@@ -2656,10 +2673,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							CALCULATOR->beginTemporaryStopMessages();
 							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
 							CALCULATOR->endTemporaryStopMessages();
-						}
-						if(had_to_conv && mparse2) {
-							mparse2->unref();
-							mparse2 = NULL;
 						}
 						had_to_conv = true;
 					}

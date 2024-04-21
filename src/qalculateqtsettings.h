@@ -223,7 +223,8 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
+		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, sinc_set;
+		int simplified_percentage;
 		bool programming_base_changed;
 		int previous_precision;
 		std::string custom_angle_unit;
@@ -295,9 +296,7 @@ class QalculateQtSettings : QObject {
 		std::vector<std::string> v_parse;
 		std::vector<bool> v_pexact;
 		std::vector<bool> v_protected;
-		std::vector<bool> v_delexpression;
 		std::vector<std::vector<std::string> > v_result;
-		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
 		std::vector<std::vector<size_t> > v_value;
 		std::vector<QString> v_messages;
