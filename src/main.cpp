@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 	parser->addOption(nOption);
 	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("TITLE"));
 	parser->addOption(tOption);
-	QCommandLineOption vOption(QStringList() << "v" << "verison", QApplication::tr("Display the application version"));
+	QCommandLineOption vOption(QStringList() << "v" << "version", QApplication::tr("Display the application version"));
 	parser->addOption(vOption);
 	QCommandLineOption wOption(QStringList() << "w" << "workspace", QApplication::tr("Open workspace"), QApplication::tr("FILE"));
 	parser->addOption(wOption);
