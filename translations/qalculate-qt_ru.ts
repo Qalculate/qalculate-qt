@@ -1082,27 +1082,27 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Decimal Fraction</source>
-        <translation type="unfinished"></translation>
+        <translation>Десятичная дробь</translation>
     </message>
     <message>
         <source>Optimal Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Оптимальный префикс</translation>
     </message>
     <message>
         <source>prefix</source>
-        <translation type="unfinished">префикс</translation>
+        <translation>префикс</translation>
     </message>
     <message>
         <source>optimal prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>оптимальный префикс</translation>
     </message>
     <message>
         <source>decimals</source>
-        <translation type="unfinished"></translation>
+        <translation>десятичные</translation>
     </message>
     <message>
         <source>decimal fraction</source>
-        <translation type="unfinished"></translation>
+        <translation>десятичная дробь</translation>
     </message>
 </context>
 <context>
@@ -1167,7 +1167,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished">Значение</translation>
+        <translation>Значение</translation>
     </message>
 </context>
 <context>
@@ -2551,7 +2551,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers away from zero</source>
-        <translation>Округлять половинные числа вверх</translation>
+        <translation>Округлять половинные числа от нуля</translation>
     </message>
     <message>
         <source>Round halfway numbers to even</source>
@@ -2815,39 +2815,39 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers to odd</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа до ближайшего нечётного целого числа</translation>
     </message>
     <message>
         <source>Round halfway numbers toward zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа к нулю</translation>
     </message>
     <message>
         <source>Round halfway numbers to random</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа случайно</translation>
     </message>
     <message>
         <source>Round halfway numbers up</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа вверх</translation>
     </message>
     <message>
         <source>Round halfway numbers down</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа вниз</translation>
     </message>
     <message>
         <source>Round toward zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять к нулю</translation>
     </message>
     <message>
         <source>Round away from zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять от нуля</translation>
     </message>
     <message>
         <source>Round up</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять вверх</translation>
     </message>
     <message>
         <source>Round down</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять вниз</translation>
     </message>
 </context>
 <context>
@@ -3475,7 +3475,7 @@ You can get version %3 at %2.</source>
     <message>
         <source>Cancel</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
-        <translation>Отмена</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <source>Close</source>
@@ -4442,15 +4442,15 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation>Копировать</translation>
     </message>
     <message>
         <source>prefix</source>
-        <translation type="unfinished">префикс</translation>
+        <translation>префикс</translation>
     </message>
     <message>
         <source>decimals</source>
-        <translation type="unfinished"></translation>
+        <translation>десятичные дроби</translation>
     </message>
 </context>
 <context>
