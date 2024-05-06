@@ -162,7 +162,7 @@ void ExpressionTipLabel::resizeEvent(QResizeEvent *e) {
 }
 ExpressionTipLabel::~ExpressionTipLabel() {}
 void ExpressionTipLabel::hideTip() {
-	if(!hideTimer.isActive()) hideTimer.start(300, this);
+	if(isVisible() && !hideTimer.isActive()) hideTimer.start(300, this);
 }
 void ExpressionTipLabel::hideTipImmediately() {
 	hide();
@@ -2108,7 +2108,7 @@ void ExpressionEdit::setStatusText(const QString &text, bool is_expression) {
 		current_status_text = text;
 		current_status_is_expression = is_expression;
 		if(settings->expression_status_delay > 0) {
-			if(tipLabel && tipLabel->isVisible()) tipLabel->hideTip();
+			if(tipLabel) tipLabel->hideTip();
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
 				toolTipTimer->setSingleShot(true);
@@ -2728,6 +2728,7 @@ void ExpressionEdit::onTextChanged() {
 	previous_pos = textCursor().position();
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
+	if(tipLabel && settings->expression_status_delay > 0) tipLabel->hideTip();
 	if(block_text_change) return;
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
@@ -3103,6 +3104,7 @@ void ExpressionEdit::onCursorPositionChanged() {
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(toolTipTimer) toolTipTimer->stop();
+	if(tipLabel && settings->expression_status_delay > 0) tipLabel->hideTip();
 	if(block_text_change) return;
 	cursor_has_moved = true;
 	int epos = document()->characterCount() - 1 - textCursor().position();

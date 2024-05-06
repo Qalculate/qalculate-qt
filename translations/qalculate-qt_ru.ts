@@ -2494,19 +2494,19 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Binary two&apos;s complement representation</source>
-        <translation>Представление двоичных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Представление двоичных чисел с дополнительным кодом</translation>
     </message>
     <message>
         <source>Hexadecimal two&apos;s complement representation</source>
-        <translation>Представление шестнадцатеричных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Представление шестнадцатеричных чисел с дополнительным кодом</translation>
     </message>
     <message>
         <source>Use lower case letters in non-decimal numbers</source>
-        <translation>Использовать строчные буквы в недесятичных числах</translation>
+        <translation type="vanished">Использовать строчные буквы в недесятичных числах</translation>
     </message>
     <message>
         <source>Spell out logical operators</source>
-        <translation>Изложить логично логические операции</translation>
+        <translation type="vanished">Изложить логично логические операции</translation>
     </message>
     <message>
         <source>Preferences</source>
@@ -2519,35 +2519,35 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use dot as multiplication sign</source>
-        <translation>Использовать точку как знак умножения</translation>
+        <translation type="vanished">Использовать точку как знак умножения</translation>
     </message>
     <message>
         <source>Use Unicode division slash in output</source>
-        <translation>Использовать косую черту деления Юнокода в выводе</translation>
+        <translation type="vanished">Использовать косую черту деления Юнокода в выводе</translation>
     </message>
     <message>
         <source>Use E-notation instead of 10^n</source>
-        <translation>Использовать E-нотацию вместо 10^n</translation>
+        <translation type="vanished">Использовать E-нотацию вместо 10^n</translation>
     </message>
     <message>
         <source>Use &apos;j&apos; as imaginary unit</source>
-        <translation>Использовать «j» для мнимой единицы</translation>
+        <translation type="vanished">Использовать «j» для мнимой единицы</translation>
     </message>
     <message>
         <source>Use comma as decimal separator</source>
-        <translation>Использовать запятую в качестве десятичного разделителя</translation>
+        <translation type="vanished">Использовать запятую в качестве десятичного разделителя</translation>
     </message>
     <message>
         <source>Ignore comma in numbers</source>
-        <translation>Игнорировать запятую в числах</translation>
+        <translation type="vanished">Игнорировать запятую в числах</translation>
     </message>
     <message>
         <source>Ignore dots in numbers</source>
-        <translation>Игнорировать точки в числах</translation>
+        <translation type="vanished">Игнорировать точки в числах</translation>
     </message>
     <message>
         <source>Copy unformatted ASCII by default</source>
-        <translation>Копировать неформатированный ASCII по умолчанию</translation>
+        <translation type="vanished">Копировать неформатированный ASCII по умолчанию</translation>
     </message>
     <message>
         <source>Round halfway numbers away from zero</source>
@@ -2559,7 +2559,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Indicate repeating decimals</source>
-        <translation>Указывать повторяющиеся десятичные дроби</translation>
+        <translation type="vanished">Указывать повторяющиеся десятичные дроби</translation>
     </message>
     <message>
         <source>Use caret for bitwise XOR</source>
@@ -2755,7 +2755,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use special duodecimal symbols</source>
-        <translation>Использовать специальные двенадцатеричные символы</translation>
+        <translation type="vanished">Использовать специальные двенадцатеричные символы</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -2848,6 +2848,30 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Round down</source>
         <translation>Округлять вниз</translation>
+    </message>
+    <message>
+        <source>Two&apos;s complement output:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Two&apos;s complement input:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Binary</source>
+        <translation type="unfinished">Двоичное</translation>
+    </message>
+    <message>
+        <source>Hexadecimal</source>
+        <translation type="unfinished">Шестнадцатеричное</translation>
+    </message>
+    <message>
+        <source>Binary bits:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation type="unfinished">Автоматическое</translation>
     </message>
 </context>
 <context>
@@ -3468,6 +3492,10 @@ You can get version %3 at %2.</source>
     <message>
         <source>Open variables menu</source>
         <translation>Открыть меню переменных</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4451,6 +4479,22 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>decimals</source>
         <translation>десятичные дроби</translation>
+    </message>
+    <message>
+        <source>Percentage Interpretation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select interpretation of percentage addition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add percentage of original value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add percentage multiplied by 1/100</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

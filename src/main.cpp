@@ -57,8 +57,10 @@ int main(int argc, char **argv) {
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 	app.setDesktopFileName("io.github.Qalculate.qalculate-qt");
-	app.setApplicationVersion("5.0.0");
+#endif
+	app.setApplicationVersion("5.1.0");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
