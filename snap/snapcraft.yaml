@@ -1,6 +1,6 @@
 name: qalculate-qt
 title: Qalculate! (Qt)
-version: '5.1.0'
+version: '5.1.1'
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -42,7 +42,7 @@ apps:
 parts:
   libqalculate:
     source: https://github.com/Qalculate/libqalculate.git
-    source-tag: v5.1.0
+    source-tag: v5.1.1
     source-depth: 1
     plugin: autotools
     build-environment:
