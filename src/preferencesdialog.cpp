@@ -59,7 +59,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	tabs->addTab(w2, tr("Numbers && Operators"));
 	tabs->addTab(w3, tr("Units && Currencies"));
 	tabs->addTab(w4, tr("Parsing && Calculation"));
-	QCheckBox *box; QGridLayout *l; QComboBox *combo;
+	QAbstractButton *box; QGridLayout *l; QComboBox *combo;
 	int r = 0;
 	l = new QGridLayout(w1); l->setSizeConstraint(QLayout::SetFixedSize);
 	BOX(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
@@ -155,11 +155,18 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l->setRowStretch(r, 1);
 	r = 0;
 	l = new QGridLayout(w4); l->setSizeConstraint(QLayout::SetFixedSize);
-	box = new QCheckBox(tr("Display expression status"), this); l->addWidget(box, r, 0); box->setChecked(settings->display_expression_status); connect(box, SIGNAL(toggled(bool)), this, SLOT(expressionStatusToggled(bool)));
-	statusBox = box;
-	QHBoxLayout *hbox = new QHBoxLayout();
-	l->addLayout(hbox, r, 1); r++;
-	hbox->addWidget(new QLabel(tr("Delay:")));
+	l->addWidget(new QLabel(tr("Expression status:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Off"), 0);
+	combo->addItem(tr("In history list"), 1);
+	combo->addItem(tr("In expression field"), 2);
+	if(!settings->display_expression_status) combo->setCurrentIndex(0);
+	else if(settings->status_in_history) combo->setCurrentIndex(1);
+	else combo->setCurrentIndex(2);
+	statusCombo = combo;
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusModeChanged(int)));
+	l->addWidget(combo, r, 1); r++;
+	l->addWidget(new QLabel(tr("Status tooltip delay:")), r, 0);
 	statusDelayWidget = new QSpinBox(this);
 	statusDelayWidget->setRange(0, 10000);
 	statusDelayWidget->setSingleStep(250);
@@ -167,8 +174,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	statusDelayWidget->setSuffix(" " + tr("ms"));
 	statusDelayWidget->setValue(settings->expression_status_delay); 
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
-	hbox->addWidget(statusDelayWidget);
-	hbox->addStretch(1);
+	l->addWidget(statusDelayWidget, r, 1); r++;
 	l->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Parsed"), 0);
@@ -413,10 +419,11 @@ void PreferencesDialog::tooltipsChanged(int i) {
 	settings->enable_tooltips = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit enableTooltipsChanged();
 }
-void PreferencesDialog::expressionStatusToggled(bool b) {
-	settings->display_expression_status = b;
-	statusDelayWidget->setEnabled(b);
-	if(!b) QToolTip::hideText();
+void PreferencesDialog::statusModeChanged(int i) {
+	settings->display_expression_status = (i > 0);
+	settings->status_in_history = (i == 1);
+	statusDelayWidget->setEnabled(settings->display_expression_status);
+	emit statusModeChanged();
 }
 void PreferencesDialog::statusDelayChanged(int v) {
 	settings->expression_status_delay = v;
@@ -826,12 +833,14 @@ void PreferencesDialog::updateParsingMode() {
 }
 void PreferencesDialog::updateExpressionStatus() {
 	statusDelayWidget->blockSignals(true);
-	statusBox->blockSignals(true);
+	statusCombo->blockSignals(true);
+	if(!settings->display_expression_status) statusCombo->setCurrentIndex(0);
+	else if(settings->status_in_history) statusCombo->setCurrentIndex(1);
+	else statusCombo->setCurrentIndex(2);
 	statusDelayWidget->setValue(settings->expression_status_delay);
-	statusBox->setChecked(settings->display_expression_status);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	statusDelayWidget->blockSignals(false);
-	statusBox->blockSignals(false);
+	statusCombo->blockSignals(false);
 }
 void PreferencesDialog::updateTemperatureCalculation() {
 	tcCombo->blockSignals(true);

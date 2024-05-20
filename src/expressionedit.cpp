@@ -1881,8 +1881,12 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		menu = cmenu->addMenu(tr("Expression Status"));
 		group = new QActionGroup(this);
 		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); statusOffAction = action;
-		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
-		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
+		action = menu->addAction(tr("In history list"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusHistoryAction = action;
+		action = menu->addAction(tr("In expression field"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusExpressionAction = action;
+		menu->addSeparator();
+		group = new QActionGroup(this);
+		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
+		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
@@ -1900,7 +1904,9 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	clearAction->setEnabled(!b_empty);
 	clearHistoryAction->setEnabled(!settings->expression_history.empty());
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
-	else if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
+	else if(settings->status_in_history) statusHistoryAction->setChecked(true);
+	else statusExpressionAction->setChecked(true);
+	if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
 	cmenu->popup(e->globalPos());
 }
@@ -1956,10 +1962,13 @@ void ExpressionEdit::onCompletionModeChanged() {
 }
 void ExpressionEdit::onStatusModeChanged() {
 	int i = qobject_cast<QAction*>(sender())->data().toInt();
-	settings->display_expression_status = (i > 0);
-	if(i == 1) settings->expression_status_delay = 1000;
-	else if(i == 2) settings->expression_status_delay = 0;
-	emit expressionStatusModeChanged();
+	if(i == 3) settings->expression_status_delay = 1000;
+	else if(i == 4) settings->expression_status_delay = 0;
+	if(i < 3) {
+		settings->display_expression_status = (i > 0);
+		settings->status_in_history = (i == 1);
+	}
+	emit expressionStatusModeChanged(i < 3);
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;
@@ -2025,40 +2034,14 @@ void ExpressionEdit::blockUndo(bool b) {
 	if(b) block_add_to_undo++;
 	else block_add_to_undo--;
 }
-void remove_spaces(std::string &str) {
-	size_t i = 0;
-	while(true) {
-		i = str.find(' ', i);
-		if(i != std::string::npos) str.erase(i, 1);
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(THIN_SPACE, i);
-		if(i != std::string::npos) str.erase(i, strlen(THIN_SPACE));
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(NNBSP, i);
-		if(i != std::string::npos) str.erase(i, strlen(NNBSP));
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(NBSP, i);
-		if(i != std::string::npos) str.erase(i, strlen(NBSP));
-		else break;
-	}
-}
 void ExpressionEdit::showCurrentStatus() {
-	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && completionView->selectionModel()->hasSelection())) {
+	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && (completionView->selectionModel()->hasSelection() || current_status_type == 3))) {
 		HIDE_TOOLTIP
 	} else {
 		QString str = current_status_text;
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
-		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
+		if(current_status_type == 1 && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
@@ -2085,14 +2068,14 @@ void ExpressionEdit::showCurrentStatus() {
 		if(str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
 		} else if(tipLabel && tipLabel->isVisible()) {
-			tipLabel->reuseTip(str, mapToGlobal(cursorRect().bottomRight()));
-			if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+			tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
+			if(!tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
 				HIDE_TOOLTIP
 			}
 		} else {
 			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(str, mapToGlobal(cursorRect().bottomRight()), this);
-			if(tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+			tipLabel = new ExpressionTipLabel(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), this);
+			if(tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
 				tipLabel->showNormal();
 			} else {
 				HIDE_TOOLTIP
@@ -2100,14 +2083,15 @@ void ExpressionEdit::showCurrentStatus() {
 		}
 	}
 }
-void ExpressionEdit::setStatusText(const QString &text, bool is_expression) {
+void ExpressionEdit::setStatusText(const QString &text, int stype) {
 	if(toolTipTimer) toolTipTimer->stop();
-	if(text.isEmpty()) {
+	if(text.isEmpty() || !settings->display_expression_status) {
 		HIDE_TOOLTIP
-	} else if(settings->display_expression_status) {
+	} else {
 		current_status_text = text;
-		current_status_is_expression = is_expression;
-		if(settings->expression_status_delay > 0) {
+		bool prev_func = (current_status_type == 2);
+		current_status_type = stype;
+		if(settings->expression_status_delay > 0 && (current_status_type != 2 || !prev_func || !tipLabel || !tipLabel->isVisible())) {
 			if(tipLabel) tipLabel->hideTip();
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
@@ -2128,12 +2112,15 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	if((iargs == 0 && arg_index == 0) || (iargs == 1 && arg_index == 1)) return false;
 	const ExpressionName *ename = &f->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) parent());
 	bool last_is_vctr = f->getArgumentDefinition(iargs) && f->getArgumentDefinition(iargs)->type() == ARGUMENT_TYPE_VECTOR;
+	if(arg_index == 0 || function_pos.isNull()) function_pos = cursorRect().bottomRight();
 	if(iargs == 0 || (arg_index > iargs && iargs >= 0 && (!last_is_vctr || iargs == 1))) {
 		if(last_is_vctr || (iargs == 1 && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->handlesVector())) {
+			function_pos = QPoint();
 			return false;
+		} else {
+			setStatusText(tr("Too many arguments for %1().").arg(QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true))), 2);
+			return true;
 		}
-		setStatusText(tr("Too many arguments for %1().").arg(QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true))));
-		return true;
 	}
 	if(arg_index <= 0) arg_index = 1;
 	Argument *arg;
@@ -2200,7 +2187,7 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 		}
 	}
 	str += ")";
-	setStatusText(str);
+	setStatusText(str, 2);
 	return true;
 }
 
@@ -2256,7 +2243,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	cdata->current_function = NULL;
 	if(block_display_parse) return;
 	if(document()->isEmpty()) {
+		function_pos = QPoint();
 		setStatusText("");
+		if(settings->status_in_history) emit statusChanged(QString(), false, false);
 		prev_parsed_expression = "";
 		expression_has_changed2 = false;
 		return;
@@ -2274,6 +2263,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			else text += to_str;
 			text += ")";
 		} else if(text.empty()) {
+			function_pos = QPoint();
 			setStatusText("");
 			prev_parsed_expression = "";
 			expression_has_changed2 = false;
@@ -2283,20 +2273,50 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
 		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
-			if(show_tooltip) setStatusText("qalc command");
+			if(settings->status_in_history) {
+				setStatusText("");
+				emit statusChanged("qalc command", false, false);
+			} else if(show_tooltip) {
+				setStatusText("qalc command");
+				function_pos = QPoint();
+			}
 			return;
 		}
 	} else if(text == "MC") {
-		if(show_tooltip) setStatusText(tr("MC (memory clear)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("MC (memory clear)"), false, false);
+		} else if(show_tooltip) {
+			setStatusText(tr("MC (memory clear)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "MS") {
-		if(show_tooltip) setStatusText(tr("MS (memory store)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("MS (memory store)"), false, false);
+		} else if(show_tooltip) {
+			setStatusText(tr("MS (memory store)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "M+") {
-		if(show_tooltip) setStatusText(tr("M+ (memory plus)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("M+ (memory plus)"), false, false);
+		} else if(show_tooltip) {
+			setStatusText(tr("M+ (memory plus)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "M-" || text == "M−") {
-		if(show_tooltip) setStatusText(tr("M− (memory minus)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("M− (memory minus)"), false, false);
+		} else if(show_tooltip) {
+			setStatusText(tr("M− (memory minus)"));
+			function_pos = QPoint();
+		}
 		return;
 	}
 	gsub(ID_WRAP_LEFT, LEFT_PARENTHESIS, text);
@@ -2359,6 +2379,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			b_func = displayFunctionHint(mfunc.function(), mfunc.countChildren());
 		}
 	}
+	if(!b_func) function_pos = QPoint();
 	if(expression_has_changed2) {
 		bool last_is_space = false;
 		parsed_expression_tooltip = "";
@@ -2429,17 +2450,17 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
 			mparse.format(po);
-			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			parsed_expression += CALCULATOR->localWhereString();
 			mwhere.format(po);
-			parsed_expression += mwhere.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression += mwhere.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		} else if(str_e.empty()) {
 			parsed_expression = "";
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
-			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
@@ -2671,7 +2692,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
 						} else {
 							CALCULATOR->beginTemporaryStopMessages();
-							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
+							parsed_expression += mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 							CALCULATOR->endTemporaryStopMessages();
 						}
 						had_to_conv = true;
@@ -2682,7 +2703,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 			if(mparse2) {
 				mparse2->format(po);
-				parsed_expression.replace(0, parse_l, mparse2->print(po, true, false, TAG_TYPE_HTML));
+				parsed_expression.replace(0, parse_l, mparse2->print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML));
 				mparse2->unref();
 			}
 		}
@@ -2697,6 +2718,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						parsed_expression_tooltip += "<br>• ";
 					}
 					parsed_expression_tooltip += CALCULATOR->message()->message();
+					had_errors = true;
 					message_n++;
 				} else if(mtype == MESSAGE_WARNING) {
 					had_warnings = true;
@@ -2704,17 +2726,25 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 			CALCULATOR->nextMessage();
 		}
+		bool status_error = had_errors;
 		parsed_had_errors = had_errors; parsed_had_warnings = had_warnings;
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
 		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		settings->evalops.parse_options.preserve_format = false;
-		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+		if(settings->status_in_history) {
+			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), status_error);
+			if(!b_func) setStatusText(settings->chain_mode || !had_errors ? "" : prev_parsed_expression, had_errors ? 3 : 0);
+		} else if(!b_func && show_tooltip) {
+			setStatusText(settings->chain_mode ? "" : prev_parsed_expression, had_errors ? 3 : 1);
+		}
 		expression_has_changed2 = false;
 	} else if(!b_func) {
 		CALCULATOR->clearMessages();
 		settings->evalops.parse_options.preserve_format = false;
-		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+		if(prev_func && show_tooltip) {
+			setStatusText((settings->status_in_history && !parsed_had_errors) || settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
+		}
 	} else {
 		settings->evalops.parse_options.preserve_format = false;
 	}
@@ -2728,7 +2758,7 @@ void ExpressionEdit::onTextChanged() {
 	previous_pos = textCursor().position();
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
-	if(tipLabel && settings->expression_status_delay > 0) tipLabel->hideTip();
+	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
@@ -3104,7 +3134,7 @@ void ExpressionEdit::onCursorPositionChanged() {
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(toolTipTimer) toolTipTimer->stop();
-	if(tipLabel && settings->expression_status_delay > 0) tipLabel->hideTip();
+	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
 	cursor_has_moved = true;
 	int epos = document()->characterCount() - 1 - textCursor().position();

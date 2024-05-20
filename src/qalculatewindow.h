@@ -189,6 +189,8 @@ class QalculateWindow : public QMainWindow {
 		void onRPNVisibilityChanged(bool);
 		void onRPNClosed();
 		void onExpressionChanged();
+		void onHistoryReloaded();
+		void onStatusChanged(QString, bool, bool);
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);
@@ -247,7 +249,7 @@ class QalculateWindow : public QMainWindow {
 		void registerChanged(int);
 		void calculateRPN(int);
 		void approximateResult();
-		void onExpressionStatusModeChanged();
+		void onExpressionStatusModeChanged(bool = true);
 		void functionActivated();
 		void unitActivated();
 		void prefixActivated();

@@ -44,6 +44,7 @@ bool item_in_calculator(ExpressionItem *item);
 bool name_matches(ExpressionItem *item, const std::string &str);
 bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
 bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
+void remove_spaces(std::string &str);
 bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
@@ -256,7 +257,7 @@ class QalculateQtSettings : QObject {
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		bool rpn_shown;
-		bool auto_calculate;
+		bool auto_calculate, status_in_history;
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
 		bool close_with_esc;

@@ -16,7 +16,7 @@
 
 #include <libqalculate/qalculate.h>
 
-class QCheckBox;
+class QAbstractButton;
 class QSpinBox;
 class QComboBox;
 
@@ -26,9 +26,9 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
+		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
 		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo;
+		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -37,7 +37,7 @@ class PreferencesDialog : public QDialog {
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
 		void tooltipsChanged(int);
-		void expressionStatusToggled(bool);
+		void statusModeChanged(int);
 		void statusDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
@@ -135,6 +135,7 @@ class PreferencesDialog : public QDialog {
 		void symbolsUpdated();
 		void historyExpressionTypeChanged();
 		void binaryBitsChanged();
+		void statusModeChanged();
 		void dialogClosed();
 
 };

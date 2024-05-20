@@ -71,7 +71,32 @@ bool item_in_calculator(ExpressionItem *item) {
 	if(item->type() == TYPE_FUNCTION) return CALCULATOR->hasFunction((MathFunction*) item);
 	return false;
 }
-
+void remove_spaces(std::string &str) {
+	size_t i = 0;
+	while(true) {
+		i = str.find(' ', i);
+		if(i != std::string::npos) str.erase(i, 1);
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(THIN_SPACE, i);
+		if(i != std::string::npos) str.erase(i, strlen(THIN_SPACE));
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(NNBSP, i);
+		if(i != std::string::npos) str.erase(i, strlen(NNBSP));
+		else break;
+	}
+	i = 0;
+	while(true) {
+		i = str.find(NBSP, i);
+		if(i != std::string::npos) str.erase(i, strlen(NBSP));
+		else break;
+	}
+}
 long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, char sgn, const QString &localized_fraction, bool qalc_command) {
 	long int fden = 0;
 	if(!qalc_command && (equalsIgnoreCase(str, "fraction") || equalsIgnoreCase(str, localized_fraction.toStdString()))) {
@@ -791,6 +816,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			implicit_question_asked = true;
 		} else if(svar == "calculate_as_you_type") {
 			auto_calculate = v;
+		} else if(svar == "status_in_history") {
+			status_in_history = v;
 		}
 	}
 }
@@ -879,6 +906,7 @@ void QalculateQtSettings::loadPreferences() {
 	title_type = TITLE_APP;
 	programming_base_changed = false;
 	auto_calculate = true;
+	status_in_history = true;
 	dot_question_asked = false;
 	implicit_question_asked = false;
 	complex_angle_form = false;
@@ -1482,6 +1510,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+		fprintf(file, "status_in_history=%i\n", status_in_history);
 		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}
 	if(read_default) {

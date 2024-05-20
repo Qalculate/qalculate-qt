@@ -128,6 +128,8 @@ int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
+std::string auto_expression, auto_result;
+bool auto_format_updated = false, auto_error = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
 bool title_modified = false;
@@ -920,11 +922,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	connect(historyView, SIGNAL(insertTextRequested(std::string)), this, SLOT(onInsertTextRequested(std::string)));
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
+	connect(historyView, SIGNAL(historyReloaded()), this, SLOT(onHistoryReloaded()));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
+	connect(expressionEdit, SIGNAL(statusChanged(QString, bool, bool)), this, SLOT(onStatusChanged(QString, bool, bool)));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
-	connect(expressionEdit, SIGNAL(expressionStatusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
+	connect(expressionEdit, SIGNAL(expressionStatusModeChanged(bool)), this, SLOT(onExpressionStatusModeChanged(bool)));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
@@ -3258,7 +3262,8 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 	settings->updateMessagePrintOptions();
 	workspace_changed = true;
 	setResult(NULL, true, false, false);
-	if(!QToolTip::text().isEmpty()) expressionEdit->displayParseStatus(true);
+	auto_format_updated = true;
+	if(!QToolTip::text().isEmpty() || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
 }
 void QalculateWindow::resultDisplayUpdated() {
 	resultFormatUpdated();
@@ -3290,6 +3295,7 @@ void QalculateWindow::expressionCalculationUpdated(int delay) {
 		return;
 	}
 	workspace_changed = true;
+	auto_format_updated = true;
 	expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 	settings->updateMessagePrintOptions();
 	if(!settings->rpn_mode) {
@@ -6054,6 +6060,72 @@ void QalculateWindow::onExpressionChanged() {
 	updateResultBases();
 }
 
+void QalculateWindow::onHistoryReloaded() {
+	if(settings->status_in_history && settings->display_expression_status) {
+		historyView->clearTemporary();
+		auto_expression = "";
+		expressionEdit->displayParseStatus(true);
+	}
+}
+void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool had_error) {
+	if(!settings->status_in_history) return;
+	std::string current_text = expressionEdit->toPlainText().toStdString();
+	remove_blank_ends(current_text);
+	if(status.isEmpty()) {
+		historyView->clearTemporary();
+		auto_expression = "";
+		auto_result = "";
+	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text)) {
+		if(auto_result.empty() && auto_expression == status.toStdString()) return;
+		std::vector<std::string> values;
+		auto_expression = status.toStdString();
+		auto_result = "";
+		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
+	} else {
+		if(!had_error && !auto_error && !auto_format_updated && auto_expression == status.toStdString()) return;
+		bool b_comp = false, is_approximate = false;
+		PrintOptions po = settings->printops;
+		po.is_approximate = &is_approximate;
+		std::string result = CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options);
+		CALCULATOR->beginTemporaryStopMessages();
+		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+		result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, settings->color, TAG_TYPE_HTML);
+		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+		auto_format_updated = false;
+		std::vector<CalculatorMessage> messages;
+		CALCULATOR->endTemporaryStopMessages(false, &messages);
+		bool b_error = false, b_warning = false;
+		for(size_t i = 0; i < messages.size(); i++) {
+			if(messages[i].type() == MESSAGE_ERROR) {
+				b_error = true;
+				break;
+			} else if(messages[i].type() == MESSAGE_WARNING) {
+				b_warning = true;
+			}
+		}
+		if(!b_error && !b_warning && !auto_error && auto_result == result && auto_expression == status.toStdString()) return;
+		auto_error = b_error || b_warning;
+		std::vector<std::string> values;
+		std::string status_nohtml = unhtmlize(status.toStdString());
+		std::string result_nohtml = unhtmlize(result);
+		remove_spaces(result_nohtml);
+		remove_spaces(current_text);
+		if(!b_error && !result.empty() && result != CALCULATOR->timedOutString() && result_nohtml.length() < 500 && (!auto_result.empty() || (result_nohtml != status_nohtml && result_nohtml != current_text))) {
+			auto_result = result;
+			if(b_comp) {
+				result.insert(0, "(");
+				result += ")";
+			}
+			values.push_back(result);
+		} else {
+			auto_result = "";
+		}
+		auto_expression = status.toStdString();
+		CALCULATOR->addMessages(&messages);
+		historyView->addResult(values, "", true, auto_expression, !is_approximate, false, QString(), NULL, 0, 0, true);
+	}
+}
+
 void QalculateWindow::onBinaryBitsChanged() {
 	if(basesDock->isVisible() && bases_is_result && settings->current_result) {
 		CALCULATOR->beginTemporaryStopMessages();
@@ -6562,6 +6634,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			}
 		}
 		if(b_add) {
+			auto_expression = "";
+			auto_result = "";
 			historyView->addResult(alt_results, update_parse ? prev_result_text : "", !parsed_approx, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 		} else if(update_parse) {
 			settings->history_answer.pop_back();
@@ -7447,8 +7521,13 @@ void QalculateWindow::onAppFontChanged() {
 	}
 	if(!settings->use_custom_keypad_font) keypad->setFont(QApplication::font());
 }
-void QalculateWindow::onExpressionStatusModeChanged() {
+void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 	if(preferencesDialog) preferencesDialog->updateExpressionStatus();
+	if(b) {
+		if(!settings->status_in_history) historyView->clearTemporary();
+		auto_expression = "";
+		expressionEdit->displayParseStatus(true);
+	}
 }
 void QalculateWindow::removeShortcutClicked() {
 	QTreeWidgetItem *item = shortcutList->currentItem();
@@ -7867,6 +7946,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), historyView, SLOT(reloadHistory()));
 	connect(preferencesDialog, SIGNAL(binaryBitsChanged()), this, SLOT(onBinaryBitsChanged()));
+	connect(preferencesDialog, SIGNAL(statusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

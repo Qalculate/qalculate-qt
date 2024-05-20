@@ -61,7 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *clearHistoryAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *clearHistoryAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
@@ -86,16 +86,17 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		int block_display_parse;
 		QString prev_parsed_expression, parsed_expression_tooltip, current_status_text;
-		bool current_status_is_expression;
+		int current_status_type;
 		bool expression_has_changed, expression_has_changed2;
 		bool parsed_had_errors, parsed_had_warnings;
 		int previous_epos;
+		QPoint function_pos;
 		bool parentheses_highlighted;
 		int default_frame;
 		QRect prev_rect;
 
 		void setCurrentObject();
-		void setStatusText(const QString &text, bool is_expression = false);
+		void setStatusText(const QString &text, int = 0);
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
@@ -164,7 +165,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		void returnPressed();
 		void toConversionRequested(std::string);
 		void calculateRPNRequest(int);
-		void expressionStatusModeChanged();
+		void expressionStatusModeChanged(bool);
+		void statusChanged(QString, bool, bool);
 
 };
 

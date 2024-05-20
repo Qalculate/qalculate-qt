@@ -26,6 +26,7 @@
 	<file alias="actions/scalable/rpn-swap.svg">data/scalable/rpn-swap.svg</file>
 	<file alias="actions/scalable/table.svg">data/scalable/table.svg</file>
 	<file alias="actions/scalable/units.svg">data/scalable/units.svg</file>
+	<file alias="actions/scalable/warning.svg">data/scalable/warning.svg</file>
 	<file alias="dark/actions/scalable/calendars.svg">data/scalable/calendars-dark.svg</file>
 	<file alias="dark/actions/scalable/configure.svg">data/scalable/configure-dark.svg</file>
 	<file alias="dark/actions/scalable/convert.svg">data/scalable/convert-dark.svg</file>
@@ -51,6 +52,7 @@
 	<file alias="dark/actions/scalable/rpn-swap.svg">data/scalable/rpn-swap-dark.svg</file>
 	<file alias="dark/actions/scalable/table.svg">data/scalable/table-dark.svg</file>
 	<file alias="dark/actions/scalable/units.svg">data/scalable/units-dark.svg</file>
+	<file alias="dark/actions/scalable/warning.svg">data/scalable/warning.svg</file>
 	<file alias="apps/16x16/qalculate-qt.png">data/16/qalculate-qt.png</file>
 	<file alias="apps/22x22/qalculate-qt.png">data/22/qalculate-qt.png</file>
 	<file alias="apps/32x32/qalculate-qt.png">data/32/qalculate-qt.png</file>
