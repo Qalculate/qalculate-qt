@@ -124,6 +124,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		void onCompleterEvent(QEvent*);
 		bool eventFilter(QObject*, QEvent*) override;
 
+		std::vector<CalculatorMessage> status_messages;
+
 	protected slots:
 
 		void onTextChanged();
@@ -166,7 +168,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void toConversionRequested(std::string);
 		void calculateRPNRequest(int);
 		void expressionStatusModeChanged(bool);
-		void statusChanged(QString, bool, bool);
+		void statusChanged(QString, bool, bool, bool);
 
 };
 

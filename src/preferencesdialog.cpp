@@ -173,8 +173,19 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	//: milliseconds
 	statusDelayWidget->setSuffix(" " + tr("ms"));
 	statusDelayWidget->setValue(settings->expression_status_delay); 
+	statusDelayWidget->setEnabled(settings->display_expression_status);
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
 	l->addWidget(statusDelayWidget, r, 1); r++;
+	l->addWidget(new QLabel(tr("Calculate-as-you-type delay:")), r, 0);
+	calculateDelayWidget = new QSpinBox(this);
+	calculateDelayWidget->setRange(0, 10000);
+	calculateDelayWidget->setSingleStep(250);
+	//: milliseconds
+	calculateDelayWidget->setSuffix(" " + tr("ms"));
+	calculateDelayWidget->setValue(settings->auto_calculate_delay);
+	calculateDelayWidget->setEnabled(settings->status_in_history);
+	connect(calculateDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(calculateDelayChanged(int)));
+	l->addWidget(calculateDelayWidget, r, 1); r++;
 	l->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Parsed"), 0);
@@ -423,10 +434,14 @@ void PreferencesDialog::statusModeChanged(int i) {
 	settings->display_expression_status = (i > 0);
 	settings->status_in_history = (i == 1);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
+	calculateDelayWidget->setEnabled(settings->status_in_history);
 	emit statusModeChanged();
 }
 void PreferencesDialog::statusDelayChanged(int v) {
 	settings->expression_status_delay = v;
+}
+void PreferencesDialog::calculateDelayChanged(int v) {
+	settings->auto_calculate_delay = v;
 }
 void PreferencesDialog::binTwosToggled(bool b) {
 	settings->printops.twos_complement = b;
@@ -833,13 +848,17 @@ void PreferencesDialog::updateParsingMode() {
 }
 void PreferencesDialog::updateExpressionStatus() {
 	statusDelayWidget->blockSignals(true);
+	calculateDelayWidget->blockSignals(true);
 	statusCombo->blockSignals(true);
 	if(!settings->display_expression_status) statusCombo->setCurrentIndex(0);
 	else if(settings->status_in_history) statusCombo->setCurrentIndex(1);
 	else statusCombo->setCurrentIndex(2);
 	statusDelayWidget->setValue(settings->expression_status_delay);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
+	calculateDelayWidget->setValue(settings->auto_calculate_delay);
+	calculateDelayWidget->setEnabled(settings->status_in_history);
 	statusDelayWidget->blockSignals(false);
+	calculateDelayWidget->blockSignals(false);
 	statusCombo->blockSignals(false);
 }
 void PreferencesDialog::updateTemperatureCalculation() {

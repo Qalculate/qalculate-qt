@@ -27,7 +27,7 @@ class PreferencesDialog : public QDialog {
 	protected:
 
 		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
-		QSpinBox *exratesSpin, *statusDelayWidget;
+		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget;
 		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;
 
 		void closeEvent(QCloseEvent*) override;
@@ -39,6 +39,7 @@ class PreferencesDialog : public QDialog {
 		void tooltipsChanged(int);
 		void statusModeChanged(int);
 		void statusDelayChanged(int);
+		void calculateDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
 		void binTwosInputToggled(bool);

@@ -816,6 +816,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			implicit_question_asked = true;
 		} else if(svar == "calculate_as_you_type") {
 			auto_calculate = v;
+		} else if(svar == "calculate_as_you_type_delay") {
+			auto_calculate_delay = v;
 		} else if(svar == "status_in_history") {
 			status_in_history = v;
 		}
@@ -940,6 +942,7 @@ void QalculateQtSettings::loadPreferences() {
 	always_on_top = false;
 	display_expression_status = true;
 	expression_status_delay = 1000;
+	auto_calculate_delay = 500;
 	prefixes_default = true;
 	keypad_type = 0;
 	toolbar_style = Qt::ToolButtonIconOnly;
@@ -1510,6 +1513,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "local_currency_conversion=%i\n", evalops.local_currency_conversion);
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
+		fprintf(file, "calculate_as_you_type_delay=%i\n", auto_calculate_delay);
 		fprintf(file, "status_in_history=%i\n", status_in_history);
 		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}

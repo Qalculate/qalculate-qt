@@ -112,7 +112,7 @@ class QalculateWindow : public QMainWindow {
 		QAction *firstFunctionsMenuOptionAction, *firstVariablesMenuOptionAction, *firstUnitsMenuOptionAction;
 		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
-		QTimer *ecTimer, *rfTimer;
+		QTimer *ecTimer, *rfTimer, *autoCalculateTimer;
 		QFont saved_app_font;
 
 		QTableWidget *rpnView;
@@ -190,7 +190,8 @@ class QalculateWindow : public QMainWindow {
 		void onRPNClosed();
 		void onExpressionChanged();
 		void onHistoryReloaded();
-		void onStatusChanged(QString, bool, bool);
+		void onStatusChanged(QString, bool, bool, bool);
+		void autoCalculateTimeout();
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
 		void onInsertValueRequested(int);

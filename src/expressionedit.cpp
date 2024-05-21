@@ -1906,7 +1906,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
 	else if(settings->status_in_history) statusHistoryAction->setChecked(true);
 	else statusExpressionAction->setChecked(true);
-	if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
+	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
 	cmenu->popup(e->globalPos());
 }
@@ -1962,11 +1962,21 @@ void ExpressionEdit::onCompletionModeChanged() {
 }
 void ExpressionEdit::onStatusModeChanged() {
 	int i = qobject_cast<QAction*>(sender())->data().toInt();
-	if(i == 3) settings->expression_status_delay = 1000;
-	else if(i == 4) settings->expression_status_delay = 0;
+	if(i == 3) {
+		if(settings->status_in_history) settings->auto_calculate_delay = 500;
+		else settings->expression_status_delay = 1000;
+	} else if(i == 4) {
+		if(settings->status_in_history) settings->auto_calculate_delay = 0;
+		else settings->expression_status_delay = 0;
+	}
 	if(i < 3) {
 		settings->display_expression_status = (i > 0);
 		settings->status_in_history = (i == 1);
+		if(settings->status_in_history && settings->display_expression_status) {
+			settings->expression_status_delay = 1000;
+		} else if(settings->auto_calculate_delay == 0) {
+			settings->expression_status_delay = 0;
+		}
 	}
 	emit expressionStatusModeChanged(i < 3);
 }
@@ -2242,10 +2252,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
 	if(block_display_parse) return;
+	status_messages.clear();
 	if(document()->isEmpty()) {
 		function_pos = QPoint();
 		setStatusText("");
-		if(settings->status_in_history) emit statusChanged(QString(), false, false);
+		if(settings->status_in_history) emit statusChanged(QString(), false, false, false);
 		prev_parsed_expression = "";
 		expression_has_changed2 = false;
 		return;
@@ -2275,7 +2286,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
 			if(settings->status_in_history) {
 				setStatusText("");
-				emit statusChanged("qalc command", false, false);
+				emit statusChanged("qalc command", false, false, false);
 			} else if(show_tooltip) {
 				setStatusText("qalc command");
 				function_pos = QPoint();
@@ -2285,7 +2296,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "MC") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("MC (memory clear)"), false, false);
+			emit statusChanged(tr("MC (memory clear)"), false, false, false);
 		} else if(show_tooltip) {
 			setStatusText(tr("MC (memory clear)"));
 			function_pos = QPoint();
@@ -2294,7 +2305,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "MS") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("MS (memory store)"), false, false);
+			emit statusChanged(tr("MS (memory store)"), false, false, false);
 		} else if(show_tooltip) {
 			setStatusText(tr("MS (memory store)"));
 			function_pos = QPoint();
@@ -2303,7 +2314,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "M+") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("M+ (memory plus)"), false, false);
+			emit statusChanged(tr("M+ (memory plus)"), false, false, false);
 		} else if(show_tooltip) {
 			setStatusText(tr("M+ (memory plus)"));
 			function_pos = QPoint();
@@ -2312,13 +2323,14 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "M-" || text == "M−") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("M− (memory minus)"), false, false);
+			emit statusChanged(tr("M− (memory minus)"), false, false, false);
 		} else if(show_tooltip) {
 			setStatusText(tr("M− (memory minus)"));
 			function_pos = QPoint();
 		}
 		return;
 	}
+	CALCULATOR->beginTemporaryStopMessages();
 	gsub(ID_WRAP_LEFT, LEFT_PARENTHESIS, text);
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
@@ -2708,44 +2720,44 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 		}
 		if(po.base == BASE_CUSTOM) CALCULATOR->setCustomOutputBase(nr_base);
+		CALCULATOR->endTemporaryStopMessages(false, &status_messages);
 		size_t message_n = 0;
-		while(CALCULATOR->message()) {
-			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
-				MessageType mtype = CALCULATOR->message()->type();
+		for(size_t i = 0; i < status_messages.size(); i++) {
+			if(status_messages[i].category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
+				MessageType mtype = status_messages[i].type();
 				if(mtype == MESSAGE_ERROR) {
 					if(message_n > 0) {
 						if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
 						parsed_expression_tooltip += "<br>• ";
 					}
-					parsed_expression_tooltip += CALCULATOR->message()->message();
+					parsed_expression_tooltip += status_messages[i].message();
 					had_errors = true;
 					message_n++;
 				} else if(mtype == MESSAGE_WARNING) {
 					had_warnings = true;
 				}
 			}
-			CALCULATOR->nextMessage();
 		}
-		bool status_error = had_errors;
-		parsed_had_errors = had_errors; parsed_had_warnings = had_warnings;
+		parsed_had_errors = had_errors && (settings->expression_status_delay >= settings->completion_delay); parsed_had_warnings = had_warnings || had_errors;
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
-		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
+		if(parsed_had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		settings->evalops.parse_options.preserve_format = false;
 		if(settings->status_in_history) {
-			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), status_error);
-			if(!b_func) setStatusText(settings->chain_mode || !had_errors ? "" : prev_parsed_expression, had_errors ? 3 : 0);
+			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), had_errors, had_warnings);
+			if(!b_func) setStatusText(settings->chain_mode || !parsed_had_errors ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 0);
 		} else if(!b_func && show_tooltip) {
-			setStatusText(settings->chain_mode ? "" : prev_parsed_expression, had_errors ? 3 : 1);
+			setStatusText(settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
 		}
 		expression_has_changed2 = false;
 	} else if(!b_func) {
-		CALCULATOR->clearMessages();
+		CALCULATOR->endTemporaryStopMessages();
 		settings->evalops.parse_options.preserve_format = false;
 		if(prev_func && show_tooltip) {
 			setStatusText((settings->status_in_history && !parsed_had_errors) || settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
 		}
 	} else {
+		CALCULATOR->endTemporaryStopMessages();
 		settings->evalops.parse_options.preserve_format = false;
 	}
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);

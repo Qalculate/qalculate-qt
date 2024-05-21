@@ -115,7 +115,7 @@ bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
 bool had_to_expression = false;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
-QString lastx_text;
+QString lastx_text, current_status;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
@@ -128,7 +128,7 @@ int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
-std::string auto_expression, auto_result;
+std::string auto_expression, auto_result, current_status_expression;
 bool auto_format_updated = false, auto_error = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
@@ -374,6 +374,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	ecTimer = NULL;
 	rfTimer = NULL;
+	autoCalculateTimer = NULL;
 	shortcutsDialog = NULL;
 	preferencesDialog = NULL;
 	functionsDialog = NULL;
@@ -925,7 +926,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(historyView, SIGNAL(historyReloaded()), this, SLOT(onHistoryReloaded()));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
-	connect(expressionEdit, SIGNAL(statusChanged(QString, bool, bool)), this, SLOT(onStatusChanged(QString, bool, bool)));
+	connect(expressionEdit, SIGNAL(statusChanged(QString, bool, bool, bool)), this, SLOT(onStatusChanged(QString, bool, bool, bool)));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
 	connect(expressionEdit, SIGNAL(expressionStatusModeChanged(bool)), this, SLOT(onExpressionStatusModeChanged(bool)));
@@ -4266,6 +4267,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	if(b_busy) return;
 
+	if(autoCalculateTimer) autoCalculateTimer->stop();
+
 	expressionEdit->hideCompletion();
 
 	b_busy++;
@@ -6064,66 +6067,126 @@ void QalculateWindow::onHistoryReloaded() {
 	if(settings->status_in_history && settings->display_expression_status) {
 		historyView->clearTemporary();
 		auto_expression = "";
+		auto_error = false;
+		if(autoCalculateTimer) autoCalculateTimer->stop();
 		expressionEdit->displayParseStatus(true);
 	}
 }
-void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool had_error) {
+void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool had_error, bool had_warning) {
 	if(!settings->status_in_history) return;
-	std::string current_text = expressionEdit->toPlainText().toStdString();
-	remove_blank_ends(current_text);
+	std::string current_text = expressionEdit->toPlainText().trimmed().toStdString();
+	bool last_op = false;
+	if(expressionEdit->textCursor().atEnd()) last_op = last_is_operator(current_text);
 	if(status.isEmpty()) {
+		if(autoCalculateTimer) autoCalculateTimer->stop();
 		historyView->clearTemporary();
 		auto_expression = "";
 		auto_result = "";
+		auto_error = false;
 	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text)) {
-		if(auto_result.empty() && auto_expression == status.toStdString()) return;
+		if(autoCalculateTimer) autoCalculateTimer->stop();
+		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && auto_expression == status.toStdString()) return;
+		auto_error = had_error || had_warning;
 		std::vector<std::string> values;
 		auto_expression = status.toStdString();
 		auto_result = "";
+		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 	} else {
-		if(!had_error && !auto_error && !auto_format_updated && auto_expression == status.toStdString()) return;
-		bool b_comp = false, is_approximate = false;
-		PrintOptions po = settings->printops;
-		po.is_approximate = &is_approximate;
-		std::string result = CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options);
-		CALCULATOR->beginTemporaryStopMessages();
-		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-		result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, settings->color, TAG_TYPE_HTML);
-		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-		auto_format_updated = false;
-		std::vector<CalculatorMessage> messages;
-		CALCULATOR->endTemporaryStopMessages(false, &messages);
-		bool b_error = false, b_warning = false;
-		for(size_t i = 0; i < messages.size(); i++) {
-			if(messages[i].type() == MESSAGE_ERROR) {
-				b_error = true;
-				break;
-			} else if(messages[i].type() == MESSAGE_WARNING) {
-				b_warning = true;
+		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_format_updated && auto_expression == status.toStdString()) {
+			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
+				autoCalculateTimer->stop();
+				autoCalculateTimer->start(settings->auto_calculate_delay);
 			}
+			return;
 		}
-		if(!b_error && !b_warning && !auto_error && auto_result == result && auto_expression == status.toStdString()) return;
-		auto_error = b_error || b_warning;
-		std::vector<std::string> values;
-		std::string status_nohtml = unhtmlize(status.toStdString());
-		std::string result_nohtml = unhtmlize(result);
-		remove_spaces(result_nohtml);
-		remove_spaces(current_text);
-		if(!b_error && !result.empty() && result != CALCULATOR->timedOutString() && result_nohtml.length() < 500 && (!auto_result.empty() || (result_nohtml != status_nohtml && result_nohtml != current_text))) {
-			auto_result = result;
-			if(b_comp) {
-				result.insert(0, "(");
-				result += ")";
+		current_status_expression = current_text;
+		current_status = status;
+		if(autoCalculateTimer) autoCalculateTimer->stop();
+		if(had_error || settings->auto_calculate_delay > 0) {
+			if(had_error || had_warning || auto_error || !auto_result.empty() || auto_expression != status.toStdString()) {
+				auto_result = "";
+				auto_expression = status.toStdString();
+				auto_error = had_error || had_warning;
+				std::vector<std::string> values;
+				CALCULATOR->addMessages(&expressionEdit->status_messages);
+				historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 			}
-			values.push_back(result);
+			if(had_error) return;
+			if(!autoCalculateTimer) {
+				autoCalculateTimer = new QTimer(this);
+				autoCalculateTimer->setSingleShot(true);
+				connect(autoCalculateTimer, SIGNAL(timeout()), this, SLOT(autoCalculateTimeout()));
+			}
+			autoCalculateTimer->start(settings->auto_calculate_delay);
 		} else {
-			auto_result = "";
+			autoCalculateTimeout();
 		}
-		auto_expression = status.toStdString();
-		CALCULATOR->addMessages(&messages);
-		historyView->addResult(values, "", true, auto_expression, !is_approximate, false, QString(), NULL, 0, 0, true);
 	}
+}
+void QalculateWindow::autoCalculateTimeout() {
+	bool b_comp = false, is_approximate = false;
+	PrintOptions po = settings->printops;
+	po.is_approximate = &is_approximate;
+	std::string result = CALCULATOR->unlocalizeExpression(current_status_expression, settings->evalops.parse_options);
+	CALCULATOR->beginTemporaryStopMessages();
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+	result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, settings->color, TAG_TYPE_HTML);
+	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+	auto_format_updated = false;
+	std::vector<CalculatorMessage> messages;
+	CALCULATOR->endTemporaryStopMessages(false, &messages);
+	bool b_error = false, b_warning = false;
+	for(size_t i = 0; i < messages.size(); i++) {
+		if(messages[i].type() == MESSAGE_ERROR) {
+			b_error = true;
+			break;
+		} else if(messages[i].type() == MESSAGE_WARNING) {
+			b_warning = true;
+		}
+	}
+	if(!b_error && !b_warning && !auto_error && auto_result == result && (settings->auto_calculate_delay > 0 || auto_expression == current_status.toStdString())) return;
+	auto_expression = current_status.toStdString();
+	auto_error = b_error || b_warning;
+	std::vector<std::string> values;
+	std::string status_nohtml = unhtmlize(current_status.toStdString());
+	std::string result_nohtml = unhtmlize(result);
+	remove_spaces(result_nohtml);
+	remove_spaces(current_status_expression);
+	QString flag;
+	if(!b_error && !result.empty() && result != CALCULATOR->timedOutString() && result_nohtml.length() < 500 && (!auto_result.empty() || (result_nohtml != status_nohtml && result_nohtml != current_status_expression))) {
+		auto_result = result;
+		size_t i = result_nohtml.find_last_of(NUMBERS);
+		if(i != std::string::npos && i < result_nohtml.length() - 1 && result_nohtml.find_last_not_of(NUMBER_ELEMENTS COMMA, i) == std::string::npos) {
+			Unit *u = CALCULATOR->getActiveUnit(result_nohtml.substr(i + 1, result_nohtml.length() - (i + 1)));
+			if(u && u->isCurrency()) {
+				flag = ":/data/flags/" + QString::fromStdString(u->referenceName()) + ".png";
+				if(!QFile::exists(flag)) flag.clear();
+			}
+		}
+		gsub("\n", "<br>", result);
+		if(b_comp) {
+			// add line break before or
+			size_t i = 0;
+			std::string or_str = " ";
+			if(po.spell_out_logical_operators) or_str += CALCULATOR->logicalORString();
+			else or_str += LOGICAL_OR;
+			or_str += " ";
+			while(true) {
+				i = result.find(or_str, i);
+				if(i == std::string::npos) break;
+				result.replace(i + or_str.length() - 1, 1, "<br>");
+				i += or_str.length();
+			}
+		}
+		values.push_back(result);
+	} else {
+		auto_result = "";
+		if(settings->auto_calculate_delay > 0) return;
+	}
+	auto_expression = current_status.toStdString();
+	CALCULATOR->addMessages(&messages);
+	historyView->addResult(values, "", true, auto_expression, !is_approximate, false, flag, NULL, 0, 0, true);
 }
 
 void QalculateWindow::onBinaryBitsChanged() {
@@ -6636,6 +6699,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		if(b_add) {
 			auto_expression = "";
 			auto_result = "";
+			auto_error = false;
+			if(autoCalculateTimer) autoCalculateTimer->stop();
 			historyView->addResult(alt_results, update_parse ? prev_result_text : "", !parsed_approx, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 		} else if(update_parse) {
 			settings->history_answer.pop_back();
@@ -7526,6 +7591,8 @@ void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 	if(b) {
 		if(!settings->status_in_history) historyView->clearTemporary();
 		auto_expression = "";
+		auto_error = "";
+		if(autoCalculateTimer) autoCalculateTimer->stop();
 		expressionEdit->displayParseStatus(true);
 	}
 }
