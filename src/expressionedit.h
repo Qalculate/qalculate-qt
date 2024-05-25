@@ -89,6 +89,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		int current_status_type;
 		bool expression_has_changed, expression_has_changed2;
 		bool parsed_had_errors, parsed_had_warnings;
+		bool expression_from_history;
 		int previous_epos;
 		QPoint function_pos;
 		bool parentheses_highlighted;
@@ -168,7 +169,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void toConversionRequested(std::string);
 		void calculateRPNRequest(int);
 		void expressionStatusModeChanged(bool);
-		void statusChanged(QString, bool, bool, bool);
+		void statusChanged(QString, bool, bool, bool, bool);
 
 };
 

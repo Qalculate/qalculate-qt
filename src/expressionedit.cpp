@@ -818,6 +818,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completion_blocked = 0;
 	parse_blocked = 0;
 	block_add_to_undo = 0;
+	expression_from_history = false;
 	undo_index = 0;
 	cdata = new CompletionData;
 	history_index = -1;
@@ -1428,6 +1429,10 @@ void ExpressionEdit::setExpression(std::string str) {
 	setExpression(QString::fromStdString(str));
 }
 void ExpressionEdit::setExpression(const QString &str) {
+	if(str.isEmpty()) {
+		clear();
+		return;
+	}
 	block_add_to_undo++;
 	setCursorWidth(0);
 	block_text_change++;
@@ -1723,12 +1728,14 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					history_index++;
 					dont_change_index = true;
 					blockCompletion(true);
-					blockParseStatus(true);
+					if(settings->status_in_history) expression_from_history = true;
+					else blockParseStatus(true);
 					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					blockParseStatus(false);
+					if(settings->status_in_history) expression_from_history = false;
+					else blockParseStatus(false);
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -1743,12 +1750,14 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					history_index++;
 					dont_change_index = true;
 					blockCompletion(true);
-					blockParseStatus(true);
+					if(settings->status_in_history) expression_from_history = true;
+					else blockParseStatus(true);
 					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					blockParseStatus(false);
+					if(settings->status_in_history) expression_from_history = false;
+					else blockParseStatus(false);
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -1778,14 +1787,16 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(history_index >= -1) history_index--;
 				dont_change_index = true;
 				blockCompletion(true);
-				blockParseStatus(true);
+				if(settings->status_in_history) expression_from_history = (history_index >= 0);
+				else blockParseStatus(true);
 				if(history_index < 0) {
 					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				blockParseStatus(false);
+				if(settings->status_in_history) expression_from_history = false;
+				else blockParseStatus(false);
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -1796,14 +1807,16 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(history_index >= -1) history_index--;
 				dont_change_index = true;
 				blockCompletion(true);
-				blockParseStatus(true);
+				if(settings->status_in_history) expression_from_history = (history_index >= 0);
+				else blockParseStatus(true);
 				if(history_index < 0) {
 					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				blockParseStatus(false);
+				if(settings->status_in_history) expression_from_history = false;
+				else blockParseStatus(false);
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -2256,7 +2269,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(document()->isEmpty()) {
 		function_pos = QPoint();
 		setStatusText("");
-		if(settings->status_in_history) emit statusChanged(QString(), false, false, false);
+		if(settings->status_in_history) emit statusChanged(QString(), false, false, false, expression_from_history);
 		prev_parsed_expression = "";
 		expression_has_changed2 = false;
 		return;
@@ -2286,7 +2299,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
 			if(settings->status_in_history) {
 				setStatusText("");
-				emit statusChanged("qalc command", false, false, false);
+				emit statusChanged("qalc command", false, false, false, expression_from_history);
 			} else if(show_tooltip) {
 				setStatusText("qalc command");
 				function_pos = QPoint();
@@ -2296,7 +2309,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "MC") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("MC (memory clear)"), false, false, false);
+			emit statusChanged(tr("MC (memory clear)"), false, false, false, expression_from_history);
 		} else if(show_tooltip) {
 			setStatusText(tr("MC (memory clear)"));
 			function_pos = QPoint();
@@ -2305,7 +2318,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "MS") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("MS (memory store)"), false, false, false);
+			emit statusChanged(tr("MS (memory store)"), false, false, false, expression_from_history);
 		} else if(show_tooltip) {
 			setStatusText(tr("MS (memory store)"));
 			function_pos = QPoint();
@@ -2314,7 +2327,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "M+") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("M+ (memory plus)"), false, false, false);
+			emit statusChanged(tr("M+ (memory plus)"), false, false, false, expression_from_history);
 		} else if(show_tooltip) {
 			setStatusText(tr("M+ (memory plus)"));
 			function_pos = QPoint();
@@ -2323,7 +2336,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	} else if(text == "M-" || text == "M−") {
 		if(settings->status_in_history) {
 			setStatusText("");
-			emit statusChanged(tr("M− (memory minus)"), false, false, false);
+			emit statusChanged(tr("M− (memory minus)"), false, false, false, expression_from_history);
 		} else if(show_tooltip) {
 			setStatusText(tr("M− (memory minus)"));
 			function_pos = QPoint();
@@ -2744,7 +2757,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		settings->evalops.parse_options.preserve_format = false;
 		if(settings->status_in_history) {
-			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), had_errors, had_warnings);
+			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), had_errors, had_warnings, expression_from_history);
 			if(!b_func) setStatusText(settings->chain_mode || !parsed_had_errors ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 0);
 		} else if(!b_func && show_tooltip) {
 			setStatusText(settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
@@ -2766,12 +2779,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 void ExpressionEdit::onTextChanged() {
 	QString str = toPlainText();
 	if(str == previous_text && textCursor().position() == previous_pos) return;
-	previous_text = str;
-	previous_pos = textCursor().position();
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
+	previous_text = str;
+	previous_pos = textCursor().position();
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
 			expression_undo_buffer.push_back(QString());

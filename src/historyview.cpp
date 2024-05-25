@@ -314,6 +314,8 @@ void HistoryView::loadInitial(bool reload) {
 	last_ans2 = 0;
 	last_ref2 = "";
 	previous_temporary = false;
+	previous_cursor = 0;
+	previous_cursor2 = 0;
 	for(size_t i = 0; i < settings->v_expression.size() && !reload;) {
 		if(i > 0 && !settings->v_protected[i] && settings->v_expression[i] == settings->v_expression[i - 1] && settings->v_parse[i] == settings->v_parse[i - 1] && settings->v_result[i] == settings->v_result[i - 1] && settings->v_pexact[i] == settings->v_pexact[i] && settings->v_exact[i] == settings->v_exact[i - 1] && settings->v_value[i] == settings->v_value[i - 1] && settings->v_parse[i].find("rand") == std::string::npos && settings->v_expression[i].find("rand") == std::string::npos) {
 			settings->v_expression.erase(settings->v_expression.begin() + i);
@@ -461,7 +463,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	if(!expression.empty() || !parse.empty()) {
 		if(initial_load && index != settings->v_expression.size() - 1) str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
 		else str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
-		if(!initial_load && !temporary) {
+		if(temporary) {
+			parse_tmp = parse;
+			result_tmp = (values.empty() ? "" : values[0]);
+		} else if(!initial_load) {
 			settings->v_expression.push_back(expression);
 			settings->v_parse.push_back(parse);
 			settings->v_pexact.push_back(pexact);
@@ -497,11 +502,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "</a>";
 			}
 		} else {
-			if(!temporary) str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+			if(temporary) str += "<a name=\"TP\" style=\"text-decoration: none\">";
+			else str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
 			if(!settings->colorize_result) str += QString::fromStdString(uncolorize(parse, false));
 			else str += QString::fromStdString(parse);
-			if(!temporary) str += "</a>";
+			str += "</a>";
 			if(!temporary && b_parse_error && !expression.empty()) {
 				str += "&nbsp;&nbsp;&nbsp; ";
 				if(settings->color == 2) str += "<i style=\"color: #AAAAAA\">";
@@ -599,7 +605,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			if(exact < 0) b_exact = -1;
 			else if(exact == 0 && i == values.size() - 1) b_exact = 0;
 		}
-		if(!temporary) {
+		if(temporary && !values[i].empty()) {
+			str += "<a name=\"TR\" style=\"text-decoration: none\">";
+		} else if(!temporary) {
 			if(i_answer == 0) str += QString("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		}
@@ -633,7 +641,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 			str += "/>";
 		}
-		if(!temporary) str += "</a>";
+		if(!temporary || !values[i].empty()) str += "</a>";
 		str += "</td></tr>";
 		i_answer_pre = i_answer;
 	}
@@ -1005,7 +1013,7 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 		}
 	}
 	if(anchorstr) *anchorstr = sref;
-	if(sref.isEmpty()) return;
+	if(sref.isEmpty() || sref == "TR" || sref == "TP") return;
 	int i = sref.indexOf(":");
 	if(sref[0] == '#' || sref[0] == 'p') {
 		if(i < 0) return;
@@ -1053,19 +1061,21 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
 	}
 	int i1 = -1, i2 = -1, i3 = -1;
+	QString astr;
 	context_pos = e->pos();
-	indexAtPos(context_pos, &i1, &i2, &i3);
+	indexAtPos(context_pos, &i1, &i2, &i3, &astr);
+	bool b_tmp = (i1 < 0 && (astr == "TR" || astr == "TP"));
 	selectAllAction->setEnabled(!document()->isEmpty());
 	protectAction->setChecked(i1 >= 0 && i1 < (int) settings->v_protected.size() && settings->v_protected[i1]);
-	if(i1 >= 0 && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection()) {
+	if((i1 >= 0 || b_tmp) && e->reason() == QContextMenuEvent::Mouse && !textCursor().hasSelection()) {
 		insertValueAction->setEnabled(i3 >= 0);
 		insertTextAction->setEnabled(true);
 		copyAction->setEnabled(true);
 		copyFormattedAction->setEnabled(true);
 		copyAsciiAction->setEnabled(true);
-		delAction->setEnabled(true);
-		protectAction->setEnabled(true);
-		movetotopAction->setEnabled(!settings->v_expression.empty());
+		delAction->setEnabled(i1 >= 0);
+		protectAction->setEnabled(i1 >= 0);
+		movetotopAction->setEnabled(i1 >= 0 && !settings->v_expression.empty());
 	} else {
 		copyAction->setEnabled(textCursor().hasSelection());
 		copyFormattedAction->setEnabled(textCursor().hasSelection());
@@ -1294,8 +1304,21 @@ void HistoryView::editCopy(int ascii) {
 		int i1 = -1, i2 = -1;
 		QString astr;
 		indexAtPos(context_pos, &i1, &i2, NULL, &astr);
-		if(i1 < 0) return;
-		if(i2 < 0) {
+		if(i1 < 0 && astr == "TP") {
+			if(ascii) {
+				QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(parse_tmp, true))));
+			} else {
+				QMimeData *qm = new QMimeData();
+				qm->setHtml(QString::fromStdString(uncolorize(parse_tmp)));
+				qm->setText(QString::fromStdString(unhtmlize(parse_tmp)));
+				qm->setObjectName("history_expression");
+				QApplication::clipboard()->setMimeData(qm);
+			}
+			return;
+		}
+		bool b_temp = (i1 < 0 && astr == "TR");
+		if(i1 < 0 && !b_temp) return;
+		if(i2 < 0 && !b_temp) {
 			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) {
 				if(astr[0] == 'e' || (astr[0] != 'a' && settings->history_expression_type == 1 && !settings->v_expression[i1].empty())) {
 					if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
@@ -1316,9 +1339,9 @@ void HistoryView::editCopy(int ascii) {
 				}
 			}
 		} else {
-			if((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) {
+			if(b_temp || ((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size())) {
 				if(ascii) {
-					std::string str = settings->v_result[i1][i2];
+					std::string str = (b_temp ? result_tmp : settings->v_result[i1][i2]);
 					if(settings->copy_ascii_without_units) {
 						size_t i = str.find("<span style=\"color:#008000\">");
 						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
@@ -1329,8 +1352,13 @@ void HistoryView::editCopy(int ascii) {
 					QApplication::clipboard()->setText(QString::fromStdString(unformat(unhtmlize(str, true))).trimmed());
 				} else {
 					QMimeData *qm = new QMimeData();
-					qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2])));
-					qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2]))));
+					if(b_temp) {
+						qm->setHtml(QString::fromStdString(uncolorize(result_tmp)));
+						qm->setText(QString::fromStdString(unhtmlize((result_tmp))));
+					} else {
+						qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2])));
+						qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2]))));
+					}
 					qm->setObjectName("history_result");
 					QApplication::clipboard()->setMimeData(qm);
 				}
@@ -1351,8 +1379,13 @@ void HistoryView::editInsertValue() {
 }
 void HistoryView::editInsertText() {
 	int i1 = -1, i2 = -1;
-	indexAtPos(context_pos, &i1, &i2);
-	if(i2 >= 0) {
+	QString astr;
+	indexAtPos(context_pos, &i1, &i2, NULL, &astr);
+	if(i1 < 0 && astr == "TR") {
+		emit insertTextRequested(result_tmp);
+	} else if(i1 < 0 && astr == "TP") {
+		emit insertTextRequested(parse_tmp);
+	} else if(i2 >= 0) {
 		if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
 	} else {
 		if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i1].empty() ? settings->v_parse[i1] : settings->v_expression[i1]);

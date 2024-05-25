@@ -190,7 +190,7 @@ class QalculateWindow : public QMainWindow {
 		void onRPNClosed();
 		void onExpressionChanged();
 		void onHistoryReloaded();
-		void onStatusChanged(QString, bool, bool, bool);
+		void onStatusChanged(QString, bool, bool, bool, bool);
 		void autoCalculateTimeout();
 		void onToConversionRequested(std::string);
 		void onInsertTextRequested(std::string);
