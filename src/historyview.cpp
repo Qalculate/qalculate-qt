@@ -343,18 +343,16 @@ void HistoryView::loadInitial(bool reload) {
 			if(!settings->v_messages[i].isEmpty()) replaceColors(settings->v_messages[i]);
 			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, 1, i);
 		}
-		if(!s_text.isEmpty()) {
-			if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
-				replaceColors(s_text);
-				for(size_t i = 0; i < settings->v_expression.size(); i++) {
-					replace_colors(settings->v_parse[i]);
-					for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
-						replace_colors(settings->v_result[i][i2]);
-					}
+		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
+			replaceColors(s_text);
+			for(size_t i = 0; i < settings->v_expression.size(); i++) {
+				replace_colors(settings->v_parse[i]);
+				for(size_t i2 = 0; i2 < settings->v_result[i].size(); i2++) {
+					replace_colors(settings->v_result[i][i2]);
 				}
 			}
-			setHtml("<body color=\"" + text_color.name() + "\">" + s_text + "</body>");
 		}
+		setHtml("<body color=\"" + text_color.name() + "\">" + s_text + "</body>");
 		if(!settings->v_messages[i].isEmpty()) {
 			replaceColors(settings->v_messages[i]);
 			if(!reload || settings->history_answer.empty() || !settings->current_result) {
