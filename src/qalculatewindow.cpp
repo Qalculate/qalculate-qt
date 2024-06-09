@@ -706,6 +706,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
 	toMenu = new QMenu(this);
 	tb->addWidget(toAction_t);
+	toAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_ICON("document-save")); storeAction_t->setText(tr("Store"));
 	storeAction_t->setPopupMode(QToolButton::MenuButtonPopup);
 	connect(storeAction_t, SIGNAL(clicked()), this, SLOT(onStoreActivated()));
@@ -1072,6 +1073,7 @@ void QalculateWindow::setToolbarStyle() {
 	settings->toolbar_style = action->data().toInt();
 	tb->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
+	toAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
