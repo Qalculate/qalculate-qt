@@ -3789,16 +3789,17 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 		c.setPosition(c.position() + i_move);
 		setTextCursor(c);
 	}
-	current_object_start = cos_bak;
 	blockCompletion(false);
 	if((do_completion_signal < 0 || (!item && !prefix)) && cdata->editing_to_expression && (current_object_end < 0 || current_object_end == text.length())) {
 		if(str[str.length() - 1] != ' ' && str[str.length() - 1] != '/') {
 			current_object_end = current_object_start + unicode_length(str);
+			current_object_start = cos_bak;
 			emit returnPressed();
 			return;
 		}
 	}
 	current_object_end = current_object_start + unicode_length(str);
+	current_object_start = cos_bak;
 	cdata->current_function = settings->f_answer;
 	displayParseStatus();
 }
