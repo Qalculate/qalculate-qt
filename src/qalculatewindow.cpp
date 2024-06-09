@@ -3264,6 +3264,7 @@ void QalculateWindow::setPreviousExpression() {
 		expressionEdit->setExpressionHasChanged(false);
 		expressionEdit->blockCompletion(false);
 		expressionEdit->blockParseStatus(false);
+		historyView->clearTemporary();
 	}
 }
 
@@ -6089,6 +6090,7 @@ void QalculateWindow::onHistoryReloaded() {
 		mauto.setAborted();
 		auto_error = false;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
+		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 		expressionEdit->displayParseStatus(true);
 	}
 }
@@ -6104,6 +6106,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_result = "";
 		auto_error = false;
 		mauto.setAborted();
+		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text)) {
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
@@ -6114,6 +6117,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		mauto.setAborted();
 		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
+		updateWindowTitle(QString(), true);
 	} else {
 		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) {
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
@@ -6135,7 +6139,10 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 				CALCULATOR->addMessages(&expressionEdit->status_messages);
 				historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 			}
-			if(had_error || expression_from_history) return;
+			if(had_error || expression_from_history) {
+				updateWindowTitle(QString(), true);
+				return;
+			}
 			if(!autoCalculateTimer) {
 				autoCalculateTimer = new QTimer(this);
 				autoCalculateTimer->setSingleShot(true);
@@ -6162,6 +6169,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->parseComments(str, settings->evalops.parse_options);
 	if(str.empty()) {
 		CALCULATOR->endTemporaryStopMessages();
+		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 		return;
 	}
 	ComplexNumberForm cnf_bak = settings->evalops.complex_number_form;
@@ -6180,6 +6188,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		if(from_str.empty()) {
 			CALCULATOR->stopControl();
 			CALCULATOR->endTemporaryStopMessages();
+			updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 			return;
 		}
 		remove_duplicate_blanks(to_str);
@@ -6637,7 +6646,10 @@ void QalculateWindow::autoCalculateTimeout() {
 		}
 	}
 
-	if(!b_error && !b_warning && !auto_error && !auto_calculation_updated && !auto_format_updated && auto_result == result && (settings->auto_calculate_delay > 0 || auto_expression == current_status.toStdString())) return;
+	if(!b_error && !b_warning && !auto_error && !auto_calculation_updated && !auto_format_updated && auto_result == result && (settings->auto_calculate_delay > 0 || auto_expression == current_status.toStdString())) {
+		if(result.empty()) updateWindowTitle(QString(), true);
+		return;
+	}
 	auto_expression = current_status.toStdString();
 	auto_error = b_error || b_warning;
 	std::string result_nohtml = unhtmlize(result);
@@ -6667,11 +6679,15 @@ void QalculateWindow::autoCalculateTimeout() {
 	} else {
 		auto_result = "";
 		mauto.setAborted();
-		if(settings->auto_calculate_delay > 0) return;
+		if(settings->auto_calculate_delay > 0) {
+			updateWindowTitle(QString(), true);
+			return;
+		}
 	}
 	auto_expression = current_status.toStdString();
 	CALCULATOR->addMessages(&messages);
 	historyView->addResult(values, "", true, auto_expression, !is_approximate && !mauto.isApproximate(), false, flag, NULL, 0, 0, true);
+	updateWindowTitle(QString::fromStdString(unhtmlize(auto_result)), true);
 }
 
 void QalculateWindow::onBinaryBitsChanged() {
@@ -7777,7 +7793,8 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool
 		}
 		if(settings->title_type == TITLE_RESULT || settings->title_type == TITLE_APP_RESULT) {
 			if(result_text.empty()) {
-				if(settings->title_type == TITLE_RESULT) setWindowTitle("Qalculate!");
+				if(!auto_result.empty()) setWindowTitle(QString::fromStdString(unhtmlize(auto_result)));
+				else if(settings->title_type == TITLE_RESULT) setWindowTitle("Qalculate!");
 			} else {
 				setWindowTitle(QString::fromStdString(unhtmlize(result_text)));
 			}
@@ -8064,6 +8081,7 @@ void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 		auto_expression = "";
 		auto_error = "";
 		mauto.setAborted();
+		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		expressionEdit->displayParseStatus(true);
 	}
@@ -8691,6 +8709,12 @@ void QalculateWindow::openFPConversion() {
 			if(to_base != 0) base = to_base;
 			else base = settings->printops.base;
 		}
+	} else if(!auto_result.empty()) {
+		if(mauto.isNumber()) {
+			str = QString::fromStdString(unhtmlize(auto_result));
+			if(to_base != 0) base = to_base;
+			else base = settings->printops.base;
+		}
 	} else {
 		str = expressionEdit->selectedText(true);
 		base = settings->evalops.parse_options.base;
@@ -8727,6 +8751,10 @@ void QalculateWindow::openPercentageCalculation() {
 	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
 		if(mstruct && mstruct->isNumber()) {
 			str = QString::fromStdString(unhtmlize(result_text));
+		}
+	} else if(!auto_result.empty()) {
+		if(mauto.isNumber()) {
+			str = QString::fromStdString(unhtmlize(auto_result));
 		}
 	} else {
 		str = expressionEdit->selectedText(true);
