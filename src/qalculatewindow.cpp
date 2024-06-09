@@ -391,6 +391,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	ecTimer = NULL;
 	rfTimer = NULL;
+	decimalsTimer = NULL;
 	autoCalculateTimer = NULL;
 	shortcutsDialog = NULL;
 	preferencesDialog = NULL;
@@ -681,14 +682,14 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(precisionEdit, SIGNAL(valueChanged(int)), this, SLOT(onPrecisionChanged(int)));
 	awg->addWidget(precisionEdit, 0, 1);
 	awg->addWidget(new QLabel(tr("Min decimals:"), this), 1, 0);
-	QSpinBox *minDecimalsEdit = new QSpinBox(this); minDecimalsEdit->setObjectName("spinbox_mindecimals");
+	minDecimalsEdit = new QSpinBox(this); minDecimalsEdit->setObjectName("spinbox_mindecimals");
 	minDecimalsEdit->setRange(0, 10000);
 	minDecimalsEdit->setValue(settings->printops.use_min_decimals ? settings->printops.min_decimals : 0);
 	minDecimalsEdit->setAlignment(Qt::AlignRight);
 	connect(minDecimalsEdit, SIGNAL(valueChanged(int)), this, SLOT(onMinDecimalsChanged(int)));
 	awg->addWidget(minDecimalsEdit, 1, 1);
 	awg->addWidget(new QLabel(tr("Max decimals:"), this), 2, 0);
-	QSpinBox *maxDecimalsEdit = new QSpinBox(this); maxDecimalsEdit->setObjectName("spinbox_maxdecimals");
+	maxDecimalsEdit = new QSpinBox(this); maxDecimalsEdit->setObjectName("spinbox_maxdecimals");
 	maxDecimalsEdit->setRange(-1, 10000);
 	maxDecimalsEdit->setSpecialValueText(tr("off", "Max decimals"));
 	maxDecimalsEdit->setValue(settings->printops.use_max_decimals ? settings->printops.max_decimals : -1);
@@ -7887,14 +7888,37 @@ void QalculateWindow::onPrecisionChanged(int v) {
 	settings->previous_precision = 0;
 	expressionCalculationUpdated(500);
 }
+void QalculateWindow::syncDecimals() {
+	if(settings->printops.use_min_decimals && settings->printops.use_max_decimals && settings->printops.max_decimals >= 0 && settings->printops.min_decimals > 0 && settings->printops.min_decimals > settings->printops.max_decimals) {
+		settings->printops.min_decimals = settings->printops.max_decimals;
+		minDecimalsEdit->blockSignals(true);
+		minDecimalsEdit->setValue(settings->printops.min_decimals);
+		minDecimalsEdit->blockSignals(false);
+	}
+}
 void QalculateWindow::onMinDecimalsChanged(int v) {
 	settings->printops.use_min_decimals = (v > 0);
 	settings->printops.min_decimals = v;
+	if(decimalsTimer) decimalsTimer->stop();
+	if(settings->printops.use_min_decimals && settings->printops.use_max_decimals && settings->printops.max_decimals >= 0 && settings->printops.min_decimals > 0 && settings->printops.min_decimals > settings->printops.max_decimals) {
+		settings->printops.max_decimals = settings->printops.min_decimals;
+		maxDecimalsEdit->blockSignals(true);
+		maxDecimalsEdit->setValue(settings->printops.max_decimals);
+		maxDecimalsEdit->blockSignals(false);
+	}
 	resultFormatUpdated(500);
 }
 void QalculateWindow::onMaxDecimalsChanged(int v) {
 	settings->printops.use_max_decimals = (v >= 0);
 	settings->printops.max_decimals = v;
+	if(decimalsTimer) {
+		decimalsTimer->stop();
+	} else {
+		decimalsTimer = new QTimer();
+		decimalsTimer->setSingleShot(true);
+		connect(decimalsTimer, SIGNAL(timeout()), this, SLOT(syncDecimals()));
+	}
+	decimalsTimer->start(2000);
 	resultFormatUpdated(500);
 }
 void QalculateWindow::approximationActivated() {

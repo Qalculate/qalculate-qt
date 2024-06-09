@@ -111,8 +111,8 @@ class QalculateWindow : public QMainWindow {
 		QAction *recentWSSeparator, *openWSAction, *defaultWSAction, *saveWSAction, *saveWSAsAction;
 		QAction *firstFunctionsMenuOptionAction, *firstVariablesMenuOptionAction, *firstUnitsMenuOptionAction;
 		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
-		QSpinBox *customOutputBaseEdit, *customInputBaseEdit;
-		QTimer *ecTimer, *rfTimer, *autoCalculateTimer;
+		QSpinBox *customOutputBaseEdit, *customInputBaseEdit, *minDecimalsEdit, *maxDecimalsEdit;
+		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer;
 		QFont saved_app_font;
 
 		QTableWidget *rpnView;
@@ -210,6 +210,7 @@ class QalculateWindow : public QMainWindow {
 		void engineeringActivated();
 		void simpleActivated();
 		void onPrecisionChanged(int);
+		void syncDecimals();
 		void onMinDecimalsChanged(int);
 		void onMaxDecimalsChanged(int);
 		void outputBaseActivated();
