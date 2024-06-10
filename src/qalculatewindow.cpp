@@ -44,9 +44,7 @@
 #include <QScrollArea>
 #include <QTableWidget>
 #include <QTreeWidget>
-#include <QListWidget>
 #include <QTreeWidgetItem>
-#include <QListWidgetItem>
 #include <QKeySequenceEdit>
 #include <QHeaderView>
 #include <QDesktopServices>
@@ -8129,11 +8127,11 @@ void QalculateWindow::removeShortcutClicked() {
 	delete item;
 }
 void QalculateWindow::updateShortcutActionOK() {
-	QListWidgetItem *item = shortcutActionList->currentItem();
+	QTreeWidgetItem *item = shortcutActionList->currentItem();
 	if(!item || !item->isSelected()) {
 		shortcutActionOKButton->setEnabled(edited_keyboard_shortcut->type.size() > 0);
 		shortcutActionAddButton->setEnabled(false);
-	} else if(!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()) {
+	} else if(!SHORTCUT_REQUIRES_VALUE(item->data(0, Qt::UserRole).toInt()) || !shortcutActionValueEdit->currentText().isEmpty()) {
 		shortcutActionOKButton->setEnabled(true);
 		shortcutActionAddButton->setEnabled(true);
 	} else {
@@ -8143,19 +8141,19 @@ void QalculateWindow::updateShortcutActionOK() {
 }
 void QalculateWindow::shortcutActionOKClicked() {
 	QString value = shortcutActionValueEdit->currentText();
-	QListWidgetItem *item = shortcutActionList->currentItem();
+	QTreeWidgetItem *item = shortcutActionList->currentItem();
 	if(!item || !item->isSelected()) {
 		if(edited_keyboard_shortcut->type.size() > 0) shortcutActionDialog->accept();
 		return;
 	}
-	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
-		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+	if(settings->testShortcutValue(item->data(0, Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(0, Qt::UserRole).toInt());
 		edited_keyboard_shortcut->value.push_back(value.toStdString());
 		shortcutActionDialog->accept();
 	} else {
 		shortcutActionValueEdit->setFocus();
 	}
-	if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+	if(item->data(0, Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
 		int v = value.toInt();
 		if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
 	} else {
@@ -8164,17 +8162,17 @@ void QalculateWindow::shortcutActionOKClicked() {
 }
 void QalculateWindow::shortcutActionAddClicked() {
 	QString value = shortcutActionValueEdit->currentText();
-	QListWidgetItem *item = shortcutActionList->currentItem();
+	QTreeWidgetItem *item = shortcutActionList->currentItem();
 	if(!item || !item->isSelected()) return;
-	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, shortcutActionDialog)) {
-		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(Qt::UserRole).toInt());
+	if(settings->testShortcutValue(item->data(0, Qt::UserRole).toInt(), value, shortcutActionDialog)) {
+		edited_keyboard_shortcut->type.push_back((shortcut_type) shortcutActionList->currentItem()->data(0, Qt::UserRole).toInt());
 		edited_keyboard_shortcut->value.push_back(value.toStdString());
 		shortcutActionValueEdit->clear();
 		shortcutActionList->setCurrentItem(NULL);
 		shortcutActionAddButton->setText(tr("Add Action (%1)").arg(edited_keyboard_shortcut->type.size() + 1));
 	} else {
 		shortcutActionValueEdit->setFocus();
-		if(item->data(Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
+		if(item->data(0, Qt::UserRole).toInt() == SHORTCUT_TYPE_COPY_RESULT) {
 			int v = value.toInt();
 			if(v >= 0 && v < settings->copy_action_value_texts.size()) shortcutActionValueEdit->setCurrentText(settings->copy_action_value_texts[v]);
 		} else {
@@ -8183,15 +8181,15 @@ void QalculateWindow::shortcutActionAddClicked() {
 	}
 }
 void QalculateWindow::currentShortcutActionChanged() {
-	QListWidgetItem *item = shortcutActionList->currentItem();
-	if(!item || !item->isSelected() || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
+	QTreeWidgetItem *item = shortcutActionList->currentItem();
+	if(!item || !item->isSelected() || !SHORTCUT_USES_VALUE(item->data(0, Qt::UserRole).toInt())) {
 		shortcutActionValueEdit->clear();
 		shortcutActionValueEdit->clearEditText();
 		shortcutActionValueEdit->setEnabled(false);
 		shortcutActionValueLabel->setEnabled(false);
 		return;
 	}
-	int i = item->data(Qt::UserRole).toInt();
+	int i = item->data(0, Qt::UserRole).toInt();
 	shortcutActionValueEdit->setEnabled(true);
 	shortcutActionValueLabel->setEnabled(true);
 	if(i == SHORTCUT_TYPE_FUNCTION || i == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
@@ -8273,40 +8271,46 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		QVBoxLayout *box = new QVBoxLayout(dialog);
 		QGridLayout *grid = new QGridLayout();
 		box->addLayout(grid);
-		grid->addWidget(new QLabel(tr("Action:"), dialog), 0, 0);
-		shortcutActionList = new QListWidget(dialog);
-		grid->addWidget(shortcutActionList, 1, 0, 1, 2);
+		shortcutActionList = new QTreeWidget(dialog);
+		shortcutActionList->setColumnCount(1);
+		shortcutActionList->setHeaderLabel(tr("Action"));
+		shortcutActionList->setSelectionMode(QAbstractItemView::SingleSelection);
+		shortcutActionList->setRootIsDecorated(false);
+		shortcutActionList->header()->setVisible(true);
+		shortcutActionList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		shortcutActionList->setSortingEnabled(true);
+		shortcutActionList->sortByColumn(-1, Qt::AscendingOrder);
+		grid->addWidget(shortcutActionList, 0, 0, 1, 2);
 		for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
 			if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
-				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), shortcutActionList);
-				item->setData(Qt::UserRole, i);
+				QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText((shortcut_type) i)));
+				item->setData(0, Qt::UserRole, i);
 				if(new_ks->type.size() == 0 && ((!ks && i == 0) || (ks && i == ks->type[0]))) shortcutActionList->setCurrentItem(item);
 			}
 			if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
-				QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR), shortcutActionList);
-				item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
+				QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR)));
+				item->setData(0, Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
 				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_HISTORY_CLEAR) shortcutActionList->setCurrentItem(item);
 			} else if(i == SHORTCUT_TYPE_SIMPLE_NOTATION) {
 				for(int i2 = SHORTCUT_TYPE_PRECISION; i2 <= SHORTCUT_TYPE_MINMAX_DECIMALS; i2++) {
-					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
-					item->setData(Qt::UserRole, i2);
+					QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText((shortcut_type) i2)));
+					item->setData(0, Qt::UserRole, i2);
 					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
 				}
 			} else if(i == SHORTCUT_TYPE_MENU) {
 				for(int i2 = SHORTCUT_TYPE_FUNCTIONS_MENU; i2 <= SHORTCUT_TYPE_VARIABLES_MENU; i2++) {
-					QListWidgetItem *item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i2), shortcutActionList);
-					item->setData(Qt::UserRole, i2);
+					QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText((shortcut_type) i2)));
+					item->setData(0, Qt::UserRole, i2);
 					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
 				}
 			}
 		}
-		shortcutActionList->setMinimumWidth(shortcutActionList->sizeHintForColumn(0) + shortcutActionList->frameWidth() * 2 + shortcutActionList->contentsMargins().left() + shortcutActionList->contentsMargins().right() + shortcutActionList->verticalScrollBar()->sizeHint().width());
 		shortcutActionValueLabel = new QLabel(tr("Value:"), dialog);
-		grid->addWidget(shortcutActionValueLabel, 2, 0);
+		grid->addWidget(shortcutActionValueLabel, 1, 0);
 		shortcutActionValueEdit = new QComboBox(dialog);
 		shortcutActionValueEdit->setEditable(true);
 		shortcutActionValueEdit->setLineEdit(new MathLineEdit());
-		grid->addWidget(shortcutActionValueEdit, 2, 1);
+		grid->addWidget(shortcutActionValueEdit, 1, 1);
 		grid->setColumnStretch(1, 1);
 		QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 		buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
@@ -8470,10 +8474,13 @@ void QalculateWindow::editKeyboardShortcuts() {
 	shortcutList->setSelectionMode(QAbstractItemView::SingleSelection);
 	shortcutList->setRootIsDecorated(false);
 	shortcutList->setColumnCount(2);
-	shortcutList->header()->setVisible(false);
+	QStringList list; list << tr("Action"); list << tr("Key combination");
+	shortcutList->setHeaderLabels(list);
+	shortcutList->header()->setVisible(true);
 	shortcutList->header()->setStretchLastSection(false);
 	shortcutList->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 	shortcutList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+
 	for(size_t i = 0; i < settings->keyboard_shortcuts.size(); i++) {
 		QTreeWidgetItem *item = new QTreeWidgetItem(shortcutList);
 		item->setText(0, settings->shortcutText(settings->keyboard_shortcuts[i]->type, settings->keyboard_shortcuts[i]->value));

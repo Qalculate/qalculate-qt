@@ -22,8 +22,8 @@ class QTimer;
 class QStackedLayout;
 class QLineEdit;
 class QComboBox;
-class QListWidget;
-class QListWidgetItem;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QDialog;
 class QGridLayout;
 class QAction;
@@ -97,7 +97,7 @@ class KeypadWidget : public QWidget {
 		QLineEdit *labelEdit;
 		QComboBox *valueEdit;
 		QLabel *valueLabel;
-		QListWidget *actionList;
+		QTreeWidget *actionList;
 		QWidget *numpad;
 		QDialog *customActionDialog;
 		QAction *addRowAction, *addColumnAction, *removeRowAction, *removeColumnAction;
@@ -138,7 +138,7 @@ class KeypadWidget : public QWidget {
 		void addCustomColumn();
 		void updateCustomActionOK();
 		void customActionOKClicked();
-		void currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void currentCustomActionChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 		void intervalDisplayActivated();
 		void intervalCalculationActivated();
 		void conciseInputActivated();

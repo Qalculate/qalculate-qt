@@ -47,8 +47,6 @@ class QMenu;
 class QTreeWidget;
 class QTreeWidgetItem;
 class QPushButton;
-class QListWidget;
-class QListWidgetItem;
 class QLineEdit;
 class QLabel;
 class QDialog;
@@ -93,7 +91,7 @@ class QalculateWindow : public QMainWindow {
 		PeriodicTableDialog *periodicTableDialog;
 		CalendarConversionDialog *calendarConversionDialog;
 		QDialog *shortcutsDialog, *shortcutActionDialog;
-		QComboBox *shortcutActionValueEdit; QListWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
+		QComboBox *shortcutActionValueEdit; QTreeWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
 		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton, *shortcutActionAddButton; keyboard_shortcut *edited_keyboard_shortcut;
 
 

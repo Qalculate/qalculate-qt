@@ -15,7 +15,8 @@
 #include <QLabel>
 #include <QTimer>
 #include <QLineEdit>
-#include <QListWidget>
+#include <QTreeWidget>
+#include <QHeaderView>
 #include <QTextDocument>
 #include <QStackedLayout>
 #include <QHBoxLayout>
@@ -957,31 +958,31 @@ void KeypadWidget::updateStoreMenu() {
 	menu->addAction(tr("All variables"), this, SIGNAL(openVariablesRequest()));
 }
 void KeypadWidget::updateCustomActionOK() {
-	QListWidgetItem *item = actionList->currentItem();
-	customOKButton->setEnabled(item && (item->data(Qt::UserRole).toInt() < 0 || ((!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(item->data(Qt::UserRole).toInt()) || !valueEdit->currentText().isEmpty()))));
+	QTreeWidgetItem *item = actionList->currentItem();
+	customOKButton->setEnabled(item && (item->data(0, Qt::UserRole).toInt() < 0 || ((!labelEdit || !labelEdit->text().trimmed().isEmpty()) && (!SHORTCUT_REQUIRES_VALUE(item->data(0, Qt::UserRole).toInt()) || !valueEdit->currentText().isEmpty()))));
 }
 void KeypadWidget::customActionOKClicked() {
 	QString value = valueEdit->currentText();
-	QListWidgetItem *item = actionList->currentItem();
+	QTreeWidgetItem *item = actionList->currentItem();
 	if(!item) return;
-	if(settings->testShortcutValue(item->data(Qt::UserRole).toInt(), value, customActionDialog)) {
+	if(settings->testShortcutValue(item->data(0, Qt::UserRole).toInt(), value, customActionDialog)) {
 		customActionDialog->accept();
 	} else {
 		valueEdit->setFocus();
 	}
 	valueEdit->setCurrentText(value);
 }
-void KeypadWidget::currentCustomActionChanged(QListWidgetItem *item, QListWidgetItem *item_prev) {
-	if(!item || !SHORTCUT_USES_VALUE(item->data(Qt::UserRole).toInt())) {
+void KeypadWidget::currentCustomActionChanged(QTreeWidgetItem *item, QTreeWidgetItem *item_prev) {
+	if(!item || !SHORTCUT_USES_VALUE(item->data(0, Qt::UserRole).toInt())) {
 		valueEdit->clear();
 		valueEdit->clearEditText();
 		valueEdit->setEnabled(false);
 		valueLabel->setEnabled(false);
 		return;
 	}
-	int i = item->data(Qt::UserRole).toInt();
+	int i = item->data(0, Qt::UserRole).toInt();
 	int i_prev = -1;
-	if(item_prev) i_prev = item_prev->data(Qt::UserRole).toInt();
+	if(item_prev) i_prev = item_prev->data(0, Qt::UserRole).toInt();
 	valueEdit->setEnabled(true);
 	valueLabel->setEnabled(true);
 	if(i == SHORTCUT_TYPE_FUNCTION || i == SHORTCUT_TYPE_FUNCTION_WITH_DIALOG) {
@@ -1044,31 +1045,37 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	} else {
 		labelEdit = NULL;
 	}
-	grid->addWidget(new QLabel(tr("Action:"), dialog), i != 1 ? 0 : 1, 0);
-	actionList = new QListWidget(dialog);
-	grid->addWidget(actionList, i != 1 ? 1 : 2, 0, 1, 2);
+	actionList = new QTreeWidget(dialog);
+	actionList->setColumnCount(1);
+	actionList->setHeaderLabel(tr("Action"));
+	actionList->setSelectionMode(QAbstractItemView::SingleSelection);
+	actionList->setRootIsDecorated(false);
+	actionList->header()->setVisible(true);
+	actionList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	actionList->setSortingEnabled(true);
+	actionList->sortByColumn(-1, Qt::AscendingOrder);
+	grid->addWidget(actionList, i != 1 ? 0 : 1, 0, 1, 2);
 	int type = -1;
 	if(button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).isValid()) type = button->property(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA)).toInt();
-	QListWidgetItem *item = new QListWidgetItem(tr("None"), actionList);
-	item->setData(Qt::UserRole, -1);
+	QTreeWidgetItem *item = new QTreeWidgetItem(actionList, QStringList(tr("None")));
+	item->setData(0, Qt::UserRole, -1);
 	actionList->setCurrentItem(item);
 	for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
-		item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) i), actionList);
-		item->setData(Qt::UserRole, i);
+		item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) i)));
+		item->setData(0, Qt::UserRole, i);
 		if(i == type) actionList->setCurrentItem(item);
 		if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
-			item = new QListWidgetItem(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_HISTORY_CLEAR), actionList);
-			item->setData(Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
+			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_HISTORY_CLEAR)));
+			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
 			if(type == SHORTCUT_TYPE_HISTORY_CLEAR) actionList->setCurrentItem(item);
 		}
 	}
 	valueLabel = new QLabel(tr("Value:"), dialog);
-	actionList->setMinimumWidth(actionList->sizeHintForColumn(0) + actionList->frameWidth() * 2 + actionList->contentsMargins().left() + actionList->contentsMargins().right() + actionList->verticalScrollBar()->sizeHint().width());
-	grid->addWidget(valueLabel, i != 1 ? 2 : 3, 0);
+	grid->addWidget(valueLabel, i != 1 ? 1 : 2, 0);
 	valueEdit = new QComboBox(dialog);
 	valueEdit->setEditable(true);
 	valueEdit->setLineEdit(new MathLineEdit());
-	grid->addWidget(valueEdit, i != 1 ? 2 : 3, 1);
+	grid->addWidget(valueEdit, i != 1 ? 1 : 2, 1);
 	grid->setColumnStretch(1, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
@@ -1077,8 +1084,8 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(customActionOKClicked()));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
 	if(labelEdit) connect(labelEdit, SIGNAL(textEdited(const QString&)), this, SLOT(updateCustomActionOK()));
-	connect(actionList, SIGNAL(currentRowChanged(int)), this, SLOT(updateCustomActionOK()));
-	connect(actionList, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)), this, SLOT(currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*)));
+	connect(actionList, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(updateCustomActionOK()));
+	connect(actionList, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentCustomActionChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
 	connect(valueEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateCustomActionOK()));
 	customOKButton = buttonBox->button(QDialogButtonBox::Ok);
 	currentCustomActionChanged(actionList->currentItem(), NULL);
@@ -1115,9 +1122,9 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 		}
 		index--;
 		custom_button *cb = &settings->custom_buttons[index];
-		cb->type[i - 1] = actionList->currentItem()->data(Qt::UserRole).toInt();
+		cb->type[i - 1] = actionList->currentItem()->data(0, Qt::UserRole).toInt();
 		cb->value[i - 1] = valueEdit->currentText().toStdString();
-		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentItem()->data(Qt::UserRole).toInt());
+		button->setProperty(i == 2 ? BUTTON_DATA2 : (i == 3 ? BUTTON_DATA3 : BUTTON_DATA), actionList->currentItem()->data(0, Qt::UserRole).toInt());
 		button->setProperty(i == 2 ? BUTTON_VALUE2 : (i == 3 ? BUTTON_VALUE3 : BUTTON_VALUE), valueEdit->currentText());
 		button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
 		if(labelEdit) {
