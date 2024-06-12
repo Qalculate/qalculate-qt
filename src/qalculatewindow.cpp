@@ -416,6 +416,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->setMovable(false);
 	tb->toggleViewAction()->setVisible(false);
 
+	tbAction = new QAction(tr("Show toolbar"), this);
+	tbAction->setCheckable(true);
+	connect(tbAction, SIGNAL(triggered(bool)), tb, SLOT(setVisible(bool)));
+
 	tmenu = NULL;
 	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
 
@@ -430,7 +434,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	menuAction_t = new QToolButton(this); menuAction_t->setIcon(LOAD_ICON("menu")); menuAction_t->setText(tr("Menu"));
 	menuAction_t->setPopupMode(QToolButton::InstantPopup);
-	menu = new QMenu(this);
+	menu = new QMenu(tr("Menu"), this);
 	menuAction_t->setMenu(menu);
 	menu2 = menu;
 	menu = menu2->addMenu(tr("New"));
@@ -484,7 +488,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	modeAction_t = new QToolButton(this); modeAction_t->setIcon(LOAD_ICON("configure")); modeAction_t->setText(tr("Mode"));
 	modeAction_t->setPopupMode(QToolButton::InstantPopup);
-	menu = new QMenu(this);
+	menu = new QMenu(tr("Mode"), this);
 	modeAction_t->setMenu(menu);
 
 	ADD_SECTION(tr("General Display Mode"));
@@ -949,6 +953,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
 	connect(expressionEdit, SIGNAL(expressionStatusModeChanged(bool)), this, SLOT(onExpressionStatusModeChanged(bool)));
+	connect(tb, SIGNAL(visibilityChanged(bool)), this, SLOT(onToolbarVisibilityChanged(bool)));
 	connect(keypadDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onKeypadVisibilityChanged(bool)));
 	connect(basesDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onBasesVisibilityChanged(bool)));
 	connect(rpnDock, SIGNAL(visibilityChanged(bool)), this, SLOT(onRPNVisibilityChanged(bool)));
@@ -1047,10 +1052,29 @@ void QalculateWindow::showToolbarContextMenu(const QPoint &pos) {
 	if(w == storeAction_t || w == functionsAction_t || w == unitsAction_t) return;
 	if(!tmenu) {
 		tmenu = new QMenu(this);
-		tmenu->addAction(tr("Icons only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonIconOnly);
-		tmenu->addAction(tr("Text only"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextOnly);
-		tmenu->addAction(tr("Text beside icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextBesideIcon);
-		tmenu->addAction(tr("Text under icons"), this, SLOT(setToolbarStyle()))->setData(Qt::ToolButtonTextUnderIcon);
+		QActionGroup *group = new QActionGroup(this);
+		QAction *action = tmenu->addAction(tr("Icons only"), this, SLOT(setToolbarStyle()));
+		action->setCheckable(true);
+		action->setChecked(tb->toolButtonStyle() == Qt::ToolButtonIconOnly);
+		action->setData(Qt::ToolButtonIconOnly);
+		group->addAction(action);
+		action = tmenu->addAction(tr("Text only"), this, SLOT(setToolbarStyle()));
+		action->setCheckable(true);
+		action->setChecked(tb->toolButtonStyle() == Qt::ToolButtonTextOnly);
+		action->setData(Qt::ToolButtonTextOnly);
+		group->addAction(action);
+		action = tmenu->addAction(tr("Text beside icons"), this, SLOT(setToolbarStyle()));
+		action->setCheckable(true);
+		action->setChecked(tb->toolButtonStyle() == Qt::ToolButtonTextBesideIcon);
+		action->setData(Qt::ToolButtonTextBesideIcon);
+		group->addAction(action);
+		action = tmenu->addAction(tr("Text under icons"), this, SLOT(setToolbarStyle()));
+		action->setCheckable(true);
+		action->setChecked(tb->toolButtonStyle() == Qt::ToolButtonTextUnderIcon);
+		action->setData(Qt::ToolButtonTextUnderIcon);
+		group->addAction(action);
+		tmenu->addSeparator();
+		tmenu->addAction(tbAction);
 	}
 	tmenu->popup(tb->mapToGlobal(pos));
 }
@@ -7769,6 +7793,11 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 		settings->programming_base_changed = false;
 		onBaseClicked(BASE_DECIMAL, true, false);
 	}
+}
+void QalculateWindow::onToolbarVisibilityChanged(bool b) {
+	expressionEdit->setMenuAndToolbarItems(b ? NULL : modeAction_t->menu(), b ? NULL : menuAction_t->menu(), b ? NULL : tbAction);
+	historyView->setMenuAndToolbarItems(b ? NULL : modeAction_t->menu(), b ? NULL : menuAction_t->menu(), b ? NULL : tbAction);
+	tbAction->setChecked(b);
 }
 void QalculateWindow::onBasesActivated(bool b) {
 	basesDock->setVisible(b);

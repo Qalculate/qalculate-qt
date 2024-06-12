@@ -60,8 +60,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		ExpressionProxyModel *completionModel;
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
-		QMenu *cmenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *clearHistoryAction;
+		QMenu *cmenu, *fileMenu, *modeMenu;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
@@ -124,6 +124,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QString selectedText(bool = false);
 		void onCompleterEvent(QEvent*);
 		bool eventFilter(QObject*, QEvent*) override;
+		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
 
 		std::vector<CalculatorMessage> status_messages;
 

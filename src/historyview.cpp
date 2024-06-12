@@ -152,6 +152,7 @@ QString unhtmlize(QString str, bool b_ascii) {
 }
 
 HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent) {
+	fileMenu = NULL;
 	i_pos = 0;
 	i_pos_p = 0;
 	previous_cursor = 0;
@@ -1057,6 +1058,12 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
 		clearAction = cmenu->addAction(tr("Clear"), this, SLOT(editClear()));
+		if(fileMenu) {
+			fileSeparator = cmenu->addSeparator();
+			cmenu->addAction(modeMenu->menuAction());
+			cmenu->addAction(fileMenu->menuAction());
+			cmenu->addAction(tbAction);
+		}
 	}
 	int i1 = -1, i2 = -1, i3 = -1;
 	QString astr;
@@ -1086,6 +1093,23 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	}
 	clearAction->setEnabled(!settings->v_expression.empty());
 	cmenu->popup(e->globalPos());
+}
+void HistoryView::setMenuAndToolbarItems(QMenu *mode, QMenu *menu, QAction *action) {
+	if(!menu && cmenu && fileMenu) {
+		cmenu->removeAction(fileSeparator);
+		cmenu->removeAction(modeMenu->menuAction());
+		cmenu->removeAction(fileMenu->menuAction());
+		cmenu->removeAction(tbAction);
+	}
+	modeMenu = mode;
+	fileMenu = menu;
+	tbAction = action;
+	if(cmenu && fileMenu) {
+		fileSeparator = cmenu->addSeparator();
+		cmenu->addAction(modeMenu->menuAction());
+		cmenu->addAction(fileMenu->menuAction());
+		cmenu->addAction(tbAction);
+	}
 }
 void HistoryView::doFind() {
 	if(!find(searchEdit->text())) {

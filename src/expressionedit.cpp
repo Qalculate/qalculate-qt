@@ -812,6 +812,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 #endif
 	tb = toolbar;
 	cmenu = NULL;
+	fileMenu = NULL;
 	tipLabel = NULL;
 	completionTimer = NULL;
 	toolTipTimer = NULL;
@@ -1904,6 +1905,12 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
 #endif
+		if(fileMenu) {
+			fileSeparator = cmenu->addSeparator();
+			cmenu->addAction(modeMenu->menuAction());
+			cmenu->addAction(fileMenu->menuAction());
+			cmenu->addAction(tbAction);
+		}
 	}
 	bool b_sel = textCursor().hasSelection();
 	bool b_empty = document()->isEmpty();
@@ -1922,6 +1929,23 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
 	cmenu->popup(e->globalPos());
+}
+void ExpressionEdit::setMenuAndToolbarItems(QMenu *mode, QMenu *menu, QAction *action) {
+	if(!menu && cmenu && fileMenu) {
+		cmenu->removeAction(fileSeparator);
+		cmenu->removeAction(modeMenu->menuAction());
+		cmenu->removeAction(fileMenu->menuAction());
+		cmenu->removeAction(tbAction);
+	}
+	modeMenu = mode;
+	fileMenu = menu;
+	tbAction = action;
+	if(cmenu && fileMenu) {
+		fileSeparator = cmenu->addSeparator();
+		cmenu->addAction(modeMenu->menuAction());
+		cmenu->addAction(fileMenu->menuAction());
+		cmenu->addAction(tbAction);
+	}
 }
 void ExpressionEdit::insertDate() {
 	QDialog *dialog = new QDialog(this, Qt::Popup);

@@ -41,6 +41,7 @@ class HistoryView : public QTextEdit {
 		void loadInitial(bool reload = false);
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
 		void replaceColors(QString&, QColor prev_text_color = QColor());
+		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
 
 	protected:
 
@@ -48,8 +49,8 @@ class HistoryView : public QTextEdit {
 		std::string parse_tmp, result_tmp;
 		int i_pos, i_pos2, i_pos_p, i_pos_p2, previous_cursor, previous_cursor2, previous_temporary;
 		int has_lock_symbol;
-		QMenu *cmenu;
-		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
+		QMenu *cmenu, *fileMenu, *modeMenu;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction, *tbAction, *fileSeparator;
 		QColor text_color;
 		QRect prev_fonti;
 		QPoint context_pos;
