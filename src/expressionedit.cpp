@@ -3809,6 +3809,7 @@ void ExpressionEdit::hideCompletion() {
 void ExpressionEdit::clearHistory() {
 	settings->expression_history.clear();
 	history_index = -1;
+	current_history.clear();
 }
 void ExpressionEdit::addToHistory() {
 	std::string str = toPlainText().toStdString();
