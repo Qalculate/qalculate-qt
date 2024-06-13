@@ -245,6 +245,7 @@ int main(int argc, char **argv) {
 	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 	else settings->color = 1;
 
+	settings->saved_app_font = app.font();
 	if(settings->use_custom_app_font) {
 		QFont font;
 		font.fromString(QString::fromStdString(settings->custom_app_font));

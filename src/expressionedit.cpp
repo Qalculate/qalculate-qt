@@ -1458,12 +1458,12 @@ QSize ExpressionEdit::sizeHint() const {
 	return size;
 }
 QSize ExpressionEdit::minimumSizeHint() const {
-	QSize size = QPlainTextEdit::sizeHint();
+	QSize size = QPlainTextEdit::minimumSizeHint();
 	QFontMetrics fm(font());
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top() + 2);
+	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
 #else
-	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() + 2);
+	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
 #endif
 	return size;
 }

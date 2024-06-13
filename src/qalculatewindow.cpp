@@ -933,7 +933,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	expressionEdit->setFocus();
 
-	QFont saved_app_font = QApplication::font();
 	if(settings->custom_result_font.empty()) settings->custom_result_font = historyView->font().toString().toStdString();
 	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
 	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
@@ -8113,7 +8112,7 @@ void QalculateWindow::onAppFontTimer() {
 }
 void QalculateWindow::onAppFontChanged() {
 	if(settings->use_custom_app_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_app_font)); QApplication::setFont(font);}
-	else QApplication::setFont(saved_app_font);
+	else QApplication::setFont(settings->saved_app_font);
 	if(!settings->use_custom_expression_font) {
 		QFont font = QApplication::font();
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);

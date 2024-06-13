@@ -111,7 +111,6 @@ class QalculateWindow : public QMainWindow {
 		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit, *minDecimalsEdit, *maxDecimalsEdit;
 		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer;
-		QFont saved_app_font;
 
 		QTableWidget *rpnView;
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;

@@ -20,6 +20,7 @@
 class QWidget;
 class QByteArray;
 class QAction;
+class QFont;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
@@ -245,6 +246,7 @@ class QalculateQtSettings : QObject {
 		bool enable_input_method;
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
+		QFont saved_app_font;
 		int replace_expression;
 		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
