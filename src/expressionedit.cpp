@@ -1457,6 +1457,16 @@ QSize ExpressionEdit::sizeHint() const {
 #endif
 	return size;
 }
+QSize ExpressionEdit::minimumSizeHint() const {
+	QSize size = QPlainTextEdit::sizeHint();
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top() + 2);
+#else
+	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() + 2);
+#endif
+	return size;
+}
 void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
 	if(event->commitString() == "⁽") event->setCommitString("^(");
 	if(event->commitString() == "⁰" || event->commitString() == "¹" || event->commitString() == "²" || event->commitString() == "³" || event->commitString() == "⁴" || event->commitString() == "⁵" || event->commitString() == "⁶" || event->commitString() == "⁷" || event->commitString() == "⁸" || event->commitString() == "⁹" || event->commitString() == "⁻") {
