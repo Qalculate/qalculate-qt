@@ -102,6 +102,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void highlightParentheses();
 
 		void keyReleaseEvent(QKeyEvent*) override;
+		void changeEvent(QEvent*) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void insertFromMimeData(const QMimeData*) override;
 		bool expressionInQuotes();
@@ -113,7 +114,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 		std::string expression() const;
 		QSize sizeHint() const override;
-		QSize minimumSizeHint() const override;
+		void updateMinimumHeight();
 
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false, bool add_comma = false, const QString &add_arg = QString(), bool quote = false);
 		bool doChainMode(const QString &op);

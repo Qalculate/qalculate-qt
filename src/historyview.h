@@ -42,6 +42,7 @@ class HistoryView : public QTextEdit {
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
 		void replaceColors(QString&, QColor prev_text_color = QColor());
 		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
+		void updateMinimumHeight();
 
 	protected:
 

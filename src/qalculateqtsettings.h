@@ -276,6 +276,9 @@ class QalculateQtSettings : QObject {
 		QByteArray datasets_geometry, datasets_vsplitter_state, datasets_hsplitter_state;
 		bool wayland_platform;
 
+		int preserve_history_height;
+		bool keypad_appended, bases_appended;
+
 		std::string volume_category;
 		std::vector<std::string> alternative_volume_categories;
 

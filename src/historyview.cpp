@@ -754,6 +754,7 @@ void HistoryView::changeEvent(QEvent *e) {
 		if(fm.boundingRect("Öy") != prev_fonti) {
 			reloadHistory();
 		}
+		updateMinimumHeight();
 	}
 	QTextEdit::changeEvent(e);
 }
@@ -1035,6 +1036,14 @@ void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *resu
 	} else {
 		*expression_index = sref.toInt();
 	}
+}
+void HistoryView::updateMinimumHeight() {
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	setMinimumHeight(fm.lineSpacing() * 4.4 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	setMinimumHeight(fm.lineSpacing() * 4.4 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
+#endif
 }
 void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 	if(!cmenu) {

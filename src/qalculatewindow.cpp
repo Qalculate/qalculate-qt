@@ -380,6 +380,8 @@ class QalculateTableWidget : public QTableWidget {
 
 QalculateWindow::QalculateWindow() : QMainWindow() {
 
+	init_in_progress = true;
+
 	QWidget *w_top = new QWidget(this);
 	setCentralWidget(w_top);
 
@@ -388,6 +390,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	workspace_changed = false;
 
 	ecTimer = NULL;
+	emhTimer = NULL;
+	resizeTimer = NULL;
 	rfTimer = NULL;
 	decimalsTimer = NULL;
 	autoCalculateTimer = NULL;
@@ -5105,7 +5109,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(from_str.empty()) {
 					b_busy--;
 					if(current_expr) setPreviousExpression();
-					basesDock->show();
+					onBasesActivated(true);
 					return;
 				}
 				do_bases = true;
@@ -5660,7 +5664,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	setResult(NULL, true, stack_index == 0, true, "", do_stack, stack_index);
 	prepend_mstruct.setUndefined();
 	
-	if(do_bases) basesDock->show();
+	if(do_bases) onBasesActivated(true);
 	if(do_calendars) openCalendarConversion();
 	
 	settings->evalops.complex_number_form = cnf_bak;
@@ -7764,12 +7768,72 @@ void QalculateWindow::resetKeypadPosition() {
 		keypadDock->setVisible(b);
 	}
 }
+void QalculateWindow::initFinished() {
+	init_in_progress = false;
+}
+#define DOCK_IN_WINDOW(dock) (!dock->isFloating() && (dockWidgetArea(dock) == Qt::BottomDockWidgetArea || dockWidgetArea(dock) == Qt::TopDockWidgetArea))
+#define DOCK_VISIBLE_IN_WINDOW(dock) (dock->isVisible() && DOCK_IN_WINDOW(dock))
+void QalculateWindow::beforeShowDockCleanUp(QDockWidget*) {
+	if(emhTimer && emhTimer->isActive()) {
+		emhTimer->stop();
+		onEMHTimeout();
+	}
+	if(resizeTimer && resizeTimer->isActive()) {
+		resizeTimer->stop();
+		onResizeTimeout();
+	}
+}
+void QalculateWindow::beforeShowDock(QDockWidget *w, bool b) {
+	beforeShowDockCleanUp(w);
+	if(!init_in_progress && b && DOCK_IN_WINDOW(w)) {
+		expressionEdit->setMinimumHeight(expressionEdit->height());
+		if(!w->isVisible() && (settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && historyView->height() < w->sizeHint().height()))) {
+			if(settings->preserve_history_height < 0) {
+				if(w == keypadDock) settings->keypad_appended = true;
+				else if(w == basesDock) settings->bases_appended = true;
+			}
+			historyView->setMinimumHeight(historyView->height());
+		} else {
+			if(w == keypadDock) settings->keypad_appended = false;
+			else if(w == basesDock) settings->bases_appended = false;
+		}
+	}
+}
+void QalculateWindow::afterShowDock(QDockWidget *w) {
+	if(!init_in_progress && w->isVisible()) {
+		if(!emhTimer) {
+			emhTimer = new QTimer();
+			emhTimer->setSingleShot(true);
+			connect(emhTimer, SIGNAL(timeout()), this, SLOT(onEMHTimeout()));
+		}
+		emhTimer->start(100);
+	}
+}
+void QalculateWindow::onEMHTimeout() {
+	expressionEdit->updateMinimumHeight();
+	historyView->updateMinimumHeight();
+}
+
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
+	beforeShowDock(keypadDock, v >= 0 || !keypadDock->isVisible());
 	if(v < 0) {
 		bool b = !keypadDock->isVisible();
+		bool b_resize = (settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->keypad_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(keypadDock);
+		if(b_resize) {
+			centralWidget()->setMaximumHeight(centralWidget()->height());
+			if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(basesDock->height());
+		}
 		keypadDock->setVisible(b);
 		if(b) keypadDock->raise();
+		if(b_resize) {
+			if(!resizeTimer) {
+				resizeTimer = new QTimer();
+				resizeTimer->setSingleShot(true);
+				connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
+			}
+			resizeTimer->start(10);
+		}
 		settings->show_keypad = b ? 1 : 0;
 	} else {
 		if(settings->keypad_type == v && keypadDock->isVisible()) v = KEYPAD_GENERAL;
@@ -7780,10 +7844,22 @@ void QalculateWindow::keypadTypeActivated() {
 		settings->show_keypad = 1;
 		updateKeypadTitle();
 	}
+	afterShowDock(keypadDock);
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	workspace_changed = true;
 }
+void QalculateWindow::onResizeTimeout() {
+	setMinimumWidth(width());
+	setMaximumWidth(width());
+	adjustSize();
+	if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(QWIDGETSIZE_MAX);
+	if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(QWIDGETSIZE_MAX);
+	setMinimumWidth(0);
+	setMaximumWidth(QWIDGETSIZE_MAX);
+	centralWidget()->setMaximumHeight(QWIDGETSIZE_MAX);
+}
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
+	beforeShowDockCleanUp(keypadDock);
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
 	if(action) action->setChecked(true);
 	settings->show_keypad = b ? 1 : 0;
@@ -7792,6 +7868,16 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 		settings->programming_base_changed = false;
 		onBaseClicked(BASE_DECIMAL, true, false);
 	}
+	if((settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->keypad_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(keypadDock)) {
+		centralWidget()->setMaximumHeight(centralWidget()->height());
+		if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(basesDock->height());
+		if(!resizeTimer) {
+			resizeTimer = new QTimer();
+			resizeTimer->setSingleShot(true);
+			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
+		}
+		resizeTimer->start(10);
+	}
 }
 void QalculateWindow::onToolbarVisibilityChanged(bool b) {
 	expressionEdit->setMenuAndToolbarItems(b ? NULL : modeAction_t->menu(), b ? NULL : menuAction_t->menu(), b ? NULL : tbAction);
@@ -7799,11 +7885,38 @@ void QalculateWindow::onToolbarVisibilityChanged(bool b) {
 	tbAction->setChecked(b);
 }
 void QalculateWindow::onBasesActivated(bool b) {
+	if(b == basesDock->isVisible()) return;
+	beforeShowDock(basesDock, b);
+	bool b_resize = (settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->bases_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(basesDock);
+	if(b_resize) {
+		centralWidget()->setMaximumHeight(centralWidget()->height());
+		if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(keypadDock->height());
+	}
 	basesDock->setVisible(b);
 	if(b) basesDock->raise();
+	if(b_resize) {
+		if(!resizeTimer) {
+			resizeTimer = new QTimer();
+			resizeTimer->setSingleShot(true);
+			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
+		}
+		resizeTimer->start(10);
+	}
+	afterShowDock(basesDock);
 }
 void QalculateWindow::onBasesVisibilityChanged(bool b) {
+	beforeShowDockCleanUp(basesDock);
 	basesAction->setChecked(b);
+	if((settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->bases_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(basesDock)) {
+		centralWidget()->setMaximumHeight(centralWidget()->height());
+		if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(keypadDock->height());
+		if(!resizeTimer) {
+			resizeTimer = new QTimer();
+			resizeTimer->setSingleShot(true);
+			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
+		}
+		resizeTimer->start(10);
+	}
 	if(b && expressionEdit->expressionHasChanged()) onExpressionChanged();
 	else if(b && !settings->history_answer.empty()) updateResultBases();
 }
@@ -9752,8 +9865,8 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		updateVariablesMenu();
 		keypad->updateBase();
 		keypad->updateSymbols();
-		if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad);
-		basesDock->setVisible(settings->show_bases > 0);
+		if(settings->show_keypad >= 0 && settings->show_keypad != keypadDock->isVisible()) keypadAction->trigger();
+		onBasesActivated(settings->show_bases > 0);
 		QAction *action = find_child_data(this, "group_keypad", settings->show_keypad == 0 ? -1 : settings->keypad_type);
 		if(action) action->setChecked(true);
 		hideNumpadAction->setChecked(settings->hide_numpad);

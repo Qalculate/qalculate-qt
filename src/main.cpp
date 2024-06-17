@@ -262,6 +262,8 @@ int main(int argc, char **argv) {
 	}
 	win->setCommandLineParser(parser);
 	win->show();
+	app.processEvents();
+	win->initFinished();
 
 	if(!parser->value(fOption).isEmpty()) win->executeFromFile(parser->value(fOption));
 

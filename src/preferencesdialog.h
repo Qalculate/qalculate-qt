@@ -17,6 +17,7 @@
 #include <libqalculate/qalculate.h>
 
 class QAbstractButton;
+class QCheckBox;
 class QSpinBox;
 class QComboBox;
 
@@ -27,6 +28,7 @@ class PreferencesDialog : public QDialog {
 	protected:
 
 		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
+		QCheckBox *preserveHeightBox;
 		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget;
 		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;
 
@@ -37,6 +39,7 @@ class PreferencesDialog : public QDialog {
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
 		void tooltipsChanged(int);
+		void preserveHeightChanged(int);
 		void statusModeChanged(int);
 		void statusDelayChanged(int);
 		void calculateDelayChanged(int);

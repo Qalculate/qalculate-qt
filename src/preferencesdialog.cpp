@@ -107,6 +107,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	BOX(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
 	BOX(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
+	QCheckBox *box2 = new QCheckBox(tr("Preserve history height"), this); l->addWidget(box2, r, 0, 1, 2); connect(box2, SIGNAL(stateChanged(int)), this, SLOT(preserveHeightChanged(int))); r++;
+	preserveHeightBox = box2;
+	if(settings->preserve_history_height < 0) {
+		box2->setTristate(true);
+		box2->setCheckState(Qt::PartiallyChecked);
+	} else {
+		box2->setChecked(settings->preserve_history_height > 0);
+	}
+	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Application name"), TITLE_APP);
@@ -418,6 +427,12 @@ void PreferencesDialog::multipleInstancesToggled(bool b) {
 }
 void PreferencesDialog::clearHistoryToggled(bool b) {
 	settings->clear_history_on_exit = b;
+}
+void PreferencesDialog::preserveHeightChanged(int state) {
+	preserveHeightBox->setTristate(false);
+	settings->preserve_history_height = (state == Qt::Checked);
+	settings->keypad_appended = false;
+	settings->bases_appended = false;
 }
 void PreferencesDialog::keepAboveToggled(bool b) {
 	settings->always_on_top = b;

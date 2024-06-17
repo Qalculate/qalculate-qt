@@ -589,6 +589,12 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			clear_history_on_exit = v;
 		} else if(svar == "window_state") {
 			window_state = QByteArray::fromBase64(svalue.c_str());
+		} else if(svar == "preserve_history_height") {
+			preserve_history_height = v;
+		} else if(svar == "keypad_appended") {
+			keypad_appended = v;
+		} else if(svar == "bases_appended") {
+			bases_appended = v;
 		} else if(svar == "replace_expression") {
 			replace_expression = v;
 		} else if(svar == "autocopy_result") {
@@ -991,6 +997,10 @@ void QalculateQtSettings::loadPreferences() {
 	v_parseerror.clear();
 	expression_history.clear();
 
+	preserve_history_height = -1;
+	keypad_appended = false;
+	bases_appended = false;
+
 	default_shortcuts = true;
 	for(size_t i = 0; i < keyboard_shortcuts.size(); i++) delete keyboard_shortcuts[i];
 	keyboard_shortcuts.clear();
@@ -1359,6 +1369,9 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		}
 		if(!window_state.isEmpty()) fprintf(file, "window_state=%s\n", window_state.toBase64().data());
 		if(!window_geometry.isEmpty()) fprintf(file, "window_geometry=%s\n", window_geometry.toBase64().data());
+		fprintf(file, "preserve_history_height=%i\n", preserve_history_height);
+		if(keypad_appended) fprintf(file, "keypad_appended=%i\n", keypad_appended);
+		if(bases_appended) fprintf(file, "bases_appended=%i\n", bases_appended);
 		if(rpn_shown) fprintf(file, "rpn_shown=%i\n", rpn_shown);
 		fprintf(file, "splitter_state=%s\n", splitter_state.toBase64().data());
 		if(!functions_geometry.isEmpty()) fprintf(file, "functions_geometry=%s\n", functions_geometry.toBase64().data());

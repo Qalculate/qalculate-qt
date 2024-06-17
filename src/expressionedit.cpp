@@ -878,6 +878,18 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 }
 ExpressionEdit::~ExpressionEdit() {}
 
+void ExpressionEdit::updateMinimumHeight() {
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	setMinimumHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	setMinimumHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
+#endif
+}
+void ExpressionEdit::changeEvent(QEvent *e) {
+	if(e->type() == QEvent::FontChange) updateMinimumHeight();
+	QPlainTextEdit::changeEvent(e);
+}
 bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 	switch(e->type()) {
 #if defined (Q_OS_QNX)
@@ -1454,16 +1466,6 @@ QSize ExpressionEdit::sizeHint() const {
 	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
 #else
 	size.setHeight(fm.lineSpacing() * 3 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
-#endif
-	return size;
-}
-QSize ExpressionEdit::minimumSizeHint() const {
-	QSize size = QPlainTextEdit::minimumSizeHint();
-	QFontMetrics fm(font());
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
-#else
-	size.setHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
 #endif
 	return size;
 }

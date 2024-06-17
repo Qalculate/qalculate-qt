@@ -14,6 +14,7 @@
 
 #include <QMainWindow>
 #include <QFont>
+#include <QList>
 #include <QSpinBox>
 #include <QTranslator>
 #include <QDockWidget>
@@ -67,6 +68,7 @@ class QalculateWindow : public QMainWindow {
 		bool displayMessages();
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false, bool type_change = false);
 		void executeFromFile(const QString&);
+		void initFinished();
 
 	protected:
 
@@ -110,13 +112,14 @@ class QalculateWindow : public QMainWindow {
 		QAction *firstFunctionsMenuOptionAction, *firstVariablesMenuOptionAction, *firstUnitsMenuOptionAction;
 		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit, *minDecimalsEdit, *maxDecimalsEdit;
-		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer;
+		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer, *resizeTimer, *emhTimer;
 
 		QTableWidget *rpnView;
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;
 
 		bool send_event;
 		bool workspace_changed;
+		bool init_in_progress;
 
 		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
@@ -143,6 +146,9 @@ class QalculateWindow : public QMainWindow {
 		void loadWorkspace(const QString &filename);
 		void updateWSActions();
 		int askSaveWorkspace();
+		void beforeShowDockCleanUp(QDockWidget*);
+		void beforeShowDock(QDockWidget*, bool);
+		void afterShowDock(QDockWidget*);
 
 	protected slots:
 
@@ -180,6 +186,8 @@ class QalculateWindow : public QMainWindow {
 		void hideNumpad(bool);
 		void showSeparateKeypadMenuButtons(bool);
 		void resetKeypadPosition();
+		void onEMHTimeout();
+		void onResizeTimeout();
 		void onKeypadVisibilityChanged(bool);
 		void onToolbarVisibilityChanged(bool);
 		void onBasesActivated(bool);
