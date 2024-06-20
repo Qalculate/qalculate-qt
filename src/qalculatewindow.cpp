@@ -1226,6 +1226,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		ks->new_action = false;
 		QList<QKeySequence> shortcuts = action->shortcuts();
 		shortcuts << QKeySequence::fromString(ks->key);
+		addAction(action);
 		action->setShortcuts(shortcuts);
 		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
 			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
@@ -7813,7 +7814,15 @@ void QalculateWindow::onEMHTimeout() {
 	expressionEdit->updateMinimumHeight();
 	historyView->updateMinimumHeight();
 }
-
+void QalculateWindow::onResizeTimeout() {
+	if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(QWIDGETSIZE_MAX);
+	if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(QWIDGETSIZE_MAX);
+	setMinimumWidth(0);
+	setMaximumWidth(QWIDGETSIZE_MAX);
+	centralWidget()->setMaximumHeight(QWIDGETSIZE_MAX);
+	centralWidget()->setMinimumHeight(0);
+}
+// minimum width when dock is shown
 void QalculateWindow::keypadTypeActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	beforeShowDock(keypadDock, v >= 0 || !keypadDock->isVisible());
@@ -7821,18 +7830,20 @@ void QalculateWindow::keypadTypeActivated() {
 		bool b = !keypadDock->isVisible();
 		bool b_resize = (settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->keypad_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(keypadDock);
 		if(b_resize) {
-			centralWidget()->setMaximumHeight(centralWidget()->height());
+			centralWidget()->setFixedHeight(centralWidget()->height());
 			if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(basesDock->height());
 		}
 		keypadDock->setVisible(b);
 		if(b) keypadDock->raise();
 		if(b_resize) {
+			setFixedWidth(width());
+			adjustSize();
 			if(!resizeTimer) {
 				resizeTimer = new QTimer();
 				resizeTimer->setSingleShot(true);
 				connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
 			}
-			resizeTimer->start(10);
+			resizeTimer->start(100);
 		}
 		settings->show_keypad = b ? 1 : 0;
 	} else {
@@ -7848,16 +7859,6 @@ void QalculateWindow::keypadTypeActivated() {
 	resetKeypadPositionAction->setEnabled(keypadDock->isVisible() && (keypadDock->isFloating() || dockWidgetArea(keypadDock) != Qt::BottomDockWidgetArea));
 	workspace_changed = true;
 }
-void QalculateWindow::onResizeTimeout() {
-	setMinimumWidth(width());
-	setMaximumWidth(width());
-	adjustSize();
-	if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(QWIDGETSIZE_MAX);
-	if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(QWIDGETSIZE_MAX);
-	setMinimumWidth(0);
-	setMaximumWidth(QWIDGETSIZE_MAX);
-	centralWidget()->setMaximumHeight(QWIDGETSIZE_MAX);
-}
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	beforeShowDockCleanUp(keypadDock);
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
@@ -7869,14 +7870,16 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 		onBaseClicked(BASE_DECIMAL, true, false);
 	}
 	if((settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->keypad_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(keypadDock)) {
-		centralWidget()->setMaximumHeight(centralWidget()->height());
+		centralWidget()->setFixedHeight(centralWidget()->height());
 		if(DOCK_VISIBLE_IN_WINDOW(basesDock)) basesDock->setMaximumHeight(basesDock->height());
+		setFixedWidth(width());
+		adjustSize();
 		if(!resizeTimer) {
 			resizeTimer = new QTimer();
 			resizeTimer->setSingleShot(true);
 			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
 		}
-		resizeTimer->start(10);
+		resizeTimer->start(100);
 	}
 }
 void QalculateWindow::onToolbarVisibilityChanged(bool b) {
@@ -7889,18 +7892,20 @@ void QalculateWindow::onBasesActivated(bool b) {
 	beforeShowDock(basesDock, b);
 	bool b_resize = (settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->bases_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(basesDock);
 	if(b_resize) {
-		centralWidget()->setMaximumHeight(centralWidget()->height());
+		centralWidget()->setFixedHeight(centralWidget()->height());
 		if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(keypadDock->height());
 	}
 	basesDock->setVisible(b);
 	if(b) basesDock->raise();
 	if(b_resize) {
+		setFixedWidth(width());
+		adjustSize();
 		if(!resizeTimer) {
 			resizeTimer = new QTimer();
 			resizeTimer->setSingleShot(true);
 			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
 		}
-		resizeTimer->start(10);
+		resizeTimer->start(100);
 	}
 	afterShowDock(basesDock);
 }
@@ -7908,14 +7913,16 @@ void QalculateWindow::onBasesVisibilityChanged(bool b) {
 	beforeShowDockCleanUp(basesDock);
 	basesAction->setChecked(b);
 	if((settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->bases_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(basesDock)) {
-		centralWidget()->setMaximumHeight(centralWidget()->height());
+		centralWidget()->setFixedHeight(centralWidget()->height());
 		if(DOCK_VISIBLE_IN_WINDOW(keypadDock)) keypadDock->setMaximumHeight(keypadDock->height());
+		setFixedWidth(width());
+		adjustSize();
 		if(!resizeTimer) {
 			resizeTimer = new QTimer();
 			resizeTimer->setSingleShot(true);
 			connect(resizeTimer, SIGNAL(timeout()), this, SLOT(onResizeTimeout()));
 		}
-		resizeTimer->start(10);
+		resizeTimer->start(100);
 	}
 	if(b && expressionEdit->expressionHasChanged()) onExpressionChanged();
 	else if(b && !settings->history_answer.empty()) updateResultBases();
@@ -8418,7 +8425,7 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		shortcutActionList->setSelectionMode(QAbstractItemView::SingleSelection);
 		shortcutActionList->setRootIsDecorated(false);
 		shortcutActionList->header()->setVisible(true);
-		shortcutActionList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+		shortcutActionList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 		shortcutActionList->setSortingEnabled(true);
 		shortcutActionList->sortByColumn(-1, Qt::AscendingOrder);
 		grid->addWidget(shortcutActionList, 0, 0, 1, 2);

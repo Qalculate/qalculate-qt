@@ -258,6 +258,7 @@ class QalculateQtSettings : QObject {
 		bool hide_numpad;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
+		int max_history_lines;
 		bool rpn_shown;
 		bool auto_calculate, status_in_history;
 		int history_expression_type;
@@ -302,6 +303,7 @@ class QalculateQtSettings : QObject {
 		std::vector<std::string> v_parse;
 		std::vector<bool> v_pexact;
 		std::vector<bool> v_protected;
+		std::vector<long long int> v_time;
 		std::vector<std::vector<std::string> > v_result;
 		std::vector<std::vector<int> > v_exact;
 		std::vector<std::vector<size_t> > v_value;
@@ -320,6 +322,7 @@ class QalculateQtSettings : QObject {
 		std::vector<custom_button> custom_buttons;
 		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;
 		bool show_all_functions, show_all_variables, show_all_units, use_function_dialog;
+		long long int current_history_time;
 
 };
 

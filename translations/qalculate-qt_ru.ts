@@ -1104,6 +1104,14 @@ Do you want to overwrite the function?</source>
         <source>decimal fraction</source>
         <translation>десятичная дробь</translation>
     </message>
+    <message>
+        <source>In history list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In expression field</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1720,7 +1728,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Action:</source>
-        <translation>Действие:</translation>
+        <translation type="vanished">Действие:</translation>
     </message>
     <message>
         <source>None</source>
@@ -1907,6 +1915,10 @@ Do you want to overwrite the function?</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
         <translatorcomment>Стандартная кнопка калькулятора. Не используйте более трёх символов.</translatorcomment>
         <translation>СХР</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished">Действие</translation>
     </message>
 </context>
 <context>
@@ -2410,11 +2422,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Display expression status</source>
-        <translation>Показывать статус выражения</translation>
+        <translation type="vanished">Показывать статус выражения</translation>
     </message>
     <message>
         <source>Delay:</source>
-        <translation>Задержка:</translation>
+        <translation type="vanished">Задержка:</translation>
     </message>
     <message>
         <source>Expression after calculation:</source>
@@ -2872,6 +2884,42 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Automatic</source>
         <translation type="unfinished">Автоматическое</translation>
+    </message>
+    <message>
+        <source>Max history lines saved:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preserve history height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expression status:</source>
+        <translation type="unfinished">Статус выражения:</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">Выкл</translation>
+    </message>
+    <message>
+        <source>In history list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In expression field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status tooltip delay:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Calculate as you type delay:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4191,7 +4239,7 @@ Please select interpretation of expressions with implicit multiplication
     </message>
     <message>
         <source>Action:</source>
-        <translation>Действие:</translation>
+        <translation type="vanished">Действие:</translation>
     </message>
     <message>
         <source>Value:</source>
@@ -4495,6 +4543,18 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>Add percentage multiplied by 1/100</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation type="unfinished">Действие</translation>
+    </message>
+    <message>
+        <source>Key combination</source>
+        <translation type="unfinished">Комбинация клавиш</translation>
     </message>
 </context>
 <context>

@@ -102,6 +102,7 @@ class PreferencesDialog : public QDialog {
 		void autocopyResultToggled(bool);
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
+		void maxHistoryLinesChanged(int);
 		void historyExpressionChanged(int);
 		void copyAsciiToggled(bool);
 		void copyAsciiWithoutUnitsToggled(bool);

@@ -156,6 +156,7 @@ int AnswerFunction::calculate(MathStructure &mstruct, const MathStructure &vargs
 QalculateQtSettings::QalculateQtSettings() {
 	ignore_locale = false;
 	fetch_exchange_rates_at_startup = false;
+	current_history_time = 0;
 	allow_multiple_instances = -1;
 	std::string filename = buildPath(getLocalDir(), "qalculate-qt.cfg");
 	FILE *file = fopen(filename.c_str(), "r");
@@ -210,11 +211,14 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		v_value.push_back(std::vector<size_t>());
 		v_messages.push_back("");
 		v_parseerror.push_back(false);
+		v_time.push_back(current_history_time);
 	} else if(svar == "history_parse") {
 		if(v_expression.size() > v_parse.size()) {
 			v_parse.push_back(svalue);
 			v_pexact.push_back(true);
 		}
+	} else if(svar == "history_time") {
+		current_history_time = (time_t) strtoll(svalue.c_str(), NULL, 10);
 	} else if(svar == "history_parse_approximate") {
 		if(v_expression.size() > v_parse.size()) {
 			v_parse.push_back(svalue);
@@ -587,6 +591,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			save_defs_on_exit = v;
 		} else if(svar == "clear_history_on_exit") {
 			clear_history_on_exit = v;
+		} else if(svar == "max_history_lines") {
+			max_history_lines = v;
 		} else if(svar == "window_state") {
 			window_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "preserve_history_height") {
@@ -975,6 +981,7 @@ void QalculateQtSettings::loadPreferences() {
 	save_mode_on_exit = true;
 	save_defs_on_exit = true;
 	clear_history_on_exit = false;
+	max_history_lines = 300;
 	history_expression_type = 0;
 	keep_function_dialog_open = false;
 #ifdef _WIN32
@@ -990,6 +997,8 @@ void QalculateQtSettings::loadPreferences() {
 	v_parse.clear();
 	v_value.clear();
 	v_protected.clear();
+	current_history_time = 0;
+	v_time.clear();
 	v_result.clear();
 	v_exact.clear();
 	v_pexact.clear();
@@ -1392,6 +1401,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "save_mode_on_exit=%i\n", save_mode_on_exit);
 		fprintf(file, "save_definitions_on_exit=%i\n", save_defs_on_exit);
 		fprintf(file, "clear_history_on_exit=%i\n", clear_history_on_exit);
+		if(max_history_lines != 300) fprintf(file, "max_history_lines=%i\n", max_history_lines);
 		fprintf(file, "enable_input_method=%i\n", enable_input_method);
 		fprintf(file, "enable_tooltips=%i\n", enable_tooltips);
 		fprintf(file, "display_expression_status=%i\n", display_expression_status);
@@ -1638,12 +1648,17 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					}
 					n++;
 				}
-				if(n >= 300 || i == 0) break;
+				if(n >= max_history_lines || i == 0) break;
 				i--;
 			}
 			size_t i_first = i;
+			long long int history_time_prev = 0;
 			for(i = 0; i < v_expression.size(); i++) {
 				if(i >= i_first || v_protected[i]) {
+					if(v_time[i] != history_time_prev) {
+						history_time_prev = v_time[i];
+						fprintf(file, "history_time=%lli\n", (long long int) history_time_prev);
+					}
 					if(v_expression[i].empty()) {
 						if(v_protected[i]) fprintf(file, "history_expression*=%s\n", v_parse[i].c_str());
 						else fprintf(file, "history_expression=%s\n", v_parse[i].c_str());
@@ -2217,6 +2232,8 @@ bool QalculateQtSettings::loadWorkspace(const char *filename) {
 	v_parse.clear();
 	v_value.clear();
 	v_protected.clear();
+	v_time.clear();
+	current_history_time = 0;
 	v_messages.clear();
 	v_parseerror.clear();
 	v_result.clear();

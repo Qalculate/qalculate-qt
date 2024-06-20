@@ -323,6 +323,7 @@ void HistoryView::loadInitial(bool reload) {
 			settings->v_parse.erase(settings->v_parse.begin() + i);
 			settings->v_result.erase(settings->v_result.begin() + i);
 			settings->v_protected.erase(settings->v_protected.begin() + i);
+			settings->v_time.erase(settings->v_time.begin() + i);
 			settings->v_exact.erase(settings->v_exact.begin() + i);
 			settings->v_pexact.erase(settings->v_pexact.begin() + i);
 			settings->v_value.erase(settings->v_value.begin() + i);
@@ -470,6 +471,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			settings->v_parse.push_back(parse);
 			settings->v_pexact.push_back(pexact);
 			settings->v_protected.push_back(false);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+			settings->v_time.push_back(QDateTime::currentSecsSinceEpoch());
+#else
+			settings->v_time.push_back(QDateTime::currentMSecsSinceEpoch() / 1000);
+#endif
 			settings->v_messages.push_back(serror);
 			settings->v_parseerror.push_back(b_parse_error);
 			settings->v_result.push_back(values);
@@ -903,6 +909,7 @@ void HistoryView::editClear() {
 			settings->v_parse.erase(settings->v_parse.begin() + i1);
 			settings->v_result.erase(settings->v_result.begin() + i1);
 			settings->v_protected.erase(settings->v_protected.begin() + i1);
+			settings->v_time.erase(settings->v_time.begin() + i1);
 			settings->v_exact.erase(settings->v_exact.begin() + i1);
 			settings->v_pexact.erase(settings->v_pexact.begin() + i1);
 			settings->v_value.erase(settings->v_value.begin() + i1);
@@ -924,6 +931,11 @@ void HistoryView::editMoveToTop() {
 	settings->v_parse.push_back(settings->v_parse[i1]);
 	settings->v_pexact.push_back(settings->v_pexact[i1]);
 	settings->v_protected.push_back(settings->v_protected[i1]);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+	settings->v_time.push_back(QDateTime::currentSecsSinceEpoch());
+#else
+	settings->v_time.push_back(QDateTime::currentMSecsSinceEpoch() / 1000);
+#endif
 	settings->v_result.push_back(settings->v_result[i1]);
 	settings->v_exact.push_back(settings->v_exact[i1]);
 	settings->v_value.push_back(settings->v_value[i1]);
@@ -933,6 +945,7 @@ void HistoryView::editMoveToTop() {
 	settings->v_parse.erase(settings->v_parse.begin() + i1);
 	settings->v_result.erase(settings->v_result.begin() + i1);
 	settings->v_protected.erase(settings->v_protected.begin() + i1);
+	settings->v_time.erase(settings->v_time.begin() + i1);
 	settings->v_exact.erase(settings->v_exact.begin() + i1);
 	settings->v_pexact.erase(settings->v_pexact.begin() + i1);
 	settings->v_value.erase(settings->v_value.begin() + i1);
@@ -964,6 +977,7 @@ void HistoryView::editRemove() {
 		settings->v_parse.erase(settings->v_parse.begin() + i1);
 		settings->v_result.erase(settings->v_result.begin() + i1);
 		settings->v_protected.erase(settings->v_protected.begin() + i1);
+		settings->v_time.erase(settings->v_time.begin() + i1);
 		settings->v_exact.erase(settings->v_exact.begin() + i1);
 		settings->v_pexact.erase(settings->v_pexact.begin() + i1);
 		settings->v_value.erase(settings->v_value.begin() + i1);

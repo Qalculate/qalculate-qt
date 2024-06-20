@@ -1051,7 +1051,7 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	actionList->setSelectionMode(QAbstractItemView::SingleSelection);
 	actionList->setRootIsDecorated(false);
 	actionList->header()->setVisible(true);
-	actionList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	actionList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	actionList->setSortingEnabled(true);
 	actionList->sortByColumn(-1, Qt::AscendingOrder);
 	grid->addWidget(actionList, i != 1 ? 0 : 1, 0, 1, 2);

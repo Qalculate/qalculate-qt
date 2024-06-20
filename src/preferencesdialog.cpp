@@ -103,6 +103,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 #endif
 	BOX(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
+	l->addWidget(new QLabel(tr("Max history lines saved:"), this), r, 0); QSpinBox *spin = new QSpinBox(this); spin->setRange(0, 100000); spin->setValue(settings->max_history_lines); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(maxHistoryLinesChanged(int))); l->addWidget(spin, r, 1); r++;
 	BOX(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
 	BOX(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
@@ -185,7 +186,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	connect(statusDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(statusDelayChanged(int)));
 	l->addWidget(statusDelayWidget, r, 1); r++;
-	l->addWidget(new QLabel(tr("Calculate-as-you-type delay:")), r, 0);
+	l->addWidget(new QLabel(tr("Calculate as you type delay:")), r, 0);
 	calculateDelayWidget = new QSpinBox(this);
 	calculateDelayWidget->setRange(0, 10000);
 	calculateDelayWidget->setSingleStep(250);
@@ -373,7 +374,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(temperatureCalculationChanged(int)));
 	box = new QCheckBox(tr("Exchange rates updates:"), this); box->setChecked(settings->auto_update_exchange_rates > 0); connect(box, SIGNAL(toggled(bool)), this, SLOT(exratesToggled(bool))); l->addWidget(box, r, 0);
 	int days = settings->auto_update_exchange_rates <= 0 ? 7 : settings->auto_update_exchange_rates;
-	QSpinBox *spin = new QSpinBox(this); spin->setRange(1, 100); spin->setValue(days); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l->addWidget(spin, r, 1); exratesSpin = spin; r++;
+	spin = new QSpinBox(this); spin->setRange(1, 100); spin->setValue(days); spin->setEnabled(settings->auto_update_exchange_rates > 0); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(exratesChanged(int))); l->addWidget(spin, r, 1); exratesSpin = spin; r++;
 	QString str = tr("%n day(s)", "", days);
 	int index = str.indexOf(QString::number(days));
 	if(index == 0) {
@@ -427,6 +428,9 @@ void PreferencesDialog::multipleInstancesToggled(bool b) {
 }
 void PreferencesDialog::clearHistoryToggled(bool b) {
 	settings->clear_history_on_exit = b;
+}
+void PreferencesDialog::maxHistoryLinesChanged(int i) {
+	settings->max_history_lines = i;
 }
 void PreferencesDialog::preserveHeightChanged(int state) {
 	preserveHeightBox->setTristate(false);
