@@ -7395,7 +7395,7 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	QRadioButton *w_relative = new QRadioButton(tr("Relative"));
 	group->addButton(w_relative);
 	grid->addWidget(w_relative, 2, 0, Qt::AlignTop);
-	grid->addWidget(new QLabel("<i>1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K<br>1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K<br>2 °C − 1 °C = 1 K<br>1 °C − 5 °F = 16 K<br>1 °C + 1 K = 2 °C</i>"), 2, 1);
+	grid->addWidget(new QLabel("<i>1 °C + 1 °C = 2 °C<br>1 °C + 5 °F = 1 °C + 5 °R ≈ 4 °C ≈ 277 K<br>2 °C − 1 °C = 1 °C<br>1 °C − 5 °F = 1 °C - 5 °R ≈ −2 °C<br>1 °C + 1 K = 2 °C</i>"), 2, 1);
 	QRadioButton *w_hybrid = new QRadioButton(tr("Hybrid"));
 	group->addButton(w_hybrid);
 	grid->addWidget(w_hybrid, 3, 0, Qt::AlignTop);
