@@ -20,6 +20,7 @@ ItemProxyModel::ItemProxyModel(QObject *parent) : QSortFilterProxyModel(parent) 
 	setSortCaseSensitivity(Qt::CaseInsensitive);
 	setSortLocaleAware(true);
 	setDynamicSortFilter(false);
+	show_hidden = true;
 }
 ItemProxyModel::~ItemProxyModel() {}
 
@@ -28,6 +29,7 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 	if(!index.isValid()) return false;
 	ExpressionItem *item = (ExpressionItem*) index.data(Qt::UserRole).value<void*>();
 	if(cat.empty()) return false;
+	if(!show_hidden && item->isHidden() && (item->type() != TYPE_UNIT || !((Unit*) item)->isCurrency())) return false;
 	if(cat == "All") {
 		if(!item->isActive()) return false;
 	} else if(cat == "Inactive") {
@@ -81,6 +83,12 @@ void ItemProxyModel::setSecondaryFilter(std::string sfilter) {
 	remove_blank_ends(sfilter);
 	if(filter != sfilter) {
 		filter = sfilter;
+		invalidateFilter();
+	}
+}
+void ItemProxyModel::setShowHidden(bool b) {
+	if(b != show_hidden) {
+		show_hidden = b;
 		invalidateFilter();
 	}
 }

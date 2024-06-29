@@ -86,12 +86,12 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
-	box->addSpacing(24);
+	box->addSpacing(12);
 	calculateButton = new QPushButton(tr("Calculate…"), this); box->addWidget(calculateButton); connect(calculateButton, SIGNAL(clicked()), this, SLOT(calculateClicked()));
 	calculateButton->setDefault(true);
 	applyButton = new QPushButton(tr("Apply"), this); box->addWidget(applyButton); connect(applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
-	box->addSpacing(24);
+	box->addSpacing(12);
 	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);

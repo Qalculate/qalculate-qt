@@ -4757,6 +4757,10 @@ Do you want to overwrite it?</source>
         <source>Inactive</source>
         <translation>Неактивные</translation>
     </message>
+    <message>
+        <source>Show hidden units</source>
+        <translation type="unfinished">Показать скрытые единицы измерения</translation>
+    </message>
 </context>
 <context>
     <name>UnknownEditDialog</name>

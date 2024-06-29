@@ -6815,28 +6815,28 @@ Jo želite prepisati?</translation>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="1057"/>
+        <location filename="../src/historyview.cpp" line="1065"/>
         <source>Insert Value</source>
         <translation type="unfinished">Vnesi vrednost</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1058"/>
+        <location filename="../src/historyview.cpp" line="1066"/>
         <source>Insert Text</source>
         <translation type="unfinished">Vnesi besedilo</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1059"/>
-        <location filename="../src/historyview.cpp" line="1063"/>
+        <location filename="../src/historyview.cpp" line="1067"/>
+        <location filename="../src/historyview.cpp" line="1071"/>
         <source>Copy</source>
         <translation type="unfinished">Kopiraj</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1064"/>
+        <location filename="../src/historyview.cpp" line="1072"/>
         <source>Copy unformatted ASCII</source>
         <translation type="unfinished">Kopiraj neoblikovano ASCII</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1065"/>
+        <location filename="../src/historyview.cpp" line="1073"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6857,7 +6857,7 @@ in pritisnite Enter.</translation>
         <translation type="unfinished">Zgoraj vpišite matematičen izraz, npr. &quot;5 + 2 / 3&quot;, in pritisnite Enter.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="635"/>
+        <location filename="../src/historyview.cpp" line="639"/>
         <source>Exchange rate source(s):</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6867,7 +6867,7 @@ in pritisnite Enter.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="638"/>
+        <location filename="../src/historyview.cpp" line="642"/>
         <source>updated %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6877,33 +6877,33 @@ in pritisnite Enter.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1070"/>
+        <location filename="../src/historyview.cpp" line="1078"/>
         <source>Protect</source>
         <translation type="unfinished">Zaščiti</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1072"/>
+        <location filename="../src/historyview.cpp" line="1080"/>
         <source>Move to Top</source>
         <translation type="unfinished">Premakni na vrh</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1074"/>
+        <location filename="../src/historyview.cpp" line="1082"/>
         <source>Remove</source>
         <translation type="unfinished">Odstrani</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1075"/>
+        <location filename="../src/historyview.cpp" line="1083"/>
         <source>Clear</source>
         <translation type="unfinished">Počisti</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1156"/>
+        <location filename="../src/historyview.cpp" line="1164"/>
         <source>Text:</source>
         <translation type="unfinished">Besedilo:</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1154"/>
         <location filename="../src/historyview.cpp" line="1162"/>
+        <location filename="../src/historyview.cpp" line="1170"/>
         <source>Search</source>
         <translation type="unfinished">Iskanje</translation>
     </message>
@@ -11172,83 +11172,88 @@ Jo želite prepisati?</translation>
         <translation type="unfinished">Kategorija</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="64"/>
-        <location filename="../src/unitsdialog.cpp" line="741"/>
+        <location filename="../src/unitsdialog.cpp" line="65"/>
+        <location filename="../src/unitsdialog.cpp" line="748"/>
         <source>Unit</source>
         <translation type="unfinished">Enota</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="87"/>
+        <location filename="../src/unitsdialog.cpp" line="88"/>
         <source>New…</source>
         <translation type="unfinished">Novo…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="88"/>
+        <location filename="../src/unitsdialog.cpp" line="89"/>
         <source>Edit…</source>
         <translation type="unfinished">Uredi…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="89"/>
-        <location filename="../src/unitsdialog.cpp" line="623"/>
-        <location filename="../src/unitsdialog.cpp" line="626"/>
+        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="630"/>
+        <location filename="../src/unitsdialog.cpp" line="633"/>
         <source>Deactivate</source>
         <translation type="unfinished">Onemogoči</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="91"/>
         <source>Delete</source>
         <translation type="unfinished">Izbriši</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="92"/>
+        <location filename="../src/unitsdialog.cpp" line="93"/>
         <source>Convert</source>
         <translation type="unfinished">Pretvori</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="93"/>
+        <location filename="../src/unitsdialog.cpp" line="94"/>
         <source>Insert</source>
         <translation type="unfinished">Vnesi</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="96"/>
+        <location filename="../src/unitsdialog.cpp" line="97"/>
         <source>Favorite</source>
         <translation type="unfinished">Priljubljeni</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="628"/>
+        <location filename="../src/unitsdialog.cpp" line="127"/>
+        <source>Show hidden units</source>
+        <translation type="unfinished">Prikaži skrite enote</translation>
+    </message>
+    <message>
+        <location filename="../src/unitsdialog.cpp" line="635"/>
         <source>Activate</source>
         <translation type="unfinished">Aktiviraj</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="829"/>
+        <location filename="../src/unitsdialog.cpp" line="836"/>
         <source>All</source>
         <comment>All units</comment>
         <translation type="unfinished">Vse</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="325"/>
-        <location filename="../src/unitsdialog.cpp" line="420"/>
-        <location filename="../src/unitsdialog.cpp" line="872"/>
+        <location filename="../src/unitsdialog.cpp" line="332"/>
+        <location filename="../src/unitsdialog.cpp" line="427"/>
+        <location filename="../src/unitsdialog.cpp" line="879"/>
         <source>Uncategorized</source>
         <translation type="unfinished">nekategorizirano</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="816"/>
+        <location filename="../src/unitsdialog.cpp" line="823"/>
         <source>User units</source>
         <translation type="unfinished">Uporabniške enote</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="811"/>
+        <location filename="../src/unitsdialog.cpp" line="818"/>
         <source>Favorites</source>
         <translation type="unfinished">Priljubljene</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="316"/>
-        <location filename="../src/unitsdialog.cpp" line="378"/>
-        <location filename="../src/unitsdialog.cpp" line="411"/>
-        <location filename="../src/unitsdialog.cpp" line="530"/>
-        <location filename="../src/unitsdialog.cpp" line="532"/>
-        <location filename="../src/unitsdialog.cpp" line="823"/>
+        <location filename="../src/unitsdialog.cpp" line="323"/>
+        <location filename="../src/unitsdialog.cpp" line="385"/>
+        <location filename="../src/unitsdialog.cpp" line="418"/>
+        <location filename="../src/unitsdialog.cpp" line="537"/>
+        <location filename="../src/unitsdialog.cpp" line="539"/>
+        <location filename="../src/unitsdialog.cpp" line="830"/>
         <source>Inactive</source>
         <translation type="unfinished">Neaktivno</translation>
     </message>

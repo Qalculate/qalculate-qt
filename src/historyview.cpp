@@ -406,6 +406,11 @@ void HistoryView::clearTemporary() {
 	last_ref2 = "";
 }
 
+bool HistoryView::testTemporaryResultLength(const std::string &str) {
+	QFontMetrics fm(font());
+	return fm.boundingRect(QString("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() < width() * 1.65;
+}
+
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, int initial_load, size_t index, bool temporary) {
 	if(temporary && !previous_temporary) {
 		previous_cursor2 = previous_cursor;
@@ -563,9 +568,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(initial_load) i_answer = settings->v_value[index][i];
 		else if(!temporary) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
 		QFontMetrics fm(font());
-		int w = fm.boundingRect("#9999").width();
-		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w); str += "\">";
-		w = fm.boundingRect("#9999" + unhtmlize(QString::fromStdString(values[i]))).width();
+		int w_number = fm.boundingRect("#9999").width();
+		int w = 0;
+		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w_number); str += "\">";
+		if(initial_load != 1) {
+			w = fm.boundingRect("= " + unhtmlize(QString::fromStdString(values[i]))).width();
+		}
 		if(i_answer != 0 && i_answer != i_answer_pre) {
 			if(!initial_load && expression.empty() && parse.empty() && last_ans == i_answer && !last_ref.isEmpty()) {
 				previous_html.remove(last_ref);
@@ -592,10 +600,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		str += "</td><td style=\"text-align:right";
 		if(initial_load > 1 && i > 0 && i_answer <= i_answer_pre) initial_load = 1;
-		if(initial_load == 1 || w > width() * 2 || !settings->format_result) {
+		if(initial_load == 1 || w * 1.5 + w_number > width() || !settings->format_result) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
-		} else if(w * 2 > width()) {
+		} else if(w * 1.85 + w_number > width()) {
 			str += "; font-size:large";
+			if(temporary) {str += "; line-height:"; str += i2s(fm.lineSpacing() * 1.5); str += "px";}
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		} else {
 			str += "; font-size:x-large";
@@ -622,7 +631,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		if(!settings->colorize_result) str += QString::fromStdString(uncolorize(values[i], false));
 		else str += QString::fromStdString(values[i]);
-		if(!image.isEmpty() && i == values.size() - 1 && w * 2 <= width()) {
+		if(!image.isEmpty() && i == values.size() - 1 && w * 1.85 + w_number + fm.ascent() <= width()) {
 			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"").arg(image).arg(fm.ascent());
 			CALCULATOR->setExchangeRatesUsed(-100);
 			int i = CALCULATOR->exchangeRatesUsed();

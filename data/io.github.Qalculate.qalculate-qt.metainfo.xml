@@ -70,6 +70,40 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="5.2.0" date="2024-07-01">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Option (enabled by default) to show expression status (parsed expression and calculated value) as you type in history list, instead of in tooltip</li>
+      <li>Option to hide toolbar</li>
+      <li>Option to preserve height of history list when keypad or number bases are shown/hidden</li>
+      <li>Option to change the max number of history lines saved</li>
+      <li>Option to show/hide hidden units (hidden by default) in units window</li>
+      <li>Headers for keyboard shortcuts and actions lists to allow custom sorting</li>
+      <li>Reduced minimum height (one line) of expression field</li>
+      <li>Physical constants updated with CODATA 2022 values</li>
+      <li>New function: allroots()</li>
+      <li>New units: therm, thermie, IUNS calorie, rpm</li>
+      <li>Additional names/symbols for turn unit</li>
+      <li>Use symbol "cal" for thermochemical (instead of international table) calorie</li>
+      <li>Change title and names/symbols of weak mixing angle (prepend "sin2" to theta variants)</li>
+      <li>Return exact negative integers in log10()</li>
+      <li>More conservative handling of infinity in equations</li>
+      <li>Remove n from equation solution if possible using assumptions of x</li>
+      <li>Fix subsequent tab completions after completion of unit with prefix</li>
+      <li>Fix unnecessary parenthesis, with wrong color for closing bracket, around unit with exponent</li>
+      <li>Fix convert button text, when toolbar style is not icon only</li>
+      <li>Fix history list not cleared before reload if there are exactly one item</li>
+      <li>Fix input of scientific E-notation using lowercase e in numbers using concise interval notation, in expressions</li>
+      <li>Fix "bit width" and "signed integer" arguments in setbits()</li>
+      <li>Fix a^(f(x))=a^(b*g(x)) where b=2 or b=3</li>
+      <li>Fix auto/dual approximation with "where" expression</li>
+      <li>Fix "where" expressions with multiple inequality statements for a single variable, e.g. "where x≥0 and x≤10"</li>
+      <li>Fix crash when a variable name/symbol with more than 20 characters is used in "where" expression</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
   <release version="5.1.0" date="2024-05-06">
    <description>
     <p>Changes:</p>

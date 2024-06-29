@@ -43,6 +43,7 @@ class HistoryView : public QTextEdit {
 		void replaceColors(QString&, QColor prev_text_color = QColor());
 		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
 		void updateMinimumHeight();
+		bool testTemporaryResultLength(const std::string&);
 
 	protected:
 

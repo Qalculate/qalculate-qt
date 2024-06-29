@@ -6886,18 +6886,18 @@ Do you want to overwrite the function?</source>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="1057"/>
+        <location filename="../src/historyview.cpp" line="1065"/>
         <source>Insert Value</source>
         <translation type="unfinished">插入值</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1058"/>
+        <location filename="../src/historyview.cpp" line="1066"/>
         <source>Insert Text</source>
         <translation type="unfinished">插入文本</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1059"/>
-        <location filename="../src/historyview.cpp" line="1063"/>
+        <location filename="../src/historyview.cpp" line="1067"/>
+        <location filename="../src/historyview.cpp" line="1071"/>
         <source>Copy</source>
         <translation type="unfinished">复制</translation>
     </message>
@@ -6906,12 +6906,12 @@ Do you want to overwrite the function?</source>
         <translation type="obsolete">复制格式化文本</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1064"/>
+        <location filename="../src/historyview.cpp" line="1072"/>
         <source>Copy unformatted ASCII</source>
         <translation type="unfinished">复制未格式化的 ASCII</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1065"/>
+        <location filename="../src/historyview.cpp" line="1073"/>
         <source>Select All</source>
         <translation type="unfinished">全选</translation>
     </message>
@@ -6932,47 +6932,47 @@ and press the enter key.</source>
         <translation type="unfinished">在上面键入一个数学表达式，例如“5+2/3”，然后按Enter键。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="635"/>
+        <location filename="../src/historyview.cpp" line="639"/>
         <source>Exchange rate source(s):</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="638"/>
+        <location filename="../src/historyview.cpp" line="642"/>
         <source>updated %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1070"/>
+        <location filename="../src/historyview.cpp" line="1078"/>
         <source>Protect</source>
         <translation type="unfinished">保护</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1072"/>
+        <location filename="../src/historyview.cpp" line="1080"/>
         <source>Move to Top</source>
         <translation type="unfinished">移动到顶部</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1074"/>
+        <location filename="../src/historyview.cpp" line="1082"/>
         <source>Remove</source>
         <translation type="unfinished">移除</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1075"/>
+        <location filename="../src/historyview.cpp" line="1083"/>
         <source>Clear</source>
         <translation type="unfinished">清除</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1156"/>
+        <location filename="../src/historyview.cpp" line="1164"/>
         <source>Text:</source>
         <translation type="unfinished">文本:</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1154"/>
         <location filename="../src/historyview.cpp" line="1162"/>
+        <location filename="../src/historyview.cpp" line="1170"/>
         <source>Search</source>
         <translation type="unfinished">搜索</translation>
     </message>
@@ -11223,83 +11223,88 @@ Do you want to overwrite it?</source>
         <translation type="unfinished">类别</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="64"/>
-        <location filename="../src/unitsdialog.cpp" line="741"/>
+        <location filename="../src/unitsdialog.cpp" line="65"/>
+        <location filename="../src/unitsdialog.cpp" line="748"/>
         <source>Unit</source>
         <translation type="unfinished">单位</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="87"/>
+        <location filename="../src/unitsdialog.cpp" line="88"/>
         <source>New…</source>
         <translation type="unfinished">新建…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="88"/>
+        <location filename="../src/unitsdialog.cpp" line="89"/>
         <source>Edit…</source>
         <translation type="unfinished">编辑…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="89"/>
-        <location filename="../src/unitsdialog.cpp" line="623"/>
-        <location filename="../src/unitsdialog.cpp" line="626"/>
+        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="630"/>
+        <location filename="../src/unitsdialog.cpp" line="633"/>
         <source>Deactivate</source>
         <translation type="unfinished">停用</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="91"/>
         <source>Delete</source>
         <translation type="unfinished">删除</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="92"/>
+        <location filename="../src/unitsdialog.cpp" line="93"/>
         <source>Convert</source>
         <translation type="unfinished">换算</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="93"/>
+        <location filename="../src/unitsdialog.cpp" line="94"/>
         <source>Insert</source>
         <translation type="unfinished">插入</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="96"/>
+        <location filename="../src/unitsdialog.cpp" line="97"/>
         <source>Favorite</source>
         <translation type="unfinished">收藏夹</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="628"/>
+        <location filename="../src/unitsdialog.cpp" line="127"/>
+        <source>Show hidden units</source>
+        <translation type="unfinished">显示隐藏单位</translation>
+    </message>
+    <message>
+        <location filename="../src/unitsdialog.cpp" line="635"/>
         <source>Activate</source>
         <translation type="unfinished">激活</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="829"/>
+        <location filename="../src/unitsdialog.cpp" line="836"/>
         <source>All</source>
         <comment>All units</comment>
         <translation type="unfinished">全部</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="325"/>
-        <location filename="../src/unitsdialog.cpp" line="420"/>
-        <location filename="../src/unitsdialog.cpp" line="872"/>
+        <location filename="../src/unitsdialog.cpp" line="332"/>
+        <location filename="../src/unitsdialog.cpp" line="427"/>
+        <location filename="../src/unitsdialog.cpp" line="879"/>
         <source>Uncategorized</source>
         <translation type="unfinished">未分类</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="816"/>
+        <location filename="../src/unitsdialog.cpp" line="823"/>
         <source>User units</source>
         <translation type="unfinished">用户单位</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="811"/>
+        <location filename="../src/unitsdialog.cpp" line="818"/>
         <source>Favorites</source>
         <translation type="unfinished">收藏夹</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="316"/>
-        <location filename="../src/unitsdialog.cpp" line="378"/>
-        <location filename="../src/unitsdialog.cpp" line="411"/>
-        <location filename="../src/unitsdialog.cpp" line="530"/>
-        <location filename="../src/unitsdialog.cpp" line="532"/>
-        <location filename="../src/unitsdialog.cpp" line="823"/>
+        <location filename="../src/unitsdialog.cpp" line="323"/>
+        <location filename="../src/unitsdialog.cpp" line="385"/>
+        <location filename="../src/unitsdialog.cpp" line="418"/>
+        <location filename="../src/unitsdialog.cpp" line="537"/>
+        <location filename="../src/unitsdialog.cpp" line="539"/>
+        <location filename="../src/unitsdialog.cpp" line="830"/>
         <source>Inactive</source>
         <translation type="unfinished">不常用</translation>
     </message>

@@ -6120,7 +6120,7 @@ void QalculateWindow::onHistoryReloaded() {
 		auto_error = false;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
-		expressionEdit->displayParseStatus(true);
+		if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true);
 	}
 }
 void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool had_error, bool had_warning, bool expression_from_history) {
@@ -6469,7 +6469,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	settings->printops.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
 	if(do_calendars || do_bases) mauto.setAborted();
 	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mparsed, &mto);
-	if(mauto.isAborted() || CALCULATOR->aborted()) {
+	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
 		mauto.setAborted();
 		result = "";
 	}
@@ -6496,7 +6496,7 @@ void QalculateWindow::autoCalculateTimeout() {
 				mauto.expand(settings->evalops);
 				settings->printops.allow_factorization = false;
 			}
-			if(CALCULATOR->aborted()) mauto.setAborted();
+			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) mauto.setAborted();
 		}
 	}
 
@@ -6681,9 +6681,8 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 	auto_expression = current_status.toStdString();
 	auto_error = b_error || b_warning;
-	std::string result_nohtml = unhtmlize(result);
 	QString flag;
-	if(!b_error && !result.empty() && result_nohtml.length() < 500) {
+	if(!b_error && !result.empty() && (mauto.countTotalChildren(false) < 10 || historyView->testTemporaryResultLength(result))) {
 		auto_result = result;
 		if((mauto.isMultiplication() && mauto.size() == 2 && mauto[1].isUnit() && mauto[1].unit()->isCurrency()) || (mauto.isUnit() && mauto.unit()->isCurrency())) {
 			flag = ":/data/flags/" + QString::fromStdString(mauto.isUnit() ? mauto.unit()->referenceName() : mauto[1].unit()->referenceName()) + ".png";

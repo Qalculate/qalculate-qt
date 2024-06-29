@@ -6336,18 +6336,18 @@ Voulez-vous l&apos;écraser ?</translation>
 <context>
     <name>HistoryView</name>
     <message>
-        <location filename="../src/historyview.cpp" line="1057"/>
+        <location filename="../src/historyview.cpp" line="1065"/>
         <source>Insert Value</source>
         <translation type="unfinished">Insérer valeur</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1058"/>
+        <location filename="../src/historyview.cpp" line="1066"/>
         <source>Insert Text</source>
         <translation type="unfinished">Insérer texte</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1059"/>
-        <location filename="../src/historyview.cpp" line="1063"/>
+        <location filename="../src/historyview.cpp" line="1067"/>
+        <location filename="../src/historyview.cpp" line="1071"/>
         <source>Copy</source>
         <translation type="unfinished">Copier</translation>
     </message>
@@ -6356,12 +6356,12 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation type="obsolete">Copier du texte formaté</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1064"/>
+        <location filename="../src/historyview.cpp" line="1072"/>
         <source>Copy unformatted ASCII</source>
         <translation type="unfinished">Copier ASCII non formaté</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1065"/>
+        <location filename="../src/historyview.cpp" line="1073"/>
         <source>Select All</source>
         <translation type="unfinished">Sélectionner tout</translation>
     </message>
@@ -6382,7 +6382,7 @@ et appuyer sur le bouton entrée.</translation>
         <translation type="unfinished">Entrer une expression mathématique au dessus, ex : &quot;5 + 2 / 3&quot;, et appuyer sur le bouton entrée.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="635"/>
+        <location filename="../src/historyview.cpp" line="639"/>
         <source>Exchange rate source(s):</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6390,7 +6390,7 @@ et appuyer sur le bouton entrée.</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/historyview.cpp" line="638"/>
+        <location filename="../src/historyview.cpp" line="642"/>
         <source>updated %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -6398,33 +6398,33 @@ et appuyer sur le bouton entrée.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1070"/>
+        <location filename="../src/historyview.cpp" line="1078"/>
         <source>Protect</source>
         <translation type="unfinished">Protéger</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1072"/>
+        <location filename="../src/historyview.cpp" line="1080"/>
         <source>Move to Top</source>
         <translation type="unfinished">Se déplacer en haut</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1074"/>
+        <location filename="../src/historyview.cpp" line="1082"/>
         <source>Remove</source>
         <translation type="unfinished">Supprimer</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1075"/>
+        <location filename="../src/historyview.cpp" line="1083"/>
         <source>Clear</source>
         <translation type="unfinished">Effacer</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1156"/>
+        <location filename="../src/historyview.cpp" line="1164"/>
         <source>Text:</source>
         <translation type="unfinished">Texte :</translation>
     </message>
     <message>
-        <location filename="../src/historyview.cpp" line="1154"/>
         <location filename="../src/historyview.cpp" line="1162"/>
+        <location filename="../src/historyview.cpp" line="1170"/>
         <source>Search</source>
         <translation type="unfinished">Rechercher</translation>
     </message>
@@ -10643,83 +10643,88 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation>Catégorie</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="64"/>
-        <location filename="../src/unitsdialog.cpp" line="741"/>
+        <location filename="../src/unitsdialog.cpp" line="65"/>
+        <location filename="../src/unitsdialog.cpp" line="748"/>
         <source>Unit</source>
         <translation>Unité</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="87"/>
+        <location filename="../src/unitsdialog.cpp" line="88"/>
         <source>New…</source>
         <translation>Nouveau…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="88"/>
+        <location filename="../src/unitsdialog.cpp" line="89"/>
         <source>Edit…</source>
         <translation>Éditer…</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="89"/>
-        <location filename="../src/unitsdialog.cpp" line="623"/>
-        <location filename="../src/unitsdialog.cpp" line="626"/>
+        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="630"/>
+        <location filename="../src/unitsdialog.cpp" line="633"/>
         <source>Deactivate</source>
         <translation>Désactiver</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="90"/>
+        <location filename="../src/unitsdialog.cpp" line="91"/>
         <source>Delete</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="92"/>
+        <location filename="../src/unitsdialog.cpp" line="93"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="93"/>
+        <location filename="../src/unitsdialog.cpp" line="94"/>
         <source>Insert</source>
         <translation>Insérer</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="96"/>
+        <location filename="../src/unitsdialog.cpp" line="97"/>
         <source>Favorite</source>
         <translation type="unfinished">Favori</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="628"/>
+        <location filename="../src/unitsdialog.cpp" line="127"/>
+        <source>Show hidden units</source>
+        <translation type="unfinished">Afficher les unités cachées</translation>
+    </message>
+    <message>
+        <location filename="../src/unitsdialog.cpp" line="635"/>
         <source>Activate</source>
         <translation>Activer</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="829"/>
+        <location filename="../src/unitsdialog.cpp" line="836"/>
         <source>All</source>
         <comment>All units</comment>
         <translation>Tout</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="325"/>
-        <location filename="../src/unitsdialog.cpp" line="420"/>
-        <location filename="../src/unitsdialog.cpp" line="872"/>
+        <location filename="../src/unitsdialog.cpp" line="332"/>
+        <location filename="../src/unitsdialog.cpp" line="427"/>
+        <location filename="../src/unitsdialog.cpp" line="879"/>
         <source>Uncategorized</source>
         <translation type="unfinished">Non classé</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="816"/>
+        <location filename="../src/unitsdialog.cpp" line="823"/>
         <source>User units</source>
         <translation type="unfinished">Unités utilisateur</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="811"/>
+        <location filename="../src/unitsdialog.cpp" line="818"/>
         <source>Favorites</source>
         <translation type="unfinished">Favoris</translation>
     </message>
     <message>
-        <location filename="../src/unitsdialog.cpp" line="316"/>
-        <location filename="../src/unitsdialog.cpp" line="378"/>
-        <location filename="../src/unitsdialog.cpp" line="411"/>
-        <location filename="../src/unitsdialog.cpp" line="530"/>
-        <location filename="../src/unitsdialog.cpp" line="532"/>
-        <location filename="../src/unitsdialog.cpp" line="823"/>
+        <location filename="../src/unitsdialog.cpp" line="323"/>
+        <location filename="../src/unitsdialog.cpp" line="385"/>
+        <location filename="../src/unitsdialog.cpp" line="418"/>
+        <location filename="../src/unitsdialog.cpp" line="537"/>
+        <location filename="../src/unitsdialog.cpp" line="539"/>
+        <location filename="../src/unitsdialog.cpp" line="830"/>
         <source>Inactive</source>
         <translation type="unfinished">Inactif</translation>
     </message>

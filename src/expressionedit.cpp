@@ -2144,10 +2144,10 @@ void ExpressionEdit::showCurrentStatus() {
 }
 void ExpressionEdit::setStatusText(const QString &text, int stype) {
 	if(toolTipTimer) toolTipTimer->stop();
+	current_status_text = text;
 	if(text.isEmpty() || !settings->display_expression_status) {
 		HIDE_TOOLTIP
 	} else {
-		current_status_text = text;
 		bool prev_func = (current_status_type == 2);
 		current_status_type = stype;
 		if(settings->expression_status_delay > 0 && (current_status_type != 2 || !prev_func || !tipLabel || !tipLabel->isVisible())) {
