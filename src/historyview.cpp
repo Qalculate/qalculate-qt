@@ -604,7 +604,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 1.85 + w_number > width()) {
 			str += "; font-size:large";
-			if(temporary) {str += "; line-height:"; str += i2s(fm.lineSpacing() * 1.5); str += "px";}
+			if(temporary) {str += "; line-height:"; str += QString::number((int) fm.lineSpacing() * 1.5); str += "px";}
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		} else {
 			str += "; font-size:x-large";
