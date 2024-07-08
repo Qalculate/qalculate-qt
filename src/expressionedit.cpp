@@ -82,7 +82,7 @@ class ExpressionTipLabel : public QLabel {
 
 };
 
-ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
+ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
 	setForegroundRole(QPalette::ToolTipText);
 	setBackgroundRole(QPalette::ToolTipBase);
 	setPalette(QToolTip::palette());
@@ -207,7 +207,7 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
 	}
 	if(settings->wayland_platform && this->isVisible()) {
-		if(p.y() != this->pos().y() || p.x() < this->pos().x()) {
+		if(p.y() != this->pos().y() || p.x() < this->pos().x() - 1) {
 			this->hide();
 			this->move(p);
 			this->show();
