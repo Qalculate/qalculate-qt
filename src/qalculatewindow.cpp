@@ -1021,9 +1021,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 		timer->setSingleShot(true);
 		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontTimer()));
 		timer->start(1);
-	} else {
-		expressionEdit->updateCompletion();
 	}
+	if(!settings->use_custom_app_font || settings->use_custom_expression_font) expressionEdit->updateCompletion();
 
 }
 QalculateWindow::~QalculateWindow() {}
