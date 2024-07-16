@@ -75,6 +75,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem("Français");
 	combo->addItem("ქართული ენა");
 	combo->addItem("Nederlands");
+	combo->addItem("Português");
 	combo->addItem("Português do Brasil");
 	combo->addItem("Русский");
 	combo->addItem("Slovenščina");
@@ -88,11 +89,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	else if(lang == "fr") combo->setCurrentIndex(5);
 	else if(lang == "ka") combo->setCurrentIndex(6);
 	else if(lang == "nl") combo->setCurrentIndex(7);
-	else if(lang == "pt") combo->setCurrentIndex(8);
-	else if(lang == "ru") combo->setCurrentIndex(9);
-	else if(lang == "sl") combo->setCurrentIndex(10);
-	else if(lang == "sv") combo->setCurrentIndex(11);
-	else if(lang == "zh") combo->setCurrentIndex(12);
+	else if(settings->custom_lang == "pt_PT") combo->setCurrentIndex(8);
+	else if(lang == "pt") combo->setCurrentIndex(9);
+	else if(lang == "ru") combo->setCurrentIndex(10);
+	else if(lang == "sl") combo->setCurrentIndex(11);
+	else if(lang == "sv") combo->setCurrentIndex(12);
+	else if(lang == "zh") combo->setCurrentIndex(13);
 	else combo->setCurrentIndex(0);
 	combo->setEnabled(!settings->ignore_locale);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
@@ -411,11 +413,12 @@ void PreferencesDialog::langChanged(int i) {
 		case 5: {settings->custom_lang = "fr_FR"; break;}
 		case 6: {settings->custom_lang = "ka_GE"; break;}
 		case 7: {settings->custom_lang = "nl_NL"; break;}
-		case 8: {settings->custom_lang = "pt_BR"; break;}
-		case 9: {settings->custom_lang = "ru_RU"; break;}
-		case 10: {settings->custom_lang = "sl_SL"; break;}
-		case 11: {settings->custom_lang = "sv_SE"; break;}
-		case 12: {settings->custom_lang = "zh_CN"; break;}
+		case 8: {settings->custom_lang = "pt_PT"; break;}
+		case 9: {settings->custom_lang = "pt_BR"; break;}
+		case 10: {settings->custom_lang = "ru"; break;}
+		case 11: {settings->custom_lang = "sl_SL"; break;}
+		case 12: {settings->custom_lang = "sv_SE"; break;}
+		case 13: {settings->custom_lang = "zh_CN"; break;}
 	}
 	if(!settings->custom_lang.isEmpty()) {
 		ignoreLocaleBox->setChecked(false);

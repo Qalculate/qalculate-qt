@@ -72,9 +72,9 @@ int main(int argc, char **argv) {
 	if(!settings->ignore_locale) {
 		if(!settings->custom_lang.isEmpty()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().territory()));
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale(settings->custom_lang).territory()));
 #else
-			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale(settings->custom_lang).country()));
 #endif
 #ifdef _WIN32
 			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
@@ -89,9 +89,9 @@ int main(int argc, char **argv) {
 						gsub("-", "_", lang);
 						if(lang != QLocale().name().toStdString()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory()));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory(QString::fromStdString(lang))));
 #else
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country()));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country(QString::fromStdString(lang))));
 #endif
 						}
 						_putenv_s("LANG", lang.c_str());
