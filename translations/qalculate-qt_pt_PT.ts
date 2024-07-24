@@ -6055,12 +6055,12 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1910"/>
         <source>In history list</source>
-        <translation type="unfinished"></translation>
+        <translation>Na lista do histórico</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1911"/>
         <source>In expression field</source>
-        <translation type="unfinished"></translation>
+        <translation>No campo de expressão</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1914"/>
@@ -7144,7 +7144,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1050"/>
         <source>Action</source>
-        <translation type="unfinished">Ação</translation>
+        <translation>Ação</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1268"/>
@@ -8328,7 +8328,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="108"/>
         <source>Max history lines saved:</source>
-        <translation type="unfinished"></translation>
+        <translation>Máx. de linhas de histórico guardadas:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="111"/>
@@ -8338,12 +8338,12 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="113"/>
         <source>Preserve history height</source>
-        <translation type="unfinished"></translation>
+        <translation>Preservar a altura do histórico</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="121"/>
         <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não altere a altura da lista de histórico quando o teclado ou as bases numéricas estiverem à vista ou ocultas.</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="132"/>
@@ -8373,32 +8373,32 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="170"/>
         <source>Expression status:</source>
-        <translation type="unfinished"></translation>
+        <translation>Estado da expressão:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="172"/>
         <source>Off</source>
-        <translation type="unfinished">Desligado</translation>
+        <translation>Desligado</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="173"/>
         <source>In history list</source>
-        <translation type="unfinished"></translation>
+        <translation>Na lista do histórico</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="174"/>
         <source>In expression field</source>
-        <translation type="unfinished"></translation>
+        <translation>No campo de expressão</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Status tooltip delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Atraso da dica do estado:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="191"/>
         <source>Calculate as you type delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcular à medida que digita o atraso:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="201"/>
@@ -8443,34 +8443,34 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="248"/>
         <source>Two&apos;s complement output:</source>
-        <translation type="unfinished"></translation>
+        <translation>Saída de complemento de dois:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="249"/>
         <source>Two&apos;s complement input:</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrada de complemento de dois:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="250"/>
         <location filename="../src/preferencesdialog.cpp" line="252"/>
         <source>Binary</source>
-        <translation type="unfinished">Binário</translation>
+        <translation>Binário</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="251"/>
         <location filename="../src/preferencesdialog.cpp" line="253"/>
         <source>Hexadecimal</source>
-        <translation type="unfinished">Hexadecimal</translation>
+        <translation>Hexadecimal</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="254"/>
         <source>Binary bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bits binários:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="256"/>
         <source>Automatic</source>
-        <translation type="unfinished">Automática</translation>
+        <translation>Automática</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="284"/>
@@ -9028,7 +9028,7 @@ Você pode obter a versão %3 em %2.</translation>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1990"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Transferir</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2035"/>
@@ -10448,7 +10448,7 @@ Você pode obter a versão %3 em %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="423"/>
         <source>Show toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar barra de ferrementas</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="1087"/>
@@ -10648,22 +10648,22 @@ Selecione a interpretação de expressões com multiplicação implícita
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7565"/>
         <source>Percentage Interpretation</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpretação das percentagens</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7571"/>
         <source>Please select interpretation of percentage addition</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar a interpretação da percentagem de adição</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7574"/>
         <source>Add percentage of original value</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar percentagem do valor original</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7579"/>
         <source>Add percentage multiplied by 1/100</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar percentagem multiplicada por 1/100</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8318"/>
@@ -10975,12 +10975,12 @@ Deseja substituir a ação atual (%1)?</translation>
         <location filename="../src/qalculatewindow.cpp" line="8422"/>
         <location filename="../src/qalculatewindow.cpp" line="8623"/>
         <source>Action</source>
-        <translation type="unfinished">Ação</translation>
+        <translation>Ação</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8623"/>
         <source>Key combination</source>
-        <translation type="unfinished">Combinação de teclas</translation>
+        <translation>Combinação de teclas</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="9271"/>
@@ -11245,7 +11245,7 @@ Deseja sobrescrevê-la?</translation>
     <message>
         <location filename="../src/unitsdialog.cpp" line="127"/>
         <source>Show hidden units</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar unidades ocultas</translation>
     </message>
     <message>
         <location filename="../src/unitsdialog.cpp" line="635"/>
