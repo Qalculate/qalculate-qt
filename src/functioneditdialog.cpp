@@ -654,7 +654,7 @@ Argument *ArgumentEditDialog::createArgument() {
 				((NumberArgument*) arg)->setIncludeEqualsMin(includeMinBox->isChecked());
 			}
 			if(maxBox->isChecked()) {
-				QString str = minEdit->cleanText();
+				QString str = maxEdit->cleanText();
 				int i = str.indexOf(",");
 				if(i > 0) {
 					if(str.indexOf(".", i) > 0) {
