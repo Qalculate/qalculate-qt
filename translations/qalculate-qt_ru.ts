@@ -2615,7 +2615,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Interval display:</source>
-        <translation>Отображение интервалов:</translation>
+        <translation>Режим отображения интервалов:</translation>
     </message>
     <message>
         <source>Significant digits</source>
