@@ -1106,11 +1106,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>In history list</source>
-        <translation type="unfinished"></translation>
+        <translation>В списке истории</translation>
     </message>
     <message>
         <source>In expression field</source>
-        <translation type="unfinished"></translation>
+        <translation>В поле выражения</translation>
     </message>
 </context>
 <context>
@@ -1918,7 +1918,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Action</source>
-        <translation type="unfinished">Действие</translation>
+        <translation>Действие</translation>
     </message>
 </context>
 <context>
@@ -2615,7 +2615,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Interval display:</source>
-        <translation>Отображение интервалов:</translation>
+        <translation>Режим отображения интервалов:</translation>
     </message>
     <message>
         <source>Significant digits</source>
@@ -2791,7 +2791,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Tooltips:</source>
-        <translation>Tooltips:</translation>
+        <translation>Подсказки:</translation>
     </message>
     <message>
         <source>Show all</source>
@@ -2863,63 +2863,63 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Two&apos;s complement output:</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительный код для вывода</translation>
     </message>
     <message>
         <source>Two&apos;s complement input:</source>
-        <translation type="unfinished"></translation>
+        <translation>Дополнительный код для ввода</translation>
     </message>
     <message>
         <source>Binary</source>
-        <translation type="unfinished">Двоичное</translation>
+        <translation>Двоичное</translation>
     </message>
     <message>
         <source>Hexadecimal</source>
-        <translation type="unfinished">Шестнадцатеричное</translation>
+        <translation>Шестнадцатеричное</translation>
     </message>
     <message>
         <source>Binary bits:</source>
-        <translation type="unfinished"></translation>
+        <translation>Двоичные биты:</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished">Автоматическое</translation>
+        <translation>Автоматически</translation>
     </message>
     <message>
         <source>Max history lines saved:</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальное количество сохраненных строк истории:</translation>
     </message>
     <message>
         <source>Preserve history height</source>
-        <translation type="unfinished"></translation>
+        <translation>Сохранять высоту списка истории</translation>
     </message>
     <message>
         <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не изменять высоту списка истории, когда клавиатура или числовые базы показаны или скрыты.</translation>
     </message>
     <message>
         <source>Expression status:</source>
-        <translation type="unfinished">Статус выражения:</translation>
+        <translation>Статус выражения:</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished">Выкл</translation>
+        <translation>Выкл</translation>
     </message>
     <message>
         <source>In history list</source>
-        <translation type="unfinished"></translation>
+        <translation>В списке истории</translation>
     </message>
     <message>
         <source>In expression field</source>
-        <translation type="unfinished"></translation>
+        <translation>В поле выражения</translation>
     </message>
     <message>
         <source>Status tooltip delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Задержка подсказки о статусе:</translation>
     </message>
     <message>
         <source>Calculate as you type delay:</source>
-        <translation type="unfinished"></translation>
+        <translation>Задержка расчёта по мере ввода:</translation>
     </message>
 </context>
 <context>
@@ -3543,7 +3543,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Скачать</translation>
     </message>
 </context>
 <context>
@@ -3736,19 +3736,19 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Normal</source>
-        <translation>Обычное</translation>
+        <translation>Обычный</translation>
     </message>
     <message>
         <source>Scientific</source>
-        <translation>Научное</translation>
+        <translation>Научный</translation>
     </message>
     <message>
         <source>Engineering</source>
-        <translation>Инженерное</translation>
+        <translation>Инженерный</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation>Простое</translation>
+        <translation>Простой</translation>
     </message>
     <message>
         <source>Angle Unit</source>
@@ -4530,31 +4530,31 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Percentage Interpretation</source>
-        <translation type="unfinished"></translation>
+        <translation>Процентная интерпретация</translation>
     </message>
     <message>
         <source>Please select interpretation of percentage addition</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, выберите интерпретацию процентного сложения</translation>
     </message>
     <message>
         <source>Add percentage of original value</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить процент от первоначального значения</translation>
     </message>
     <message>
         <source>Add percentage multiplied by 1/100</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить процент, умноженный на 1/100</translation>
     </message>
     <message>
         <source>Show toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать панель инструментов</translation>
     </message>
     <message>
         <source>Action</source>
-        <translation type="unfinished">Действие</translation>
+        <translation>Действие</translation>
     </message>
     <message>
         <source>Key combination</source>
-        <translation type="unfinished">Комбинация клавиш</translation>
+        <translation>Комбинация клавиш</translation>
     </message>
 </context>
 <context>
@@ -4759,7 +4759,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Show hidden units</source>
-        <translation type="unfinished">Показать скрытые единицы измерения</translation>
+        <translation>Показать скрытые единицы измерения</translation>
     </message>
 </context>
 <context>
