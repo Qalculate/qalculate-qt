@@ -23,6 +23,11 @@
 #include <QProgressDialog>
 #include <QPushButton>
 #include <QKeySequence>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	include <QScreen>
+#else
+#	include <QDesktopWidget>
+#endif
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 #	include <QStyleHints>
 #endif
@@ -37,6 +42,20 @@ extern int b_busy;
 
 bool can_display_unicode_string_function(const char*, void*) {
 	return true;
+}
+
+QRect get_screen_geometry(QWidget *widget) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+	QScreen *scr = widget->screen();
+#	else
+	QScreen *scr = QGuiApplication::screenAt(pos);
+#	endif
+	if(!scr) scr = QGuiApplication::primaryScreen();
+	return scr->availableGeometry();
+#else
+	return QApplication::desktop()->availableGeometry(widget);
+#endif
 }
 
 std::string to_html_escaped(const std::string strpre) {
@@ -348,7 +367,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(!is_workspace && svar == "use_function_dialog") {
 		use_function_dialog = v;
 	} else if(svar == "keypad_type") {
-		if(v >= 0 && v <= 3) keypad_type = v;
+		if(v >= 0 && v <= 4) keypad_type = v;
 	} else if(svar == "programming_base_changed") {
 		if(keypad_type == KEYPAD_PROGRAMMING && show_keypad) programming_base_changed = v;
 	} else if(svar == "toolbar_style") {
@@ -2015,18 +2034,45 @@ QString QalculateQtSettings::shortcutText(int type, const std::string &value) {
 	switch(type) {
 		case SHORTCUT_TYPE_FUNCTION: {
 			MathFunction *f = CALCULATOR->getActiveFunction(value);
+			if(!f) break;
 			return QString::fromStdString(f->title(true, printops.use_unicode_signs));
 		}
 		case SHORTCUT_TYPE_FUNCTION_WITH_DIALOG: {
 			MathFunction *f = CALCULATOR->getActiveFunction(value);
+			if(!f) break;
 			return QString::fromStdString(f->title(true, printops.use_unicode_signs));
 		}
 		case SHORTCUT_TYPE_VARIABLE: {
 			Variable *v = CALCULATOR->getActiveVariable(value);
+			if(!v) break;
 			return QString::fromStdString(v->title(true, printops.use_unicode_signs));
 		}
 		case SHORTCUT_TYPE_UNIT: {
 			Unit *u = CALCULATOR->getActiveUnit(value);
+			if(!u) {
+				CALCULATOR->beginTemporaryStopMessages();
+				CompositeUnit cu("", "", "", value);
+				CALCULATOR->endTemporaryStopMessages();
+				if(cu.countUnits() == 0) break;
+				for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+					if(CALCULATOR->units[i]->subtype() == SUBTYPE_COMPOSITE_UNIT) {
+						CompositeUnit *cu2 = (CompositeUnit*) CALCULATOR->units[i];
+						if(cu2->countUnits() == cu.countUnits()) {
+							bool b = true;
+							for(size_t i2 = 1; i2 <= cu.countUnits(); i2++) {
+								int exp1 = 1, exp2 = 1;
+								Prefix *p1 = NULL, *p2 = NULL;
+								if(cu.get(i2, &exp1, &p1) != cu2->get(i2, &exp2, &p2) || exp1 != exp2 || p1 != p2) {
+									b = false;
+									break;
+								}
+							}
+							if(b) return QString::fromStdString(cu2->title(true, printops.use_unicode_signs));
+						}
+					}
+				}
+				return QString::fromStdString(cu.print(false, true, printops.use_unicode_signs));
+			}
 			return QString::fromStdString(u->title(true, printops.use_unicode_signs));
 		}
 		default: {}
@@ -2159,8 +2205,13 @@ bool QalculateQtSettings::testShortcutValue(int type, QString &value, QWidget *w
 		}
 		case SHORTCUT_TYPE_UNIT: {
 			if(!CALCULATOR->getActiveUnit(value.toStdString())) {
-				QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
-				return false;
+				CALCULATOR->beginTemporaryStopMessages();
+				CompositeUnit cu("", "", "", value.toStdString());
+				int n = 0;
+				if(CALCULATOR->endTemporaryStopMessages(NULL, &n) || n) {
+					QMessageBox::critical(w, QApplication::tr("Error"), QApplication::tr("Unit not found."), QMessageBox::Ok);
+					return false;
+				}
 			}
 			break;
 		}

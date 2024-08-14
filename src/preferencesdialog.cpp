@@ -20,6 +20,7 @@
 #include <QToolTip>
 #include <QComboBox>
 #include <QLabel>
+#include <QScrollArea>
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QMessageBox>
@@ -49,19 +50,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("Preferences"));
 	QVBoxLayout *topbox = new QVBoxLayout(this);
 	QTabWidget *tabs = new QTabWidget(this);
-	tabs->setUsesScrollButtons(false);
 	topbox->addWidget(tabs);
 	QWidget *w1 = new QWidget(this);
 	QWidget *w2 = new QWidget(this);
 	QWidget *w3 = new QWidget(this);
 	QWidget *w4 = new QWidget(this);
-	tabs->addTab(w1, tr("Look && Feel"));
-	tabs->addTab(w2, tr("Numbers && Operators"));
-	tabs->addTab(w3, tr("Units && Currencies"));
-	tabs->addTab(w4, tr("Parsing && Calculation"));
 	QAbstractButton *box; QGridLayout *l; QComboBox *combo;
 	int r = 0;
-	l = new QGridLayout(w1); l->setSizeConstraint(QLayout::SetFixedSize);
+	l = new QGridLayout(w1);
 	BOX(tr("Ignore system language (requires restart)"), settings->ignore_locale, ignoreLocaleToggled(bool));
 	ignoreLocaleBox = box;
 	QLabel *label = new QLabel(tr("Language:"), this);
@@ -99,10 +95,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setEnabled(!settings->ignore_locale);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
 	l->addWidget(combo, r, 1); r++; langCombo = combo;
-#ifndef _WIN32
-	label->hide();
-	combo->hide();
-#endif
 	BOX(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
 	BOX(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	l->addWidget(new QLabel(tr("Max history lines saved:"), this), r, 0); QSpinBox *spin = new QSpinBox(this); spin->setRange(0, 100000); spin->setValue(settings->max_history_lines); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(maxHistoryLinesChanged(int))); l->addWidget(spin, r, 1); r++;
@@ -166,7 +158,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	l->setRowStretch(r, 1);
 	r = 0;
-	l = new QGridLayout(w4); l->setSizeConstraint(QLayout::SetFixedSize);
+	l = new QGridLayout(w4);
 	l->addWidget(new QLabel(tr("Expression status:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Off"), 0);
@@ -242,7 +234,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	intervalCalculationCombo = combo;
 	BOX(tr("Factorize result"), settings->evalops.structuring == STRUCTURING_FACTORIZE, factorizeToggled(bool));
 	l->setRowStretch(r, 1);
-	l = new QGridLayout(w2); l->setSizeConstraint(QLayout::SetFixedSize);
+	l = new QGridLayout(w2);
 	r = 0;
 	QGridLayout *l2 = new QGridLayout();
 	l2->addWidget(new QLabel(tr("Two's complement output:"), this), 0, 0);
@@ -332,7 +324,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	complexFormCombo = combo;
 	l->addWidget(combo, r, 1); r++;
 	l->setRowStretch(r, 1);
-	l = new QGridLayout(w3); l->setSizeConstraint(QLayout::SetFixedSize);
+	l = new QGridLayout(w3);
 	r = 0;
 	BOX(tr("Enable units"), settings->evalops.parse_options.units_enabled, unitsToggled(bool));
 	BOX(tr("Abbreviate names"), settings->printops.abbreviate_names, abbreviateNamesToggled(bool));
@@ -391,6 +383,27 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+	QScrollArea *s1 = new QScrollArea(this);
+	QScrollArea *s2 = new QScrollArea(this);
+	QScrollArea *s3 = new QScrollArea(this);
+	QScrollArea *s4 = new QScrollArea(this);
+	s1->setWidget(w1);
+	s2->setWidget(w2);
+	s3->setWidget(w3);
+	s4->setWidget(w4);
+	QSize size = get_screen_geometry(this).size();
+	QSize sh = w1->sizeHint().expandedTo(w2->sizeHint().expandedTo(w3->sizeHint().expandedTo(w4->sizeHint())));
+	if(size.width() >= sh.width() + 100) {
+		tabs->setUsesScrollButtons(false);
+		s1->setMinimumWidth(sh.width());
+	}
+	if(size.height() >= sh.height() + 100) {
+		s1->setMinimumHeight(sh.height());
+	}
+	tabs->addTab(s1, tr("Look && Feel"));
+	tabs->addTab(s2, tr("Numbers && Operators"));
+	tabs->addTab(s3, tr("Units && Currencies"));
+	tabs->addTab(s4, tr("Parsing && Calculation"));
 }
 PreferencesDialog::~PreferencesDialog() {}
 

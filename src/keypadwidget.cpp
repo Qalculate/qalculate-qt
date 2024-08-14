@@ -528,110 +528,121 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	}
 	b_edit = false;
 
-	grid = grid2;
-	c = 0;
-	SYMBOL_BUTTON2("(", "[", 1, c)
-	button->setToolTip(tr("Left parenthesis"), tr("Left vector bracket"));
-	SYMBOL_BUTTON2(")", "]", 2, c)
-	button->setToolTip(tr("Right parenthesis"), tr("Right vector bracket"));
-	button = new KeypadButton("(x)", this);
-	button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
-	connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
-	grid->addWidget(button, 0, c, 1, 1);
-	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getComma()), " ", "\n", 3, c)
-	button->setToolTip(tr("Argument separator"), tr("Blank space"), tr("New line"));
-	commaButton = button;
-	c++;
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
-	button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true, settings->printops.use_unicode_signs)));
-	f = CALCULATOR->getActiveFunction("inv");
-	if(f) {
-		SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
-		button->setToolTip(QString(), "x<sup>1</sup>", "1/x");
-	} else {
-		SYMBOL_OPERATOR_SYMBOL_BUTTON("1", "¹", "¹", 2, c)
-		button->setToolTip(QString(), "x<sup>1</sup>");
+	for(size_t i = 0; i < 2; i++) {
+		if(i == 0) {
+			QWidget *keypadN = new QWidget(this);
+			leftStack->addWidget(keypadN);
+			grid = new QGridLayout(keypadN);
+			grid->setContentsMargins(0, 0, 0, 0);
+		} else {
+			grid = grid2;
+		}
+		c = 0;
+		SYMBOL_BUTTON2("(", "[", 1, c)
+		button->setToolTip(tr("Left parenthesis"), tr("Left vector bracket"));
+		SYMBOL_BUTTON2(")", "]", 2, c)
+		button->setToolTip(tr("Right parenthesis"), tr("Right vector bracket"));
+		button = new KeypadButton("(x)", this);
+		button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
+		connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
+		connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
+		connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
+		grid->addWidget(button, 0, c, 1, 1);
+		SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getComma()), " ", "\n", 3, c)
+		button->setToolTip(tr("Argument separator"), tr("Blank space"), tr("New line"));
+		commaButton[i] = button;
+		c++;
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("0", "⁰", "°", 3, c)
+		button->setToolTip(QString(), "x<sup>0</sup>", QString::fromStdString(CALCULATOR->getDegUnit()->title(true, settings->printops.use_unicode_signs)));
+		f = CALCULATOR->getActiveFunction("inv");
+		if(f) {
+			SYMBOL_OPERATOR_ITEM_BUTTON("1", "¹", f, 2, c)
+			button->setToolTip(QString(), "x<sup>1</sup>", "1/x");
+		} else {
+			SYMBOL_OPERATOR_SYMBOL_BUTTON("1", "¹", "¹", 2, c)
+			button->setToolTip(QString(), "x<sup>1</sup>");
+		}
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("4", "⁴", "¼", 1, c)
+		button->setToolTip(QString(), "x<sup>4</sup>", "1/4");
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("7", "⁷", "⅐", 0, c)
+		button->setToolTip(QString(), "x<sup>7</sup>", "1/7");
+		c++;
+		SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getDecimalPoint()), " ", "\n", 3, c)
+		button->setToolTip(tr("Decimal point"), tr("Blank space"), tr("New line"));
+		dotButton[i] = button;
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("2", "²", "½", 2, c)
+		button->setToolTip(QString(), "x<sup>2</sup>", "1/2");
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("5", "⁵", "⅕", 1, c)
+		button->setToolTip(QString(), "x<sup>5</sup>", "1/5");
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("8", "⁸", "⅛", 0, c)
+		button->setToolTip(QString(), "x<sup>8</sup>", "1/8");
+		c++;
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("3", "³", "⅓", 2, c)
+		button->setToolTip(QString(), "x<sup>3</sup>", "1/3");
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("6", "⁶", "⅙", 1, c)
+		button->setToolTip(QString(), "x<sup>6</sup>", "1/6");
+		SYMBOL_OPERATOR_SYMBOL_BUTTON("9", "⁹", "⅑", 0, c)
+		button->setToolTip(QString(), "x<sup>9</sup>", "1/9");
+		f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
+		if(f && f2) {
+			OPERATOR_ITEM2_BUTTON("E", f, f2, 3, c);
+			button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(f2->title(true, settings->printops.use_unicode_signs)));
+		} else {
+			OPERATOR_BUTTON("E", 3, c);
+			button->setToolTip("10<sup>x</sup>");
+		}
+		button->setText("EXP");
+		c++;
+		ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
+		button = new KeypadButton("ANS", this);
+		button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
+		button->setToolTip(QString::fromStdString(settings->vans[0]->title(true, settings->printops.use_unicode_signs)), tr("Previous result (static)"));
+		connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
+		connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
+		connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
+		grid->addWidget(button, 3, c, 1, 1);
+		OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
+		button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
+		multiplicationButton[i] = button;
+		button = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
+		connect(button, SIGNAL(clicked()), this, SIGNAL(delClicked()));
+		connect(button, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
+		connect(button, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
+		button->setToolTip(tr("Delete"), tr("Backspace"));
+		grid->addWidget(button, 0, c, 1, 1);
+		delButton[i] = button;
+		OPERATOR_SYMBOL_BUTTON("+", "+", 2, c);
+		button->setToolTip(tr("Addition"), tr("Plus"));
+		c++;
+		f = CALCULATOR->getActiveFunction("neg");
+		if(f) {
+			OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
+			button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
+		} else {
+			OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
+			button->setToolTip(tr("Subtraction"), tr("Minus"));
+		}
+		OPERATOR_BUTTON3(settings->divisionSign(), "|", "~", 1, c);
+		divisionButton[i] = button;
+		button->setProperty(BUTTON_DATA, settings->divisionSign(false));
+		button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
+		button = new KeypadButton(LOAD_ICON("edit-clear"), this);
+		button->setToolTip(tr("Clear expression"));
+		connect(button, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
+		connect(button, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
+		connect(button, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
+		grid->addWidget(button, 0, c, 1, 1);
+		acButton[i] = button;
+		button = new KeypadButton("=", this);
+		button->setToolTip(tr("Calculate expression"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE)->title(true, settings->printops.use_unicode_signs)));
+		button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))); \
+		connect(button, SIGNAL(clicked()), this, SIGNAL(equalsClicked()));
+		connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked()));
+		connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked()));
+		grid->addWidget(button, 3, c, 1, 1);
+		for(c = 0; c < 6; c++) grid->setColumnStretch(c, 1);
+		for(int r = 0; r < 4; r++) grid->setRowStretch(r, 1);
 	}
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("4", "⁴", "¼", 1, c)
-	button->setToolTip(QString(), "x<sup>4</sup>", "1/4");
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("7", "⁷", "⅐", 0, c)
-	button->setToolTip(QString(), "x<sup>7</sup>", "1/7");
-	c++;
-	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getDecimalPoint()), " ", "\n", 3, c)
-	button->setToolTip(tr("Decimal point"), tr("Blank space"), tr("New line"));
-	dotButton = button;
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("2", "²", "½", 2, c)
-	button->setToolTip(QString(), "x<sup>2</sup>", "1/2");
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("5", "⁵", "⅕", 1, c)
-	button->setToolTip(QString(), "x<sup>5</sup>", "1/5");
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("8", "⁸", "⅛", 0, c)
-	button->setToolTip(QString(), "x<sup>8</sup>", "1/8");
-	c++;
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("3", "³", "⅓", 2, c)
-	button->setToolTip(QString(), "x<sup>3</sup>", "1/3");
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("6", "⁶", "⅙", 1, c)
-	button->setToolTip(QString(), "x<sup>6</sup>", "1/6");
-	SYMBOL_OPERATOR_SYMBOL_BUTTON("9", "⁹", "⅑", 0, c)
-	button->setToolTip(QString(), "x<sup>9</sup>", "1/9");
-	f = CALCULATOR->getActiveFunction("exp10"); f2 = CALCULATOR->getActiveFunction("exp2");
-	if(f && f2) {
-		OPERATOR_ITEM2_BUTTON("E", f, f2, 3, c);
-		button->setToolTip("10<sup>x</sup>", QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)), QString::fromStdString(f2->title(true, settings->printops.use_unicode_signs)));
-	} else {
-		OPERATOR_BUTTON("E", 3, c);
-		button->setToolTip("10<sup>x</sup>");
-	}
-	button->setText("EXP");
-	c++;
-	ITEM_BUTTON(settings->vans[0], "ANS", 3, c);
-	button = new KeypadButton("ANS", this);
-	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) settings->vans[0])); \
-	button->setToolTip(QString::fromStdString(settings->vans[0]->title(true, settings->printops.use_unicode_signs)), tr("Previous result (static)"));
-	connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(answerClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(answerClicked()));
-	grid->addWidget(button, 3, c, 1, 1);
-	OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
-	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
-	multiplicationButton = button;
-	delButton = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
-	connect(delButton, SIGNAL(clicked()), this, SIGNAL(delClicked()));
-	connect(delButton, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
-	connect(delButton, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
-	delButton->setToolTip(tr("Delete"), tr("Backspace"));
-	grid->addWidget(delButton, 0, c, 1, 1);
-	OPERATOR_SYMBOL_BUTTON("+", "+", 2, c);
-	button->setToolTip(tr("Addition"), tr("Plus"));
-	c++;
-	f = CALCULATOR->getActiveFunction("neg");
-	if(f) {
-		OPERATOR_ITEM_SYMBOL_BUTTON(SIGN_MINUS, f, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs)) + " (" + QKeySequence(Qt::CTRL | Qt::Key_Minus).toString(QKeySequence::NativeText) + ")", tr("Minus"));
-	} else {
-		OPERATOR_SYMBOL_BUTTON(SIGN_MINUS, SIGN_MINUS, 2, c);
-		button->setToolTip(tr("Subtraction"), tr("Minus"));
-	}
-	OPERATOR_BUTTON3(settings->divisionSign(), "|", "~", 1, c);
-	divisionButton = button;
-	button->setProperty(BUTTON_DATA, settings->divisionSign(false));
-	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
-	acButton = new KeypadButton(LOAD_ICON("edit-clear"), this);
-	acButton->setToolTip(tr("Clear expression"));
-	connect(acButton, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
-	connect(acButton, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
-	connect(acButton, SIGNAL(clicked3()), this, SIGNAL(clearClicked()));
-	grid->addWidget(acButton, 0, c, 1, 1);
-	button = new KeypadButton("=", this);
-	button->setToolTip(tr("Calculate expression"), QString::fromStdString(CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE)->title(true, settings->printops.use_unicode_signs)));
-	button->setProperty(BUTTON_DATA, QVariant::fromValue((void*) CALCULATOR->getFunctionById(FUNCTION_ID_SOLVE))); \
-	connect(button, SIGNAL(clicked()), this, SIGNAL(equalsClicked()));
-	connect(button, SIGNAL(clicked2()), this, SLOT(onItemButtonClicked()));
-	connect(button, SIGNAL(clicked3()), this, SLOT(onItemButtonClicked()));
-	grid->addWidget(button, 3, c, 1, 1);
-	for(c = 0; c < 6; c++) grid->setColumnStretch(c, 1);
-	for(int r = 0; r < 4; r++) grid->setRowStretch(r, 1);
 	setKeypadType(settings->keypad_type);
 }
 KeypadWidget::~KeypadWidget() {}
@@ -1426,7 +1437,7 @@ void KeypadWidget::assumptionsSignActivated() {
 	emit expressionCalculationUpdated(0);
 }
 void KeypadWidget::setKeypadType(int i) {
-	if(i < 0 || i > KEYPAD_CUSTOM) i = 0;
+	if(i < 0 || i > KEYPAD_NUMBERPAD) i = 0;
 	if(leftStack->currentIndex() == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
 		settings->programming_base_changed = false;
 		emit baseClicked(BASE_DECIMAL, true, false);
@@ -1469,21 +1480,25 @@ void KeypadWidget::updateBase() {
 	fButton->setEnabled(base > 15);
 }
 void KeypadWidget::updateSymbols() {
-	multiplicationButton->setText(settings->multiplicationSign());
-	multiplicationButton->setText(settings->multiplicationSign());
-	multiplicationButton->setProperty(BUTTON_DATA, settings->multiplicationSign());
-	divisionButton->setText(settings->divisionSign());
-	divisionButton->setProperty(BUTTON_DATA, settings->divisionSign(false));
-	commaButton->setText(QString::fromStdString(CALCULATOR->getComma()));
-	commaButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
-	dotButton->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));
-	dotButton->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getDecimalPoint()));
+	for(size_t i = 0; i < 2; i++) {
+		multiplicationButton[i]->setText(settings->multiplicationSign());
+		multiplicationButton[i]->setText(settings->multiplicationSign());
+		multiplicationButton[i]->setProperty(BUTTON_DATA, settings->multiplicationSign());
+		divisionButton[i]->setText(settings->divisionSign());
+		divisionButton[i]->setProperty(BUTTON_DATA, settings->divisionSign(false));
+		commaButton[i]->setText(QString::fromStdString(CALCULATOR->getComma()));
+		commaButton[i]->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getComma()));
+		dotButton[i]->setText(QString::fromStdString(CALCULATOR->getDecimalPoint()));
+		dotButton[i]->setProperty(BUTTON_DATA, QString::fromStdString(CALCULATOR->getDecimalPoint()));
+	}
 	imaginaryButton->setText(CALCULATOR->getVariableById(VARIABLE_ID_I)->hasName("j") > 0 ? "j" : "i");
 }
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
-		acButton->setIcon(LOAD_ICON("edit-clear"));
-		delButton->setIcon(LOAD_ICON("edit-delete"));
+		for(size_t i = 0; i < 2; i++) {
+			acButton[i]->setIcon(LOAD_ICON("edit-clear"));
+			delButton[i]->setIcon(LOAD_ICON("edit-delete"));
+		}
 		backButton->setIcon(LOAD_ICON("go-back"));
 		forwardButton->setIcon(LOAD_ICON("go-forward"));
 		customEditButton->setIcon(LOAD_ICON("document-edit"));

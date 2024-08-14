@@ -759,10 +759,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(KEYPAD_ALGEBRA); xKeypadAction = action;
 	action = menu->addAction(tr("Custom"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(KEYPAD_CUSTOM); cKeypadAction = action;
+	action = menu->addAction(tr("Number Pad"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
+	action->setData(KEYPAD_NUMBERPAD); action->setVisible(settings->hide_numpad); nKeypadAction = action;
 	action = menu->addAction(tr("None"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
-	action = menu->addAction(tr("Hide Number Pad"), this, SLOT(hideNumpad(bool))); action->setCheckable(true); action->setChecked(settings->hide_numpad); hideNumpadAction = action;
+	action = menu->addAction(tr("Always Show Number Pad"), this, SLOT(showNumpad(bool))); action->setCheckable(true); action->setChecked(!settings->hide_numpad); showNumpadAction = action;
 	action = menu->addAction(tr("Separate Menu Buttons"), this, SLOT(showSeparateKeypadMenuButtons(bool))); action->setCheckable(true); action->setChecked(settings->separate_keypad_menu_buttons);
 	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
@@ -863,6 +865,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	keypadDock = new QalculateDockWidget(this, expressionEdit);
 	keypadDock->setObjectName("keypad-dock");
 	keypadDock->setWidget(keypad);
+	if(!settings->hide_numpad && get_screen_geometry(this).width() < keypad->sizeHint().width() + 50) {
+		showNumpadAction->trigger();
+		if(settings->show_keypad) nKeypadAction->trigger();
+	}
 	updateKeypadTitle();
 	keypadDock->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(keypadDock, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showKeypadContextMenu(const QPoint&)));
@@ -1042,6 +1048,7 @@ void QalculateWindow::updateKeypadTitle() {
 	else if(settings->keypad_type == KEYPAD_PROGRAMMING) str += tr("Programming");
 	else if(settings->keypad_type == KEYPAD_ALGEBRA) str += tr("Algebra");
 	else if(settings->keypad_type == KEYPAD_CUSTOM) str += tr("Custom");
+	else if(settings->keypad_type == KEYPAD_NUMBERPAD) str += tr("Number Pad");
 	str += ")";
 	keypadDock->setWindowTitle(str);
 }
@@ -1333,7 +1340,18 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			break;
 		}
 		case SHORTCUT_TYPE_UNIT: {
-			onUnitClicked(CALCULATOR->getActiveUnit(value));
+			Unit *u = CALCULATOR->getActiveUnit(value);
+			if(!u) {
+				CALCULATOR->clearMessages();
+				CompositeUnit cu("", "", "", value);
+				if(CALCULATOR->message()) {
+					settings->displayMessages(this);
+				} else {
+					onUnitClicked(&cu);
+				}
+			} else {
+				onUnitClicked(u);
+			}
 			break;
 		}
 		case SHORTCUT_TYPE_OPERATOR: {
@@ -7749,10 +7767,12 @@ void QalculateWindow::newFunction() {
 	}
 }
 
-void QalculateWindow::hideNumpad(bool b) {
-	keypad->hideNumpad(b);
-	settings->hide_numpad = b;
+void QalculateWindow::showNumpad(bool b) {
+	keypad->hideNumpad(!b);
+	settings->hide_numpad = !b;
 	workspace_changed = true;
+	nKeypadAction->setVisible(!b);
+	if(settings->keypad_type == KEYPAD_NUMBERPAD) gKeypadAction->trigger();
 }
 void QalculateWindow::showSeparateKeypadMenuButtons(bool b) {
 	settings->separate_keypad_menu_buttons = b;
@@ -8884,33 +8904,29 @@ void QalculateWindow::openFPConversion() {
 	int base = 10;
 	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
 		if(mstruct && mstruct->isNumber()) {
-			str = QString::fromStdString(unhtmlize(result_text));
-			if(to_base != 0) base = to_base;
-			else base = settings->printops.base;
+			fpConversionDialog->setValue(*mstruct);
 		}
 	} else if(!auto_result.empty()) {
 		if(mauto.isNumber()) {
-			str = QString::fromStdString(unhtmlize(auto_result));
-			if(to_base != 0) base = to_base;
-			else base = settings->printops.base;
+			fpConversionDialog->setValue(mauto);
 		}
 	} else {
 		str = expressionEdit->selectedText(true);
 		base = settings->evalops.parse_options.base;
-	}
-	if(base <= BASE_FP16 && base >= BASE_FP80) base = BASE_BINARY;
-	switch(base) {
-		case BASE_BINARY: {
-			fpConversionDialog->setBin(str);
-			break;
-		}
-		case BASE_HEXADECIMAL: {
-			fpConversionDialog->setHex(str);
-			break;
-		}
-		default: {
-			fpConversionDialog->setValue(str);
-			break;
+		if(base <= BASE_FP16 && base >= BASE_FP80) base = BASE_BINARY;
+		switch(base) {
+			case BASE_BINARY: {
+				fpConversionDialog->setBin(str);
+				break;
+			}
+			case BASE_HEXADECIMAL: {
+				fpConversionDialog->setHex(str);
+				break;
+			}
+			default: {
+				fpConversionDialog->setValue(str);
+				break;
+			}
 		}
 	}
 }
@@ -9874,10 +9890,11 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		onBasesActivated(settings->show_bases > 0);
 		QAction *action = find_child_data(this, "group_keypad", settings->show_keypad == 0 ? -1 : settings->keypad_type);
 		if(action) action->setChecked(true);
-		hideNumpadAction->setChecked(settings->hide_numpad);
+		showNumpadAction->setChecked(!settings->hide_numpad);
 		keypad->setKeypadType(settings->keypad_type);
 		updateKeypadTitle();
 		keypad->hideNumpad(settings->hide_numpad);
+		nKeypadAction->setVisible(settings->hide_numpad);
 		if(preferencesDialog) {
 			preferencesDialog->hide();
 			preferencesDialog->deleteLater();

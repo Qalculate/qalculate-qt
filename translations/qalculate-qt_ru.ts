@@ -4367,7 +4367,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Hide Number Pad</source>
-        <translation>Скрыть цифровую клавиатуру</translation>
+        <translation type="vanished">Скрыть цифровую клавиатуру</translation>
     </message>
     <message>
         <source>Reset Keypad Position</source>
@@ -4555,6 +4555,14 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>Key combination</source>
         <translation>Комбинация клавиш</translation>
+    </message>
+    <message>
+        <source>Number Pad</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Show Number Pad</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

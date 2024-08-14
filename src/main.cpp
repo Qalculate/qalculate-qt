@@ -89,9 +89,9 @@ int main(int argc, char **argv) {
 						gsub("-", "_", lang);
 						if(lang != QLocale().name().toStdString()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory(QString::fromStdString(lang))));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).territory()));
 #else
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country(QString::fromStdString(lang))));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).country()));
 #endif
 						}
 						_putenv_s("LANG", lang.c_str());

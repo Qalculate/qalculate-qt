@@ -175,17 +175,7 @@ void ExpressionTipLabel::timerEvent(QTimerEvent *e) {
 	}
 }
 bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rect) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	QScreen *scr = widget->screen();
-#	else
-	QScreen *scr = QGuiApplication::screenAt(pos);
-#	endif
-	if(!scr) scr = QGuiApplication::primaryScreen();
-	QRect screen = scr->availableGeometry();
-#else
-	QRect screen = QApplication::desktop()->availableGeometry(widget);
-#endif
+	QRect screen = get_screen_geometry(widget);
 	QPoint p = pos;
 	p += QPoint(2, 16);
 	if(!completion_rect.isNull() && completion_rect.intersects(QRect(p, this->size()))) {

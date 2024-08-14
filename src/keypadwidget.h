@@ -74,7 +74,8 @@ enum {
 	KEYPAD_GENERAL = 0,
 	KEYPAD_PROGRAMMING = 1,
 	KEYPAD_ALGEBRA = 2,
-	KEYPAD_CUSTOM = 3
+	KEYPAD_CUSTOM = 3,
+	KEYPAD_NUMBERPAD = 4
 };
 
 class KeypadWidget : public QWidget {
@@ -88,7 +89,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
 		QVector<QVector<KeypadButton*> > customButtons;
