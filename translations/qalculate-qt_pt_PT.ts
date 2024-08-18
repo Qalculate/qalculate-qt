@@ -10454,12 +10454,12 @@ Você pode obter a versão %3 em %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="762"/>
         <location filename="../src/qalculatewindow.cpp" line="1051"/>
         <source>Number Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Teclado numérico</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="767"/>
         <source>Always Show Number Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar sempre o teclado numérico</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="1094"/>
