@@ -112,7 +112,7 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	connect(variablesView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedVariableChanged(const QModelIndex&, const QModelIndex&)));
 	connect(variablesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(insertClicked()));
 	if(!settings->variables_geometry.isEmpty()) restoreGeometry(settings->variables_geometry);
-	else resize(900, 700);
+	else try_resize(this, 900, 700);
 	if(!settings->variables_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->variables_vsplitter_state);
 	if(!settings->variables_hsplitter_state.isEmpty()) hsplitter->restoreState(settings->variables_hsplitter_state);
 }

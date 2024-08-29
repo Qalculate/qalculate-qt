@@ -18,6 +18,7 @@
 #include <libqalculate/qalculate.h>
 
 class QWidget;
+class QWindow;
 class QByteArray;
 class QAction;
 class QFont;
@@ -32,7 +33,8 @@ bool can_display_unicode_string_function(const char *str, void *w);
 
 #define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
 
-QRect get_screen_geometry(QWidget*);
+QRect get_screen_geometry(QWidget *w);
+bool try_resize(QWidget *win, int w, int h);
 std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);

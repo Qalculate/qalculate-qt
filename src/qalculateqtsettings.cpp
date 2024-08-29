@@ -58,6 +58,15 @@ QRect get_screen_geometry(QWidget *widget) {
 #endif
 }
 
+bool try_resize(QWidget *win, int w, int h) {
+	QSize size = get_screen_geometry(win).size();
+	if(w + 50 < size.width() && h + 50 < size.height()) {
+		win->resize(w, h);
+		return true;
+	}
+	return false;
+}
+
 std::string to_html_escaped(const std::string strpre) {
 	std::string str = strpre;
 	if(settings->printops.use_unicode_signs) {

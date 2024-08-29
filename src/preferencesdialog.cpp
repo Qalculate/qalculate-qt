@@ -46,6 +46,20 @@ QString font_string(std::string str) {
 	return QString::fromStdString(str);
 }
 
+class PreferencesPageScroll : public QScrollArea {
+	protected:
+		QWidget *child_widget;
+		bool use_child_hint;
+	public:
+		PreferencesPageScroll(QWidget *parent, QWidget *child, bool b) : QScrollArea(parent), child_widget(child), use_child_hint(b) {
+			setWidget(child);
+		}
+		QSize sizeHint() const {
+			if(use_child_hint) return child_widget->sizeHint();
+			return QScrollArea::sizeHint();
+		}
+};
+
 PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	setWindowTitle(tr("Preferences"));
 	QVBoxLayout *topbox = new QVBoxLayout(this);
@@ -383,23 +397,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-	QScrollArea *s1 = new QScrollArea(this);
-	QScrollArea *s2 = new QScrollArea(this);
-	QScrollArea *s3 = new QScrollArea(this);
-	QScrollArea *s4 = new QScrollArea(this);
-	s1->setWidget(w1);
-	s2->setWidget(w2);
-	s3->setWidget(w3);
-	s4->setWidget(w4);
 	QSize size = get_screen_geometry(this).size();
 	QSize sh = w1->sizeHint().expandedTo(w2->sizeHint().expandedTo(w3->sizeHint().expandedTo(w4->sizeHint())));
-	if(size.width() >= sh.width() + 100) {
-		tabs->setUsesScrollButtons(false);
-		s1->setMinimumWidth(sh.width());
-	}
-	if(size.height() >= sh.height() + 100) {
-		s1->setMinimumHeight(sh.height());
-	}
+	if(size.width() >= sh.width() + 100) tabs->setUsesScrollButtons(false);
+	bool use_child_hint = size.height() >= sh.height() + 100;
+	QScrollArea *s1 = new PreferencesPageScroll(this, w1, use_child_hint);
+	QScrollArea *s2 = new PreferencesPageScroll(this, w2, use_child_hint);
+	QScrollArea *s3 = new PreferencesPageScroll(this, w3, use_child_hint);
+	QScrollArea *s4 = new PreferencesPageScroll(this, w4, use_child_hint);
 	tabs->addTab(s1, tr("Look && Feel"));
 	tabs->addTab(s2, tr("Numbers && Operators"));
 	tabs->addTab(s3, tr("Units && Currencies"));

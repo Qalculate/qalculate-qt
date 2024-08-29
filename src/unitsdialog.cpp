@@ -140,7 +140,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	connect(unitsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedUnitChanged(const QModelIndex&, const QModelIndex&)));
 	connect(unitsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(onUnitActivated(const QModelIndex&)));
 	if(!settings->units_geometry.isEmpty()) restoreGeometry(settings->units_geometry);
-	else resize(900, 800);
+	else try_resize(this, 900, 800);
 	if(!settings->units_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->units_vsplitter_state);
 	if(!settings->units_hsplitter_state.isEmpty()) hsplitter->restoreState(settings->units_hsplitter_state);
 }

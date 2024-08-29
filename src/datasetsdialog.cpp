@@ -127,7 +127,7 @@ DataSetsDialog::DataSetsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	connect(vsplitter_r, SIGNAL(splitterMoved(int, int)), this, SLOT(vsplitterrMoved(int, int)));
 	updateDatasets();
 	if(!settings->datasets_geometry.isEmpty()) restoreGeometry(settings->datasets_geometry);
-	else resize(1000, 700);
+	else try_resize(this, 1000, 700);
 	vsplitter_l->setStretchFactor(0, 2);
 	vsplitter_l->setStretchFactor(1, 3);
 	vsplitter_r->setStretchFactor(0, 2);

@@ -1574,6 +1574,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
+				if(!event->text().isEmpty() && event->text() != "^") break;
 				if(settings->rpn_mode && settings->rpn_keys) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
@@ -1584,10 +1585,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Tilde: {
+				if(!event->text().isEmpty() && event->text() != "~") break;
 				insertPlainText("~");
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
+				if(!event->text().isEmpty() && event->text() != "^") break;
 				if(settings->rpn_mode && settings->rpn_keys) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
@@ -1955,11 +1958,28 @@ void ExpressionEdit::insertDate() {
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	box->setContentsMargins(0, 0, 0, 0);
 	QCalendarWidget *w = new QCalendarWidget(dialog);
+	std::string str = textCursor().selectedText().toStdString(), str2;
+	CALCULATOR->separateToExpression(str, str2, settings->evalops, true);
+	remove_blank_ends(str);
+	int b_quote = -1;
+	if(str.length() > 2 && ((str[0] == '\"' && str[str.length() - 1] == '\"') || (str[0] == '\'' && str[str.length() - 1] == '\''))) {
+		str = str.substr(1, str.length() - 2);
+		remove_blank_ends(str);
+		b_quote = 1;
+	}
+	if(!str.empty()) {
+		QalculateDateTime date;
+		if(date.set(str)) {
+			if(b_quote < 0 && is_in(NUMBERS, str[0])) b_quote = 0;
+			w->setSelectedDate(QDate(date.year(), date.month() - 1, date.day()));
+		}
+	}
 	box->addWidget(w);
 	connect(w, SIGNAL(clicked(QDate)), dialog, SLOT(accept()));
 	connect(w, SIGNAL(activated(QDate)), dialog, SLOT(accept()));
 	if(dialog->exec() == QDialog::Accepted) {
-		insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
+		if(b_quote == 0) insertPlainText(w->selectedDate().toString(Qt::ISODate));
+		else insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
 	}
 	dialog->deleteLater();
 }

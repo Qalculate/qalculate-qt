@@ -1012,7 +1012,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->enable_tooltips != 1) onEnableTooltipsChanged();
 
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
-	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) try_resize(this, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
 	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
 
@@ -8630,7 +8630,7 @@ void QalculateWindow::editKeyboardShortcuts() {
 		return;
 	}
 	shortcutsDialog = new QDialog(this);
-	shortcutsDialog->resize(700, 500);
+	try_resize(shortcutsDialog, 700, 500);
 	if(settings->always_on_top) shortcutsDialog->setWindowFlags(shortcutsDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	shortcutsDialog->setWindowTitle(tr("Keyboard Shortcuts"));
 	QVBoxLayout *box = new QVBoxLayout(shortcutsDialog);

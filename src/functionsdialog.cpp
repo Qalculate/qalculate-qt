@@ -106,7 +106,7 @@ FunctionsDialog::FunctionsDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	connect(functionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedFunctionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(functionsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(calculateClicked()));
 	if(!settings->functions_geometry.isEmpty()) restoreGeometry(settings->functions_geometry);
-	else resize(900, 800);
+	else try_resize(this, 900, 800);
 	if(!settings->functions_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->functions_vsplitter_state);
 	if(!settings->functions_hsplitter_state.isEmpty()) hsplitter->restoreState(settings->functions_hsplitter_state);
 }
