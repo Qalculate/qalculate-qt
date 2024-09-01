@@ -3513,6 +3513,7 @@ void ExpressionEdit::smartParentheses() {
 		setTextCursor(cur);
 		insertPlainText("()");
 		moveCursor(QTextCursor::PreviousCharacter);
+		cur.endEditBlock();
 		setCursorWidth(1);
 		return;
 	}
