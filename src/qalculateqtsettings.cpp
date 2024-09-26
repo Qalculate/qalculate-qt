@@ -288,8 +288,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		recent_variables_pre.push_back(svalue);
 	} else if(!is_workspace && svar == "keyboard_shortcut") {
 		default_shortcuts = false;
-		char str1[svalue.length()];
-		char str2[svalue.length()];
+		char *str1 = new char[svalue.length()];
+		char *str2 = new char[svalue.length()];
 		int ks_type = 0;
 		int n = sscanf(svalue.c_str(), "%s %i %[^\n]", str1, &ks_type, str2);
 		if(n >= 2 && ks_type >= SHORTCUT_TYPE_FUNCTION && ks_type <= LAST_SHORTCUT_TYPE) {
@@ -317,9 +317,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 				ks->type.push_back((shortcut_type) ks_type);
 			}
 		}
+		delete[] str1;
+		delete[] str2;
 	} else if(!is_workspace && svar == "custom_button_label") {
 		int c = 0, r = 0;
-		char str[svalue.length()];
+		char *str = new char[svalue.length()];
 		int n = sscanf(svalue.c_str(), "%i %i %[^\n]", &r, &c, str);
 		if(n == 3 && c > 0 && r > 0) {
 			size_t index = 0;
@@ -338,10 +340,11 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			index--;
 			custom_buttons[index].label = QString::fromUtf8(str).trimmed();
 		}
+		delete[] str;
 	} else if(!is_workspace && svar == "custom_button") {
 		int c = 0, r = 0;
 		unsigned int bi = 0;
-		char str[svalue.length()];
+		char *str = new char[svalue.length()];
 		int cb_type = -1;
 		int n = sscanf(svalue.c_str(), "%i %i %u %i %[^\n]", &c, &r, &bi, &cb_type, str);
 		if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
@@ -367,6 +370,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 				custom_buttons[index].value[bi] = "";
 			}
 		}
+		delete[] str;
 	} else if(!is_workspace && svar == "show_all_units") {
 		show_all_units = v;
 	} else if(!is_workspace && svar == "show_all_functions") {
@@ -442,15 +446,12 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(v == FRACTION_COMBINED + 2) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = 1;
-		} else if(v == FRACTION_COMBINED + 3) {
-			printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
-			dual_fraction = 0;
-		} else if(v == FRACTION_COMBINED + 4) {
-			printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
-			dual_fraction = 0;
 		} else if(v < 0) {
 			printops.number_fraction_format = FRACTION_DECIMAL;
 			dual_fraction = -1;
+		} else if(v <= FRACTION_PERMYRIAD + 2) {
+			printops.number_fraction_format = (NumberFractionFormat) (v - 2);
+			dual_fraction = 0;
 		}
 	} else if(svar == "number_fraction_denominator") {
 		CALCULATOR->setFixedDenominator(v);
@@ -665,10 +666,17 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			datasets_hsplitter_state = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "style") {
 #if defined _WIN32
-			if(!PREFERENCES_VERSION_BEFORE(4, 7, 0)) style = v;
+			if(PREFERENCES_VERSION_BEFORE(4, 7, 0)) {
+			} else {
 #else
-			style = v;
+				if(v >= 0 && v < QStyleFactory::keys().count()) style = QStyleFactory::keys().at(v);
+				else style = "";
 #endif
+#if defined _WIN32
+			}
+#endif
+		} else if(svar == "style_name") {
+			style = QString::fromStdString(svalue);
 		} else if(svar == "palette") {
 #ifdef _WIN32
 #if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
@@ -1002,7 +1010,7 @@ void QalculateQtSettings::loadPreferences() {
 	custom_expression_font = "";
 	custom_keypad_font = "";
 	custom_app_font = "";
-	style = -1;
+	style = "";
 	palette = -1;
 	replace_expression = KEEP_EXPRESSION;
 	autocopy_result = false;
@@ -1185,7 +1193,7 @@ void QalculateQtSettings::loadPreferences() {
 #ifdef _WIN32
 	updateStyle();
 #else
-	if(style >= 0) updateStyle();
+	if(!style.isEmpty()) updateStyle();
 	else if(palette >= 0) updatePalette();
 #endif
 
@@ -1261,7 +1269,7 @@ void QalculateQtSettings::updateFavourites() {
 
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 void QalculateQtSettings::updatePalette(bool force_update) {
-	if(!force_update && palette != 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark && (style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("Fusion", Qt::CaseInsensitive) == 0)) return;
+	if(!force_update && palette != 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark && (style.isEmpty() || !QStyleFactory::keys().contains(style) || style.compare("Fusion", Qt::CaseInsensitive) == 0)) return;
 	QPalette p;
 	if(palette == 1 && QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark) {
 #else
@@ -1312,7 +1320,7 @@ void QalculateQtSettings::updatePalette(bool) {
 #ifdef _WIN32
 		QStyle *s = NULL;
 #if	(QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-		if(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark || style < 0 || style >= QStyleFactory::keys().count() || QStyleFactory::keys().at(style).compare("windowsvista", Qt::CaseInsensitive) != 0) s = QStyleFactory::create("fusion");
+		if(QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Dark || style.isEmpty() || !QStyleFactory::keys().contains(style) || style.compare("windowsvista", Qt::CaseInsensitive) != 0) s = QStyleFactory::create("fusion");
 #else
 		s = QStyleFactory::create("fusion");
 #endif
@@ -1325,8 +1333,8 @@ void QalculateQtSettings::updatePalette(bool) {
 	QApplication::setPalette(p);
 }
 void QalculateQtSettings::updateStyle() {
-	if(style >= 0 && style < QStyleFactory::keys().count()) {
-		QStyle *s = QStyleFactory::create(QStyleFactory::keys().at(style));
+	if(!style.isEmpty() && QStyleFactory::keys().contains(style)) {
+		QStyle *s = QStyleFactory::create(style);
 		if(s) QApplication::setStyle(s);
 	}
 #ifdef _WIN32
@@ -1439,7 +1447,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "completion_min=%i\n", completion_min);
 		fprintf(file, "completion_min2=%i\n", completion_min2);
 		fprintf(file, "completion_delay=%i\n", completion_delay);
-		fprintf(file, "style=%i\n", style);
+		if(!style.isEmpty()) fprintf(file, "style_name=%s\n", style.toUtf8().data());
 		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
 		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
 		fprintf(file, "palette=%i\n", palette);
@@ -1586,10 +1594,9 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(dual_fraction < 0) v = -1;
 		else if(dual_fraction > 0) v = FRACTION_COMBINED + 2;
 		else if(!printops.restrict_fraction_length && printops.number_fraction_format == FRACTION_FRACTIONAL) v = FRACTION_COMBINED + 1;
-		else if(printops.number_fraction_format == FRACTION_FRACTIONAL_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 3;
-		else if(printops.number_fraction_format == FRACTION_COMBINED_FIXED_DENOMINATOR) v = FRACTION_COMBINED + 4;
+		else if(printops.number_fraction_format >= FRACTION_FRACTIONAL_FIXED_DENOMINATOR) v += 2;
 		fprintf(file, "number_fraction_format=%i\n", v);
-		if(v > FRACTION_COMBINED + 2) fprintf(file, "number_fraction_denominator=%li\n", CALCULATOR->fixedDenominator());
+		if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2 || v == FRACTION_FRACTIONAL_FIXED_DENOMINATOR + 2) fprintf(file, "number_fraction_denominator=%li\n", CALCULATOR->fixedDenominator());
 		fprintf(file, "complex_number_form=%i\n", (complex_angle_form && evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) ? evalops.complex_number_form + 1 : evalops.complex_number_form);
 		fprintf(file, "use_prefixes=%i\n", printops.use_unit_prefixes);
 		fprintf(file, "use_prefixes_for_all_units=%i\n", printops.use_prefixes_for_all_units);

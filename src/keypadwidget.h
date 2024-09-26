@@ -89,9 +89,10 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton, *xButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
+		QWidget *keypadG, *keypadP, *keypadX, *keypadC, *keypadN;
 		QVector<QVector<KeypadButton*> > customButtons;
 		QStackedLayout *leftStack;
 		QGridLayout *customGrid;
@@ -106,6 +107,8 @@ class KeypadWidget : public QWidget {
 		void changeEvent(QEvent *e);
 		void editCustomAction(KeypadButton*, int);
 		void updateStretch();
+		void createKeypad(int);
+		void createNumpad(QWidget*, int);
 
 	protected slots:
 

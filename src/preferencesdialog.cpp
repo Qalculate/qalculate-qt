@@ -55,7 +55,11 @@ class PreferencesPageScroll : public QScrollArea {
 			setWidget(child);
 		}
 		QSize sizeHint() const {
-			if(use_child_hint) return child_widget->sizeHint();
+			if(use_child_hint) {
+				QSize s = child_widget->sizeHint();
+				s.setHeight(s.height() + 1);
+				return s;
+			}
 			return QScrollArea::sizeHint();
 		}
 };
@@ -148,7 +152,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	QStringList list = QStyleFactory::keys();
 	combo->addItem(tr("Default (requires restart)", "Default style"));
 	combo->addItems(list);
-	combo->setCurrentIndex(settings->style < 0 ? 0 : settings->style + 1);
+	if(settings->style.isEmpty()) {
+		combo->setCurrentIndex(0);
+	} else {
+		int i = list.indexOf(settings->style);
+		combo->setCurrentIndex(i < 0 ? 0 : i + 1);
+	}
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(styleChanged(int)));
 	l->addWidget(combo, r, 1); r++; styleCombo = combo;
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
@@ -845,7 +854,7 @@ void PreferencesDialog::darkModeToggled(bool b) {
 #endif
 }
 void PreferencesDialog::styleChanged(int i) {
-	settings->style = i - 1;
+	settings->style = (i == 0 ? "" : styleCombo->currentText());
 	settings->updateStyle();
 }
 void PreferencesDialog::factorizeToggled(bool b) {

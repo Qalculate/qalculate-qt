@@ -102,6 +102,9 @@ unsigned int FPConversionDialog::getSignPosition() {
 void FPConversionDialog::formatChanged() {
 	updateFields(10);
 }
+void FPConversionDialog::clear() {
+	updateFields(0);
+}
 void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 	std::string sbin;
 	Number decnum;
@@ -138,15 +141,18 @@ void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 		} else {
 			std::string str = valueEdit->text().toStdString();
 			remove_blank_ends(str);
-			if(str.empty()) return;
-			if(last_is_operator(str, true)) return;
-			EvaluationOptions eo;
-			eo.parse_options = settings->evalops.parse_options;
-			eo.parse_options.read_precision = DONT_READ_PRECISION;
-			if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-			if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-			eo.parse_options.base = 10;
-			CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
+			if(str.empty()) {
+				value.setAborted();
+			} else {
+				if(last_is_operator(str, true)) return;
+				EvaluationOptions eo;
+				eo.parse_options = settings->evalops.parse_options;
+				eo.parse_options.read_precision = DONT_READ_PRECISION;
+				if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+				if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+				eo.parse_options.base = 10;
+				CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
+			}
 		}
 		if(value.isNumber()) {
 			sbin = to_float(value.number(), bits, expbits, sgnpos);
@@ -161,32 +167,34 @@ void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 	} else if(base == 2) {
 		std::string str = binEdit->toPlainText().toStdString();
 		remove_blanks(str);
-		if(str.empty()) return;
-		if(str.find_first_not_of("01") == std::string::npos && str.length() <= bits) {
-			sbin = str;
-		} else {
-			sbin = "";
+		if(!str.empty()) {
+			if(str.find_first_not_of("01") == std::string::npos && str.length() <= bits) {
+				sbin = str;
+			} else {
+				sbin = "";
+			}
+			CALCULATOR->clearMessages();
 		}
-		CALCULATOR->clearMessages();
 	} else if(base == 16) {
 		std::string str = hexEdit->text().toStdString();
 		remove_blanks(str);
-		if(str.empty()) return;
-		ParseOptions pa;
-		pa.base = BASE_HEXADECIMAL;
-		Number nr(str, pa);
-		PrintOptions po;
-		po.base = BASE_BINARY;
-		po.binary_bits = bits;
-		po.max_decimals = 0;
-		po.use_max_decimals = true;
-		po.base_display = BASE_DISPLAY_NONE;
-		sbin = nr.print(po);
-		if(sbin.length() < bits) sbin.insert(0, bits - sbin.length(), '0');
-		if(sbin.length() > bits) {
-			sbin = "";
+		if(!str.empty()) {
+			ParseOptions pa;
+			pa.base = BASE_HEXADECIMAL;
+			Number nr(str, pa);
+			PrintOptions po;
+			po.base = BASE_BINARY;
+			po.binary_bits = bits;
+			po.max_decimals = 0;
+			po.use_max_decimals = true;
+			po.base_display = BASE_DISPLAY_NONE;
+			sbin = nr.print(po);
+			if(sbin.length() < bits) sbin.insert(0, bits - sbin.length(), '0');
+			if(sbin.length() > bits) {
+				sbin = "";
+			}
+			CALCULATOR->clearMessages();
 		}
-		CALCULATOR->clearMessages();
 	}
 	valueEdit->blockSignals(true);
 	binEdit->blockSignals(true);

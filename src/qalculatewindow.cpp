@@ -760,7 +760,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action = menu->addAction(tr("Custom"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(KEYPAD_CUSTOM); cKeypadAction = action;
 	action = menu->addAction(tr("Number Pad"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
-	action->setData(KEYPAD_NUMBERPAD); action->setVisible(settings->hide_numpad); nKeypadAction = action;
+	action->setData(KEYPAD_NUMBERPAD); action->setEnabled(settings->hide_numpad); nKeypadAction = action;
 	action = menu->addAction(tr("None"), this, SLOT(keypadTypeActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
@@ -919,10 +919,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	addDockWidget(Qt::TopDockWidgetArea, rpnDock);
 	if(!settings->rpn_mode) rpnDock->hide();
 
-	updateVariablesMenu();
-	updateFunctionsMenu();
-	updateUnitsMenu();
-
 	QLocalServer::removeServer("qalculate-qt");
 	server = new QLocalServer(this);
 	server->listen("qalculate-qt");
@@ -953,6 +949,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	loadShortcuts();
 
+	connect(functionsMenu, SIGNAL(aboutToShow()), this, SLOT(initializeFunctionsMenu()));
+	connect(variablesMenu, SIGNAL(aboutToShow()), this, SLOT(initializeVariablesMenu()));
+	connect(unitsMenu, SIGNAL(aboutToShow()), this, SLOT(initializeUnitsMenu()));
 	connect(historyView, SIGNAL(insertTextRequested(std::string)), this, SLOT(onInsertTextRequested(std::string)));
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
 	connect(historyView, SIGNAL(historyReloaded()), this, SLOT(onHistoryReloaded()));
@@ -1028,10 +1027,19 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontTimer()));
 		timer->start(1);
 	}
-	if(!settings->use_custom_app_font || settings->use_custom_expression_font) expressionEdit->updateCompletion();
 
 }
 QalculateWindow::~QalculateWindow() {}
+
+void QalculateWindow::initializeFunctionsMenu() {
+	if(functionsMenu->isEmpty()) updateFunctionsMenu();
+}
+void QalculateWindow::initializeVariablesMenu() {
+	if(variablesMenu->isEmpty()) updateVariablesMenu();
+}
+void QalculateWindow::initializeUnitsMenu() {
+	if(unitsMenu->isEmpty()) updateUnitsMenu();
+}
 
 void QalculateWindow::keypadPreferencesChanged() {
 	if(preferencesDialog) {
@@ -1968,6 +1976,7 @@ void QalculateWindow::showAllFunctions(bool b) {
 	updateFunctionsMenu();
 }
 void QalculateWindow::updateFavouriteFunctions() {
+	if(functionsMenu->isEmpty()) return;
 	for(int i = 0; i < favouriteFunctionActions.size(); i++) {
 		favouriteFunctionsMenu->removeAction(favouriteFunctionActions[i]);
 		favouriteFunctionActions[i]->deleteLater();
@@ -2008,6 +2017,7 @@ void QalculateWindow::updateFavouriteFunctions() {
 	}
 }
 void QalculateWindow::updateRecentFunctions() {
+	if(functionsMenu->isEmpty()) return;
 	for(int i = 0; i < recentFunctionActions.size(); i++) {
 		recentFunctionsMenu->removeAction(recentFunctionActions[i]);
 		recentFunctionActions[i]->deleteLater();
@@ -2278,6 +2288,7 @@ void QalculateWindow::showAllUnits(bool b) {
 	updateUnitsMenu();
 }
 void QalculateWindow::updateFavouriteUnits() {
+	if(unitsMenu->isEmpty()) return;
 	for(int i = 0; i < favouriteUnitActions.size(); i++) {
 		favouriteUnitsMenu->removeAction(favouriteUnitActions[i]);
 		favouriteUnitActions[i]->deleteLater();
@@ -2321,6 +2332,7 @@ void QalculateWindow::updateFavouriteUnits() {
 	}
 }
 void QalculateWindow::updateRecentUnits() {
+	if(unitsMenu->isEmpty()) return;
 	for(int i = 0; i < recentUnitActions.size(); i++) {
 		recentUnitsMenu->removeAction(recentUnitActions[i]);
 		recentUnitActions[i]->deleteLater();
@@ -2547,6 +2559,7 @@ void QalculateWindow::showAllVariables(bool b) {
 	updateVariablesMenu();
 }
 void QalculateWindow::updateFavouriteVariables() {
+	if(variablesMenu->isEmpty()) return;
 	for(int i = 0; i < favouriteVariableActions.size(); i++) {
 		favouriteVariablesMenu->removeAction(favouriteVariableActions[i]);
 		favouriteVariableActions[i]->deleteLater();
@@ -2587,6 +2600,7 @@ void QalculateWindow::updateFavouriteVariables() {
 	}
 }
 void QalculateWindow::updateRecentVariables() {
+	if(variablesMenu->isEmpty()) return;
 	for(int i = 0; i < recentVariableActions.size(); i++) {
 		recentVariablesMenu->removeAction(recentVariableActions[i]);
 		recentVariableActions[i]->deleteLater();
@@ -4046,8 +4060,8 @@ void QalculateWindow::setOption(std::string str) {
 		if(!display && equalsIgnoreCase(svalue, "off")) v = EXP_NONE;
 		else if(!display && equalsIgnoreCase(svalue, "auto")) v = EXP_PRECISION;
 		else if(!display && equalsIgnoreCase(svalue, "pure")) v = EXP_PURE;
-		else if(!display && (empty_value || equalsIgnoreCase(svalue, "scientific"))) v = EXP_SCIENTIFIC;
-		else if(!display && equalsIgnoreCase(svalue, "engineering")) v = EXP_BASE_3;
+		else if(!display && (empty_value || svalue == "sci" || equalsIgnoreCase(svalue, "scientific"))) v = EXP_SCIENTIFIC;
+		else if(!display && (svalue == "eng" || equalsIgnoreCase(svalue, "engineering"))) v = EXP_BASE_3;
 		else if(svalue == "E" || (display && empty_value && settings->printops.exp_display == EXP_POWER_OF_10)) {v = EXP_UPPERCASE_E; display = true;}
 		else if(svalue == "e") {v = EXP_LOWERCASE_E; display = true;}
 		else if((display && svalue == "10") || (display && empty_value && settings->printops.exp_display != EXP_POWER_OF_10) || svalue == "pow" || svalue == "pow10" || equalsIgnoreCase(svalue, "power") || equalsIgnoreCase(svalue, "power of 10")) {
@@ -4168,33 +4182,41 @@ void QalculateWindow::setOption(std::string str) {
 		else if(equalsIgnoreCase(svalue, "exact")) v = FRACTION_DECIMAL_EXACT;
 		else if(empty_value || equalsIgnoreCase(svalue, "on")) v = FRACTION_FRACTIONAL;
 		else if(equalsIgnoreCase(svalue, "combined") || equalsIgnoreCase(svalue, "mixed")) v = FRACTION_COMBINED;
-		else if(equalsIgnoreCase(svalue, "long")) v = FRACTION_COMBINED + 1;
-		else if(equalsIgnoreCase(svalue, "dual")) v = FRACTION_COMBINED + 2;
+		else if(equalsIgnoreCase(svalue, "long")) v = FRACTION_PERMYRIAD + 1;
+		else if(equalsIgnoreCase(svalue, "dual")) v = FRACTION_PERMYRIAD + 2;
 		else if(equalsIgnoreCase(svalue, "auto")) v = -1;
 		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
 			v = s2i(svalue);
-			if(v == FRACTION_COMBINED + 1) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 1;
-			else if(v == FRACTION_COMBINED + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR + 2;
-			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
-			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_COMBINED_FIXED_DENOMINATOR;
+			if(v == FRACTION_COMBINED + 1) v = FRACTION_PERMYRIAD + 1;
+			else if(v == FRACTION_COMBINED + 2) v = FRACTION_PERMYRIAD + 2;
+			else if(v > FRACTION_COMBINED + 2) v -= 2;
 		} else {
-			int tofr = 0;
-			long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(svalue), tofr, QString(), true);
-			if(fden != 0) {
-				if(tofr == 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
-				else v = FRACTION_COMBINED_FIXED_DENOMINATOR;
-				if(fden > 0) CALCULATOR->setFixedDenominator(fden);
+			Variable *var = CALCULATOR->getActiveVariable(svalue);
+			if(var && var->referenceName() == "percent") {
+				v = FRACTION_PERCENT;
+			} else if(var && var->referenceName() == "permille") {
+				v = FRACTION_PERMILLE;
+			} else if(var && var->referenceName() == "permyriad") {
+				v = FRACTION_PERMYRIAD;
+			} else {
+				int tofr = 0;
+				long int fden = get_fixed_denominator_qt(settings->unlocalizeExpression(svalue), tofr, QString(), true);
+				if(fden != 0) {
+					if(tofr == 1) v = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+					else v = FRACTION_COMBINED_FIXED_DENOMINATOR;
+					if(fden > 0) CALCULATOR->setFixedDenominator(fden);
+				}
 			}
 		}
-		if(v > FRACTION_COMBINED_FIXED_DENOMINATOR + 2) {
+		if(v > FRACTION_PERMYRIAD + 2) {
 			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
 		} else {
 			settings->printops.restrict_fraction_length = (v == FRACTION_FRACTIONAL || v == FRACTION_COMBINED);
 			if(v < 0) settings->dual_fraction = -1;
-			else if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) settings->dual_fraction = 1;
+			else if(v == FRACTION_PERMYRIAD + 2) settings->dual_fraction = 1;
 			else settings->dual_fraction = 0;
-			if(v == FRACTION_COMBINED_FIXED_DENOMINATOR + 1) v = FRACTION_FRACTIONAL;
-			else if(v < 0 || v == FRACTION_COMBINED_FIXED_DENOMINATOR + 2) v = FRACTION_DECIMAL;
+			if(v == FRACTION_PERMYRIAD + 1) v = FRACTION_FRACTIONAL;
+			else if(v < 0 || v == FRACTION_PERMYRIAD + 2) v = FRACTION_DECIMAL;
 			settings->printops.number_fraction_format = (NumberFractionFormat) v;
 			resultFormatUpdated();
 		}
@@ -4657,13 +4679,15 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
 					}
 				}
-			} else if(equalsIgnoreCase(scom, "keep")) {
+			} else if(equalsIgnoreCase(scom, "keep") || equalsIgnoreCase(scom, "unkeep")) {
+				bool unkeep = equalsIgnoreCase(scom, "unkeep");
 				str = str.substr(ispace + 1, slen - (ispace + 1));
 				remove_blank_ends(str);
 				Variable *v = CALCULATOR->getActiveVariable(str);
 				bool b = v && v->isLocal();
-				if(b && v->category() == CALCULATOR->temporaryCategory()) {
-					v->setCategory("");
+				if(b && (v->category() == CALCULATOR->temporaryCategory()) == !unkeep) {
+					if(unkeep) v->setCategory(CALCULATOR->temporaryCategory());
+					else v->setCategory("");
 					expressionEdit->updateCompletion();
 					if(variablesDialog) variablesDialog->updateVariables();
 					if(unitsDialog) unitsDialog->updateUnits();
@@ -4672,8 +4696,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
 					if(f && f->isLocal()) {
-						if(f->category() == CALCULATOR->temporaryCategory()) {
-							f->setCategory("");
+						if((f->category() == CALCULATOR->temporaryCategory()) == !unkeep) {
+							if(unkeep) f->setCategory(CALCULATOR->temporaryCategory());
+							else f->setCategory("");
 							expressionEdit->updateCompletion();
 							if(functionsDialog) functionsDialog->updateFunctions();
 							if(current_expr) expressionEdit->clear();
@@ -7694,7 +7719,7 @@ void QalculateWindow::importCSV() {
 		for(size_t i = n; i < CALCULATOR->variables.size(); i++) {
 			if(!CALCULATOR->variables[i]->isHidden()) settings->favourite_variables.push_back(CALCULATOR->variables[i]);
 		}
-		updateVariablesMenu();
+		variablesMenu->clear();
 	}
 }
 void QalculateWindow::exportCSV() {
@@ -7708,7 +7733,7 @@ void QalculateWindow::onStoreActivated() {
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
-		updateVariablesMenu();
+		variablesMenu->clear();
 	}
 }
 void QalculateWindow::newVariable() {
@@ -7719,7 +7744,7 @@ void QalculateWindow::newVariable() {
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
-		updateVariablesMenu();
+		variablesMenu->clear();
 	}
 }
 void QalculateWindow::newMatrix() {
@@ -7730,7 +7755,7 @@ void QalculateWindow::newMatrix() {
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
-		updateVariablesMenu();
+		variablesMenu->clear();
 	}
 }
 void QalculateWindow::newUnknown() {
@@ -7741,7 +7766,7 @@ void QalculateWindow::newUnknown() {
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
-		updateVariablesMenu();
+		variablesMenu->clear();
 	}
 }
 void QalculateWindow::newUnit() {
@@ -7752,7 +7777,7 @@ void QalculateWindow::newUnit() {
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(u != replaced_item && !u->isHidden()) settings->favourite_units.push_back(u);
-		updateUnitsMenu();
+		unitsMenu->clear();
 	}
 }
 
@@ -7763,7 +7788,7 @@ void QalculateWindow::newFunction() {
 		expressionEdit->updateCompletion();
 		if(functionsDialog) functionsDialog->updateFunctions();
 		if(f != replaced_item && !f->isHidden()) settings->favourite_functions.push_back(f);
-		updateFunctionsMenu();
+		functionsMenu->clear();
 	}
 }
 
@@ -7771,8 +7796,8 @@ void QalculateWindow::showNumpad(bool b) {
 	keypad->hideNumpad(!b);
 	settings->hide_numpad = !b;
 	workspace_changed = true;
-	nKeypadAction->setVisible(!b);
-	if(settings->keypad_type == KEYPAD_NUMBERPAD) gKeypadAction->trigger();
+	nKeypadAction->setEnabled(!b);
+	if(b && settings->keypad_type == KEYPAD_NUMBERPAD) gKeypadAction->trigger();
 }
 void QalculateWindow::showSeparateKeypadMenuButtons(bool b) {
 	settings->separate_keypad_menu_buttons = b;
@@ -8256,7 +8281,7 @@ void QalculateWindow::onAppFontChanged() {
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
 		else font.setPointSize(font.pointSize() * 1.35);
 		expressionEdit->setFont(font);
-		expressionEdit->updateCompletion();
+		if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
 	}
 	if(!settings->use_custom_result_font) {
 		historyView->setFont(QApplication::font());
@@ -8710,12 +8735,12 @@ void QalculateWindow::editPreferences() {
 void QalculateWindow::onDatasetsChanged() {
 	expressionEdit->updateCompletion();
 	if(functionsDialog) functionsDialog->updateFunctions();
-	updateFunctionsMenu();
+	functionsMenu->clear();
 }
 void QalculateWindow::onFunctionsChanged() {
 	expressionEdit->updateCompletion();
 	if(datasetsDialog) datasetsDialog->updateDatasets();
-	updateFunctionsMenu();
+	functionsMenu->clear();
 }
 void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	expressionEdit->blockCompletion();
@@ -8803,8 +8828,8 @@ void QalculateWindow::openVariables() {
 	}
 	variablesDialog = new VariablesDialog();
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
-	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
-	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), unitsMenu, SLOT(clear()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), variablesMenu, SLOT(clear()));
 	connect(variablesDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteVariables()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
@@ -8839,8 +8864,8 @@ void QalculateWindow::openUnits() {
 	unitsDialog = new UnitsDialog();
 	if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
-	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateUnitsMenu()));
-	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(updateVariablesMenu()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), unitsMenu, SLOT(clear()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), variablesMenu, SLOT(clear()));
 	connect(unitsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteUnits()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
 	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
@@ -8900,8 +8925,6 @@ void QalculateWindow::openFPConversion() {
 		if(settings->always_on_top) fpConversionDialog->setWindowFlags(fpConversionDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 		fpConversionDialog->show();
 	}
-	QString str;
-	int base = 10;
 	if(!expressionEdit->expressionHasChanged() && !settings->history_answer.empty()) {
 		if(mstruct && mstruct->isNumber()) {
 			fpConversionDialog->setValue(*mstruct);
@@ -8911,21 +8934,29 @@ void QalculateWindow::openFPConversion() {
 			fpConversionDialog->setValue(mauto);
 		}
 	} else {
-		str = expressionEdit->selectedText(true);
-		base = settings->evalops.parse_options.base;
+		QString str = expressionEdit->selectedText(true).trimmed();
+		int base = settings->evalops.parse_options.base;
 		if(base <= BASE_FP16 && base >= BASE_FP80) base = BASE_BINARY;
-		switch(base) {
-			case BASE_BINARY: {
-				fpConversionDialog->setBin(str);
-				break;
-			}
-			case BASE_HEXADECIMAL: {
-				fpConversionDialog->setHex(str);
-				break;
-			}
-			default: {
-				fpConversionDialog->setValue(str);
-				break;
+		if(str.isEmpty()) {
+			fpConversionDialog->clear();
+		} else {
+			switch(base) {
+				case BASE_BINARY: {
+					fpConversionDialog->setBin(str);
+					break;
+				}
+				case BASE_HEXADECIMAL: {
+					fpConversionDialog->setHex(str);
+					break;
+				}
+				case BASE_DECIMAL: {
+					fpConversionDialog->setValue(str);
+					break;
+				}
+				default: {
+					fpConversionDialog->clear();
+					break;
+				}
 			}
 		}
 	}
@@ -9876,14 +9907,14 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		parsed_mstruct->clear();
 		expressionEdit->clear();
 		historyView->loadInitial();
-		expressionEdit->updateCompletion();
+		if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
 		if(functionsDialog) functionsDialog->updateFunctions();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(datasetsDialog) datasetsDialog->updateDatasets();
-		updateFunctionsMenu();
-		updateUnitsMenu();
-		updateVariablesMenu();
+		functionsMenu->clear();
+		unitsMenu->clear();
+		variablesMenu->clear();
 		keypad->updateBase();
 		keypad->updateSymbols();
 		if(settings->show_keypad >= 0 && settings->show_keypad != keypadDock->isVisible()) keypadAction->trigger();
@@ -9894,7 +9925,7 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		keypad->setKeypadType(settings->keypad_type);
 		updateKeypadTitle();
 		keypad->hideNumpad(settings->hide_numpad);
-		nKeypadAction->setVisible(settings->hide_numpad);
+		nKeypadAction->setEnabled(settings->hide_numpad);
 		if(preferencesDialog) {
 			preferencesDialog->hide();
 			preferencesDialog->deleteLater();

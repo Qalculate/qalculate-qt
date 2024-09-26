@@ -239,7 +239,8 @@ class QalculateQtSettings : QObject {
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay, auto_calculate_delay;
 		int completion_min, completion_min2;
-		int style, palette;
+		QString style;
+		int palette;
 		bool enable_completion, enable_completion2;
 		int enable_tooltips;
 		int color;

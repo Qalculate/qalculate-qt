@@ -2014,7 +2014,7 @@ void ExpressionEdit::onCompletionModeChanged() {
 	settings->enable_completion = completion_level > 0;
 	if(completion_level == 0) completion_level = 4;
 	settings->enable_completion2 = completion_level > 2;
-	if(completion_level > 1) settings->completion_min = 1;
+	if(completion_level == 2 || completion_level == 4) settings->completion_min = 1;
 	else settings->completion_min = 2;
 	if(completion_level > 3) settings->completion_min2 = 1;
 	else settings->completion_min2 = 2;
@@ -2900,9 +2900,12 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 void ExpressionEdit::onCompletionMenuItemActivated() {
 	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
 }
+bool ExpressionEdit::completionInitialized() {return sourceModel->hasChildren();}
+
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak; cdata->current_from_categories = from_cats_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
+	if(!sourceModel->hasChildren()) updateCompletion();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	std::vector<Unit*> from_units_bak = cdata->current_from_units;
 	std::vector<std::string> from_cats_bak = cdata->current_from_categories;

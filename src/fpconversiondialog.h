@@ -47,6 +47,7 @@ class FPConversionDialog : public QDialog {
 		void setValue(const MathStructure &m);
 		void setBin(const QString &str);
 		void setHex(const QString &str);
+		void clear();
 
 	public:
 

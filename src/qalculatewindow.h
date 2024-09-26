@@ -263,6 +263,9 @@ class QalculateWindow : public QMainWindow {
 		void prefixActivated();
 		void variableActivated();
 		void updateAngleUnitsMenu();
+		void initializeFunctionsMenu();
+		void initializeVariablesMenu();
+		void initializeUnitsMenu();
 		void updateFunctionsMenu();
 		void useFunctionDialog(bool);
 		void showAllFunctions(bool);

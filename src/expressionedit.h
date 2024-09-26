@@ -127,6 +127,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void onCompleterEvent(QEvent*);
 		bool eventFilter(QObject*, QEvent*) override;
 		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
+		bool completionInitialized();
 
 		std::vector<CalculatorMessage> status_messages;
 
