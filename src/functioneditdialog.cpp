@@ -94,32 +94,47 @@ QSize MathTextEdit::sizeHint() const {
 #endif
 	return size;
 }
+void MathTextEdit::insertText(const QString &s) {
+	if(overwriteMode() && !textCursor().atEnd()) {
+		QTextCursor cur = textCursor();
+		cur.beginEditBlock();
+		cur.deleteChar();
+		insertPlainText(s);
+		cur.endEditBlock();
+	} else {
+		insertPlainText(s);
+	}
+}
 void MathTextEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
+			case Qt::Key_Insert: {
+				if(event->modifiers() != Qt::ShiftModifier) setOverwriteMode(!overwriteMode());
+				break;
+			}
 			case Qt::Key_Asterisk: {
-				insertPlainText(settings->multiplicationSign());
+				insertText(settings->multiplicationSign());
 				return;
 			}
 			case Qt::Key_Slash: {
-				insertPlainText(settings->divisionSign(false));
+				insertText(settings->divisionSign(false));
 				return;
 			}
 			case Qt::Key_Minus: {
-				insertPlainText(SIGN_MINUS);
+				insertText(SIGN_MINUS);
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
-				insertPlainText(settings->caret_as_xor ? " xor " : "^");
+				insertText(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Dead_Tilde: {
-				insertPlainText("~");
+				insertText("~");
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
 				if(settings->caret_as_xor) {
-					insertPlainText(" xor ");
+					insertText(" xor ");
 					return;
 				}
 				break;
@@ -127,7 +142,7 @@ void MathTextEdit::keyPressEvent(QKeyEvent *event) {
 		}
 	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		insertPlainText("^");
+		insertText("^");
 		return;
 	}
 	QPlainTextEdit::keyPressEvent(event);

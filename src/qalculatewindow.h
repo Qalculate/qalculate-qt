@@ -325,6 +325,7 @@ class QalculateWindow : public QMainWindow {
 		void expressionCalculationUpdated(int delay = 0);
 		void resultFormatUpdated(int delay = 0);
 		void resultDisplayUpdated();
+		void expressionObjectsUpdated();
 		void expressionFormatUpdated(bool);
 		void insertFunction(MathFunction*, QWidget* = NULL);
 		void newVariable();
@@ -342,6 +343,7 @@ class QalculateWindow : public QMainWindow {
 		void insertProperty(DataObject*, DataProperty*);
 		void openDatasets();
 		void openFunctions();
+		void resetUnitsAndVariablesMenus();
 		void openUnits();
 		void openVariables();
 		void applyFunction(MathFunction*);

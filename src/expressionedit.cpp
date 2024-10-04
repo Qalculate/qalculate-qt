@@ -2014,7 +2014,7 @@ void ExpressionEdit::onCompletionModeChanged() {
 	settings->enable_completion = completion_level > 0;
 	if(completion_level == 0) completion_level = 4;
 	settings->enable_completion2 = completion_level > 2;
-	if(completion_level == 2 || completion_level == 4) settings->completion_min = 1;
+	if(completion_level == 2 || completion_level > 3) settings->completion_min = 1;
 	else settings->completion_min = 2;
 	if(completion_level > 3) settings->completion_min2 = 1;
 	else settings->completion_min2 = 2;
@@ -3336,10 +3336,21 @@ void ExpressionEdit::insertBrackets() {
 	cur.endEditBlock();
 	highlightParentheses();
 }
+void ExpressionEdit::insertText(const QString &s) {
+	if(overwriteMode() && !textCursor().atEnd()) {
+		QTextCursor cur = textCursor();
+		cur.beginEditBlock();
+		cur.deleteChar();
+		insertPlainText(s);
+		cur.endEditBlock();
+	} else {
+		insertPlainText(s);
+	}
+}
 void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args, bool quote) {
 	parse_blocked++;
 	QTextCursor cur = textCursor();
-	if(cur.hasSelection()) {
+	if(cur.hasSelection() && (!overwriteMode() || insert_before || always_add_parentheses || add_comma || !add_args.isEmpty())) {
 		QString qstr = toPlainText();
 		std::string str = qstr.toStdString();
 		int istart = cur.selectionStart();
@@ -3439,6 +3450,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	} else if(always_add_parentheses && insert_before) {
 		setCursorWidth(0);
 		cur.beginEditBlock();
+		if(overwriteMode()) cur.deleteChar();
 		if(quote) insertPlainText(text + "(\"\"" + add_args + ")");
 		else insertPlainText(text + "(" + add_args + ")");
 		cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + (quote ? 2 : 1));
@@ -3446,9 +3458,9 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 		setTextCursor(cur);
 		setCursorWidth(1);
 	} else if(always_add_parentheses) {
-		insertPlainText("(" + add_args + ")" + text);
+		insertText("(" + add_args + ")" + text);
 	} else if(!text.isEmpty()) {
-		insertPlainText(text);
+		insertText(text);
 	} else {
 		parse_blocked--;
 		return;
@@ -3984,7 +3996,7 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 		} else if(!cur.atEnd()) {
 			return false;
 		}
-		std::string str = toPlainText().toStdString();
+		std::string str = CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options);
 		remove_blanks(str);
 		if(str.empty() || str[0] == '/' || CALCULATOR->hasToExpression(str, true, settings->evalops) || CALCULATOR->hasWhereExpression(str, settings->evalops) || last_is_operator(str)) return false;
 		size_t par_n = 0, vec_n = 0;
@@ -3995,39 +4007,26 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 			else if(vec_n > 0 && str[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
 		}
 		if(par_n > 0 || vec_n > 0) return false;
-		MathStructure m;
-		CALCULATOR->clearMessages();
-		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), 1000, settings->evalops, NULL, NULL, false);
-		if(m.isAborted()) return false;
-		PrintOptions po = settings->printops;
-		po.allow_non_usable = false;
-		po.is_approximate = NULL;
-		po.can_display_unicode_string_arg = (void*) this;
-		str = CALCULATOR->print(m, 1000, settings->printops);
-		if(str == CALCULATOR->abortedMessage() || str.length() > 100) return false;
-		std::string warnings;
-		int message_n = 0;
-		while(CALCULATOR->message()) {
-			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
-				MessageType mtype = CALCULATOR->message()->type();
-				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-					if(mtype == MESSAGE_ERROR) return false;
-					if(message_n > 0) {
-						if(message_n == 1) warnings.insert(0, "• ");
-						warnings += "\n• ";
-					}
-					warnings += CALCULATOR->message()->message();
-					message_n++;
-				}
+		cur.beginEditBlock();
+		if(str.find_first_not_of(NUMBER_ELEMENTS SPACE) != std::string::npos) {
+			MathStructure mparse;
+			CALCULATOR->beginTemporaryStopMessages();
+			CALCULATOR->parse(&mparse, str, settings->evalops.parse_options);
+			CALCULATOR->endTemporaryStopMessages();
+			if((!mparse.isMultiplication() || op != settings->multiplicationSign(false)) && (!mparse.isAddition() || (op != "+" && op != "-" && op != SIGN_MINUS)) && (!mparse.isBitwiseOr() || op != BITWISE_OR) && (!mparse.isBitwiseAnd() || op != BITWISE_AND)) {
+				cur.movePosition(QTextCursor::Start);
+				cur.insertText("(");
+				cur.movePosition(QTextCursor::End);
+				cur.insertText(")");
+			} else if(cur.hasSelection()) {
+				cur.movePosition(QTextCursor::End);
 			}
-			CALCULATOR->nextMessage();
+		} else if(cur.hasSelection()) {
+			cur.movePosition(QTextCursor::End);
 		}
-		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != settings->multiplicationSign()) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
-			str.insert(0, "(");
-			str += ")";
-		}
-		setExpression(QString::fromStdString(str) + op);
-		setStatusText(QString::fromStdString(warnings));
+		setTextCursor(cur);
+		insertPlainText(op);
+		cur.endEditBlock();
 		return true;
 	}
 	return false;

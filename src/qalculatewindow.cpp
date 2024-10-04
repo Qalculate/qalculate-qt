@@ -1560,7 +1560,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		case SHORTCUT_TYPE_INSERT_RESULT: {
 			if(!settings->v_result.empty()) {
 				expressionEdit->blockCompletion();
-				expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
+				expressionEdit->insertText(QString::fromStdString(unhtmlize(settings->v_result[settings->v_result.size() - 1][0])));
 				if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 				expressionEdit->blockCompletion(false);
 			}
@@ -2656,7 +2656,7 @@ void QalculateWindow::prefixActivated() {
 	Prefix *p = (Prefix*) ((QAction*) sender())->data().value<void*>();
 	if(!p) return;
 	expressionEdit->blockCompletion();
-	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
+	expressionEdit->insertText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -2784,7 +2784,7 @@ void QalculateWindow::registerChanged(int index) {
 void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion();
 	gsub("…", "", str);
-	expressionEdit->insertPlainText(QString::fromStdString(unhtmlize(str)));
+	expressionEdit->insertText(QString::fromStdString(unhtmlize(str)));
 	expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -2794,13 +2794,13 @@ void QalculateWindow::showAbout() {
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
 	Number nr(i, 1, 0);
-	expressionEdit->insertPlainText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
+	expressionEdit->insertText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion();
-	expressionEdit->insertPlainText(str);
+	expressionEdit->insertText(str);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -2844,8 +2844,8 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		expressionEdit->wrapSelection(str);
 		if(do_exec) expressionEdit->blockParseStatus(false);
 	} else if(str == "E" || str == "e") {
-		if(expressionEdit->textCursor().hasSelection()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
-		else expressionEdit->insertPlainText(settings->printops.exp_display == EXP_UPPERCASE_E ? "E" : "e");
+		if(expressionEdit->textCursor().hasSelection() && !expressionEdit->overwriteMode()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
+		else expressionEdit->insertText(settings->printops.exp_display == EXP_UPPERCASE_E ? "E" : "e");
 	} else {
 		if((str == "//" || (s != str && (s_low == "mod" || s_low == "rem"))) && (settings->rpn_mode || expressionEdit->document()->isEmpty() || settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN || (expressionEdit->textCursor().atStart() && !expressionEdit->textCursor().hasSelection()))) {
 			MathFunction *f;
@@ -2876,6 +2876,65 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	if(settings->rpn_mode && (f->minargs() <= 1 || (int) CALCULATOR->RPNStackSize() >= f->minargs())) {
 		calculateRPN(f);
 		return;
+	}
+	if(!settings->rpn_mode && settings->chain_mode && !expressionEdit->textCursor().hasSelection() && expressionEdit->textCursor().atEnd()) {
+		QString str = expressionEdit->toPlainText();
+		std::string str2 = CALCULATOR->unlocalizeExpression(str.toStdString(), settings->evalops.parse_options);
+		remove_blanks(str2);
+		size_t par_n = 0, vec_n = 0;
+		for(size_t i = 0; i < str2.length(); i++) {
+			if(str2[i] == LEFT_PARENTHESIS_CH) par_n++;
+			else if(par_n > 0 && str2[i] == RIGHT_PARENTHESIS_CH) par_n--;
+			else if(str2[i] == LEFT_VECTOR_WRAP_CH) vec_n++;
+			else if(vec_n > 0 && str2[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
+		}
+		if(par_n <= 0 && vec_n <= 0 && !str2.empty() && str2[0] != '/' && !CALCULATOR->hasToExpression(str2, true, settings->evalops) && !CALCULATOR->hasWhereExpression(str2, settings->evalops) && !last_is_operator(str2)) {
+			int i = str.length() - 1;
+			int nr_of_p = 0;
+			bool prev_plusminus = false;
+			while(i >= 0) {
+				if(str[i] == LEFT_PARENTHESIS_CH) {
+					if(nr_of_p == 0) {
+						if(prev_plusminus) i--;
+						break;
+					}
+					nr_of_p--;
+				} else if(str[i] == RIGHT_PARENTHESIS_CH) {
+					if(nr_of_p == 0 && i + 1 < str.length()) {
+						if(prev_plusminus) i++;
+						break;
+					}
+					nr_of_p++;
+				} else if(nr_of_p == 0) {
+					if(!str[i].isLetterOrNumber() && (signed char) str[i].toLatin1() <= 0) {
+						str2 = str.mid(i, 1).toStdString();
+						CALCULATOR->parseSigns(str2);
+						if(!str2.empty() && (signed char) str2[0] > 0) {
+							if(is_in("+-", str2[0])) {
+								prev_plusminus = true;
+							} else if(is_in("*/&|=><^", str2[0])) {
+								break;
+							} else if(prev_plusminus) {
+								i++;
+								break;
+							}
+						}
+					} else if(str[i] == '+' || str[i] == '-') {
+						prev_plusminus = true;
+					} else if(is_in("*/&|=><^", str[i].toLatin1())) {
+						break;
+					} else if(prev_plusminus) {
+						i++;
+						break;
+					}
+				}
+				i--;
+			}
+			i++;
+			QTextCursor cur = expressionEdit->textCursor();
+			cur.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor, str.length() - i);
+			expressionEdit->setTextCursor(cur);
+		}
 	}
 	QString sargs;
 	bool b_text = USE_QUOTES(f->getArgumentDefinition(1), f);
@@ -3052,16 +3111,21 @@ void QalculateWindow::onFunctionClicked(MathFunction *f) {
 	bool do_exec = false;
 	int minargs = f->minargs();
 	if(minargs == 1 && f->id() == FUNCTION_ID_LOGN) minargs = 2;
-	if(settings->chain_mode) {
-		if(!expressionEdit->document()->isEmpty()) {
+	if(cur.hasSelection()) {
+		do_exec = (!sargs.isEmpty() || minargs <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+	} else if(cur.atEnd() && last_is_number(expressionEdit->toPlainText().toStdString())) {
+		QString str = expressionEdit->toPlainText();
+		size_t par_n = 0, vec_n = 0;
+		for(int i = 0; i < str.length(); i++) {
+			if(str[i] == LEFT_PARENTHESIS_CH) par_n++;
+			else if(par_n > 0 && str[i] == RIGHT_PARENTHESIS_CH) par_n--;
+			else if(str[i] == LEFT_VECTOR_WRAP_CH) vec_n++;
+			else if(vec_n > 0 && str[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
+		}
+		if(par_n <= 0 && vec_n <= 0) {
 			expressionEdit->selectAll();
 			do_exec = !sargs.isEmpty() || minargs <= 1;
 		}
-	} else if(cur.hasSelection()) {
-		do_exec = (!sargs.isEmpty() || minargs <= 1) && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
-	} else if(cur.atEnd() && last_is_number(expressionEdit->toPlainText().toStdString())) {
-		expressionEdit->selectAll();
-		do_exec = !sargs.isEmpty() || minargs <= 1;
 	}
 	if(do_exec) expressionEdit->blockParseStatus();
 	expressionEdit->wrapSelection(f->referenceName() == "neg" ? SIGN_MINUS : QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)), true, true, minargs > 1 && sargs.isEmpty(), sargs, b_text);
@@ -3076,7 +3140,7 @@ void QalculateWindow::negate() {
 void QalculateWindow::onVariableClicked(Variable *v) {
 	if(!v) return;
 	expressionEdit->blockCompletion();
-	expressionEdit->insertPlainText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_VARIABLE, true)));
+	expressionEdit->insertText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_VARIABLE, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -3087,9 +3151,9 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
 		po.can_display_unicode_string_arg = (void*) expressionEdit;
-		expressionEdit->insertPlainText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true)));
+		expressionEdit->insertText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true)));
 	} else {
-		expressionEdit->insertPlainText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
+		expressionEdit->insertText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
@@ -3097,7 +3161,7 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 void QalculateWindow::onPrefixClicked(Prefix *p) {
 	if(!p) return;
 	expressionEdit->blockCompletion();
-	expressionEdit->insertPlainText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
+	expressionEdit->insertText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -3348,6 +3412,10 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 }
 void QalculateWindow::resultDisplayUpdated() {
 	resultFormatUpdated();
+}
+void QalculateWindow::expressionObjectsUpdated() {
+	auto_calculation_updated = true;
+	expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 }
 void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 	settings->updateMessagePrintOptions();
@@ -4543,6 +4611,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 							if(variablesDialog) variablesDialog->updateVariables();
 							if(unitsDialog) unitsDialog->updateUnits();
 							if(current_expr) expressionEdit->clear();
+							variablesMenu->clear();
+							unitsMenu->clear();
 						}
 					}
 				}
@@ -4599,6 +4669,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(variablesDialog) variablesDialog->updateVariables();
 					if(unitsDialog) unitsDialog->updateUnits();
 					if(current_expr) expressionEdit->clear();
+					variablesMenu->clear();
+					unitsMenu->clear();
 				}
 			} else if(equalsIgnoreCase(scom, "function")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
@@ -4656,6 +4728,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					expressionEdit->updateCompletion();
 					if(functionsDialog) functionsDialog->updateFunctions();
 					if(current_expr) expressionEdit->clear();
+					functionsMenu->clear();
 				}
 			} else if(equalsIgnoreCase(scom, "delete")) {
 				str = str.substr(ispace + 1, slen - (ispace + 1));
@@ -4666,7 +4739,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					expressionEdit->updateCompletion();
 					if(variablesDialog) variablesDialog->updateVariables();
 					if(unitsDialog) unitsDialog->updateUnits();
+					variablesMenu->clear();
+					unitsMenu->clear();
 					if(current_expr) expressionEdit->clear();
+
 				} else {
 					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
@@ -4674,6 +4750,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						f->destroy();
 						expressionEdit->updateCompletion();
 						if(functionsDialog) functionsDialog->updateFunctions();
+						functionsMenu->clear();
 						if(current_expr) expressionEdit->clear();
 					} else {
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
@@ -4692,6 +4769,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(variablesDialog) variablesDialog->updateVariables();
 					if(unitsDialog) unitsDialog->updateUnits();
 					if(current_expr) expressionEdit->clear();
+					variablesMenu->clear();
+					unitsMenu->clear();
 				} else {
 					if(str.length() > 2 && str[str.length() - 2] == '(' && str[str.length() - 1] == ')') str = str.substr(0, str.length() - 2);
 					MathFunction *f = CALCULATOR->getActiveFunction(str);
@@ -4702,6 +4781,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 							expressionEdit->updateCompletion();
 							if(functionsDialog) functionsDialog->updateFunctions();
 							if(current_expr) expressionEdit->clear();
+							functionsMenu->clear();
 						}
 					} else if(!b) {
 						CALCULATOR->error(true, "No user-defined variable or function with the specified name (%s) exist.", str.c_str(), NULL);
@@ -5780,6 +5860,9 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
 		if(functionsDialog) functionsDialog->updateFunctions();
+		unitsMenu->clear();
+		variablesMenu->clear();
+		functionsMenu->clear();
 	}
 
 }
@@ -7688,7 +7771,7 @@ void QalculateWindow::onToActivated(bool button) {
 	if(b_addto) {
 		expressionEdit->blockParseStatus();
 		expressionEdit->moveCursor(QTextCursor::End);
-		expressionEdit->insertPlainText("➞");
+		expressionEdit->insertText("➞");
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->displayParseStatus(true, false);
 	}
@@ -7707,7 +7790,7 @@ void QalculateWindow::onToActivated(bool button) {
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
-	if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertPlainText(QString::fromStdString(str));
+	if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertText(QString::fromStdString(str));
 	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 }
 void QalculateWindow::importCSV() {
@@ -7716,10 +7799,12 @@ void QalculateWindow::importCSV() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
+		variablesMenu->clear();
+		unitsMenu->clear();
 		for(size_t i = n; i < CALCULATOR->variables.size(); i++) {
 			if(!CALCULATOR->variables[i]->isHidden()) settings->favourite_variables.push_back(CALCULATOR->variables[i]);
 		}
-		variablesMenu->clear();
+		expressionObjectsUpdated();
 	}
 }
 void QalculateWindow::exportCSV() {
@@ -7732,8 +7817,10 @@ void QalculateWindow::onStoreActivated() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		variablesMenu->clear();
+		unitsMenu->clear();
+		expressionObjectsUpdated();
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 	}
 }
 void QalculateWindow::newVariable() {
@@ -7743,8 +7830,10 @@ void QalculateWindow::newVariable() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		variablesMenu->clear();
+		unitsMenu->clear();
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
+		expressionObjectsUpdated();
 	}
 }
 void QalculateWindow::newMatrix() {
@@ -7754,8 +7843,10 @@ void QalculateWindow::newMatrix() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		variablesMenu->clear();
+		unitsMenu->clear();
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
+		expressionObjectsUpdated();
 	}
 }
 void QalculateWindow::newUnknown() {
@@ -7765,8 +7856,10 @@ void QalculateWindow::newUnknown() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
 		variablesMenu->clear();
+		unitsMenu->clear();
+		if(v != replaced_item && !v->isHidden()) settings->favourite_variables.push_back(v);
+		expressionObjectsUpdated();
 	}
 }
 void QalculateWindow::newUnit() {
@@ -7776,8 +7869,10 @@ void QalculateWindow::newUnit() {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
 		if(unitsDialog) unitsDialog->updateUnits();
-		if(u != replaced_item && !u->isHidden()) settings->favourite_units.push_back(u);
+		variablesMenu->clear();
 		unitsMenu->clear();
+		if(u != replaced_item && !u->isHidden()) settings->favourite_units.push_back(u);
+		expressionObjectsUpdated();
 	}
 }
 
@@ -7787,8 +7882,9 @@ void QalculateWindow::newFunction() {
 	if(f) {
 		expressionEdit->updateCompletion();
 		if(functionsDialog) functionsDialog->updateFunctions();
-		if(f != replaced_item && !f->isHidden()) settings->favourite_functions.push_back(f);
 		functionsMenu->clear();
+		if(f != replaced_item && !f->isHidden()) settings->favourite_functions.push_back(f);
+		expressionObjectsUpdated();
 	}
 }
 
@@ -8752,7 +8848,7 @@ void QalculateWindow::insertProperty(DataObject *o, DataProperty *dp) {
 	str += " ";
 	str += dp->getName();
 	str += ")";
-	expressionEdit->insertPlainText(QString::fromStdString(str));
+	expressionEdit->insertText(QString::fromStdString(str));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -8801,6 +8897,7 @@ void QalculateWindow::openFunctions() {
 	}
 	functionsDialog = new FunctionsDialog();
 	connect(functionsDialog, SIGNAL(itemsChanged()), this, SLOT(onFunctionsChanged()));
+	connect(functionsDialog, SIGNAL(itemsChanged()), this, SLOT(expressionObjectsUpdated()));
 	connect(functionsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteFunctions()));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(applyFunction(MathFunction*)));
 	connect(functionsDialog, SIGNAL(applyFunctionRequest(MathFunction*)), this, SLOT(addToRecentFunctions(MathFunction*)));
@@ -8817,6 +8914,10 @@ void QalculateWindow::onUnitRemoved(Unit *u) {
 void QalculateWindow::onUnitDeactivated(Unit *u) {
 	if(unitsDialog) unitsDialog->unitDeactivated(u);
 }
+void QalculateWindow::resetUnitsAndVariablesMenus() {
+	unitsMenu->clear();
+	variablesMenu->clear();
+}
 void QalculateWindow::openVariables() {
 	if(variablesDialog) {
 		variablesDialog->setWindowState((variablesDialog->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
@@ -8828,8 +8929,8 @@ void QalculateWindow::openVariables() {
 	}
 	variablesDialog = new VariablesDialog();
 	connect(variablesDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
-	connect(variablesDialog, SIGNAL(itemsChanged()), unitsMenu, SLOT(clear()));
-	connect(variablesDialog, SIGNAL(itemsChanged()), variablesMenu, SLOT(clear()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(resetUnitsAndVariablesMenus()));
+	connect(variablesDialog, SIGNAL(itemsChanged()), this, SLOT(expressionObjectsUpdated()));
 	connect(variablesDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteVariables()));
 	connect(variablesDialog, SIGNAL(unitRemoved(Unit*)), this, SLOT(onUnitRemoved(Unit*)));
 	connect(variablesDialog, SIGNAL(unitDeactivated(Unit*)), this, SLOT(onUnitDeactivated(Unit*)));
@@ -8864,8 +8965,8 @@ void QalculateWindow::openUnits() {
 	unitsDialog = new UnitsDialog();
 	if(u && !u->category().empty()) unitsDialog->selectCategory(u->category());
 	connect(unitsDialog, SIGNAL(itemsChanged()), expressionEdit, SLOT(updateCompletion()));
-	connect(unitsDialog, SIGNAL(itemsChanged()), unitsMenu, SLOT(clear()));
-	connect(unitsDialog, SIGNAL(itemsChanged()), variablesMenu, SLOT(clear()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(expressionObjectsUpdated()));
+	connect(unitsDialog, SIGNAL(itemsChanged()), this, SLOT(resetUnitsAndVariablesMenus()));
 	connect(unitsDialog, SIGNAL(favouritesChanged()), this, SLOT(updateFavouriteUnits()));
 	connect(unitsDialog, SIGNAL(variableRemoved(Variable*)), this, SLOT(onVariableRemoved(Variable*)));
 	connect(unitsDialog, SIGNAL(variableDeactivated(Variable*)), this, SLOT(onVariableDeactivated(Variable*)));
@@ -9137,7 +9238,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 
 	//if function takes no arguments, do not display dialog and insert function directly
 	if(f->args() == 0) {
-		expressionEdit->insertPlainText(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)) + "()");
+		expressionEdit->insertText(QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)) + "()");
 		//function_inserted(f);
 		return;
 	}
@@ -9680,7 +9781,7 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 	}
 	str += ")";
 	expressionEdit->blockCompletion(true);
-	expressionEdit->insertPlainText(QString::fromStdString(str));
+	expressionEdit->insertText(QString::fromStdString(str));
 	expressionEdit->blockCompletion(false);
 	//if(fd->add_to_menu) function_inserted(f);
 }
