@@ -6237,7 +6237,7 @@ Enkel</translation>
     <message>
         <location filename="../src/csvdialog.cpp" line="84"/>
         <source>Includes headings</source>
-        <translation>Inkludera kolumnnamn</translation>
+        <translation>Inkluderar kolumnnamn</translation>
     </message>
     <message>
         <location filename="../src/csvdialog.cpp" line="87"/>

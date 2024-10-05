@@ -1419,6 +1419,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			Number save_nbase = CALCULATOR->customOutputBase();
 			to_base = 0;
 			to_bits = 0;
+			to_duo_syms = false;
 			Number nbase;
 			base_from_string(value, settings->printops.base, nbase);
 			CALCULATOR->setCustomOutputBase(nbase);
@@ -1456,6 +1457,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			base_from_string(value, settings->printops.base, nbase, false);
 			to_base = 0;
 			to_bits = 0;
+			to_duo_syms = false;
 			QAction *action = find_child_data(this, "group_outbase", settings->printops.base);
 			if(!action) action = customOutputBaseAction;
 			if(action) action->setChecked(true);
@@ -3274,6 +3276,7 @@ void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 		settings->printops.base = v;
 		to_base = 0;
 		to_bits = 0;
+		to_duo_syms = false;
 		QAction *action = find_child_data(this, "group_outbase", v);
 		if(action) action->setChecked(true);
 		if(b_update) resultFormatUpdated();
@@ -3630,6 +3633,7 @@ void QalculateWindow::setOption(std::string str) {
 				settings->printops.base = v;
 				to_base = 0;
 				to_bits = 0;
+				to_duo_syms = false;
 				QAction *action = find_child_data(this, "group_outbase", v);
 				if(!action) action = find_child_data(this, "group_outbase", BASE_CUSTOM);
 				if(action) {
@@ -4435,7 +4439,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(!do_stack) stack_index = 0;
 
 	if(execute_str.empty()) {
-		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
+		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1;
 	}
 	bool current_expr = false;
 	if(str.empty() && !do_mathoperation) {
@@ -5853,6 +5857,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				QApplication::clipboard()->setMimeData(qm);
 			}
 		}
+		if(!do_calendars && calendarConversionDialog && mstruct->isDateTime() && calendarConversionDialog->isVisible()) calendarConversionDialog->setDate(*mstruct->datetime());
+		if(fpConversionDialog && mstruct->isNumber() && mstruct->number().isReal() && fpConversionDialog->isVisible()) fpConversionDialog->setValue(*mstruct);
 	}
 
 	if(CALCULATOR->checkSaveFunctionCalled()) {
@@ -6318,7 +6324,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->beginTemporaryStopMessages();
 
 	bool do_factors = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
-	to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_bits = 0; to_nbase.clear(); to_caf = -1;
+	to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1;
 	std::string to_str, str_conv;
 	CALCULATOR->parseComments(str, settings->evalops.parse_options);
 	if(str.empty()) {
@@ -6689,10 +6695,10 @@ void QalculateWindow::autoCalculateTimeout() {
 		bool do_to = false;
 
 		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
-			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms != settings->printops.duodecimal_symbols))) {
+			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !settings->printops.duodecimal_symbols))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
-				settings->printops.duodecimal_symbols = to_duo_syms;
+				if(to_duo_syms) settings->printops.duodecimal_symbols = true;
 				if(to_base == BASE_CUSTOM) {
 					custom_base_set = true;
 					save_nbase = CALCULATOR->customOutputBase();
@@ -7141,10 +7147,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(!do_stack) {
 		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
-			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms != settings->printops.duodecimal_symbols))) {
+			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !settings->printops.duodecimal_symbols))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
-				settings->printops.duodecimal_symbols = to_duo_syms;
+				if(to_duo_syms) settings->printops.duodecimal_symbols = true;
 				if(to_base == BASE_CUSTOM) {
 					custom_base_set = true;
 					save_nbase = CALCULATOR->customOutputBase();
@@ -8225,6 +8231,7 @@ void QalculateWindow::outputBaseActivated() {
 	int v = qobject_cast<QAction*>(sender())->data().toInt();
 	to_base = 0;
 	to_bits = 0;
+	to_duo_syms = false;
 	if(v == BASE_CUSTOM) {
 		v = customOutputBaseEdit->value();
 		if(v > 2 && v <= 36) {
@@ -8243,6 +8250,7 @@ void QalculateWindow::onCustomOutputBaseChanged(int v) {
 	customOutputBaseAction->setChecked(true);
 	to_base = 0;
 	to_bits = 0;
+	to_duo_syms = false;
 	if(v > 2 && v <= 36) {
 		settings->printops.base = v;
 	} else {

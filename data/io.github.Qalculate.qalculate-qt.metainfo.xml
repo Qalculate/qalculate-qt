@@ -83,8 +83,9 @@
       <li>Update parsed expression and calculate-as-you-type result if variable, function, or unit in expression has changed</li>
       <li>Improve support for small displays with low resolution/high scaling</li>
       <li>Update chain mode to match behaviour in Gtk UI</li>
+      <li>Update calendar and floating point conversion dialogs after expression calculation</li>
       <li>Portuguese (pt_PT) translation</li>
-      <li>Fixes for overwrite input mode
+      <li>Fixes for overwrite input mode</li>
       <li>Fix unresponsive expression field in some cases after smart parentheses has been applied</li>
       <li>Fix completion with both custom app font and custom expression font set</li>
       <li>Fix input of max value for number argument</li>
