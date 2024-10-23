@@ -481,6 +481,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	menu->addAction(tr("Keyboard Shortcuts"), this, SLOT(editKeyboardShortcuts()));
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
+	menu->addAction(tr("Open Settings Folder"), this, SLOT(openSettingsFolder()));
 	menu->addSeparator();
 	helpAction = menu->addAction(tr("Help"), this, SLOT(help()));
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
@@ -8835,6 +8836,10 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();
+}
+void QalculateWindow::openSettingsFolder() {
+	if(getLocalDir() != getLocalDataDir()) QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(getLocalDataDir() + "/definitions")));
+	QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(getLocalDir())));
 }
 void QalculateWindow::onDatasetsChanged() {
 	expressionEdit->updateCompletion();
