@@ -1559,6 +1559,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);
 		fprintf(file, "twos_complement=%i\n", printops.twos_complement);
 		fprintf(file, "hexadecimal_twos_complement=%i\n", printops.hexadecimal_twos_complement);
+		fprintf(file, "twos_complement_input=%i\n", evalops.parse_options.twos_complement);
+		fprintf(file, "hexadecimal_twos_complement_input=%i\n", evalops.parse_options.hexadecimal_twos_complement);
 		fprintf(file, "use_unicode_signs=%i\n", printops.use_unicode_signs);
 		fprintf(file, "lower_case_numbers=%i\n", printops.lower_case_numbers);
 		fprintf(file, "duodecimal_symbols=%i\n", printops.duodecimal_symbols);
