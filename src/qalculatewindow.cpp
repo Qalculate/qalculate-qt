@@ -481,7 +481,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	menu->addAction(tr("Keyboard Shortcuts"), this, SLOT(editKeyboardShortcuts()));
 	menu->addAction(tr("Preferences"), this, SLOT(editPreferences()));
-	menu->addAction(tr("Open Settings Folder"), this, SLOT(openSettingsFolder()));
+	menu->addAction(tr("Open Settings Folder(s)", "", getLocalDir() == getLocalDataDir() ? 1 : 2), this, SLOT(openSettingsFolder()));
 	menu->addSeparator();
 	helpAction = menu->addAction(tr("Help"), this, SLOT(help()));
 	menu->addAction(tr("Report a Bug"), this, SLOT(reportBug()));
@@ -6799,11 +6799,13 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->endTemporaryStopMessages(false, &messages);
 	bool b_error = false, b_warning = false;
 	for(size_t i = 0; i < messages.size(); i++) {
-		if(messages[i].type() == MESSAGE_ERROR) {
-			b_error = true;
-			break;
-		} else if(messages[i].type() == MESSAGE_WARNING) {
-			b_warning = true;
+		if(!mauto.isAborted() || messages[i].stage() != MESSAGE_STAGE_CALCULATION) {
+			if(messages[i].type() == MESSAGE_ERROR) {
+				b_error = true;
+				break;
+			} else if(messages[i].type() == MESSAGE_WARNING) {
+				b_warning = true;
+			}
 		}
 	}
 
@@ -8838,8 +8840,12 @@ void QalculateWindow::editPreferences() {
 	preferencesDialog->show();
 }
 void QalculateWindow::openSettingsFolder() {
-	if(getLocalDir() != getLocalDataDir()) QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(getLocalDataDir() + "/definitions")));
-	QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(getLocalDir())));
+	if(getLocalDir() != getLocalDataDir()) {
+		std::string dir = buildPath(getLocalDataDir(), "definitions");
+		if(dirExists(dir) || recursiveMakeDir(dir)) QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(dir)));
+	}
+	std::string dir = getLocalDir();
+	if(dirExists(dir) || recursiveMakeDir(dir)) QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(dir)));
 }
 void QalculateWindow::onDatasetsChanged() {
 	expressionEdit->updateCompletion();
