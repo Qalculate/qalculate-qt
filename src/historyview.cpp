@@ -408,7 +408,7 @@ void HistoryView::clearTemporary() {
 
 bool HistoryView::testTemporaryResultLength(const std::string &str) {
 	QFontMetrics fm(font());
-	return fm.boundingRect(QString("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() < width() * 1.65;
+	return fm.boundingRect(QStringLiteral("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() < width() * 1.65;
 }
 
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, int initial_load, size_t index, bool temporary) {
@@ -466,8 +466,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	PASTE_H
 	QString str;
 	if(!expression.empty() || !parse.empty()) {
-		if(initial_load && index != settings->v_expression.size() - 1) str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
-		else str += QString("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
+		if(initial_load && index != settings->v_expression.size() - 1) str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
+		else str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
 		if(temporary) {
 			parse_tmp = parse;
 			result_tmp = (values.empty() ? "" : values[0]);
@@ -494,12 +494,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", parse);
 		if(!temporary && !expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
 			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
-				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QStringLiteral("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 				if(settings->color == 2) str += "&nbsp; <i style=\"color: #AAAAAA\">";
 				else str += "&nbsp; <i style=\"color: #666666\">";
-				str += QString("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QStringLiteral("<a name=\"a%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				if(pexact) str += "= ";
 				else str += SIGN_ALMOST_EQUAL " ";
 				if(!settings->colorize_result) str += QString::fromStdString(uncolorize(parse, false));
@@ -507,13 +507,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "</a>";
 				str += "</i>";
 			} else {
-				str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QStringLiteral("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 			}
 		} else {
 			if(temporary) str += "<a name=\"TP\" style=\"text-decoration: none\">";
-			else str += QString("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+			else str += QStringLiteral("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
 			if(!settings->colorize_result) str += QString::fromStdString(uncolorize(parse, false));
 			else str += QString::fromStdString(parse);
@@ -522,7 +522,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += "&nbsp;&nbsp;&nbsp; ";
 				if(settings->color == 2) str += "<i style=\"color: #AAAAAA\">";
 				else str += "<i style=\"color: #666666\">";
-				str += QString("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
+				str += QStringLiteral("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				str += QString::fromStdString(replace_parse_colors(expression));
 				str += "</a>";
 				str += "</i>";
@@ -539,7 +539,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		if(temporary) {
 			temporary_error = serror;
-			if(!serror.isEmpty()) str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\" alt=\"temporary_error\"/>").arg(":/icons/actions/scalable/warning.svg").arg(fm.ascent());
+			if(!serror.isEmpty()) str += QStringLiteral("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\" alt=\"temporary_error\"/>").arg(":/icons/actions/scalable/warning.svg").arg(fm.ascent());
 		}
 		str += "</td></tr>";
 	} else if(!initial_load && !settings->v_result.empty()) {
@@ -580,9 +580,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 			QString sref;
 			if(settings->color == 2) {
-				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			} else {
-				sref = QString("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			}
 			bool b = true;
 			if(initial_load) {
@@ -610,7 +610,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "; font-size:x-large";
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"2\"/></i>", values[i]);
 		}
-		if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QString("; padding-bottom: %1 px").arg(paste_h / 4);
+		if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QStringLiteral("; padding-bottom: %1 px").arg(paste_h / 4);
 		str += "\">";
 		int b_exact = 1;
 		if(initial_load) {
@@ -622,8 +622,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(temporary && !values[i].empty()) {
 			str += "<a name=\"TR\" style=\"text-decoration: none\">";
 		} else if(!temporary) {
-			if(i_answer == 0) str += QString("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
-			else str += QString("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			else str += QStringLiteral("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		}
 		if(!temporary || !values[i].empty()) {
 			if(b_exact > 0) str += "= ";
@@ -632,7 +632,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(!settings->colorize_result) str += QString::fromStdString(uncolorize(values[i], false));
 		else str += QString::fromStdString(values[i]);
 		if(!image.isEmpty() && i == values.size() - 1 && w * 1.85 + w_number + fm.ascent() <= width()) {
-			str += QString("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"").arg(image).arg(fm.ascent());
+			str += QStringLiteral("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\"").arg(image).arg(fm.ascent());
 			CALCULATOR->setExchangeRatesUsed(-100);
 			int i = CALCULATOR->exchangeRatesUsed();
 			CALCULATOR->setExchangeRatesUsed(-100);

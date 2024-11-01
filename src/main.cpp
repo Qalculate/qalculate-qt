@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
 		if(lockFile.error() == QLockFile::LockFailedError) {
 			bool ami_changed = false;
 			if(settings->allow_multiple_instances < 0 && parser->value(fOption).isEmpty() && parser->value(wOption).isEmpty() && parser->positionalArguments().isEmpty()) {
-				settings->allow_multiple_instances = (QMessageBox::question(NULL, QString("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
+				settings->allow_multiple_instances = (QMessageBox::question(NULL, QStringLiteral("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
 				ami_changed = true;
 				if(settings->allow_multiple_instances) {
 					QLocalSocket socket;
