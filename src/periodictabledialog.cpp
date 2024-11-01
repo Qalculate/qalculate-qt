@@ -197,10 +197,10 @@ void PeriodicTableDialog::elementClicked() {
 		case TRANSACTINIDES: {group_name = tr("Unknown chemical properties"); break;}
 		default: {group_name = tr("Unknown"); break;}
 	}
-	grid->addWidget(new QLabel(QString("<div style=\"font-size: large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_number))), dialog), 0, 0, 1, 3, Qt::AlignRight);
-	grid->addWidget(new QLabel(QString("<div style=\"font-size: xx-large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_symbol))), dialog), 1, 0, 1, 3);
-	grid->addWidget(new QLabel(QString("<div style=\"font-size: x-large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_name))), dialog), 2, 0, 1, 3);
-	grid->addWidget(new QLabel(QString("<div style=\"font-weight: bold\">%1</div>").arg(tr("%1:").arg(QString::fromStdString(p_class->title()))), dialog), 3, 0);
+	grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-size: large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_number))), dialog), 0, 0, 1, 3, Qt::AlignRight);
+	grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-size: xx-large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_symbol))), dialog), 1, 0, 1, 3);
+	grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-size: x-large\">%1</div>").arg(QString::fromStdString(e->getProperty(p_name))), dialog), 2, 0, 1, 3);
+	grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-weight: bold\">%1</div>").arg(tr("%1:").arg(QString::fromStdString(p_class->title()))), dialog), 3, 0);
 	grid->addWidget(new QLabel(group_name, dialog), 3, 1);
 	DataPropertyIter it;
 	DataProperty *dp = ds->getFirstProperty(&it);
@@ -209,7 +209,7 @@ void PeriodicTableDialog::elementClicked() {
 		if(!dp->isHidden() && dp != p_number && dp != p_class && dp != p_symbol && dp != p_name) {
 			std::string sval = e->getPropertyDisplayString(dp);
 			if(!sval.empty()) {
-				grid->addWidget(new QLabel(QString("<div style=\"font-weight: bold\">%1</div>").arg(tr("%1:").arg(QString::fromStdString(dp->title()))), dialog), row, 0);
+				grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-weight: bold\">%1</div>").arg(tr("%1:").arg(QString::fromStdString(dp->title()))), dialog), row, 0);
 				grid->addWidget(new QLabel(QString::fromStdString(sval), dialog), row, 1);
 				QPushButton *button = new QPushButton(LOAD_ICON("edit-paste"), QString(), dialog);
 				grid->addWidget(button, row, 2);

@@ -1157,35 +1157,35 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	shortcuts.removeAll(QKeySequence::fromString(ks->key));
 	ks->action->setShortcuts(shortcuts);
 	if(ks->type[0] == SHORTCUT_TYPE_PLOT && plotAction_t) {
-		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		plotAction_t->setToolTip(tr("Plot Functions/Data") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		storeAction_t->setToolTip(tr("Store") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		unitsAction_t->setToolTip(tr("Units") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+		functionsAction_t->setToolTip(tr("Functions") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
-		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
-		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
-		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
-		menuAction_t->setToolTip(tr("Menu") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		menuAction_t->setToolTip(tr("Menu") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
-		rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
-		rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
-		rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
-		rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
-		rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
-		rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
-		rpnClearAction->setToolTip(tr("Clear the RPN stack") + (shortcuts.isEmpty() ? QString() : QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		rpnClearAction->setToolTip(tr("Clear the RPN stack") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	}
 }
 void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
@@ -1244,38 +1244,38 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		addAction(action);
 		action->setShortcuts(shortcuts);
 		if(ks->type[0] == SHORTCUT_TYPE_PLOT) {
-			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			if(plotAction_t) plotAction_t->setToolTip(tr("Plot Functions/Data") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_UNITS) {
-			unitsAction_t->setToolTip(tr("Units") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+			unitsAction_t->setToolTip(tr("Units") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MANAGE_FUNCTIONS) {
-			functionsAction_t->setToolTip(tr("Functions") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+			functionsAction_t->setToolTip(tr("Functions") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
-			basesAction->setToolTip(tr("Number Bases") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			basesAction->setToolTip(tr("Number Bases") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_UP) {
-			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DOWN) {
-			rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnDownAction->setToolTip(tr("Rotate the stack or move the selected register down") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_SWAP) {
-			rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnSwapAction->setToolTip(tr("Swap the top two values or move the selected value to the top of the stack") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_DELETE) {
-			rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnDeleteAction->setToolTip(tr("Delete the top or selected value") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_LASTX) {
-			rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnLastxAction->setToolTip(tr("Enter the top value from before the last numeric operation") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_COPY) {
-			rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnCopyAction->setToolTip(tr("Copy the selected or top value to the top of the stack") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_RPN_CLEAR) {
-			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QString(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
+			rpnClearAction->setToolTip(tr("Clear the RPN stack") + QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText)));
 		}
 	} else {
 		if(ks->type[0] == SHORTCUT_TYPE_MODE) {
-			modeAction_t->setToolTip(tr("Mode") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+			modeAction_t->setToolTip(tr("Mode") + QStringLiteral(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
-			menuAction_t->setToolTip(tr("Menu") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+			menuAction_t->setToolTip(tr("Menu") + QStringLiteral(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		} else if(ks->type[0] == SHORTCUT_TYPE_STORE) {
-			storeAction_t->setToolTip(tr("Store") + QString("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
+			storeAction_t->setToolTip(tr("Store") + QStringLiteral("(%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 		}
 		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
-			toAction_t->setToolTip(tr("Convert") + QString(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+			toAction_t->setToolTip(tr("Convert") + QStringLiteral(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
 		}
 		ks->new_action = true;
 		action = new QAction(this);
@@ -2792,12 +2792,12 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QString("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2024 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QStringLiteral("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2024 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
 	Number nr(i, 1, 0);
-	expressionEdit->insertText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
+	expressionEdit->insertText(QStringLiteral("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -6111,7 +6111,7 @@ void QalculateWindow::updateResultBases() {
 						} else if(sbin_i[i2] == '<') {
 							inhtml = false;
 						} else if(!inhtml && (sbin_i[i2] == '0' || sbin_i[i2] == '1')) {
-							sbin_i.replace(i2, 1, QString("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
+							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
 							n++;
 						}
 					}
@@ -8522,7 +8522,7 @@ void QalculateWindow::currentShortcutActionChanged() {
 			shortcutActionValueEdit->addItems(citems);
 		} else if(i == SHORTCUT_TYPE_OPERATOR) {
 			QStringList citems;
-			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
+			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QStringLiteral(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QStringLiteral(".") + settings->multiplicationSign(false)) << (QStringLiteral(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			shortcutActionValueEdit->addItems(citems);
 		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
 			settings->updateActionValueTexts();
@@ -9634,7 +9634,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 						if(use_current_result) {
 							if(exact_text.empty()) {
 								Number nr(settings->history_answer.size(), 1, 0);
-								((QLineEdit*) fd->entry[i])->setText(QString("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
+								((QLineEdit*) fd->entry[i])->setText(QStringLiteral("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 							} else {
 								((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(exact_text));
 							}

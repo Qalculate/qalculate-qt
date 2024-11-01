@@ -983,8 +983,8 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						sourceModel->appendRow(items);}
 
 #define COMPLETION_APPEND_FLAG(x, y, y2, z, p)	if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {COMPLETION_APPEND_2(x, y, y2, z, p)} \
-						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
-						else {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
+						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
+						else {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
 
 #define MAX_COMPLETION_LENGTH_1 25
 #define MAX_COMPLETION_LENGTH_2 25

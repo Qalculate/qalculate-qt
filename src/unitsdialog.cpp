@@ -334,7 +334,7 @@ void UnitsDialog::newClicked() {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(u->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateUnits();
@@ -429,7 +429,7 @@ void UnitsDialog::editClicked() {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(u->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateUnits();

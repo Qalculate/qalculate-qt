@@ -1075,7 +1075,7 @@ void KeypadWidget::currentCustomActionChanged(QTreeWidgetItem *item, QTreeWidget
 			valueEdit->addItems(citems);
 		} else if(i == SHORTCUT_TYPE_OPERATOR) {
 			QStringList citems;
-			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QString(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QString(".") + settings->multiplicationSign(false)) << (QString(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
+			citems << "+" << (settings->printops.use_unicode_signs ? SIGN_MINUS : "-") << settings->multiplicationSign(false) << settings->divisionSign(false) << "^" << ".+" << (QStringLiteral(".") + (settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) << (QStringLiteral(".") + settings->multiplicationSign(false)) << (QStringLiteral(".") + settings->divisionSign(false)) << ".^" << "mod" << "rem" << "//" << "&" << "|" << "<<" << ">>" << "&&" << "||" << "xor" << "=" << SIGN_NOT_EQUAL << "<" << SIGN_LESS_OR_EQUAL << SIGN_GREATER_OR_EQUAL << ">";
 			valueEdit->addItems(citems);
 		} else if(i == SHORTCUT_TYPE_COPY_RESULT) {
 			settings->updateActionValueTexts();
