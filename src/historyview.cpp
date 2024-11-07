@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <QMouseEvent>
 #include <QFontMetrics>
+#include <QCalendarWidget>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QContextMenuEvent>
@@ -175,6 +176,9 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent) {
 	findAction = new QAction(tr("Search…"), this);
 	addAction(findAction);
 	connect(findAction, SIGNAL(triggered()), this, SLOT(editFind()));
+	findDateAction = new QAction(tr("Search by Date…"), this);
+	addAction(findDateAction);
+	connect(findDateAction, SIGNAL(triggered()), this, SLOT(editFindDate()));
 }
 HistoryView::~HistoryView() {}
 
@@ -1083,6 +1087,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		selectAllAction->setShortcut(QKeySequence::SelectAll);
 		selectAllAction->setShortcutContext(Qt::WidgetShortcut);
 		cmenu->addAction(findAction);
+		cmenu->addAction(findDateAction);
 		cmenu->addSeparator();
 		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
 		protectAction->setCheckable(true);
@@ -1113,6 +1118,12 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		delAction->setEnabled(i1 >= 0);
 		protectAction->setEnabled(i1 >= 0);
 		movetotopAction->setEnabled(i1 >= 0 && !settings->v_expression.empty());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+		if(i1 >= 0 && !settings->v_time.empty() && settings->v_time[i1] != 0) findDateAction->setText(tr("Search by Date…") + " (" + QDateTime::fromSecsSinceEpoch(settings->v_time[i1]).date().toString(Qt::ISODate) + ")");
+#else
+		if(i1 >= 0 && !settings->v_time.empty() && settings->v_time[i1] != 0) findDateAction->setText(tr("Search by Date…") + " (" + QDateTime::fromMSecsSinceEpoch(settings->v_time[i1] * 1000).date().toString(Qt::ISODate) + ")");
+#endif
+		else findDateAction->setText(tr("Search by Date…"));
 	} else {
 		copyAction->setEnabled(textCursor().hasSelection());
 		copyFormattedAction->setEnabled(textCursor().hasSelection());
@@ -1122,6 +1133,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		movetotopAction->setEnabled(false);
 		insertValueAction->setEnabled(false);
 		insertTextAction->setEnabled(false);
+		findDateAction->setText(tr("Search by Date…"));
 	}
 	clearAction->setEnabled(!settings->v_expression.empty());
 	cmenu->popup(e->globalPos());
@@ -1180,6 +1192,50 @@ void HistoryView::editFind() {
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), searchDialog, SLOT(reject()));
 	box->addWidget(buttonBox);
 	searchDialog->show();
+}
+
+void HistoryView::editFindDate() {
+	QDialog *dialog = new QDialog(this, Qt::Popup);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	box->setContentsMargins(0, 0, 0, 0);
+	QCalendarWidget *w = new QCalendarWidget(dialog);
+	if(!settings->v_time.empty() && settings->v_time[settings->v_time.size() - 1] > 0) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+		w->setMaximumDate(QDateTime::fromSecsSinceEpoch(settings->v_time[settings->v_time.size() - 1]).date());
+#else
+		w->setMaximumDate(QDateTime::fromMSecsSinceEpoch(settings->v_time[settings->v_time.size() - 1] * 1000).date());
+#endif
+		for(size_t i = settings->v_time.size() - 1; ; i--) {
+			if(i == 0 || settings->v_time[i] == 0) {
+				if(settings->v_time[i] == 0) i++;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+				w->setMinimumDate(QDateTime::fromSecsSinceEpoch(settings->v_time[i]).date());
+#else
+				w->setMinimumDate(QDateTime::fromMSecsSinceEpoch(settings->v_time[i] * 1000).date());
+#endif
+				break;
+			}
+		}
+	}
+	box->addWidget(w);
+	connect(w, SIGNAL(clicked(QDate)), dialog, SLOT(accept()));
+	connect(w, SIGNAL(activated(QDate)), dialog, SLOT(accept()));
+	if(dialog->exec() == QDialog::Accepted) {
+		QDate date = w->selectedDate();
+		for(size_t i = settings->v_time.size(); i > 0; i--) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+			if(settings->v_time[i - 1] != 0 && QDateTime::fromSecsSinceEpoch(settings->v_time[i - 1]).date() <= date) {
+#else
+			if(settings->v_time[i - 1] != 0 && QDateTime::fromMSecsSinceEpoch(settings->v_time[i - 1] * 1000).date() <= date) {
+#endif
+				if(settings->history_expression_type > 1) scrollToAnchor("e" + QString::number(i - 1));
+				else scrollToAnchor(QString::number(i - 1));
+				break;
+			}
+		}
+	}
+	dialog->deleteLater();
 }
 
 void remove_separator(std::string &copy_text) {
