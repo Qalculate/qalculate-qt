@@ -6335,6 +6335,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 	ComplexNumberForm cnf_bak = settings->evalops.complex_number_form;
 	ComplexNumberForm cnf = settings->evalops.complex_number_form;
+	bool caf_bak = settings->complex_angle_form;
 	bool delay_complex = false;
 	bool b_units_saved = settings->evalops.parse_options.units_enabled;
 	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
@@ -6440,7 +6441,7 @@ void QalculateWindow::autoCalculateTimeout() {
 				to_base = BASE_UNICODE;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "utc") || equalsIgnoreCase(to_str, "gmt")) {
-				settings->printops.time_zone = TIME_ZONE_UTC;
+				po.time_zone = TIME_ZONE_UTC;
 				do_to = true;
 			} else if(to_str.length() > 3 && equalsIgnoreCase(to_str.substr(0, 3), "bin") && is_in(NUMBERS, to_str[3])) {
 				to_base = BASE_BINARY;
@@ -6479,12 +6480,12 @@ void QalculateWindow::autoCalculateTimeout() {
 				} else {
 					CALCULATOR->error(true, tr("Time zone parsing failed.").toUtf8().data(),  NULL);
 				}
-				settings->printops.time_zone = TIME_ZONE_CUSTOM;
-				settings->printops.custom_time_zone = itz;
+				po.time_zone = TIME_ZONE_CUSTOM;
+				po.custom_time_zone = itz;
 				do_to = true;
 			} else if(to_str == "CET") {
-				settings->printops.time_zone = TIME_ZONE_CUSTOM;
-				settings->printops.custom_time_zone = 60;
+				po.time_zone = TIME_ZONE_CUSTOM;
+				po.custom_time_zone = 60;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "bases") || equalsIgnoreCase(to_str, tr("bases").toStdString())) {
 				do_bases = true;
@@ -6598,7 +6599,7 @@ void QalculateWindow::autoCalculateTimeout() {
 
 	MathStructure mexact, mto, mparsed;
 	mexact.setUndefined();
-	settings->printops.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
+	po.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
 	if(do_calendars || do_bases) mauto.setAborted();
 	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mparsed, &mto);
 	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
@@ -6606,7 +6607,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		result = "";
 	}
 	if(!mauto.isAborted()) {
-		if(settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) {
+		if(settings->dual_approximation > 0 || po.base == BASE_DECIMAL) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mparsed, settings->evalops, settings->dual_approximation != 0 ? AUTOMATIC_APPROXIMATION_SINGLE : AUTOMATIC_APPROXIMATION_OFF, 0, -1);
 			mexact.setUndefined();
@@ -6620,13 +6621,13 @@ void QalculateWindow::autoCalculateTimeout() {
 				if((mauto.isNumber() || mauto.isVector()) && to_fraction == 0 && to_fixed_fraction == 0) to_fraction = 2;
 				if(!mauto.integerFactorize()) {
 					mauto.structure(STRUCTURING_FACTORIZE, settings->evalops, true);
-					settings->printops.allow_factorization = true;
+					po.allow_factorization = true;
 				}
 			} else if(do_pfe) {
 				mauto.expandPartialFractions(settings->evalops);
 			} else if(do_expand) {
 				mauto.expand(settings->evalops);
-				settings->printops.allow_factorization = false;
+				po.allow_factorization = false;
 			}
 			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) mauto.setAborted();
 		}
@@ -6679,27 +6680,16 @@ void QalculateWindow::autoCalculateTimeout() {
 
 		Number save_nbase;
 		bool custom_base_set = false;
-		int save_base = settings->printops.base;
-		bool caf_bak = settings->complex_angle_form;
-		unsigned int save_bits = settings->printops.binary_bits;
-		bool save_pre = settings->printops.use_unit_prefixes;
-		bool save_cur = settings->printops.use_prefixes_for_currencies;
-		bool save_allu = settings->printops.use_prefixes_for_all_units;
-		bool save_all = settings->printops.use_all_prefixes;
-		bool save_den = settings->printops.use_denominator_prefix;
 		int save_bin = CALCULATOR->usesBinaryPrefixes();
-		NumberFractionFormat save_format = settings->printops.number_fraction_format;
 		long int save_fden = CALCULATOR->fixedDenominator();
-		bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
 		int save_dual = settings->dual_fraction;
-		bool save_duo_syms = settings->printops.duodecimal_symbols;
 		bool do_to = false;
 
 		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
-			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !settings->printops.duodecimal_symbols))) {
-				settings->printops.base = to_base;
-				settings->printops.binary_bits = to_bits;
-				if(to_duo_syms) settings->printops.duodecimal_symbols = true;
+			if(to_base != 0 && (to_base != po.base || to_bits != po.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !po.duodecimal_symbols))) {
+				po.base = to_base;
+				po.binary_bits = to_bits;
+				if(to_duo_syms) po.duodecimal_symbols = true;
 				if(to_base == BASE_CUSTOM) {
 					custom_base_set = true;
 					save_nbase = CALCULATOR->customOutputBase();
@@ -6708,16 +6698,16 @@ void QalculateWindow::autoCalculateTimeout() {
 				do_to = true;
 			}
 			if(to_fixed_fraction >= 2) {
-				if(to_fraction == 2 || (to_fraction < 0 && !contains_fraction_qt(mauto))) settings->printops.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
-				else settings->printops.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
+				if(to_fraction == 2 || (to_fraction < 0 && !contains_fraction_qt(mauto))) po.number_fraction_format = FRACTION_FRACTIONAL_FIXED_DENOMINATOR;
+				else po.number_fraction_format = FRACTION_COMBINED_FIXED_DENOMINATOR;
 				CALCULATOR->setFixedDenominator(to_fixed_fraction);
 				settings->dual_fraction = 0;
 				do_to = true;
-			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || settings->printops.restrict_fraction_length || (to_fraction != 2 && settings->printops.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && settings->printops.number_fraction_format != FRACTION_FRACTIONAL) || (to_fraction == 3 && settings->printops.number_fraction_format != FRACTION_DECIMAL))) {
-				settings->printops.restrict_fraction_length = false;
-				if(to_fraction == 3) settings->printops.number_fraction_format = FRACTION_DECIMAL;
-				else if(to_fraction == 2) settings->printops.number_fraction_format = FRACTION_FRACTIONAL;
-				else settings->printops.number_fraction_format = FRACTION_COMBINED;
+			} else if(to_fraction > 0 && (settings->dual_fraction != 0 || po.restrict_fraction_length || (to_fraction != 2 && po.number_fraction_format != FRACTION_COMBINED) || (to_fraction == 2 && po.number_fraction_format != FRACTION_FRACTIONAL) || (to_fraction == 3 && po.number_fraction_format != FRACTION_DECIMAL))) {
+				po.restrict_fraction_length = false;
+				if(to_fraction == 3) po.number_fraction_format = FRACTION_DECIMAL;
+				else if(to_fraction == 2) po.number_fraction_format = FRACTION_FRACTIONAL;
+				else po.number_fraction_format = FRACTION_COMBINED;
 				settings->dual_fraction = 0;
 				do_to = true;
 			}
@@ -6726,11 +6716,11 @@ void QalculateWindow::autoCalculateTimeout() {
 				do_to = true;
 			}
 			if(to_prefix != 0) {
-				bool new_pre = settings->printops.use_unit_prefixes;
-				bool new_cur = settings->printops.use_prefixes_for_currencies;
-				bool new_allu = settings->printops.use_prefixes_for_all_units;
-				bool new_all = settings->printops.use_all_prefixes;
-				bool new_den = settings->printops.use_denominator_prefix;
+				bool new_pre = po.use_unit_prefixes;
+				bool new_cur = po.use_prefixes_for_currencies;
+				bool new_allu = po.use_prefixes_for_all_units;
+				bool new_all = po.use_all_prefixes;
+				bool new_den = po.use_denominator_prefix;
 				int new_bin = CALCULATOR->usesBinaryPrefixes();
 				new_pre = true;
 				if(to_prefix == 'b') {
@@ -6750,43 +6740,44 @@ void QalculateWindow::autoCalculateTimeout() {
 					if(to_prefix == 'a') new_all = true;
 					else if(to_prefix == 'd') new_bin = 0;
 				}
-				if(settings->printops.use_unit_prefixes != new_pre || settings->printops.use_prefixes_for_currencies != new_cur || settings->printops.use_prefixes_for_all_units != new_allu || settings->printops.use_all_prefixes != new_all || settings->printops.use_denominator_prefix != new_den || CALCULATOR->usesBinaryPrefixes() != new_bin) {
-					settings->printops.use_unit_prefixes = new_pre;
-					settings->printops.use_all_prefixes = new_all;
-					settings->printops.use_prefixes_for_currencies = new_cur;
-					settings->printops.use_prefixes_for_all_units = new_allu;
-					settings->printops.use_denominator_prefix = new_den;
+				if(po.use_unit_prefixes != new_pre || po.use_prefixes_for_currencies != new_cur || po.use_prefixes_for_all_units != new_allu || po.use_all_prefixes != new_all || po.use_denominator_prefix != new_den || CALCULATOR->usesBinaryPrefixes() != new_bin) {
+					po.use_unit_prefixes = new_pre;
+					po.use_all_prefixes = new_all;
+					po.use_prefixes_for_currencies = new_cur;
+					po.use_prefixes_for_all_units = new_allu;
+					po.use_denominator_prefix = new_den;
 					CALCULATOR->useBinaryPrefixes(new_bin);
 					do_to = true;
 				}
 			}
 		}
 
-		PrintOptions po = settings->printops;
 		po.allow_non_usable = true;
-		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, settings->complex_angle_form, NULL, true, settings->format_result, settings->color, TAG_TYPE_HTML, -1, had_to_expression);
+		AutomaticFractionFormat aff = AUTOMATIC_FRACTION_OFF;
+		if(settings->dual_fraction != 0) {
+			if(mauto.isNumber() && mauto.number().isRational() && mauto.number().denominator() <= 12 && mauto.number() < 100 && mauto.number() > -100) {
+				if(settings->dual_fraction < 0) aff = AUTOMATIC_FRACTION_AUTO;
+				else aff = AUTOMATIC_FRACTION_DUAL;
+			} else {
+				aff = AUTOMATIC_FRACTION_SINGLE;
+			}
+		}
+		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, aff, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, -1, had_to_expression);
+		for(size_t i = 0; i < values.size(); i++) {
+			result += " = ";
+			result += values[i];
+		}
 		values.clear();
 		if(do_to) {
 			settings->complex_angle_form = caf_bak;
-			settings->printops.base = save_base;
-			settings->printops.duodecimal_symbols = save_duo_syms;
-			settings->printops.binary_bits = save_bits;
 			if(custom_base_set) CALCULATOR->setCustomOutputBase(save_nbase);
-			settings->printops.use_unit_prefixes = save_pre;
-			settings->printops.use_all_prefixes = save_all;
-			settings->printops.use_prefixes_for_currencies = save_cur;
-			settings->printops.use_prefixes_for_all_units = save_allu;
-			settings->printops.use_denominator_prefix = save_den;
 			CALCULATOR->useBinaryPrefixes(save_bin);
-			settings->printops.number_fraction_format = save_format;
 			CALCULATOR->setFixedDenominator(save_fden);
 			settings->dual_fraction = save_dual;
-			settings->printops.restrict_fraction_length = save_restrict_fraction_length;
 			settings->evalops.complex_number_form = cnf_bak;
 			settings->evalops.auto_post_conversion = save_auto_post_conversion;
 			settings->evalops.parse_options.units_enabled = b_units_saved;
 			settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-			settings->printops.time_zone = TIME_ZONE_LOCAL;
 		}
 	}
 	CALCULATOR->stopControl();
@@ -6848,7 +6839,9 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 	auto_expression = current_status.toStdString();
 	CALCULATOR->addMessages(&messages);
-	historyView->addResult(values, "", true, auto_expression, !is_approximate && !mauto.isApproximate(), false, flag, NULL, 0, 0, true);
+	int b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
+	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
+	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true);
 	updateWindowTitle(QString::fromStdString(unhtmlize(auto_result)), true);
 }
 
