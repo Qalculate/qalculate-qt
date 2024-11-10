@@ -1479,6 +1479,10 @@ Do you want to overwrite the function?</source>
         <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
         <translation>Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
     </message>
+    <message>
+        <source>Search by Date…</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>
@@ -2514,11 +2518,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use lower case letters in non-decimal numbers</source>
-        <translation type="vanished">Использовать строчные буквы в недесятичных числах</translation>
+        <translation>Использовать строчные буквы в недесятичных числах</translation>
     </message>
     <message>
         <source>Spell out logical operators</source>
-        <translation type="vanished">Изложить логично логические операции</translation>
+        <translation>Изложить логично логические операции</translation>
     </message>
     <message>
         <source>Preferences</source>
@@ -2531,35 +2535,35 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use dot as multiplication sign</source>
-        <translation type="vanished">Использовать точку как знак умножения</translation>
+        <translation>Использовать точку как знак умножения</translation>
     </message>
     <message>
         <source>Use Unicode division slash in output</source>
-        <translation type="vanished">Использовать косую черту деления Юнокода в выводе</translation>
+        <translation>Использовать косую черту деления Юнокода в выводе</translation>
     </message>
     <message>
         <source>Use E-notation instead of 10^n</source>
-        <translation type="vanished">Использовать E-нотацию вместо 10^n</translation>
+        <translation>Использовать E-нотацию вместо 10^n</translation>
     </message>
     <message>
         <source>Use &apos;j&apos; as imaginary unit</source>
-        <translation type="vanished">Использовать «j» для мнимой единицы</translation>
+        <translation>Использовать «j» для мнимой единицы</translation>
     </message>
     <message>
         <source>Use comma as decimal separator</source>
-        <translation type="vanished">Использовать запятую в качестве десятичного разделителя</translation>
+        <translation>Использовать запятую в качестве десятичного разделителя</translation>
     </message>
     <message>
         <source>Ignore comma in numbers</source>
-        <translation type="vanished">Игнорировать запятую в числах</translation>
+        <translation>Игнорировать запятую в числах</translation>
     </message>
     <message>
         <source>Ignore dots in numbers</source>
-        <translation type="vanished">Игнорировать точки в числах</translation>
+        <translation>Игнорировать точки в числах</translation>
     </message>
     <message>
         <source>Copy unformatted ASCII by default</source>
-        <translation type="vanished">Копировать неформатированный ASCII по умолчанию</translation>
+        <translation>Копировать неформатированный ASCII по умолчанию</translation>
     </message>
     <message>
         <source>Round halfway numbers away from zero</source>
@@ -2571,7 +2575,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Indicate repeating decimals</source>
-        <translation type="vanished">Указывать повторяющиеся десятичные дроби</translation>
+        <translation>Указывать повторяющиеся десятичные дроби</translation>
     </message>
     <message>
         <source>Use caret for bitwise XOR</source>
@@ -2767,7 +2771,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use special duodecimal symbols</source>
-        <translation type="vanished">Использовать специальные двенадцатеричные символы</translation>
+        <translation>Использовать специальные двенадцатеричные символы</translation>
     </message>
     <message>
         <source>Language:</source>
@@ -3051,6 +3055,10 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <source>Unsupported value.</source>
         <translation>Неподдерживаемое значение.</translation>
+    </message>
+    <message>
+        <source>Allow multiple instances?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4563,6 +4571,14 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <source>Always Show Number Pad</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Open Settings Folder(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
