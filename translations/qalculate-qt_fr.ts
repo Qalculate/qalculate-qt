@@ -8936,12 +8936,12 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="286"/>
         <source>Use dot as multiplication sign</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utiliser le point comme signe de multiplication</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="287"/>
         <source>Use Unicode division slash in output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utiliser la barre oblique de division Unicode en sortie</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="288"/>
