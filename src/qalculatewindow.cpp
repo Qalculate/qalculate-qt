@@ -4420,6 +4420,22 @@ void QalculateWindow::approximateResult() {
 	settings->dual_fraction = dfrac_bak;
 }
 
+bool is_equal_quantity_with_unit(const MathStructure &mp, const MathStructure &mr) {
+	if(mr.isUnit_exp() && mr == mp) {
+		return true;
+	} else if(mr.isMultiplication() && mr.size() == 2 && mr[0].isNumber() && mr[1].isUnit_exp()) {
+		if(mp.isNegate() && mr[0].number().isNegative() && mp[0].isMultiplication() && mp[0].size() == 2 && mp[0][0].isNumber() && mp[0][1] == mr[1] && mp[0][0].number().equals(-mr[0].number(), true)) return true;
+		if(mp.isMultiplication() && mp.size() == 2 && mp[1] == mr[1]) {
+			if(mp[0].isNegate()) {
+				return mp[0][0].isNumber() && mr[0].number().isNegative() && mp[0][0].number().equals(-mr[0].number(), true);
+			} else {
+				return mp[0].equals(mr[0], true);
+			}
+		}
+	}
+	return false;
+}
+
 void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates) {
 
 	workspace_changed = true;
@@ -5682,7 +5698,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
-	if(!settings->rpn_mode && (!parsed_tostruct || parsed_tostruct->isUndefined()) && execute_str.empty() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && parsed_mstruct && mstruct && ((parsed_mstruct->isMultiplication() && parsed_mstruct->size() == 2 && (*parsed_mstruct)[0].isNumber() && (*parsed_mstruct)[1].isUnit_exp() && parsed_mstruct->equals(*mstruct)) || (parsed_mstruct->isNegate() && (*parsed_mstruct)[0].isMultiplication() && (*parsed_mstruct)[0].size() == 2 && (*parsed_mstruct)[0][0].isNumber() && (*parsed_mstruct)[0][1].isUnit_exp() && mstruct->isMultiplication() && mstruct->size() == 2 && (*mstruct)[1] == (*parsed_mstruct)[0][1] && (*mstruct)[0].isNumber() && (*parsed_mstruct)[0][0].number() == -(*mstruct)[0].number()) || (parsed_mstruct->isUnit_exp() && parsed_mstruct->equals(*mstruct)))) {
+	if(!settings->rpn_mode && (!parsed_tostruct || parsed_tostruct->isUndefined()) && execute_str.empty() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && parsed_mstruct && mstruct && is_equal_quantity_with_unit(*parsed_mstruct, *mstruct)) {
 		Unit *u = NULL;
 		MathStructure *munit = NULL;
 		if(mstruct->isMultiplication()) munit = &(*mstruct)[1];
@@ -6636,7 +6652,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	std::vector<std::string> values;
 	if(!mauto.isAborted()) {
 		// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
-		if(mto.isUndefined() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && ((mparsed.isMultiplication() && mparsed.size() == 2 && mparsed[0].isNumber() && mparsed[1].isUnit_exp() && mparsed.equals(mauto)) || (mparsed.isNegate() && mparsed[0].isMultiplication() && mparsed[0].size() == 2 && mparsed[0][0].isNumber() && mparsed[0][1].isUnit_exp() && mauto.isMultiplication() && mauto.size() == 2 && mauto[1] == mparsed[0][1] && mauto[0].isNumber() && mauto[0][0].number() == -mauto[0].number()) || (mparsed.isUnit_exp() && mparsed.equals(mauto)))) {
+		if(mto.isUndefined() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && is_equal_quantity_with_unit(mparsed, mauto)) {
 			Unit *u = NULL;
 			MathStructure *munit = NULL;
 			if(mauto.isMultiplication()) munit = &mauto[1];
@@ -6755,7 +6771,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		po.allow_non_usable = true;
 		AutomaticFractionFormat aff = AUTOMATIC_FRACTION_OFF;
 		if(settings->dual_fraction != 0) {
-			if(mauto.isNumber() && mauto.number().isRational() && mauto.number().denominator() <= 12 && mauto.number() < 100 && mauto.number() > -100) {
+			if(mauto.isNumber() && mauto.number().isRational() && mauto.number().denominator() < 20 && mauto.number() < 100 && mauto.number() > -100) {
 				if(settings->dual_fraction < 0) aff = AUTOMATIC_FRACTION_AUTO;
 				else aff = AUTOMATIC_FRACTION_DUAL;
 			} else {
@@ -6882,6 +6898,14 @@ std::string ellipsize_result(const std::string &result_text, size_t length) {
 	return result_text.substr(0, index1) + " (…) " + result_text.substr(index2, result_text.length() - index2);
 }
 
+bool contains_large_matrix(const MathStructure &m) {
+	if((m.isVector() && m.size() > 500) || (m.isMatrix() && m.rows() * m.columns() > 500)) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_large_matrix(m[i])) return true;
+	}
+	return false;
+}
+
 void ViewThread::run() {
 
 	while(true) {
@@ -6982,8 +7006,8 @@ void ViewThread::run() {
 			if(alt_results[i].length() > 50000) alt_results.erase(alt_results.begin() + i);
 			else i++;
 		}
-		if(mresult->isMatrix() && mresult->rows() * mresult->columns() > 500) {
-			if(result_text.length() > 1000000L) {
+		if(contains_large_matrix(*mresult)) {
+			if(mresult->isMatrix() && result_text.length() > 1000000L) {
 				result_text = "matrix ("; result_text += i2s(mresult->rows()); result_text += SIGN_MULTIPLICATION; result_text += i2s(mresult->columns()); result_text += ")";
 			} else {
 				std::string str = unhtmlize(result_text);
@@ -6997,7 +7021,7 @@ void ViewThread::run() {
 			} else {
 				std::string str = unhtmlize(result_text);
 				if(str.length() > 20000) {
-					result_text = ellipsize_result(result_text, 2000);
+					result_text = ellipsize_result(str, 2000);
 				}
 			}
 		}
