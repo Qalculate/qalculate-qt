@@ -36,7 +36,7 @@ class FPConversionDialog : public QDialog {
 	protected slots:
 
 		void formatChanged();
-		void updateFields(int base);
+		void updateFields(int base, const MathStructure *value = NULL);
 		void hexChanged();
 		void binChanged();
 		void valueChanged();
@@ -44,8 +44,10 @@ class FPConversionDialog : public QDialog {
 	public slots:
 
 		void setValue(const QString &str);
+		void setValue(const MathStructure &m);
 		void setBin(const QString &str);
 		void setHex(const QString &str);
+		void clear();
 
 	public:
 

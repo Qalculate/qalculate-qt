@@ -16,6 +16,7 @@
 
 #include <libqalculate/qalculate.h>
 
+class QAbstractButton;
 class QCheckBox;
 class QSpinBox;
 class QComboBox;
@@ -26,9 +27,10 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QCheckBox *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *statusBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
-		QSpinBox *exratesSpin, *statusDelayWidget;
-		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo;
+		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
+		QCheckBox *preserveHeightBox;
+		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget;
+		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -37,10 +39,15 @@ class PreferencesDialog : public QDialog {
 		void ignoreLocaleToggled(bool);
 		void keepAboveToggled(bool);
 		void tooltipsChanged(int);
-		void expressionStatusToggled(bool);
+		void preserveHeightChanged(int);
+		void statusModeChanged(int);
 		void statusDelayChanged(int);
+		void calculateDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);
+		void binTwosInputToggled(bool);
+		void hexTwosInputToggled(bool);
+		void bitsChanged(int);
 		void lowerCaseToggled(bool);
 		void duodecimalSymbolsToggled(bool);
 		void multiplicationDotToggled(bool);
@@ -95,6 +102,7 @@ class PreferencesDialog : public QDialog {
 		void autocopyResultToggled(bool);
 		void multipleInstancesToggled(bool);
 		void clearHistoryToggled(bool);
+		void maxHistoryLinesChanged(int);
 		void historyExpressionChanged(int);
 		void copyAsciiToggled(bool);
 		void copyAsciiWithoutUnitsToggled(bool);
@@ -131,6 +139,8 @@ class PreferencesDialog : public QDialog {
 		void appFontChanged();
 		void symbolsUpdated();
 		void historyExpressionTypeChanged();
+		void binaryBitsChanged();
+		void statusModeChanged();
 		void dialogClosed();
 
 };

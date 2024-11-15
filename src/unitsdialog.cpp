@@ -60,6 +60,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	unitsModel = new ItemProxyModel(this);
 	sourceModel = new QStandardItemModel(this);
 	unitsModel->setSourceModel(sourceModel);
+	unitsModel->setShowHidden(false);
 	sourceModel->setColumnCount(1);
 	sourceModel->setHorizontalHeaderItem(0, new QStandardItem(tr("Unit")));
 	unitsView->setModel(unitsModel);
@@ -88,11 +89,11 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	editButton = new QPushButton(tr("Edit…"), this); box->addWidget(editButton); connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
-	box->addSpacing(24);
+	box->addSpacing(12);
 	convertButton = new QPushButton(tr("Convert"), this); box->addWidget(convertButton); connect(convertButton, SIGNAL(clicked()), this, SLOT(convertClicked()));
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
-	box->addSpacing(24);
+	box->addSpacing(12);
 	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
@@ -122,8 +123,11 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	grid->addWidget(toCombo, 1, 2);
 	topbox->addLayout(grid);
 	topbox->addSpacing(topbox->spacing() * 2);
+	hbox = new QHBoxLayout();
+	showHiddenButton = new QCheckBox(tr("Show hidden units"), this); hbox->addWidget(showHiddenButton, Qt::AlignLeft); showHiddenButton->setChecked(false); connect(showHiddenButton, SIGNAL(toggled(bool)), this, SLOT(showHiddenToggled(bool)));
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close, Qt::Horizontal, this);
-	topbox->addWidget(buttonBox);
+	hbox->addWidget(buttonBox, 1);
+	topbox->addLayout(hbox);
 	selected_category = "All";
 	updateUnits();
 	unitsView->setFocus();
@@ -136,7 +140,7 @@ UnitsDialog::UnitsDialog(QWidget *parent) : QDialog(parent, Qt::Window) {
 	connect(unitsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedUnitChanged(const QModelIndex&, const QModelIndex&)));
 	connect(unitsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(onUnitActivated(const QModelIndex&)));
 	if(!settings->units_geometry.isEmpty()) restoreGeometry(settings->units_geometry);
-	else resize(900, 800);
+	else try_resize(this, 900, 800);
 	if(!settings->units_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->units_vsplitter_state);
 	if(!settings->units_hsplitter_state.isEmpty()) hsplitter->restoreState(settings->units_hsplitter_state);
 }
@@ -282,6 +286,9 @@ void UnitsDialog::searchChanged(const QString &str) {
 	unitsView->selectionModel()->setCurrentIndex(unitsModel->index(0, 0), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 	if(str.isEmpty()) unitsView->setFocus();
 }
+void UnitsDialog::showHiddenToggled(bool b) {
+	unitsModel->setShowHidden(b);
+}
 #define SET_TO_STR 	if(u->isCurrency()) qstr = QString::fromStdString(u->referenceName());\
 			else qstr = QString::fromStdString(u->print(true, true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) toCombo));\
 			if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {\
@@ -327,7 +334,7 @@ void UnitsDialog::newClicked() {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(u->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateUnits();
@@ -422,7 +429,7 @@ void UnitsDialog::editClicked() {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(u->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(u->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateUnits();

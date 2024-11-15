@@ -72,6 +72,7 @@ class MathTextEdit : public QPlainTextEdit {
 		~MathTextEdit();
 
 		QSize sizeHint() const;
+		void insertText(const QString&);
 
 	protected:
 

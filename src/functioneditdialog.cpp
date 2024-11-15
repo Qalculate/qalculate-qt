@@ -40,6 +40,29 @@
 #include "functioneditdialog.h"
 #include "qalculateqtsettings.h"
 
+void fix_expression(std::string &str) {
+	ParseOptions pa = settings->evalops.parse_options; pa.base = 10;
+	str = CALCULATOR->unlocalizeExpression(str, pa);
+	if(str.empty()) return;
+	size_t i = 0;
+	bool b = false;
+	while(true) {
+		i = str.find("\\", i);
+		if(i == std::string::npos || i == str.length() - 1) break;
+		if((str[i + 1] >= 'a' && str[i + 1] <= 'z') || (str[i + 1] >= 'A' && str[i + 1] <= 'Z') || (str[i + 1] >= '1' && str[i + 1] <= '9')) {
+			b = true;
+			break;
+		}
+		i++;
+	}
+	if(!b) {
+		gsub("x", "\\x", str);
+		gsub("y", "\\y", str);
+		gsub("z", "\\z", str);
+	}
+	CALCULATOR->parseSigns(str);
+}
+
 SmallTextEdit::SmallTextEdit(int r, QWidget *parent) : QPlainTextEdit(parent), i_rows(r) {}
 SmallTextEdit::~SmallTextEdit() {}
 
@@ -71,32 +94,47 @@ QSize MathTextEdit::sizeHint() const {
 #endif
 	return size;
 }
+void MathTextEdit::insertText(const QString &s) {
+	if(overwriteMode() && !textCursor().atEnd()) {
+		QTextCursor cur = textCursor();
+		cur.beginEditBlock();
+		cur.deleteChar();
+		insertPlainText(s);
+		cur.endEditBlock();
+	} else {
+		insertPlainText(s);
+	}
+}
 void MathTextEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->modifiers() == Qt::NoModifier || event->modifiers() == Qt::GroupSwitchModifier || event->modifiers() == Qt::ShiftModifier || event->modifiers() == Qt::KeypadModifier) {
 		switch(event->key()) {
+			case Qt::Key_Insert: {
+				if(event->modifiers() != Qt::ShiftModifier) setOverwriteMode(!overwriteMode());
+				break;
+			}
 			case Qt::Key_Asterisk: {
-				insertPlainText(settings->multiplicationSign());
+				insertText(settings->multiplicationSign());
 				return;
 			}
 			case Qt::Key_Slash: {
-				insertPlainText(settings->divisionSign(false));
+				insertText(settings->divisionSign(false));
 				return;
 			}
 			case Qt::Key_Minus: {
-				insertPlainText(SIGN_MINUS);
+				insertText(SIGN_MINUS);
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
-				insertPlainText(settings->caret_as_xor ? " xor " : "^");
+				insertText(settings->caret_as_xor ? " xor " : "^");
 				return;
 			}
 			case Qt::Key_Dead_Tilde: {
-				insertPlainText("~");
+				insertText("~");
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
 				if(settings->caret_as_xor) {
-					insertPlainText(" xor ");
+					insertText(" xor ");
 					return;
 				}
 				break;
@@ -104,7 +142,7 @@ void MathTextEdit::keyPressEvent(QKeyEvent *event) {
 		}
 	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		insertPlainText("^");
+		insertText("^");
 		return;
 	}
 	QPlainTextEdit::keyPressEvent(event);
@@ -654,7 +692,7 @@ Argument *ArgumentEditDialog::createArgument() {
 				((NumberArgument*) arg)->setIncludeEqualsMin(includeMinBox->isChecked());
 			}
 			if(maxBox->isChecked()) {
-				QString str = minEdit->cleanText();
+				QString str = maxEdit->cleanText();
 				int i = str.indexOf(",");
 				if(i > 0) {
 					if(str.indexOf(".", i) > 0) {
@@ -705,7 +743,8 @@ Argument *ArgumentEditDialog::createArgument() {
 		}
 	}
 	arg->setName(nameEdit->text().trimmed().toStdString());
-	std::string str = settings->unlocalizeExpression(conditionEdit->text().trimmed().toStdString());
+	std::string str = conditionEdit->text().trimmed().toStdString();
+	fix_expression(str);
 	arg->setCustomCondition(str);
 	arg->setTests(testBox->isChecked());
 	arg->setAlerts(testBox->isChecked());
@@ -887,27 +926,6 @@ void FunctionEditDialog::editNames() {
 	onFunctionChanged();
 }
 
-void fix_expression(std::string &str) {
-	if(str.empty()) return;
-	size_t i = 0;
-	bool b = false;
-	while(true) {
-		i = str.find("\\", i);
-		if(i == std::string::npos || i == str.length() - 1) break;
-		if((str[i + 1] >= 'a' && str[i + 1] <= 'z') || (str[i + 1] >= 'A' && str[i + 1] <= 'Z') || (str[i + 1] >= '1' && str[i + 1] <= '9')) {
-			b = true;
-			break;
-		}
-		i++;
-	}
-	if(!b) {
-		gsub("x", "\\x", str);
-		gsub("y", "\\y", str);
-		gsub("z", "\\z", str);
-	}
-	CALCULATOR->parseSigns(str);
-}
-
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
@@ -931,15 +949,13 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	}
 	f = new UserFunction("", "", "");
 	std::string str;
-	ParseOptions pa = settings->evalops.parse_options;
-	pa.base = 10;
 	f->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
 	f->setTitle(titleEdit->text().trimmed().toStdString());
 	f->setCategory(categoryEdit->currentText().trimmed().toStdString());
 	f->setHidden(hideBox->isChecked());
 	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
-	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
+	str = conditionEdit->text().trimmed().toStdString();
 	fix_expression(str);
 	f->setCondition(str);
 	for(int i = 0; i < argumentsModel->rowCount(); i++) {
@@ -947,13 +963,13 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 		if(arg) f->setArgumentDefinition(i + 1, arg);
 	}
 	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
-		str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
+		str = subfunctionsModel->item(i, 0)->text().trimmed().toStdString();
 		fix_expression(str);
 		f->addSubfunction(str, subfunctionsModel->item(i, 1)->checkState() == Qt::Checked);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	else NamesEditDialog::modifyName(f, nameEdit->text());
-	str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
+	str = expressionEdit->toPlainText().trimmed().toStdString();
 	fix_expression(str);
 	((UserFunction*) f)->setFormula(str);
 	CALCULATOR->addFunction(f);
@@ -974,8 +990,6 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	f->setLocal(true);
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	else NamesEditDialog::modifyName(f, nameEdit->text());
-	ParseOptions pa = settings->evalops.parse_options;
-	pa.base = 10;
 	std::string str;
 	f->setDescription(descriptionEdit->toPlainText().trimmed().toStdString());
 	f->setTitle(titleEdit->text().trimmed().toStdString());
@@ -983,7 +997,7 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	f->setHidden(hideBox->isChecked());
 	str = settings->unlocalizeExpression(exampleEdit->text().trimmed().toStdString());
 	f->setExample(str);
-	str = CALCULATOR->unlocalizeExpression(conditionEdit->text().trimmed().toStdString(), pa);
+	str = conditionEdit->text().trimmed().toStdString();
 	fix_expression(str);
 	f->setCondition(str);
 	f->clearArgumentDefinitions();
@@ -994,11 +1008,11 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		((UserFunction*) f)->clearSubfunctions();
 		for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
-			str = CALCULATOR->unlocalizeExpression(subfunctionsModel->item(i, 0)->text().trimmed().toStdString(), pa);
+			str = subfunctionsModel->item(i, 0)->text().trimmed().toStdString();
 			fix_expression(str);
 			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 1)->checkState() == Qt::Checked);
 		}
-		str = CALCULATOR->unlocalizeExpression(expressionEdit->toPlainText().trimmed().toStdString(), pa);
+		str = expressionEdit->toPlainText().trimmed().toStdString();
 		fix_expression(str);
 		((UserFunction*) f)->setFormula(str);
 	}

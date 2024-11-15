@@ -18,8 +18,10 @@
 #include <libqalculate/qalculate.h>
 
 class QWidget;
+class QWindow;
 class QByteArray;
 class QAction;
+class QFont;
 
 bool can_display_unicode_string_function(const char *str, void *w);
 
@@ -31,6 +33,8 @@ bool can_display_unicode_string_function(const char *str, void *w);
 
 #define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
 
+QRect get_screen_geometry(QWidget *w);
+bool try_resize(QWidget *win, int w, int h);
 std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);
@@ -44,6 +48,7 @@ bool item_in_calculator(ExpressionItem *item);
 bool name_matches(ExpressionItem *item, const std::string &str);
 bool country_matches(Unit *u, const std::string &str, size_t minlength = 0);
 bool title_matches(ExpressionItem *item, const std::string &str, size_t minlength = 0);
+void remove_spaces(std::string &str);
 bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
@@ -223,7 +228,8 @@ class QalculateQtSettings : QObject {
 
 		EvaluationOptions evalops;
 		PrintOptions printops;
-		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, simplified_percentage, sinc_set;
+		bool complex_angle_form, dot_question_asked, implicit_question_asked, adaptive_interval_display, tc_set, rpn_mode, chain_mode, caret_as_xor, ignore_locale, do_imaginary_j, fetch_exchange_rates_at_startup, always_on_top, display_expression_status, prefixes_default, rpn_keys, sinc_set;
+		int simplified_percentage;
 		bool programming_base_changed;
 		int previous_precision;
 		std::string custom_angle_unit;
@@ -231,9 +237,10 @@ class QalculateQtSettings : QObject {
 		int rounding_mode;
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
-		int completion_delay, expression_status_delay;
+		int completion_delay, expression_status_delay, auto_calculate_delay;
 		int completion_min, completion_min2;
-		int style, palette;
+		QString style;
+		int palette;
 		bool enable_completion, enable_completion2;
 		int enable_tooltips;
 		int color;
@@ -243,6 +250,7 @@ class QalculateQtSettings : QObject {
 		bool enable_input_method;
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font;
+		QFont saved_app_font;
 		int replace_expression;
 		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
@@ -254,8 +262,9 @@ class QalculateQtSettings : QObject {
 		bool hide_numpad;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
+		int max_history_lines;
 		bool rpn_shown;
-		bool auto_calculate;
+		bool auto_calculate, status_in_history;
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
 		bool close_with_esc;
@@ -271,6 +280,9 @@ class QalculateQtSettings : QObject {
 		QByteArray variables_geometry, variables_vsplitter_state, variables_hsplitter_state;
 		QByteArray datasets_geometry, datasets_vsplitter_state, datasets_hsplitter_state;
 		bool wayland_platform;
+
+		int preserve_history_height;
+		bool keypad_appended, bases_appended;
 
 		std::string volume_category;
 		std::vector<std::string> alternative_volume_categories;
@@ -295,11 +307,12 @@ class QalculateQtSettings : QObject {
 		std::vector<std::string> v_parse;
 		std::vector<bool> v_pexact;
 		std::vector<bool> v_protected;
-		std::vector<bool> v_delexpression;
+		std::vector<long long int> v_time;
 		std::vector<std::vector<std::string> > v_result;
-		std::vector<std::vector<bool> > v_delresult;
 		std::vector<std::vector<int> > v_exact;
 		std::vector<std::vector<size_t> > v_value;
+		std::vector<QString> v_messages;
+		std::vector<bool> v_parseerror;
 		std::vector<MathFunction*> favourite_functions, recent_functions;
 		std::vector<Variable*> favourite_variables, recent_variables;
 		std::vector<Unit*> favourite_units, recent_units;
@@ -313,6 +326,7 @@ class QalculateQtSettings : QObject {
 		std::vector<custom_button> custom_buttons;
 		bool favourite_functions_changed, favourite_variables_changed, favourite_units_changed;
 		bool show_all_functions, show_all_variables, show_all_units, use_function_dialog;
+		long long int current_history_time;
 
 };
 

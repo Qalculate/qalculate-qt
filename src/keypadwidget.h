@@ -22,8 +22,8 @@ class QTimer;
 class QStackedLayout;
 class QLineEdit;
 class QComboBox;
-class QListWidget;
-class QListWidgetItem;
+class QTreeWidget;
+class QTreeWidgetItem;
 class QDialog;
 class QGridLayout;
 class QAction;
@@ -74,7 +74,8 @@ enum {
 	KEYPAD_GENERAL = 0,
 	KEYPAD_PROGRAMMING = 1,
 	KEYPAD_ALGEBRA = 2,
-	KEYPAD_CUSTOM = 3
+	KEYPAD_CUSTOM = 3,
+	KEYPAD_NUMBERPAD = 4
 };
 
 class KeypadWidget : public QWidget {
@@ -88,16 +89,17 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton, *acButton, *backButton, *forwardButton, *dotButton, *commaButton, *multiplicationButton, *divisionButton, *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton, *xButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
+		QWidget *keypadG, *keypadP, *keypadX, *keypadC, *keypadN;
 		QVector<QVector<KeypadButton*> > customButtons;
 		QStackedLayout *leftStack;
 		QGridLayout *customGrid;
 		QLineEdit *labelEdit;
 		QComboBox *valueEdit;
 		QLabel *valueLabel;
-		QListWidget *actionList;
+		QTreeWidget *actionList;
 		QWidget *numpad;
 		QDialog *customActionDialog;
 		QAction *addRowAction, *addColumnAction, *removeRowAction, *removeColumnAction;
@@ -105,6 +107,8 @@ class KeypadWidget : public QWidget {
 		void changeEvent(QEvent *e);
 		void editCustomAction(KeypadButton*, int);
 		void updateStretch();
+		void createKeypad(int);
+		void createNumpad(QWidget*, int);
 
 	protected slots:
 
@@ -138,7 +142,7 @@ class KeypadWidget : public QWidget {
 		void addCustomColumn();
 		void updateCustomActionOK();
 		void customActionOKClicked();
-		void currentCustomActionChanged(QListWidgetItem*, QListWidgetItem*);
+		void currentCustomActionChanged(QTreeWidgetItem*, QTreeWidgetItem*);
 		void intervalDisplayActivated();
 		void intervalCalculationActivated();
 		void conciseInputActivated();

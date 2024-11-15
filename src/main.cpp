@@ -47,11 +47,20 @@ QTranslator translator, translator_qt, translator_qtbase;
 
 int main(int argc, char **argv) {
 
+#ifdef _WIN32
+	if(!qEnvironmentVariableIsSet("QT_QPA_PLATFORM")) {
+		qputenv("QT_QPA_PLATFORM", "windows:altgr");
+	}
+#endif
+
 	QApplication app(argc, argv);
 	app.setApplicationName("qalculate-qt");
 	app.setApplicationDisplayName("Qalculate!");
 	app.setOrganizationName("qalculate");
-	app.setApplicationVersion("5.0.0");
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
+	app.setDesktopFileName("io.github.Qalculate.qalculate-qt");
+#endif
+	app.setApplicationVersion("5.3.0");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -63,9 +72,9 @@ int main(int argc, char **argv) {
 	if(!settings->ignore_locale) {
 		if(!settings->custom_lang.isEmpty()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().territory()));
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale(settings->custom_lang).territory()));
 #else
-			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale().country()));
+			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale(settings->custom_lang).country()));
 #endif
 #ifdef _WIN32
 			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
@@ -80,9 +89,9 @@ int main(int argc, char **argv) {
 						gsub("-", "_", lang);
 						if(lang != QLocale().name().toStdString()) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().territory()));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).territory()));
 #else
-							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale().country()));
+							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).country()));
 #endif
 						}
 						_putenv_s("LANG", lang.c_str());
@@ -116,7 +125,7 @@ int main(int argc, char **argv) {
 	parser->addOption(nOption);
 	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("TITLE"));
 	parser->addOption(tOption);
-	QCommandLineOption vOption(QStringList() << "v" << "verison", QApplication::tr("Display the application version"));
+	QCommandLineOption vOption(QStringList() << "v" << "version", QApplication::tr("Display the application version"));
 	parser->addOption(vOption);
 	QCommandLineOption wOption(QStringList() << "w" << "workspace", QApplication::tr("Open workspace"), QApplication::tr("FILE"));
 	parser->addOption(wOption);
@@ -136,7 +145,7 @@ int main(int argc, char **argv) {
 		if(lockFile.error() == QLockFile::LockFailedError) {
 			bool ami_changed = false;
 			if(settings->allow_multiple_instances < 0 && parser->value(fOption).isEmpty() && parser->value(wOption).isEmpty() && parser->positionalArguments().isEmpty()) {
-				settings->allow_multiple_instances = (QMessageBox::question(NULL, QString("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
+				settings->allow_multiple_instances = (QMessageBox::question(NULL, QStringLiteral("Allow multiple instances?"), QApplication::tr("By default, only one instance (one main window) of %1 is allowed.\n\nIf multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.\n\nDo you, despite this, want to change the default behavior and allow multiple simultaneous instances?").arg("Qalculate!"), QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes);
 				ami_changed = true;
 				if(settings->allow_multiple_instances) {
 					QLocalSocket socket;
@@ -232,6 +241,17 @@ int main(int argc, char **argv) {
 	settings->setCustomAngleUnit();
 	settings->updateFavourites();
 
+	QColor c = QApplication::palette().base().color();
+	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
+	else settings->color = 1;
+
+	settings->saved_app_font = app.font();
+	if(settings->use_custom_app_font) {
+		QFont font;
+		font.fromString(QString::fromStdString(settings->custom_app_font));
+		app.setFont(font);
+	}
+
 	QalculateWindow *win = new QalculateWindow();
 	if(parser->value(tOption).isEmpty()) {
 		win->updateWindowTitle(QString(), false, true);
@@ -242,6 +262,8 @@ int main(int argc, char **argv) {
 	}
 	win->setCommandLineParser(parser);
 	win->show();
+	app.processEvents();
+	win->initFinished();
 
 	if(!parser->value(fOption).isEmpty()) win->executeFromFile(parser->value(fOption));
 
@@ -257,10 +279,7 @@ int main(int argc, char **argv) {
 
 	settings->checkVersion(false, win);
 
-	QColor c = QApplication::palette().base().color();
-	if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
-	else settings->color = 1;
-	win->loadInitialHistory();
+	if(!settings->use_custom_app_font) win->loadInitialHistory();
 
 	return app.exec();
 

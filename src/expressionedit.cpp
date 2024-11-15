@@ -82,7 +82,7 @@ class ExpressionTipLabel : public QLabel {
 
 };
 
-ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(NULL, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
+ExpressionTipLabel::ExpressionTipLabel(const QString &text, const QPoint &pos, QWidget *w) : QLabel(w, Qt::ToolTip | Qt::BypassGraphicsProxyWidget), widget(w) {
 	setForegroundRole(QPalette::ToolTipText);
 	setBackgroundRole(QPalette::ToolTipBase);
 	setPalette(QToolTip::palette());
@@ -162,7 +162,7 @@ void ExpressionTipLabel::resizeEvent(QResizeEvent *e) {
 }
 ExpressionTipLabel::~ExpressionTipLabel() {}
 void ExpressionTipLabel::hideTip() {
-	if(!hideTimer.isActive()) hideTimer.start(300, this);
+	if(isVisible() && !hideTimer.isActive()) hideTimer.start(300, this);
 }
 void ExpressionTipLabel::hideTipImmediately() {
 	hide();
@@ -175,17 +175,7 @@ void ExpressionTipLabel::timerEvent(QTimerEvent *e) {
 	}
 }
 bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rect) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-#	if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-	QScreen *scr = widget->screen();
-#	else
-	QScreen *scr = QGuiApplication::screenAt(pos);
-#	endif
-	if(!scr) scr = QGuiApplication::primaryScreen();
-	QRect screen = scr->availableGeometry();
-#else
-	QRect screen = QApplication::desktop()->availableGeometry(widget);
-#endif
+	QRect screen = get_screen_geometry(widget);
 	QPoint p = pos;
 	p += QPoint(2, 16);
 	if(!completion_rect.isNull() && completion_rect.intersects(QRect(p, this->size()))) {
@@ -207,7 +197,7 @@ bool ExpressionTipLabel::placeTip(const QPoint &pos, const QRect &completion_rec
 		if(p.y() + this->height() > screen.y() + screen.height()) p.setY(screen.y() + screen.height() - this->height());
 	}
 	if(settings->wayland_platform && this->isVisible()) {
-		if(p.y() != this->pos().y() || p.x() < this->pos().x()) {
+		if(p.y() != this->pos().y() || p.x() < this->pos().x() - 1) {
 			this->hide();
 			this->move(p);
 			this->show();
@@ -812,12 +802,14 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 #endif
 	tb = toolbar;
 	cmenu = NULL;
+	fileMenu = NULL;
 	tipLabel = NULL;
 	completionTimer = NULL;
 	toolTipTimer = NULL;
 	completion_blocked = 0;
 	parse_blocked = 0;
 	block_add_to_undo = 0;
+	expression_from_history = false;
 	undo_index = 0;
 	cdata = new CompletionData;
 	history_index = -1;
@@ -876,6 +868,18 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 }
 ExpressionEdit::~ExpressionEdit() {}
 
+void ExpressionEdit::updateMinimumHeight() {
+	QFontMetrics fm(font());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	setMinimumHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin() * 2 + viewportMargins().bottom() + viewportMargins().top());
+#else
+	setMinimumHeight(fm.lineSpacing() * 1 + frameWidth() * 2 + contentsMargins().top() + contentsMargins().bottom() + document()->documentMargin());
+#endif
+}
+void ExpressionEdit::changeEvent(QEvent *e) {
+	if(e->type() == QEvent::FontChange) updateMinimumHeight();
+	QPlainTextEdit::changeEvent(e);
+}
 bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 	switch(e->type()) {
 #if defined (Q_OS_QNX)
@@ -979,8 +983,8 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						sourceModel->appendRow(items);}
 
 #define COMPLETION_APPEND_FLAG(x, y, y2, z, p)	if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {COMPLETION_APPEND_2(x, y, y2, z, p)} \
-						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
-						else {COMPLETION_APPEND_2(x, QString("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QString("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
+						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
+						else {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
 
 #define MAX_COMPLETION_LENGTH_1 25
 #define MAX_COMPLETION_LENGTH_2 25
@@ -1428,6 +1432,10 @@ void ExpressionEdit::setExpression(std::string str) {
 	setExpression(QString::fromStdString(str));
 }
 void ExpressionEdit::setExpression(const QString &str) {
+	if(str.isEmpty()) {
+		clear();
+		return;
+	}
 	block_add_to_undo++;
 	setCursorWidth(0);
 	block_text_change++;
@@ -1566,6 +1574,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Circumflex: {
+				if(!event->text().isEmpty() && event->text() != "^") break;
 				if(settings->rpn_mode && settings->rpn_keys) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
@@ -1576,10 +1585,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Dead_Tilde: {
+				if(!event->text().isEmpty() && event->text() != "~") break;
 				insertPlainText("~");
 				return;
 			}
 			case Qt::Key_AsciiCircum: {
+				if(!event->text().isEmpty() && event->text() != "^") break;
 				if(settings->rpn_mode && settings->rpn_keys) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
@@ -1723,12 +1734,14 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					history_index++;
 					dont_change_index = true;
 					blockCompletion(true);
-					blockParseStatus(true);
+					if(settings->status_in_history) expression_from_history = true;
+					else blockParseStatus(true);
 					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					blockParseStatus(false);
+					if(settings->status_in_history) expression_from_history = false;
+					else blockParseStatus(false);
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -1743,12 +1756,14 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					history_index++;
 					dont_change_index = true;
 					blockCompletion(true);
-					blockParseStatus(true);
+					if(settings->status_in_history) expression_from_history = true;
+					else blockParseStatus(true);
 					if(history_index == -1 && (current_history.isEmpty() || current_history == toPlainText())) history_index = 0;
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					blockParseStatus(false);
+					if(settings->status_in_history) expression_from_history = false;
+					else blockParseStatus(false);
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -1778,14 +1793,16 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(history_index >= -1) history_index--;
 				dont_change_index = true;
 				blockCompletion(true);
-				blockParseStatus(true);
+				if(settings->status_in_history) expression_from_history = (history_index >= 0);
+				else blockParseStatus(true);
 				if(history_index < 0) {
 					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				blockParseStatus(false);
+				if(settings->status_in_history) expression_from_history = false;
+				else blockParseStatus(false);
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -1796,14 +1813,16 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				if(history_index >= -1) history_index--;
 				dont_change_index = true;
 				blockCompletion(true);
-				blockParseStatus(true);
+				if(settings->status_in_history) expression_from_history = (history_index >= 0);
+				else blockParseStatus(true);
 				if(history_index < 0) {
 					if(history_index == -1 && current_history != toPlainText()) setExpression(current_history);
 					else clear();
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				blockParseStatus(false);
+				if(settings->status_in_history) expression_from_history = false;
+				else blockParseStatus(false);
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -1881,12 +1900,22 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		menu = cmenu->addMenu(tr("Expression Status"));
 		group = new QActionGroup(this);
 		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); statusOffAction = action;
-		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
-		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
+		action = menu->addAction(tr("In history list"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusHistoryAction = action;
+		action = menu->addAction(tr("In expression field"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusExpressionAction = action;
+		menu->addSeparator();
+		group = new QActionGroup(this);
+		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
+		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
 #endif
+		if(fileMenu) {
+			fileSeparator = cmenu->addSeparator();
+			cmenu->addAction(modeMenu->menuAction());
+			cmenu->addAction(fileMenu->menuAction());
+			cmenu->addAction(tbAction);
+		}
 	}
 	bool b_sel = textCursor().hasSelection();
 	bool b_empty = document()->isEmpty();
@@ -1900,9 +1929,28 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	clearAction->setEnabled(!b_empty);
 	clearHistoryAction->setEnabled(!settings->expression_history.empty());
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
-	else if(settings->expression_status_delay > 0) statusDelayAction->setChecked(true);
+	else if(settings->status_in_history) statusHistoryAction->setChecked(true);
+	else statusExpressionAction->setChecked(true);
+	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
 	cmenu->popup(e->globalPos());
+}
+void ExpressionEdit::setMenuAndToolbarItems(QMenu *mode, QMenu *menu, QAction *action) {
+	if(!menu && cmenu && fileMenu) {
+		cmenu->removeAction(fileSeparator);
+		cmenu->removeAction(modeMenu->menuAction());
+		cmenu->removeAction(fileMenu->menuAction());
+		cmenu->removeAction(tbAction);
+	}
+	modeMenu = mode;
+	fileMenu = menu;
+	tbAction = action;
+	if(cmenu && fileMenu) {
+		fileSeparator = cmenu->addSeparator();
+		cmenu->addAction(modeMenu->menuAction());
+		cmenu->addAction(fileMenu->menuAction());
+		cmenu->addAction(tbAction);
+	}
 }
 void ExpressionEdit::insertDate() {
 	QDialog *dialog = new QDialog(this, Qt::Popup);
@@ -1910,11 +1958,28 @@ void ExpressionEdit::insertDate() {
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	box->setContentsMargins(0, 0, 0, 0);
 	QCalendarWidget *w = new QCalendarWidget(dialog);
+	std::string str = textCursor().selectedText().toStdString(), str2;
+	CALCULATOR->separateToExpression(str, str2, settings->evalops, true);
+	remove_blank_ends(str);
+	int b_quote = -1;
+	if(str.length() > 2 && ((str[0] == '\"' && str[str.length() - 1] == '\"') || (str[0] == '\'' && str[str.length() - 1] == '\''))) {
+		str = str.substr(1, str.length() - 2);
+		remove_blank_ends(str);
+		b_quote = 1;
+	}
+	if(!str.empty()) {
+		QalculateDateTime date;
+		if(date.set(str)) {
+			if(b_quote < 0 && is_in(NUMBERS, str[0])) b_quote = 0;
+			w->setSelectedDate(QDate(date.year(), date.month() - 1, date.day()));
+		}
+	}
 	box->addWidget(w);
 	connect(w, SIGNAL(clicked(QDate)), dialog, SLOT(accept()));
 	connect(w, SIGNAL(activated(QDate)), dialog, SLOT(accept()));
 	if(dialog->exec() == QDialog::Accepted) {
-		insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
+		if(b_quote == 0) insertPlainText(w->selectedDate().toString(Qt::ISODate));
+		else insertPlainText("\"" + w->selectedDate().toString(Qt::ISODate) + "\"");
 	}
 	dialog->deleteLater();
 }
@@ -1949,17 +2014,30 @@ void ExpressionEdit::onCompletionModeChanged() {
 	settings->enable_completion = completion_level > 0;
 	if(completion_level == 0) completion_level = 4;
 	settings->enable_completion2 = completion_level > 2;
-	if(completion_level > 1) settings->completion_min = 1;
+	if(completion_level == 2 || completion_level > 3) settings->completion_min = 1;
 	else settings->completion_min = 2;
 	if(completion_level > 3) settings->completion_min2 = 1;
 	else settings->completion_min2 = 2;
 }
 void ExpressionEdit::onStatusModeChanged() {
 	int i = qobject_cast<QAction*>(sender())->data().toInt();
-	settings->display_expression_status = (i > 0);
-	if(i == 1) settings->expression_status_delay = 1000;
-	else if(i == 2) settings->expression_status_delay = 0;
-	emit expressionStatusModeChanged();
+	if(i == 3) {
+		if(settings->status_in_history) settings->auto_calculate_delay = 500;
+		else settings->expression_status_delay = 1000;
+	} else if(i == 4) {
+		if(settings->status_in_history) settings->auto_calculate_delay = 0;
+		else settings->expression_status_delay = 0;
+	}
+	if(i < 3) {
+		settings->display_expression_status = (i > 0);
+		settings->status_in_history = (i == 1);
+		if(settings->status_in_history && settings->display_expression_status) {
+			settings->expression_status_delay = 1000;
+		} else if(settings->auto_calculate_delay == 0) {
+			settings->expression_status_delay = 0;
+		}
+	}
+	emit expressionStatusModeChanged(i < 3);
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;
@@ -2025,40 +2103,14 @@ void ExpressionEdit::blockUndo(bool b) {
 	if(b) block_add_to_undo++;
 	else block_add_to_undo--;
 }
-void remove_spaces(std::string &str) {
-	size_t i = 0;
-	while(true) {
-		i = str.find(' ', i);
-		if(i != std::string::npos) str.erase(i, 1);
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(THIN_SPACE, i);
-		if(i != std::string::npos) str.erase(i, strlen(THIN_SPACE));
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(NNBSP, i);
-		if(i != std::string::npos) str.erase(i, strlen(NNBSP));
-		else break;
-	}
-	i = 0;
-	while(true) {
-		i = str.find(NBSP, i);
-		if(i != std::string::npos) str.erase(i, strlen(NBSP));
-		else break;
-	}
-}
 void ExpressionEdit::showCurrentStatus() {
-	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && completionView->selectionModel()->hasSelection())) {
+	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && (completionView->selectionModel()->hasSelection() || current_status_type == 3))) {
 		HIDE_TOOLTIP
 	} else {
 		QString str = current_status_text;
 		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
 		std::string current_text = toPlainText().toStdString();
-		if(current_status_is_expression && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
+		if(current_status_type == 1 && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
@@ -2085,14 +2137,14 @@ void ExpressionEdit::showCurrentStatus() {
 		if(str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
 		} else if(tipLabel && tipLabel->isVisible()) {
-			tipLabel->reuseTip(str, mapToGlobal(cursorRect().bottomRight()));
-			if(!tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+			tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
+			if(!tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
 				HIDE_TOOLTIP
 			}
 		} else {
 			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(str, mapToGlobal(cursorRect().bottomRight()), this);
-			if(tipLabel->placeTip(mapToGlobal(cursorRect().bottomRight()), completionView->isVisible() ? completionView->geometry(): QRect())) {
+			tipLabel = new ExpressionTipLabel(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), this);
+			if(tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
 				tipLabel->showNormal();
 			} else {
 				HIDE_TOOLTIP
@@ -2100,14 +2152,16 @@ void ExpressionEdit::showCurrentStatus() {
 		}
 	}
 }
-void ExpressionEdit::setStatusText(const QString &text, bool is_expression) {
+void ExpressionEdit::setStatusText(const QString &text, int stype) {
 	if(toolTipTimer) toolTipTimer->stop();
-	if(text.isEmpty()) {
+	current_status_text = text;
+	if(text.isEmpty() || !settings->display_expression_status) {
 		HIDE_TOOLTIP
-	} else if(settings->display_expression_status) {
-		current_status_text = text;
-		current_status_is_expression = is_expression;
-		if(settings->expression_status_delay > 0 && (!tipLabel || !tipLabel->isVisible())) {
+	} else {
+		bool prev_func = (current_status_type == 2);
+		current_status_type = stype;
+		if(settings->expression_status_delay > 0 && (current_status_type != 2 || !prev_func || !tipLabel || !tipLabel->isVisible())) {
+			if(tipLabel) tipLabel->hideTip();
 			if(!toolTipTimer) {
 				toolTipTimer = new QTimer(this);
 				toolTipTimer->setSingleShot(true);
@@ -2127,12 +2181,15 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 	if((iargs == 0 && arg_index == 0) || (iargs == 1 && arg_index == 1)) return false;
 	const ExpressionName *ename = &f->preferredName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) parent());
 	bool last_is_vctr = f->getArgumentDefinition(iargs) && f->getArgumentDefinition(iargs)->type() == ARGUMENT_TYPE_VECTOR;
+	if(arg_index == 0 || function_pos.isNull()) function_pos = cursorRect().bottomRight();
 	if(iargs == 0 || (arg_index > iargs && iargs >= 0 && (!last_is_vctr || iargs == 1))) {
 		if(last_is_vctr || (iargs == 1 && f->getArgumentDefinition(1) && f->getArgumentDefinition(1)->handlesVector())) {
+			function_pos = QPoint();
 			return false;
+		} else {
+			setStatusText(tr("Too many arguments for %1().").arg(QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true))), 2);
+			return true;
 		}
-		setStatusText(tr("Too many arguments for %1().").arg(QString::fromStdString(ename->formattedName(TYPE_FUNCTION, true, true))));
-		return true;
 	}
 	if(arg_index <= 0) arg_index = 1;
 	Argument *arg;
@@ -2199,7 +2256,7 @@ bool ExpressionEdit::displayFunctionHint(MathFunction *f, int arg_index) {
 		}
 	}
 	str += ")";
-	setStatusText(str);
+	setStatusText(str, 2);
 	return true;
 }
 
@@ -2254,8 +2311,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
 	if(block_display_parse) return;
+	status_messages.clear();
 	if(document()->isEmpty()) {
+		function_pos = QPoint();
 		setStatusText("");
+		if(settings->status_in_history) emit statusChanged(QString(), false, false, false, expression_from_history);
 		prev_parsed_expression = "";
 		expression_has_changed2 = false;
 		return;
@@ -2273,6 +2333,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			else text += to_str;
 			text += ")";
 		} else if(text.empty()) {
+			function_pos = QPoint();
 			setStatusText("");
 			prev_parsed_expression = "";
 			expression_has_changed2 = false;
@@ -2282,22 +2343,53 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
 		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
-			if(show_tooltip) setStatusText("qalc command");
+			if(settings->status_in_history) {
+				setStatusText("");
+				emit statusChanged("qalc command", false, false, false, expression_from_history);
+			} else if(show_tooltip) {
+				setStatusText("qalc command");
+				function_pos = QPoint();
+			}
 			return;
 		}
 	} else if(text == "MC") {
-		if(show_tooltip) setStatusText(tr("MC (memory clear)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("MC (memory clear)"), false, false, false, expression_from_history);
+		} else if(show_tooltip) {
+			setStatusText(tr("MC (memory clear)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "MS") {
-		if(show_tooltip) setStatusText(tr("MS (memory store)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("MS (memory store)"), false, false, false, expression_from_history);
+		} else if(show_tooltip) {
+			setStatusText(tr("MS (memory store)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "M+") {
-		if(show_tooltip) setStatusText(tr("M+ (memory plus)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("M+ (memory plus)"), false, false, false, expression_from_history);
+		} else if(show_tooltip) {
+			setStatusText(tr("M+ (memory plus)"));
+			function_pos = QPoint();
+		}
 		return;
 	} else if(text == "M-" || text == "M−") {
-		if(show_tooltip) setStatusText(tr("M− (memory minus)"));
+		if(settings->status_in_history) {
+			setStatusText("");
+			emit statusChanged(tr("M− (memory minus)"), false, false, false, expression_from_history);
+		} else if(show_tooltip) {
+			setStatusText(tr("M− (memory minus)"));
+			function_pos = QPoint();
+		}
 		return;
 	}
+	CALCULATOR->beginTemporaryStopMessages();
 	gsub(ID_WRAP_LEFT, LEFT_PARENTHESIS, text);
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
@@ -2358,6 +2450,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			b_func = displayFunctionHint(mfunc.function(), mfunc.countChildren());
 		}
 	}
+	if(!b_func) function_pos = QPoint();
 	if(expression_has_changed2) {
 		bool last_is_space = false;
 		parsed_expression_tooltip = "";
@@ -2428,17 +2521,17 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
 			mparse.format(po);
-			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			parsed_expression += CALCULATOR->localWhereString();
 			mwhere.format(po);
-			parsed_expression += mwhere.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression += mwhere.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		} else if(str_e.empty()) {
 			parsed_expression = "";
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
-			parsed_expression = mparse.print(po, true, false, TAG_TYPE_HTML);
+			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
@@ -2616,13 +2709,30 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
 						if(u) {
 							mparse = u;
+							if(!had_to_conv && !str_e.empty()) {
+								CALCULATOR->beginTemporaryStopMessages();
+								MathStructure to_struct = get_units_for_parsed_expression(&mparse, u, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
+								if(!to_struct.isZero()) {
+									mparse2 = new MathStructure();
+									CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
+									po.preserve_format = false;
+									to_struct.format(po);
+									po.preserve_format = true;
+									if(to_struct.isMultiplication() && to_struct.size() >= 2) {
+										if(to_struct[0].isOne()) to_struct.delChild(1, true);
+										else if(to_struct[1].isOne()) to_struct.delChild(2, true);
+									}
+									mparse2->multiply(to_struct);
+								}
+								CALCULATOR->endTemporaryStopMessages();
+							}
 						} else if(v) {
 							mparse = v;
 						} else if(!p) {
 							CALCULATOR->beginTemporaryStopMessages();
 							CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
 							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
-							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty() && str_w.empty()) {
+							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty()) {
 								CALCULATOR->beginTemporaryStopMessages();
 								MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
 								if(!to_struct.isZero()) {
@@ -2653,12 +2763,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
 						} else {
 							CALCULATOR->beginTemporaryStopMessages();
-							parsed_expression += mparse.print(po, true, false, TAG_TYPE_HTML);
+							parsed_expression += mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 							CALCULATOR->endTemporaryStopMessages();
-						}
-						if(had_to_conv && mparse2) {
-							mparse2->unref();
-							mparse2 = NULL;
 						}
 						had_to_conv = true;
 					}
@@ -2668,40 +2774,49 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 			if(mparse2) {
 				mparse2->format(po);
-				parsed_expression.replace(0, parse_l, mparse2->print(po, true, false, TAG_TYPE_HTML));
+				parsed_expression.replace(0, parse_l, mparse2->print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML));
 				mparse2->unref();
 			}
 		}
 		if(po.base == BASE_CUSTOM) CALCULATOR->setCustomOutputBase(nr_base);
+		CALCULATOR->endTemporaryStopMessages(false, &status_messages);
 		size_t message_n = 0;
-		while(CALCULATOR->message()) {
-			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
-				MessageType mtype = CALCULATOR->message()->type();
+		for(size_t i = 0; i < status_messages.size(); i++) {
+			if(status_messages[i].category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
+				MessageType mtype = status_messages[i].type();
 				if(mtype == MESSAGE_ERROR) {
 					if(message_n > 0) {
 						if(message_n == 1) parsed_expression_tooltip = "• " + parsed_expression_tooltip;
 						parsed_expression_tooltip += "<br>• ";
 					}
-					parsed_expression_tooltip += CALCULATOR->message()->message();
+					parsed_expression_tooltip += status_messages[i].message();
+					had_errors = true;
 					message_n++;
 				} else if(mtype == MESSAGE_WARNING) {
 					had_warnings = true;
 				}
 			}
-			CALCULATOR->nextMessage();
 		}
-		parsed_had_errors = had_errors; parsed_had_warnings = had_warnings;
+		parsed_had_errors = had_errors && (settings->expression_status_delay >= settings->completion_delay); parsed_had_warnings = had_warnings || had_errors;
 		if(!str_f.empty()) {str_f += " "; parsed_expression.insert(0, str_f);}
-		if(had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
+		if(parsed_had_errors) prev_parsed_expression = QString::fromStdString(parsed_expression_tooltip);
 		else prev_parsed_expression = QString::fromStdString(parsed_expression);
 		settings->evalops.parse_options.preserve_format = false;
-		if(!b_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+		if(settings->status_in_history) {
+			emit statusChanged(QString::fromStdString(parsed_expression), !str_e.empty(), had_errors, had_warnings, expression_from_history);
+			if(!b_func) setStatusText(settings->chain_mode || !parsed_had_errors ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 0);
+		} else if(!b_func && show_tooltip) {
+			setStatusText(settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
+		}
 		expression_has_changed2 = false;
 	} else if(!b_func) {
-		CALCULATOR->clearMessages();
+		CALCULATOR->endTemporaryStopMessages();
 		settings->evalops.parse_options.preserve_format = false;
-		if(prev_func && show_tooltip) setStatusText(settings->chain_mode ? "" : prev_parsed_expression, true);
+		if(prev_func && show_tooltip) {
+			setStatusText((settings->status_in_history && !parsed_had_errors) || settings->chain_mode ? "" : prev_parsed_expression, parsed_had_errors ? 3 : 1);
+		}
 	} else {
+		CALCULATOR->endTemporaryStopMessages();
 		settings->evalops.parse_options.preserve_format = false;
 	}
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
@@ -2710,11 +2825,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 void ExpressionEdit::onTextChanged() {
 	QString str = toPlainText();
 	if(str == previous_text && textCursor().position() == previous_pos) return;
-	previous_text = str;
-	previous_pos = textCursor().position();
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
+	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
+	previous_text = str;
+	previous_pos = textCursor().position();
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
 			expression_undo_buffer.push_back(QString());
@@ -2784,9 +2900,12 @@ void ExpressionEdit::setExpressionHasChanged(bool b) {
 void ExpressionEdit::onCompletionMenuItemActivated() {
 	onCompletionActivated(sender()->property("MODEL INDEX").toModelIndex());
 }
+bool ExpressionEdit::completionInitialized() {return sourceModel->hasChildren();}
+
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak; cdata->current_from_categories = from_cats_bak;}
 bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
 	if(completionTimer) completionTimer->stop();
+	if(!sourceModel->hasChildren()) updateCompletion();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
 	std::vector<Unit*> from_units_bak = cdata->current_from_units;
 	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
@@ -3089,6 +3208,7 @@ void ExpressionEdit::onCursorPositionChanged() {
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(toolTipTimer) toolTipTimer->stop();
+	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
 	cursor_has_moved = true;
 	int epos = document()->characterCount() - 1 - textCursor().position();
@@ -3216,10 +3336,21 @@ void ExpressionEdit::insertBrackets() {
 	cur.endEditBlock();
 	highlightParentheses();
 }
+void ExpressionEdit::insertText(const QString &s) {
+	if(overwriteMode() && !textCursor().atEnd()) {
+		QTextCursor cur = textCursor();
+		cur.beginEditBlock();
+		cur.deleteChar();
+		insertPlainText(s);
+		cur.endEditBlock();
+	} else {
+		insertPlainText(s);
+	}
+}
 void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args, bool quote) {
 	parse_blocked++;
 	QTextCursor cur = textCursor();
-	if(cur.hasSelection()) {
+	if(cur.hasSelection() && (!overwriteMode() || insert_before || always_add_parentheses || add_comma || !add_args.isEmpty())) {
 		QString qstr = toPlainText();
 		std::string str = qstr.toStdString();
 		int istart = cur.selectionStart();
@@ -3319,6 +3450,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	} else if(always_add_parentheses && insert_before) {
 		setCursorWidth(0);
 		cur.beginEditBlock();
+		if(overwriteMode()) cur.deleteChar();
 		if(quote) insertPlainText(text + "(\"\"" + add_args + ")");
 		else insertPlainText(text + "(" + add_args + ")");
 		cur.movePosition(QTextCursor::PreviousCharacter, QTextCursor::MoveAnchor, add_args.length() + (quote ? 2 : 1));
@@ -3326,9 +3458,9 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 		setTextCursor(cur);
 		setCursorWidth(1);
 	} else if(always_add_parentheses) {
-		insertPlainText("(" + add_args + ")" + text);
+		insertText("(" + add_args + ")" + text);
 	} else if(!text.isEmpty()) {
-		insertPlainText(text);
+		insertText(text);
 	} else {
 		parse_blocked--;
 		return;
@@ -3396,6 +3528,7 @@ void ExpressionEdit::smartParentheses() {
 		setTextCursor(cur);
 		insertPlainText("()");
 		moveCursor(QTextCursor::PreviousCharacter);
+		cur.endEditBlock();
 		setCursorWidth(1);
 		return;
 	}
@@ -3718,16 +3851,17 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 		c.setPosition(c.position() + i_move);
 		setTextCursor(c);
 	}
-	current_object_start = cos_bak;
 	blockCompletion(false);
 	if((do_completion_signal < 0 || (!item && !prefix)) && cdata->editing_to_expression && (current_object_end < 0 || current_object_end == text.length())) {
 		if(str[str.length() - 1] != ' ' && str[str.length() - 1] != '/') {
 			current_object_end = current_object_start + unicode_length(str);
+			current_object_start = cos_bak;
 			emit returnPressed();
 			return;
 		}
 	}
 	current_object_end = current_object_start + unicode_length(str);
+	current_object_start = cos_bak;
 	cdata->current_function = settings->f_answer;
 	displayParseStatus();
 }
@@ -3737,6 +3871,7 @@ void ExpressionEdit::hideCompletion() {
 void ExpressionEdit::clearHistory() {
 	settings->expression_history.clear();
 	history_index = -1;
+	current_history.clear();
 }
 void ExpressionEdit::addToHistory() {
 	std::string str = toPlainText().toStdString();
@@ -3861,7 +3996,7 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 		} else if(!cur.atEnd()) {
 			return false;
 		}
-		std::string str = toPlainText().toStdString();
+		std::string str = CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options);
 		remove_blanks(str);
 		if(str.empty() || str[0] == '/' || CALCULATOR->hasToExpression(str, true, settings->evalops) || CALCULATOR->hasWhereExpression(str, settings->evalops) || last_is_operator(str)) return false;
 		size_t par_n = 0, vec_n = 0;
@@ -3872,39 +4007,26 @@ bool ExpressionEdit::doChainMode(const QString &op) {
 			else if(vec_n > 0 && str[i] == RIGHT_VECTOR_WRAP_CH) vec_n--;
 		}
 		if(par_n > 0 || vec_n > 0) return false;
-		MathStructure m;
-		CALCULATOR->clearMessages();
-		CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), 1000, settings->evalops, NULL, NULL, false);
-		if(m.isAborted()) return false;
-		PrintOptions po = settings->printops;
-		po.allow_non_usable = false;
-		po.is_approximate = NULL;
-		po.can_display_unicode_string_arg = (void*) this;
-		str = CALCULATOR->print(m, 1000, settings->printops);
-		if(str == CALCULATOR->abortedMessage() || str.length() > 100) return false;
-		std::string warnings;
-		int message_n = 0;
-		while(CALCULATOR->message()) {
-			if(CALCULATOR->message()->category() != MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION || !settings->implicit_question_asked) {
-				MessageType mtype = CALCULATOR->message()->type();
-				if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-					if(mtype == MESSAGE_ERROR) return false;
-					if(message_n > 0) {
-						if(message_n == 1) warnings.insert(0, "• ");
-						warnings += "\n• ";
-					}
-					warnings += CALCULATOR->message()->message();
-					message_n++;
-				}
+		cur.beginEditBlock();
+		if(str.find_first_not_of(NUMBER_ELEMENTS SPACE) != std::string::npos) {
+			MathStructure mparse;
+			CALCULATOR->beginTemporaryStopMessages();
+			CALCULATOR->parse(&mparse, str, settings->evalops.parse_options);
+			CALCULATOR->endTemporaryStopMessages();
+			if((!mparse.isMultiplication() || op != settings->multiplicationSign(false)) && (!mparse.isAddition() || (op != "+" && op != "-" && op != SIGN_MINUS)) && (!mparse.isBitwiseOr() || op != BITWISE_OR) && (!mparse.isBitwiseAnd() || op != BITWISE_AND)) {
+				cur.movePosition(QTextCursor::Start);
+				cur.insertText("(");
+				cur.movePosition(QTextCursor::End);
+				cur.insertText(")");
+			} else if(cur.hasSelection()) {
+				cur.movePosition(QTextCursor::End);
 			}
-			CALCULATOR->nextMessage();
+		} else if(cur.hasSelection()) {
+			cur.movePosition(QTextCursor::End);
 		}
-		if(m.size() > 0 && !m.isFunction() && !m.isVector() && (((!m.isMultiplication() || op != settings->multiplicationSign()) && (!m.isAddition() || (op != "+" && op != SIGN_MINUS)) && (!m.isBitwiseOr() || op != BITWISE_OR) && (!m.isBitwiseAnd() || op != BITWISE_AND)))) {
-			str.insert(0, "(");
-			str += ")";
-		}
-		setExpression(QString::fromStdString(str) + op);
-		setStatusText(QString::fromStdString(warnings));
+		setTextCursor(cur);
+		insertPlainText(op);
+		cur.endEditBlock();
 		return true;
 	}
 	return false;

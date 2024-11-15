@@ -41,7 +41,7 @@ class UnitsDialog : public QDialog {
 		ItemProxyModel *unitsModel, *toModel;
 		QStandardItemModel *sourceModel, *toSourceModel;
 		QPushButton *deactivateButton, *insertButton, *delButton, *editButton, *newButton, *convertButton;
-		QAbstractButton *favouriteButton;
+		QAbstractButton *favouriteButton, *showHiddenButton;
 		QLineEdit *searchEdit, *fromEdit, *toEdit;
 		QSplitter *vsplitter, *hsplitter;
 		QLabel *fromLabel, *equalsLabel;
@@ -72,6 +72,7 @@ class UnitsDialog : public QDialog {
 		void toUnitChanged();
 		void fromUnitChanged();
 		void favouriteClicked();
+		void showHiddenToggled(bool);
 		void onUnitActivated(const QModelIndex&);
 
 	public:

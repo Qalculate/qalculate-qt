@@ -1082,27 +1082,35 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Decimal Fraction</source>
-        <translation type="unfinished"></translation>
+        <translation>Десятичная дробь</translation>
     </message>
     <message>
         <source>Optimal Prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Оптимальный префикс</translation>
     </message>
     <message>
         <source>prefix</source>
-        <translation type="unfinished">префикс</translation>
+        <translation>префикс</translation>
     </message>
     <message>
         <source>optimal prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>оптимальный префикс</translation>
     </message>
     <message>
         <source>decimals</source>
-        <translation type="unfinished"></translation>
+        <translation>десятичные</translation>
     </message>
     <message>
         <source>decimal fraction</source>
-        <translation type="unfinished"></translation>
+        <translation>десятичная дробь</translation>
+    </message>
+    <message>
+        <source>In history list</source>
+        <translation>В списке истории</translation>
+    </message>
+    <message>
+        <source>In expression field</source>
+        <translation>В поле выражения</translation>
     </message>
 </context>
 <context>
@@ -1167,7 +1175,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Value</source>
-        <translation type="unfinished">Значение</translation>
+        <translation>Значение</translation>
     </message>
 </context>
 <context>
@@ -1471,6 +1479,10 @@ Do you want to overwrite the function?</source>
         <source>Type a mathematical expression above, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
         <translation>Введите математическое выражение выше, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
     </message>
+    <message>
+        <source>Search by Date…</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>
@@ -1720,7 +1732,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Action:</source>
-        <translation>Действие:</translation>
+        <translation type="vanished">Действие:</translation>
     </message>
     <message>
         <source>None</source>
@@ -1907,6 +1919,10 @@ Do you want to overwrite the function?</source>
         <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
         <translatorcomment>Стандартная кнопка калькулятора. Не используйте более трёх символов.</translatorcomment>
         <translation>СХР</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>Действие</translation>
     </message>
 </context>
 <context>
@@ -2410,11 +2426,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Display expression status</source>
-        <translation>Показывать статус выражения</translation>
+        <translation type="vanished">Показывать статус выражения</translation>
     </message>
     <message>
         <source>Delay:</source>
-        <translation>Задержка:</translation>
+        <translation type="vanished">Задержка:</translation>
     </message>
     <message>
         <source>Expression after calculation:</source>
@@ -2494,11 +2510,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Binary two&apos;s complement representation</source>
-        <translation>Представление двоичных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Представление двоичных чисел с дополнительным кодом</translation>
     </message>
     <message>
         <source>Hexadecimal two&apos;s complement representation</source>
-        <translation>Представление шестнадцатеричных чисел с дополнительным кодом</translation>
+        <translation type="vanished">Представление шестнадцатеричных чисел с дополнительным кодом</translation>
     </message>
     <message>
         <source>Use lower case letters in non-decimal numbers</source>
@@ -2551,7 +2567,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers away from zero</source>
-        <translation>Округлять половинные числа вверх</translation>
+        <translation>Округлять половинные числа от нуля</translation>
     </message>
     <message>
         <source>Round halfway numbers to even</source>
@@ -2603,7 +2619,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Interval display:</source>
-        <translation>Отображение интервалов:</translation>
+        <translation>Режим отображения интервалов:</translation>
     </message>
     <message>
         <source>Significant digits</source>
@@ -2779,7 +2795,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Tooltips:</source>
-        <translation>Tooltips:</translation>
+        <translation>Подсказки:</translation>
     </message>
     <message>
         <source>Show all</source>
@@ -2815,39 +2831,99 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers to odd</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа до ближайшего нечётного целого числа</translation>
     </message>
     <message>
         <source>Round halfway numbers toward zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа к нулю</translation>
     </message>
     <message>
         <source>Round halfway numbers to random</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа случайно</translation>
     </message>
     <message>
         <source>Round halfway numbers up</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа вверх</translation>
     </message>
     <message>
         <source>Round halfway numbers down</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять половинные числа вниз</translation>
     </message>
     <message>
         <source>Round toward zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять к нулю</translation>
     </message>
     <message>
         <source>Round away from zero</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять от нуля</translation>
     </message>
     <message>
         <source>Round up</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять вверх</translation>
     </message>
     <message>
         <source>Round down</source>
-        <translation type="unfinished"></translation>
+        <translation>Округлять вниз</translation>
+    </message>
+    <message>
+        <source>Two&apos;s complement output:</source>
+        <translation>Дополнительный код для вывода</translation>
+    </message>
+    <message>
+        <source>Two&apos;s complement input:</source>
+        <translation>Дополнительный код для ввода</translation>
+    </message>
+    <message>
+        <source>Binary</source>
+        <translation>Двоичное</translation>
+    </message>
+    <message>
+        <source>Hexadecimal</source>
+        <translation>Шестнадцатеричное</translation>
+    </message>
+    <message>
+        <source>Binary bits:</source>
+        <translation>Двоичные биты:</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Автоматически</translation>
+    </message>
+    <message>
+        <source>Max history lines saved:</source>
+        <translation>Максимальное количество сохраненных строк истории:</translation>
+    </message>
+    <message>
+        <source>Preserve history height</source>
+        <translation>Сохранять высоту списка истории</translation>
+    </message>
+    <message>
+        <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
+        <translation>Не изменять высоту списка истории, когда клавиатура или числовые базы показаны или скрыты.</translation>
+    </message>
+    <message>
+        <source>Expression status:</source>
+        <translation>Статус выражения:</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Выкл</translation>
+    </message>
+    <message>
+        <source>In history list</source>
+        <translation>В списке истории</translation>
+    </message>
+    <message>
+        <source>In expression field</source>
+        <translation>В поле выражения</translation>
+    </message>
+    <message>
+        <source>Status tooltip delay:</source>
+        <translation>Задержка подсказки о статусе:</translation>
+    </message>
+    <message>
+        <source>Calculate as you type delay:</source>
+        <translation>Задержка расчёта по мере ввода:</translation>
     </message>
 </context>
 <context>
@@ -2979,6 +3055,10 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     <message>
         <source>Unsupported value.</source>
         <translation>Неподдерживаемое значение.</translation>
+    </message>
+    <message>
+        <source>Allow multiple instances?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3469,13 +3549,17 @@ You can get version %3 at %2.</source>
         <source>Open variables menu</source>
         <translation>Открыть меню переменных</translation>
     </message>
+    <message>
+        <source>Download</source>
+        <translation>Скачать</translation>
+    </message>
 </context>
 <context>
     <name>QalculateTranslator</name>
     <message>
         <source>Cancel</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
-        <translation>Отмена</translation>
+        <translation>Отменить</translation>
     </message>
     <message>
         <source>Close</source>
@@ -3660,19 +3744,19 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Normal</source>
-        <translation>Обычное</translation>
+        <translation>Обычный</translation>
     </message>
     <message>
         <source>Scientific</source>
-        <translation>Научное</translation>
+        <translation>Научный</translation>
     </message>
     <message>
         <source>Engineering</source>
-        <translation>Инженерное</translation>
+        <translation>Инженерный</translation>
     </message>
     <message>
         <source>Simple</source>
-        <translation>Простое</translation>
+        <translation>Простой</translation>
     </message>
     <message>
         <source>Angle Unit</source>
@@ -4163,7 +4247,7 @@ Please select interpretation of expressions with implicit multiplication
     </message>
     <message>
         <source>Action:</source>
-        <translation>Действие:</translation>
+        <translation type="vanished">Действие:</translation>
     </message>
     <message>
         <source>Value:</source>
@@ -4291,7 +4375,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Hide Number Pad</source>
-        <translation>Скрыть цифровую клавиатуру</translation>
+        <translation type="vanished">Скрыть цифровую клавиатуру</translation>
     </message>
     <message>
         <source>Reset Keypad Position</source>
@@ -4442,15 +4526,59 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished">Копировать</translation>
+        <translation>Копировать</translation>
     </message>
     <message>
         <source>prefix</source>
-        <translation type="unfinished">префикс</translation>
+        <translation>префикс</translation>
     </message>
     <message>
         <source>decimals</source>
+        <translation>десятичные дроби</translation>
+    </message>
+    <message>
+        <source>Percentage Interpretation</source>
+        <translation>Процентная интерпретация</translation>
+    </message>
+    <message>
+        <source>Please select interpretation of percentage addition</source>
+        <translation>Пожалуйста, выберите интерпретацию процентного сложения</translation>
+    </message>
+    <message>
+        <source>Add percentage of original value</source>
+        <translation>Добавить процент от первоначального значения</translation>
+    </message>
+    <message>
+        <source>Add percentage multiplied by 1/100</source>
+        <translation>Добавить процент, умноженный на 1/100</translation>
+    </message>
+    <message>
+        <source>Show toolbar</source>
+        <translation>Показать панель инструментов</translation>
+    </message>
+    <message>
+        <source>Action</source>
+        <translation>Действие</translation>
+    </message>
+    <message>
+        <source>Key combination</source>
+        <translation>Комбинация клавиш</translation>
+    </message>
+    <message>
+        <source>Number Pad</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Show Number Pad</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Open Settings Folder(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4652,6 +4780,10 @@ Do you want to overwrite it?</source>
     <message>
         <source>Inactive</source>
         <translation>Неактивные</translation>
+    </message>
+    <message>
+        <source>Show hidden units</source>
+        <translation>Показать скрытые единицы измерения</translation>
     </message>
 </context>
 <context>

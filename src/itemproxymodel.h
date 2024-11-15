@@ -25,12 +25,14 @@ class ItemProxyModel : public QSortFilterProxyModel {
 
 		void setFilter(std::string, std::string = "");
 		void setSecondaryFilter(std::string);
+		void setShowHidden(bool);
 		std::string currentFilter() const;
 		std::string currentSecondaryFilter() const;
 
 	protected:
 
 		std::string cat, subcat, filter;
+		bool show_hidden;
 
 		bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 

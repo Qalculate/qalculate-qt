@@ -102,26 +102,58 @@ unsigned int FPConversionDialog::getSignPosition() {
 void FPConversionDialog::formatChanged() {
 	updateFields(10);
 }
-void FPConversionDialog::updateFields(int base) {
+void FPConversionDialog::clear() {
+	updateFields(0);
+}
+void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 	std::string sbin;
 	Number decnum;
 	bool use_decnum = false;
 	unsigned int bits = getBits();
 	unsigned int expbits = getExponentBits();
 	unsigned int sgnpos = getSignPosition();
-	if(base == 10) {
-		std::string str = valueEdit->text().toStdString();
-		remove_blank_ends(str);
-		if(str.empty()) return;
-		if(last_is_operator(str, true)) return;
-		EvaluationOptions eo;
-		eo.parse_options = settings->evalops.parse_options;
-		eo.parse_options.read_precision = DONT_READ_PRECISION;
-		if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
-		if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-		eo.parse_options.base = 10;
+	PrintOptions po;
+	po.number_fraction_format = FRACTION_DECIMAL;
+	po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+	po.use_unicode_signs = settings->printops.use_unicode_signs;
+	po.exp_display = settings->printops.exp_display;
+	po.lower_case_numbers = settings->printops.lower_case_numbers;
+	po.rounding = settings->printops.rounding;
+	po.base_display = BASE_DISPLAY_NONE;
+	po.abbreviate_names = settings->printops.abbreviate_names;
+	po.digit_grouping = settings->printops.digit_grouping;
+	po.multiplication_sign = settings->printops.multiplication_sign;
+	po.division_sign = settings->printops.division_sign;
+	po.short_multiplication = settings->printops.short_multiplication;
+	po.excessive_parenthesis = settings->printops.excessive_parenthesis;
+	po.can_display_unicode_string_function = &can_display_unicode_string_function;
+	po.can_display_unicode_string_arg = (void*) valueEdit;
+	po.spell_out_logical_operators = settings->printops.spell_out_logical_operators;
+	po.binary_bits = bits;
+	po.show_ending_zeroes = false;
+	po.min_exp = 0;
+	if(base == 10 || v) {
 		MathStructure value;
-		CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
+		if(v) {
+			valueEdit->setText(QString::fromStdString(v->number().print(po)));
+			base = 10;
+			value.set(*v);
+		} else {
+			std::string str = valueEdit->text().toStdString();
+			remove_blank_ends(str);
+			if(str.empty()) {
+				value.setAborted();
+			} else {
+				if(last_is_operator(str, true)) return;
+				EvaluationOptions eo;
+				eo.parse_options = settings->evalops.parse_options;
+				eo.parse_options.read_precision = DONT_READ_PRECISION;
+				if(eo.parse_options.parsing_mode == PARSING_MODE_RPN || eo.parse_options.parsing_mode == PARSING_MODE_CHAIN) eo.parse_options.parsing_mode = PARSING_MODE_ADAPTIVE;
+				if(!settings->simplified_percentage) eo.parse_options.parsing_mode = (ParsingMode) (eo.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
+				eo.parse_options.base = 10;
+				CALCULATOR->calculate(&value, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 1500, eo);
+			}
+		}
 		if(value.isNumber()) {
 			sbin = to_float(value.number(), bits, expbits, sgnpos);
 			decnum = value.number();
@@ -135,32 +167,34 @@ void FPConversionDialog::updateFields(int base) {
 	} else if(base == 2) {
 		std::string str = binEdit->toPlainText().toStdString();
 		remove_blanks(str);
-		if(str.empty()) return;
-		if(str.find_first_not_of("01") == std::string::npos && str.length() <= bits) {
-			sbin = str;
-		} else {
-			sbin = "";
+		if(!str.empty()) {
+			if(str.find_first_not_of("01") == std::string::npos && str.length() <= bits) {
+				sbin = str;
+			} else {
+				sbin = "";
+			}
+			CALCULATOR->clearMessages();
 		}
-		CALCULATOR->clearMessages();
 	} else if(base == 16) {
 		std::string str = hexEdit->text().toStdString();
 		remove_blanks(str);
-		if(str.empty()) return;
-		ParseOptions pa;
-		pa.base = BASE_HEXADECIMAL;
-		Number nr(str, pa);
-		PrintOptions po;
-		po.base = BASE_BINARY;
-		po.binary_bits = bits;
-		po.max_decimals = 0;
-		po.use_max_decimals = true;
-		po.base_display = BASE_DISPLAY_NONE;
-		sbin = nr.print(po);
-		if(sbin.length() < bits) sbin.insert(0, bits - sbin.length(), '0');
-		if(sbin.length() > bits) {
-			sbin = "";
+		if(!str.empty()) {
+			ParseOptions pa;
+			pa.base = BASE_HEXADECIMAL;
+			Number nr(str, pa);
+			PrintOptions po;
+			po.base = BASE_BINARY;
+			po.binary_bits = bits;
+			po.max_decimals = 0;
+			po.use_max_decimals = true;
+			po.base_display = BASE_DISPLAY_NONE;
+			sbin = nr.print(po);
+			if(sbin.length() < bits) sbin.insert(0, bits - sbin.length(), '0');
+			if(sbin.length() > bits) {
+				sbin = "";
+			}
+			CALCULATOR->clearMessages();
 		}
-		CALCULATOR->clearMessages();
 	}
 	valueEdit->blockSignals(true);
 	binEdit->blockSignals(true);
@@ -174,26 +208,6 @@ void FPConversionDialog::updateFields(int base) {
 		decEdit->clear();
 		errorEdit->clear();
 	} else {
-		PrintOptions po;
-		po.number_fraction_format = FRACTION_DECIMAL;
-		po.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
-		po.use_unicode_signs = settings->printops.use_unicode_signs;
-		po.exp_display = settings->printops.exp_display;
-		po.lower_case_numbers = settings->printops.lower_case_numbers;
-		po.rounding = settings->printops.rounding;
-		po.base_display = BASE_DISPLAY_NONE;
-		po.abbreviate_names = settings->printops.abbreviate_names;
-		po.digit_grouping = settings->printops.digit_grouping;
-		po.multiplication_sign = settings->printops.multiplication_sign;
-		po.division_sign = settings->printops.division_sign;
-		po.short_multiplication = settings->printops.short_multiplication;
-		po.excessive_parenthesis = settings->printops.excessive_parenthesis;
-		po.can_display_unicode_string_function = &can_display_unicode_string_function;
-		po.can_display_unicode_string_arg = (void*) valueEdit;
-		po.spell_out_logical_operators = settings->printops.spell_out_logical_operators;
-		po.binary_bits = bits;
-		po.show_ending_zeroes = false;
-		po.min_exp = 0;
 		int prec_bak = CALCULATOR->getPrecision();
 		CALCULATOR->setPrecision(100);
 		ParseOptions pa;
@@ -269,6 +283,7 @@ void FPConversionDialog::updateFields(int base) {
 				po.base = 16;
 				po.lower_case_numbers = true;
 				po.decimalpoint_sign = ".";
+				po.use_unicode_signs = false;
 				if(significand.isNegative()) {
 					significand.negate();
 					sfloathex = "-";
@@ -283,6 +298,7 @@ void FPConversionDialog::updateFields(int base) {
 				po.decimalpoint_sign = settings->printops.decimalpoint_sign;
 				po.lower_case_numbers = false;
 				po.min_exp = exp_bak;
+				po.use_unicode_signs = settings->printops.use_unicode_signs;
 			}
 			hexExp2Edit->setText(QString::fromStdString(sfloathex));
 			exp2Edit->setText(QString::fromStdString(sfloat));
@@ -314,6 +330,13 @@ void FPConversionDialog::setValue(const QString &str) {
 	valueEdit->setText(str);
 	valueEdit->blockSignals(false);
 	updateFields(10);
+	valueEdit->selectAll();
+	valueEdit->setFocus();
+}
+void FPConversionDialog::setValue(const MathStructure &m) {
+	updateFields(0, &m);
+	valueEdit->selectAll();
+	valueEdit->setFocus();
 }
 void FPConversionDialog::setBin(const QString &str) {
 	binEdit->blockSignals(true);
@@ -327,12 +350,15 @@ void FPConversionDialog::setBin(const QString &str) {
 	binEdit->setTextCursor(cursor);
 	binEdit->blockSignals(false);
 	updateFields(2);
+	binEdit->setFocus();
 }
 void FPConversionDialog::setHex(const QString &str) {
 	hexEdit->blockSignals(true);
 	hexEdit->setText(str);
 	hexEdit->blockSignals(false);
 	updateFields(16);
+	hexEdit->selectAll();
+	hexEdit->setFocus();
 }
 void FPConversionDialog::hexChanged() {
 	updateFields(16);

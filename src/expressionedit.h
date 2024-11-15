@@ -60,8 +60,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		ExpressionProxyModel *completionModel;
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
-		QMenu *cmenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *clearHistoryAction;
+		QMenu *cmenu, *fileMenu, *modeMenu;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
@@ -86,20 +86,23 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool disable_history_arrow_keys, dont_change_index, cursor_has_moved;
 		int block_display_parse;
 		QString prev_parsed_expression, parsed_expression_tooltip, current_status_text;
-		bool current_status_is_expression;
+		int current_status_type;
 		bool expression_has_changed, expression_has_changed2;
 		bool parsed_had_errors, parsed_had_warnings;
+		bool expression_from_history;
 		int previous_epos;
+		QPoint function_pos;
 		bool parentheses_highlighted;
 		int default_frame;
 		QRect prev_rect;
 
 		void setCurrentObject();
-		void setStatusText(const QString &text, bool is_expression = false);
+		void setStatusText(const QString &text, int = 0);
 		bool displayFunctionHint(MathFunction *f, int arg_index = 1);
 		void highlightParentheses();
 
 		void keyReleaseEvent(QKeyEvent*) override;
+		void changeEvent(QEvent*) override;
 		void contextMenuEvent(QContextMenuEvent *e) override;
 		void insertFromMimeData(const QMimeData*) override;
 		bool expressionInQuotes();
@@ -111,6 +114,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 		std::string expression() const;
 		QSize sizeHint() const override;
+		void updateMinimumHeight();
 
 		void wrapSelection(const QString &text = QString(), bool insert_before = false, bool add_parentheses = false, bool add_comma = false, const QString &add_arg = QString(), bool quote = false);
 		bool doChainMode(const QString &op);
@@ -122,6 +126,11 @@ class ExpressionEdit : public QPlainTextEdit {
 		QString selectedText(bool = false);
 		void onCompleterEvent(QEvent*);
 		bool eventFilter(QObject*, QEvent*) override;
+		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
+		bool completionInitialized();
+		void insertText(const QString&);
+
+		std::vector<CalculatorMessage> status_messages;
 
 	protected slots:
 
@@ -164,7 +173,8 @@ class ExpressionEdit : public QPlainTextEdit {
 		void returnPressed();
 		void toConversionRequested(std::string);
 		void calculateRPNRequest(int);
-		void expressionStatusModeChanged();
+		void expressionStatusModeChanged(bool);
+		void statusChanged(QString, bool, bool, bool, bool);
 
 };
 

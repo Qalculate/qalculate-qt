@@ -55,7 +55,7 @@
  <url type="help">https://qalculate.github.io/manual/index.html</url>
  <url type="donation">https://www.paypal.me/HannaKnutsson</url>
  <url type="translate">https://github.com/Qalculate/libqalculate/blob/master/README.translate</url>
- <developer id="io.github.Qalculate">
+ <developer id="io.github.qalculate">
   <name>Hanna Knutsson</name>
  </developer>
  <content_rating type="oars-1.0"/>
@@ -70,6 +70,95 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="5.3.0" date="2024-10-07">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Show language menu in preferences on all platforms</li>
+      <li>Change "Hide number pad" to "Always show number pad", and add separate number pad when the option is not enabled</li>
+      <li>Improve initial value and clear all other fields when edited field is empty, in number bases and floating point conversion dialogs</li>
+      <li>Allow unit expressions for insert unit action, for custom shortcuts and buttons</li>
+      <li>Set minimum characters to two for all completion with "Limited full completion"</li>
+      <li>Support x without backslash for custom function argument condition</li>
+      <li>Update parsed expression and calculate-as-you-type result if variable, function, or unit in expression has changed</li>
+      <li>Improve support for small displays with low resolution/high scaling</li>
+      <li>Update chain mode to match behaviour in Gtk UI</li>
+      <li>Update calendar and floating point conversion dialogs after expression calculation</li>
+      <li>Portuguese (pt_PT) translation</li>
+      <li>Fixes for overwrite input mode</li>
+      <li>Fix unresponsive expression field in some cases after smart parentheses has been applied</li>
+      <li>Fix completion with both custom app font and custom expression font set</li>
+      <li>Fix input of max value for number argument</li>
+      <li>Fix memory leaks</li>
+      <li>Fix segfault with recursive (self-referencing) function</li>
+      <li>Fix input of negative exponent in scientific e notation with RPN syntax</li>
+      <li>Fix parsing of 1°2'3" as 1°+2'+3"</li>
+      <li>Improve handling of "where" expressions with inequalities</li>
+      <li>Fix definite integral for 1/sqrt(1-x^2), with limits higher/lower than or equal to -1 and 1</li>
+      <li>Fix crash with empty vector in plot function, e.g. plot([])</li>
+      <li>Fix "did you mean..." warning for two implicitly multiplicated functions without space between (e.g. "atan2(a,b)atan2(c,d)")</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
+  <release version="5.2.0" date="2024-07-01">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Option (enabled by default) to show expression status (parsed expression and calculated value) as you type in history list, instead of in tooltip</li>
+      <li>Option to hide toolbar</li>
+      <li>Option to preserve height of history list when keypad or number bases are shown/hidden</li>
+      <li>Option to change the max number of history lines saved</li>
+      <li>Option to show/hide hidden units (hidden by default) in units window</li>
+      <li>Headers for keyboard shortcuts and actions lists to allow custom sorting</li>
+      <li>Reduced minimum height (one line) of expression field</li>
+      <li>Physical constants updated with CODATA 2022 values</li>
+      <li>New function: allroots()</li>
+      <li>New units: therm, thermie, IUNS calorie, rpm</li>
+      <li>Additional names/symbols for turn unit</li>
+      <li>Use symbol "cal" for thermochemical (instead of international table) calorie</li>
+      <li>Change title and names/symbols of weak mixing angle (prepend "sin2" to theta variants)</li>
+      <li>Return exact negative integers in log10()</li>
+      <li>More conservative handling of infinity in equations</li>
+      <li>Remove n from equation solution if possible using assumptions of x</li>
+      <li>Fix subsequent tab completions after completion of unit with prefix</li>
+      <li>Fix unnecessary parenthesis, with wrong color for closing bracket, around unit with exponent</li>
+      <li>Fix convert button text, when toolbar style is not icon only</li>
+      <li>Fix history list not cleared before reload if there are exactly one item</li>
+      <li>Fix input of scientific E-notation using lowercase e in numbers using concise interval notation, in expressions</li>
+      <li>Fix "bit width" and "signed integer" arguments in setbits()</li>
+      <li>Fix a^(f(x))=a^(b*g(x)) where b=2 or b=3</li>
+      <li>Fix auto/dual approximation with "where" expression</li>
+      <li>Fix "where" expressions with multiple inequality statements for a single variable, e.g. "where x≥0 and x≤10"</li>
+      <li>Fix crash when a variable name/symbol with more than 20 characters is used in "where" expression</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
+  <release version="5.1.0" date="2024-05-06">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Improved history list efficiency</li>
+      <li>Add two's complement input and binary bits to preferences</li>
+      <li>Ask for the desired interpretation the first time percent addition is used (e.g. 100 + 10% equals 110 or 100.1)</li>
+      <li>Hide expression tooltip (after 300 ms) when input resumes, if delayed expression status is enabled</li>
+      <li>Download button in dialog shown when new version is available, on Windows</li>
+      <li>Support for solving equations containing if() function</li>
+      <li>Support for solving root(a, x)=b (requires rational value for ln(a)/ln(b))</li>
+      <li>New functions: powertower() and multiples()</li>
+      <li>New units for solar radius, mass, and luminosity</li>
+      <li>Use parentheses for exponent using scientific notation (with power of 10)</li>
+      <li>Support integer factorization of integers in matrix/vector, and of numerator and denominator in rational number</li>
+      <li>Relaxed conditions for (x^a)^b = x^(a × b) and x^a × x^b = x^(a + b) when complex numbers are deactivated (fixes segfaults)</li>
+      <li>Fix AltGr for input of operators on Windows</li>
+      <li>Fix (ax + n)^2 > 1, where n is even and a is not 1, returning false</li>
+      <li>Fix setbits() function</li>
+      <li>Fix Number::equals(0, ..., true) when number is infinite (affects replace() function)</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
   <release version="5.0.0" date="2024-03-11">
    <description>
     <p>Changes:</p>

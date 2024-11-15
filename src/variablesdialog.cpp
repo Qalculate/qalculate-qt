@@ -94,10 +94,10 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	exportButton = new QPushButton(tr("Export…"), this); box->addWidget(exportButton); connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
 	deactivateButton = new QPushButton(tr("Deactivate"), this); box->addWidget(deactivateButton); connect(deactivateButton, SIGNAL(clicked()), this, SLOT(deactivateClicked()));
 	delButton = new QPushButton(tr("Delete"), this); box->addWidget(delButton); connect(delButton, SIGNAL(clicked()), this, SLOT(delClicked()));
-	box->addSpacing(24);
+	box->addSpacing(12);
 	insertButton = new QPushButton(tr("Insert"), this); box->addWidget(insertButton); connect(insertButton, SIGNAL(clicked()), this, SLOT(insertClicked()));
 	insertButton->setDefault(true);
-	box->addSpacing(24);
+	box->addSpacing(12);
 	favouriteButton = new QCheckBox(tr("Favorite"), this); box->addWidget(favouriteButton); connect(favouriteButton, SIGNAL(clicked()), this, SLOT(favouriteClicked()));
 	box->addStretch(1);
 	hbox->addLayout(box, 0);
@@ -112,7 +112,7 @@ VariablesDialog::VariablesDialog(QWidget *parent) : QDialog(parent, Qt::Window) 
 	connect(variablesView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedVariableChanged(const QModelIndex&, const QModelIndex&)));
 	connect(variablesView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(insertClicked()));
 	if(!settings->variables_geometry.isEmpty()) restoreGeometry(settings->variables_geometry);
-	else resize(900, 700);
+	else try_resize(this, 900, 700);
 	if(!settings->variables_vsplitter_state.isEmpty()) vsplitter->restoreState(settings->variables_vsplitter_state);
 	if(!settings->variables_hsplitter_state.isEmpty()) hsplitter->restoreState(settings->variables_hsplitter_state);
 }
@@ -211,7 +211,7 @@ void VariablesDialog::newVariable(int type) {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(v->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(v->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(v->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateVariables();
@@ -298,7 +298,7 @@ void VariablesDialog::editClicked() {
 				new QTreeWidgetItem(list.isEmpty() ? categoriesView->topLevelItem(2) : list[0], l);
 			}
 		} else if(v->category() != CALCULATOR->temporaryCategory()) {
-			QList<QTreeWidgetItem*> list = categoriesView->findItems(QString("/") + QString::fromStdString(v->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
+			QList<QTreeWidgetItem*> list = categoriesView->findItems(QStringLiteral("/") + QString::fromStdString(v->category()), Qt::MatchExactly | Qt::MatchRecursive | Qt::MatchWrap, 1);
 			if(list.isEmpty()) {
 				if(selected_category != "All") selected_category = "User items";
 				updateVariables();

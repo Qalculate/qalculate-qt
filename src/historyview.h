@@ -35,24 +35,31 @@ class HistoryView : public QTextEdit {
 		QAction *findAction;
 		QDialog *searchDialog;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, bool initial_load = false, size_t index = 0);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, int initial_load = 0, size_t index = 0, bool temporary = false);
+		void clearTemporary();
 		void addMessages();
-		void loadInitial();
+		void loadInitial(bool reload = false);
 		void indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index = NULL, QString *anchorstr = NULL);
-		void replaceColors(QString&);
+		void replaceColors(QString&, QColor prev_text_color = QColor());
+		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
+		void updateMinimumHeight();
+		bool testTemporaryResultLength(const std::string&);
 
 	protected:
 
-		QString s_text;
-		int i_pos;
+		QString s_text, previous_html, previous_html2, temporary_error;
+		std::string parse_tmp, result_tmp;
+		int i_pos, i_pos2, i_pos_p, i_pos_p2, previous_cursor, previous_cursor2, previous_temporary;
 		int has_lock_symbol;
-		QMenu *cmenu;
-		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction;
-		QColor prev_color;
+		QMenu *cmenu, *fileMenu, *modeMenu;
+		QAction *insertTextAction, *insertValueAction, *copyAction, *copyFormattedAction, *copyAsciiAction, *selectAllAction, *delAction, *clearAction, *protectAction, *movetotopAction, *tbAction, *fileSeparator, *findDateAction;
+		QColor text_color;
+		QRect prev_fonti;
 		QPoint context_pos;
 		QLineEdit *searchEdit;
-		size_t last_ans;
-		QString last_ref;
+		size_t last_ans, last_ans2;
+		QString last_ref, last_ref2;
+		bool initial_loaded;
 
 		void mouseDoubleClickEvent(QMouseEvent *e) override;
 		void mouseReleaseEvent(QMouseEvent *e) override;
@@ -77,12 +84,15 @@ class HistoryView : public QTextEdit {
 		void editRemove();
 		void editProtect();
 		void editFind();
+		void editFindDate();
 		void editMoveToTop();
+		void reloadHistory();
 
 	signals:
 
 		void insertTextRequested(std::string);
 		void insertValueRequested(int);
+		void historyReloaded();
 
 };
 
