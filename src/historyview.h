@@ -44,6 +44,7 @@ class HistoryView : public QTextEdit {
 		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
 		void updateMinimumHeight();
 		bool testTemporaryResultLength(const std::string&);
+		int maxTemporaryCharacters();
 
 	protected:
 

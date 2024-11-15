@@ -4420,22 +4420,6 @@ void QalculateWindow::approximateResult() {
 	settings->dual_fraction = dfrac_bak;
 }
 
-bool is_equal_quantity_with_unit(const MathStructure &mp, const MathStructure &mr) {
-	if(mr.isUnit_exp() && mr == mp) {
-		return true;
-	} else if(mr.isMultiplication() && mr.size() == 2 && mr[0].isNumber() && mr[1].isUnit_exp()) {
-		if(mp.isNegate() && mr[0].number().isNegative() && mp[0].isMultiplication() && mp[0].size() == 2 && mp[0][0].isNumber() && mp[0][1] == mr[1] && mp[0][0].number().equals(-mr[0].number(), true)) return true;
-		if(mp.isMultiplication() && mp.size() == 2 && mp[1] == mr[1]) {
-			if(mp[0].isNegate()) {
-				return mp[0][0].isNumber() && mr[0].number().isNegative() && mp[0][0].number().equals(-mr[0].number(), true);
-			} else {
-				return mp[0].equals(mr[0], true);
-			}
-		}
-	}
-	return false;
-}
-
 void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates) {
 
 	workspace_changed = true;
@@ -5698,40 +5682,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
-	if(!settings->rpn_mode && (!parsed_tostruct || parsed_tostruct->isUndefined()) && execute_str.empty() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && parsed_mstruct && mstruct && is_equal_quantity_with_unit(*parsed_mstruct, *mstruct)) {
-		Unit *u = NULL;
-		MathStructure *munit = NULL;
-		if(mstruct->isMultiplication()) munit = &(*mstruct)[1];
-		else munit = mstruct;
-		if(munit->isUnit()) u = munit->unit();
-		else u = (*munit)[0].unit();
-		if(u && u->isCurrency()) {
-			if(settings->evalops.local_currency_conversion && CALCULATOR->getLocalCurrency() && u != CALCULATOR->getLocalCurrency()) {
-				ApproximationMode abak = settings->evalops.approximation;
-				if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-				mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				settings->evalops.approximation = abak;
-			}
-		} else if(u && u->subtype() != SUBTYPE_BASE_UNIT && !u->isSIUnit()) {
-			MathStructure mbak(*mstruct);
-			if(settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) {
-				if(munit->isUnit() && u->referenceName() == "oF") {
-					u = CALCULATOR->getActiveUnit("oC");
-					if(u) mstruct->set(CALCULATOR->convert(*mstruct, u, settings->evalops, true, false, false));
-				} else if(munit->isUnit() && u->referenceName() == "oC") {
-					u = CALCULATOR->getActiveUnit("oF");
-					if(u) mstruct->set(CALCULATOR->convert(*mstruct, u, settings->evalops, true, false, false));
-				} else {
-					mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				}
-			}
-			if(settings->evalops.approximation == APPROXIMATION_EXACT && ((settings->evalops.auto_post_conversion != POST_CONVERSION_OPTIMAL && settings->evalops.auto_post_conversion != POST_CONVERSION_NONE) || mstruct->equals(mbak))) {
-				settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-				if(settings->evalops.auto_post_conversion == POST_CONVERSION_BASE) mstruct->set(CALCULATOR->convertToBaseUnits(*mstruct, settings->evalops));
-				else mstruct->set(CALCULATOR->convertToOptimalUnit(*mstruct, settings->evalops, true));
-				settings->evalops.approximation = APPROXIMATION_EXACT;
-			}
-		}
+	if(!settings->rpn_mode && (!parsed_tostruct || parsed_tostruct->isUndefined()) && execute_str.empty() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && parsed_mstruct && mstruct) {
+		convert_unchanged_quantity_with_unit(*parsed_mstruct, *mstruct, settings->evalops);
 	}
 
 	if(!do_mathoperation && (askTC(*parsed_mstruct) || askSinc(*parsed_mstruct) || askSinc(*mstruct) || askPercent() || (check_exrates && settings->checkExchangeRates(this)))) {
@@ -6331,6 +6283,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		}
 	}
 }
+
 void QalculateWindow::autoCalculateTimeout() {
 	mauto.setAborted();
 	bool is_approximate = false;
@@ -6625,8 +6578,12 @@ void QalculateWindow::autoCalculateTimeout() {
 	if(!mauto.isAborted()) {
 		if(settings->dual_approximation > 0 || po.base == BASE_DECIMAL) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
-			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mparsed, settings->evalops, settings->dual_approximation != 0 ? AUTOMATIC_APPROXIMATION_SINGLE : AUTOMATIC_APPROXIMATION_OFF, 0, -1);
-			mexact.setUndefined();
+			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mparsed, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), 0, -1);
+			if(delay_complex && !mexact.isUndefined()) {
+				settings->evalops.complex_number_form = cnf;
+				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mexact.complexToCisForm(settings->evalops);
+				else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mexact.complexToPolarForm(settings->evalops);
+			}
 		}
 		if(CALCULATOR->aborted()) {
 			CALCULATOR->stopControl();
@@ -6652,40 +6609,8 @@ void QalculateWindow::autoCalculateTimeout() {
 	std::vector<std::string> values;
 	if(!mauto.isAborted()) {
 		// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
-		if(mto.isUndefined() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) && is_equal_quantity_with_unit(mparsed, mauto)) {
-			Unit *u = NULL;
-			MathStructure *munit = NULL;
-			if(mauto.isMultiplication()) munit = &mauto[1];
-			else munit = &mauto;
-			if(munit->isUnit()) u = munit->unit();
-			else u = (*munit)[0].unit();
-			if(u && u->isCurrency()) {
-				if(settings->evalops.local_currency_conversion && CALCULATOR->getLocalCurrency() && u != CALCULATOR->getLocalCurrency()) {
-					ApproximationMode abak = settings->evalops.approximation;
-					if(settings->evalops.approximation == APPROXIMATION_EXACT) settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-					mauto.set(CALCULATOR->convertToOptimalUnit(mauto, settings->evalops, true));
-					settings->evalops.approximation = abak;
-				}
-			} else if(u && u->subtype() != SUBTYPE_BASE_UNIT && !u->isSIUnit()) {
-				MathStructure mbak(mauto);
-				if(settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE) {
-					if(munit->isUnit() && u->referenceName() == "oF") {
-						u = CALCULATOR->getActiveUnit("oC");
-						if(u) mauto.set(CALCULATOR->convert(mauto, u, settings->evalops, true, false, false));
-					} else if(munit->isUnit() && u->referenceName() == "oC") {
-						u = CALCULATOR->getActiveUnit("oF");
-						if(u) mauto.set(CALCULATOR->convert(mauto, u, settings->evalops, true, false, false));
-					} else {
-						mauto.set(CALCULATOR->convertToOptimalUnit(mauto, settings->evalops, true));
-					}
-				}
-				if(settings->evalops.approximation == APPROXIMATION_EXACT && ((settings->evalops.auto_post_conversion != POST_CONVERSION_OPTIMAL && settings->evalops.auto_post_conversion != POST_CONVERSION_NONE) || mauto.equals(mbak))) {
-					settings->evalops.approximation = APPROXIMATION_TRY_EXACT;
-					if(settings->evalops.auto_post_conversion == POST_CONVERSION_BASE) mauto.set(CALCULATOR->convertToBaseUnits(mauto, settings->evalops));
-					else mauto.set(CALCULATOR->convertToOptimalUnit(mauto, settings->evalops, true));
-					settings->evalops.approximation = APPROXIMATION_EXACT;
-				}
-			}
+		if(mto.isUndefined() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE)) {
+			convert_unchanged_quantity_with_unit(mparsed, mauto, settings->evalops);
 		}
 
 		if(delay_complex) {
@@ -6767,18 +6692,20 @@ void QalculateWindow::autoCalculateTimeout() {
 				}
 			}
 		}
-
 		po.allow_non_usable = true;
-		AutomaticFractionFormat aff = AUTOMATIC_FRACTION_OFF;
-		if(settings->dual_fraction != 0) {
-			if(mauto.isNumber() && mauto.number().isRational() && mauto.number().denominator() < 20 && mauto.number() < 100 && mauto.number() > -100) {
-				if(settings->dual_fraction < 0) aff = AUTOMATIC_FRACTION_AUTO;
-				else aff = AUTOMATIC_FRACTION_DUAL;
-			} else {
-				aff = AUTOMATIC_FRACTION_SINGLE;
+		int max_length = -1;
+		if(!mauto.isNumber() || !mauto.number().isRational() || mauto.number().denominator() >= 20 || mauto.number() >= 100 || mauto.number() <= -100) max_length = historyView->maxTemporaryCharacters();
+		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, max_length, had_to_expression);
+		if(max_length >= 0) {
+			size_t l = unformatted_length(result);
+			for(size_t i = 0; i < values.size(); i++) {
+				l += unformatted_length(values[i]);
+				if(l > (size_t) max_length) {
+					values.clear();
+					break;
+				}
 			}
 		}
-		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, aff, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, -1, had_to_expression);
 		for(size_t i = 0; i < values.size(); i++) {
 			result += " = ";
 			result += values[i];
@@ -6790,13 +6717,14 @@ void QalculateWindow::autoCalculateTimeout() {
 			CALCULATOR->useBinaryPrefixes(save_bin);
 			CALCULATOR->setFixedDenominator(save_fden);
 			settings->dual_fraction = save_dual;
-			settings->evalops.complex_number_form = cnf_bak;
-			settings->evalops.auto_post_conversion = save_auto_post_conversion;
-			settings->evalops.parse_options.units_enabled = b_units_saved;
-			settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
 		}
 	}
 	CALCULATOR->stopControl();
+
+	settings->evalops.complex_number_form = cnf_bak;
+	settings->evalops.auto_post_conversion = save_auto_post_conversion;
+	settings->evalops.parse_options.units_enabled = b_units_saved;
+	settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
 
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
@@ -7003,26 +6931,20 @@ void ViewThread::run() {
 		}
 
 		for(size_t i = 0; i < alt_results.size();) {
-			if(alt_results[i].length() > 50000) alt_results.erase(alt_results.begin() + i);
+			if(unformatted_length(alt_results[i]) > 20000) alt_results.erase(alt_results.begin() + i);
 			else i++;
 		}
 		if(contains_large_matrix(*mresult)) {
 			if(mresult->isMatrix() && result_text.length() > 1000000L) {
 				result_text = "matrix ("; result_text += i2s(mresult->rows()); result_text += SIGN_MULTIPLICATION; result_text += i2s(mresult->columns()); result_text += ")";
-			} else {
-				std::string str = unhtmlize(result_text);
-				if(str.length() > 5000) {
-					result_text = ellipsize_result(str, 1000);
-				}
+			} else if(unformatted_length(result_text) > 5000) {
+				result_text = ellipsize_result(unhtmlize(result_text), 1000);
 			}
-		} else if(result_text.length() > 50000) {
-			if(mstruct->isNumber())	{
+		} else if(unformatted_length(result_text) > (mstruct->isNumber() ? 50000 : 20000)) {
+			if(mstruct->isNumber()) {
 				result_text = ellipsize_result(result_text, 5000);
 			} else {
-				std::string str = unhtmlize(result_text);
-				if(str.length() > 20000) {
-					result_text = ellipsize_result(str, 2000);
-				}
+				result_text = ellipsize_result(unhtmlize(result_text), 2000);
 			}
 		}
 

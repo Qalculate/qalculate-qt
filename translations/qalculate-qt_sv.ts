@@ -11721,8 +11721,8 @@ Du kan hämta version %3 på %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="484"/>
         <source>Open Settings Folder(s)</source>
         <translation>
-            <numerusform>Öppna mappen med inställningar</numerusform>
-            <numerusform>Öppna mapparna med inställningar</numerusform>
+            <numerusform>Öppna inställningsmappen</numerusform>
+            <numerusform>Öppna inställningsmappar</numerusform>
         </translation>
     </message>
     <message>

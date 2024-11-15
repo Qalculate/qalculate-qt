@@ -3845,7 +3845,9 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 			i_move = -1;
 		}
 	}
+	blockParseStatus();
 	insertPlainText(QString::fromStdString(str));
+	blockParseStatus(false);
 	if(i_move != 0) {
 		QTextCursor c = textCursor();
 		c.setPosition(c.position() + i_move);

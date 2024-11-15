@@ -415,6 +415,11 @@ bool HistoryView::testTemporaryResultLength(const std::string &str) {
 	return fm.boundingRect(QStringLiteral("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() < width() * 1.65;
 }
 
+int HistoryView::maxTemporaryCharacters() {
+	QFontMetrics fm(font());
+	return (width() * 1.65 / fm.averageCharWidth()) - 7;
+}
+
 void HistoryView::addResult(std::vector<std::string> values, std::string expression, bool pexact, std::string parse, int exact, bool dual_approx, const QString &image, bool *implicit_warning, int initial_load, size_t index, bool temporary) {
 	if(temporary && !previous_temporary) {
 		previous_cursor2 = previous_cursor;

@@ -39,6 +39,7 @@ std::string to_html_escaped(const std::string str);
 std::string unhtmlize(std::string str, bool b_ascii = false);
 QString unhtmlize(QString str, bool b_ascii = false);
 std::string unformat(std::string str, bool restorable = false);
+size_t unformatted_length(const std::string &str);
 std::string uncolorize(std::string str, bool remove_class = true);
 std::string replace_first_minus(const std::string &str);
 QIcon load_icon(const QString &str, QWidget*);

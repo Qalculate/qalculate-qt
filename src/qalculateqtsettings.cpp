@@ -157,6 +157,21 @@ long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, cons
 	return get_fixed_denominator_qt2(str, to_fraction, 0, localized_fraction, qalc_command);
 }
 
+size_t unformatted_length(const std::string &str) {
+	size_t l = 0;
+	bool intag = false;
+	for(size_t i = 0; i < str.length(); i++) {
+		if(intag) {
+			if(str[i] == '>') intag = false;
+		} else if(str[i] == '<') {
+			intag = true;
+		} else if((signed char) str[i] > 0 || (unsigned char) str[i] >= 0xC0) {
+			l++;
+		}
+	}
+	return l;
+}
+
 AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName(QApplication::tr("answer").toStdString(), 1);
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
@@ -1680,7 +1695,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 			while(true) {
 				n++;
 				for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
-					if(v_result[i][i2].length() > 300 && (v_result[i][i2].length() <= 6000 || unhtmlize(v_result[i][i2]).length() <= 5000)) {
+					if(v_result[i][i2].length() > 300 && unformatted_length(v_result[i][i2]) <= 5000) {
 						n += v_result[i][i2].length() / 300;
 					}
 					n++;
@@ -1711,15 +1726,20 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					for(size_t i2 = 0; i2 < v_result[i].size(); i2++) {
 						if(v_exact[i][i2]) fprintf(file, "history_result");
 						else fprintf(file, "history_result_approximate");
-						if(v_result[i][i2].length() > 6000 && !v_protected[i]) {
+						if(unformatted_length(v_result[i][i2]) > 5000 && !v_protected[i]) {
 							std::string str = unhtmlize(v_result[i][i2]);
-							if(str.length() > 5000) {
-								int index = 50;
-								while(index >= 0 && (signed char) str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
-								gsub("\n", "<br>", str);
-								fprintf(file,  "=%s …\n", str.substr(0, index + 1).c_str());
+							int index = 50;
+							size_t i3 = str.find("\n", 40);
+							if(i3 != std::string::npos && i3 < (size_t) index + 1) {
+								fprintf(file,  "=%s<br>…\n", str.substr(0, i3).c_str());
 							} else {
-								fprintf(file, "=%s\n", v_result[i][i2].c_str());
+								if(i3 != std::string::npos) gsub("\n", "<br>", str);
+								while(index >= 0 && (signed char) str[index] < 0 && (unsigned char) str[index + 1] < 0xC0) index--;
+								if(is_not_in(NUMBERS, str[index]) || is_not_in(NUMBERS, str[index + 1])) {
+									str[index + 1] = ' ';
+									index++;
+								}
+								fprintf(file,  "=%s…\n", str.substr(0, index + 1).c_str());
 							}
 						} else {
 							fprintf(file, "=%s\n", v_result[i][i2].c_str());
