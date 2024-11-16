@@ -304,6 +304,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->printops.digit_grouping));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(groupingChanged(int)));
 	l->addWidget(combo, r, 1); r++;
+	BOX(tr("Automatically group digits in input (experimental)"), settings->automatic_digit_grouping, automaticDigitGroupingToggled(bool));
 	l->addWidget(new QLabel(tr("Interval display:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), -1);
@@ -685,6 +686,9 @@ void PreferencesDialog::copyAsciiWithoutUnitsToggled(bool b) {
 }
 void PreferencesDialog::caretAsXorToggled(bool b) {
 	settings->caret_as_xor = b;
+}
+void PreferencesDialog::automaticDigitGroupingToggled(bool b) {
+	settings->automatic_digit_grouping = b;
 }
 void PreferencesDialog::closeWithEscToggled(bool b) {
 	settings->close_with_esc = b;

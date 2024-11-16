@@ -2829,8 +2829,61 @@ void ExpressionEdit::onTextChanged() {
 	if(completionTimer) completionTimer->stop();
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
-	previous_text = str;
 	previous_pos = textCursor().position();
+	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos > 3 && previous_text != str && !str.isEmpty() && str[previous_pos - 1].isDigit()) {
+		int n = 0, ns = 0, ns_p = 0;
+		int last_pos = 0;
+		if(previous_pos < str.length()) {
+			last_pos = previous_pos - 1;
+			for(; last_pos < str.length(); last_pos++) {
+				if(!str[last_pos].isDigit() && (!str[last_pos].isSpace() || last_pos == str.length() - 1 || !str[last_pos + 1].isDigit())) {
+					break;
+				}
+			}
+			last_pos--;
+		} else {
+			last_pos = str.length() - 1;
+		}
+		int first_pos = 0;
+		for(int i = last_pos; i >= 0; i--) {
+			if(str[i].isDigit()) {
+				n++;
+			} else if(str[i].isSpace() && i > 0 && str[i - 1].isDigit()) {
+				if(i < previous_pos) ns_p++;
+				ns++;
+			} else {
+				first_pos = i + 1;
+				break;
+			}
+		}
+		if((n > 4 && ns < (n + 1) / 3) || (ns > 0 && str.length() < previous_text.length())) {
+			for(int i = last_pos - 1; ns > 0 && i >= 0;) {
+				if(str[i].isSpace()) {
+					str.remove(i, 1);
+					ns--;
+					last_pos--;
+				} else {
+					i--;
+				}
+			}
+			previous_pos -= ns_p;
+			ns_p = 0;
+			for(int i = last_pos - 2; n > 4 && i > first_pos; i -= 3) {
+				str.insert(i, THIN_SPACE);
+				if(i < previous_pos) ns_p++;
+			}
+			previous_pos += ns_p;
+			block_text_change++;
+			setCursorWidth(0);
+			setPlainText(str);
+			QTextCursor cur = textCursor();
+			cur.setPosition(previous_pos);
+			setTextCursor(cur);
+			setCursorWidth(1);
+			block_text_change--;
+		}
+	}
+	previous_text = str;
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
 			expression_undo_buffer.push_back(QString());

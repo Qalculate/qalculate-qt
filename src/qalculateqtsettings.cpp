@@ -842,6 +842,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			printops.spell_out_logical_operators = v;
 		} else if(svar == "caret_as_xor") {
 			caret_as_xor = v;
+		} else if(svar == "automatic_digit_grouping") {
+			automatic_digit_grouping = v;
 		} else if(svar == "close_with_esc") {
 			close_with_esc = v;
 		} else if(svar == "copy_ascii") {
@@ -987,6 +989,7 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_keys = true;
 	rpn_shown = false;
 	caret_as_xor = false;
+	automatic_digit_grouping = false;
 	copy_ascii = false;
 	copy_ascii_without_units = false;
 	do_imaginary_j = false;
@@ -1565,6 +1568,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(default_signed >= 0) fprintf(file, "signed_integer=%i\n", default_signed);
 		fprintf(file, "spell_out_logical_operators=%i\n", printops.spell_out_logical_operators);
 		fprintf(file, "caret_as_xor=%i\n", caret_as_xor);
+		fprintf(file, "automatic_digit_grouping=%i\n", automatic_digit_grouping);
 		fprintf(file, "close_with_esc=%i\n", close_with_esc);
 		fprintf(file, "copy_ascii=%i\n", copy_ascii);
 		fprintf(file, "copy_ascii_without_units=%i\n", copy_ascii_without_units);
