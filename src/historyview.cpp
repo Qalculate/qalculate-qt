@@ -30,6 +30,7 @@
 #include <QDate>
 #include <QDesktopServices>
 #include <QToolTip>
+#include <QPlainTextEdit>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -439,6 +440,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 					mstr.replace(">=", SIGN_GREATER_OR_EQUAL);
 					mstr.replace("<=", SIGN_LESS_OR_EQUAL);
 					mstr.replace("!=", SIGN_NOT_EQUAL);
+					mstr.replace("\n", "<br>");
 				}
 				MessageType mtype = CALCULATOR->message()->type();
 				if(temporary) {
@@ -450,8 +452,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						serror += mstr;
 					}
 				} else {
-					serror += "<tr><td class=\"message\" colspan=\"2\" style=\"text-align:left; font-size:normal";
 					if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
+						serror += "<tr><td class=\"message\" colspan=\"2\" style=\"text-align:left; font-size:normal";
 						serror += "; color: ";
 						if(mtype == MESSAGE_ERROR) {
 							if(settings->color == 2) serror += "#FFAAAA";
@@ -462,11 +464,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						}
 						serror += "";
 						if(CALCULATOR->message()->stage() == MESSAGE_STAGE_PARSING) b_parse_error = true;
+						serror += "\">";
+						if(!mstr.startsWith("-")) serror += "- ";
+						serror += mstr.toHtmlEscaped();
+						serror += "</td></tr>";
+					} else {
+						values.insert(values.begin(), std::string("#") + mstr.toStdString());
 					}
-					serror += "\">";
-					if(!mstr.startsWith("-")) serror += "- ";
-					serror += mstr.toHtmlEscaped();
-					if(!temporary) serror += "</td></tr>";
 				}
 			}
 		} while(CALCULATOR->nextMessage());
@@ -474,9 +478,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	PASTE_H
 	QString str;
+	bool comment = false;
 	if(!expression.empty() || !parse.empty()) {
-		if(initial_load && index != settings->v_expression.size() - 1) str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
-		else str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left\">").arg(paste_h / 4).arg(text_color.name());
+		comment = !temporary && expression.empty() && parse == "#";
+		if(initial_load && index != settings->v_expression.size() - 1) str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left").arg(comment ? 0 : paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
+		else str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left").arg(comment ? 0 : paste_h / 4).arg(text_color.name());
+		if(comment) str += "; line-height: 1%";
+		str += "\">";
 		if(temporary) {
 			parse_tmp = parse;
 			result_tmp = (values.empty() ? "" : values[0]);
@@ -501,7 +509,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 		}
 		gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", parse);
-		if(!temporary && !expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
+		if(!comment && !temporary && !expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
 			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
 				str += QStringLiteral("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				str += QString::fromStdString(expression).toHtmlEscaped();
@@ -520,7 +528,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
 			}
-		} else {
+		} else if(!comment) {
 			if(temporary) str += "<a name=\"TP\" style=\"text-decoration: none\">";
 			else str += QStringLiteral("<a name=\"%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 			if(!pexact) str += SIGN_ALMOST_EQUAL " ";
@@ -573,6 +581,18 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		values.push_back("");
 	}
 	for(size_t i = 0; i < values.size(); i++) {
+		if(!values[i].empty() && values[i][0] == '#') {
+			str += "<tr><td colspan=\"2\" style=\"text-align:left";
+			if(!comment && initial_load) str += "; font-size:small";
+			else if(!comment) str += "; font-size:normal";
+			if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QStringLiteral("; padding-bottom: %1 px").arg(paste_h / 4);
+			str += "\">";
+			str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			if(values[i].size() == 1 || values[i][1] != '-') str += "- ";
+			str += QString::fromStdString(values[i]).mid(1);
+			str += "</a></td></tr>";
+			continue;
+		}
 		size_t i_answer = 0;
 		if(initial_load) i_answer = settings->v_value[index][i];
 		else if(!temporary) i_answer = dual_approx && i == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
@@ -608,8 +628,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 		}
 		str += "</td><td style=\"text-align:right";
-		if(initial_load > 1 && i > 0 && i_answer <= i_answer_pre) initial_load = 1;
-		if(initial_load == 1 || w * 1.5 + w_number > width() || !settings->format_result) {
+		if(initial_load == 1 || (initial_load > 1 && i > 0 && i_answer <= i_answer_pre) || w * 1.5 + w_number > width() || !settings->format_result) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 1.85 + w_number > width()) {
 			str += "; font-size:large";
@@ -631,8 +650,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		if(temporary && !values[i].empty()) {
 			str += "<a name=\"TR\" style=\"text-decoration: none\">";
 		} else if(!temporary) {
-			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
-			else str += QStringLiteral("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			else str += QStringLiteral("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 		}
 		if(!temporary || !values[i].empty()) {
 			if(b_exact > 0) str += "= ";
@@ -854,7 +873,10 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 				} else {
 					int i1 = str.left(index).toInt();
 					int i2 = str.mid(index + 1).toInt();
-					if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && i2 >= 0 && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
+					if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && i2 >= 0 && (size_t) i2 < settings->v_result[i1].size()) {
+						if(!settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') emit insertTextRequested(settings->v_result[i1][i2].substr(1));
+						else emit insertTextRequested(settings->v_result[i1][i2]);
+					}
 				}
 			}
 		}
@@ -983,10 +1005,19 @@ void HistoryView::editRemove() {
 	indexAtPos(context_pos, &i1, &i2);
 	if(i1 < 0 || i1 >= (int) settings->v_expression.size()) return;
 	if(i2 >= 0 && i2 < (int) settings->v_result[i1].size()) {
-		if(settings->v_result[i1].size() == 1) {
+		bool remove_expression = true;
+		for(size_t i = 0; i < settings->v_result[i1].size(); i++) {
+			if(i != (size_t) i2 && (settings->v_result[i1][i].empty() || settings->v_result[i1][i][0] != '#')) {
+				remove_expression = false;
+				break;
+			}
+		}
+		if(remove_expression) {
 			i2 = -1;
 		} else {
 			settings->v_result[i1].erase(settings->v_result[i1].begin() + i2);
+			settings->v_exact[i1].erase(settings->v_exact[i1].begin() + i2);
+			settings->v_value[i1].erase(settings->v_value[i1].begin() + i2);
 		}
 	}
 	if(i2 < 0) {
@@ -1005,6 +1036,52 @@ void HistoryView::editRemove() {
 	int vpos = verticalScrollBar()->value();
 	reloadHistory();
 	verticalScrollBar()->setValue(vpos);
+}
+void HistoryView::editComment() {
+	int i1 = -1, i2 = -1;
+	indexAtPos(context_pos, &i1, &i2);
+	if(i1 < 0 || i1 >= (int) settings->v_expression.size()) return;
+	bool b_edit = i2 >= 0 && i2 < (int) settings->v_result[i1].size() && !settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#';
+	if(i2 < 0 || i2 >= (int) settings->v_result[i1].size()) i2 = 0;
+	QDialog *dialog = new QDialog(this);
+	QVBoxLayout *box = new QVBoxLayout(dialog);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	dialog->setWindowTitle(tr("Comment"));
+	QGridLayout *grid = new QGridLayout();
+	QPlainTextEdit *commentEdit = new QPlainTextEdit(this);
+	if(b_edit) {
+		QString str = QString::fromStdString(unhtmlize(settings->v_result[i1][i2].substr(1)));
+		commentEdit->setPlainText(str);
+		commentEdit->selectAll();
+	}
+	commentEdit->setFocus();
+	grid->addWidget(commentEdit, 0, 0);
+	box->addLayout(grid);
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Ok, Qt::Horizontal, dialog);
+	buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
+	buttonBox->button(QDialogButtonBox::Cancel)->setAutoDefault(false);
+	box->addWidget(buttonBox);
+	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
+	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), dialog, SLOT(reject()));
+	if(dialog->exec() == QDialog::Accepted && (b_edit || !commentEdit->toPlainText().trimmed().isEmpty())) {
+		if(b_edit && commentEdit->toPlainText().trimmed().isEmpty()) {
+			editRemove();
+		} else {
+			QString str = "#" + commentEdit->toPlainText().trimmed().toHtmlEscaped();
+			str.replace("\n", "<br>");
+			if(b_edit) {
+				settings->v_result[i1][i2] = str.toStdString();
+			} else {
+				settings->v_result[i1].insert(settings->v_result[i1].begin() + i2, str.toStdString());
+				settings->v_exact[i1].insert(settings->v_exact[i1].begin() + i2, settings->v_exact[i1][i2]);
+				settings->v_value[i1].insert(settings->v_value[i1].begin() + i2, settings->v_value[i1][i2]);
+			}
+			int vpos = verticalScrollBar()->value();
+			reloadHistory();
+			verticalScrollBar()->setValue(vpos);
+		}
+	}
+	dialog->deleteLater();
 }
 void HistoryView::editProtect() {
 	int i1 = -1, i2 = -1;
@@ -1096,6 +1173,7 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		cmenu->addSeparator();
 		protectAction = cmenu->addAction(tr("Protect"), this, SLOT(editProtect()));
 		protectAction->setCheckable(true);
+		commentAction = cmenu->addAction(tr("Add Comment…"), this, SLOT(editComment()));
 		movetotopAction = cmenu->addAction(tr("Move to Top"), this, SLOT(editMoveToTop()));
 		cmenu->addSeparator();
 		delAction = cmenu->addAction(tr("Remove"), this, SLOT(editRemove()));
@@ -1129,6 +1207,9 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		if(i1 >= 0 && !settings->v_time.empty() && settings->v_time[i1] != 0) findDateAction->setText(tr("Search by Date…") + " (" + QDateTime::fromMSecsSinceEpoch(settings->v_time[i1] * 1000).date().toString(Qt::ISODate) + ")");
 #endif
 		else findDateAction->setText(tr("Search by Date…"));
+		commentAction->setEnabled(i1 >= 0);
+		if(i1 >= 0 && i2 >= 0 && i2 < (int) settings->v_result[i1].size() && !settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') commentAction->setText(tr("Edit Comment…"));
+		else commentAction->setText(tr("Add Comment…"));
 	} else {
 		copyAction->setEnabled(textCursor().hasSelection());
 		copyFormattedAction->setEnabled(textCursor().hasSelection());
@@ -1139,7 +1220,11 @@ void HistoryView::contextMenuEvent(QContextMenuEvent *e) {
 		insertValueAction->setEnabled(false);
 		insertTextAction->setEnabled(false);
 		findDateAction->setText(tr("Search by Date…"));
+		commentAction->setEnabled(false);
+		commentAction->setText(tr("Add Comment…"));
 	}
+	findAction->setEnabled(!settings->v_expression.empty());
+	findDateAction->setEnabled(!settings->v_expression.empty());
 	clearAction->setEnabled(!settings->v_expression.empty());
 	cmenu->popup(e->globalPos());
 }
@@ -1457,6 +1542,7 @@ void HistoryView::editCopy(int ascii) {
 			if(b_temp || ((size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size())) {
 				if(ascii) {
 					std::string str = (b_temp ? result_tmp : settings->v_result[i1][i2]);
+					if(!str.empty() && str[0] == '#') str.erase(0, 1);
 					if(settings->copy_ascii_without_units) {
 						size_t i = str.find("<span style=\"color:#008000\">");
 						if(i == std::string::npos) i = str.find("<span style=\"color:#BBFFBB\">");
@@ -1470,6 +1556,9 @@ void HistoryView::editCopy(int ascii) {
 					if(b_temp) {
 						qm->setHtml(QString::fromStdString(uncolorize(result_tmp)));
 						qm->setText(QString::fromStdString(unhtmlize((result_tmp))));
+					} else if(!settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') {
+						qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2].substr(1))));
+						qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2].substr(1)))));
 					} else {
 						qm->setHtml(QString::fromStdString(uncolorize(settings->v_result[i1][i2])));
 						qm->setText(QString::fromStdString(unhtmlize((settings->v_result[i1][i2]))));
@@ -1501,7 +1590,10 @@ void HistoryView::editInsertText() {
 	} else if(i1 < 0 && astr == "TP") {
 		emit insertTextRequested(parse_tmp);
 	} else if(i2 >= 0) {
-		if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) emit insertTextRequested(settings->v_result[i1][i2]);
+		if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && (size_t) i2 < settings->v_result[i1].size()) {
+			if(!settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') emit insertTextRequested(settings->v_result[i1][i2].substr(1));
+			else emit insertTextRequested(settings->v_result[i1][i2]);
+		}
 	} else {
 		if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) emit insertTextRequested(settings->v_expression[i1].empty() ? settings->v_parse[i1] : settings->v_expression[i1]);
 	}

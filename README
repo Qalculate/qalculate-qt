@@ -12,7 +12,7 @@ Qt, and CLI).
 1. Requirements
 
 * Qt5 (>= 5.6) or Qt6
-* libqalculate (>= 5.2.0)
+* libqalculate (>= 5.4.0)
 
 2. Installation
 

@@ -4468,7 +4468,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		to_str = CALCULATOR->parseComments(str, settings->evalops.parse_options, &double_tag);
 		if(!to_str.empty()) {
 			if(str.empty()) {
-				if(!double_tag) {
+				if(!double_tag && settings->current_result) {
 					expressionEdit->clear();
 					CALCULATOR->message(MESSAGE_INFORMATION, to_str.c_str(), NULL);
 					historyView->addMessages();
@@ -6228,7 +6228,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 	std::string current_text = expressionEdit->toPlainText().trimmed().toStdString();
 	bool last_op = false;
 	if(expressionEdit->textCursor().atEnd()) last_op = last_is_operator(current_text);
-	if(status.isEmpty()) {
+	if(status.isEmpty() || current_text.empty() || (current_text.length() == 1 && current_text[0] == '#')) {
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		historyView->clearTemporary();
 		auto_expression = "";
@@ -6236,7 +6236,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_error = false;
 		mauto.setAborted();
 		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
-	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text)) {
+	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text) || current_text[0] == '#') {
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
 		auto_error = had_error || had_warning;
@@ -7025,12 +7025,6 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		update_parse = false;
 	}
 
-	if(update_parse && parsed_mstruct && parsed_mstruct->isFunction() && (parsed_mstruct->function()->id() == FUNCTION_ID_ERROR || parsed_mstruct->function()->id() == FUNCTION_ID_WARNING || parsed_mstruct->function()->id() == FUNCTION_ID_MESSAGE)) {
-		expressionEdit->clear();
-		historyView->addMessages();
-		return;
-	}
-
 	b_busy++;
 
 	if(!viewThread->running && !viewThread->start()) {b_busy--; return;}
@@ -7261,7 +7255,15 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		} else {
 			exact_text = "";
 		}
-		alt_results.push_back(result_text);
+		if(update_parse && parsed_mstruct && alt_results.empty() && mstruct->isZero() && parsed_mstruct->isFunction() && (parsed_mstruct->function()->id() == FUNCTION_ID_ERROR || parsed_mstruct->function()->id() == FUNCTION_ID_WARNING || parsed_mstruct->function()->id() == FUNCTION_ID_MESSAGE || parsed_mstruct->function()->subtype() == SUBTYPE_DATA_SET) && CALCULATOR->message() && CALCULATOR->message()->type() == MESSAGE_INFORMATION) {
+			if(prev_result_text.empty()) {
+				expressionEdit->clear();
+				parsed_text = "#";
+			}
+			result_text = "";
+		} else {
+			alt_results.push_back(result_text);
+		}
 		for(size_t i = 0; i < alt_results.size(); i++) {
 			gsub("\n", "<br>", alt_results[i]);
 		}

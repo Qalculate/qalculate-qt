@@ -2323,20 +2323,15 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	QString qtext = toPlainText();
 	std::string text = qtext.toStdString(), str_f;
 	if(text.find("#") != std::string::npos) {
-		bool double_tag = false;
-		std::string to_str = CALCULATOR->parseComments(text, settings->evalops.parse_options, &double_tag);
-		if(!to_str.empty() && text.empty() && double_tag) {
-			text = CALCULATOR->getFunctionById(FUNCTION_ID_MESSAGE)->referenceName();
-			text += "(";
-			if(to_str.find("\"") == std::string::npos) {text += "\""; text += to_str; text += "\"";}
-			else if(to_str.find("\'") == std::string::npos) {text += "\'"; text += to_str; text += "\'";}
-			else text += to_str;
-			text += ")";
-		} else if(text.empty()) {
-			function_pos = QPoint();
-			setStatusText("");
-			prev_parsed_expression = "";
-			expression_has_changed2 = false;
+		CALCULATOR->parseComments(text, settings->evalops.parse_options);
+		if(text.empty()) {
+			if(settings->status_in_history) {
+				setStatusText("");
+				emit statusChanged(tr("comment"), false, false, false, expression_from_history);
+			} else if(show_tooltip) {
+				setStatusText(tr("comment"));
+				function_pos = QPoint();
+			}
 			return;
 		}
 	}
@@ -2830,13 +2825,18 @@ void ExpressionEdit::onTextChanged() {
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
 	previous_pos = textCursor().position();
-	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos > 3 && previous_text != str && !str.isEmpty() && str[previous_pos - 1].isDigit()) {
+	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos >= 3 && previous_text != str && !str.isEmpty() && str[previous_pos - 1].isDigit()) {
+		char sep = ' ';
+		if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE) {
+			if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
+			else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
+		}
 		int n = 0, ns = 0, ns_p = 0;
 		int last_pos = 0;
 		if(previous_pos < str.length()) {
 			last_pos = previous_pos - 1;
 			for(; last_pos < str.length(); last_pos++) {
-				if(!str[last_pos].isDigit() && (!str[last_pos].isSpace() || last_pos == str.length() - 1 || !str[last_pos + 1].isDigit())) {
+				if(!str[last_pos].isDigit() && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || !str[last_pos + 1].isDigit())) {
 					break;
 				}
 			}
@@ -2848,7 +2848,7 @@ void ExpressionEdit::onTextChanged() {
 		for(int i = last_pos; i >= 0; i--) {
 			if(str[i].isDigit()) {
 				n++;
-			} else if(str[i].isSpace() && i > 0 && str[i - 1].isDigit()) {
+			} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && str[i - 1].isDigit()) {
 				if(i < previous_pos) ns_p++;
 				ns++;
 			} else {
@@ -2858,7 +2858,7 @@ void ExpressionEdit::onTextChanged() {
 		}
 		if((n > 4 && ns < (n + 1) / 3) || (ns > 0 && str.length() < previous_text.length())) {
 			for(int i = last_pos - 1; ns > 0 && i >= 0;) {
-				if(str[i].isSpace()) {
+				if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
 					str.remove(i, 1);
 					ns--;
 					last_pos--;
@@ -2869,7 +2869,8 @@ void ExpressionEdit::onTextChanged() {
 			previous_pos -= ns_p;
 			ns_p = 0;
 			for(int i = last_pos - 2; n > 4 && i > first_pos; i -= 3) {
-				str.insert(i, THIN_SPACE);
+				if(sep == ' ') str.insert(i, THIN_SPACE);
+				else str.insert(i, sep);
 				if(i < previous_pos) ns_p++;
 			}
 			previous_pos += ns_p;

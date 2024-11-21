@@ -1112,6 +1112,10 @@ Do you want to overwrite the function?</source>
         <source>In expression field</source>
         <translation>В поле выражения</translation>
     </message>
+    <message>
+        <source>comment</source>
+        <translation type="unfinished">комментарий</translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1482,6 +1486,18 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Search by Date…</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comment</source>
+        <translation type="unfinished">Комментарий</translation>
+    </message>
+    <message>
+        <source>Add Comment…</source>
+        <translation type="unfinished">Добавить комментарий…</translation>
+    </message>
+    <message>
+        <source>Edit Comment…</source>
+        <translation type="unfinished">Изменить комментарий…</translation>
     </message>
 </context>
 <context>
@@ -2924,6 +2940,10 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Calculate as you type delay:</source>
         <translation>Задержка расчёта по мере ввода:</translation>
+    </message>
+    <message>
+        <source>Automatically group digits in input (experimental)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
