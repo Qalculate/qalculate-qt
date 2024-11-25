@@ -3398,7 +3398,7 @@ void QalculateWindow::setPreviousExpression() {
 
 void QalculateWindow::resultFormatUpdated(int delay) {
 	if(rfTimer) rfTimer->stop();
-	if(block_result_update) return;
+	if(block_result_update || (!expressionEdit->expressionHasChanged() && auto_expression.empty() && parsed_mstruct && parsed_mstruct->isFunction() && parsed_mstruct->function()->id() == FUNCTION_ID_MESSAGE)) return;
 	if(delay > 0) {
 		if(!rfTimer) {
 			rfTimer = new QTimer();
@@ -3412,7 +3412,7 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 	workspace_changed = true;
 	setResult(NULL, true, false, false);
 	auto_format_updated = true;
-	if(!QToolTip::text().isEmpty() || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
+	if((!settings->status_in_history && !QToolTip::text().isEmpty()) || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
 }
 void QalculateWindow::resultDisplayUpdated() {
 	resultFormatUpdated();
@@ -3431,7 +3431,7 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 		}
 	}
 	workspace_changed = true;
-	if(!settings->rpn_mode && recalculate) {
+	if(!settings->rpn_mode && recalculate && (expressionEdit->expressionHasChanged() || !parsed_mstruct || !parsed_mstruct->isFunction() || parsed_mstruct->function()->id() != FUNCTION_ID_MESSAGE)) {
 		calculateExpression(false);
 	}
 	if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
@@ -3450,7 +3450,7 @@ void QalculateWindow::expressionCalculationUpdated(int delay) {
 	workspace_changed = true;
 	auto_calculation_updated = true;
 	settings->updateMessagePrintOptions();
-	if(!settings->rpn_mode) {
+	if(!settings->rpn_mode && (expressionEdit->expressionHasChanged() || !parsed_mstruct || !parsed_mstruct->isFunction() || parsed_mstruct->function()->id() != FUNCTION_ID_MESSAGE)) {
 		if(parsed_mstruct) {
 			for(size_t i = 0; i < 5; i++) {
 				if(parsed_mstruct->contains(settings->vans[i])) return;
@@ -4223,6 +4223,13 @@ void QalculateWindow::setOption(std::string str) {
 		} else {
 			settings->colorize_result = v;
 		}
+	} else if(equalsIgnoreCase(svar, "calculate as you type") || svar == "autocalc") {
+		bool b = settings->display_expression_status;
+		SET_BOOL(b)
+		if(b != settings->display_expression_status) {
+			settings->display_expression_status = b;
+			onExpressionStatusModeChanged(true);
+		}
 	} else if(equalsIgnoreCase(svar, "max decimals") || svar == "maxdeci") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = -1;
@@ -4249,6 +4256,29 @@ void QalculateWindow::setOption(std::string str) {
 		settings->printops.use_min_decimals = (v > 0);
 		settings->printops.min_decimals = v;
 		resultFormatUpdated();
+	} else if(equalsIgnoreCase(svar, "digits")) {
+		int v = -1;
+		if(equalsIgnoreCase(svalue, "off") || equalsIgnoreCase(svalue, "auto") || equalsIgnoreCase(svalue, "precision")) v = -1;
+		else if(!empty_value && svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) v = s2i(svalue);
+		if(v < PRECISION) {
+			QSpinBox *w = findChild<QSpinBox*>("spinbox_maxdecimals");
+			if(w) {
+				w->blockSignals(true);
+				w->setValue(-1);
+				w->blockSignals(false);
+			}
+		}
+		if(v <= 0 || v == PRECISION) {
+			settings->printops.max_decimals = -1;
+			settings->printops.use_max_decimals = false;
+			resultFormatUpdated();
+		} else if(v >= 2 && v < PRECISION) {
+			settings->printops.max_decimals = -v;
+			settings->printops.use_max_decimals = true;
+			resultFormatUpdated();
+		} else {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		}
 	} else if(equalsIgnoreCase(svar, "fractions") || svar == "fr") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "off")) v = FRACTION_DECIMAL;
@@ -6289,7 +6319,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	bool is_approximate = false;
 	PrintOptions po = settings->printops;
 	po.is_approximate = &is_approximate;
-	std::string str = current_status_expression, result;
+	std::string str = current_status_expression, result, single_result;
 
 	CALCULATOR->beginTemporaryStopMessages();
 
@@ -6696,6 +6726,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		int max_length = -1;
 		if(!mauto.isNumber() || !mauto.number().isRational() || mauto.number().denominator() >= 20 || mauto.number() >= 100 || mauto.number() <= -100) max_length = historyView->maxTemporaryCharacters();
 		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, max_length, had_to_expression);
+		single_result = result;
 		if(max_length >= 0) {
 			size_t l = unformatted_length(result);
 			for(size_t i = 0; i < values.size(); i++) {
@@ -6785,7 +6816,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->addMessages(&messages);
 	int b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
 	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
-	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true);
+	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true, values.empty() ? "" : single_result);
 	updateWindowTitle(QString::fromStdString(unhtmlize(auto_result)), true);
 }
 
@@ -9212,7 +9243,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	} else if(f->minargs() > 0) {
 		args = f->minargs();
 		while(!f->getDefaultValue(args + 1).empty()) args++;
-		args++;
+		if(args == 1 || f->id() == FUNCTION_ID_PLOT) args++;
 	} else {
 		args = 1;
 		has_vector = true;

@@ -70,6 +70,28 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="5.4.0" date="2024-11-25">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Apply dual approximation/fraction to calculate as you type result, as regular result but with length restriction</li>
+      <li>Add option to add/edit comment to history context menu, and save comments in result on exit</li>
+      <li>Add "Search by Date" (also shows the date of the expression) to history context menu</li>
+      <li>Improve decision to automatically convert unchanged quantity with unit</li>
+      <li>Option to automatically group digits in input</li>
+      <li>Option, in menu, to open settings folder(s)</li>
+      <li>New functions: tripleProduct(), multilimit()</li>
+      <li>Updated French translation</li>
+      <li>Fix equals sign for calculate as you type result</li>
+      <li>Fix segfault with calculate as you type of "-(300K" and similar</li>
+      <li>Fix saving of two's complement input settings</li>
+      <li>Fix erroneous HTML output after format of result with error/warning has been updated</li>
+      <li>Fix case conversion of µ to M and similar</li>
+      <li>Fix segfault with very large integer raised by very large integer</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
   <release version="5.3.0" date="2024-10-07">
    <description>
     <p>Changes:</p>

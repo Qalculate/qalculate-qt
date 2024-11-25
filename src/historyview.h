@@ -35,7 +35,7 @@ class HistoryView : public QTextEdit {
 		QAction *findAction;
 		QDialog *searchDialog;
 
-		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, int initial_load = 0, size_t index = 0, bool temporary = false);
+		void addResult(std::vector<std::string> values, std::string expression = "", bool pexact = true, std::string parse = "", int exact = 1, bool dual_approx = false, const QString &image = QString(), bool *implicit_warning = NULL, int initial_load = 0, size_t index = 0, bool temporary = false, const std::string &tmp_value = "");
 		void clearTemporary();
 		void addMessages();
 		void loadInitial(bool reload = false);
@@ -69,6 +69,7 @@ class HistoryView : public QTextEdit {
 		void keyPressEvent(QKeyEvent *e) override;
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void changeEvent(QEvent*) override;
+		void editComment(int, int);
 
 	protected slots:
 
