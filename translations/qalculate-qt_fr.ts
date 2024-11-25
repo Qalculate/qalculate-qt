@@ -9029,7 +9029,7 @@ Voulez-vous l&apos;écraser ?</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="307"/>
         <source>Automatically group digits in input (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Groupement automatique des chiffres en entrée (expérimental)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="308"/>
