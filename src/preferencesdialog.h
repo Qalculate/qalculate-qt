@@ -109,6 +109,7 @@ class PreferencesDialog : public QDialog {
 		void caretAsXorToggled(bool);
 		void automaticDigitGroupingToggled(bool);
 		void closeWithEscToggled(bool);
+		void disableCursorBlinkingToggled(bool);
 
 	public:
 

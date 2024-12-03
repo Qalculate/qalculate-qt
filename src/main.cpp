@@ -205,6 +205,7 @@ int main(int argc, char **argv) {
 	settings->loadPreferences();
 
 	if(!parser->value(wOption).isEmpty()) settings->loadWorkspace(parser->value(wOption).toLocal8Bit().data());
+	if(settings->disable_cursor_blinking) app.setCursorFlashTime(0);
 
 	CALCULATOR->loadExchangeRates();
 
@@ -261,6 +262,7 @@ int main(int argc, char **argv) {
 	}
 	win->setCommandLineParser(parser);
 	win->show();
+
 	app.processEvents();
 	win->initFinished();
 

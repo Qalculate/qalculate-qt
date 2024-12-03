@@ -702,6 +702,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 #else
 			palette = v;
 #endif
+		} else if(svar == "disable_cursor_blinking") {
+			disable_cursor_blinking = v;
 		} else if(svar == "color") {
 			colorize_result = v;
 		} else if(svar == "format") {
@@ -1030,6 +1032,7 @@ void QalculateQtSettings::loadPreferences() {
 	custom_app_font = "";
 	style = "";
 	palette = -1;
+	disable_cursor_blinking = false;
 	replace_expression = KEEP_EXPRESSION;
 	autocopy_result = false;
 	save_mode_on_exit = true;
@@ -1470,6 +1473,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
+		if(disable_cursor_blinking) fprintf(file, "disable_cursor_blinking=%i\n", disable_cursor_blinking);
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
 		fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
 		fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);

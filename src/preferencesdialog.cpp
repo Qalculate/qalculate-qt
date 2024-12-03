@@ -24,8 +24,8 @@
 #include <QFontDialog>
 #include <QStyleFactory>
 #include <QMessageBox>
+#include <QApplication>
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-#	include <QApplication>
 #	include <QStyleHints>
 #endif
 #include <QDebug>
@@ -165,6 +165,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 #else
 	BOX(tr("Dark mode"), settings->palette == 1, darkModeToggled(bool));
 #endif
+	BOX(tr("Disable cursor blinking"), settings->disable_cursor_blinking, disableCursorBlinkingToggled(bool));
 	BOX(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX(tr("Format result"), settings->format_result, formatToggled(bool));
 	BOX1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool));
@@ -692,6 +693,11 @@ void PreferencesDialog::automaticDigitGroupingToggled(bool b) {
 }
 void PreferencesDialog::closeWithEscToggled(bool b) {
 	settings->close_with_esc = b;
+}
+void PreferencesDialog::disableCursorBlinkingToggled(bool b) {
+	settings->disable_cursor_blinking = b;
+	if(b) qApp->setCursorFlashTime(0);
+	else qApp->setCursorFlashTime(1000);
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
 	if(b) settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;

@@ -281,6 +281,7 @@ class QalculateQtSettings : QObject {
 		QByteArray units_geometry, units_vsplitter_state, units_hsplitter_state;
 		QByteArray variables_geometry, variables_vsplitter_state, variables_hsplitter_state;
 		QByteArray datasets_geometry, datasets_vsplitter_state, datasets_hsplitter_state;
+		bool disable_cursor_blinking;
 		bool wayland_platform;
 
 		int preserve_history_height;
