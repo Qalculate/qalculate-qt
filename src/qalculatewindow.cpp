@@ -5743,7 +5743,27 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		m1.replace(settings->vans[1], settings->vans[2]);
 		settings->vans[1]->set(m1);
 		mstruct->replace(settings->vans[0], settings->vans[1]);
-		settings->vans[0]->set(*mstruct);
+		if(is_equation_solutions(*mstruct)) {
+			if(mstruct->isLogicalAnd()) {
+				settings->vans[0]->set((*mstruct)[0][1]);
+			} else if(mstruct->isLogicalOr()) {
+				MathStructure m(*mstruct);
+				m.setType(STRUCT_VECTOR);
+				for(size_t i = 0; i < m.size(); i++) {
+					if(m[i].isLogicalAnd()) {
+						m[i].setToChild(1);
+						m[i].setToChild(2);
+					} else {
+						m[i].setToChild(2);
+					}
+				}
+				settings->vans[0]->set(m);
+			} else {
+				settings->vans[0]->set((*mstruct)[1]);
+			}
+		} else {
+			settings->vans[0]->set(*mstruct);
+		}
 	}
 
 	mstruct_exact.setUndefined();

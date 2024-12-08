@@ -172,6 +172,35 @@ size_t unformatted_length(const std::string &str) {
 	return l;
 }
 
+bool is_equation_solutions(const MathStructure &m) {
+	if(m.isComparison()) {
+		return m.comparisonType() == COMPARISON_EQUALS && m[0].isUnknown();
+	} else if(m.isLogicalAnd() && m.size() >= 1 && m[0].isComparison() && m[0].comparisonType() == COMPARISON_EQUALS && m[0][0].isUnknown()) {
+		for(size_t i = 1; i < m.size(); i++) {
+			if(!m[i].isComparison() || m[i].comparisonType() == COMPARISON_EQUALS) {
+				return false;
+			}
+		}
+		return true;
+	} else if(m.isLogicalOr()) {
+		for(size_t i = 0; i < m.size(); i++) {
+			if(m[i].isComparison()) {
+				if(m[i].comparisonType() != COMPARISON_EQUALS || !m[i][0].isUnknown()) return false;
+			} else if(m[i].isLogicalAnd() && m[i].size() >= 1 && m[i][0].isComparison() && m[i][0].comparisonType() == COMPARISON_EQUALS && m[i][0][0].isUnknown()) {
+				for(size_t i2 = 1; i2 < m[i].size(); i2++) {
+					if(!m[i][i2].isComparison() || m[i][i2].comparisonType() == COMPARISON_EQUALS) {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
 AnswerFunction::AnswerFunction() : MathFunction("answer", 1, 1, "", QApplication::tr("History Answer Value").toStdString()) {
 	if(QApplication::tr("answer") != "answer") addName(QApplication::tr("answer").toStdString(), 1);
 	VectorArgument *arg = new VectorArgument(QApplication::tr("History Index(es)").toStdString());
@@ -189,8 +218,30 @@ int AnswerFunction::calculate(MathStructure &mstruct, const MathStructure &vargs
 			if(vargs[0].size() == 1) mstruct.setUndefined();
 			else mstruct.addChild(m_undefined);
 		} else {
-			if(vargs[0].size() == 1) mstruct.set(*settings->history_answer[(size_t) index - 1]);
-			else mstruct.addChild(*settings->history_answer[(size_t) index - 1]);
+			if(is_equation_solutions(*settings->history_answer[(size_t) index - 1])) {
+				MathStructure m(*settings->history_answer[(size_t) index - 1]);
+				if(m.isLogicalAnd()) {
+					m.setToChild(1);
+					m.setToChild(2);
+				} else if(m.isLogicalOr()) {
+					m.setType(STRUCT_VECTOR);
+					for(size_t i = 0; i < m.size(); i++) {
+						if(m[i].isLogicalAnd()) {
+							m[i].setToChild(1);
+							m[i].setToChild(2);
+						} else {
+							m[i].setToChild(2);
+						}
+					}
+				} else {
+					m.setToChild(2);
+				}
+				if(vargs[0].size() == 1) mstruct.set(m);
+				else mstruct.addChild(m);
+			} else {
+				if(vargs[0].size() == 1) mstruct.set(*settings->history_answer[(size_t) index - 1]);
+				else mstruct.addChild(*settings->history_answer[(size_t) index - 1]);
+			}
 		}
 	}
 	return 1;
