@@ -5457,7 +5457,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	}
 
 	if(execute_str.empty()) {
-		size_t i = str.find_first_of(SPACES LEFT_PARENTHESIS);
+		size_t i = str.find_first_of(SPACES);
 		if(i != std::string::npos) {
 			to_str = str.substr(0, i);
 			if(to_str == "factor" || equalsIgnoreCase(to_str, "factorize") || equalsIgnoreCase(to_str, tr("factorize").toStdString())) {
@@ -6602,7 +6602,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 	}
 
-	size_t i = str.find_first_of(SPACES LEFT_PARENTHESIS);
+	size_t i = str.find_first_of(SPACES);
 	if(i != std::string::npos) {
 		to_str = str.substr(0, i);
 		if(to_str == "factor" || equalsIgnoreCase(to_str, "factorize") || equalsIgnoreCase(to_str, tr("factorize").toStdString())) {
@@ -6655,6 +6655,8 @@ void QalculateWindow::autoCalculateTimeout() {
 			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) mauto.setAborted();
 		}
 	}
+
+	int b_exact = true;
 
 	std::vector<std::string> values;
 	if(!mauto.isAborted()) {
@@ -6757,11 +6759,19 @@ void QalculateWindow::autoCalculateTimeout() {
 				}
 			}
 		}
-		for(size_t i = 0; i < values.size(); i++) {
-			result += " = ";
-			result += values[i];
+		b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
+		if(!values.empty()) {
+			result = "";
+			for(size_t i = 0; i < values.size(); i++) {
+				if(i > 0) result += " = ";
+				result += values[i];
+			}
+			if(!is_approximate && !mauto.isApproximate()) result += " = ";
+			else result += " " SIGN_ALMOST_EQUAL " ";
+			result += single_result;
+			values.clear();
+			b_exact = true;
 		}
-		values.clear();
 		if(do_to) {
 			settings->complex_angle_form = caf_bak;
 			if(custom_base_set) CALCULATOR->setCustomOutputBase(save_nbase);
@@ -6834,7 +6844,6 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 	auto_expression = current_status.toStdString();
 	CALCULATOR->addMessages(&messages);
-	int b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
 	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
 	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true, values.empty() ? "" : single_result);
 	updateWindowTitle(QString::fromStdString(unhtmlize(auto_result)), true);

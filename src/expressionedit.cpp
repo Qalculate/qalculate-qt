@@ -2389,7 +2389,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
-	size_t i = text.find_first_of(SPACES LEFT_PARENTHESIS);
+	size_t i = text.find_first_of(SPACES);
 	if(i != std::string::npos) {
 		str_f = text.substr(0, i);
 		if(str_f == "factor" || equalsIgnoreCase(str_f, "factorize") || equalsIgnoreCase(str_f, tr("factorize").toStdString())) {
@@ -2703,10 +2703,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						Prefix *p = NULL;
 						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
 						if(u) {
-							mparse = u;
 							if(!had_to_conv && !str_e.empty()) {
 								CALCULATOR->beginTemporaryStopMessages();
-								MathStructure to_struct = get_units_for_parsed_expression(&mparse, u, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
+								MathStructure to_struct = get_units_for_parsed_expression(&mparse, u, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL, str_e);
 								if(!to_struct.isZero()) {
 									mparse2 = new MathStructure();
 									CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
@@ -2721,6 +2720,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 								}
 								CALCULATOR->endTemporaryStopMessages();
 							}
+							mparse = u;
 						} else if(v) {
 							mparse = v;
 						} else if(!p) {
@@ -2729,7 +2729,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
 							if(!had_to_conv && cu.countUnits() > 0 && !str_e.empty()) {
 								CALCULATOR->beginTemporaryStopMessages();
-								MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL);
+								MathStructure to_struct = get_units_for_parsed_expression(&mparse, &cu, settings->evalops, cdata->current_from_struct && !cdata->current_from_struct->isAborted() ? cdata->current_from_struct : NULL, str_e);
 								if(!to_struct.isZero()) {
 									mparse2 = new MathStructure();
 									CALCULATOR->parse(mparse2, str_e, settings->evalops.parse_options);
