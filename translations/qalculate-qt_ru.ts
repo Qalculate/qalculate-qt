@@ -2945,6 +2945,10 @@ Do you want to overwrite the function?</source>
         <source>Automatically group digits in input (experimental)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Disable cursor blinking</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -3572,6 +3576,10 @@ You can get version %3 at %2.</source>
     <message>
         <source>Download</source>
         <translation>Скачать</translation>
+    </message>
+    <message>
+        <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

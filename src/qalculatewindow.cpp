@@ -5745,13 +5745,23 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		mstruct->replace(settings->vans[0], settings->vans[1]);
 		if(is_equation_solutions(*mstruct)) {
 			if(mstruct->isLogicalAnd()) {
-				settings->vans[0]->set((*mstruct)[0][1]);
+				for(size_t i = 0; i < mstruct->size(); i++) {
+					if((*mstruct)[i].comparisonType() == COMPARISON_EQUALS) {
+						settings->vans[0]->set((*mstruct)[i][1]);
+						break;
+					}
+				}
 			} else if(mstruct->isLogicalOr()) {
 				MathStructure m(*mstruct);
 				m.setType(STRUCT_VECTOR);
 				for(size_t i = 0; i < m.size(); i++) {
 					if(m[i].isLogicalAnd()) {
-						m[i].setToChild(1);
+						for(size_t i2 = 0; i2 < m[i].size(); i2++) {
+							if(m[i][i2].comparisonType() == COMPARISON_EQUALS) {
+								m[i].setToChild(i2 + 1);
+								break;
+							}
+						}
 						m[i].setToChild(2);
 					} else {
 						m[i].setToChild(2);

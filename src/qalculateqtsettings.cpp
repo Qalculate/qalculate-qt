@@ -175,23 +175,32 @@ size_t unformatted_length(const std::string &str) {
 bool is_equation_solutions(const MathStructure &m) {
 	if(m.isComparison()) {
 		return m.comparisonType() == COMPARISON_EQUALS && m[0].isUnknown();
-	} else if(m.isLogicalAnd() && m.size() >= 1 && m[0].isComparison() && m[0].comparisonType() == COMPARISON_EQUALS && m[0][0].isUnknown()) {
-		for(size_t i = 1; i < m.size(); i++) {
-			if(!m[i].isComparison() || m[i].comparisonType() == COMPARISON_EQUALS) {
+	} else if(m.isLogicalAnd()) {
+		bool b = false;
+		for(size_t i = 0; i < m.size(); i++) {
+			if(!m[i].isComparison()) {
 				return false;
+			} else if(m[i].comparisonType() == COMPARISON_EQUALS) {
+				if(b || !m[i][0].isUnknown()) return false;
+				b = true;
 			}
 		}
-		return true;
+		return b;
 	} else if(m.isLogicalOr()) {
 		for(size_t i = 0; i < m.size(); i++) {
 			if(m[i].isComparison()) {
 				if(m[i].comparisonType() != COMPARISON_EQUALS || !m[i][0].isUnknown()) return false;
-			} else if(m[i].isLogicalAnd() && m[i].size() >= 1 && m[i][0].isComparison() && m[i][0].comparisonType() == COMPARISON_EQUALS && m[i][0][0].isUnknown()) {
-				for(size_t i2 = 1; i2 < m[i].size(); i2++) {
-					if(!m[i][i2].isComparison() || m[i][i2].comparisonType() == COMPARISON_EQUALS) {
+			} else if(m[i].isLogicalAnd()) {
+				bool b = false;
+				for(size_t i2 = 0; i2 < m[i].size(); i2++) {
+					if(!m[i][i2].isComparison()) {
 						return false;
+					} else if(m[i][i2].comparisonType() == COMPARISON_EQUALS) {
+						if(b || !m[i][i2][0].isUnknown()) return false;
+						b = true;
 					}
 				}
+				if(!b) return false;
 			} else {
 				return false;
 			}
@@ -221,13 +230,23 @@ int AnswerFunction::calculate(MathStructure &mstruct, const MathStructure &vargs
 			if(is_equation_solutions(*settings->history_answer[(size_t) index - 1])) {
 				MathStructure m(*settings->history_answer[(size_t) index - 1]);
 				if(m.isLogicalAnd()) {
-					m.setToChild(1);
+					for(size_t i = 0; i < m.size(); i++) {
+						if(m[i].comparisonType() == COMPARISON_EQUALS) {
+							m.setToChild(i + 1);
+							break;
+						}
+					}
 					m.setToChild(2);
 				} else if(m.isLogicalOr()) {
 					m.setType(STRUCT_VECTOR);
 					for(size_t i = 0; i < m.size(); i++) {
 						if(m[i].isLogicalAnd()) {
-							m[i].setToChild(1);
+							for(size_t i2 = 0; i2 < m[i].size(); i2++) {
+								if(m[i][i2].comparisonType() == COMPARISON_EQUALS) {
+									m[i].setToChild(i2 + 1);
+									break;
+								}
+							}
 							m[i].setToChild(2);
 						} else {
 							m[i].setToChild(2);
@@ -1160,7 +1179,7 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 5;
-	preferences_version[1] = 4;
+	preferences_version[1] = 5;
 	preferences_version[2] = 0;
 
 	if(file) {
@@ -1246,6 +1265,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	std::string ans_str = "ans";
 	vans[0] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str, m_undefined, QApplication::tr("Last Answer").toStdString(), false, true));
+	vans[0]->setDescription(tr("Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).").toStdString());
 	vans[0]->addName(QApplication::tr("answer").toStdString());
 	vans[0]->addName(ans_str + "1");
 	vans[1] = (KnownVariable*) CALCULATOR->addVariable(new KnownVariable(CALCULATOR->temporaryCategory(), ans_str + "2", m_undefined, QApplication::tr("Answer 2").toStdString(), false, true));
