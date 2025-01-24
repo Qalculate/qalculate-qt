@@ -47,7 +47,7 @@ HEADERS += src/calendarconversiondialog.h src/csvdialog.h src/dataseteditdialog.
 
 SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/dataseteditdialog.cpp src/datasetsdialog.cpp src/expressionedit.cpp src/fpconversiondialog.cpp src/functioneditdialog.cpp src/functionsdialog.cpp src/historyview.cpp src/itemproxymodel.cpp src/keypadwidget.cpp src/main.cpp src/matrixwidget.cpp src/percentagecalculationdialog.cpp src/periodictabledialog.cpp src/plotdialog.cpp src/preferencesdialog.cpp src/qalculateqtsettings.cpp src/qalculatewindow.cpp src/unitsdialog.cpp src/uniteditdialog.cpp src/unknowneditdialog.cpp src/variableeditdialog.cpp src/variablesdialog.cpp
 
-LANGUAGES = ca de es fr nl pt_BR pt_PT ru sl sv zh_CN
+LANGUAGES = ca de en es fr nl pt_BR pt_PT ru sl sv zh_CN
 
 !win32 {
 	#parameters: var, prepend, append
@@ -58,6 +58,7 @@ LANGUAGES = ca de es fr nl pt_BR pt_PT ru sl sv zh_CN
 
 	TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
 			translations/qalculate-qt_de.ts \
+			translations/qalculate-qt_en.ts \
 			translations/qalculate-qt_es.ts \
 			translations/qalculate-qt_fr.ts \
 			translations/qalculate-qt_nl.ts \
@@ -89,6 +90,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
 	qm.files = 	translations/qalculate-qt_ca.qm \
 			translations/qalculate-qt_de.qm \
+			translations/qalculate-qt_en.qm \
 			translations/qalculate-qt_es.qm \
 			translations/qalculate-qt_fr.qm \
 			translations/qalculate-qt_nl.qm \
