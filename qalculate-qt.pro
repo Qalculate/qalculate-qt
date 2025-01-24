@@ -49,26 +49,13 @@ SOURCES += src/calendarconversiondialog.cpp src/csvdialog.cpp src/dataseteditdia
 
 LANGUAGES = ca de en es fr nl pt_BR pt_PT ru sl sv zh_CN
 
+#parameters: var, prepend, append
+defineReplace(prependAll) {
+	for(a,$$1):result += $$2$${a}$$3
+	return($$result)
+}
+
 !win32 {
-	#parameters: var, prepend, append
-	defineReplace(prependAll) {
-		for(a,$$1):result += $$2$${a}$$3
-		return($$result)
-	}
-
-	TRANSLATIONS = 	translations/qalculate-qt_ca.ts \
-			translations/qalculate-qt_de.ts \
-			translations/qalculate-qt_en.ts \
-			translations/qalculate-qt_es.ts \
-			translations/qalculate-qt_fr.ts \
-			translations/qalculate-qt_nl.ts \
-			translations/qalculate-qt_pt_BR.ts \
-			translations/qalculate-qt_pt_PT.ts \
-			translations/qalculate-qt_ru.ts \
-			translations/qalculate-qt_sl.ts \
-			translations/qalculate-qt_sv.ts \
-			translations/qalculate-qt_zh_CN.ts
-
 	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
 	TRANSLATIONS_FILES =
 	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
@@ -88,19 +75,7 @@ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
 
 	target.path = $$BINDIR
 
-	qm.files = 	translations/qalculate-qt_ca.qm \
-			translations/qalculate-qt_de.qm \
-			translations/qalculate-qt_en.qm \
-			translations/qalculate-qt_es.qm \
-			translations/qalculate-qt_fr.qm \
-			translations/qalculate-qt_nl.qm \
-			translations/qalculate-qt_pt_BR.qm \
-			translations/qalculate-qt_pt_PT.qm \
-			translations/qalculate-qt_ru.qm \
-			translations/qalculate-qt_sl.qm \
-			translations/qalculate-qt_sv.qm \
-			translations/qalculate-qt_zh_CN.qm
-		
+	qm.files = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .qm)
 	qm.path = $$TRANSLATIONS_DIR
 
 	desktop.files = data/io.github.Qalculate.qalculate-qt.desktop
