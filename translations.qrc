@@ -2,6 +2,7 @@
 <qresource>
 <file>translations/qalculate-qt_ca.qm</file>
 <file>translations/qalculate-qt_de.qm</file>
+<file>translations/qalculate-qt_en.qm</file>
 <file>translations/qalculate-qt_es.qm</file>
 <file>translations/qalculate-qt_fr.qm</file>
 <file>translations/qalculate-qt_nl.qm</file>
