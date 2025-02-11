@@ -61,7 +61,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu, *fileMenu, *modeMenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *autocalcSelectionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
 		QTimer *completionTimer, *toolTipTimer;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
@@ -142,8 +142,10 @@ class ExpressionEdit : public QPlainTextEdit {
 		void enableIM();
 		void enableCompletionDelay();
 		void onCompletionModeChanged();
+		void onAutocalcSelectionChanged();
 		void onStatusModeChanged();
 		void showCurrentStatus();
+		void onSelectionChanged();
 
 	public slots:
 

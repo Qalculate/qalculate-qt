@@ -42,6 +42,7 @@ class PreferencesDialog : public QDialog {
 		void preserveHeightChanged(int);
 		void statusModeChanged(int);
 		void statusDelayChanged(int);
+		void autocalcSelectionToggled(bool);
 		void calculateDelayChanged(int);
 		void binTwosToggled(bool);
 		void hexTwosToggled(bool);

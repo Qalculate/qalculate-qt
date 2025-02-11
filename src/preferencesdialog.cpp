@@ -214,6 +214,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	calculateDelayWidget->setEnabled(settings->status_in_history);
 	connect(calculateDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(calculateDelayChanged(int)));
 	l->addWidget(calculateDelayWidget, r, 1); r++;
+	BOX(tr("Automatically calculate selection"), settings->autocalc_selection, autocalcSelectionToggled(bool));
 	l->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Parsed"), 0);
@@ -493,6 +494,9 @@ void PreferencesDialog::statusDelayChanged(int v) {
 }
 void PreferencesDialog::calculateDelayChanged(int v) {
 	settings->auto_calculate_delay = v;
+}
+void PreferencesDialog::autocalcSelectionToggled(bool b) {
+	settings->autocalc_selection = b;
 }
 void PreferencesDialog::binTwosToggled(bool b) {
 	settings->printops.twos_complement = b;

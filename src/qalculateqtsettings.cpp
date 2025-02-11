@@ -957,6 +957,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			auto_calculate_delay = v;
 		} else if(svar == "status_in_history") {
 			status_in_history = v;
+		} else if(svar == "autocalc_selection") {
+			autocalc_selection = v;
 		}
 	}
 }
@@ -1046,6 +1048,7 @@ void QalculateQtSettings::loadPreferences() {
 	programming_base_changed = false;
 	auto_calculate = true;
 	status_in_history = true;
+	autocalc_selection = false;
 	dot_question_asked = false;
 	implicit_question_asked = false;
 	complex_angle_form = false;
@@ -1670,6 +1673,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
 		fprintf(file, "calculate_as_you_type_delay=%i\n", auto_calculate_delay);
 		fprintf(file, "status_in_history=%i\n", status_in_history);
+		fprintf(file, "autocalc_selection=%i\n", autocalc_selection);
 		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}
 	if(read_default) {

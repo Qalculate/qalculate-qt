@@ -267,7 +267,7 @@ class QalculateQtSettings : QObject {
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		int max_history_lines;
 		bool rpn_shown;
-		bool auto_calculate, status_in_history;
+		bool auto_calculate, status_in_history, autocalc_selection;
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
 		bool close_with_esc;

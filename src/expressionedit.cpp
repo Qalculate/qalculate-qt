@@ -861,6 +861,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 		connect(toolTipTimer, SIGNAL(timeout()), this, SLOT(showCurrentStatus()));
 	}
 	connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+	connect(this, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
 	connect(completer, SIGNAL(activated(const QModelIndex&)), this, SLOT(onCompletionActivated(const QModelIndex&)));
 	connect(completer, SIGNAL(highlighted(const QModelIndex&)), this, SLOT(onCompletionHighlighted(const QModelIndex&)));
@@ -1908,6 +1909,8 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		group = new QActionGroup(this);
 		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
 		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
+		menu->addSeparator();
+		action = menu->addAction(tr("Calculate selection"), this, SLOT(onAutocalcSelectionChanged())); action->setCheckable(true); autocalcSelectionAction = action;
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
@@ -1935,6 +1938,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	else statusExpressionAction->setChecked(true);
 	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
+	autocalcSelectionAction->setChecked(settings->autocalc_selection);
 	cmenu->popup(e->globalPos());
 }
 void ExpressionEdit::setMenuAndToolbarItems(QMenu *mode, QMenu *menu, QAction *action) {
@@ -2021,6 +2025,9 @@ void ExpressionEdit::onCompletionModeChanged() {
 	if(completion_level > 3) settings->completion_min2 = 1;
 	else settings->completion_min2 = 2;
 }
+void ExpressionEdit::onAutocalcSelectionChanged() {
+	settings->autocalc_selection = qobject_cast<QAction*>(sender())->isChecked();
+}
 void ExpressionEdit::onStatusModeChanged() {
 	int i = qobject_cast<QAction*>(sender())->data().toInt();
 	if(i == 3) {
@@ -2106,13 +2113,13 @@ void ExpressionEdit::blockUndo(bool b) {
 	else block_add_to_undo--;
 }
 void ExpressionEdit::showCurrentStatus() {
-	if(!expression_has_changed || current_status_text.isEmpty() || (completionView->isVisible() && (completionView->selectionModel()->hasSelection() || current_status_type == 3))) {
+	if((!expression_has_changed && current_status_type != 4) || current_status_text.isEmpty() || (completionView->isVisible() && (completionView->selectionModel()->hasSelection() || current_status_type == 3))) {
 		HIDE_TOOLTIP
 	} else {
-		QString str = current_status_text;
-		std::string str_nohtml = unhtmlize(current_status_text.toStdString());
-		std::string current_text = toPlainText().toStdString();
-		if(current_status_type == 1 && settings->auto_calculate && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
+		QString str = current_status_type == 4 ? "" : current_status_text;
+		std::string str_nohtml = current_status_type == 4 ? current_status_text.toStdString() : unhtmlize(current_status_text.toStdString());
+		std::string current_text = current_status_type == 4 ? str_nohtml : toPlainText().toStdString();
+		if(((current_status_type == 1 && settings->auto_calculate) || current_status_type == 4) && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
@@ -2120,11 +2127,13 @@ void ExpressionEdit::showCurrentStatus() {
 			remove_spaces(current_text);
 			CALCULATOR->beginTemporaryStopMessages();
 			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
-			result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
+			std::string parsed_text;
+			result = CALCULATOR->calculateAndPrint(result, 50, settings->evalops, po, settings->dual_fraction == 0 ? AUTOMATIC_FRACTION_OFF : AUTOMATIC_FRACTION_SINGLE, settings->dual_approximation == 0 ? AUTOMATIC_APPROXIMATION_OFF : AUTOMATIC_APPROXIMATION_SINGLE, current_status_type == 4 ? &parsed_text : NULL, -1, &b_comp, true, false, TAG_TYPE_HTML);
 			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 			std::string result_nohtml = unhtmlize(result);
 			remove_spaces(result_nohtml);
-			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString()) {
+			if(current_status_type == 4 && parsed_text != CALCULATOR->timedOutString()) str = QString::fromStdString(parsed_text);
+			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString() && result != str) {
 				str += "&nbsp;";
 				if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
 				else str += "= ";
@@ -2136,7 +2145,7 @@ void ExpressionEdit::showCurrentStatus() {
 		} else {
 			remove_spaces(current_text);
 		}
-		if(str_nohtml == current_text || str_nohtml.length() > 2000) {
+		if(str.isEmpty() || str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
 		} else if(tipLabel && tipLabel->isVisible()) {
 			tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
@@ -2154,10 +2163,22 @@ void ExpressionEdit::showCurrentStatus() {
 		}
 	}
 }
+void ExpressionEdit::onSelectionChanged() {
+	if(settings->autocalc_selection && textCursor().hasSelection()) {
+		QTextCursor cur = textCursor();
+		if(((!settings->status_in_history || !settings->display_expression_status) && expression_has_changed) || cur.selectionStart() != 0 || cur.selectionEnd() != toPlainText().length()) {
+			setStatusText(cur.selectedText(), 4);
+		} else if(current_status_type == 4) {
+			HIDE_TOOLTIP
+		}
+	} else if(current_status_type == 4) {
+		HIDE_TOOLTIP
+	}
+}
 void ExpressionEdit::setStatusText(const QString &text, int stype) {
 	if(toolTipTimer) toolTipTimer->stop();
 	current_status_text = text;
-	if(text.isEmpty() || !settings->display_expression_status) {
+	if(text.isEmpty() || (stype != 4 && !settings->display_expression_status)) {
 		HIDE_TOOLTIP
 	} else {
 		bool prev_func = (current_status_type == 2);
