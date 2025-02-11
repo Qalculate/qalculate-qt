@@ -957,6 +957,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(historyView, SIGNAL(insertValueRequested(int)), this, SLOT(onInsertValueRequested(int)));
 	connect(historyView, SIGNAL(historyReloaded()), this, SLOT(onHistoryReloaded()));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
+	connect(expressionEdit, SIGNAL(calculateSelectionRequest()), this, SLOT(calculateSelection()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
 	connect(expressionEdit, SIGNAL(statusChanged(QString, bool, bool, bool, bool)), this, SLOT(onStatusChanged(QString, bool, bool, bool, bool)));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
@@ -4452,7 +4453,12 @@ void QalculateWindow::approximateResult() {
 	settings->dual_fraction = dfrac_bak;
 }
 
-void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates) {
+void QalculateWindow::calculateSelection() {
+	if(!expressionEdit->textCursor().hasSelection()) return;
+	calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", "", true, true);
+}
+
+void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, MathOperation op, MathFunction *f, bool do_stack, size_t stack_index, std::string execute_str, std::string str, bool check_exrates, bool calculate_selection) {
 
 	workspace_changed = true;
 
@@ -4480,6 +4486,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			QTableWidgetItem *item = rpnView->item(stack_index, 0);
 			if(!item) {b_busy--; return;}
 			str = item->text().toStdString();
+		} else if(calculate_selection) {
+			str = expressionEdit->textCursor().selectedText().toStdString();
 		} else {
 			current_expr = true;
 			str = expressionEdit->toPlainText().toStdString();
@@ -4519,7 +4527,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 		// qalc command
 		bool b_command = false;
-		if(str[0] == '/' && str.length() > 1) {
+		if(!calculate_selection && str[0] == '/' && str.length() > 1) {
 			size_t i = str.find_first_not_of(SPACES, 1);
 			if(i != std::string::npos && (signed char) str[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, str[i])) {
 				b_command = true;
@@ -5072,7 +5080,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		}
 	}
 
-	if(execute_str.empty()) {
+	if(execute_str.empty() && !calculate_selection) {
 		if(str == "MC") {
 			b_busy--;
 			if(current_expr) setPreviousExpression();
@@ -5106,7 +5114,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	had_to_expression = false;
 	std::string from_str = str;
 	bool last_is_space = !from_str.empty() && is_in(SPACES, from_str[from_str.length() - 1]);
-	if(execute_str.empty() && CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true, !do_stack)) {
+	if(execute_str.empty() && CALCULATOR->separateToExpression(from_str, to_str, settings->evalops, true, !do_stack && !calculate_selection)) {
 		remove_duplicate_blanks(to_str);
 		had_to_expression = true;
 		std::string str_left;
@@ -5720,7 +5728,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	if(!do_mathoperation && (askTC(*parsed_mstruct) || askSinc(*parsed_mstruct) || askSinc(*mstruct) || askPercent() || (check_exrates && settings->checkExchangeRates(this)))) {
 		b_busy--;
-		calculateExpression(force, do_mathoperation, op, f, settings->rpn_mode, stack_index, saved_execute_str, str, false);
+		calculateExpression(force, do_mathoperation, op, f, settings->rpn_mode, stack_index, saved_execute_str, str, false, calculate_selection);
 		settings->evalops.complex_number_form = cnf_bak;
 		settings->evalops.auto_post_conversion = save_auto_post_conversion;
 		settings->evalops.parse_options.units_enabled = b_units_saved;
@@ -5818,8 +5826,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		settings->history_answer.push_back(new MathStructure(*mstruct));
 	}
 
-	if(!do_stack) previous_expression = execute_str.empty() ? str : execute_str;
-	setResult(NULL, true, stack_index == 0, true, "", do_stack, stack_index);
+	if(!do_stack && !calculate_selection) previous_expression = execute_str.empty() ? str : execute_str;
+	setResult(NULL, true, stack_index == 0, true, "", do_stack, stack_index, false, false, calculate_selection);
 	prepend_mstruct.setUndefined();
 	
 	if(do_bases) onBasesActivated(true);
@@ -5839,36 +5847,38 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				unitsDialog->selectCategory(u->category());
 			}
 		}
-		expressionEdit->blockCompletion();
-		expressionEdit->blockParseStatus();
-		if(settings->chain_mode) {
-			if(exact_text == "0" || result_text == "0") expressionEdit->clear();
-			std::string str = unhtmlize(result_text);
-			if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
-		} else if(settings->replace_expression == CLEAR_EXPRESSION) {
-			expressionEdit->clear();
-		} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
-			if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
+		if(!calculate_selection) {
+			expressionEdit->blockCompletion();
+			expressionEdit->blockParseStatus();
+			if(settings->chain_mode) {
 				if(exact_text == "0" || result_text == "0") expressionEdit->clear();
-				else if(exact_text.empty()) {
-					std::string str = unhtmlize(result_text);
-					if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+				std::string str = unhtmlize(result_text);
+				if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+			} else if(settings->replace_expression == CLEAR_EXPRESSION) {
+				expressionEdit->clear();
+			} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
+				if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
+					if(exact_text == "0" || result_text == "0") expressionEdit->clear();
+					else if(exact_text.empty()) {
+						std::string str = unhtmlize(result_text);
+						if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+					} else {
+						if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) expressionEdit->setExpression(QString::fromStdString(exact_text));
+					}
 				} else {
-					if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) expressionEdit->setExpression(QString::fromStdString(exact_text));
+					if(!execute_str.empty()) {
+						from_str = execute_str;
+						CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
+					}
+					expressionEdit->setExpression(QString::fromStdString(from_str));
 				}
-			} else {
-				if(!execute_str.empty()) {
-					from_str = execute_str;
-					CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
-				}
-				expressionEdit->setExpression(QString::fromStdString(from_str));
 			}
+			if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
+			expressionEdit->selectAll();
+			expressionEdit->blockCompletion(false);
+			expressionEdit->blockParseStatus(false);
+			expressionEdit->setExpressionHasChanged(false);
 		}
-		if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
-		expressionEdit->selectAll();
-		expressionEdit->blockCompletion(false);
-		expressionEdit->blockParseStatus(false);
-		expressionEdit->setExpressionHasChanged(false);
 		if(settings->autocopy_result) {
 			if(settings->copy_ascii) {
 				std::string str = result_text;
@@ -7061,11 +7071,11 @@ int intervals_are_relative(MathStructure &m) {
 	return ret;
 }
 
-void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog) {
+void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog, bool calculate_selection) {
 
 	if(block_result_update) return;
 
-	if(expressionEdit->expressionHasChanged() && (!settings->rpn_mode || CALCULATOR->RPNStackSize() == 0)) {
+	if(!calculate_selection && expressionEdit->expressionHasChanged() && (!settings->rpn_mode || CALCULATOR->RPNStackSize() == 0)) {
 		if(!force) return;
 		calculateExpression();
 		if(!prefix) return;
@@ -7232,7 +7242,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		MathStructure *mreg = CALCULATOR->getRPNRegister(stack_index + 1);
 		if(!viewThread->write((void*) mreg)) {b_busy--; viewThread->cancel(); return;}
 	}
-	if(!viewThread->write(do_stack)) {b_busy--; viewThread->cancel(); return;}
+	if(!viewThread->write(do_stack || calculate_selection)) {b_busy--; viewThread->cancel(); return;}
 	if(do_stack) {
 		if(!viewThread->write((void*) NULL)) {b_busy--; viewThread->cancel(); return;}
 	} else {
@@ -7396,7 +7406,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	b_busy--;
 
 	if(implicit_warning && askImplicit()) {
-		calculateExpression(true);
+		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", "", true, calculate_selection);
 		return;
 	}
 

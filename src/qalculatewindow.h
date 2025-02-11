@@ -121,8 +121,8 @@ class QalculateWindow : public QMainWindow {
 		bool workspace_changed;
 		bool init_in_progress;
 
-		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true);
-		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false);
+		void calculateExpression(bool force = true, bool do_mathoperation = false, MathOperation op = OPERATION_ADD, MathFunction *f = NULL, bool do_stack = false, size_t stack_index = 0, std::string execute_str = std::string(), std::string str = std::string(), bool check_exrates = true, bool calculate_selection = false);
+		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false, bool calculate_selection = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
 		bool askTC(MathStructure&);
@@ -317,6 +317,7 @@ class QalculateWindow : public QMainWindow {
 		void socketReadyRead();
 		void calculate();
 		void calculate(const QString&);
+		void calculateSelection();
 		void onActivateRequested(const QStringList&, const QString&);
 		void abort();
 		void abortCommand();

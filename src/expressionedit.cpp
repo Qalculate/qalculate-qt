@@ -1869,6 +1869,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		deleteAction = cmenu->addAction(tr("Delete"), this, SLOT(editDelete()));
 		deleteAction->setShortcut(QKeySequence::Delete);
 		deleteAction->setShortcutContext(Qt::WidgetShortcut);
+		calculateSelectionAction = cmenu->addAction(tr("Calculate Selection"), this, SIGNAL(calculateSelectionRequest()));
 		cmenu->addSeparator();
 		cmenu->addAction(tr("Insert Date…"), this, SLOT(insertDate()));
 		cmenu->addAction(tr("Insert Matrix…"), this, SLOT(insertMatrix()));
@@ -1910,7 +1911,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
 		action = menu->addAction(tr("Without delay"), this, SLOT(onStatusModeChanged())); action->setData(4); action->setCheckable(true); group->addAction(action); statusNoDelayAction = action;
 		menu->addSeparator();
-		action = menu->addAction(tr("Calculate selection"), this, SLOT(onAutocalcSelectionChanged())); action->setCheckable(true); autocalcSelectionAction = action;
+		action = menu->addAction(tr("Automatically calculate selection"), this, SLOT(onAutocalcSelectionChanged())); action->setCheckable(true); autocalcSelectionAction = action;
 #ifndef _WIN32
 		QAction *enableIMAction = cmenu->addAction(tr("Use input method"), this, SLOT(enableIM())); enableIMAction->setCheckable(true);
 		enableIMAction->setChecked(settings->enable_input_method);
@@ -1930,6 +1931,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	copyAction->setEnabled(b_sel);
 	pasteAction->setEnabled(canPaste());
 	deleteAction->setEnabled(b_sel);
+	calculateSelectionAction->setEnabled(b_sel);
 	selectAllAction->setEnabled(!b_empty);
 	clearAction->setEnabled(!b_empty);
 	clearHistoryAction->setEnabled(!settings->expression_history.empty());
