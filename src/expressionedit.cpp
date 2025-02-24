@@ -1547,7 +1547,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				break;
 			}
 			case Qt::Key_Asterisk: {
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(OPERATION_MULTIPLY);
 					return;
 				}
@@ -1557,7 +1557,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Minus: {
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					int pos = 0;
 					if(textCursor().hasSelection()) pos = textCursor().selectionStart();
 					else pos = textCursor().position();
@@ -1578,7 +1578,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 			case Qt::Key_Dead_Circumflex: {
 				if(!event->text().isEmpty() && event->text() != "^") break;
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
 				}
@@ -1594,7 +1594,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 			case Qt::Key_AsciiCircum: {
 				if(!event->text().isEmpty() && event->text() != "^") break;
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
 					return;
 				}
@@ -1604,7 +1604,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Plus: {
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(OPERATION_ADD);
 					return;
 				}
@@ -1614,7 +1614,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_Slash: {
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(OPERATION_DIVIDE);
 					return;
 				}
@@ -1636,7 +1636,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 		}
 	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
-		if(settings->rpn_mode && settings->rpn_keys) {
+		if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 			emit calculateRPNRequest(OPERATION_RAISE);
 			return;
 		}
@@ -1660,7 +1660,7 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				return;
 			}
 			case Qt::Key_E: {
-				if(settings->rpn_mode && settings->rpn_keys) {
+				if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 					emit calculateRPNRequest(OPERATION_EXP10);
 					return;
 				}
@@ -2135,7 +2135,7 @@ void ExpressionEdit::showCurrentStatus() {
 			std::string result_nohtml = unhtmlize(result);
 			remove_spaces(result_nohtml);
 			if(current_status_type == 4 && parsed_text != CALCULATOR->timedOutString()) str = QString::fromStdString(parsed_text);
-			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString() && result != str) {
+			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString() && result != parsed_text) {
 				str += "&nbsp;";
 				if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
 				else str += "= ";
@@ -2990,7 +2990,8 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
 	completionView->setColumnHidden(2, true);
 	if(mstruct_from) {
-		do_completion_signal = 1;
+		if(current_object_is_set) do_completion_signal = -1;
+		else do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
 		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
 		cdata->current_from_categories.clear();

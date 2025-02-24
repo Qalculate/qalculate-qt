@@ -70,6 +70,21 @@
  </provides>
  <translation type="qt">qalculate-qt</translation>
  <releases>
+  <release version="5.5.1" date="2025-02-24">
+   <description>
+    <p>Changes:</p>
+     <ul>
+      <li>Option to automatically calculate the current selection, in tooltip</li>
+      <li>Option to calculate the current selection, once in history</li>
+      <li>Toggle fraction format action for custom keyboard shortcuts and keypad buttons</li>
+      <li>Fix copy unformatted ASCII without units when unit is placed before quantity</li>
+      <li>Fix solve() function with replace() function as first argument (fixes solve2() function)</li>
+      <li>Fix "where" operator using (in)equality in variable</li>
+      <li>Return x=a*e^(i*r) (with r instead of n) for abs(x)=x</li>
+      <li>Minor bug fixes and feature enhancements</li>
+     </ul>
+   </description>
+  </release>
   <release version="5.5.0" date="2025-01-13">
    <description>
     <p>Changes:</p>

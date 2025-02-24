@@ -1116,6 +1116,14 @@ Do you want to overwrite the function?</source>
         <source>comment</source>
         <translation type="unfinished">комментарий</translation>
     </message>
+    <message>
+        <source>Calculate Selection</source>
+        <translation type="unfinished">Вычислить выделение</translation>
+    </message>
+    <message>
+        <source>Automatically calculate selection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -2949,6 +2957,10 @@ Do you want to overwrite the function?</source>
         <source>Disable cursor blinking</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Automatically calculate selection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -3579,6 +3591,10 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle fraction format in current result</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4740,6 +4756,14 @@ Do you want to overwrite it?</source>
     <message>
         <source>New Unit</source>
         <translation>Новая единица измерения</translation>
+    </message>
+    <message>
+        <source>Example: priority of the unit &quot;hand&quot; is set to 2, while priority of ft (foot) and in (inch) is set to 1, which results in &quot;17 in = 1 ft + 5 in&quot;, instead of &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Example: minimum base unit number of yd (yard) is set to 12, which results in &quot;3 × 3 ft = 9 ft&quot; (instead of &quot;3 yd&quot;) and &quot;4 × 3 ft = 4 yd&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

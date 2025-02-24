@@ -27,7 +27,7 @@ class PreferencesDialog : public QDialog {
 
 	protected:
 
-		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox;
+		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox, *rpnKeysBox;
 		QCheckBox *preserveHeightBox;
 		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget;
 		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;

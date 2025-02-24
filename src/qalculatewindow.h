@@ -257,6 +257,7 @@ class QalculateWindow : public QMainWindow {
 		void registerChanged(int);
 		void calculateRPN(int);
 		void approximateResult();
+		void toggleResultFraction();
 		void onExpressionStatusModeChanged(bool = true);
 		void functionActivated();
 		void unitActivated();

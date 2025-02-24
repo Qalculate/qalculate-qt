@@ -117,7 +117,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	l->addWidget(new QLabel(tr("Max history lines saved:"), this), r, 0); QSpinBox *spin = new QSpinBox(this); spin->setRange(0, 100000); spin->setValue(settings->max_history_lines); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(maxHistoryLinesChanged(int))); l->addWidget(spin, r, 1); r++;
 	BOX(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
-	BOX(tr("Use keyboard keys for RPN"), settings->rpn_keys, rpnKeysToggled(bool));
+	BOX(tr("Use keyboard keys for RPN"), settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN, rpnKeysToggled(bool)); rpnKeysBox = box; rpnKeysBox->setEnabled(settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN);
 	BOX(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
 	BOX(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
 	QCheckBox *box2 = new QCheckBox(tr("Preserve history height"), this); l->addWidget(box2, r, 0, 1, 2); connect(box2, SIGNAL(stateChanged(int)), this, SLOT(preserveHeightChanged(int))); r++;
@@ -610,6 +610,10 @@ void PreferencesDialog::formatToggled(bool b) {
 void PreferencesDialog::parsingModeChanged(int i) {
 	settings->evalops.parse_options.parsing_mode = (ParsingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CONVENTIONAL || settings->evalops.parse_options.parsing_mode == PARSING_MODE_IMPLICIT_MULTIPLICATION_FIRST) settings->implicit_question_asked = true;
+	rpnKeysBox->setEnabled(settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN);
+	rpnKeysBox->blockSignals(true);
+	rpnKeysBox->setChecked(settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN);
+	rpnKeysBox->blockSignals(false);
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::temperatureCalculationChanged(int i) {

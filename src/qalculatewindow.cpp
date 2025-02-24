@@ -131,7 +131,7 @@ bool auto_calculation_updated = false, auto_format_updated = false, auto_error =
 bool bases_is_result = false;
 Number max_bases, min_bases;
 bool title_modified = false;
-MathStructure mauto;
+MathStructure mauto, mauto_parsed;
 
 bool contains_unknown_variable(const MathStructure &m) {
 	if(m.isVariable()) return !m.variable()->isKnown();
@@ -1315,6 +1315,10 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_APPROXIMATE: {
 			approximateResult();
+			break;
+		}
+		case SHORTCUT_TYPE_TOGGLE_FRACTION: {
+			toggleResultFraction();
 			break;
 		}
 		case SHORTCUT_TYPE_MODE: {
@@ -4453,6 +4457,27 @@ void QalculateWindow::approximateResult() {
 	settings->dual_fraction = dfrac_bak;
 }
 
+void QalculateWindow::toggleResultFraction() {
+	if(expressionEdit->expressionHasChanged()) {
+		if(settings->status_in_history && !auto_result.empty()) {
+			NumberFractionFormat frac_bak = settings->printops.number_fraction_format;
+			int dfrac_bak = settings->dual_fraction;
+			settings->dual_fraction = 0;
+			if(unhtmlize(auto_result).find(settings->printops.decimalpoint()) != std::string::npos) settings->printops.number_fraction_format = FRACTION_COMBINED;
+			else settings->printops.number_fraction_format = FRACTION_DECIMAL;
+			auto_format_updated = true;
+			expressionEdit->displayParseStatus(true);
+			settings->printops.number_fraction_format = frac_bak;
+			settings->dual_fraction = dfrac_bak;
+		}
+	} else if(!result_text.empty()) {
+		if(unhtmlize(result_text).find(settings->printops.decimalpoint()) != std::string::npos) to_fraction = 2;
+		else to_fraction = 3;
+		to_fixed_fraction = 0;
+		setResult(NULL, true, false, false);
+	}
+}
+
 void QalculateWindow::calculateSelection() {
 	if(!expressionEdit->textCursor().hasSelection()) return;
 	calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", "", true, true);
@@ -6640,11 +6665,11 @@ void QalculateWindow::autoCalculateTimeout() {
 
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 
-	MathStructure mexact, mto, mparsed;
+	MathStructure mexact, mto;
 	mexact.setUndefined();
 	po.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
 	if(do_calendars || do_bases) mauto.setAborted();
-	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mparsed, &mto);
+	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
 	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
 		mauto.setAborted();
 		result = "";
@@ -6652,7 +6677,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	if(!mauto.isAborted()) {
 		if(settings->dual_approximation > 0 || po.base == BASE_DECIMAL) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
-			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mparsed, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), 0, -1);
+			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mauto_parsed, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), 0, -1);
 			if(delay_complex && !mexact.isUndefined()) {
 				settings->evalops.complex_number_form = cnf;
 				if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mexact.complexToCisForm(settings->evalops);
@@ -6686,7 +6711,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	if(!mauto.isAborted()) {
 		// Always perform conversion to optimal (SI) unit when the expression is a number multiplied by a unit and input equals output
 		if(mto.isUndefined() && !had_to_expression && (settings->evalops.approximation == APPROXIMATION_EXACT || settings->evalops.auto_post_conversion == POST_CONVERSION_OPTIMAL || settings->evalops.auto_post_conversion == POST_CONVERSION_NONE)) {
-			convert_unchanged_quantity_with_unit(mparsed, mauto, settings->evalops);
+			convert_unchanged_quantity_with_unit(mauto_parsed, mauto, settings->evalops);
 		}
 
 		if(delay_complex) {
@@ -6771,7 +6796,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		po.allow_non_usable = true;
 		int max_length = -1;
 		if(!mauto.isNumber() || !mauto.number().isRational() || mauto.number().denominator() >= 20 || mauto.number() >= 100 || mauto.number() <= -100) max_length = historyView->maxTemporaryCharacters();
-		print_dual(mauto, str, mparsed, mexact, result, values, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, max_length, had_to_expression);
+		print_dual(mauto, str, mauto_parsed, mexact, result, values, po, settings->evalops, settings->dual_fraction < 0 ? AUTOMATIC_FRACTION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_FRACTION_DUAL : AUTOMATIC_FRACTION_OFF), settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_fraction > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), settings->complex_angle_form, &exact_comparison, true, settings->format_result, settings->color, TAG_TYPE_HTML, max_length, had_to_expression);
 		single_result = result;
 		if(max_length >= 0) {
 			size_t l = unformatted_length(result);
@@ -7794,14 +7819,16 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 
 void QalculateWindow::onToActivated(bool button) {
 	QTextCursor cur = expressionEdit->textCursor();
-	bool b_result = !expressionEdit->expressionHasChanged() && settings->current_result;
-	bool b_addto = !b_result;
+	int b_result = 0;
+	if(!expressionEdit->expressionHasChanged() && settings->current_result) b_result = 1;
+	else if(settings->status_in_history && !mauto.isAborted() && expressionEdit->expressionHasChanged()) b_result = 2;
+	bool b_addto = (b_result != 1);
 	if(b_addto && button && CALCULATOR->hasToExpression(expressionEdit->toPlainText().toStdString(), true, settings->evalops)) {
 		std::string str = expressionEdit->toPlainText().toStdString(), to_str;
 		CALCULATOR->separateToExpression(str, to_str, settings->evalops, true, true);
 		if(to_str.empty()) b_addto = false;
 	}
-	if(!b_result) expressionEdit->blockCompletion(true, button);
+	if(b_result != 1) expressionEdit->blockCompletion(true, button);
 	if(b_addto) {
 		expressionEdit->blockParseStatus();
 		expressionEdit->moveCursor(QTextCursor::End);
@@ -7810,7 +7837,7 @@ void QalculateWindow::onToActivated(bool button) {
 		expressionEdit->displayParseStatus(true, false);
 	}
 	if(b_result || button) {
-		expressionEdit->complete(b_result ? mstruct : NULL, b_result ? parsed_mstruct : NULL, toMenu);
+		expressionEdit->complete(b_result == 1 ? mstruct : (b_result == 2 ? &mauto : NULL), b_result == 1 ? parsed_mstruct : (b_result == 2 ? &mauto_parsed : NULL), toMenu, b_result == 2);
 		if(!toMenu->isEmpty()) {
 			toAction_t->setMenu(toMenu);
 			toAction_t->showMenu();
@@ -7820,7 +7847,7 @@ void QalculateWindow::onToActivated(bool button) {
 	} else {
 		expressionEdit->complete();
 	}
-	if(!b_result) expressionEdit->blockCompletion(false);
+	if(b_result != 1) expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
@@ -8626,6 +8653,10 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 					item->setData(0, Qt::UserRole, i2);
 					if(new_ks->type.size() == 0 && ks && i2 == ks->type[0]) shortcutActionList->setCurrentItem(item);
 				}
+			} else if(i == SHORTCUT_TYPE_APPROXIMATE) {
+				QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_TOGGLE_FRACTION)));
+				item->setData(0, Qt::UserRole, SHORTCUT_TYPE_TOGGLE_FRACTION);
+				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_TOGGLE_FRACTION) shortcutActionList->setCurrentItem(item);
 			}
 		}
 		shortcutActionValueLabel = new QLabel(tr("Value:"), dialog);

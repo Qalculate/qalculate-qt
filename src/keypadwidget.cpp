@@ -1126,6 +1126,10 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_HISTORY_CLEAR)));
 			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
 			if(type == SHORTCUT_TYPE_HISTORY_CLEAR) actionList->setCurrentItem(item);
+		} else if(i == SHORTCUT_TYPE_APPROXIMATE) {
+			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_TOGGLE_FRACTION)));
+			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_TOGGLE_FRACTION);
+			if(type == SHORTCUT_TYPE_TOGGLE_FRACTION) actionList->setCurrentItem(item);
 		}
 	}
 	valueLabel = new QLabel(tr("Value:"), dialog);

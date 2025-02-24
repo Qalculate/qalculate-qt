@@ -1183,7 +1183,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 5;
 	preferences_version[1] = 5;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -2297,6 +2297,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_FUNCTIONS_MENU: {return tr("Open functions menu");}
 		case SHORTCUT_TYPE_UNITS_MENU: {return tr("Open units menu");}
 		case SHORTCUT_TYPE_VARIABLES_MENU: {return tr("Open variables menu");}
+		case SHORTCUT_TYPE_TOGGLE_FRACTION: {return tr("Toggle fraction format in current result");}
 	}
 	return "-";
 }

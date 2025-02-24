@@ -121,13 +121,15 @@ UnitEditDialog::UnitEditDialog(QWidget *parent) : QDialog(parent) {
 	priorityLabel = new QLabel(tr("Priority:"), this);
 	grid->addWidget(priorityLabel, 6, 0);
 	priorityEdit = new QSpinBox(this);
+	priorityEdit->setToolTip(tr("Example: priority of the unit \"hand\" is set to 2, while priority of ft (foot) and in (inch) is set to 1, which results in \"17 in = 1 ft + 5 in\", instead of \"17 in = 1 ft + 1 hand + 1 in\"."));
 	priorityEdit->setRange(1, 100);
 	priorityEdit->setValue(1);
 	grid->addWidget(priorityEdit, 6, 1);
 	mbunLabel = new QLabel(tr("Minimum base unit number:"), this);
 	grid->addWidget(mbunLabel, 7, 0);
 	mbunEdit = new QSpinBox(this);
-	mbunEdit->setRange(1, 100);
+	mbunEdit->setToolTip(tr("Example: minimum base unit number of yd (yard) is set to 12, which results in \"3 × 3 ft = 9 ft\" (instead of \"3 yd\") and \"4 × 3 ft = 4 yd\"."));
+	mbunEdit->setRange(1, 100000);
 	mbunEdit->setValue(1);
 	grid->addWidget(mbunEdit, 7, 1);
 	prefixBox = new QCheckBox(tr("Use with prefixes by default"), this);
