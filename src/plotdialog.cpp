@@ -129,6 +129,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	group = new QButtonGroup(this);
 	rateButton = new QRadioButton(tr("Sampling rate:"), this); group->addButton(rateButton, 0); grid->addWidget(rateButton, r, 0);
 	rateSpin = new QSpinBox(this); grid->addWidget(rateSpin, r, 1); r++;
+	rateSpin->setSingleStep(2);
 	rateSpin->setRange(1, INT_MAX); rateSpin->setValue(settings->default_plot_sampling_rate);
 	rateButton->setChecked(settings->default_plot_use_sampling_rate);
 	rateSpin->setEnabled(settings->default_plot_use_sampling_rate);

@@ -1281,8 +1281,8 @@ void QalculateQtSettings::loadPreferences() {
 	ename.case_sensitive = true;
 	ename.abbreviation = true;
 	v_memory->addName(ename);
-	ename.name = "MRC";
-	v_memory->addName(ename);
+	/*ename.name = "MRC";
+	v_memory->addName(ename);*/
 	CALCULATOR->addVariable(v_memory);
 
 #ifdef _WIN32

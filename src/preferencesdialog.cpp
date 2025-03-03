@@ -294,10 +294,17 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	decimalCommaBox = box;
 	BOX(tr("Ignore comma in numbers"), settings->evalops.parse_options.comma_as_separator, ignoreCommaToggled(bool)); ignoreCommaBox = box;
 	BOX(tr("Ignore dots in numbers"), settings->evalops.parse_options.dot_as_separator, ignoreDotToggled(bool)); ignoreDotBox = box;
-	BOX(tr("Indicate repeating decimals"), settings->printops.indicate_infinite_series, repeatingDecimalsToggled(bool));
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
 	BOX(tr("Copy unformatted ASCII by default"), settings->copy_ascii, copyAsciiToggled(bool));
+	l->addWidget(new QLabel(tr("Indicate repeating decimals:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(tr("Off"), REPEATING_DECIMALS_OFF);
+	combo->addItem(tr("Ellipsis"), REPEATING_DECIMALS_ELLIPSIS);
+	combo->addItem(tr("Overline"), REPEATING_DECIMALS_OVERLINE);
+	combo->setCurrentIndex(combo->findData(settings->printops.indicate_infinite_series));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(repeatingDecimalsChanged(int)));
+	l->addWidget(combo, r, 1); r++;
 	l->addWidget(new QLabel(tr("Digit grouping:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("None"), DIGIT_GROUPING_NONE);
@@ -683,9 +690,9 @@ void PreferencesDialog::roundingChanged(int i) {
 	settings->printops.rounding = (RoundingMode) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultFormatUpdated();
 }
-void PreferencesDialog::repeatingDecimalsToggled(bool b) {
-	settings->printops.indicate_infinite_series = b;
-	emit resultFormatUpdated();
+void PreferencesDialog::repeatingDecimalsChanged(int i) {
+	settings->printops.indicate_infinite_series = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	emit resultDisplayUpdated();
 }
 void PreferencesDialog::copyAsciiToggled(bool b) {
 	settings->copy_ascii = b;

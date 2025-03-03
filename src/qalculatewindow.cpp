@@ -3905,8 +3905,21 @@ void QalculateWindow::setOption(std::string str) {
 	else if(equalsIgnoreCase(svar, "variables") || svar == "var") SET_BOOL_PV(settings->evalops.parse_options.variables_enabled)
 	else if(equalsIgnoreCase(svar, "abbreviations") || svar == "abbr" || svar == "abbrev") SET_BOOL_D(settings->printops.abbreviate_names)
 	else if(equalsIgnoreCase(svar, "show ending zeroes") || svar == "zeroes") SET_BOOL_D(settings->printops.show_ending_zeroes)
-	else if(equalsIgnoreCase(svar, "repeating decimals") || svar == "repdeci") SET_BOOL_D(settings->printops.indicate_infinite_series)
-	else if(equalsIgnoreCase(svar, "angle unit") || svar == "angle") {
+	else if(equalsIgnoreCase(svar, "repeating decimals") || svar == "repdeci") {
+		int v = -1;
+		if(equalsIgnoreCase(svalue, "off")) v = REPEATING_DECIMALS_OFF;
+		else if(equalsIgnoreCase(svalue, "on") || equalsIgnoreCase(svalue, "ellipsis")) v = REPEATING_DECIMALS_ELLIPSIS;
+		else if(equalsIgnoreCase(svalue, "overline")) v = REPEATING_DECIMALS_OVERLINE;
+		else if(svalue.find_first_not_of(SPACES NUMBERS) == std::string::npos) {
+			v = s2i(svalue);
+		}
+		if(v < REPEATING_DECIMALS_OFF || v > REPEATING_DECIMALS_OVERLINE) {
+			CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);
+		} else if(v != settings->printops.indicate_infinite_series) {
+			settings->printops.indicate_infinite_series = v;
+			resultDisplayUpdated();
+		}
+	} else if(equalsIgnoreCase(svar, "angle unit") || svar == "angle") {
 		int v = -1;
 		if(equalsIgnoreCase(svalue, "rad") || equalsIgnoreCase(svalue, "radians")) v = ANGLE_UNIT_RADIANS;
 		else if(equalsIgnoreCase(svalue, "deg") || equalsIgnoreCase(svalue, "degrees")) v = ANGLE_UNIT_DEGREES;

@@ -73,7 +73,7 @@ class PreferencesDialog : public QDialog {
 		void intervalCalculationChanged(int);
 		void complexFormChanged(int);
 		void roundingChanged(int);
-		void repeatingDecimalsToggled(bool);
+		void repeatingDecimalsChanged(int);
 		void mixedUnitsToggled(bool);
 		void abbreviateNamesToggled(bool);
 		void conversionChanged(int);
