@@ -5985,7 +5985,7 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1872"/>
         <source>Calculate Selection</source>
-        <translation type="unfinished">Calcular seleção</translation>
+        <translation>Calcular seleção</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1874"/>
@@ -6080,7 +6080,7 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1914"/>
         <source>Automatically calculate selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcular automaticamente a seleção</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1916"/>
@@ -6111,7 +6111,7 @@ Deseja substituir a função?</translation>
         <location filename="../src/expressionedit.cpp" line="2355"/>
         <location filename="../src/expressionedit.cpp" line="2357"/>
         <source>comment</source>
-        <translation type="unfinished">comentário</translation>
+        <translation>comentário</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2378"/>
@@ -6895,7 +6895,7 @@ e pressione a tecla Enter.</translation>
         <location filename="../src/historyview.cpp" line="1234"/>
         <location filename="../src/historyview.cpp" line="1247"/>
         <source>Search by Date…</source>
-        <translation type="unfinished"></translation>
+        <translation>Pesquisar por data…</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="343"/>
@@ -6921,7 +6921,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/historyview.cpp" line="1056"/>
         <source>Comment</source>
-        <translation type="unfinished">Comentário</translation>
+        <translation>Comentário</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="1197"/>
@@ -6933,7 +6933,7 @@ e pressione a tecla Enter.</translation>
         <location filename="../src/historyview.cpp" line="1237"/>
         <location filename="../src/historyview.cpp" line="1249"/>
         <source>Add Comment…</source>
-        <translation type="unfinished">Adicionar comentário…</translation>
+        <translation>Adicionar comentário…</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="1200"/>
@@ -6953,7 +6953,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/historyview.cpp" line="1236"/>
         <source>Edit Comment…</source>
-        <translation type="unfinished">Editar comentário…</translation>
+        <translation>Editar comentário…</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="1300"/>
@@ -8422,7 +8422,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="168"/>
         <source>Disable cursor blinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Desativar o cursor intermitente</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="170"/>
@@ -8462,7 +8462,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="217"/>
         <source>Automatically calculate selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Calcular automaticamente a seleção</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="218"/>
@@ -8559,7 +8559,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="309"/>
         <source>Automatically group digits in input (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Agrupar automaticamente os dígitos na entrada (experimental)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="310"/>
@@ -8889,7 +8889,7 @@ Mesmo assim, você deseja alterar o comportamento padrão e permitir várias ins
     <message>
         <location filename="../src/main.cpp" line="147"/>
         <source>Allow multiple instances?</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir várias instâncias?</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="166"/>
@@ -9022,12 +9022,12 @@ Pretende atualizar as taxas de câmbio agora?</numerusform>
     </message>
     <message>
         <source>Fetching exchange rates.</source>
-        <translation type="obsolete">Buscando taxas de câmbio.</translation>
+        <translation type="obsolete">A obter taxas de câmbio.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1271"/>
         <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
-        <translation type="unfinished"></translation>
+        <translation>Contém o resultado do cálculo mais recente. Os vários resultados de uma equação são representados como um vetor. Aceder a soluções separadas utilizando ans(n) (por exemplo, ans(1) para a primeira solução).</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1983"/>
@@ -9587,7 +9587,7 @@ Você pode obter a versão %3 em %2.</translation>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2300"/>
         <source>Toggle fraction format in current result</source>
-        <translation type="unfinished"></translation>
+        <translation>Alternar o formato da fração no resultado atual</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2306"/>
@@ -10537,9 +10537,9 @@ Você pode obter a versão %3 em %2.</translation>
     <message numerus="yes">
         <location filename="../src/qalculatewindow.cpp" line="484"/>
         <source>Open Settings Folder(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Abrir a pasta de definições</numerusform>
+            <numerusform>Abrir as pastas de definições</numerusform>
         </translation>
     </message>
     <message>
@@ -11239,7 +11239,7 @@ Deseja substituir a ação atual (%1)?</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="124"/>
         <source>Example: priority of the unit &quot;hand&quot; is set to 2, while priority of ft (foot) and in (inch) is set to 1, which results in &quot;17 in = 1 ft + 5 in&quot;, instead of &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exemplo: a prioridade da unidade “hand” está definida para 2, enquanto a prioridade de ft (pé) e in (polegada) está definida para 1, o que resulta em “17 in = 1 ft + 5 in”, em vez de “17 in = 1 ft + 1 hand + 1 in”.</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="128"/>
@@ -11249,7 +11249,7 @@ Deseja substituir a ação atual (%1)?</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="131"/>
         <source>Example: minimum base unit number of yd (yard) is set to 12, which results in &quot;3 × 3 ft = 9 ft&quot; (instead of &quot;3 yd&quot;) and &quot;4 × 3 ft = 4 yd&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exemplo: o número mínimo da unidade de base yd (jarda) é fixado em 12, o que resulta em “3 × 3 ft = 9 ft” (em vez de “3 yd”) e “4 × 3 ft = 4 yd”.</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="135"/>
