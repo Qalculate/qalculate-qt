@@ -94,7 +94,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem("Русский");
 	combo->addItem("Slovenščina");
 	combo->addItem("Svenska");
-	combo->addItem("汉语");
+	combo->addItem("简体中文");
+	combo->addItem("繁體中文");
 	QString lang = settings->custom_lang.left(2);
 	if(lang == "ca") combo->setCurrentIndex(1);
 	else if(lang == "de") combo->setCurrentIndex(2);
@@ -108,7 +109,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	else if(lang == "ru") combo->setCurrentIndex(10);
 	else if(lang == "sl") combo->setCurrentIndex(11);
 	else if(lang == "sv") combo->setCurrentIndex(12);
-	else if(lang == "zh") combo->setCurrentIndex(13);
+	else if(settings->custom_lang == "zh_CN") combo->setCurrentIndex(13);
+	else if(settings->custom_lang == "zh_TW") combo->setCurrentIndex(14);
 	else combo->setCurrentIndex(0);
 	combo->setEnabled(!settings->ignore_locale);
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
@@ -456,6 +458,7 @@ void PreferencesDialog::langChanged(int i) {
 		case 11: {settings->custom_lang = "sl_SL"; break;}
 		case 12: {settings->custom_lang = "sv_SE"; break;}
 		case 13: {settings->custom_lang = "zh_CN"; break;}
+		case 14: {settings->custom_lang = "zh_TW"; break;}
 	}
 	if(!settings->custom_lang.isEmpty()) {
 		ignoreLocaleBox->setChecked(false);
