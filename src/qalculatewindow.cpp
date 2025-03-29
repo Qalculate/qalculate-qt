@@ -6360,7 +6360,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 		updateWindowTitle(QString(), true);
 	} else {
-		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) {
+		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty()))) {
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
 				autoCalculateTimer->stop();
 				autoCalculateTimer->start(settings->auto_calculate_delay);
