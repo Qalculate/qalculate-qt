@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>For example if argument is a matrix that must have equal number of rows and columns: rows(\x) = columns(\x)</source>
-        <translation>Например, если аргумент - это матрица, которая должна иметь равное количество строк и столбцов: строки(\\x) = столбцы(\\x)</translation>
+        <translation>Например, если аргумент — это матрица, которая должна содержать равное количество строк и столбцов: строки(\\x) = столбцы(\\x)</translation>
     </message>
     <message>
         <source>Allow matrix</source>
@@ -662,7 +662,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Complex cis Form</source>
-        <translation>Сисоидная форма комплексных чисел</translation>
+        <translation>Цисоидальная форма комплексных чисел</translation>
     </message>
     <message>
         <source>Decimal Number</source>
@@ -1022,7 +1022,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>rectangular</source>
-        <translation>прямоугоная</translation>
+        <translation>прямоугольная</translation>
     </message>
     <message>
         <source>cartesian</source>
@@ -1050,7 +1050,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>complex cis form</source>
-        <translation>сисоидная форма комплексных чисел</translation>
+        <translation>цисоидальная форма комплексных чисел</translation>
     </message>
     <message>
         <source>angle</source>
@@ -1114,15 +1114,15 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>comment</source>
-        <translation type="unfinished">комментарий</translation>
+        <translation>комментарий</translation>
     </message>
     <message>
         <source>Calculate Selection</source>
-        <translation type="unfinished">Вычислить выделение</translation>
+        <translation>Вычислить выделение</translation>
     </message>
     <message>
         <source>Automatically calculate selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматически вычислять выделение</translation>
     </message>
 </context>
 <context>
@@ -1493,19 +1493,19 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Search by Date…</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск по дате…</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation type="unfinished">Комментарий</translation>
+        <translation>Комментарий</translation>
     </message>
     <message>
         <source>Add Comment…</source>
-        <translation type="unfinished">Добавить комментарий…</translation>
+        <translation>Добавить комментарий…</translation>
     </message>
     <message>
         <source>Edit Comment…</source>
-        <translation type="unfinished">Изменить комментарий…</translation>
+        <translation>Изменить комментарий…</translation>
     </message>
 </context>
 <context>
@@ -2563,7 +2563,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use Unicode division slash in output</source>
-        <translation>Использовать косую черту деления Юнокода в выводе</translation>
+        <translation>Использовать косую черту деления Юникода в выводе</translation>
     </message>
     <message>
         <source>Use E-notation instead of 10^n</source>
@@ -2611,15 +2611,15 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Parsed</source>
-        <translation>Проанализированое</translation>
+        <translation>Разобранное</translation>
     </message>
     <message>
         <source>Entered</source>
-        <translation>Введное</translation>
+        <translation>Введённое</translation>
     </message>
     <message>
         <source>Entered + parsed</source>
-        <translation>Введное + проанализированое</translation>
+        <translation>Введённое + разобранное</translation>
     </message>
     <message>
         <source>Simplified percentage calculation</source>
@@ -2951,15 +2951,15 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Automatically group digits in input (experimental)</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматически группировать цифры во входных данных (экспериментально)</translation>
     </message>
     <message>
         <source>Disable cursor blinking</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить мигание курсора</translation>
     </message>
     <message>
         <source>Automatically calculate selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматически вычислять выделение</translation>
     </message>
 </context>
 <context>
@@ -3094,7 +3094,7 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     </message>
     <message>
         <source>Allow multiple instances?</source>
-        <translation type="unfinished"></translation>
+        <translation>Разрешить несколько экземпляров?</translation>
     </message>
 </context>
 <context>
@@ -3179,7 +3179,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Approximate result</source>
-        <translation>Приблезительный результат</translation>
+        <translation>Приблизительный результат</translation>
     </message>
     <message>
         <source>Negate</source>
@@ -3591,11 +3591,11 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
-        <translation type="unfinished"></translation>
+        <translation>Содержит результат последнего вычисления. Несколько результатов уравнения представляются в виде вектора. Доступ к отдельным решениям осуществляется с помощью ans(n) (напр., ans(1) для первого решения).</translation>
     </message>
     <message>
         <source>Toggle fraction format in current result</source>
-        <translation type="unfinished"></translation>
+        <translation>Переключить формат дробей в текущем результате</translation>
     </message>
 </context>
 <context>
@@ -4105,7 +4105,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>rectangular</source>
-        <translation>прямоугоная</translation>
+        <translation>прямоугольная</translation>
     </message>
     <message>
         <source>cartesian</source>
@@ -4610,18 +4610,18 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>Number Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Цифровой блок</translation>
     </message>
     <message>
         <source>Always Show Number Pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Всегда показывать цифровой блок</translation>
     </message>
     <message numerus="yes">
         <source>Open Settings Folder(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Открыть папку настроек</numerusform>
+            <numerusform>Открыть папки настроек</numerusform>
+            <numerusform>Открыть папки настроек</numerusform>
         </translation>
     </message>
 </context>
@@ -4759,11 +4759,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Example: priority of the unit &quot;hand&quot; is set to 2, while priority of ft (foot) and in (inch) is set to 1, which results in &quot;17 in = 1 ft + 5 in&quot;, instead of &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пример: приоритет единицы измерения «хэнд» установлен на 2, а приоритет единиц измерения ft (фут) и in (дюйм) на 1, в результате чего вместо «17 in = 1 ft + 5 in» получается «17 in = 1 ft + 1 hand + 1 in».</translation>
     </message>
     <message>
         <source>Example: minimum base unit number of yd (yard) is set to 12, which results in &quot;3 × 3 ft = 9 ft&quot; (instead of &quot;3 yd&quot;) and &quot;4 × 3 ft = 4 yd&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пример: минимальное число базовых единиц измерения yd (ярд) установлено на 12, в результате чего получается «3 × 3 ft = 9 ft» (вместо Э3 yd») и «4 × 3 ft = 4 yd».</translation>
     </message>
 </context>
 <context>
