@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 			QLocale::setDefault(QLocale(QLocale(settings->custom_lang).language(), QLocale(settings->custom_lang).country()));
 #endif
 #ifdef _WIN32
-			_putenv_s("LANG", settings->custom_lang.toLocal8Bit().data());
+			_putenv_s("LANGUAGE", settings->custom_lang.toLocal8Bit().data());
 		} else {
 			ULONG nlang = 0;
 			DWORD n = 0;
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
 							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).country()));
 #endif
 						}
-						_putenv_s("LANG", lang.c_str());
+						_putenv_s("LANGUAGE", lang.c_str());
 					}
 				}
 			}
@@ -101,7 +101,8 @@ int main(int argc, char **argv) {
 #else
 			QString lang = settings->custom_lang;
 			if(lang.indexOf(".") < 0) lang += ".utf8";
-			setenv("LANG", lang.toLocal8Bit().data(), 1);
+			setenv("LANGUAGE", lang.toLocal8Bit().data(), 1);
+			setenv("LC_MESSAGES", lang.toLocal8Bit().data(), 1);
 		}
 #endif
 #ifndef TRANSLATIONS_DIR

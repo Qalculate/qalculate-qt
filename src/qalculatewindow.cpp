@@ -809,9 +809,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
+	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
+	binfont.setFeature("tnum", 1);
+	binEdit->setFont(binfont);
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
-	updateBinEditSize(settings->use_custom_app_font ? &appfont : NULL);
+	updateBinEditSize();
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
@@ -7499,12 +7502,15 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
 		QFont font(QApplication::font());
-		updateBinEditSize(&font);
 		if(!settings->use_custom_expression_font) {
 			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
 			else font.setPointSize(font.pointSize() * 1.35);
 			expressionEdit->setFont(font);
 		}
+		QFont binfont(QApplication::font());
+		binfont.setFeature("tnum", 1);
+		binEdit->setFont(binfont);
+		updateBinEditSize();
 	}
 	QMainWindow::changeEvent(e);
 }

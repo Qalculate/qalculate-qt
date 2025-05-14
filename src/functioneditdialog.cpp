@@ -927,6 +927,10 @@ void FunctionEditDialog::editNames() {
 }
 
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
+	if(CALCULATOR->hasToExpression(expressionEdit->toPlainText().trimmed().toStdString())) {
+		QMessageBox::warning(this, tr("Warning"), tr("Conversion (using \"to\") is not supported in functions."), QMessageBox::Ok);
+		return NULL;
+	}
 	if(replaced_item) *replaced_item = NULL;
 	MathFunction *func = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString())) {
@@ -976,6 +980,10 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	return f;
 }
 bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced_item) {
+	if(CALCULATOR->hasToExpression(expressionEdit->toPlainText().trimmed().toStdString())) {
+		QMessageBox::warning(this, tr("Warning"), tr("Conversion (using \"to\") is not supported in functions."), QMessageBox::Ok);
+		return false;
+	}
 	if(replaced_item) *replaced_item = NULL;
 	if(CALCULATOR->functionNameTaken(nameEdit->text().trimmed().toStdString(), f)) {
 		MathFunction *func = CALCULATOR->getActiveFunction(nameEdit->text().trimmed().toStdString(), true);
