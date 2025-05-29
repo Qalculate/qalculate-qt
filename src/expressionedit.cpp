@@ -2937,7 +2937,7 @@ void ExpressionEdit::onTextChanged() {
 		if(b && settings->completion_delay > 0) {
 			std::string prev_object_text = current_object_text;
 			setCurrentObject();
-			if(current_object_text.find(prev_object_text) != 0 || (prev_object_text.empty() && !CALCULATOR->hasToExpression(str.toStdString(), true, settings->evalops))) {
+			if(!settings->wayland_platform && (current_object_text.find(prev_object_text) != 0 || (prev_object_text.empty() && !CALCULATOR->hasToExpression(str.toStdString(), true, settings->evalops)))) {
 				b = false;
 			}
 		}
