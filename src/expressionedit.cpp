@@ -2562,7 +2562,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure *mparse2 = NULL;
 			while(true) {
 				if(last_is_space) str_u += " ";
-				CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, true, false);
+				if(!str_e.empty()) CALCULATOR->separateToExpression(str_u, str_u2, settings->evalops, true, false);
 				remove_blank_ends(str_u);
 				if(parsed_expression.empty()) {
 					parsed_expression += CALCULATOR->localToString(false);
@@ -2937,7 +2937,7 @@ void ExpressionEdit::onTextChanged() {
 		if(b && settings->completion_delay > 0) {
 			std::string prev_object_text = current_object_text;
 			setCurrentObject();
-			if(!settings->wayland_platform && (current_object_text.find(prev_object_text) != 0 || (prev_object_text.empty() && !CALCULATOR->hasToExpression(str.toStdString(), true, settings->evalops)))) {
+			if((!settings->wayland_platform || strcmp(qVersion(), "6.9.0") != 0) && (current_object_text.find(prev_object_text) != 0 || (prev_object_text.empty() && !CALCULATOR->hasToExpression(str.toStdString(), true, settings->evalops)))) {
 				b = false;
 			}
 		}
@@ -3009,7 +3009,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
-		if(cdata->editing_to_expression && cdata->current_from_struct && (!cdata->current_from_units.empty() || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
+		if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct && (!cdata->current_from_units.empty() || cdata->current_from_struct->containsType(STRUCT_UNIT, true))) {
 			cdata->to_type = 4;
 		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 			cdata->to_type = 2;
