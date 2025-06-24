@@ -810,7 +810,9 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	binEdit = new QLabel();
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
+#endif
 	binEdit->setFont(binfont);
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
@@ -6289,22 +6291,24 @@ void set_result_bases(const MathStructure &m) {
 }
 
 bool contains_plot_or_save(const std::string &str) {
-	if(expression_contains_save_function(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops.parse_options, false)) return true;
-	MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_PLOT);
-	for(size_t i = 1; f && i <= f->countNames(); i++) {
-		if(str.find(f->getName(i).name) != std::string::npos) return true;
-	}
-	f = CALCULATOR->getFunctionById(FUNCTION_ID_EXPORT);
-	for(size_t i = 1; f && i <= f->countNames(); i++) {
-		if(str.find(f->getName(i).name) != std::string::npos) return true;
-	}
-	f = CALCULATOR->getFunctionById(FUNCTION_ID_LOAD);
-	for(size_t i = 1; f && i <= f->countNames(); i++) {
-		if(str.find(f->getName(i).name) != std::string::npos) return true;
-	}
-	f = CALCULATOR->getFunctionById(FUNCTION_ID_COMMAND);
-	for(size_t i = 1; f && i <= f->countNames(); i++) {
-		if(str.find(f->getName(i).name) != std::string::npos) return true;
+	if(expression_contains_save_function(str, settings->evalops.parse_options, false)) return true;
+	for(size_t f_i = 0; f_i < 4; f_i++) {
+		int id = 0;
+		if(f_i == 0) id = FUNCTION_ID_PLOT;
+		else if(f_i == 1) id = FUNCTION_ID_EXPORT;
+		else if(f_i == 2) id = FUNCTION_ID_LOAD;
+		else if(f_i == 3) id = FUNCTION_ID_COMMAND;
+		MathFunction *f = CALCULATOR->getFunctionById(id);
+		for(size_t i = 1; f && i <= f->countNames(); i++) {
+			if(str.find(f->getName(i).name) != std::string::npos) {
+				MathStructure mtest;
+				CALCULATOR->beginTemporaryStopMessages();
+				CALCULATOR->parse(&mtest, str, settings->evalops.parse_options);
+				CALCULATOR->endTemporaryStopMessages();
+				if(mtest.containsFunctionId(FUNCTION_ID_PLOT) || mtest.containsFunctionId(FUNCTION_ID_EXPORT) || mtest.containsFunctionId(FUNCTION_ID_LOAD) || mtest.containsFunctionId(FUNCTION_ID_COMMAND)) return true;
+				return false;
+			}
+		}
 	}
 	return false;
 }
@@ -6330,7 +6334,12 @@ void QalculateWindow::onExpressionChanged() {
 	CALCULATOR->beginTemporaryStopMessages();
 	bases_is_result = false;
 	std::string str = expressionEdit->toPlainText().toStdString();
-	if(contains_plot_or_save(str) || !CALCULATOR->calculate(&m, CALCULATOR->unlocalizeExpression(str, eo.parse_options), 100, eo)) {
+	str = CALCULATOR->unlocalizeExpression(str, eo.parse_options);
+	CALCULATOR->parseComments(str, eo.parse_options);
+	std::string stmp;
+	CALCULATOR->separateToExpression(str, stmp, eo);
+	CALCULATOR->separateWhereExpression(str, stmp, eo);
+	if(contains_plot_or_save(str) || !CALCULATOR->calculate(&m, str, 100, eo)) {
 		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
 	} else {
 		set_result_bases(m);
@@ -6363,7 +6372,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_error = false;
 		mauto.setAborted();
 		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
-	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(current_text) || current_text[0] == '#') {
+	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options)) || current_text[0] == '#') {
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
 		auto_error = had_error || had_warning;
@@ -7520,7 +7529,9 @@ void QalculateWindow::changeEvent(QEvent *e) {
 			expressionEdit->setFont(font);
 		}
 		QFont binfont(QApplication::font());
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 		binfont.setFeature("tnum", 1);
+#endif
 		binEdit->setFont(binfont);
 		updateBinEditSize();
 	}

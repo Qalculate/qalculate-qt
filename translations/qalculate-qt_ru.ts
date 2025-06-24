@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ru">
+<TS version="2.1" language="ru_RU">
 <context>
     <name>ArgumentEditDialog</name>
     <message>
@@ -1304,6 +1304,14 @@ Do you want to overwrite the function?</source>
         <source>Question</source>
         <translation>Вопрос</translation>
     </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Предупреждение</translation>
+    </message>
+    <message>
+        <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FunctionsDialog</name>
@@ -2599,7 +2607,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Indicate repeating decimals</source>
-        <translation>Указывать повторяющиеся десятичные дроби</translation>
+        <translation type="vanished">Указывать повторяющиеся десятичные дроби</translation>
     </message>
     <message>
         <source>Use caret for bitwise XOR</source>
@@ -2960,6 +2968,18 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Automatically calculate selection</source>
         <translation>Автоматически вычислять выделение</translation>
+    </message>
+    <message>
+        <source>Indicate repeating decimals:</source>
+        <translation type="unfinished">Указывать повторяющиеся десятичные дроби:</translation>
+    </message>
+    <message>
+        <source>Ellipsis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overline</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

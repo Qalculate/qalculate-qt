@@ -2122,7 +2122,7 @@ void ExpressionEdit::showCurrentStatus() {
 		QString str = current_status_type == 4 ? "" : current_status_text;
 		std::string str_nohtml = current_status_type == 4 ? current_status_text.toStdString() : unhtmlize(current_status_text.toStdString());
 		std::string current_text = current_status_type == 4 ? str_nohtml : toPlainText().toStdString();
-		if(((current_status_type == 1 && settings->auto_calculate) || current_status_type == 4) && str_nohtml.length() <= 2000 && !contains_plot_or_save(current_text)) {
+		if(((current_status_type == 1 && settings->auto_calculate) || current_status_type == 4) && str_nohtml.length() <= 2000 && !contains_plot_or_save(CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options))) {
 			bool b_comp = false, is_approximate = false;
 			PrintOptions po = settings->printops;
 			po.is_approximate = &is_approximate;
