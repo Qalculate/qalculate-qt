@@ -8449,8 +8449,10 @@ void QalculateWindow::onTitleTypeChanged() {
 	updateWindowTitle(QString(), false, true);
 }
 void QalculateWindow::onPreferencesClosed() {
-	preferencesDialog->deleteLater();
-	preferencesDialog = NULL;
+	if(preferencesDialog) {
+		preferencesDialog->deleteLater();
+		preferencesDialog = NULL;
+	}
 }
 void QalculateWindow::onResultFontChanged() {
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
