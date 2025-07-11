@@ -1243,7 +1243,7 @@ void KeypadWidget::removeCustomRow() {
 	for(int c = 0; c < settings->custom_button_columns; c++) {
 		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
 			if(settings->custom_buttons[i - 1].r == r + 1 && settings->custom_buttons[i - 1].c == c + 1) {
-				settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+				settings->custom_buttons.erase(settings->custom_buttons.begin() + (i - 1));
 				break;
 			}
 		}
@@ -1262,7 +1262,7 @@ void KeypadWidget::removeCustomColumn() {
 	for(int r = 0; r < settings->custom_button_rows; r++) {
 		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
 			if(settings->custom_buttons[i - 1].r == r + 1 && settings->custom_buttons[i - 1].c == c + 1) {
-				settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+				settings->custom_buttons.erase(settings->custom_buttons.begin() + (i - 1));
 				break;
 			}
 		}
