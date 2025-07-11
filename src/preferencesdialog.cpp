@@ -752,7 +752,18 @@ void PreferencesDialog::updateVariableUnits() {
 }
 void PreferencesDialog::groupingChanged(int i) {
 	settings->printops.digit_grouping = (DigitGrouping) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	emit resultFormatUpdated();
+	if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.comma_as_separator || CALCULATOR->getDecimalPoint() == COMMA) && CALCULATOR->local_digit_group_separator == COMMA) {
+		if(CALCULATOR->getDecimalPoint() == COMMA) {
+			decimalCommaBox->toggle();
+			ignoreCommaBox->setChecked(true);
+			settings->evalops.parse_options.comma_as_separator = true;
+		} else {
+			ignoreCommaBox->toggle();
+		}
+
+	} else {
+		emit resultFormatUpdated();
+	}
 }
 void PreferencesDialog::intervalDisplayChanged(int i) {
 	if(i == 0) {
