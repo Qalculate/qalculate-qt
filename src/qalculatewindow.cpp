@@ -5904,9 +5904,20 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(exact_text == "0" || result_text == "0") expressionEdit->clear();
 					else if(exact_text.empty()) {
 						std::string str = unhtmlize(result_text);
-						if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+						if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
+							gsub(COMMA, "", str);
+						}
+						if(unicode_length(str) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
 					} else {
-						if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) expressionEdit->setExpression(QString::fromStdString(exact_text));
+						if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) {
+							if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
+								std::string str = exact_text;
+								gsub(COMMA, "", str);
+								expressionEdit->setExpression(QString::fromStdString(str));
+							} else {
+								expressionEdit->setExpression(QString::fromStdString(exact_text));
+							}
+						}
 					}
 				} else {
 					if(!execute_str.empty()) {
