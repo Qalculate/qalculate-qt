@@ -8946,6 +8946,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), historyView, SLOT(reloadHistory()));
 	connect(preferencesDialog, SIGNAL(binaryBitsChanged()), this, SLOT(onBinaryBitsChanged()));
 	connect(preferencesDialog, SIGNAL(statusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
+	connect(preferencesDialog, SIGNAL(buttonLocationChanged()), keypad, SLOT(updateButtonLocation()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

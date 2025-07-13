@@ -89,7 +89,7 @@ class KeypadWidget : public QWidget {
 
 	protected:
 
-		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton, *xButton;
+		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton, *xButton, *parButton, *percentButton;
 		QPushButton *customOKButton;
 		QToolButton *customEditButton;
 		QWidget *keypadG, *keypadP, *keypadX, *keypadC, *keypadN;
@@ -174,6 +174,7 @@ class KeypadWidget : public QWidget {
 		void setKeypadType(int);
 		void hideNumpad(bool);
 		void showSeparateKeypadMenuButtons(bool);
+		void updateButtonLocation();
 
 	signals:
 

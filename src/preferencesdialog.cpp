@@ -299,6 +299,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	if(CALCULATOR->getDecimalPoint() == COMMA) ignoreCommaBox->hide();
 	if(CALCULATOR->getDecimalPoint() == DOT) ignoreDotBox->hide();
 	BOX(tr("Copy unformatted ASCII by default"), settings->copy_ascii, copyAsciiToggled(bool));
+	BOX(tr("Place percent button in number pad"), settings->show_percent_in_numpad, showPercentInNumpadToggled(bool));
 	l->addWidget(new QLabel(tr("Indicate repeating decimals:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Off"), REPEATING_DECIMALS_OFF);
@@ -700,6 +701,10 @@ void PreferencesDialog::repeatingDecimalsChanged(int i) {
 void PreferencesDialog::copyAsciiToggled(bool b) {
 	settings->copy_ascii = b;
 }
+void PreferencesDialog::showPercentInNumpadToggled(bool b) {
+	settings->show_percent_in_numpad = b;
+	emit buttonLocationChanged();
+}
 void PreferencesDialog::copyAsciiWithoutUnitsToggled(bool b) {
 	settings->copy_ascii_without_units = b;
 }
@@ -754,9 +759,11 @@ void PreferencesDialog::groupingChanged(int i) {
 	settings->printops.digit_grouping = (DigitGrouping) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.comma_as_separator || CALCULATOR->getDecimalPoint() == COMMA) && CALCULATOR->local_digit_group_separator == COMMA) {
 		if(CALCULATOR->getDecimalPoint() == COMMA) {
-			decimalCommaBox->toggle();
-			ignoreCommaBox->setChecked(true);
 			settings->evalops.parse_options.comma_as_separator = true;
+			ignoreCommaBox->blockSignals(true);
+			ignoreCommaBox->setChecked(true);
+			ignoreCommaBox->blockSignals(false);
+			decimalCommaBox->toggle();
 		} else {
 			ignoreCommaBox->toggle();
 		}

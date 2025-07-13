@@ -111,6 +111,7 @@ class PreferencesDialog : public QDialog {
 		void automaticDigitGroupingToggled(bool);
 		void closeWithEscToggled(bool);
 		void disableCursorBlinkingToggled(bool);
+		void showPercentInNumpadToggled(bool);
 
 	public:
 
@@ -144,6 +145,7 @@ class PreferencesDialog : public QDialog {
 		void historyExpressionTypeChanged();
 		void binaryBitsChanged();
 		void statusModeChanged();
+		void buttonLocationChanged();
 		void dialogClosed();
 
 };

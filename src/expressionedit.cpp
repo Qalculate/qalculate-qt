@@ -2851,18 +2851,21 @@ void ExpressionEdit::onTextChanged() {
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(block_text_change) return;
 	previous_pos = textCursor().position();
-	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos >= 3 && previous_text != str && !str.isEmpty() && str[previous_pos - 1].isDigit()) {
+	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos >= 3 && previous_text != str && !str.isEmpty() && (str[previous_pos - 1].isDigit() || str[previous_pos - 1] == '.' || str[previous_pos - 1] == CALCULATOR->getDecimalPoint()[0])) {
 		char sep = ' ';
+		char dec = '.', alt_dec = '.';
+		dec = CALCULATOR->getDecimalPoint()[0];
+		if(dec != '.' && settings->evalops.parse_options.dot_as_separator) alt_dec = dec;
 		if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE) {
 			if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
 			else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
 		}
-		int n = 0, ns = 0, ns_p = 0;
+		int n = 0, nd = 0, ns = 0, ns_p = 0;
 		int last_pos = 0;
 		if(previous_pos < str.length()) {
 			last_pos = previous_pos - 1;
 			for(; last_pos < str.length(); last_pos++) {
-				if(!str[last_pos].isDigit() && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || !str[last_pos + 1].isDigit())) {
+				if(!str[last_pos].isDigit() && str[last_pos] != dec && str[last_pos] != alt_dec && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || (!str[last_pos + 1].isDigit() && str[last_pos + 1] != dec && str[last_pos + 1] != alt_dec))) {
 					break;
 				}
 			}
@@ -2871,10 +2874,15 @@ void ExpressionEdit::onTextChanged() {
 			last_pos = str.length() - 1;
 		}
 		int first_pos = 0;
+		int dec_pos = -1;
 		for(int i = last_pos; i >= 0; i--) {
-			if(str[i].isDigit()) {
+			if(str[i] == dec || str[i] == alt_dec) {
+				dec_pos = i;
+				nd = n;
+				n = 0;
+			} else if(str[i].isDigit()) {
 				n++;
-			} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && str[i - 1].isDigit()) {
+			} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && (str[i - 1].isDigit() || str[i - 1] == dec || str[i - 1] == alt_dec)) {
 				if(i < previous_pos) ns_p++;
 				ns++;
 			} else {
@@ -2882,22 +2890,31 @@ void ExpressionEdit::onTextChanged() {
 				break;
 			}
 		}
-		if((n > 4 && ns < (n + 1) / 3) || (ns > 0 && str.length() < previous_text.length())) {
+		if(n > 4 || (nd > 4 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0))) {
 			for(int i = last_pos - 1; ns > 0 && i >= 0;) {
 				if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
 					str.remove(i, 1);
 					ns--;
 					last_pos--;
+					if(i < dec_pos) dec_pos--;
 				} else {
 					i--;
 				}
 			}
 			previous_pos -= ns_p;
 			ns_p = 0;
-			for(int i = last_pos - 2; n > 4 && i > first_pos; i -= 3) {
+			for(int i = (dec_pos >= 0 ? dec_pos - 3 : last_pos - 2); n > 4 && i > first_pos; i -= 3) {
 				if(sep == ' ') str.insert(i, THIN_SPACE);
 				else str.insert(i, sep);
 				if(i < previous_pos) ns_p++;
+				last_pos++;
+				dec_pos++;
+			}
+			for(int i = dec_pos + 4; nd > 4 && i <= last_pos && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE; i += 4) {
+				if(sep == ' ') str.insert(i, THIN_SPACE);
+				else str.insert(i, sep);
+				if(i < previous_pos + ns_p) ns_p++;
+				last_pos++;
 			}
 			previous_pos += ns_p;
 			block_text_change++;

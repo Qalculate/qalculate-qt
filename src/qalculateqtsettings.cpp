@@ -127,7 +127,7 @@ void remove_spaces(std::string &str) {
 }
 long int get_fixed_denominator_qt2(const std::string &str, int &to_fraction, char sgn, const QString &localized_fraction, bool qalc_command) {
 	long int fden = 0;
-	if(!qalc_command && (equalsIgnoreCase(str, "fraction") || equalsIgnoreCase(str, localized_fraction.toStdString()))) {
+	if(!qalc_command && (equalsIgnoreCase(str, "fraction") || equalsIgnoreCase(str, localized_fraction.toStdString()) || str == "1/n" || str == "/n")) {
 		fden = -1;
 	} else {
 		if(str.length() > 2 && str[0] == '1' && str[1] == '/' && str.find_first_not_of(NUMBERS SPACES, 2) == std::string::npos) {
@@ -472,6 +472,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		if(v == Qt::ToolButtonIconOnly || v == Qt::ToolButtonTextOnly || v == Qt::ToolButtonTextBesideIcon || v == Qt::ToolButtonTextUnderIcon) toolbar_style = v;
 	} else if(svar == "separate_keypad_menu_buttons") {
 		separate_keypad_menu_buttons = v;
+	} else if(svar == "show_percent_in_numpad") {
+		show_percent_in_numpad = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
 	} else if(svar == "show_keypad") {
@@ -1088,6 +1090,7 @@ void QalculateQtSettings::loadPreferences() {
 	keypad_type = 0;
 	toolbar_style = Qt::ToolButtonIconOnly;
 	separate_keypad_menu_buttons = false;
+	show_percent_in_numpad = false;
 	show_keypad = -1;
 	hide_numpad = false;
 	show_bases = -1;
@@ -1545,6 +1548,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(!style.isEmpty()) fprintf(file, "style_name=%s\n", style.toUtf8().data());
 		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
 		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
+		fprintf(file, "show_percent_in_numpad=%i\n", show_percent_in_numpad);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(disable_cursor_blinking) fprintf(file, "disable_cursor_blinking=%i\n", disable_cursor_blinking);

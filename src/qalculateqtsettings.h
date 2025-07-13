@@ -259,7 +259,7 @@ class QalculateQtSettings : QObject {
 		bool autocopy_result;
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
-		bool separate_keypad_menu_buttons;
+		bool separate_keypad_menu_buttons, show_percent_in_numpad;
 		int toolbar_style;
 		int show_keypad;
 		int show_bases;

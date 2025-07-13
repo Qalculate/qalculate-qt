@@ -328,10 +328,21 @@ void KeypadWidget::createKeypad(int i) {
 		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateFactorizeMenu()));
 
 		c++;
-		SYMBOL_BUTTON2("%", "‰", c, 1);
-		button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
-		CREATE_MENU
-		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePercentageMenu()));
+		if(!settings->show_percent_in_numpad) {
+			SYMBOL_BUTTON2("%", "‰", c, 1);
+			button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+			CREATE_MENU
+			connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePercentageMenu()));
+			percentButton = button;
+		} else {
+			button = new KeypadButton("(x)", this);
+			button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
+			connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
+			connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
+			connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
+			grid->addWidget(button, c, 2, 1, 1);
+			parButton = button;
+		}
 		SYMBOL_ITEM2_BUTTON("±", CALCULATOR->getFunctionById(FUNCTION_ID_UNCERTAINTY), CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL), c, 0);
 		button->setToolTip(tr("Uncertainty/interval"), tr("Relative error"), tr("Interval"));
 		CREATE_MENU
@@ -347,7 +358,7 @@ void KeypadWidget::createKeypad(int i) {
 		connect(button, SIGNAL(clicked()), this, SLOT(onItemButtonClicked()));
 		connect(button, SIGNAL(clicked2()), this, SLOT(onUnitButtonClicked2()));
 		connect(button, SIGNAL(clicked3()), this, SLOT(onUnitButtonClicked3()));
-		grid->addWidget(button, c, 2, 1, 1);
+		grid->addWidget(button, c, settings->show_percent_in_numpad ? 1 : 2, 1, 1);
 		unitButton = button;
 		unitButton->setToolTip(QString::fromStdString(u ? u->title(true, settings->printops.use_unicode_signs) : sunit), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
 		CREATE_MENU
@@ -517,6 +528,59 @@ void KeypadWidget::createKeypad(int i) {
 		createNumpad(keypadN, 1);
 	}
 }
+void KeypadWidget::updateButtonLocation() {
+	KeypadButton *button, *prev_parbutton = parButton;
+	QMenu *menu;
+	if(settings->show_percent_in_numpad) {
+		 if(percentButton && keypadG->layout()) {
+			QGridLayout *grid = (QGridLayout*) keypadG->layout();
+			percentButton->deleteLater();
+			percentButton = NULL;
+			button = new KeypadButton("(x)", this);
+			button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
+			connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
+			connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
+			connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
+			grid->removeWidget(unitButton);
+			grid->addWidget(button, 4, 2, 1, 1);
+			grid->addWidget(unitButton, 4, 1, 1, 1);
+			parButton = button;
+		}
+		if(prev_parbutton && (settings->hide_numpad ? keypadN->layout() : numpad->layout())) {
+			QGridLayout *grid = (QGridLayout*) (settings->hide_numpad ? keypadN->layout() : numpad->layout());
+			prev_parbutton->deleteLater();
+			if(parButton == prev_parbutton) parButton = NULL;
+			SYMBOL_BUTTON2("%", "‰", 0, 0);
+			button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+			percentButton = button;
+		}
+	} else {
+		if(percentButton && (settings->hide_numpad ? keypadN->layout() : numpad->layout())) {
+			QGridLayout *grid = (QGridLayout*) (settings->hide_numpad ? keypadN->layout() : numpad->layout());
+			percentButton->deleteLater();
+			percentButton = NULL;
+			button = new KeypadButton("(x)", this);
+			button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
+			connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
+			connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
+			connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
+			grid->addWidget(button, 0, 0, 1, 1);
+			parButton = button;
+		}
+		if(prev_parbutton && keypadG->layout()) {
+			QGridLayout *grid = (QGridLayout*) keypadG->layout();
+			prev_parbutton->deleteLater();
+			if(parButton == prev_parbutton) parButton = NULL;
+			grid->removeWidget(unitButton);
+			SYMBOL_BUTTON2("%", "‰", 4, 1);
+			grid->addWidget(unitButton, 4, 2, 1, 1);
+			button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+			CREATE_MENU
+			connect(menu, SIGNAL(aboutToShow()), this, SLOT(updatePercentageMenu()));
+			percentButton = button;
+		}
+	}
+}
 void KeypadWidget::createNumpad(QWidget *w, int i) {
 	if(acButton[i]) return;
 	KeypadButton *button;
@@ -528,12 +592,19 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	button->setToolTip(tr("Left parenthesis"), tr("Left vector bracket"));
 	SYMBOL_BUTTON2(")", "]", 2, c)
 	button->setToolTip(tr("Right parenthesis"), tr("Right vector bracket"));
-	button = new KeypadButton("(x)", this);
-	button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
-	connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
-	connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
-	connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
-	grid->addWidget(button, 0, c, 1, 1);
+	if(settings->show_percent_in_numpad) {
+		SYMBOL_BUTTON2("%", "‰", 0, c);
+		button->setToolTip(tr("Percent or remainder"), QString::fromStdString(CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)->title(true, settings->printops.use_unicode_signs)));
+		percentButton = button;
+	} else {
+		button = new KeypadButton("(x)", this);
+		button->setToolTip(tr("Smart parentheses"), tr("Vector brackets"));
+		connect(button, SIGNAL(clicked()), this, SIGNAL(parenthesesClicked()));
+		connect(button, SIGNAL(clicked2()), this, SIGNAL(bracketsClicked()));
+		connect(button, SIGNAL(clicked3()), this, SIGNAL(bracketsClicked()));
+		grid->addWidget(button, 0, c, 1, 1);
+		parButton = button;
+	}
 	SYMBOL_BUTTON3(QString::fromStdString(CALCULATOR->getComma()), " ", "\n", 3, c)
 	button->setToolTip(tr("Argument separator"), tr("Blank space"), tr("New line"));
 	commaButton[i] = button;
@@ -686,6 +757,8 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	customOKButton = NULL;
 	customEditButton = NULL;
 	xButton = NULL;
+	percentButton = NULL;
+	parButton = NULL;
 
 	updateStretch();
 
