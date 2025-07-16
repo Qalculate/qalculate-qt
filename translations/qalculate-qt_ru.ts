@@ -1124,6 +1124,10 @@ Do you want to overwrite the function?</source>
         <source>Automatically calculate selection</source>
         <translation>Автоматически вычислять выделение</translation>
     </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished">Пользовательская</translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1955,6 +1959,10 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Action</source>
         <translation>Действие</translation>
+    </message>
+    <message>
+        <source>DEL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2979,6 +2987,10 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Overline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place percent button in number pad</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4643,6 +4655,14 @@ Do you wish to replace the current action (%1)?</source>
             <numerusform>Открыть папки настроек</numerusform>
             <numerusform>Открыть папки настроек</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
+        <translation type="unfinished">&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
+    </message>
+    <message>
+        <source>Conversion operator</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

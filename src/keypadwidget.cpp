@@ -661,7 +661,8 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
 	multiplicationButton[i] = button;
-	button = new KeypadButton(LOAD_ICON("edit-delete"), this, true);
+	// Standard calculator button. Do not use more than three characters.
+	button = new KeypadButton(tr("DEL"), this, true);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(delClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
@@ -1628,7 +1629,6 @@ void KeypadWidget::changeEvent(QEvent *e) {
 		for(size_t i = 0; i < 2; i++) {
 			if(!acButton[i]) continue;
 			acButton[i]->setIcon(LOAD_ICON("edit-clear"));
-			delButton[i]->setIcon(LOAD_ICON("edit-delete"));
 		}
 		if(backButton) backButton->setIcon(LOAD_ICON("go-back"));
 		if(forwardButton) forwardButton->setIcon(LOAD_ICON("go-forward"));

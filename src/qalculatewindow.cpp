@@ -294,13 +294,17 @@ QalculateToolButton::QalculateToolButton(QWidget *parent) : QToolButton(parent),
 QalculateToolButton::~QalculateToolButton() {}
 void QalculateToolButton::mousePressEvent(QMouseEvent *e) {
 	b_longpress = false;
-	if(e->button() == Qt::LeftButton) {
+	if(e->button() == Qt::RightButton && menu()) {
+		showMenu();
+	} else if(e->button() == Qt::LeftButton && menu()) {
 		if(!longPressTimer) {
 			longPressTimer = new QTimer(this);
 			longPressTimer->setSingleShot(true);
 			connect(longPressTimer, SIGNAL(timeout()), this, SLOT(longPressTimeout()));
 		}
 		longPressTimer->start(500);
+	} else if(e->button() == Qt::MiddleButton) {
+		emit middleButtonClicked();
 	}
 	QToolButton::mousePressEvent(e);
 }
@@ -309,20 +313,16 @@ void QalculateToolButton::longPressTimeout() {
 	showMenu();
 }
 void QalculateToolButton::mouseReleaseEvent(QMouseEvent *e) {
-	if(e->button() == Qt::RightButton) {
-		showMenu();
-	} else {
-		if(longPressTimer && longPressTimer->isActive() && e->button() == Qt::LeftButton) {
-			longPressTimer->stop();
-		} else if(b_longpress && e->button() == Qt::LeftButton) {
-			b_longpress = false;
-			blockSignals(true);
-			QToolButton::mouseReleaseEvent(e);
-			blockSignals(false);
-			return;
-		}
+	if(longPressTimer && longPressTimer->isActive() && e->button() == Qt::LeftButton) {
+		longPressTimer->stop();
+	} else if(b_longpress && e->button() == Qt::LeftButton) {
+		b_longpress = false;
+		blockSignals(true);
 		QToolButton::mouseReleaseEvent(e);
+		blockSignals(false);
+		return;
 	}
+	QToolButton::mouseReleaseEvent(e);
 }
 
 QalculateDockWidget::QalculateDockWidget(const QString &name, QWidget *parent, ExpressionEdit *editwidget) : QDockWidget(name, parent), expressionEdit(editwidget) {}
@@ -712,6 +712,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_ICON("convert")); toAction_t->setText(tr("Convert"));
 	toAction_t->setEnabled(false);
 	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
+	connect(toAction_t, SIGNAL(middleButtonClicked()), this, SLOT(onToActivatedAlt()));
 	toMenu = new QMenu(this);
 	tb->addWidget(toAction_t);
 	toAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
@@ -1134,7 +1135,7 @@ void QalculateWindow::loadShortcuts() {
 	unitsAction_t->setToolTip(tr("Units") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	functionsAction_t->setToolTip(tr("Functions") + "<br><br>" + tr("<i>Right-click/long press</i>: %1").arg(tr("Open menu")));
 	basesAction->setToolTip(tr("Number Bases"));
-	toAction_t->setToolTip(tr("Convert"));
+	toAction_t->setToolTip(tr("Convert") + "<br><br>" + tr("<i>Middle-click</i>: %1").arg(tr("Conversion operator")));
 	menuAction_t->setToolTip(tr("Menu"));
 	modeAction_t->setToolTip(tr("Mode"));
 	rpnUpAction->setToolTip(tr("Rotate the stack or move the selected register up"));
@@ -1173,7 +1174,7 @@ void QalculateWindow::keyboardShortcutRemoved(keyboard_shortcut *ks) {
 	} else if(ks->type[0] == SHORTCUT_TYPE_NUMBER_BASES) {
 		basesAction->setToolTip(tr("Number Bases") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_CONVERT) {
-		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
+		toAction_t->setToolTip(tr("Convert") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))) + "<br><br>" + tr("<i>Middle-click</i>: %1").arg(tr("Conversion operator")));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MODE) {
 		modeAction_t->setToolTip(tr("Mode") + (shortcuts.isEmpty() ? QString() : QStringLiteral(" (%1)").arg(shortcuts[0].toString(QKeySequence::NativeText))));
 	} else if(ks->type[0] == SHORTCUT_TYPE_MENU) {
@@ -1282,6 +1283,7 @@ void QalculateWindow::keyboardShortcutAdded(keyboard_shortcut *ks) {
 		}
 		if(ks->type.size() == 1 && ks->type[0] == SHORTCUT_TYPE_CONVERT) {
 			toAction_t->setToolTip(tr("Convert") + QStringLiteral(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)));
+			toAction_t->setToolTip(tr("Convert") + QStringLiteral(" (%1)").arg(QKeySequence::fromString(ks->key).toString(QKeySequence::NativeText)) + "<br><br>" + tr("<i>Middle-click</i>: %1").arg(tr("Conversion operator")));
 		}
 		ks->new_action = true;
 		action = new QAction(this);
@@ -7875,7 +7877,7 @@ void QalculateWindow::onToActivated(bool button) {
 	int b_result = 0;
 	if(!expressionEdit->expressionHasChanged() && settings->current_result) b_result = 1;
 	else if(settings->status_in_history && !mauto.isAborted() && expressionEdit->expressionHasChanged()) b_result = 2;
-	bool b_addto = (b_result != 1);
+	bool b_addto = (b_result == 0);
 	if(b_addto && button && CALCULATOR->hasToExpression(expressionEdit->toPlainText().toStdString(), true, settings->evalops)) {
 		std::string str = expressionEdit->toPlainText().toStdString(), to_str;
 		CALCULATOR->separateToExpression(str, to_str, settings->evalops, true, true);
@@ -7902,10 +7904,28 @@ void QalculateWindow::onToActivated(bool button) {
 	}
 	if(b_result != 1) expressionEdit->blockCompletion(false);
 }
+void QalculateWindow::onToActivatedAlt() {
+	expressionEdit->blockCompletion(true, true);
+	expressionEdit->blockParseStatus();
+	expressionEdit->moveCursor(QTextCursor::End);
+	expressionEdit->insertText("➞");
+	expressionEdit->blockParseStatus(false);
+	expressionEdit->displayParseStatus(true, false);
+	expressionEdit->blockCompletion(false);
+}
 void QalculateWindow::onToConversionRequested(std::string str) {
 	str.insert(0, "➞");
-	if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertText(QString::fromStdString(str));
-	else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
+	if(str.length() == strlen("➞") || str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') {
+		expressionEdit->insertText(QString::fromStdString(str));
+	} else if(expressionEdit->expressionHasChanged() || !settings->current_result) {
+		expressionEdit->setExpressionHasChanged(false);
+		expressionEdit->addToHistory();
+		askDot(str);
+		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", expressionEdit->toPlainText().toStdString() + str);
+	} else {
+		if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertText(QString::fromStdString(str));
+		else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
+	}
 }
 void QalculateWindow::importCSV() {
 	size_t n = CALCULATOR->variables.size();

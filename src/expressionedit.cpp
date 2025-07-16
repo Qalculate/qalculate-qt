@@ -475,7 +475,7 @@ struct CompletionData {
 	std::vector<Unit*> current_from_units;
 	std::vector<std::string> current_from_categories;
 	QModelIndex exact_prefix_match;
-	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1;
+	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1, show_custom_to;
 	int to_type, highest_match;
 	Argument *arg;
 	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
@@ -711,6 +711,8 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 		if(b_match > cdata->highest_match) cdata->highest_match = b_match;
 		else if(b_match == 1 && cdata->highest_match < 2) cdata->highest_match = 2;
 		prefix = NULL;
+	} else if(p_type == 1000) {
+		if(cdata->show_custom_to) b_match = 2;
 	} else if(p_type >= 100 && cdata->editing_to_expression && cdata->editing_to_expression1) {
 		QString qstr = index.data(Qt::DisplayRole).toString();
 		if(cdata->to_type >= 2 && str.empty()) b_match = 2;
@@ -788,6 +790,8 @@ bool ExpressionProxyModel::lessThan(const QModelIndex &index1, const QModelIndex
 		int i2 = s2.data(MATCH_ROLE).toInt();
 		if(i1 < i2) return true;
 		if(i1 > i2) return false;
+		if(s1.data(TYPE_ROLE).toInt() == 1000) return true;
+		if(s2.data(TYPE_ROLE).toInt() == 1000) return false;
 	}
 	return QSortFilterProxyModel::lessThan(index1, index2);
 }
@@ -1428,6 +1432,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Unicode"), 281, NULL)
 	COMPLETION_CONVERT_STRING("utc")
 	COMPLETION_APPEND_C(str1, tr("UTC Time Zone"), 501, NULL)
+	COMPLETION_APPEND_C("", tr("Custom"), 1000, NULL)
 }
 
 void ExpressionEdit::setExpression(std::string str) {
@@ -3008,8 +3013,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
 	completionView->setColumnHidden(2, true);
 	if(mstruct_from) {
-		if(current_object_is_set) do_completion_signal = -1;
-		else do_completion_signal = 1;
+		do_completion_signal = 1;
 		cdata->current_from_struct = mstruct_from;
 		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
 		cdata->current_from_categories.clear();
@@ -3023,6 +3027,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		else do_completion_signal = -1;
 		if(!current_object_is_set) setCurrentObject();
 	}
+	cdata->show_custom_to = menu;
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
@@ -3953,7 +3958,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	}
 	blockCompletion(false);
 	if((do_completion_signal < 0 || (!item && !prefix)) && cdata->editing_to_expression && (current_object_end < 0 || current_object_end == text.length())) {
-		if(str[str.length() - 1] != ' ' && str[str.length() - 1] != '/') {
+		if(!str.empty() && str[str.length() - 1] != ' ' && str[str.length() - 1] != '/') {
 			current_object_end = current_object_start + unicode_length(str);
 			current_object_start = cos_bak;
 			emit returnPressed();

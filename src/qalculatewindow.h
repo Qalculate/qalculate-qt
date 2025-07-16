@@ -181,6 +181,7 @@ class QalculateWindow : public QMainWindow {
 		void onExpandClicked();
 		void onExpandPartialFractionsClicked();
 		void onToActivated(bool = true);
+		void onToActivatedAlt();
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void showNumpad(bool);
@@ -443,6 +444,10 @@ class QalculateToolButton : public QToolButton {
 	protected slots:
 
 		void longPressTimeout();
+
+	signals:
+
+		void middleButtonClicked();
 
 };
 
