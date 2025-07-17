@@ -4664,6 +4664,24 @@ Do you wish to replace the current action (%1)?</source>
         <source>Conversion operator</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Interpretation of comma</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select interpretation of comma (&quot;,&quot;)
+(this can later be changed in preferences).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comma as thousands separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comma as separator for function arguments
+and matrix/vector elements</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UnitEditDialog</name>

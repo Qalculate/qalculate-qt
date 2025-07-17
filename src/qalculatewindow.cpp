@@ -7691,11 +7691,12 @@ bool QalculateWindow::askSinc(MathStructure &m) {
 	return false;
 }
 bool QalculateWindow::askDot(const std::string &str) {
-	if(settings->dot_question_asked || CALCULATOR->getDecimalPoint() == DOT) return false;
+	if(settings->dot_question_asked) return false;
+	bool ask_comma = (CALCULATOR->getDecimalPoint() == DOT);
 	size_t i = 0;
 	bool b = false;
 	while(true) {
-		i = str.find(DOT, i);
+		i = str.find(ask_comma ? COMMA : DOT, i);
 		if(i == std::string::npos) return false;
 		i = str.find_first_not_of(SPACES, i + 1);
 		if(i == std::string::npos) return false;
@@ -7708,46 +7709,63 @@ bool QalculateWindow::askDot(const std::string &str) {
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
-	dialog->setWindowTitle(tr("Interpretation of dots"));
+	dialog->setWindowTitle(ask_comma ? tr("Interpretation of comma") : tr("Interpretation of dots"));
 	QGridLayout *grid = new QGridLayout();
 	box->addLayout(grid);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
 	box->addWidget(buttonBox);
-	grid->addWidget(new QLabel(tr("Please select interpretation of dots (\".\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
+	if(ask_comma) grid->addWidget(new QLabel(tr("Please select interpretation of comma (\",\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
+	else grid->addWidget(new QLabel(tr("Please select interpretation of dots (\".\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
 	QButtonGroup *group = new QButtonGroup(dialog);
 	group->setExclusive(true);
 	QRadioButton *w_bothdeci = new QRadioButton(tr("Both dot and comma as decimal separators"));
 	group->addButton(w_bothdeci);
-	grid->addWidget(w_bothdeci, 1, 0);
-	grid->addWidget(new QLabel("<i>(1.2 = 1,2)</i>"), 1, 1);
-	QRadioButton *w_ignoredot = new QRadioButton(tr("Dot as thousands separator"));
+	grid->addWidget(w_bothdeci, ask_comma ? 3 : 1, 0);
+	grid->addWidget(new QLabel("<i>(1.2 = 1,2)</i>"), ask_comma ? 3 : 1, 1);
+	QRadioButton *w_ignoredot = new QRadioButton(ask_comma ? tr("Comma as thousands separator") : tr("Dot as thousands separator"));
 	group->addButton(w_ignoredot);
 	grid->addWidget(w_ignoredot, 2, 0);
-	grid->addWidget(new QLabel("<i>(1.000.000 = 1000000)</i>"), 2, 1);
-	QRadioButton *w_dotdeci = new QRadioButton(tr("Only dot as decimal separator"));
+	grid->addWidget(new QLabel(ask_comma ? "<i>(1,000,000 = 1000000)</i>" : "<i>(1.000.000 = 1000000)</i>"), 2, 1);
+	QRadioButton *w_dotdeci = new QRadioButton(ask_comma ? tr("Comma as separator for function arguments\nand matrix/vector elements") : tr("Only dot as decimal separator"));
 	group->addButton(w_dotdeci);
-	grid->addWidget(w_dotdeci, 3, 0);
-	grid->addWidget(new QLabel("<i>(1.2 + root(16, 4) = 3.2)</i>"), 3, 1);
-	if(settings->evalops.parse_options.dot_as_separator) w_ignoredot->setChecked(true);
+	grid->addWidget(w_dotdeci, ask_comma ? 1 : 3, 0);
+	grid->addWidget(new QLabel("<i>(1.2 + root(16, 4) = 3.2)</i>"), ask_comma ? 1 : 3, 1);
+	if((!ask_comma && settings->evalops.parse_options.dot_as_separator) || (ask_comma && settings->evalops.parse_options.comma_as_separator)) w_ignoredot->setChecked(true);
+	else if(ask_comma) w_dotdeci->setChecked(true);
 	else w_bothdeci->setChecked(true);
 	dialog->exec();
 	settings->dot_question_asked = true;
-	bool das = settings->evalops.parse_options.dot_as_separator;
+	bool b_ret = false;
 	if(w_dotdeci->isChecked()) {
+		b_ret = !ask_comma || settings->evalops.parse_options.comma_as_separator;
 		settings->evalops.parse_options.dot_as_separator = false;
 		settings->evalops.parse_options.comma_as_separator = false;
 		settings->decimal_comma = false;
 		CALCULATOR->useDecimalPoint(false);
-		das = !settings->evalops.parse_options.dot_as_separator;
 	} else if(w_ignoredot->isChecked()) {
-		settings->evalops.parse_options.dot_as_separator = true;
+		if(ask_comma) {
+			b_ret = !settings->evalops.parse_options.comma_as_separator;
+			settings->evalops.parse_options.comma_as_separator = true;
+			CALCULATOR->useDecimalPoint(true);
+		} else {
+			b_ret = !settings->evalops.parse_options.dot_as_separator;
+			settings->evalops.parse_options.dot_as_separator = true;
+		}
 	} else {
-		settings->evalops.parse_options.dot_as_separator = false;
+		if(ask_comma) {
+			settings->evalops.parse_options.comma_as_separator = false;
+			CALCULATOR->useDecimalComma();
+			settings->decimal_comma = true;
+			b_ret = true;
+		} else {
+			b_ret = settings->evalops.parse_options.dot_as_separator;
+			settings->evalops.parse_options.dot_as_separator = false;
+		}
 	}
 	if(preferencesDialog) preferencesDialog->updateDot();
 	dialog->deleteLater();
-	return das != settings->evalops.parse_options.dot_as_separator;
+	return b_ret;
 }
 bool QalculateWindow::askImplicit() {
 	QDialog *dialog = new QDialog(this);
