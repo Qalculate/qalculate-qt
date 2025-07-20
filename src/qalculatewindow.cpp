@@ -2793,6 +2793,7 @@ void QalculateWindow::clearStack() {
 	rpnUpAction->setEnabled(false);
 	rpnDownAction->setEnabled(false);
 	rpnSwapAction->setEnabled(false);
+	updateInsertFunctionDialogs();
 }
 void QalculateWindow::registerChanged(int index) {
 	calculateExpression(true, false, OPERATION_ADD, NULL, true, index);
@@ -4436,6 +4437,7 @@ void QalculateWindow::RPNRegisterAdded(std::string text, int index) {
 		rpnDownAction->setEnabled(true);
 		rpnSwapAction->setEnabled(true);
 	}
+	updateInsertFunctionDialogs();
 }
 void QalculateWindow::RPNRegisterRemoved(int index) {
 	rpnView->removeRow(index);
@@ -4449,6 +4451,7 @@ void QalculateWindow::RPNRegisterRemoved(int index) {
 		rpnDownAction->setEnabled(false);
 		rpnSwapAction->setEnabled(false);
 	}
+	updateInsertFunctionDialogs();
 }
 void QalculateWindow::RPNRegisterChanged(std::string text, int index) {
 	QTableWidgetItem *item = rpnView->item(index, 0);
@@ -5908,6 +5911,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						std::string str = unhtmlize(result_text);
 						if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
 							gsub(COMMA, "", str);
+						} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
+							gsub(DOT, "", str);
 						}
 						if(unicode_length(str) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
 					} else {
@@ -5915,6 +5920,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 							if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
 								std::string str = exact_text;
 								gsub(COMMA, "", str);
+								expressionEdit->setExpression(QString::fromStdString(str));
+							} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
+								std::string str = exact_text;
+								gsub(DOT, "", str);
 								expressionEdit->setExpression(QString::fromStdString(str));
 							} else {
 								expressionEdit->setExpression(QString::fromStdString(exact_text));
@@ -6720,7 +6729,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	po.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
 	if(do_calendars || do_bases) mauto.setAborted();
 	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
-	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
+	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500 || mauto_parsed.contains(m_undefined)) {
 		mauto.setAborted();
 		result = "";
 	}
@@ -9328,7 +9337,7 @@ struct FunctionDialog {
 	std::vector<QWidget*> entry;
 	std::vector<QRadioButton*> boolean_buttons;
 	std::vector<int> boolean_index;
-	bool add_to_menu, keep_open, rpn;
+	bool keep_open, rpn;
 	int args;
 };
 
@@ -9428,7 +9437,6 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	}
 	fd->args = args;
 	fd->rpn = settings->rpn_mode && expressionEdit->document()->isEmpty() && CALCULATOR->RPNStackSize() >= (f->minargs() <= 0 ? 1 : (size_t) f->minargs());
-	fd->add_to_menu = true;
 	fd->f = f;
 
 	std::string f_title = f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this);
@@ -9498,7 +9506,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	fd->b_cancel = buttonBox->button(QDialogButtonBox::Close);
 	fd->b_exec = buttonBox->addButton(settings->rpn_mode ? tr("Enter", "RPN Enter") : tr("Calculate"), QDialogButtonBox::ApplyRole);
 	fd->b_insert = buttonBox->addButton(settings->rpn_mode ? tr("Apply to Stack") : tr("Insert"), QDialogButtonBox::AcceptRole);
-	if(settings->rpn_mode && CALCULATOR->RPNStackSize() < (f->minargs() <= 0 ? 1 : (size_t) f->minargs())) fd->b_insert->setEnabled(false);
+	fd->b_insert->setEnabled(!settings->rpn_mode || CALCULATOR->RPNStackSize() >= (f->minargs() <= 0 ? 1 : (size_t) f->minargs()));
 
 	fd->label.resize(args, NULL);
 	fd->entry.resize(args, NULL);
@@ -9820,19 +9828,19 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 	fd->b_cancel->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
 	fd->b_insert->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
 	fd->b_keepopen->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
-	fd->b_exec->setDefault(false);
 	fd->b_cancel->setDefault(false);
-	fd->b_insert->setDefault(false);
+	fd->b_exec->setDefault(fd->keep_open || settings->rpn_mode);
+	fd->b_insert->setDefault(!fd->keep_open && !settings->rpn_mode);
 	fd->dialog->setProperty("QALCULATE FD", QVariant::fromValue((void*) fd));
 	connect(fd->b_exec, SIGNAL(clicked()), this, SLOT(onInsertFunctionExec()));
-	if(fd->rpn) connect(fd->b_insert, SIGNAL(clicked()), this, SLOT(onInsertFunctionRPN()));
-	else connect(fd->b_insert, SIGNAL(clicked()), this, SLOT(onInsertFunctionInsert()));
+	connect(fd->b_insert, SIGNAL(clicked()), this, SLOT(onInsertFunctionInsertRPN()));
 	connect(fd->b_cancel, SIGNAL(clicked()), fd->dialog, SLOT(reject()));
 	connect(fd->b_keepopen, SIGNAL(toggled(bool)), this, SLOT(onInsertFunctionKeepOpen(bool)));
 	connect(fd->dialog, SIGNAL(rejected()), this, SLOT(onInsertFunctionClosed()));
 
 	box->setSizeConstraint(QLayout::SetFixedSize);
 	fd->dialog->show();
+	functionDialogs << fd;
 
 }
 void QalculateWindow::onEntrySelectFile() {
@@ -9952,7 +9960,6 @@ void QalculateWindow::insertFunctionDo(FunctionDialog *fd) {
 	expressionEdit->blockCompletion(true);
 	expressionEdit->insertText(QString::fromStdString(str));
 	expressionEdit->blockCompletion(false);
-	//if(fd->add_to_menu) function_inserted(f);
 }
 
 void QalculateWindow::onInsertFunctionChanged() {
@@ -9964,9 +9971,8 @@ void QalculateWindow::onInsertFunctionEntryActivated() {
 	for(int i = 0; i < fd->args; i++) {
 		if(fd->entry[i] == sender()) {
 			if(i == fd->args - 1) {
-				if(fd->rpn) onInsertFunctionRPN();
-				else if(fd->keep_open || settings->rpn_mode) onInsertFunctionExec();
-				else onInsertFunctionInsert();
+				if(fd->keep_open || settings->rpn_mode) onInsertFunctionExec();
+				else onInsertFunctionInsertRPN();
 			} else {
 				if(fd->f->getArgumentDefinition(i + 2) && fd->f->getArgumentDefinition(i + 2)->type() == ARGUMENT_TYPE_BOOLEAN) {
 					fd->boolean_buttons[fd->boolean_index[i + 1]]->setFocus();
@@ -9976,6 +9982,15 @@ void QalculateWindow::onInsertFunctionEntryActivated() {
 			}
 			break;
 		}
+	}
+}
+void QalculateWindow::updateInsertFunctionDialogs() {
+	for(int i = 0; i < functionDialogs.size(); i++) {
+		FunctionDialog *fd = functionDialogs.at(i);
+		fd->b_insert->setEnabled(!settings->rpn_mode || CALCULATOR->RPNStackSize() >= (fd->f->minargs() <= 0 ? 1 : (size_t) fd->f->minargs()));
+		fd->b_insert->setText(settings->rpn_mode ? tr("Apply to Stack") : tr("Insert"));
+		fd->b_exec->setDefault(fd->keep_open || settings->rpn_mode);
+		fd->b_insert->setDefault(!fd->keep_open && !settings->rpn_mode);
 	}
 }
 void QalculateWindow::onInsertFunctionExec() {
@@ -10001,31 +10016,21 @@ void QalculateWindow::onInsertFunctionExec() {
 		expressionEdit->selectAll();
 	} else {
 		fd->dialog->deleteLater();
+		functionDialogs.removeAll(fd);
 		delete fd;
 	}
 }
-void QalculateWindow::onInsertFunctionRPN() {
+void QalculateWindow::onInsertFunctionInsertRPN() {
 	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
 	if(!fd->keep_open) fd->dialog->hide();
-	calculateRPN(fd->f);
-	//if(fd->add_to_menu) function_inserted(f);
+	if(settings->rpn_mode) calculateRPN(fd->f);
+	else insertFunctionDo(fd);
 	if(fd->keep_open) {
 		fd->entry[0]->setFocus();
 		expressionEdit->selectAll();
 	} else {
 		fd->dialog->deleteLater();
-		delete fd;
-	}
-}
-void QalculateWindow::onInsertFunctionInsert() {
-	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
-	if(!fd->keep_open) fd->dialog->hide();
-	insertFunctionDo(fd);
-	if(fd->keep_open) {
-		fd->entry[0]->setFocus();
-		expressionEdit->selectAll();
-	} else {
-		fd->dialog->deleteLater();
+		functionDialogs.removeAll(fd);
 		delete fd;
 	}
 }
@@ -10034,10 +10039,13 @@ void QalculateWindow::onInsertFunctionKeepOpen(bool b) {
 	fd->keep_open = b;
 	settings->keep_function_dialog_open = b;
 	if(!b) fd->w_scrollresult->hide();
+	fd->b_exec->setDefault(fd->keep_open || settings->rpn_mode);
+	fd->b_insert->setDefault(!fd->keep_open && !settings->rpn_mode);
 }
 void QalculateWindow::onInsertFunctionClosed() {
 	FunctionDialog *fd = (FunctionDialog*) sender()->property("QALCULATE FD").value<void*>();
 	fd->dialog->deleteLater();
+	functionDialogs.removeAll(fd);
 	delete fd;
 }
 void QalculateWindow::executeFromFile(const QString &file) {
@@ -10093,6 +10101,7 @@ void QalculateWindow::executeFromFile(const QString &file) {
 			mstruct->clear();
 		}
 	}
+	updateInsertFunctionDialogs();
 	qfile.close();
 }
 void QalculateWindow::convertToUnit(Unit *u) {
@@ -10105,6 +10114,7 @@ void QalculateWindow::normalModeActivated() {
 	CALCULATOR->clearRPNStack();
 	rpnView->clear();
 	rpnView->setRowCount(0);
+	updateInsertFunctionDialogs();
 }
 void QalculateWindow::onRPNVisibilityChanged(bool b) {
 	if(settings->rpn_mode != b) {
@@ -10123,6 +10133,7 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
 			toAction_t->setEnabled(false);
+			updateInsertFunctionDialogs();
 		}
 	}
 }
@@ -10143,6 +10154,7 @@ void QalculateWindow::rpnModeActivated() {
 		rpnDock->show();
 		rpnDock->raise();
 		toAction_t->setEnabled(false);
+		updateInsertFunctionDialogs();
 	}
 }
 void QalculateWindow::chainModeActivated() {
@@ -10157,6 +10169,7 @@ void QalculateWindow::chainModeActivated() {
 		CALCULATOR->clearRPNStack();
 		rpnView->clear();
 		rpnView->setRowCount(0);
+		updateInsertFunctionDialogs();
 	}
 }
 void QalculateWindow::checkVersion() {

@@ -760,14 +760,31 @@ void PreferencesDialog::groupingChanged(int i) {
 	if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.comma_as_separator || CALCULATOR->getDecimalPoint() == COMMA) && CALCULATOR->local_digit_group_separator == COMMA) {
 		if(CALCULATOR->getDecimalPoint() == COMMA) {
 			settings->evalops.parse_options.comma_as_separator = true;
+			settings->evalops.parse_options.dot_as_separator = false;
 			ignoreCommaBox->blockSignals(true);
 			ignoreCommaBox->setChecked(true);
 			ignoreCommaBox->blockSignals(false);
+			ignoreDotBox->blockSignals(true);
+			ignoreDotBox->setChecked(false);
+			ignoreDotBox->blockSignals(false);
 			decimalCommaBox->toggle();
 		} else {
 			ignoreCommaBox->toggle();
 		}
-
+	} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.dot_as_separator || CALCULATOR->getDecimalPoint() == DOT) && CALCULATOR->local_digit_group_separator == DOT) {
+		if(CALCULATOR->getDecimalPoint() == DOT) {
+			settings->evalops.parse_options.dot_as_separator = true;
+			settings->evalops.parse_options.comma_as_separator = false;
+			ignoreDotBox->blockSignals(true);
+			ignoreDotBox->setChecked(true);
+			ignoreDotBox->blockSignals(false);
+			ignoreCommaBox->blockSignals(true);
+			ignoreCommaBox->setChecked(false);
+			ignoreCommaBox->blockSignals(false);
+			decimalCommaBox->toggle();
+		} else {
+			ignoreDotBox->toggle();
+		}
 	} else {
 		emit resultFormatUpdated();
 	}

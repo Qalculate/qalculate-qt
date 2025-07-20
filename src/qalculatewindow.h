@@ -95,7 +95,7 @@ class QalculateWindow : public QMainWindow {
 		QDialog *shortcutsDialog, *shortcutActionDialog;
 		QComboBox *shortcutActionValueEdit; QTreeWidget *shortcutActionList; QLabel *shortcutActionValueLabel;
 		QTreeWidget *shortcutList; QPushButton *addShortcutButton, *editShortcutButton, *removeShortcutButton, *shortcutActionOKButton, *shortcutActionAddButton; keyboard_shortcut *edited_keyboard_shortcut;
-
+		QList<FunctionDialog*> functionDialogs;
 
 		KeypadWidget *keypad;
 		QDockWidget *keypadDock, *basesDock, *rpnDock;
@@ -149,6 +149,7 @@ class QalculateWindow : public QMainWindow {
 		void beforeShowDockCleanUp(QDockWidget*);
 		void beforeShowDock(QDockWidget*, bool);
 		void afterShowDock(QDockWidget*);
+		void updateInsertFunctionDialogs();
 
 	protected slots:
 
@@ -229,8 +230,7 @@ class QalculateWindow : public QMainWindow {
 		void approximationActivated();
 		void openCalendarConversion();
 		void onInsertFunctionExec();
-		void onInsertFunctionRPN();
-		void onInsertFunctionInsert();
+		void onInsertFunctionInsertRPN();
 		void onInsertFunctionKeepOpen(bool);
 		void onInsertFunctionClosed();
 		void onInsertFunctionChanged();

@@ -866,6 +866,10 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 							std::string str = settings->v_result[i1][settings->v_result[i1].size() - i2 - 1];
 							gsub(COMMA, "", str);
 							emit insertTextRequested(str);
+						} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
+							std::string str = settings->v_result[i1][settings->v_result[i1].size() - i2 - 1];
+							gsub(DOT, "", str);
+							emit insertTextRequested(str);
 						} else {
 							emit insertTextRequested(settings->v_result[i1][settings->v_result[i1].size() - i2 - 1]);
 						}
@@ -893,6 +897,10 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 							if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
 								std::string str = settings->v_result[i1][i2];
 								gsub(COMMA, "", str);
+								emit insertTextRequested(str);
+							} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
+								std::string str = settings->v_result[i1][i2];
+								gsub(DOT, "", str);
 								emit insertTextRequested(str);
 							} else {
 								emit insertTextRequested(settings->v_result[i1][i2]);
