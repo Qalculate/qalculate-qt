@@ -473,6 +473,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	periodicTableAction = menu->addAction(tr("Periodic Table"), this, SLOT(openPeriodicTable()));
 	menu->addSeparator();
 	exratesAction = menu->addAction(tr("Update Exchange Rates"), this, SLOT(fetchExchangeRates()));
+	exratesAction->setEnabled(CALCULATOR->canFetch());
 	menu->addSeparator();
 	group = new QActionGroup(this);
 	action = menu->addAction(tr("Normal Mode"), this, SLOT(normalModeActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_normalmode"); if(!settings->rpn_mode && !settings->chain_mode) action->setChecked(true);
@@ -2807,7 +2808,7 @@ void QalculateWindow::onInsertTextRequested(std::string str) {
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::showAbout() {
-	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QStringLiteral("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2024 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
+	QMessageBox::about(this, tr("About %1").arg(qApp->applicationDisplayName()), QStringLiteral("<font size=+2><b>%1 v%4</b></font><br><font size=+1>%2</font><br><font size=+1><i><a href=\"https://qalculate.github.io/\">https://qalculate.github.io/</a></i></font><br><br>Copyright © 2003-2007, 2008, 2016-2025 Hanna Knutsson<br>%3").arg(qApp->applicationDisplayName()).arg(tr("Powerful and easy to use calculator")).arg(tr("License: GNU General Public License version 2 or later")).arg(qApp->applicationVersion()));
 }
 void QalculateWindow::onInsertValueRequested(int i) {
 	expressionEdit->blockCompletion();
@@ -5908,26 +5909,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
 					if(exact_text == "0" || result_text == "0") expressionEdit->clear();
 					else if(exact_text.empty()) {
-						std::string str = unhtmlize(result_text);
-						if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
-							gsub(COMMA, "", str);
-						} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
-							gsub(DOT, "", str);
-						}
+						std::string str = settings->replaceResultSeparators(unhtmlize(result_text));
 						if(unicode_length(str) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
 					} else {
 						if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) {
-							if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
-								std::string str = exact_text;
-								gsub(COMMA, "", str);
-								expressionEdit->setExpression(QString::fromStdString(str));
-							} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
-								std::string str = exact_text;
-								gsub(DOT, "", str);
-								expressionEdit->setExpression(QString::fromStdString(str));
-							} else {
-								expressionEdit->setExpression(QString::fromStdString(exact_text));
-							}
+							expressionEdit->setExpression(QString::fromStdString(settings->replaceResultSeparators(exact_text)));
 						}
 					}
 				} else {
@@ -7724,8 +7710,7 @@ bool QalculateWindow::askDot(const std::string &str) {
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, Qt::Horizontal, dialog);
 	connect(buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), dialog, SLOT(accept()));
 	box->addWidget(buttonBox);
-	if(ask_comma) grid->addWidget(new QLabel(tr("Please select interpretation of comma (\",\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
-	else grid->addWidget(new QLabel(tr("Please select interpretation of dots (\".\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
+	grid->addWidget(new QLabel(ask_comma ? tr("Please select interpretation of comma (\",\")\n(this can later be changed in preferences).") : tr("Please select interpretation of dots (\".\")\n(this can later be changed in preferences).")), 0, 0, 1, 2);
 	QButtonGroup *group = new QButtonGroup(dialog);
 	group->setExclusive(true);
 	QRadioButton *w_bothdeci = new QRadioButton(tr("Both dot and comma as decimal separators"));
@@ -7747,10 +7732,14 @@ bool QalculateWindow::askDot(const std::string &str) {
 	settings->dot_question_asked = true;
 	bool b_ret = false;
 	if(w_dotdeci->isChecked()) {
-		b_ret = !ask_comma || settings->evalops.parse_options.comma_as_separator;
-		settings->evalops.parse_options.dot_as_separator = false;
+		if(ask_comma) {
+			b_ret = settings->evalops.parse_options.comma_as_separator;
+		} else {
+			b_ret = true;
+			settings->evalops.parse_options.dot_as_separator = false;
+			settings->decimal_comma = false;
+		}
 		settings->evalops.parse_options.comma_as_separator = false;
-		settings->decimal_comma = false;
 		CALCULATOR->useDecimalPoint(false);
 	} else if(w_ignoredot->isChecked()) {
 		if(ask_comma) {
@@ -7769,10 +7758,10 @@ bool QalculateWindow::askDot(const std::string &str) {
 			b_ret = true;
 		} else {
 			b_ret = settings->evalops.parse_options.dot_as_separator;
-			settings->evalops.parse_options.dot_as_separator = false;
 		}
+		settings->evalops.parse_options.dot_as_separator = false;
 	}
-	if(preferencesDialog) preferencesDialog->updateDot();
+	if(b_ret && preferencesDialog) preferencesDialog->updateDot();
 	dialog->deleteLater();
 	return b_ret;
 }
@@ -7945,13 +7934,25 @@ void QalculateWindow::onToConversionRequested(std::string str) {
 	if(str.length() == strlen("➞") || str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') {
 		expressionEdit->insertText(QString::fromStdString(str));
 	} else if(expressionEdit->expressionHasChanged() || !settings->current_result) {
+		std::string str_expr = expressionEdit->toPlainText().toStdString();
+		if(CALCULATOR->hasToExpression(str_expr, true, settings->evalops)) {
+			std::string str2 = str_expr, to_str;
+			CALCULATOR->separateToExpression(str2, to_str, settings->evalops, true, true);
+			if(to_str.empty()) {
+				str_expr = str2;
+				expressionEdit->blockCompletion(true, true);
+				expressionEdit->blockParseStatus();
+				expressionEdit->setPlainText(QString::fromStdString(str_expr));
+				expressionEdit->blockParseStatus(false);
+				expressionEdit->blockCompletion(false);
+			}
+		}
 		expressionEdit->setExpressionHasChanged(false);
 		expressionEdit->addToHistory();
-		askDot(str);
-		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", expressionEdit->toPlainText().toStdString() + str);
+		askDot(str_expr);
+		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str_expr + str);
 	} else {
-		if(str[str.length() - 1] == ' ' || str[str.length() - 1] == '/') expressionEdit->insertText(QString::fromStdString(str));
-		else calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
+		calculateExpression(true, false, OPERATION_ADD, NULL, false, 0, "", str);
 	}
 }
 void QalculateWindow::importCSV() {

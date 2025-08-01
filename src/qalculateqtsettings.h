@@ -222,6 +222,7 @@ class QalculateQtSettings : QObject {
 		void autoUpdate(std::string new_version, QWidget *parent);
 		const char *multiplicationSign(bool units = false);
 		const char *divisionSign(bool output = true);
+		std::string replaceResultSeparators(std::string str);
 		std::string localizeExpression(std::string, bool unit_expression = false);
 		std::string unlocalizeExpression(std::string);
 		bool loadWorkspace(const char *filename);

@@ -9511,7 +9511,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="302"/>
         <source>Place percent button in number pad</source>
-        <translation>Plasera procentknappen i den numeriska knappsatsen</translation>
+        <translation>Placera procentknappen i den numeriska knappsatsen</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="303"/>

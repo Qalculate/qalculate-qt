@@ -862,17 +862,7 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 					int i1 = str.left(index).toInt();
 					int i2 = str.mid(index + 1).toInt();
 					if(i1 >= 0 && i1 < (int) settings->v_result.size() && i2 < (int) settings->v_result[i1].size()) {
-						if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
-							std::string str = settings->v_result[i1][settings->v_result[i1].size() - i2 - 1];
-							gsub(COMMA, "", str);
-							emit insertTextRequested(str);
-						} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
-							std::string str = settings->v_result[i1][settings->v_result[i1].size() - i2 - 1];
-							gsub(DOT, "", str);
-							emit insertTextRequested(str);
-						} else {
-							emit insertTextRequested(settings->v_result[i1][settings->v_result[i1].size() - i2 - 1]);
-						}
+						emit insertTextRequested(settings->replaceResultSeparators(settings->v_result[i1][settings->v_result[i1].size() - i2 - 1]));
 					}
 				}
 			} else if(str[0] == '#') {
@@ -891,21 +881,8 @@ void HistoryView::mouseDoubleClickEvent(QMouseEvent *e) {
 					int i1 = str.left(index).toInt();
 					int i2 = str.mid(index + 1).toInt();
 					if(i1 >= 0 && (size_t) i1 < settings->v_result.size() && i2 >= 0 && (size_t) i2 < settings->v_result[i1].size()) {
-						if(!settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') {
-							editComment(i1, i2);
-						} else {
-							if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && settings->printops.comma() == ";" && settings->printops.decimalpoint() == ".") {
-								std::string str = settings->v_result[i1][i2];
-								gsub(COMMA, "", str);
-								emit insertTextRequested(str);
-							} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && !settings->evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && settings->printops.decimalpoint() != DOT) {
-								std::string str = settings->v_result[i1][i2];
-								gsub(DOT, "", str);
-								emit insertTextRequested(str);
-							} else {
-								emit insertTextRequested(settings->v_result[i1][i2]);
-							}
-						}
+						if(!settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#') editComment(i1, i2);
+						else emit insertTextRequested(settings->replaceResultSeparators(settings->v_result[i1][i2]));
 					}
 				}
 			}

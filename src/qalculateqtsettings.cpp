@@ -1185,7 +1185,7 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 5;
-	preferences_version[1] = 6;
+	preferences_version[1] = 7;
 	preferences_version[2] = 0;
 
 	if(file) {
@@ -1548,7 +1548,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(!style.isEmpty()) fprintf(file, "style_name=%s\n", style.toUtf8().data());
 		if(toolbar_style != Qt::ToolButtonIconOnly) fprintf(file, "toolbar_style=%i\n", toolbar_style);
 		fprintf(file, "separate_keypad_menu_buttons=%i\n", separate_keypad_menu_buttons);
-		fprintf(file, "show_percent_in_numpad=%i\n", show_percent_in_numpad);
+		if(show_percent_in_numpad) fprintf(file, "show_percent_in_numpad=%i\n", show_percent_in_numpad);
 		fprintf(file, "palette=%i\n", palette);
 		fprintf(file, "color=%i\n", colorize_result);
 		if(disable_cursor_blinking) fprintf(file, "disable_cursor_blinking=%i\n", disable_cursor_blinking);
@@ -1861,6 +1861,15 @@ const char *QalculateQtSettings::divisionSign(bool output) {
 	if(printops.division_sign == DIVISION_SIGN_DIVISION && printops.use_unicode_signs) return SIGN_DIVISION;
 	else if(output && printops.division_sign == DIVISION_SIGN_DIVISION_SLASH && printops.use_unicode_signs) return SIGN_DIVISION_SLASH;
 	return "/";
+}
+
+std::string QalculateQtSettings::replaceResultSeparators(std::string str) {
+	if(printops.digit_grouping == DIGIT_GROUPING_LOCALE && !evalops.parse_options.comma_as_separator && CALCULATOR->local_digit_group_separator == COMMA && printops.comma() == ";" && printops.decimalpoint() == ".") {
+		gsub(COMMA, "", str);
+	} else if(printops.digit_grouping == DIGIT_GROUPING_LOCALE && !evalops.parse_options.dot_as_separator && CALCULATOR->local_digit_group_separator == DOT && printops.decimalpoint() != DOT) {
+		gsub(DOT, "", str);
+	}
+	return str;
 }
 
 std::string QalculateQtSettings::localizeExpression(std::string str, bool unit_expression) {

@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 	app.setDesktopFileName("io.github.Qalculate.qalculate-qt");
 #endif
-	app.setApplicationVersion("5.6.0");
+	app.setApplicationVersion("5.7.0");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
