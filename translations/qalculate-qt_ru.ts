@@ -116,7 +116,7 @@
     <name>CSVDialog</name>
     <message>
         <source>Import CSV File</source>
-        <translation>Загрузить файл формата CSV</translation>
+        <translation>Загрузить файл типа CSV</translation>
     </message>
     <message>
         <source>Export CSV File</source>
@@ -229,11 +229,11 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Islamic (Hijri)</source>
-        <translation>Исламский (от Хиджры)</translation>
+        <translation>Исламский (Хиджра)</translation>
     </message>
     <message>
         <source>Persian (Solar Hijri)</source>
-        <translation>Иранский (Солнечная хиджра)</translation>
+        <translation>Иранский (солнечная Хиджра)</translation>
     </message>
     <message>
         <source>Indian (National)</source>
@@ -249,7 +249,7 @@ Do you want to overwrite it?</source>
     </message>
     <message>
         <source>Revised Julian (Milanković)</source>
-        <translation>Пересмотренный юлианский (Миланковича)</translation>
+        <translation>Новоюлианский (Миланкович)</translation>
     </message>
     <message>
         <source>Coptic</source>
@@ -814,7 +814,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Off</source>
-        <translation>Выкл</translation>
+        <translation>Откл</translation>
     </message>
     <message>
         <source>With delay</source>
@@ -1126,7 +1126,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished">Пользовательская</translation>
+        <translation>Пользовательский</translation>
     </message>
 </context>
 <context>
@@ -1310,11 +1310,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Предупреждение</translation>
+        <translation>Предупреждение</translation>
     </message>
     <message>
         <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Преобразование (с использованием «to») не поддерживается в функциях.</translation>
     </message>
 </context>
 <context>
@@ -1962,7 +1962,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>DEL</source>
-        <translation type="unfinished"></translation>
+        <translation>УДЛ</translation>
     </message>
 </context>
 <context>
@@ -2867,7 +2867,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Close application with Escape key</source>
-        <translation>Закрыть приложение клавишей Esc</translation>
+        <translation>Закрывать приложение клавишей Esc</translation>
     </message>
     <message>
         <source>Round halfway numbers to odd</source>
@@ -2907,11 +2907,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Two&apos;s complement output:</source>
-        <translation>Дополнительный код для вывода</translation>
+        <translation>Дополнительный код для вывода:</translation>
     </message>
     <message>
         <source>Two&apos;s complement input:</source>
-        <translation>Дополнительный код для ввода</translation>
+        <translation>Дополнительный код для ввода:</translation>
     </message>
     <message>
         <source>Binary</source>
@@ -2931,7 +2931,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Max history lines saved:</source>
-        <translation>Максимальное количество сохраненных строк истории:</translation>
+        <translation>Максимальное количество сохранённых строк истории:</translation>
     </message>
     <message>
         <source>Preserve history height</source>
@@ -2947,7 +2947,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Off</source>
-        <translation>Выкл</translation>
+        <translation>Откл</translation>
     </message>
     <message>
         <source>In history list</source>
@@ -2979,19 +2979,19 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Indicate repeating decimals:</source>
-        <translation type="unfinished">Указывать повторяющиеся десятичные дроби:</translation>
+        <translation>Указывать повторяющиеся десятичные дроби:</translation>
     </message>
     <message>
         <source>Ellipsis</source>
-        <translation type="unfinished"></translation>
+        <translation>Многоточие</translation>
     </message>
     <message>
         <source>Overline</source>
-        <translation type="unfinished"></translation>
+        <translation>Черта сверху</translation>
     </message>
     <message>
         <source>Place percent button in number pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Разместить кнопку процентов на цифровой клавиатуре</translation>
     </message>
 </context>
 <context>
@@ -3142,13 +3142,13 @@ Do you wish to update the exchange rates now?</source>
         <translation>
             <numerusform>Прошёл %n день с момента последнего обновления курсов обмена.
 
-Вы хотите обновить курсы обмена сейчас?</numerusform>
+Хотите обновить курсы обмена сейчас?</numerusform>
             <numerusform>Прошло %n дня с момента последнего обновления курсов обмена.
 
-Вы хотите обновить курсы обмена сейчас?</numerusform>
+Хотите обновить курсы обмена сейчас?</numerusform>
             <numerusform>Прошло %n дней с момента последнего обновления курсов обмена.
 
-Вы хотите обновить курсы обмена сейчас?</numerusform>
+Хотите обновить курсы обмена сейчас?</numerusform>
         </translation>
     </message>
     <message>
@@ -3736,11 +3736,11 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Import CSV File…</source>
-        <translation>Загрузить CSV файл…</translation>
+        <translation>Загрузить файл CSV…</translation>
     </message>
     <message>
         <source>Export CSV File…</source>
-        <translation>Экспорт в CSV файл…</translation>
+        <translation>Экспорт в файл CSV…</translation>
     </message>
     <message>
         <source>Functions</source>
@@ -4013,7 +4013,7 @@ You can get version %3 at %2.</source>
     <message>
         <source>off</source>
         <comment>Max decimals</comment>
-        <translation>выкл</translation>
+        <translation>откл</translation>
     </message>
     <message>
         <source>Convert</source>
@@ -4257,7 +4257,7 @@ Please select temperature calculation mode
     </message>
     <message>
         <source>Please select desired variant of the sinc function.</source>
-        <translation>Выберите нужный вариант функции sinc.</translation>
+        <translation>Пожалуйста, выберите нужный вариант функции sinc.</translation>
     </message>
     <message>
         <source>Unnormalized</source>
@@ -4274,8 +4274,8 @@ Please select temperature calculation mode
     <message>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
-        <translation>Выберите использование точки («.»)
-(позже это можно изменить в настройках).</translation>
+        <translation>Пожалуйста, выберите интерпретацию точки («.»)
+(можно изменить позже в настройках).</translation>
     </message>
     <message>
         <source>Both dot and comma as decimal separators</source>
@@ -4658,29 +4658,31 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
+        <translation>&lt;i&gt;Щелчок средней кнопкой&lt;/i&gt;: %1</translation>
     </message>
     <message>
         <source>Conversion operator</source>
-        <translation type="unfinished"></translation>
+        <translation>Оператор преобразования</translation>
     </message>
     <message>
         <source>Interpretation of comma</source>
-        <translation type="unfinished"></translation>
+        <translation>Интерпретация запятой</translation>
     </message>
     <message>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
-        <translation type="unfinished"></translation>
+        <translation>Пожалуйста, выберите интерпретацию запятой («,»)
+(можно изменить позже в настройках).</translation>
     </message>
     <message>
         <source>Comma as thousands separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Запятая как разделитель тысяч</translation>
     </message>
     <message>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Запятая как разделитель аргументов функции
+и элементов матрицы/вектора</translation>
     </message>
 </context>
 <context>
