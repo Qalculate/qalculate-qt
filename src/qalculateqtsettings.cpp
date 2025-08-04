@@ -1957,6 +1957,7 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 	if(event->key() == Qt::Key_Return) event->accept();
 }
 bool QalculateQtSettings::checkExchangeRates(QWidget *parent) {
+	if(!CALCULATOR->canFetch()) return false;
 	int i = CALCULATOR->exchangeRatesUsed();
 	if(i == 0) return false;
 	if(auto_update_exchange_rates == 0) return false;

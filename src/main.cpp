@@ -201,7 +201,7 @@ int main(int argc, char **argv) {
 
 	new Calculator(settings->ignore_locale);
 
-	CALCULATOR->setExchangeRatesWarningEnabled(false);
+	CALCULATOR->setExchangeRatesWarningEnabled(!CALCULATOR->canFetch());
 
 	settings->loadPreferences();
 
