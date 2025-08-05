@@ -662,7 +662,7 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
 	multiplicationButton[i] = button;
 	// Standard calculator button. Do not use more than three characters.
-	button = new KeypadButton(tr("DEL"), this, true);
+	button = new KeypadButton(LOAD_ICON("edit-clear"), this);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(delClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
 	connect(button, SIGNAL(clicked3()), this, SIGNAL(backspaceClicked()));
@@ -684,7 +684,7 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	divisionButton[i] = button;
 	button->setProperty(BUTTON_DATA, settings->divisionSign(false));
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
-	button = new KeypadButton(LOAD_ICON("edit-clear"), this);
+	button = new KeypadButton(tr("AC"), this, true);
 	button->setToolTip(tr("Clear expression"));
 	connect(button, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
@@ -1627,8 +1627,8 @@ void KeypadWidget::updateSymbols() {
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
 		for(size_t i = 0; i < 2; i++) {
-			if(!acButton[i]) continue;
-			acButton[i]->setIcon(LOAD_ICON("edit-clear"));
+			if(!delButton[i]) continue;
+			delButton[i]->setIcon(LOAD_ICON("edit-clear"));
 		}
 		if(backButton) backButton->setIcon(LOAD_ICON("go-back"));
 		if(forwardButton) forwardButton->setIcon(LOAD_ICON("go-forward"));
