@@ -1627,10 +1627,6 @@ void KeypadWidget::updateSymbols() {
 }
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
-		for(size_t i = 0; i < 2; i++) {
-			if(!acButton[i]) continue;
-			acButton[i]->setIcon(LOAD_ICON("edit-clear"));
-		}
 		if(backButton) backButton->setIcon(LOAD_ICON("go-back"));
 		if(forwardButton) forwardButton->setIcon(LOAD_ICON("go-forward"));
 		if(customEditButton) customEditButton->setIcon(LOAD_ICON("document-edit"));
