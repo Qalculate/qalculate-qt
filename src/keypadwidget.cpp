@@ -684,7 +684,8 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	divisionButton[i] = button;
 	button->setProperty(BUTTON_DATA, settings->divisionSign(false));
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
-	button = new KeypadButton(LOAD_ICON("edit-clear"), this);
+	// Standard calculator button. Do not use more than three characters.
+	button = new KeypadButton(tr("C"), this);
 	button->setToolTip(tr("Clear expression"));
 	connect(button, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(clearClicked()));
