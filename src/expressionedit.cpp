@@ -474,11 +474,10 @@ struct CompletionData {
 	int current_function_index;
 	std::vector<Unit*> current_from_units;
 	std::vector<std::string> current_from_categories;
-	QModelIndex exact_prefix_match;
-	bool exact_match_found, exact_prefix_match_found, editing_to_expression, editing_to_expression1, show_custom_to;
+	bool editing_to_expression, editing_to_expression1, show_custom_to;
 	int to_type, highest_match;
 	Argument *arg;
-	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), exact_match_found(false), exact_prefix_match_found(false), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
+	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
 	}
 };
 
@@ -576,11 +575,17 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 									if(b_match && (!cu || (exp == 1 && cu->countUnits() == 1)) && ((!ename->case_sensitive && equalsIgnoreCase(*namestr, *cmpstr)) || (ename->case_sensitive && *namestr == *cmpstr))) b_match = 1;
 									if(b_match) {
 										if(icmp > 0 && !cu) {
-											if(CALCULATOR->getActiveVariable(str.substr(0, namestr->length() + (str.length() - cmpstr->length()))) || CALCULATOR->getActiveFunction(str.substr(0, namestr->length() + (str.length() - cmpstr->length())))) {
+											prefix = cdata->prefixes[icmp - 1];
+											if((prefix->type() != PREFIX_DECIMAL || ((Unit*) item)->minPreferredPrefix() > ((DecimalPrefix*) prefix)->exponent() || ((Unit*) item)->maxPreferredPrefix() < ((DecimalPrefix*) prefix)->exponent()) && (prefix->type() != PREFIX_BINARY || ((Unit*) item)->baseUnit()->referenceName() != "bit" || ((Unit*) item)->minPreferredPrefix() > ((BinaryPrefix*) prefix)->exponent() || ((Unit*) item)->maxPreferredPrefix() < ((BinaryPrefix*) prefix)->exponent())) {
 												b_match = false;
+												prefix = NULL;
 												continue;
 											}
-											prefix = cdata->prefixes[icmp - 1];
+											if(CALCULATOR->getActiveExpressionItem(str.substr(0, str.length() - cmpstr->length()) + *namestr)) {
+												b_match = false;
+												prefix = NULL;
+												continue;
+											}
 											i_match = str.length() - cmpstr->length();
 										} else if(b_match > 1 && !cdata->editing_to_expression && item->isHidden() && str.length() == 1) {
 											b_match = 4;
@@ -609,10 +614,15 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 						cap_it = capitalized_names.find(&item->getName(name_i));
 						if(item->getName(name_i).name == *cmpstr || (cap_it != capitalized_names.end() && cap_it->second == *cmpstr)) {
 							if(!cu) {
-								if(icmp > 0) prefix = cdata->prefixes[icmp - 1];
-								else prefix = NULL;
+								if(icmp > 0) {
+									if(CALCULATOR->getActiveExpressionItem(str.substr(0, str.length() - cmpstr->length()) + *cmpstr)) break;
+									prefix = cdata->prefixes[icmp - 1];
+								} else {
+									prefix = NULL;
+								}
 							}
-							b_match = 1; break;
+							b_match = 1;
+							break;
 						}
 					}
 				}
@@ -653,14 +663,6 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					qstr.insert(0, QString::fromStdString(prefix->longName()));
 					qstr.insert(0, "<font size=\"-1\">(");
 					sourceModel()->setData(index, qstr, Qt::DisplayRole);
-				}
-			}
-			if(b_match == 1 && item->type() != TYPE_FUNCTION) {
-				if(prefix) {
-					cdata->exact_prefix_match = index;
-					cdata->exact_prefix_match_found = true;
-				} else {
-					cdata->exact_match_found = true;
 				}
 			}
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
@@ -2313,6 +2315,10 @@ void find_matching_units(const MathStructure &m, const MathStructure *mparse, st
 			if(v[i] == u) return;
 		}
 		v.push_back(u);
+		if(top && mparse) {
+			Unit *u2 = CALCULATOR->findMatchingUnit(*mparse);
+			if(u2 && u2 != u && u2->baseUnit() == u->baseUnit() && u2->baseExponent() == u->baseExponent() && u2->category() != u->category()) v.push_back(u2);
+		}
 		return;
 	}
 	if(top) {
@@ -3074,9 +3080,6 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 			if(!b) cdata->current_from_categories.push_back(cdata->current_from_units[i]->category());
 		}
 	}
-	cdata->exact_prefix_match = QModelIndex();
-	cdata->exact_match_found = false;
-	cdata->exact_prefix_match_found = false;
 	cdata->highest_match = 0;
 	cdata->arg = NULL;
 	if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET) {
@@ -3811,6 +3814,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 								break;
 							}
 						}
+						if(b && i_match > 0 && i_type != 1 && equalsIgnoreCase(cap_it->second, str2)) b = false;
 					}
 					if(b) cap_str = cap_it->second;
 					if(!b && str2.length() <= ename->name.length()) {
@@ -3823,6 +3827,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 								break;
 							}
 						}
+						if(b && i_match > 0 && i_type != 1 && equalsIgnoreCase(ename->name, str2)) b = false;
 					}
 					if(!b) ename = NULL;
 				}
@@ -3844,6 +3849,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 								break;
 							}
 						}
+						if(b && i_match > 0 && i_type != 1 && equalsIgnoreCase(ename->name, str2)) b = false;
 					}
 					if(!b) ename = NULL;
 				}
