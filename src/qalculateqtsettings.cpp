@@ -1012,6 +1012,7 @@ void QalculateQtSettings::loadPreferences() {
 	printops.allow_non_usable = false;
 	printops.lower_case_numbers = false;
 	printops.duodecimal_symbols = false;
+	printops.exp_display = EXP_POWER_OF_10;
 	printops.lower_case_e = false;
 	printops.base_display = BASE_DISPLAY_SUFFIX;
 	printops.twos_complement = true;
