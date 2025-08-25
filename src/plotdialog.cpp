@@ -650,5 +650,20 @@ void PlotDialog::onRateStepToggled(QAbstractButton *w, bool b) {
 }
 void PlotDialog::onGraphsSelectionChanged() {
 	enableDisableButtons();
+	QList<QTreeWidgetItem *> list = graphsTable->selectedItems();
+	if(list.count() != 1) return;
+	QTreeWidgetItem *item = list[0];
+	titleEdit->setText(item->text(0));
+	expressionEdit->setText(item->text(1));
+	variableEdit->setText(item->data(0, X_ROLE).toString());
+	primaryButton->setChecked(!item->data(0, YAXIS2_ROLE).toBool());
+	secondaryButton->setChecked(item->data(0, YAXIS2_ROLE).toBool());
+	rowsBox->setChecked(item->data(0, ROWS_ROLE).toBool());
+	styleCombo->setCurrentIndex(styleCombo->findData(item->data(0, STYLE_ROLE).toInt()));
+	smoothingCombo->setCurrentIndex(smoothingCombo->findData(item->data(0, SMOOTHING_ROLE).toInt()));
+	int type = item->data(0, TYPE_ROLE).toInt();
+	vectorButton->setChecked(type == 1);
+	pairedButton->setChecked(type == 2);
+	functionButton->setChecked(type == 0);
 }
 
