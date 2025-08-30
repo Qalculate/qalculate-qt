@@ -170,7 +170,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Disable cursor blinking"), settings->disable_cursor_blinking, disableCursorBlinkingToggled(bool));
 	BOX(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX(tr("Format result"), settings->format_result, formatToggled(bool));
-	BOX1(tr("Custom result font:"), settings->use_custom_result_font, resultFontToggled(bool));
+	BOX1(tr("Custom history font:"), settings->use_custom_result_font, resultFontToggled(bool));
 	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	BOX1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
