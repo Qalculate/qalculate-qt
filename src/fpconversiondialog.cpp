@@ -250,7 +250,7 @@ void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 		} else {
 			if(sbin.length() < bits) sbin.insert(0, bits - sbin.length(), '0');
 			Number exponent, significand;
-			exponent.set(sbin.substr(1, expbits), pa);
+			exponent.set(sbin.substr(sgnpos == 0 ? 1 : 0, expbits), pa);
 			Number expbias(2);
 			expbias ^= (expbits - 1);
 			expbias--;
@@ -265,9 +265,9 @@ void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 				sfloathex = sfloat;
 			} else {
 				if(subnormal) exponent++;
-				if(subnormal) significand.set(std::string("0.") + sbin.substr(1 + expbits), pa);
-				else significand.set(std::string("1.") + sbin.substr(1 + expbits), pa);
-				if(sbin[0] != '0') significand.negate();
+				if(subnormal) significand.set(std::string("0.") + sbin.substr((bits == 80 ? 2 : 1) + expbits), pa);
+				else significand.set(std::string("1.") + sbin.substr((bits == 80 ? 2 : 1) + expbits), pa);
+				if(sbin[sgnpos] != '0') significand.negate();
 				int exp_bak = po.min_exp;
 				po.min_exp = 0;
 				sfloat = significand.print(po);
