@@ -348,7 +348,7 @@ void HistoryView::loadInitial(bool reload) {
 		size_t i = 0;
 		for(; i < settings->v_expression.size() - 1; i++) {
 			if(!settings->v_messages[i].isEmpty()) replaceColors(settings->v_messages[i]);
-			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, 1, i);
+			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload ? 2 : 1, i);
 		}
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
 			replaceColors(s_text);
@@ -368,7 +368,7 @@ void HistoryView::loadInitial(bool reload) {
 				settings->v_messages[i].replace("width=\"2\"", "width=\"1\"");
 			}
 		}
-		addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload && !settings->history_answer.empty() && settings->current_result ? 2 : 1, i);
+		addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload && !settings->history_answer.empty() && settings->current_result ? 3 : (reload ? 2 : 1), i);
 	}
 	initial_loaded = true;
 	QFontMetrics fm(font());
@@ -576,7 +576,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	str.replace("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>");
 	if((!expression.empty() || !parse.empty()) && !temporary) {
 		i_pos = str.length();
-		if(initial_load != 1) i_pos_p = i_pos;
+		if(!initial_load || initial_load > 2) i_pos_p = i_pos;
 	}
 	size_t i_answer_pre = 0;
 	if(temporary && values.empty()) {
@@ -589,12 +589,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		else if(!temporary) i_answer = dual_approx && n == 0 ? settings->history_answer.size() - 1 : settings->history_answer.size();
 		if(!values[i].empty() && values[i][0] == '#') {
 			str += "<tr><td colspan=\"2\" style=\"text-align:left";
-			if(!comment && (initial_load == 1 || (initial_load > 1 && n > 0))) str += "; font-size:small";
+			if(!comment && (initial_load == 1 || initial_load == 2 || (initial_load > 2 && n > 0))) str += "; font-size:small";
 			else if(!comment) str += "; font-size:normal";
 			if((!expression.empty() || !parse.empty()) && i == values.size() - 1) str += QStringLiteral("; padding-bottom: %1 px").arg(paste_h / 4);
 			str += "\">";
 			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
-			else str += QStringLiteral("<a name=\"c%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			else str += QStringLiteral("<a name=\"c%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
 			if(values[i].size() == 1 || values[i][1] != '-') str += "- ";
 			str += QString::fromStdString(values[i]).mid(1);
 			str += "</a></td></tr>";
@@ -604,7 +604,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		int w_number = fm.boundingRect("#9999").width();
 		int w = 0;
 		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w_number); str += "\">";
-		if(initial_load != 1) {
+		if(!initial_load || initial_load > 2) {
 			w = fm.boundingRect("= " + unhtmlize(QString::fromStdString(values[i]))).width();
 		}
 		if(i_answer != 0 && i_answer != i_answer_pre) {
@@ -613,9 +613,9 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 			QString sref;
 			if(settings->color == 2) {
-				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #AAAAAA\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
 			} else {
-				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+				sref = QStringLiteral("<a href=\"#%1:%2:%3\" style=\"text-decoration: none; text-align:left; color: #585858\">#%1</a>").arg(i_answer).arg(initial_load ? (int) index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
 			}
 			bool b = true;
 			if(initial_load) {
@@ -626,13 +626,13 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				}
 			}
 			if(b) str += sref;
-			if((initial_load > 1 && n == 0) || (!initial_load && (!dual_approx || i == values.size() - 1))) {
+			if((initial_load > 2 && n == 0) || (!initial_load && (!dual_approx || i == values.size() - 1))) {
 				last_ans = i_answer;
 				last_ref = sref;
 			}
 		}
 		str += "</td><td style=\"text-align:right";
-		if(initial_load == 1 || (initial_load > 1 && n > 0 && i_answer <= i_answer_pre) || w * 1.5 + w_number > width() || !settings->format_result) {
+		if(initial_load == 1 || initial_load == 2 || (initial_load > 1 && n > 0 && i_answer <= i_answer_pre) || w * 1.5 + w_number > width() || !settings->format_result) {
 			gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", values[i]);
 		} else if(w * 1.85 + w_number > width()) {
 			str += "; font-size:large";
@@ -655,7 +655,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "<a name=\"TR\" style=\"text-decoration: none\">";
 		} else if(!temporary) {
 			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
-			else str += QStringLiteral("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
+			else str += QStringLiteral("<a name=\"p%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
 		}
 		if(!temporary || !values[i].empty()) {
 			if(b_exact > 0) str += "= ";
@@ -1087,10 +1087,11 @@ void HistoryView::editComment(int i1, int i2) {
 				std::vector<std::string> values;
 				values.push_back(str.toStdString());
 				addResult(values, "", true, "", settings->v_exact[i1][i2]);
+				emit historyReloaded();
 			} else {
-				settings->v_result[i1].insert(settings->v_result[i1].begin() + i2, str.toStdString());
-				settings->v_exact[i1].insert(settings->v_exact[i1].begin() + i2, settings->v_exact[i1][i2]);
-				settings->v_value[i1].insert(settings->v_value[i1].begin() + i2, settings->v_value[i1][i2]);
+				settings->v_result[i1].insert(settings->v_result[i1].begin(), str.toStdString());
+				settings->v_exact[i1].insert(settings->v_exact[i1].begin(), settings->v_exact[i1][i2]);
+				settings->v_value[i1].insert(settings->v_value[i1].begin(), settings->v_value[i1][i2]);
 				int vpos = verticalScrollBar()->value();
 				reloadHistory();
 				verticalScrollBar()->setValue(vpos);
