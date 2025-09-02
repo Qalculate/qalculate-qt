@@ -134,7 +134,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 	protected slots:
 
-		void onTextChanged();
+		void onTextChanged(bool = false);
 		void onCursorPositionChanged();
 		void onCompletionActivated(const QModelIndex&);
 		void onCompletionHighlighted(const QModelIndex&);
@@ -169,6 +169,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		bool completeOrActivateFirst(bool = false);
 		bool complete(MathStructure* = NULL, MathStructure* = NULL, QMenu* = NULL, bool = false);
 		void clearHistory();
+		void updateDigitGroups();
 
 	signals:
 

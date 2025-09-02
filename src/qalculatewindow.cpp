@@ -3668,6 +3668,7 @@ void QalculateWindow::setOption(std::string str) {
 			}
 		}
 	} else if(equalsIgnoreCase(svar, "assumptions") || svar == "ass" || svar == "asm") {
+		settings->assumptions_warning_shown = true;
 		size_t i = svalue.find_first_of(SPACES);
 		AssumptionType at = CALCULATOR->defaultAssumptions()->type();
 		AssumptionSign as = CALCULATOR->defaultAssumptions()->sign();
@@ -5786,6 +5787,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 		return;
 	}
+	warnAssumptions(*parsed_mstruct);
 
 	//update "ans" variables
 	if(stack_index == 0) {
@@ -6873,6 +6875,9 @@ void QalculateWindow::autoCalculateTimeout() {
 			CALCULATOR->setFixedDenominator(save_fden);
 			settings->dual_fraction = save_dual;
 		}
+		if(askDot(str, false) || askTC(mauto_parsed, true) || askSinc(mauto_parsed, true) || askSinc(mauto, true) || askPercent(true) || warnAssumptions(mauto_parsed, true)) {
+			CALCULATOR->error(false, "", NULL);
+		}
 	}
 	CALCULATOR->stopControl();
 
@@ -7597,7 +7602,21 @@ bool contains_temperature_unit_qt(const MathStructure &m) {
 	}
 	return false;
 }
-bool QalculateWindow::askTC(MathStructure &m) {
+bool QalculateWindow::warnAssumptions(MathStructure &m, bool dry_run) {
+	if(settings->assumptions_warning_shown) return false;
+	if(CALCULATOR->defaultAssumptions()->type() != ASSUMPTION_TYPE_REAL || CALCULATOR->defaultAssumptions()->sign() != ASSUMPTION_SIGN_UNKNOWN) {
+		settings->assumptions_warning_shown = true;
+		return false;
+	}
+	if(m.containsType(STRUCT_COMPARISON, false) <= 0 && !m.containsFunctionId(FUNCTION_ID_SOLVE)) return false;
+	MathStructure mvar = m.find_x_var();
+	if(!mvar.isSymbolic() && !mvar.isVariable()) return false;
+	if(mvar.isVariable() && (mvar.variable()->isKnown() || ((UnknownVariable*) mvar.variable())->assumptions())) return false;
+	CALCULATOR->error(false, tr("Unknown variables (e.g. x, y, z) are by default assumed real.").toUtf8(), NULL);
+	if(!dry_run) settings->assumptions_warning_shown = true;
+	return true;
+}
+bool QalculateWindow::askTC(MathStructure &m, bool dry_run) {
 	if(settings->tc_set || !contains_temperature_unit_qt(m)) return false;
 	MathStructure *mp = &m;
 	if(m.isMultiplication() && m.size() == 2 && m[0].isMinusOne()) mp = &m[1];
@@ -7610,6 +7629,7 @@ bool QalculateWindow::askTC(MathStructure &m) {
 		}
 		if(!b) return false;
 	}
+	if(dry_run) return true;
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -7652,8 +7672,9 @@ bool QalculateWindow::askTC(MathStructure &m) {
 	}
 	return false;
 }
-bool QalculateWindow::askSinc(MathStructure &m) {
+bool QalculateWindow::askSinc(MathStructure &m, bool dry_run) {
 	if(settings->sinc_set || !m.containsFunctionId(FUNCTION_ID_SINC)) return false;
+	if(dry_run) return true;
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -7685,7 +7706,7 @@ bool QalculateWindow::askSinc(MathStructure &m) {
 	}
 	return false;
 }
-bool QalculateWindow::askDot(const std::string &str) {
+bool QalculateWindow::askDot(const std::string &str, bool dry_run) {
 	if(settings->dot_question_asked) return false;
 	bool ask_comma = (CALCULATOR->getDecimalPoint() == DOT);
 	size_t i = 0;
@@ -7701,6 +7722,7 @@ bool QalculateWindow::askDot(const std::string &str) {
 		}
 	}
 	if(!b) return false;
+	if(dry_run) return true;
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -7813,8 +7835,9 @@ bool QalculateWindow::askImplicit() {
 	dialog->deleteLater();
 	return pm_bak != settings->evalops.parse_options.parsing_mode;
 }
-bool QalculateWindow::askPercent() {
+bool QalculateWindow::askPercent(bool dry_run) {
 	if(settings->simplified_percentage >= 0 || !CALCULATOR->simplifiedPercentageUsed()) return false;
+	if(dry_run) return true;
 	QDialog *dialog = new QDialog(this);
 	QVBoxLayout *box = new QVBoxLayout(dialog);
 	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
@@ -8452,6 +8475,7 @@ void QalculateWindow::assumptionsTypeActivated() {
 			break;
 		}
 	}
+	settings->assumptions_warning_shown = true;
 	expressionCalculationUpdated();
 }
 void QalculateWindow::assumptionsSignActivated() {
@@ -8463,6 +8487,7 @@ void QalculateWindow::assumptionsSignActivated() {
 			break;
 		}
 	}
+	settings->assumptions_warning_shown = true;
 	expressionCalculationUpdated();
 }
 void QalculateWindow::onAlwaysOnTopChanged() {
@@ -8995,6 +9020,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(binaryBitsChanged()), this, SLOT(onBinaryBitsChanged()));
 	connect(preferencesDialog, SIGNAL(statusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
 	connect(preferencesDialog, SIGNAL(buttonLocationChanged()), keypad, SLOT(updateButtonLocation()));
+	connect(preferencesDialog, SIGNAL(automaticDigitGroupingChanged()), expressionEdit, SLOT(updateDigitGroups()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

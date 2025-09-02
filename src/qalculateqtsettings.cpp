@@ -952,7 +952,9 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 				sinc_set = true;
 			}
 		} else if(svar == "implicit_question_asked") {
-			implicit_question_asked = true;
+			implicit_question_asked = v;
+		} else if(svar == "assumptions_warning_shown") {
+			assumptions_warning_shown = v;
 		} else if(svar == "calculate_as_you_type") {
 			auto_calculate = v;
 		} else if(svar == "calculate_as_you_type_delay") {
@@ -1054,6 +1056,7 @@ void QalculateQtSettings::loadPreferences() {
 	autocalc_selection = false;
 	dot_question_asked = false;
 	implicit_question_asked = false;
+	assumptions_warning_shown = false;
 	complex_angle_form = false;
 	decimal_comma = -1;
 	adaptive_interval_display = true;
@@ -1565,6 +1568,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);
+		if(assumptions_warning_shown) fprintf(file, "assumptions_warning_shown=%i\n", assumptions_warning_shown);
 		fprintf(file, "replace_expression=%i\n", replace_expression);
 		fprintf(file, "autocopy_result=%i\n", autocopy_result);
 		fprintf(file, "history_expression_type=%i\n", history_expression_type);

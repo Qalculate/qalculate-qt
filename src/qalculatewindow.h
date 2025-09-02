@@ -125,11 +125,12 @@ class QalculateWindow : public QMainWindow {
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false, bool calculate_selection = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
-		bool askTC(MathStructure&);
-		bool askSinc(MathStructure&);
-		bool askDot(const std::string&);
+		bool warnAssumptions(MathStructure&, bool = false);
+		bool askTC(MathStructure&, bool = false);
+		bool askSinc(MathStructure&, bool = false);
+		bool askDot(const std::string&, bool = false);
 		bool askImplicit();
-		bool askPercent();
+		bool askPercent(bool = false);
 		void keyPressEvent(QKeyEvent*) override;
 		bool eventFilter(QObject*, QEvent*) override;
 		void closeEvent(QCloseEvent*) override;

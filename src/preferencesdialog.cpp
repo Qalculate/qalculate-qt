@@ -713,6 +713,7 @@ void PreferencesDialog::caretAsXorToggled(bool b) {
 }
 void PreferencesDialog::automaticDigitGroupingToggled(bool b) {
 	settings->automatic_digit_grouping = b;
+	emit automaticDigitGroupingChanged();
 }
 void PreferencesDialog::closeWithEscToggled(bool b) {
 	settings->close_with_esc = b;

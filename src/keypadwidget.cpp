@@ -1542,7 +1542,9 @@ void KeypadWidget::defaultAssumptionsActivated() {
 	if(!v || v->isKnown()) return;
 	UnknownVariable *uv = (UnknownVariable*) v;
 	uv->setAssumptions(NULL);
+	settings->assumptions_warning_shown = true;
 	emit expressionCalculationUpdated(0);
+
 }
 void KeypadWidget::assumptionsTypeActivated() {
 	QAction *action = qobject_cast<QAction*>(sender());
@@ -1551,6 +1553,7 @@ void KeypadWidget::assumptionsTypeActivated() {
 	UnknownVariable *uv = (UnknownVariable*) v;
 	if(!uv->assumptions()) uv->setAssumptions(new Assumptions());
 	uv->assumptions()->setType((AssumptionType) action->data().toInt());
+	settings->assumptions_warning_shown = true;
 	emit expressionCalculationUpdated(0);
 }
 void KeypadWidget::assumptionsSignActivated() {
@@ -1560,6 +1563,7 @@ void KeypadWidget::assumptionsSignActivated() {
 	UnknownVariable *uv = (UnknownVariable*) v;
 	if(!uv->assumptions()) uv->setAssumptions(new Assumptions());
 	uv->assumptions()->setSign((AssumptionSign) action->data().toInt());
+	settings->assumptions_warning_shown = true;
 	emit expressionCalculationUpdated(0);
 }
 void KeypadWidget::setKeypadType(int i) {

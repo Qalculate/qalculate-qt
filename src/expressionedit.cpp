@@ -2854,15 +2854,22 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 }
 
-void ExpressionEdit::onTextChanged() {
+void ExpressionEdit::updateDigitGroups() {
+	if(settings->automatic_digit_grouping) {
+		onTextChanged(true);
+	}
+}
+
+void ExpressionEdit::onTextChanged(bool force_update_groups) {
 	QString str = toPlainText();
-	if(str == previous_text && textCursor().position() == previous_pos) return;
+	if(!force_update_groups && str == previous_text && textCursor().position() == previous_pos) return;
 	tabbed_index = -1;
 	if(completionTimer) completionTimer->stop();
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
-	if(block_text_change) return;
+	if(!force_update_groups && block_text_change) return;
 	previous_pos = textCursor().position();
-	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && previous_pos >= 3 && previous_text != str && !str.isEmpty() && (str[previous_pos - 1].isDigit() || str[previous_pos - 1] == '.' || str[previous_pos - 1] == CALCULATOR->getDecimalPoint()[0])) {
+	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && (force_update_groups || previous_text != str) && !str.isEmpty()) {
+		QString sbak = str;
 		char sep = ' ';
 		char dec = '.', alt_dec = '.';
 		dec = CALCULATOR->getDecimalPoint()[0];
@@ -2871,74 +2878,96 @@ void ExpressionEdit::onTextChanged() {
 			if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
 			else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
 		}
-		int n = 0, nd = 0, ns = 0, ns_p = 0;
-		int last_pos = 0;
-		if(previous_pos < str.length()) {
-			last_pos = previous_pos - 1;
-			for(; last_pos < str.length(); last_pos++) {
+		int first_pos = 0, last_pos = 0;
+		int sel_anchor = textCursor().selectionStart();
+		if(sel_anchor == previous_pos) sel_anchor = textCursor().selectionEnd();
+		while(true) {
+			if(last_pos == 0 && previous_pos > 0 && sep == ' ' && str[previous_pos - 1].isSpace() && str.length() - 1 == previous_text.length()) {
+				QString stest = str;
+				stest.remove(previous_pos - 1, 1);
+				if(stest == previous_text) break;
+			}
+			bool cit1 = 0, cit2 = 0;
+			int vpar = 0;
+			for(first_pos = last_pos; first_pos < str.length(); first_pos++) {
+				if(!cit1 && str[first_pos] == "\"") cit2 = !cit2;
+				else if(!cit2 && str[first_pos] == "\'") cit1 = !cit1;
+				else if(!cit1 && !cit2 && vpar > 0 && str[first_pos] == RIGHT_VECTOR_WRAP_CH) vpar--;
+				else if(!cit1 && !cit2 && str[first_pos] == LEFT_VECTOR_WRAP_CH) vpar++;
+				if(!cit1 && !cit2 && !vpar && (str[first_pos].isDigit() || str[first_pos] == dec || str[first_pos] == alt_dec)) break;
+			}
+			if(first_pos >= str.length()) break;
+			for(last_pos = first_pos + 1; last_pos < str.length(); last_pos++) {
 				if(!str[last_pos].isDigit() && str[last_pos] != dec && str[last_pos] != alt_dec && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || (!str[last_pos + 1].isDigit() && str[last_pos + 1] != dec && str[last_pos + 1] != alt_dec))) {
 					break;
 				}
 			}
 			last_pos--;
-		} else {
-			last_pos = str.length() - 1;
-		}
-		int first_pos = 0;
-		int dec_pos = -1;
-		for(int i = last_pos; i >= 0; i--) {
-			if(str[i] == dec || str[i] == alt_dec) {
-				dec_pos = i;
-				nd = n;
-				n = 0;
-			} else if(str[i].isDigit()) {
-				n++;
-			} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && (str[i - 1].isDigit() || str[i - 1] == dec || str[i - 1] == alt_dec)) {
-				if(i < previous_pos) ns_p++;
-				ns++;
-			} else {
-				first_pos = i + 1;
-				break;
-			}
-		}
-		if(n > 4 || (nd > 4 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0))) {
-			for(int i = last_pos - 1; ns > 0 && i >= 0;) {
-				if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
-					str.remove(i, 1);
-					ns--;
-					last_pos--;
-					if(i < dec_pos) dec_pos--;
-				} else {
-					i--;
+			int n = 0, nd = 0, ns = 0, ns_p = 0;
+			int dec_pos = -1;
+			for(int i = last_pos; i >= first_pos; i--) {
+				if(str[i] == dec || str[i] == alt_dec) {
+					dec_pos = i;
+					nd = n;
+					n = 0;
+				} else if(str[i].isDigit()) {
+					n++;
+				} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && (str[i - 1].isDigit() || str[i - 1] == dec || str[i - 1] == alt_dec)) {
+					if(i < previous_pos) ns_p++;
+					ns++;
 				}
 			}
-			previous_pos -= ns_p;
-			ns_p = 0;
-			for(int i = (dec_pos >= 0 ? dec_pos - 3 : last_pos - 2); n > 4 && i > first_pos; i -= 3) {
-				if(sep == ' ') str.insert(i, THIN_SPACE);
-				else str.insert(i, sep);
-				if(i < previous_pos) ns_p++;
-				last_pos++;
-				dec_pos++;
+			if(n > 4 || (nd > 4 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0 || previous_pos < str.length()))) {
+				for(int i = last_pos - 1; ns > 0 && i >= 0;) {
+					if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
+						str.remove(i, 1);
+						ns--;
+						last_pos--;
+						if(i < dec_pos) dec_pos--;
+						if(i < sel_anchor) sel_anchor--;
+					} else {
+						i--;
+					}
+				}
+				previous_pos -= ns_p;
+				ns_p = 0;
+				for(int i = (dec_pos >= 0 ? dec_pos - 3 : last_pos - 2); n > 4 && i > first_pos; i -= 3) {
+					if(sep == ' ') str.insert(i, THIN_SPACE);
+					else str.insert(i, sep);
+					if(i < previous_pos) ns_p++;
+					last_pos++;
+					dec_pos++;
+					if(i < sel_anchor) sel_anchor++;
+				}
+				for(int i = dec_pos + 4; nd > 4 && i <= last_pos && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE; i += 4) {
+					if(sep == ' ') str.insert(i, THIN_SPACE);
+					else str.insert(i, sep);
+					if(i < previous_pos + ns_p) ns_p++;
+					last_pos++;
+					if(i < sel_anchor) sel_anchor++;
+				}
+				previous_pos += ns_p;
 			}
-			for(int i = dec_pos + 4; nd > 4 && i <= last_pos && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE; i += 4) {
-				if(sep == ' ') str.insert(i, THIN_SPACE);
-				else str.insert(i, sep);
-				if(i < previous_pos + ns_p) ns_p++;
-				last_pos++;
-			}
-			previous_pos += ns_p;
+			last_pos++;
+		}
+		if(str != sbak) {
 			block_text_change++;
 			setCursorWidth(0);
 			setPlainText(str);
 			QTextCursor cur = textCursor();
-			cur.setPosition(previous_pos);
+			if(sel_anchor != previous_pos) {
+				cur.setPosition(sel_anchor);
+				cur.setPosition(previous_pos, QTextCursor::KeepAnchor);
+			} else {
+				cur.setPosition(previous_pos);
+			}
 			setTextCursor(cur);
 			setCursorWidth(1);
 			block_text_change--;
 		}
 	}
 	previous_text = str;
+	if(force_update_groups) return;
 	if(expression_undo_buffer.isEmpty() || str != expression_undo_buffer.last()) {
 		if(expression_undo_buffer.isEmpty()) {
 			expression_undo_buffer.push_back(QString());

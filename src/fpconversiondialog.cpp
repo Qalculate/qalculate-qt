@@ -276,7 +276,9 @@ void FPConversionDialog::updateFields(int base, const MathStructure *v) {
 					sfloat += settings->multiplicationSign();
 					sfloat += " ";
 					sfloat += "2^";
+					po.digit_grouping = DIGIT_GROUPING_NONE;
 					sfloat += exponent.print(po);
+					po.digit_grouping = settings->printops.digit_grouping;
 				}
 				if(b_approx) sfloat.insert(0, SIGN_ALMOST_EQUAL " ");
 				b_approx = false;

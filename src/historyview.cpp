@@ -430,6 +430,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	}
 	QString serror;
 	bool b_parse_error = (initial_load && !expression.empty() && settings->v_parseerror[index] && !settings->v_messages[index].isEmpty());
+	bool empty_error = false;
 	if(!initial_load && CALCULATOR->message()) {
 		do {
 			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
@@ -445,11 +446,15 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				MessageType mtype = CALCULATOR->message()->type();
 				if(temporary) {
 					if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
-						if(!serror.isEmpty()) {
-							if(!serror.startsWith("• ")) serror = "• " + serror;
-							serror += "\n• ";
+						if(CALCULATOR->message()->message().empty()) {
+							empty_error = true;
+						} else {
+							if(!serror.isEmpty()) {
+								if(!serror.startsWith("• ")) serror = "• " + serror;
+								serror += "\n• ";
+							}
+							serror += mstr;
 						}
-						serror += mstr;
 					}
 				} else {
 					if(mtype == MESSAGE_ERROR || mtype == MESSAGE_WARNING) {
@@ -465,7 +470,11 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						serror += "";
 						if(CALCULATOR->message()->stage() == MESSAGE_STAGE_PARSING) b_parse_error = true;
 						serror += "\">";
-						if(!mstr.startsWith("-")) serror += "- ";
+						if(!mstr.startsWith("-")) {
+							serror += "• ";
+						} else {
+							mstr.replace(0, 1, "•");
+						}
 						serror += mstr.toHtmlEscaped();
 						serror += "</td></tr>";
 					} else {
@@ -558,7 +567,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		if(temporary) {
 			temporary_error = serror;
-			if(!serror.isEmpty()) str += QStringLiteral("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\" alt=\"temporary_error\"/>").arg(":/icons/actions/scalable/warning.svg").arg(fm.ascent());
+			if(!serror.isEmpty() || empty_error) str += QStringLiteral("<img src=\"data://img1px.png\" width=\"2\"/><img valign=\"top\" src=\"%1\" height=\"%2\" alt=\"temporary_error\"/>").arg(":/icons/actions/scalable/warning.svg").arg(fm.ascent());
 		}
 		str += "</td></tr>";
 	} else if(!initial_load && !settings->v_result.empty()) {
@@ -595,7 +604,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "\">";
 			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			else str += QStringLiteral("<a name=\"c%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
-			if(values[i].size() == 1 || values[i][1] != '-') str += "- ";
+			if(values[i].size() == 1 || values[i][1] != '-') str += "• ";
 			str += QString::fromStdString(values[i]).mid(1);
 			str += "</a></td></tr>";
 			continue;
@@ -828,8 +837,10 @@ void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 					str = str.mid(i, i2 - i);
 					if(str == "temporary_error") str = temporary_error;
 					else str.replace("\\n", "\n");
-					QToolTip::showText(mapToGlobal(e->pos()), str);
-					b_tooltip = true;
+					if(!str.isEmpty()) {
+						QToolTip::showText(mapToGlobal(e->pos()), str);
+						b_tooltip = true;
+					}
 				}
 				break;
 			}
