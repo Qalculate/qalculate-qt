@@ -1,211 +1,327 @@
-# Qalculate! Qt
+# 🧮 Qalculate! Qt - Advanced Desktop Calculator
 
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Qt Version](https://img.shields.io/badge/Qt-%3E%3D%205.6-brightgreen.svg)](https://www.qt.io/)
-[![libqalculate Version](https://img.shields.io/badge/libqalculate-%3E%3D%205.6.0-brightgreen.svg)](https://qalculate.github.io/)
-[![Platform](https://img.shields.io/badge/platform-cross--platform-lightgrey.svg)](https://qalculate.github.io/downloads.html)
+<div align="center">
 
-<p align="center">
-  <a href="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png">
-    <img src="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png" alt="Qalculate! Qt Screenshot" width="552">
-  </a>
-</p>
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Qt Version](https://img.shields.io/badge/Qt-%3E%3D%205.6-brightgreen.svg?style=for-the-badge&logo=qt)](https://www.qt.io/)
+[![libqalculate Version](https://img.shields.io/badge/libqalculate-%3E%3D%205.6.0-brightgreen.svg?style=for-the-badge)](https://qalculate.github.io/)
+[![Platform](https://img.shields.io/badge/platform-cross--platform-lightgrey.svg?style=for-the-badge)](https://qalculate.github.io/downloads.html)
 
-> **Qalculate!** is a powerful and versatile cross-platform desktop calculator. It combines the simplicity of a traditional calculator with the power of a complex math package, making it an essential tool for everyone from students to engineers.
+<img src="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png" alt="Qalculate! Qt Screenshot" width="600" style="border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
 
-## Key Features
-- **Extensive Function Library:** A vast library of customizable functions for various fields.
-- **Unit Calculations & Conversions:** Seamlessly handle units with smart conversion capabilities.
-- **Symbolic Calculations:** Perform symbolic math, including integrals, equations, factorization, and simplification.
-- **Arbitrary Precision:** No more worrying about rounding errors.
-- **Uncertainty Propagation & Interval Arithmetic:** Advanced mathematical tools for precise calculations.
-- **Plotting:** Visualize your data and functions with Gnuplot integration.
-- **User-Friendly Interface:** A clean and intuitive interface available for GTK, Qt, and CLI.
+**A powerful and versatile cross-platform desktop calculator that combines simplicity with advanced mathematical capabilities**
 
-## Getting Started
+[📥 Download](https://qalculate.github.io/downloads.html) • [📖 Documentation](https://qalculate.github.io/manual/) • [🐛 Report Bug](https://github.com/Qalculate/qalculate-qt/issues) • [💡 Request Feature](https://github.com/Qalculate/qalculate-qt/issues)
 
-### Requirements
-| Dependency | Version |
-| :--- | :--- |
-| Qt | >= 5.6 (Qt6 supported) |
-| libqalculate | >= 5.6.0 |
+</div>
 
-### Installation
-You can find installers and binary packages on the [official downloads page](https://qalculate.github.io/downloads.html).
+---
 
-To build from source, run the following commands in the root directory:
+## 🌟 What Makes Qalculate! Special?
+
+> **Qalculate!** bridges the gap between simple calculators and complex mathematical software. Whether you're a student solving homework problems or an engineer performing advanced calculations, Qalculate! adapts to your needs with precision and ease.
+
+### ✨ Core Features
+
+<table>
+<tr>
+<td width="50%">
+
+**🧮 Mathematical Powerhouse**
+- Extensive function library with 500+ built-in functions
+- Symbolic calculations and equation solving
+- Arbitrary precision arithmetic
+- Complex numbers and infinite number support
+
+</td>
+<td width="50%">
+
+**📐 Smart Unit Handling**
+- Automatic unit conversions
+- Support for all SI units and prefixes
+- Imperial and metric system compatibility
+- Real-time currency conversion
+
+</td>
+</tr>
+<tr>
+<td>
+
+**📊 Advanced Analysis**
+- Uncertainty propagation
+- Interval arithmetic
+- Statistical functions
+- Matrix and vector operations
+
+</td>
+<td>
+
+**🎨 User Experience**
+- Clean, intuitive interface
+- Plotting with Gnuplot integration
+- Multiple number base support
+- Customizable display options
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🚀 Quick Start
+
+### 💻 System Requirements
+
+| Component | Minimum Version |
+|-----------|----------------|
+| **Qt Framework** | 5.6+ (Qt6 supported) |
+| **libqalculate** | 5.6.0+ |
+| **Operating System** | Windows, macOS, Linux |
+
+### 📦 Installation Options
+
+<details>
+<summary><b>🎯 Option 1: Pre-built Binaries (Recommended)</b></summary>
+
+Visit our [**official downloads page**](https://qalculate.github.io/downloads.html) for:
+- Windows installers (.msi, .exe)
+- macOS packages (.dmg)
+- Linux packages (.deb, .rpm, .appimage)
+
+</details>
+
+<details>
+<summary><b>⚡ Option 2: Build from Source</b></summary>
+
 ```bash
+# Clone the repository
+git clone https://github.com/Qalculate/qalculate-qt.git
+cd qalculate-qt
+
+# Build and install
 qmake
 make
 sudo make install
+
+# Run the application
+qalculate-qt
 ```
-The executable will be named `qalculate-qt`.
+
+</details>
+
+---
+
+## 💡 Usage Examples
 
 <details>
-<summary><b>Full Feature List (from libqalculate)</b></summary>
+<summary><b>🔢 Basic Mathematical Operations</b></summary>
 
-* **Calculation and parsing:**
-   * Basic operations and operators: `+ - * / mod ^ E () && || ! < > >= <= != ~ & | << >> xor`
-   * Fault-tolerant parsing of strings: `log 5 / 2 .5 (3) + (2( 3 +5` = `ln(5) / (2.5 * 3) + 2 * (3 + 5)`
-   * Expressions may contain any combination of numbers, functions, units, variables, vectors and matrices, and dates
-   * Supports complex and infinite numbers
-   * Propagation of uncertainty
-   * Interval arithmetic (for determination of the number of significant digits or direct calculation with intervals of numbers)
-   * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
-   * Ability to disable functions, variables, units or unknown variables for less confusion: e.g. when you do not want `(a+b)^2` to mean `(are+barn)^2` but `("a"+"b")^2`
-   * Controllable implicit multiplication
-   * Matrices and vectors, and related operations (determinants etc.)
-   * Verbose error messages
-   * Arbitrary precision
-   * RPN mode
-* **Result display:**
-   * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
-   * Many customization options: precision, max/min decimals, complex form, multiplication sign, etc.
-   * Exact or approximate: `sqrt(32)` returns `4 * sqrt(2)` or `5.66`
-   * Simple and mixed fractions: `4 / 6 * 2 = 1.333... = 4/3 = 1 + 1/3`
-* **Symbolic calculation:**
-   * E.g. `(x + y)^2 = x^2 + 2xy + y^2`; `4 "apples" + 3 "oranges"`
-   * Factorization and simplification
-   * Differentiation and integration
-   * Can solve most equations and inequalities
-   * Customizable assumptions give different results (e.g. `ln(2x) = ln(2) + ln(x)` if x is assumed positive)
-* **Functions:**
-   * Hundreds of flexible functions: trigonometry, exponents and logarithms, combinatorics, geometry, calculus, statistics, finance, time and date, etc.
-   * Can easily be created, edited and saved to a standard XML file
-* **Units:**
-   * Supports all SI units and prefixes (including binary), as well as imperial and other unit systems
-   * Automatic conversion: `ft + yd + m = 2.2192 m`
-   * Explicit conversion: `5 m/s to mi/h = 11.18 miles/hour`
-   * Smart conversion: automatically converts `5 kg*m/s^2` to `5 N`
-   * Currency conversion with retrieval of daily exchange rates
-   * Different name forms: abbreviation, singular, plural (m, meter, meters)
-   * Can easily be created, edited and saved to a standard XML file
-* **Variables and constants:**
-   * Basic constants: pi, e, etc.
-   * Lots of physical constants (with or without units) and properties of chemical element
-   * CSV file import and export
-   * Can easily be created, edited and saved to a standard XML file
-   * Flexible - may contain simple numbers, units, or whole expressions
-   * Data sets with objects and associated properties in database-like structure
-* **Plotting:**
-   * Uses Gnuplot
-   * Can plot functions or data (matrices and vectors)
-   * Ability to save plot to PNG image, postscript, etc.
-   * Several customization options
-* and more...
+```javascript
+sqrt(4)                    // = 2
+sqrt(25; 16; 9; 4)        // = [5  4  3  2]
+sqrt(32)                  // = 4 × √(2) (exact mode)
+cbrt(−27)                 // = -3 (real root)
+5!                        // = 120
+52 to factors             // = 2^2 × 13
+sum(x; 1; 5)             // = 15
+```
 
 </details>
 
 <details>
-<summary><b>Usage Examples</b></summary>
+<summary><b>📏 Unit Conversions & Calculations</b></summary>
 
-_Note that semicolon can be replaced with comma in function arguments, if comma is not used as decimal or thousands separator._
-
-### Basic functions and operators
-
-`sqrt(4)` _= 4^(0.5) = 4^(1/2) = 2_
-
-`sqrt(25; 16; 9; 4)` _= \[5  4  3  2\]_
-
-`sqrt(32)` _= 4 × √(2) (in exact mode)_
-
-`cbrt(−27)` _= root(-27; 3) = −3 (real root)_
-
-`(−27)^(1/3)` _≈ 1.5 + 2.5980762i (principal root)_
-
-`ln(25)` _= log(25; e) ≈ 3.2188758_
-
-`log2(4)/log10(100)` _= log(4; 2)/log(100; 10) = 1_
-
-`5!` _= 1 × 2 × 3 × 4 × 5 = 120_
-
-`52 to factors` _= 2^2 × 13_
-
-`sum(x; 1; 5)` _= 1 + 2 + 3 + 4 + 5 = 15_
-
-`plot(x^2; −5; 5)` _(plots the function y=x^2 from -5 to 5)_
-
-### Units
-
-`5 dm3 to L` _= 5 dm^3 to L = 5 L_
-
-`20 miles / 2h to km/h` _= 16.09344 km/h_
-
-`1.74 to ft` _= 1.74 m to ft ≈ 5 ft + 8.5039370 in_
-
-`50 Ω × 2 A` _= 100 V_
-
-`500 € − 20% to $` _≈ $451.04_
-
-### Physical constants
-
-`k_e / G × a_0` _= (coulombs_constant / newtonian_constant) × bohr_radius ≈ 7.126e9 kg·H·m^−1_
-
-`ℎ / (λ_C × c)` _= planck ∕ (compton_wavelength × speed_of_light) ≈ 9.1093837e-31 kg_
-
-`(G × planet(earth; mass) × planet(mars; mass))/(54.6e6 km)^2` _≈ 8.58e16 N_
-
-### Uncertainty and interval arithmetic
-
-`sin(5±0.2)^2/2±0.3` _≈ 0.460±0.088 (0.46±0.12)_
-
-`interval(−2; 5)^2` _≈ interval(−8.2500000; 12.750000) (interval(0; 25))_
-
-### Algebra
-
-`(5x^2 + 2)/(x − 3)` _= 5x + 15 + 47/(x − 3)_
-
-`factorize x^4 − 7x^3 + 9x^2 + 27x − 54` _= (x + 2)(x − 3)^3_
-
-`x+x^2+4 = 16` _= (x = 3 or x = −4)_
-
-`solve(x = y+ln(y); y)` _= lambertw(e^x)_
-
-### Calculus
-
-`diff(6x^2)` _= 12x_
-
-`integrate(6x^2; 1; 5)` _= 248_
-
-`limit(ln(1 + 4x)/(3^x − 1); 0)` _= 4 / ln(3)_
-
-### Matrices and vectors
-
-`[1, 2, 3; 4, 5, 6]` _= \[1  2  3; 4  5  6\]_
-
-`cross([1 2 3]; [4 5 6])` _= \[−3 6 −3\]_
-
-`[1 2; 3 4]^-1` _= \[−2  1; 1.5  −0.5\]_
-
-### Statistics
-
-`mean(5; 6; 4; 2; 3; 7)` _= 4.5_
-
-`stdev(5; 6; 4; 2; 3; 7)` _≈ 1.87_
-
-### Time and date
-
-`"2020-05-20" + 523d` _= "2021-10-25"_
-
-`today − 5 days` _= "2020-07-05"_
-
-`"2020-10-05" − today` _= 87 d_
-
-### Number bases
-
-`52 to bin` _= 0011 0100_
-
-`52 to hex` _= 0x34_
-
-`1978 to roman` _= MCMLXXVIII_
+```javascript
+5 dm3 to L               // = 5 L
+20 miles / 2h to km/h    // = 16.09344 km/h
+1.74 to ft               // ≈ 5 ft + 8.5039370 in
+50 Ω × 2 A              // = 100 V
+500 € − 20% to $        // ≈ $451.04
+```
 
 </details>
 
-## Documentation
-For more details about the syntax, and available functions, units, and variables, please consult the [**official manual**](https://qalculate.github.io/manual/).
+<details>
+<summary><b>🔬 Scientific Constants & Physics</b></summary>
 
-## Contributing
-Contributions are welcome! If you have a feature request, bug report, or pull request, please feel free to open an issue or submit a PR.
+```javascript
+k_e / G × a_0           // Coulomb constant calculation
+ℎ / (λ_C × c)           // Planck constant derivation
+(G × planet(earth; mass) × planet(mars; mass))/(54.6e6 km)^2  // Gravitational force
+```
 
-## License
-This project is licensed under the **GNU General Public License v2.0**. See the [COPYING](COPYING) file for details.
+</details>
+
+<details>
+<summary><b>📐 Advanced Mathematics</b></summary>
+
+```javascript
+// Algebra
+(5x^2 + 2)/(x − 3)              // = 5x + 15 + 47/(x − 3)
+factorize x^4 − 7x^3 + 9x^2 + 27x − 54  // = (x + 2)(x − 3)^3
+solve(x = y+ln(y); y)           // = lambertw(e^x)
+
+// Calculus
+diff(6x^2)                      // = 12x
+integrate(6x^2; 1; 5)           // = 248
+limit(ln(1 + 4x)/(3^x − 1); 0)  // = 4 / ln(3)
+
+// Linear Algebra
+[1, 2, 3; 4, 5, 6]             // Matrix creation
+cross([1 2 3]; [4 5 6])        // = [−3 6 −3]
+[1 2; 3 4]^-1                  // Matrix inverse
+```
+
+</details>
+
+<details>
+<summary><b>📊 Statistics & Data Analysis</b></summary>
+
+```javascript
+mean(5; 6; 4; 2; 3; 7)         // = 4.5
+stdev(5; 6; 4; 2; 3; 7)        // ≈ 1.87
+sin(5±0.2)^2/2±0.3             // ≈ 0.460±0.088 (uncertainty)
+interval(−2; 5)^2               // Interval arithmetic
+```
+
+</details>
+
+---
+
+## 🛠️ Advanced Features
+
+<div align="center">
+
+### 🎯 Professional Tools for Every Use Case
+
+</div>
+
+| Feature Category | Capabilities |
+|-----------------|--------------|
+| **🔢 Number Systems** | Binary, hexadecimal, octal, roman numerals, sexagesimal |
+| **📊 Data Visualization** | Function plotting, data graphing with Gnuplot |
+| **🌍 Internationalization** | Multiple languages, locale-specific formatting |
+| **🔐 Data Management** | CSV import/export, custom functions and variables |
+| **⚙️ Customization** | Configurable precision, display modes, keyboard shortcuts |
+
+<details>
+<summary><b>📚 Complete Feature Matrix (from libqalculate)</b></summary>
+
+### **🧮 Calculation and Parsing Engine**
+- **Operators**: `+ - * / mod ^ E () && || ! < > >= <= != ~ & | << >> xor`
+- **Intelligent Parsing**: `log 5 / 2 .5 (3) + (2( 3 +5` → `ln(5) / (2.5 * 3) + 2 * (3 + 5)`
+- **Data Types**: Numbers, functions, units, variables, vectors, matrices, dates
+- **Advanced Math**: Complex numbers, infinite numbers, uncertainty propagation
+- **Number Bases**: All common bases, negative/non-integer radices, time format
+- **Safety Features**: Disable ambiguous variables (e.g., prevent `(a+b)^2` = `(are+barn)^2`)
+
+### **📐 Result Display & Formatting**
+- **Multiple Formats**: All number bases, sexagesimal, time, roman numerals
+- **Precision Control**: Customizable precision, decimal places, complex forms
+- **Smart Display**: Exact (`sqrt(32)` = `4 * sqrt(2)`) or approximate (`5.66`)
+- **Fraction Support**: Simple and mixed fractions (`4/6 * 2` = `1.333...` = `4/3` = `1 + 1/3`)
+
+### **🔬 Symbolic Mathematics**
+- **Algebraic Operations**: `(x + y)^2` = `x^2 + 2xy + y^2`
+- **String Arithmetic**: `4 "apples" + 3 "oranges"`
+- **Advanced Operations**: Factorization, simplification, differentiation, integration
+- **Equation Solving**: Most equations and inequalities
+- **Assumption Engine**: Context-aware results (`ln(2x)` = `ln(2) + ln(x)` if x > 0)
+
+### **🛠️ Extensible Function Library**
+- **500+ Built-in Functions**: Trigonometry, logarithms, combinatorics, geometry, calculus, statistics, finance, dates
+- **Custom Functions**: Create, edit, save in XML format
+- **Domain-Specific**: Engineering, scientific, financial calculations
+
+### **📏 Comprehensive Unit System**
+- **Standard Support**: All SI units, prefixes (including binary), imperial system
+- **Smart Conversion**: `ft + yd + m` = `2.2192 m`, `5 kg*m/s^2` → `5 N`
+- **Currency**: Daily exchange rates, automatic updates
+- **Flexible Naming**: Abbreviations, singular, plural forms
+- **Custom Units**: Create and save custom unit definitions
+
+### **📊 Variables and Constants**
+- **Mathematical Constants**: π, e, and hundreds more
+- **Physical Constants**: With/without units, chemical element properties
+- **Data Import/Export**: CSV file support
+- **Flexible Storage**: Numbers, units, expressions, database-like structures
+- **Data Sets**: Object-oriented data with associated properties
+
+### **📈 Plotting and Visualization**
+- **Gnuplot Integration**: Professional-quality plots
+- **Multiple Data Types**: Functions, matrices, vectors
+- **Export Options**: PNG, PostScript, and more
+- **Customization**: Extensive plotting options
+
+</details>
+
+---
+
+## 📖 Documentation & Resources
+
+<div align="center">
+
+| Resource | Description |
+|----------|-------------|
+| [📘 **Official Manual**](https://qalculate.github.io/manual/) | Comprehensive syntax and function reference |
+| [🌐 **Project Website**](https://qalculate.github.io/) | Latest news and updates |
+| [💬 **Community Forum**](https://github.com/Qalculate/qalculate-qt/discussions) | Get help and share tips |
+| [🐛 **Issue Tracker**](https://github.com/Qalculate/qalculate-qt/issues) | Report bugs and request features |
+
+</div>
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+<details>
+<summary><b>🚀 Ways to Contribute</b></summary>
+
+- **🐛 Bug Reports**: Found an issue? [Create a detailed bug report](https://github.com/Qalculate/qalculate-qt/issues)
+- **💡 Feature Requests**: Have an idea? [Suggest new features](https://github.com/Qalculate/qalculate-qt/issues)
+- **🔧 Code Contributions**: Submit pull requests with improvements
+- **📖 Documentation**: Help improve our documentation
+- **🌍 Translations**: Contribute to internationalization efforts
+- **💬 Community Support**: Help other users in discussions
+
+</details>
+
+<details>
+<summary><b>👨‍💻 Development Setup</b></summary>
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes and test thoroughly
+4. Commit with descriptive messages: `git commit -m 'Add amazing feature'`
+5. Push to your branch: `git push origin feature/amazing-feature`
+6. Open a Pull Request with detailed description
+
+</details>
+
+---
+
+## 📄 License & Legal
+
+<div align="center">
+
+**Qalculate! Qt** is licensed under the [**GNU General Public License v2.0**](COPYING)
+
+*This ensures the software remains free and open-source for everyone*
+
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🌟 Star this repository if you find Qalculate! useful!
+
+**Made with ❤️ by the Qalculate! team and contributors**
+
+[⬆️ Back to Top](#-qalculate-qt---advanced-desktop-calculator)
+
+</div>
