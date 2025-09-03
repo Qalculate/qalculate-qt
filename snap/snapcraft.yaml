@@ -1,6 +1,6 @@
 name: qalculate-qt
 title: Qalculate! (Qt)
-version: '5.7.0'
+adopt-info: qalculate-qt
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -15,7 +15,7 @@ description: |
 
 grade: stable
 confinement: strict
-base: core18
+base: core22
 
 compression: lzo
 
@@ -130,4 +130,3 @@ parts:
       "*": qalculate-snap/
     prime:
       - -*
-
