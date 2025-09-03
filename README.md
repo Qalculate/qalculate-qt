@@ -1,311 +1,211 @@
-# Qalculate! Qt UI
+# Qalculate! Qt
 
-<a href="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png"><img src="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png" width="552"></a>
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Qt Version](https://img.shields.io/badge/Qt-%3E%3D%205.6-brightgreen.svg)](https://www.qt.io/)
+[![libqalculate Version](https://img.shields.io/badge/libqalculate-%3E%3D%205.6.0-brightgreen.svg)](https://qalculate.github.io/)
+[![Platform](https://img.shields.io/badge/platform-cross--platform-lightgrey.svg)](https://qalculate.github.io/downloads.html)
 
-Qalculate! is a multi-purpose cross-platform desktop calculator. It is simple to use but provides power and versatility normally reserved for complicated math packages, as well as useful tools for everyday needs (such as currency conversion and percent calculation). Features include a large library of customizable functions, unit calculations and conversion, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface (GTK, Qt, and CLI).
+<p align="center">
+  <a href="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png">
+    <img src="https://raw.githubusercontent.com/Qalculate/qalculate.github.io/master/images/qalculate-qt.png" alt="Qalculate! Qt Screenshot" width="552">
+  </a>
+</p>
 
-## Requirements
-* Qt5 (>= 5.6) or Qt6
-* libqalculate (>= 5.6.0)
+> **Qalculate!** is a powerful and versatile cross-platform desktop calculator. It combines the simplicity of a traditional calculator with the power of a complex math package, making it an essential tool for everyone from students to engineers.
 
-## Installation
-Instructions and download links for installers, binaries packages, and the source code of released versions of Qalculate! are available at https://qalculate.github.io/downloads.html.
+## Key Features
+- **Extensive Function Library:** A vast library of customizable functions for various fields.
+- **Unit Calculations & Conversions:** Seamlessly handle units with smart conversion capabilities.
+- **Symbolic Calculations:** Perform symbolic math, including integrals, equations, factorization, and simplification.
+- **Arbitrary Precision:** No more worrying about rounding errors.
+- **Uncertainty Propagation & Interval Arithmetic:** Advanced mathematical tools for precise calculations.
+- **Plotting:** Visualize your data and functions with Gnuplot integration.
+- **User-Friendly Interface:** A clean and intuitive interface available for GTK, Qt, and CLI.
 
-In a terminal window in the top source code directory run
-* `qmake`
-* `make`
-* `make install` *(as root, e.g. `sudo make install`)*
+## Getting Started
 
-The resulting executable is named `qalculate-qt`.
+### Requirements
+| Dependency | Version |
+| :--- | :--- |
+| Qt | >= 5.6 (Qt6 supported) |
+| libqalculate | >= 5.6.0 |
 
+### Installation
+You can find installers and binary packages on the [official downloads page](https://qalculate.github.io/downloads.html).
 
-## Features (from libqalculate)
+To build from source, run the following commands in the root directory:
+```bash
+qmake
+make
+sudo make install
+```
+The executable will be named `qalculate-qt`.
 
-* Calculation and parsing:
-   * Basic operations and operators: + - * / mod ^ E () && || ! < > >= <= != ~ & | << >> xor
-   * Fault-tolerant parsing of strings: log 5 / 2 .5 (3) + (2( 3 +5 = ln(5) / (2.5 * 3) + 2 * (3 + 5)
+<details>
+<summary><b>Full Feature List (from libqalculate)</b></summary>
+
+* **Calculation and parsing:**
+   * Basic operations and operators: `+ - * / mod ^ E () && || ! < > >= <= != ~ & | << >> xor`
+   * Fault-tolerant parsing of strings: `log 5 / 2 .5 (3) + (2( 3 +5` = `ln(5) / (2.5 * 3) + 2 * (3 + 5)`
    * Expressions may contain any combination of numbers, functions, units, variables, vectors and matrices, and dates
    * Supports complex and infinite numbers
    * Propagation of uncertainty
    * Interval arithmetic (for determination of the number of significant digits or direct calculation with intervals of numbers)
    * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
-   * Ability to disable functions, variables, units or unknown variables for less confusion: e.g. when you do not want (a+b)^2 to mean (are+barn)^2 but ("a"+"b")^2
+   * Ability to disable functions, variables, units or unknown variables for less confusion: e.g. when you do not want `(a+b)^2` to mean `(are+barn)^2` but `("a"+"b")^2`
    * Controllable implicit multiplication
    * Matrices and vectors, and related operations (determinants etc.)
    * Verbose error messages
    * Arbitrary precision
    * RPN mode
-* Result display:
+* **Result display:**
    * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
    * Many customization options: precision, max/min decimals, complex form, multiplication sign, etc.
-   * Exact or approximate: sqrt(32) returns 4 * sqrt(2) or 5.66
-   * Simple and mixed fractions: 4 / 6 * 2 = 1.333... = 4/3 = 1 + 1/3
-* Symbolic calculation:
-   * E.g. (x + y)^2 = x^2 + 2xy + y^2; 4 "apples" + 3 "oranges"
+   * Exact or approximate: `sqrt(32)` returns `4 * sqrt(2)` or `5.66`
+   * Simple and mixed fractions: `4 / 6 * 2 = 1.333... = 4/3 = 1 + 1/3`
+* **Symbolic calculation:**
+   * E.g. `(x + y)^2 = x^2 + 2xy + y^2`; `4 "apples" + 3 "oranges"`
    * Factorization and simplification
    * Differentiation and integration
    * Can solve most equations and inequalities
-   * Customizable assumptions give different results (e.g. ln(2x) = ln(2) + ln(x) if x is assumed positive)
-* Functions:
+   * Customizable assumptions give different results (e.g. `ln(2x) = ln(2) + ln(x)` if x is assumed positive)
+* **Functions:**
    * Hundreds of flexible functions: trigonometry, exponents and logarithms, combinatorics, geometry, calculus, statistics, finance, time and date, etc.
    * Can easily be created, edited and saved to a standard XML file
-* Units:
+* **Units:**
    * Supports all SI units and prefixes (including binary), as well as imperial and other unit systems
-   * Automatic conversion: ft + yd + m = 2.2192 m
-   * Explicit conversion: 5 m/s to mi/h = 11.18 miles/hour
-   * Smart conversion: automatically converts 5 kg*m/s^2 to 5 N
+   * Automatic conversion: `ft + yd + m = 2.2192 m`
+   * Explicit conversion: `5 m/s to mi/h = 11.18 miles/hour`
+   * Smart conversion: automatically converts `5 kg*m/s^2` to `5 N`
    * Currency conversion with retrieval of daily exchange rates
    * Different name forms: abbreviation, singular, plural (m, meter, meters)
    * Can easily be created, edited and saved to a standard XML file
-* Variables and constants:
+* **Variables and constants:**
    * Basic constants: pi, e, etc.
    * Lots of physical constants (with or without units) and properties of chemical element
    * CSV file import and export
    * Can easily be created, edited and saved to a standard XML file
    * Flexible - may contain simple numbers, units, or whole expressions
    * Data sets with objects and associated properties in database-like structure
-* Plotting:
+* **Plotting:**
    * Uses Gnuplot
    * Can plot functions or data (matrices and vectors)
    * Ability to save plot to PNG image, postscript, etc.
    * Several customization options
 * and more...
 
-_For more details about the syntax, and available functions, units, and variables, please consult the manual (https://qalculate.github.io/manual/)_
+</details>
 
-## Examples (expressions)
+<details>
+<summary><b>Usage Examples</b></summary>
 
 _Note that semicolon can be replaced with comma in function arguments, if comma is not used as decimal or thousands separator._
 
 ### Basic functions and operators
 
-sqrt 4 _= sqrt(4) = 4^(0.5) = 4^(1/2) = 2_
+`sqrt(4)` _= 4^(0.5) = 4^(1/2) = 2_
 
-sqrt(25; 16; 9; 4) _= \[5  4  3  2\]_
+`sqrt(25; 16; 9; 4)` _= \[5  4  3  2\]_
 
-sqrt(32) _= 4 × √(2) (in exact mode)_
+`sqrt(32)` _= 4 × √(2) (in exact mode)_
 
-cbrt(−27) _= root(-27; 3) = −3 (real root)_
+`cbrt(−27)` _= root(-27; 3) = −3 (real root)_
 
-(−27)^(1/3) _≈ 1.5 + 2.5980762i (principal root)_
+`(−27)^(1/3)` _≈ 1.5 + 2.5980762i (principal root)_
 
-ln 25 _= log(25; e) ≈ 3.2188758_
+`ln(25)` _= log(25; e) ≈ 3.2188758_
 
-log2(4)/log10(100) _= log(4; 2)/log(100; 10) = 1_
+`log2(4)/log10(100)` _= log(4; 2)/log(100; 10) = 1_
 
-5! _= 1 × 2 × 3 × 4 × 5 = 120_
+`5!` _= 1 × 2 × 3 × 4 × 5 = 120_
 
-5\2 _= 5//2 = trunc(5 / 2) = 2 (integer division)_
+`52 to factors` _= 2^2 × 13_
 
-5 mod 3 _= mod(5; 3) = 2_
+`sum(x; 1; 5)` _= 1 + 2 + 3 + 4 + 5 = 15_
 
-52 to factors _= 2^2 × 13_
-
-25/4 × 3/5 to fraction _= 3 + 3/4_
-
-gcd(63; 27) _= 9_
-
-sin(pi/2) − cos(pi) _= sin(90 deg) − cos(180 deg) = 2_
-
-sum(x; 1; 5) _= 1 + 2 + 3 + 4 + 5 = 15_
-
-sum(\i^2+sin(\i); 1; 5; \i) _= 1^2 + sin(1) + 2^2 + sin(2) + ... ≈ 55.176162_
-
-product(x; 1; 5) _= 1 × 2 × 3 × 4 × 5 = 120_
-
-var1:=5 _(stores value 5 in variable var1)_
-var1 × 2 _= 10_
-
-5^2 #this is a comment _= 25_
-
-sinh(0.5) where sinh()=cosh() _= cosh(0.5) ≈ 1.1276260_
-
-plot(x^2; −5; 5) _(plots the function y=x^2 from -5 to 5)_
+`plot(x^2; −5; 5)` _(plots the function y=x^2 from -5 to 5)_
 
 ### Units
 
-5 dm3 to L _= 5 dm^3 to L = 5 L_
+`5 dm3 to L` _= 5 dm^3 to L = 5 L_
 
-20 miles / 2h to km/h _= 16.09344 km/h_
+`20 miles / 2h to km/h` _= 16.09344 km/h_
 
-1.74 to ft _= 1.74 m to ft ≈ 5 ft + 8.5039370 in_
+`1.74 to ft` _= 1.74 m to ft ≈ 5 ft + 8.5039370 in_
 
-1.74 m to -ft _≈ 5.7086614 ft_
+`50 Ω × 2 A` _= 100 V_
 
-100 lbf × 60 mph to hp _≈ 16 hp_
-
-50 Ω × 2 A _= 100 V_
-
-50 Ω × 2 A to base _= 100 kg·m²/(s³·A)_
-
-10 N / 5 Pa _= (10 N)/(5 Pa) = 2 m²_
-
-5 m/s to s/m _= 0.2 s/m_
-
-500 € − 20% to $ _≈ $451.04_
-
-500 megabit/s × 2 h to b?byte _≈ 419.09516 gibibytes_
+`500 € − 20% to $` _≈ $451.04_
 
 ### Physical constants
 
-k\_e / G × a\_0 _= (coulombs\_constant / newtonian\_constant) × bohr\_radius ≈ 7.126e9 kg·H·m^−1_
+`k_e / G × a_0` _= (coulombs_constant / newtonian_constant) × bohr_radius ≈ 7.126e9 kg·H·m^−1_
 
-ℎ / (λ\_C × c) _= planck ∕ (compton\_wavelength × speed\_of\_light) ≈ 9.1093837e-31 kg_
+`ℎ / (λ_C × c)` _= planck ∕ (compton_wavelength × speed_of_light) ≈ 9.1093837e-31 kg_
 
-5 ns × rydberg to c _≈ 6.0793194E-8c_
-
-atom(Hg; weight) + atom(C; weight) × 4 to g _≈ 4.129e-22 g_
-
-(G × planet(earth; mass) × planet(mars; mass))/(54.6e6 km)^2 _≈ 8.58e16 N (gravitational attraction between earth and mars)_
+`(G × planet(earth; mass) × planet(mars; mass))/(54.6e6 km)^2` _≈ 8.58e16 N_
 
 ### Uncertainty and interval arithmetic
 
-_"±" can be replaced with "+/-"; result with interval arithmetic activated is shown in parenthesis_
+`sin(5±0.2)^2/2±0.3` _≈ 0.460±0.088 (0.46±0.12)_
 
-sin(5±0.2)^2/2±0.3 _≈ 0.460±0.088 (0.46±0.12)_
-
-(2±0.02 J)/(523±5 W) _≈ 3.824±0.053 ms (3.825±0.075 ms)_
-
-interval(−2; 5)^2 _≈ interval(−8.2500000; 12.750000) (interval(0; 25))_
+`interval(−2; 5)^2` _≈ interval(−8.2500000; 12.750000) (interval(0; 25))_
 
 ### Algebra
 
-(5x^2 + 2)/(x − 3) _= 5x + 15 + 47/(x − 3)_
+`(5x^2 + 2)/(x − 3)` _= 5x + 15 + 47/(x − 3)_
 
-(\a + \b)(\a − \b) _= ("a" + "b")("a" − "b") = 'a'^2 − 'b'^2_
+`factorize x^4 − 7x^3 + 9x^2 + 27x − 54` _= (x + 2)(x − 3)^3_
 
-(x + 2)(x − 3)^3 _= x^4 − 7x^3 + 9x^2 + 27x − 54_
+`x+x^2+4 = 16` _= (x = 3 or x = −4)_
 
-factorize x^4 − 7x^3 + 9x^2 + 27x − 54 _= x^4 − 7x^3 + 9x^2 + 27x − 54 to factors = (x + 2)(x − 3)^3_
-
-cos(x)+3y^2 where x=pi and y=2 _= 11_
-
-gcd(25x; 5x^2) _= 5x_
-
-1/(x^2+2x−3) to partial fraction _= 1/(4x − 4) − 1/(4x + 12)_
-
-x+x^2+4 = 16
-_= (x = 3 or x = −4)_
-
-x^2/(5 m) − hypot(x; 4 m) = 2 m where x > 0
-_= (x ≈ 7.1340411 m)_
-
-cylinder(20cm; x) = 20L _(calculates the height of a 20 L cylinder with radius of 20 cm)_
-_= (x = (1 / (2π)) m)_
-_= (x ≈ 16 cm)_
-
-asin(sqrt(x)) = 0.2
-_= (x = sin(0.2)^2)_
-_= (x ≈ 0.039469503)_
-
-x^2 > 25x
-_= (x > 25 or x < 0)_
-
-solve(x = y+ln(y); y) _= lambertw(e^x)_
-
-solve2(5x=2y^2; sqrt(y)=2; x; y) _= 32/5_
-
-multisolve(\[5x=2y+32, y=2z, z=2x\]; \[x, y, z\]) _= \[−32/3  −128/3  −64/3\]_
-
-dsolve(diff(y; x) − 2y = 4x; 5) _= 6e^(2x) − 2x − 1_
+`solve(x = y+ln(y); y)` _= lambertw(e^x)_
 
 ### Calculus
 
-diff(6x^2) _= 12x_
+`diff(6x^2)` _= 12x_
 
-diff(sinh(x^2)/(5x) + 3xy/sqrt(x)) _= (2/5) × cosh(x^2) − sinh(x^2)/(5x^2) + (3y)/(2 × √(x))_
+`integrate(6x^2; 1; 5)` _= 248_
 
-integrate(6x^2) _= 2x^3 + C_
-
-integrate(6x^2; 1; 5) _= 248_
-
-integrate(sinh(x^2)/(5x) + 3xy/sqrt(x)) _= 2x × √(x) × y + Shi(x^2) / 10 + C_
-
-integrate(sinh(x^2)/(5x) + 3xy/sqrt(x); 1; 2) _≈ 3.6568542y + 0.87600760_
-
-limit(ln(1 + 4x)/(3^x − 1); 0) _= 4 / ln(3)_
+`limit(ln(1 + 4x)/(3^x − 1); 0)` _= 4 / ln(3)_
 
 ### Matrices and vectors
 
-\[1, 2, 3; 4, 5, 6\] _= ((1; 2; 3); (4; 5; 6)) = \[1  2  3; 4  5  6\] (2×3 matrix)_
+`[1, 2, 3; 4, 5, 6]` _= \[1  2  3; 4  5  6\]_
 
-1...5 = (1:5) = (1:1:5) = _\[1  2  3  4  5\]_
+`cross([1 2 3]; [4 5 6])` _= \[−3 6 −3\]_
 
-(1; 2; 3) × 2 − 2 _= \[(1 × 2 − 2), (2 × 2 − 2), (3 × 2 − 2)\] = \[0  2  4\]_
-
-\[1 2 3\].\[4 5 6\] = dot(\[1 2 3\]; \[4 5 6\]) _= 32 (dot product)_
-
-cross(\[1 2 3\]; \[4 5 6\]) _= \[−3 6 −3\] (cross product)_
-
-\[1 2 3; 4 5 6\].×\[7 8 9; 10 11 12\] _= hadamard(\[1 2 3; 4 5 6\]; \[7 8 9; 10 11 12\]) = \[7  16  27; 40  55  72\] (hadamard product)_
-
-\[1 2 3; 4 5 6\] × \[7 8; 9 10; 11 12\] _= \[58  64; 139  154\] (matrix multiplication)_
-
-\[1 2; 3 4\]^-1 _= inverse(\[1 2; 3 4\]) = \[−2  1; 1.5  −0.5\]_
+`[1 2; 3 4]^-1` _= \[−2  1; 1.5  −0.5\]_
 
 ### Statistics
 
-mean(5; 6; 4; 2; 3; 7) _= 4.5_
+`mean(5; 6; 4; 2; 3; 7)` _= 4.5_
 
-stdev(5; 6; 4; 2; 3; 7) _≈ 1.87_
-
-quartile(\[5 6 4 2 3 7\]; 1) _= percentile((5; 6; 4; 2; 3; 7); 25) ≈ 2.9166667_
-
-normdist(7; 5) _≈ 0.053990967_
-
-spearman(column(load(test.csv); 1); column(load(test.csv); 2)) _≈ −0.33737388 (depends on the data in the CSV file)_
+`stdev(5; 6; 4; 2; 3; 7)` _≈ 1.87_
 
 ### Time and date
 
-10:31 + 8:30 to time _= 19:01_
+`"2020-05-20" + 523d` _= "2021-10-25"_
 
-10h 31min + 8h 30min to time _= 19:01_
+`today − 5 days` _= "2020-07-05"_
 
-now to utc _= "2020-07-10T07:50:40Z"_
-
-"2020-07-10T07:50CET" to utc+8 _= "2020-07-10T14:50:00+08:00"_
-
-"2020-05-20" + 523d _= addDays(2020-05-20; 523) = "2021-10-25"_
-
-today − 5 days _= "2020-07-05"_
-
-"2020-10-05" − today _= days(today; 2020-10-05) = 87 d_
-
-timestamp(2020-05-20) _= 1 589 925 600_
-
-stamptodate(1 589 925 600) _= "2020-05-20T00:00:00"_
-
-"2020-05-20" to calendars _(returns date in Hebrew, Islamic, Persian, Indian, Chinese, Julian, Coptic, and Ethiopian calendars)_
+`"2020-10-05" − today` _= 87 d_
 
 ### Number bases
 
-52 to bin _= 0011 0100_
+`52 to bin` _= 0011 0100_
 
-52 to bin16 _= 0000 0000 0011 0100_
+`52 to hex` _= 0x34_
 
-52 to oct _= 064_
+`1978 to roman` _= MCMLXXVIII_
 
-52 to hex _= 0x34_
+</details>
 
-0x34 = hex(34) _= base(34; 16) = 52_
+## Documentation
+For more details about the syntax, and available functions, units, and variables, please consult the [**official manual**](https://qalculate.github.io/manual/).
 
-523<<2&250 to bin _= 0010 1000_
+## Contributing
+Contributions are welcome! If you have a feature request, bug report, or pull request, please feel free to open an issue or submit a PR.
 
-52.345 to float _≈ 0100 0010 0101 0001 0110 0001 0100 1000_
-
-float(01000010010100010110000101001000) _= 1715241/32768 ≈ 52.345001_
-
-floatError(52.345) _≈ 1.2207031e-6_
-
-52.34 to sexa _= 52°20′24″_
-
-1978 to roman _= MCMLXXVIII_
-
-52 to base 32 _= 1K_
-
-sqrt(32) to base sqrt(2) _≈ 100000_
-
-0xD8 to unicode _= Ø_
-
-code(Ø) to hex _= 0xD8_
-
+## License
+This project is licensed under the **GNU General Public License v2.0**. See the [COPYING](COPYING) file for details.
