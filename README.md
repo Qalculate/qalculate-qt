@@ -496,6 +496,11 @@ We welcome contributions from the community! Here's how you can help:
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Qalculate/qalculate-qt&type=Date)](https://www.star-history.com/#Qalculate/qalculate-qt&Date)
+
+
 <div align="center">
 
 ### 🌟 Star this repository if you find Qalculate! useful!
