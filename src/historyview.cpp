@@ -347,7 +347,13 @@ void HistoryView::loadInitial(bool reload) {
 	} else {
 		size_t i = 0;
 		for(; i < settings->v_expression.size() - 1; i++) {
-			if(!settings->v_messages[i].isEmpty()) replaceColors(settings->v_messages[i]);
+			if(!settings->v_messages[i].isEmpty()) {
+				replaceColors(settings->v_messages[i]);
+				if(reload) {
+					settings->v_messages[i].replace("font-size:normal", "font-size:small ");
+					settings->v_messages[i].replace("width=\"2\"", "width=\"1\"");
+				}
+			}
 			addResult(settings->v_result[i], settings->v_expression[i], settings->v_pexact[i], settings->v_parse[i], true, false, QString(), NULL, reload ? 2 : 1, i);
 		}
 		if((settings->color == 2 && (s_text.contains("color:#00") || s_text.contains("color:#58"))) || (settings->color != 2 && (s_text.contains("color:#FF") || s_text.contains("color:#AA")))) {
@@ -432,6 +438,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	bool b_parse_error = (initial_load && !expression.empty() && settings->v_parseerror[index] && !settings->v_messages[index].isEmpty());
 	bool empty_error = false;
 	if(!initial_load && CALCULATOR->message()) {
+		int n = 0, first_error_index = -1;
 		do {
 			if(CALCULATOR->message()->category() == MESSAGE_CATEGORY_IMPLICIT_MULTIPLICATION && (settings->implicit_question_asked || implicit_warning)) {
 				if(!settings->implicit_question_asked) *implicit_warning = true;
@@ -449,11 +456,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						if(CALCULATOR->message()->message().empty()) {
 							empty_error = true;
 						} else {
-							if(!serror.isEmpty()) {
-								if(!serror.startsWith("• ")) serror = "• " + serror;
+							if(n > 0) {
+								if(n == 1) serror = "• " + serror;
 								serror += "\n• ";
 							}
 							serror += mstr;
+							n++;
 						}
 					}
 				} else {
@@ -470,13 +478,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						serror += "";
 						if(CALCULATOR->message()->stage() == MESSAGE_STAGE_PARSING) b_parse_error = true;
 						serror += "\">";
-						if(!mstr.startsWith("-")) {
-							serror += "• ";
-						} else {
-							mstr.replace(0, 1, "•");
-						}
+						if(n == 0 && (mstr.isEmpty() || mstr[0] != "-")) first_error_index = serror.length();
+						if(n == 1 && first_error_index >= 0) serror.insert(first_error_index, "• ");
+						if(n > 0 && !mstr.startsWith("-")) serror += "• ";
 						serror += mstr.toHtmlEscaped();
 						serror += "</td></tr>";
+						n++;
 					} else {
 						values.insert(values.begin(), std::string("#") + mstr.toStdString());
 					}
@@ -604,7 +611,6 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			str += "\">";
 			if(i_answer == 0) str += QStringLiteral("<a name=\"%1:%2\" style=\"text-decoration: none\">").arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load ? (int) i : settings->v_result[settings->v_result.size() - 1].size() - i - 1);
 			else str += QStringLiteral("<a name=\"c%1:%2:%3\" style=\"text-decoration: none\">").arg(i_answer).arg(initial_load ? index : settings->v_expression.size() - 1).arg(initial_load == 1 ? (int) i : (initial_load > 1 ? values.size() - i - 1 : settings->v_result[settings->v_result.size() - 1].size() - i - 1));
-			if(values[i].size() == 1 || values[i][1] != '-') str += "• ";
 			str += QString::fromStdString(values[i]).mid(1);
 			str += "</a></td></tr>";
 			continue;

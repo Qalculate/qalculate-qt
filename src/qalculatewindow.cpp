@@ -121,6 +121,8 @@ int to_fraction = 0;
 long int to_fixed_fraction = 0;
 char to_prefix = 0;
 int to_base = 0;
+#define TO_FORM_OFF -10000
+int to_form = TO_FORM_OFF;
 bool to_duo_syms = false;
 int to_caf = -1;
 unsigned int to_bits = 0;
@@ -1415,6 +1417,7 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 		}
 		case SHORTCUT_TYPE_OPTIMAL_PREFIX: {
 			to_prefix = 0;
+			to_form = TO_FORM_OFF;
 			bool b_use_unit_prefixes = settings->printops.use_unit_prefixes;
 			bool b_use_prefixes_for_all_units = settings->printops.use_prefixes_for_all_units;
 			if((!expressionEdit->expressionHasChanged() || (settings->rpn_mode && CALCULATOR->RPNStackSize() != 0)) && contains_prefix(*mstruct)) {
@@ -3691,13 +3694,15 @@ void QalculateWindow::setOption(std::string str) {
 	else if(equalsIgnoreCase(svar, "excessive parentheses") || svar == "expar") SET_BOOL_D(settings->printops.excessive_parenthesis)
 	else if(equalsIgnoreCase(svar, "functions") || svar == "func") SET_BOOL_PV(settings->evalops.parse_options.functions_enabled)
 	else if(equalsIgnoreCase(svar, "infinite numbers") || svar == "inf") SET_BOOL_E(settings->evalops.allow_infinite)
-	else if(equalsIgnoreCase(svar, "show negative exponents") || svar == "negexp") SET_BOOL_D(settings->printops.negative_exponents)
-	else if(equalsIgnoreCase(svar, "minus last") || svar == "minlast") {
-		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(settings->printops.sort_options.minus_last != v) {settings->printops.sort_options.minus_last = v; resultDisplayUpdated();}}
+	else if(equalsIgnoreCase(svar, "show negative exponents") || svar == "negexp") {
+		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(settings->printops.negative_exponents != v) {to_form = TO_FORM_OFF; settings->printops.negative_exponents = v; resultDisplayUpdated();}}
+	} else if(equalsIgnoreCase(svar, "minus last") || svar == "minlast") {
+		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(settings->printops.sort_options.minus_last != v) {to_form = TO_FORM_OFF; settings->printops.sort_options.minus_last = v; resultDisplayUpdated();}}
 	} else if(equalsIgnoreCase(svar, "assume nonzero denominators") || svar == "nzd") SET_BOOL_E(settings->evalops.assume_denominators_nonzero)
 	else if(equalsIgnoreCase(svar, "warn nonzero denominators") || svar == "warnnzd") SET_BOOL_E(settings->evalops.warn_about_denominators_assumed_nonzero)
-	else if(equalsIgnoreCase(svar, "prefixes") || svar == "pref") SET_BOOL_D(settings->printops.use_unit_prefixes)
-	else if(equalsIgnoreCase(svar, "binary prefixes") || svar == "binpref") {
+	else if(equalsIgnoreCase(svar, "prefixes") || svar == "pref") {
+		{int v = s2b(svalue); if(v < 0) {CALCULATOR->error(true, "Illegal value: %s.", svalue.c_str(), NULL);} else if(settings->printops.use_unit_prefixes != v) {to_form = TO_FORM_OFF; settings->printops.use_unit_prefixes = v; resultDisplayUpdated();}}
+	} else if(equalsIgnoreCase(svar, "binary prefixes") || svar == "binpref") {
 		bool b = CALCULATOR->usesBinaryPrefixes() > 0;
 		SET_BOOL(b)
 		if(b != (CALCULATOR->usesBinaryPrefixes() > 0)) {
@@ -4179,6 +4184,7 @@ void QalculateWindow::setOption(std::string str) {
 			resultDisplayUpdated();
 		} else if(!display && valid) {
 			settings->printops.min_exp = v;
+			to_form = TO_FORM_OFF;
 			QAction *action = find_child_data(this, "group_general", v);
 			if(action) {
 				action->setChecked(true);
@@ -4528,7 +4534,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if(!do_stack) stack_index = 0;
 
 	if(execute_str.empty()) {
-		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1;
+		to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1; to_form = TO_FORM_OFF;
 	}
 	bool current_expr = false;
 	if(str.empty() && !do_mathoperation) {
@@ -5195,6 +5201,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "dec") || equalsIgnoreCase(to_str, "decimal") || equalsIgnoreCase(to_str, tr("decimal").toStdString())) {
 				to_base = BASE_DECIMAL;
+				to_form = EXP_NONE;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "duo") || equalsIgnoreCase(to_str, "duodecimal") || equalsIgnoreCase(to_str, tr("duodecimal").toStdString())) {
 				to_base = BASE_DUODECIMAL;
@@ -5257,6 +5264,15 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "Unicode")) {
 				to_base = BASE_UNICODE;
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "sci") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "scientific", tr("scientific"))) {
+				to_form = EXP_PURE;
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "eng") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "engineering", tr("engineering"))) {
+				to_form = EXP_BASE_3;
+				do_to = true;
+			} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "simple", tr("simple"))) {
+				to_form = EXP_NONE;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "utc") || equalsIgnoreCase(to_str, "gmt")) {
 				settings->printops.time_zone = TIME_ZONE_UTC;
@@ -6440,7 +6456,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->beginTemporaryStopMessages();
 
 	bool do_factors = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
-	to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1;
+	to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1; to_form = TO_FORM_OFF;
 	std::string to_str, str_conv;
 	CALCULATOR->parseComments(str, settings->evalops.parse_options);
 	if(str.empty()) {
@@ -6492,6 +6508,7 @@ void QalculateWindow::autoCalculateTimeout() {
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "dec") || equalsIgnoreCase(to_str, "decimal") || equalsIgnoreCase(to_str, tr("decimal").toStdString())) {
 				to_base = BASE_DECIMAL;
+				to_form = EXP_NONE;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "duo") || equalsIgnoreCase(to_str, "duodecimal") || equalsIgnoreCase(to_str, tr("duodecimal").toStdString())) {
 				to_base = BASE_DUODECIMAL;
@@ -6554,6 +6571,15 @@ void QalculateWindow::autoCalculateTimeout() {
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "Unicode")) {
 				to_base = BASE_UNICODE;
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "sci") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "scientific", tr("scientific"))) {
+				to_form = EXP_PURE;
+				do_to = true;
+			} else if(equalsIgnoreCase(to_str, "eng") || EQUALS_IGNORECASE_AND_LOCAL(to_str, "engineering", tr("engineering"))) {
+				to_form = EXP_BASE_3;
+				do_to = true;
+			} else if(EQUALS_IGNORECASE_AND_LOCAL(to_str, "simple", tr("simple"))) {
+				to_form = EXP_NONE;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "utc") || equalsIgnoreCase(to_str, "gmt")) {
 				po.time_zone = TIME_ZONE_UTC;
@@ -6721,6 +6747,10 @@ void QalculateWindow::autoCalculateTimeout() {
 		mauto.setAborted();
 		result = "";
 	}
+	if(mauto.isZero() && mauto_parsed.isFunction() && mauto_parsed.function()->subtype() == SUBTYPE_DATA_SET && mauto_parsed.size() >= 2 && mauto_parsed[1].isSymbolic() && equalsIgnoreCase(mauto_parsed[1].symbol(), "info")) {
+		mauto.setAborted();
+		result = "";
+	}
 	if(!mauto.isAborted()) {
 		if(settings->dual_approximation > 0 || po.base == BASE_DECIMAL) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
@@ -6774,7 +6804,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		int save_dual = settings->dual_fraction;
 		bool do_to = false;
 
-		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
+		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form) || to_form != TO_FORM_OFF) {
 			if(to_base != 0 && (to_base != po.base || to_bits != po.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !po.duodecimal_symbols))) {
 				po.base = to_base;
 				po.binary_bits = to_bits;
@@ -6802,6 +6832,16 @@ void QalculateWindow::autoCalculateTimeout() {
 			}
 			if(to_caf >= 0 && to_caf != settings->complex_angle_form) {
 				settings->complex_angle_form = to_caf;
+				do_to = true;
+			}
+			if(to_form != TO_FORM_OFF) {
+				po.min_exp = to_form;
+				if(to_base != BASE_DECIMAL) {
+					po.sort_options.minus_last = (to_form == EXP_NONE);
+					po.show_ending_zeroes = (to_form != EXP_NONE);
+					po.use_unit_prefixes = (to_form == EXP_NONE);
+					po.negative_exponents = (to_form > 0);
+				}
 				do_to = true;
 			}
 			if(to_prefix != 0) {
@@ -6875,9 +6915,10 @@ void QalculateWindow::autoCalculateTimeout() {
 			CALCULATOR->setFixedDenominator(save_fden);
 			settings->dual_fraction = save_dual;
 		}
-		if(askDot(str, false) || askTC(mauto_parsed, true) || askSinc(mauto_parsed, true) || askSinc(mauto, true) || askPercent(true) || warnAssumptions(mauto_parsed, true)) {
+		if(askDot(str, false) || askTC(mauto_parsed, true) || askSinc(mauto_parsed, true) || askSinc(mauto, true) || askPercent(true)) {
 			CALCULATOR->error(false, "", NULL);
 		}
+		warnAssumptions(mauto_parsed, true);
 	}
 	CALCULATOR->stopControl();
 
@@ -7238,10 +7279,15 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 	bool save_restrict_fraction_length = settings->printops.restrict_fraction_length;
 	int save_dual = settings->dual_fraction;
 	bool save_duo_syms = settings->printops.duodecimal_symbols;
+	bool save_minus = settings->printops.sort_options.minus_last;
+	int save_exp = settings->printops.min_exp;
+	bool save_zeroes = settings->printops.show_ending_zeroes;
+	bool save_neg = settings->printops.negative_exponents;
+
 	bool do_to = false;
 
 	if(!do_stack) {
-		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form)) {
+		if(to_base != 0 || to_fraction > 0 || to_fixed_fraction >= 2 || to_prefix != 0 || (to_caf >= 0 && to_caf != settings->complex_angle_form) || to_form != TO_FORM_OFF) {
 			if(to_base != 0 && (to_base != settings->printops.base || to_bits != settings->printops.binary_bits || (to_base == BASE_CUSTOM && to_nbase != CALCULATOR->customOutputBase()) || (to_base == BASE_DUODECIMAL && to_duo_syms && !settings->printops.duodecimal_symbols))) {
 				settings->printops.base = to_base;
 				settings->printops.binary_bits = to_bits;
@@ -7269,6 +7315,16 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			}
 			if(to_caf >= 0 && to_caf != settings->complex_angle_form) {
 				settings->complex_angle_form = to_caf;
+				do_to = true;
+			}
+			if(to_form != TO_FORM_OFF) {
+				settings->printops.min_exp = to_form;
+				if(to_base != BASE_DECIMAL) {
+					settings->printops.sort_options.minus_last = (to_form == EXP_NONE);
+					settings->printops.show_ending_zeroes = (to_form != EXP_NONE);
+					settings->printops.use_unit_prefixes = (to_form == EXP_NONE);
+					settings->printops.negative_exponents = (to_form > 0);
+				}
 				do_to = true;
 			}
 			if(to_prefix != 0 && !prefix) {
@@ -7473,6 +7529,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		CALCULATOR->setFixedDenominator(save_fden);
 		settings->dual_fraction = save_dual;
 		settings->printops.restrict_fraction_length = save_restrict_fraction_length;
+		settings->printops.sort_options.minus_last = save_minus;
+		settings->printops.min_exp = save_exp;
+		settings->printops.show_ending_zeroes = save_zeroes;
+		settings->printops.negative_exponents = save_neg;
 	}
 	settings->printops.prefix = NULL;
 
@@ -8327,6 +8387,7 @@ void QalculateWindow::normalActivated() {
 	settings->printops.show_ending_zeroes = true;
 	if(settings->prefixes_default) settings->printops.use_unit_prefixes = true;
 	settings->printops.negative_exponents = false;
+	to_form = TO_FORM_OFF;
 	resultFormatUpdated();
 }
 void QalculateWindow::scientificActivated() {
@@ -8335,6 +8396,7 @@ void QalculateWindow::scientificActivated() {
 	settings->printops.show_ending_zeroes = true;
 	if(settings->prefixes_default) settings->printops.use_unit_prefixes = false;
 	settings->printops.negative_exponents = true;
+	to_form = TO_FORM_OFF;
 	resultFormatUpdated();
 }
 void QalculateWindow::engineeringActivated() {
@@ -8343,6 +8405,7 @@ void QalculateWindow::engineeringActivated() {
 	settings->printops.show_ending_zeroes = true;
 	if(settings->prefixes_default) settings->printops.use_unit_prefixes = false;
 	settings->printops.negative_exponents = false;
+	to_form = TO_FORM_OFF;
 	resultFormatUpdated();
 }
 void QalculateWindow::simpleActivated() {
@@ -8351,6 +8414,7 @@ void QalculateWindow::simpleActivated() {
 	settings->printops.show_ending_zeroes = false;
 	if(settings->prefixes_default) settings->printops.use_unit_prefixes = true;
 	settings->printops.negative_exponents = false;
+	to_form = TO_FORM_OFF;
 	resultFormatUpdated();
 }
 void QalculateWindow::onPrecisionChanged(int v) {

@@ -764,6 +764,8 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					if(!cdata->current_from_struct->isInteger() && cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
 				} else if(p_type == 601) {
 					if(cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
+				} else if(p_type >= 700 && p_type < 800) {
+					if(!cdata->current_from_struct->isNumber() || (cdata->current_from_struct->number() < Number(1, 1, PRECISION + 3) && cdata->current_from_struct->number() > Number(1, 1, -PRECISION))) b_match = 0;
 				}
 			}
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
@@ -1434,6 +1436,12 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Unicode"), 281, NULL)
 	COMPLETION_CONVERT_STRING("utc")
 	COMPLETION_APPEND_C(str1, tr("UTC Time Zone"), 501, NULL)
+	COMPLETION_CONVERT_STRING("scientific") str1 += " <i>"; str1 += "sci"; str1 += "</i>";
+	COMPLETION_APPEND_C(str1, tr("Scientific Notation"), 701, NULL)
+	COMPLETION_CONVERT_STRING("engineering") str1 += " <i>"; str1 += "eng"; str1 += "</i>";
+	COMPLETION_APPEND_C(str1, tr("Engineering Notation"), 702, NULL)
+	COMPLETION_CONVERT_STRING("simple")
+	COMPLETION_APPEND_C(str1, tr("Simple Notation"), 703, NULL)
 	COMPLETION_APPEND_C("", tr("Custom"), 1000, NULL)
 }
 
@@ -2628,6 +2636,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("time format").toStdString();
 				} else if(equalsIgnoreCase(str_u, "unicode")) {
 					parsed_expression += tr("Unicode").toStdString();
+				} else if(equalsIgnoreCase(str_u, "sci") || EQUALS_IGNORECASE_AND_LOCAL(str_u, "scientific", tr("scientific"))) {
+					parsed_expression += tr("scientific notation").toStdString();
+				} else if(equalsIgnoreCase(str_u, "eng") || EQUALS_IGNORECASE_AND_LOCAL(str_u, "engineering", tr("engineering"))) {
+					parsed_expression += tr("engineering notation").toStdString();
+				} else if(EQUALS_IGNORECASE_AND_LOCAL(str_u, "simple", tr("simple"))) {
+					parsed_expression += tr("simple notation").toStdString();
 				} else if(equalsIgnoreCase(str_u, "bases") || equalsIgnoreCase(str_u, tr("bases").toStdString())) {
 					parsed_expression += tr("number bases").toStdString();
 				} else if(equalsIgnoreCase(str_u, "calendars") || equalsIgnoreCase(str_u, tr("calendars").toStdString())) {

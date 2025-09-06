@@ -1128,6 +1128,42 @@ Do you want to overwrite the function?</source>
         <source>Custom</source>
         <translation>Пользовательский</translation>
     </message>
+    <message>
+        <source>scientific</source>
+        <translation type="unfinished">научный</translation>
+    </message>
+    <message>
+        <source>engineering</source>
+        <translation type="unfinished">инженерный</translation>
+    </message>
+    <message>
+        <source>simple</source>
+        <translation type="unfinished">простой</translation>
+    </message>
+    <message>
+        <source>Scientific Notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple Notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Engineering Notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>scientific notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>engineering notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>simple notation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -1964,6 +2000,10 @@ Do you want to overwrite the function?</source>
         <source>DEL</source>
         <translation>УДЛ</translation>
     </message>
+    <message>
+        <source>C</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NamesEditDialog</name>
@@ -2450,7 +2490,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Custom result font:</source>
-        <translation>Шрифт результатов:</translation>
+        <translation type="vanished">Шрифт результатов:</translation>
     </message>
     <message>
         <source>Custom expression font:</source>
@@ -2992,6 +3032,10 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Place percent button in number pad</source>
         <translation>Разместить кнопку процентов на цифровой клавиатуре</translation>
+    </message>
+    <message>
+        <source>Custom history font:</source>
+        <translation type="unfinished">Шрифт история:</translation>
     </message>
 </context>
 <context>
@@ -4683,6 +4727,22 @@ Do you wish to replace the current action (%1)?</source>
 and matrix/vector elements</source>
         <translation>Запятая как разделитель аргументов функции
 и элементов матрицы/вектора</translation>
+    </message>
+    <message>
+        <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>scientific</source>
+        <translation type="unfinished">научный</translation>
+    </message>
+    <message>
+        <source>engineering</source>
+        <translation type="unfinished">инженерный</translation>
+    </message>
+    <message>
+        <source>simple</source>
+        <translation type="unfinished">простой</translation>
     </message>
 </context>
 <context>
