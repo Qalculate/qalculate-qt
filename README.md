@@ -29,63 +29,53 @@ The resulting executable is named `qalculate-qt`.
    * Flexible expression entry with customizable completion and function hints
    * Calculate as you type
    * Context-dependent menu for conversion to suitable units and output formats
-   * Calculation history with access to values of previous expressions and results
-   * Customizable keypad with quick access to most features
-   * Customizable workspaces for quickly switching between different projects and settings
+   * History list with support for comments, protection of individual items, search, and access to actual values of previous calculations
+   * Customizable keypad with access to most features
+   * Customizable workspaces for switching between different projects and settings
    * Dialogs for management of and easy access to functions, variables and units (with quick conversion)
    * Dialogs for easy entry of all functions
    * Create/edit functions, variables, matrices/vectors, units, and data sets
-   * Tools for fast conversion between number bases, floating point conversion, calendar conversion, and percentage calculation
+   * Tools for quick conversion between number bases, floating point conversion, calendar conversion, and percentage calculation
    * Convenient interface for plots and graphs
    * Configurable keyboard shortcuts
 
 *Features from libqalculate:*
 
-#### Calculation and parsing
-   * All basic operations and operators: arithmetic, logical, bitwise, element-wise, (in)equalities
-   * Fault-tolerant parsing of strings: *log 5 / 2 .5 (3) + (2( 3 +5* = *ln(5) / (2.5 × 3) + 2 × (3 + 5)*
-   * Expressions may contain any combination of numbers, functions, units, variables, vectors and matrices, and dates
-   * Supports complex and infinite numbers
-   * Arbitrary precision
-   * Propagation of uncertainty
-   * Interval arithmetic (for determination of the number of significant digits or direct calculation with intervals of numbers)
-   * Matrices and vectors, and related operations (determinants etc.)
-   * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
-   * Ability to disable functions, variables, units or unknown variables for less confusion: e.g. when you do not want *(a+b)^2* to mean *(are+barn)^2* but *(\a+\b)^2*
-   * Controllable implicit multiplication
-   * Verbose error messages
+#### General
+   * All common operators — arithmetic, logical, bitwise, element-wise, (in)equalities
+   * Expressions may contain any combination of numbers, constants, functions, units, variables, matrices, vectors, and time/dates
+   * Fault-tolerant and flexible input parsing with verbose error/warning messages
+   * Arbitrary precision with both rational and floating point numbers
+   * Complex and infinite numbers
+   * Propagation of uncertainty and interval arithmetic
+   * Both exact and approximate output (*sqrt(32)* = *4 × sqrt(2)* ≈ *5.657*)
+   * Simple and mixed fractions (*4 / 6 × 2* = *1.333…* = *4/3* = *1 + 1/3*)
+   * All common number bases, as well as negative and non-integer radices, roman numerals, etc.
    * RPN mode
-
-#### Result display
-   * Supports all common number bases, as well as negative and non-integer radices, sexagesimal numbers, time format, and roman numerals
-   * Many customization options: precision, max/min decimals, complex form, multiplication sign, etc.
-   * Exact or approximate: *sqrt(32)* returns *4 × sqrt(2)* or *5.657*
-   * Simple and mixed fractions: *4 / 6 × 2* = *1.333…* = *4/3* = *1 + 1/3*
+   * Highly customizable with a myriad of options for every aspect of the calculator
 
 #### Symbolic calculations
-   * E.g. *(x + y)^2* = *x^2 + 2xy + y^2*; *4 "apples" + 3 "oranges"*
    * Factorization and simplification
    * Differentiation and integration
    * Can solve most equations and inequalities
-   * Customizable assumptions give different results (e.g. *ln(2x) where x > 0* = *ln(2) + ln(x)*)
+   * Customizable assumptions (e.g. *ln(2x) where x > 0* = *ln(2) + ln(x)*)
 
 #### Functions
    * Over 400 flexible and diverse functions (trigonometry, exponents and logarithms, combinatorics, geometry, calculus, statistics, finance, time and date, etc.)
-   * Easily created and edited from the user interfaces, with support for different argument types, subfunctions, and custom conditions
+   * Easily created and edited, with support for different argument types, subfunctions, and custom conditions
 
 #### Units
    * Over 400 diverse units and all standard decimal and binary prefixes
    * Includes all SI units, as well as imperial, CGS, atomic, and natural units, and more…
    * Automatic and explicit conversion (e.g. *ft + yd + m* = *2.2192 m*, *5 kg × m/s^2* = *5 N*, *5 m/s to mph* = *11.18 mph*)
    * Currency conversion with daily updated exchange rates
-   * Easily created and edited from the user interfaces
 
 #### Variables and constants
-   * All common basic constants: pi, e, etc.
-   * All fundamental physical constants with 2022 CODATA values (including standard uncertainy and optional units)
+   * All common basic constants (pi, e, etc.)
+   * All fundamental physical constants with 2022 CODATA values (including standard uncertainty and optional units)
    * CSV file import and export
-   * Easily created and edited from the user interfaces (including by direct assignment, e.g. *x = 2 s*)
-   * Data sets with objects and associated properties in database-like structure (data set with chemical elements is included)
+   * Easily created and edited, including by using simple assignment expressions (e.g. *x = 2 s*)
+   * Data sets with objects and associated properties (a data set with chemical elements is included)
 
 #### Plots and graphs
    * Uses Gnuplot
@@ -102,7 +92,7 @@ The resulting executable is named `qalculate-qt`.
 > [!NOTE]
 > Semicolon can be replaced with comma in function arguments, if comma is not used as decimal or thousands separator.
 
-### Basic functions and operators
+#### Basic functions and operators
 
 ```R
 sqrt 4                        # = sqrt(4) = 4^(0.5) = 4^(1/2) = 2
@@ -147,7 +137,7 @@ sinh(0.5) where sinh()=cosh() # = cosh(0.5) ≈ 1.1276260
 plot(x^2; -5; 5)              # plots the function y=x^2 from -5 to 5
 ```
 
-### Units
+#### Units
 
 > [!TIP]
 > ` to ` can be replace with an arrow (`➞` or `->`).
@@ -176,7 +166,7 @@ plot(x^2; -5; 5)              # plots the function y=x^2 from -5 to 5
 500 megabit/s * 2 h to b?byte # ≈ 419.09516 gibibytes
 ```
 
-### Physical constants
+#### Physical constants
 
 ```bash
 k_e / G * a_0
@@ -195,7 +185,7 @@ atom(Hg; weight) + atom(C; weight) * 4 to g
 # ≈ 8.58e16 N (gravitational attraction between earth and mars)
 ```
 
-### Uncertainty and interval arithmetic
+#### Uncertainty and interval arithmetic
 
 > [!NOTE]
 > Results with interval arithmetic activated are shown in parenthesis.
@@ -211,7 +201,7 @@ interval(-2; 5)^2    # ≈ interval(−8.2500000; 12.750000) (interval(0; 25))
 > [!TIP]
 > "±" can be replaced with "+/-".
 
-### Algebra
+#### Algebra
 
 ```ruby
 (5x^2 + 2)/(x - 3)                            # = 5x + 15 + 47/(x − 3)
@@ -247,7 +237,7 @@ multisolve([5x=2y+32, y=2z, z=2x]; [x, y, z]) # = [−32/3  −128/3  −64/3]
 dsolve(diff(y; x) - 2y = 4x; 5)               # = 6e^(2x) − 2x − 1
 ```
 
-### Calculus
+#### Calculus
 
 ```ruby
 diff(6x^2)                                    # = 12x
@@ -265,7 +255,7 @@ integrate(sinh(x^2)/(5x) + 3xy/sqrt(x); 1; 2) # ≈ 3.6568542y + 0.87600760
 limit(ln(1 + 4x)/(3^x - 1); 0)                # = 4 / ln(3)
 ```
 
-### Matrices and vectors
+#### Matrices and vectors
 
 ```R
 [1, 2, 3; 4, 5, 6]                      # = [1  2  3; 4  5  6] (2×3 matrix)
@@ -285,7 +275,7 @@ cross([1 2 3]; [4 5 6])                 # = [−3 6 −3] (cross product)
 [1 2; 3 4]^-1                           # = inverse([1 2; 3 4]) = [−2  1; 1.5  −0.5]
 ```
 
-### Statistics
+#### Statistics
 
 ```R
 mean(5; 6; 4; 2; 3; 7)             # = 4.5
@@ -300,7 +290,7 @@ spearman(column(load(test.csv); 1); column(load(test.csv); 2))
 # ≈ −0.33737388 (depends on the data in the CSV file)
 ```
 
-### Time and date
+#### Time and date
 
 ```ruby
 10:31 + 8:30 to time           # = 19:01
@@ -325,7 +315,7 @@ stamptodate(1 589 925 600)     # = "2020-05-20T00:00:00"
 # returns date in Hebrew, Islamic, Persian, Indian, Chinese, Julian, Coptic, and Ethiopian calendars
 ```
 
-### Number bases
+#### Number bases
 
 ```R
 52 to bin                               # = 0011 0100
