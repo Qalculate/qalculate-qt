@@ -287,7 +287,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l->addLayout(l2, r, 0, 1, 2); r++;
 	BOX(tr("Use lower case letters in non-decimal numbers"), settings->printops.lower_case_numbers, lowerCaseToggled(bool));
 	BOX(tr("Use special duodecimal symbols"), settings->printops.duodecimal_symbols, duodecimalSymbolsToggled(bool));
-	BOX(tr("Use dot as multiplication sign"), settings->printops.multiplication_sign != MULTIPLICATION_SIGN_X, multiplicationDotToggled(bool));
+	l->addWidget(new QLabel(tr("Multiplication sign:"), this), r, 0);
+	combo = new QComboBox(this);
+	combo->addItem(QString(" × (%1)").arg(tr("multiplication sign")), MULTIPLICATION_SIGN_X);
+	combo->addItem(QString(" ⋅ (%1)").arg(tr("dot operator")), MULTIPLICATION_SIGN_DOT);
+	combo->addItem(QString(" · (%1)").arg(tr("middle dot")), MULTIPLICATION_SIGN_ALTDOT);
+	combo->addItem(QString(" * (%1)").arg(tr("asterisk")), MULTIPLICATION_SIGN_ASTERISK);
+	combo->setCurrentIndex(combo->findData(settings->printops.multiplication_sign));
+	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(multiplicationSignChanged(int)));
+	l->addWidget(combo, r, 1); r++;
 	BOX(tr("Use Unicode division slash in output"), settings->printops.division_sign == DIVISION_SIGN_DIVISION_SLASH, divisionSlashToggled(bool));
 	BOX(tr("Spell out logical operators"), settings->printops.spell_out_logical_operators, spellOutToggled(bool));
 	BOX(tr("Use E-notation instead of 10^n"), settings->printops.exp_display != EXP_POWER_OF_10, eToggled(bool));
@@ -545,9 +553,8 @@ void PreferencesDialog::duodecimalSymbolsToggled(bool b) {
 	settings->printops.duodecimal_symbols = b;
 	emit resultDisplayUpdated();
 }
-void PreferencesDialog::multiplicationDotToggled(bool b) {
-	if(b) settings->printops.multiplication_sign = MULTIPLICATION_SIGN_ALTDOT;
-	else settings->printops.multiplication_sign = MULTIPLICATION_SIGN_X;
+void PreferencesDialog::multiplicationSignChanged(int i) {
+	settings->printops.multiplication_sign = (MultiplicationSign) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit resultDisplayUpdated();
 	emit symbolsUpdated();
 }
