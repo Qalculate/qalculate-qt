@@ -5955,17 +5955,17 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1440"/>
         <source>Scientific Notation</source>
-        <translation type="unfinished">Notação científica</translation>
+        <translation>Notação científica</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1444"/>
         <source>Simple Notation</source>
-        <translation type="unfinished">Notação simples</translation>
+        <translation>Notação simples</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1445"/>
         <source>Custom</source>
-        <translation type="unfinished">Personalizado</translation>
+        <translation>Personalizado</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1869"/>
@@ -6302,32 +6302,32 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="2639"/>
         <source>scientific</source>
-        <translation type="unfinished">científica</translation>
+        <translation>científica</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2640"/>
         <source>scientific notation</source>
-        <translation type="unfinished">notação científica</translation>
+        <translation>notação científica</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2641"/>
         <source>engineering</source>
-        <translation type="unfinished">engenharia</translation>
+        <translation>engenharia</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2642"/>
         <source>engineering notation</source>
-        <translation type="unfinished">notação engenharia</translation>
+        <translation>notação engenharia</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2643"/>
         <source>simple</source>
-        <translation type="unfinished">simples</translation>
+        <translation>simples</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2644"/>
         <source>simple notation</source>
-        <translation type="unfinished">notação simples</translation>
+        <translation>notação simples</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2645"/>
@@ -6412,7 +6412,7 @@ Deseja substituir a função?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1442"/>
         <source>Engineering Notation</source>
-        <translation type="unfinished">Notação engenharia</translation>
+        <translation>Notação engenharia</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2659"/>
@@ -6722,13 +6722,13 @@ Deseja substituir a função?</translation>
         <location filename="../src/functioneditdialog.cpp" line="931"/>
         <location filename="../src/functioneditdialog.cpp" line="984"/>
         <source>Warning</source>
-        <translation type="unfinished">Aviso</translation>
+        <translation>Aviso</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="931"/>
         <location filename="../src/functioneditdialog.cpp" line="984"/>
         <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>A conversão (usando &quot;para&quot;) não é suportada em funções.</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="938"/>
@@ -7220,12 +7220,12 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="665"/>
         <source>DEL</source>
-        <translation type="unfinished">DEL</translation>
+        <translation>DEL</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="688"/>
         <source>C</source>
-        <translation type="unfinished"></translation>
+        <translation>C</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="869"/>
@@ -8511,7 +8511,7 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="173"/>
         <source>Custom history font:</source>
-        <translation type="unfinished">Fonte do histórico personalizado:</translation>
+        <translation>Fonte do histórico personalizado:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="188"/>
@@ -8624,22 +8624,22 @@ e pressione a tecla Enter.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="302"/>
         <source>Place percent button in number pad</source>
-        <translation type="unfinished"></translation>
+        <translation>Coloque o botão de percentagem no teclado numérico</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="303"/>
         <source>Indicate repeating decimals:</source>
-        <translation type="unfinished">Indicar decimais repetidos:</translation>
+        <translation>Indicar decimais repetidos:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="306"/>
         <source>Ellipsis</source>
-        <translation type="unfinished"></translation>
+        <translation>Elipse</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="307"/>
         <source>Overline</source>
-        <translation type="unfinished"></translation>
+        <translation>Linha superior</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="311"/>
@@ -10669,25 +10669,25 @@ Você pode obter a versão %3 em %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="1180"/>
         <location filename="../src/qalculatewindow.cpp" line="1289"/>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
-        <translation type="unfinished">&lt;i&gt;Botão do meio&lt;/i&gt;: %1</translation>
+        <translation>&lt;i&gt;Botão do meio&lt;/i&gt;: %1</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5268"/>
         <location filename="../src/qalculatewindow.cpp" line="6575"/>
         <source>scientific</source>
-        <translation type="unfinished">científica</translation>
+        <translation>científica</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5271"/>
         <location filename="../src/qalculatewindow.cpp" line="6578"/>
         <source>engineering</source>
-        <translation type="unfinished">engenharia</translation>
+        <translation>engenharia</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5274"/>
         <location filename="../src/qalculatewindow.cpp" line="6581"/>
         <source>simple</source>
-        <translation type="unfinished">simples</translation>
+        <translation>simples</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5431"/>
@@ -10781,7 +10781,7 @@ Você pode obter a versão %3 em %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7675"/>
         <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
-        <translation type="unfinished"></translation>
+        <translation>Variáveis desconhecidas (por exemplo, x, y, z) são consideradas verdadeiras por padrão.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7696"/>
@@ -10836,13 +10836,14 @@ Selecione o modo de cálculo da temperatura
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7789"/>
         <source>Interpretation of comma</source>
-        <translation type="unfinished"></translation>
+        <translation>Interpretação de vírgula</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7795"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecione a interpretação de vírgula (&quot;,&quot;)
+(isto pode ser alterado mais tarde nas preferências).</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7795"/>
@@ -10864,7 +10865,7 @@ Selecione o modo de cálculo da temperatura
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7802"/>
         <source>Comma as thousands separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Vírgula como separador de milhares</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7806"/>
@@ -11183,7 +11184,7 @@ Deseja substituir a ação atual (%1)?</translation>
         <location filename="../src/qalculatewindow.cpp" line="1180"/>
         <location filename="../src/qalculatewindow.cpp" line="1289"/>
         <source>Conversion operator</source>
-        <translation type="unfinished">Operador de conversão</translation>
+        <translation>Operador de conversão</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="1144"/>
@@ -11238,7 +11239,8 @@ Deseja substituir a ação atual (%1)?</translation>
         <location filename="../src/qalculatewindow.cpp" line="7806"/>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
-        <translation type="unfinished"></translation>
+        <translation>Vírgula como separador para argumentos de função
+e elementos de matriz/vetor</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8818"/>
