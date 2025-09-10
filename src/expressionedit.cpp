@@ -477,9 +477,23 @@ struct CompletionData {
 	bool editing_to_expression, editing_to_expression1, show_custom_to;
 	int to_type, highest_match;
 	Argument *arg;
-	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), editing_to_expression(false), editing_to_expression1(false), to_type(0), highest_match(0), arg(NULL) {
+	CompletionData() : current_from_struct(NULL), current_function(NULL), current_function_index(0), editing_to_expression(false), editing_to_expression1(false), show_custom_to(false), to_type(0), highest_match(0), arg(NULL) {
 	}
 };
+
+extern int to_form;
+extern int to_base;
+#define TO_FORM_OFF -10000
+
+const Number *from_struct_get_number(const MathStructure &m) {
+	if(m.isNumber()) return &m.number();
+	const Number *nr = NULL;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(m[i].isNumber()) return &m[i].number();
+		else if(!nr) nr = from_struct_get_number(m[i]);
+	}
+	return nr;
+}
 
 ExpressionProxyModel::ExpressionProxyModel(CompletionData *cd, QObject *parent) : QSortFilterProxyModel(parent), cdata(cd) {
 	setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -725,7 +739,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					b_match = 0;
 				} else if(p_type >= 100 && p_type < 200) {
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
-				} else if((p_type == 294 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
+				} else if((p_type == 294 || p_type == 295 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
 					bool b = false;
 					for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
 						if(cdata->current_from_units[i] == CALCULATOR->getDegUnit()) {
@@ -733,15 +747,52 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 							break;
 						}
 					}
-					if(!b) b_match = 0;
+					if(!b) {
+						b_match = 0;
+					} else if(str.empty()) {
+						int base = to_base;
+						if(base == 0) base = settings->printops.base;
+						if((base == BASE_SEXAGESIMAL && p_type == 292) || (base == BASE_TIME && p_type == 293) || (base == BASE_LATITUDE && p_type == 294) || (base == BASE_LONGITUDE && p_type == 295)) {
+							b_match = 0;
+						}
+					}
 				} else if(p_type > 290 && p_type < 300 && (p_type != 292 || cdata->to_type >= 1)) {
 					if(!cdata->current_from_struct->isNumber() || (p_type > 290 && str.empty() && cdata->current_from_struct->isInteger())) b_match = 0;
+					if(str.empty()) {
+						int base = to_base;
+						if(base == 0) base = settings->printops.base;
+						if((base == BASE_SEXAGESIMAL && p_type == 292) || (base == BASE_TIME && p_type == 293) || (base == BASE_LATITUDE && p_type == 294) || (base == BASE_LONGITUDE && p_type == 295)) {
+							b_match = 0;
+						}
+					}
 				} else if(p_type >= 200 && p_type <= 290 && (p_type != 200 || cdata->to_type == 1 || cdata->to_type >= 3)) {
-					if(!cdata->current_from_struct->isNumber()) b_match = 0;
-					else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) b_match = 0;
+					if(!cdata->current_from_struct->isNumber()) {
+						b_match = 0;
+					} else if(str.empty() && p_type >= 202 && !cdata->current_from_struct->isInteger()) {
+						b_match = 0;
+					} else if(str.empty()) {
+						int base = to_base;
+						if(base == 0) base = settings->printops.base;
+						if((p_type >= 202 && p_type <= 236 && base == p_type - 200) || (base == BASE_UNICODE && p_type == 281) || (base == BASE_BINARY_DECIMAL && p_type == 285) || (base == BASE_BIJECTIVE_26 && p_type == 290) || (base == BASE_ROMAN_NUMERALS && p_type == 280)) {
+							b_match = 0;
+						}
+					}
 				} else if(p_type >= 300 && p_type < 400) {
 					if(p_type == 300 || p_type == 302) {
 						if(!contains_rational_number(*cdata->current_from_struct)) b_match = 0;
+						if(str.empty()) {
+							ExpressionEdit *expression_edit = qobject_cast<ExpressionEdit*>(parent());
+							if(expression_edit && !expression_edit->expressionHasChanged()) {
+								bool has_decimal = false;
+								bool has_fraction = false;
+								for(size_t i = 0; i < 2 && i < settings->v_result.back().size() && (!has_decimal || !has_fraction); i++) {
+									if(settings->v_result.back()[i].find(settings->printops.decimalpoint()) != std::string::npos) has_decimal = true;
+									else if(!has_fraction && settings->v_result.back()[i].find(settings->divisionSign()) != std::string::npos) has_fraction = true;
+								}
+								if(p_type == 302 && has_decimal) b_match = 0;
+								else if(p_type == 300 && has_fraction) b_match = 0;
+							}
+						}
 					} else if(p_type == 301) {
 						if((!cdata->current_from_struct->isNumber() || cdata->current_from_struct->number().isInteger() || cdata->current_from_struct->number().hasImaginaryPart())) {
 							bool b = false;
@@ -755,9 +806,23 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 						}
 					} else {
 						if(!cdata->current_from_struct->isNumber()) b_match = 0;
+						if(p_type >= 310 && p_type <= 314) {
+							int base = to_base;
+							if(base == 0) base = settings->printops.base;
+							if((base == BASE_FP16 && p_type == 310) || (base == BASE_FP32 && p_type == 311) || (base == BASE_FP64 && p_type == 312) || (base == BASE_FP80 && p_type == 313) || (base == BASE_FP128 && p_type == 314)) {
+								b_match = 0;
+							}
+						}
 					}
 				} else if(p_type >= 400 && p_type < 500) {
 					if(!contains_imaginary_number(*cdata->current_from_struct)) b_match = 0;
+					if(str.empty()) {
+						if(p_type == 404 && settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_RECTANGULAR) b_match = 0;
+						else if(p_type == 403 && settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) b_match = 0;
+						else if(p_type == 402 && settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_EXPONENTIAL) b_match = 0;
+						else if(p_type == 401 && settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS && !settings->complex_angle_form) b_match = 0;
+						else if(p_type == 400 && settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS && settings->complex_angle_form) b_match = 0;
+					}
 				} else if(p_type >= 500 && p_type < 600) {
 					if(!cdata->current_from_struct->isDateTime()) b_match = 0;
 				} else if(p_type == 600) {
@@ -765,7 +830,33 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 				} else if(p_type == 601) {
 					if(cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
 				} else if(p_type >= 700 && p_type < 800) {
-					if(!cdata->current_from_struct->isNumber() || (cdata->current_from_struct->number() < Number(1, 1, PRECISION + 3) && cdata->current_from_struct->number() > Number(1, 1, -PRECISION))) b_match = 0;
+					int exp = to_form;
+					if(exp == TO_FORM_OFF) exp = settings->printops.min_exp;
+					if((p_type == 703 && (exp == 0 || !cdata->current_from_struct->isNumber())) || (p_type == 702 && exp == -3) || (p_type == 701 && exp > 0)) {
+						b_match = 0;
+					} else {
+						const Number *nr_p = from_struct_get_number(*cdata->current_from_struct);
+						if(!nr_p) {
+							b_match = 0;
+						} else {
+							int absexp = (exp < -1 ? -exp : exp);
+							Number nr(nr_p->hasImaginaryPart() ? nr_p->realPart() : *nr_p);
+							if(nr.isFraction()) {
+								nr.recip();
+								if(absexp == -1) absexp = PRECISION;
+							} else if(absexp == -1) {
+								absexp = PRECISION + 3;
+							}
+							nr.abs();
+							if(nr > Number(1, 1, 100)) {
+								if(p_type == 703 || (p_type == 701 && absexp <= 100 && exp > 0)) b_match = 0;
+							} else {
+								if((p_type == 703 && (absexp > 100 || nr < Number(1, 1, absexp))) || (p_type == 701 && absexp <= 100 && ((absexp > 0 && exp >= -1 && nr >= Number(1, 1, absexp)) || nr < Number(1, 1, str.empty() ? 5 : 1))) || (p_type == 702 && nr < Number(1, 1, str.empty() ? 5 : 3))) {
+									b_match = 0;
+								}
+							}
+						}
+					}
 				}
 			}
 			if(b_match > cdata->highest_match) cdata->highest_match = b_match;
@@ -1371,6 +1462,7 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Number bases"), 201, NULL)*/
 	COMPLETION_CONVERT_STRING("base")
 	COMPLETION_APPEND_C(str1, tr("Base units"), 101, NULL)
+	COMPLETION_APPEND_C("", tr("Custom"), 1000, NULL)
 	COMPLETION_CONVERT_STRING("base ")
 	COMPLETION_APPEND_C(str1, tr("Number Base"), 200, NULL)
 	COMPLETION_APPEND_C("bcd", tr("Binary-Coded Decimal"), 285, NULL)
@@ -1382,10 +1474,14 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Calendars"), 500, NULL)
 	COMPLETION_CONVERT_STRING("cis")
 	COMPLETION_APPEND_C(str1, tr("Complex cis Form"), 401, NULL)
+	COMPLETION_CONVERT_STRING("decimals")
+	COMPLETION_APPEND_C(str1, tr("Decimal Fraction"), 302, NULL)
 	COMPLETION_CONVERT_STRING("decimal") str1 += " <i>"; str1 += "dec"; str1 += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Decimal Number"), 210, NULL)
 	COMPLETION_CONVERT_STRING("duodecimal") str1 += " <i>"; str1 += "duo"; str1 += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Duodecimal Number"), 212, NULL)
+	COMPLETION_CONVERT_STRING("engineering") str1 += " <i>"; str1 += "eng"; str1 += "</i>";
+	COMPLETION_APPEND_C(str1, tr("Engineering Notation"), 702, NULL)
 	COMPLETION_CONVERT_STRING("exponential")
 	COMPLETION_APPEND_C(str1, tr("Complex Exponential Form"), 402, NULL)
 	COMPLETION_CONVERT_STRING("factors")
@@ -1404,14 +1500,12 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Fraction") + " (1/n)", 301, NULL)
 	COMPLETION_CONVERT_STRING("fraction")
 	COMPLETION_APPEND_C(str1, tr("Fraction"), 300, NULL)
-	COMPLETION_CONVERT_STRING("decimals")
-	COMPLETION_APPEND_C(str1, tr("Decimal Fraction"), 302, NULL)
 	COMPLETION_CONVERT_STRING("hexadecimal") str1 += " <i>"; str1 += "hex"; str1 += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Hexadecimal Number"), 216, NULL)
 	COMPLETION_CONVERT_STRING("latitude") str1 += " <i>"; str1 += "latitude2"; str1 += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Latitude"), 294, NULL)
 	COMPLETION_CONVERT_STRING("longitude") str1 += " <i>"; str1 += "longitude2"; str1 += "</i>";
-	COMPLETION_APPEND_C(str1, tr("Longitude"), 294, NULL)
+	COMPLETION_APPEND_C(str1, tr("Longitude"), 295, NULL)
 	COMPLETION_CONVERT_STRING("mixed")
 	COMPLETION_APPEND_C(str1, tr("Mixed Units"), 102, NULL)
 	COMPLETION_CONVERT_STRING("octal") str1 += " <i>"; str1 += "oct"; str1 += "</i>";
@@ -1428,21 +1522,18 @@ void ExpressionEdit::updateCompletion() {
 	COMPLETION_APPEND_C(str1, tr("Complex Rectangular Form"), 404, NULL)
 	COMPLETION_CONVERT_STRING("roman")
 	COMPLETION_APPEND_C(str1, tr("Roman Numerals"), 280, NULL)
+	COMPLETION_CONVERT_STRING("scientific") str1 += " <i>"; str1 += "sci"; str1 += "</i>";
+	COMPLETION_APPEND_C(str1, tr("Scientific Notation"), 701, NULL)
 	COMPLETION_CONVERT_STRING("sexagesimal") str += " <i>"; str += "sexa"; str += "</i>"; str += " <i>"; str += "sexa2"; str += "</i>"; str += " <i>"; str += "sexa3"; str += "</i>";
 	COMPLETION_APPEND_C(str1, tr("Sexagesimal Number"), 292, NULL)
+	COMPLETION_CONVERT_STRING("simple")
+	COMPLETION_APPEND_C(str1, tr("Simple Notation"), 703, NULL)
 	COMPLETION_CONVERT_STRING("time")
 	COMPLETION_APPEND_C(str1, tr("Time Format"), 293, NULL)
 	COMPLETION_CONVERT_STRING("unicode")
 	COMPLETION_APPEND_C(str1, tr("Unicode"), 281, NULL)
 	COMPLETION_CONVERT_STRING("utc")
 	COMPLETION_APPEND_C(str1, tr("UTC Time Zone"), 501, NULL)
-	COMPLETION_CONVERT_STRING("scientific") str1 += " <i>"; str1 += "sci"; str1 += "</i>";
-	COMPLETION_APPEND_C(str1, tr("Scientific Notation"), 701, NULL)
-	COMPLETION_CONVERT_STRING("engineering") str1 += " <i>"; str1 += "eng"; str1 += "</i>";
-	COMPLETION_APPEND_C(str1, tr("Engineering Notation"), 702, NULL)
-	COMPLETION_CONVERT_STRING("simple")
-	COMPLETION_APPEND_C(str1, tr("Simple Notation"), 703, NULL)
-	COMPLETION_APPEND_C("", tr("Custom"), 1000, NULL)
 }
 
 void ExpressionEdit::setExpression(std::string str) {
@@ -3076,7 +3167,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		else do_completion_signal = -1;
 		if(!current_object_is_set) setCurrentObject();
 	}
-	cdata->show_custom_to = menu;
+	cdata->show_custom_to = (menu != NULL);
 	cdata->to_type = 0;
 	if(cdata->editing_to_expression && cdata->current_from_struct && cdata->current_from_struct->isDateTime()) cdata->to_type = 3;
 	if(current_object_start < 0) {
@@ -3280,7 +3371,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 #else
 				index = index.sibling(r, 0);
 #endif
-				if(!b_separator && r > 0 && index.data(TYPE_ROLE).toInt() < 100) {
+				if(!b_separator && r > 0 && index.data(MATCH_ROLE).toInt() == 6) {
 					menu->addSeparator();
 					b_separator = true;
 				}

@@ -7002,6 +7002,7 @@ void QalculateWindow::onBinaryBitsChanged() {
 }
 
 std::string ellipsize_result(const std::string &result_text, size_t length) {
+	if(result_text.length() <= length) return result_text;
 	length /= 2;
 	size_t index1 = result_text.find(SPACE, length);
 	if(index1 == std::string::npos || index1 > length * 1.2) {
@@ -8326,10 +8327,10 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool
 		}
 		if(settings->title_type == TITLE_RESULT || settings->title_type == TITLE_APP_RESULT) {
 			if(result_text.empty()) {
-				if(!auto_result.empty()) setWindowTitle(QString::fromStdString(unhtmlize(auto_result)));
+				if(!auto_result.empty()) setWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(auto_result, 1000))));
 				else if(settings->title_type == TITLE_RESULT) setWindowTitle("Qalculate!");
 			} else {
-				setWindowTitle(QString::fromStdString(unhtmlize(result_text)));
+				setWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(result_text, 1000))));
 			}
 		}
 	}

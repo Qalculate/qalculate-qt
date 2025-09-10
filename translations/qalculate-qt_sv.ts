@@ -7573,7 +7573,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1442"/>
         <source>Engineering Notation</source>
-        <translation>teknisk form</translation>
+        <translation type="unfinished">Teknisk form</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1923"/>

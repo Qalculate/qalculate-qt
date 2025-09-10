@@ -289,9 +289,13 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Use special duodecimal symbols"), settings->printops.duodecimal_symbols, duodecimalSymbolsToggled(bool));
 	l->addWidget(new QLabel(tr("Multiplication sign:"), this), r, 0);
 	combo = new QComboBox(this);
+	//: Unicode character name
 	combo->addItem(QString(" × (%1)").arg(tr("multiplication sign")), MULTIPLICATION_SIGN_X);
+	//: Unicode character name
 	combo->addItem(QString(" ⋅ (%1)").arg(tr("dot operator")), MULTIPLICATION_SIGN_DOT);
+	//: Unicode character name
 	combo->addItem(QString(" · (%1)").arg(tr("middle dot")), MULTIPLICATION_SIGN_ALTDOT);
+	//: Unicode character name
 	combo->addItem(QString(" * (%1)").arg(tr("asterisk")), MULTIPLICATION_SIGN_ASTERISK);
 	combo->setCurrentIndex(combo->findData(settings->printops.multiplication_sign));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(multiplicationSignChanged(int)));
