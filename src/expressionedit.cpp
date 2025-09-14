@@ -694,6 +694,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					if(b_match == 6) break;
 				}
 			}
+			if(b_match == 6 && item->isHidden() && ((Unit*) item)->isCurrency() && item != CALCULATOR->getLocalCurrency()) b_match = 0;
 			if(b_match == 6) {
 				QString qstr = index.data(Qt::DisplayRole).toString();
 				if(!qstr.isEmpty() && qstr[0] == '<') {
@@ -826,9 +827,9 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 				} else if(p_type >= 500 && p_type < 600) {
 					if(!cdata->current_from_struct->isDateTime()) b_match = 0;
 				} else if(p_type == 600) {
-					if(!cdata->current_from_struct->isInteger() && cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
+					if(!cdata->current_from_units.empty() || (!cdata->current_from_struct->isInteger() && cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0)) b_match = 0;
 				} else if(p_type == 601) {
-					if(cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
+					if(!cdata->current_from_units.empty() || cdata->current_from_struct->containsType(STRUCT_ADDITION) <= 0) b_match = 0;
 				} else if(p_type >= 700 && p_type < 800) {
 					int exp = to_form;
 					if(exp == TO_FORM_OFF) exp = settings->printops.min_exp;
@@ -2593,7 +2594,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
-				if(!cdata->current_from_struct && !mparse.containsFunctionId(FUNCTION_ID_SAVE) && !mparse.containsFunctionId(FUNCTION_ID_PLOT)) {
+				if(!cdata->current_from_struct && !mparse.containsFunctionId(FUNCTION_ID_SAVE) && !mparse.containsFunctionId(FUNCTION_ID_PLOT) && !mparse.containsFunctionId(FUNCTION_ID_EXPORT) && !mparse.containsFunctionId(FUNCTION_ID_LOAD) && !mparse.containsFunctionId(FUNCTION_ID_COMMAND)) {
 					cdata->current_from_struct = new MathStructure;
 					EvaluationOptions eo = settings->evalops;
 					eo.structuring = STRUCTURING_NONE;
@@ -2844,6 +2845,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						if(v && !v->isKnown()) v = NULL;
 						Prefix *p = NULL;
 						if(!u && !v && CALCULATOR->unitNameIsValid(str_u)) p = CALCULATOR->getPrefix(str_u);
+						CALCULATOR->startControl(100);
 						if(u) {
 							if(!had_to_conv && !str_e.empty()) {
 								CALCULATOR->beginTemporaryStopMessages();
@@ -2896,6 +2898,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							}
 							mparse.format(po);
 						}
+						CALCULATOR->stopControl();
 						if(p) {
 							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
 						} else {
@@ -3094,6 +3097,7 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 	highlightParentheses();
 	bool b = completionView->isVisible();
 	expression_has_changed2 = true;
+	qApp->processEvents();
 	displayParseStatus();
 	if(!completion_blocked && settings->enable_completion) {
 		if(b && settings->completion_delay > 0) {
@@ -3152,19 +3156,33 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	std::vector<Unit*> from_units_bak = cdata->current_from_units;
 	std::vector<std::string> from_cats_bak = cdata->current_from_categories;
 	completionView->setColumnHidden(2, true);
-	if(mstruct_from) {
+	if(mstruct_from || (menu && (cdata->current_from_struct || !contains_plot_or_save(CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), settings->evalops.parse_options))))) {
 		do_completion_signal = 1;
-		cdata->current_from_struct = mstruct_from;
-		find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
-		cdata->current_from_categories.clear();
+		if(mstruct_from) {
+			cdata->current_from_struct = mstruct_from;
+			find_matching_units(*cdata->current_from_struct, mstruct_parsed, cdata->current_from_units);
+			cdata->current_from_categories.clear();
+		} else if(!cdata->current_from_struct) {
+			cdata->current_from_struct = new MathStructure;
+			EvaluationOptions eo = settings->evalops;
+			eo.structuring = STRUCTURING_NONE;
+			eo.mixed_units_conversion = MIXED_UNITS_CONVERSION_NONE;
+			eo.auto_post_conversion = POST_CONVERSION_NONE;
+			eo.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
+			eo.expand = -2;
+			MathStructure mparse;
+			if(!CALCULATOR->calculate(cdata->current_from_struct, CALCULATOR->unlocalizeExpression(toPlainText().toStdString(), eo.parse_options), 50, eo, &mparse)) cdata->current_from_struct->setAborted();
+			find_matching_units(*cdata->current_from_struct, &mparse, cdata->current_from_units);
+			cdata->current_from_categories.clear();
+		}
 		cdata->editing_to_expression = true;
 		cdata->editing_to_expression1 = true;
 		current_object_start = -1;
 		current_object_end = -1;
 		current_object_text = "";
 	} else {
-		if(!menu) do_completion_signal = 0;
-		else do_completion_signal = -1;
+		if(menu) {MFROM_CLEANUP; return false;}
+		do_completion_signal = 0;
 		if(!current_object_is_set) setCurrentObject();
 	}
 	cdata->show_custom_to = (menu != NULL);
@@ -3175,7 +3193,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 			cdata->to_type = 4;
 		} else if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 			cdata->to_type = 2;
-		} else if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET && cdata->current_function_index > 1) {
+		} else if(!mstruct_from && !menu && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET && cdata->current_function_index > 1) {
 			Argument *arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
 			if(!arg || arg->type() != ARGUMENT_TYPE_DATA_PROPERTY) {
 				hideCompletion();
@@ -3216,7 +3234,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	}
 	cdata->highest_match = 0;
 	cdata->arg = NULL;
-	if(!mstruct_from && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET) {
+	if(!mstruct_from && !menu && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET) {
 		cdata->arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
 		if(cdata->arg && (cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT || cdata->arg->type() == ARGUMENT_TYPE_DATA_PROPERTY)) {
 			if(cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT && (current_object_text.empty() || current_object_text.length() < (size_t) settings->completion_min)) {hideCompletion(); MFROM_CLEANUP; return false;}
@@ -3324,7 +3342,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	}
 	cdata->prefixes.clear();
 	cdata->pstr.clear();
-	if(!mstruct_from && !cdata->arg && current_object_text.length() > (size_t) settings->completion_min) {
+	if(!mstruct_from && !menu && !cdata->arg && current_object_text.length() > (size_t) settings->completion_min) {
 		for(size_t pi = 1; ; pi++) {
 			Prefix *prefix = CALCULATOR->getPrefix(pi);
 			if(!prefix) break;

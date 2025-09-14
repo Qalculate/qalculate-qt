@@ -129,6 +129,10 @@ int main(int argc, char **argv) {
 	parser->addOption(vOption);
 	QCommandLineOption wOption(QStringList() << "w" << "workspace", QApplication::tr("Open workspace"), QApplication::tr("FILE"));
 	parser->addOption(wOption);
+	QCommandLineOption testOption(QStringList() << "run-test"); testOption.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser->addOption(testOption);
+	QCommandLineOption stopTestOption(QStringList() << "stop-test"); stopTestOption.setFlags(QCommandLineOption::HiddenFromHelp);
+	parser->addOption(stopTestOption);
 	parser->addPositionalArgument("expression", QApplication::tr("Expression to calculate"), QApplication::tr("[EXPRESSION]"));
 	parser->addHelpOption();
 	parser->process(app);
@@ -175,6 +179,10 @@ int main(int argc, char **argv) {
 					} else if(!parser->value(wOption).isEmpty()) {
 						command = "w";
 						command += parser->value(wOption);
+					} else if(parser->isSet(testOption)) {
+						command = "t";
+					} else if(parser->isSet(stopTestOption)) {
+						command = "e";
 					} else if(ami_changed) {
 						command = "-";
 					} else {

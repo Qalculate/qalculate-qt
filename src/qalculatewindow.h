@@ -66,6 +66,7 @@ class QalculateWindow : public QMainWindow {
 
 		void setCommandLineParser(QCommandLineParser*);
 		bool displayMessages();
+		void updateWindowTitleResult(const std::string &str);
 		bool updateWindowTitle(const QString &str = QString(), bool is_result = false, bool type_change = false);
 		void executeFromFile(const QString&);
 		void initFinished();
@@ -112,7 +113,9 @@ class QalculateWindow : public QMainWindow {
 		QAction *firstFunctionsMenuOptionAction, *firstVariablesMenuOptionAction, *firstUnitsMenuOptionAction;
 		QList<QAction*> recentWSAction, recentVariableActions, favouriteVariableActions, recentFunctionActions, favouriteFunctionActions, recentUnitActions, favouriteUnitActions;
 		QSpinBox *customOutputBaseEdit, *customInputBaseEdit, *minDecimalsEdit, *maxDecimalsEdit;
-		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer, *resizeTimer, *emhTimer;
+		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer, *resizeTimer, *emhTimer, *testTimer;
+		qint64 prev_test_time;
+		int prev_test_type;
 
 		QTableWidget *rpnView;
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;
@@ -154,6 +157,7 @@ class QalculateWindow : public QMainWindow {
 
 	protected slots:
 
+		void testTimeout();
 		void updateBinEditSize(QFont* = NULL);
 		void onBinaryBitsChanged();
 		void onSymbolClicked(const QString&);
@@ -361,6 +365,7 @@ class QalculateWindow : public QMainWindow {
 		void reportBug();
 		void help();
 		void loadInitialHistory();
+		void startTest();
 
 	signals:
 

@@ -391,6 +391,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	workspace_changed = false;
 
+	testTimer = NULL;
 	ecTimer = NULL;
 	emhTimer = NULL;
 	resizeTimer = NULL;
@@ -1041,6 +1042,89 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 }
 QalculateWindow::~QalculateWindow() {}
+
+void QalculateWindow::startTest() {
+	if(!testTimer) {
+		testTimer = new QTimer(this);
+		connect(testTimer, SIGNAL(timeout()), this, SLOT(testTimeout()));
+	}
+	prev_test_time = QDateTime::currentMSecsSinceEpoch();
+	prev_test_type = 0;
+	testTimer->start(1);
+}
+void QalculateWindow::testTimeout() {
+	if(toAction_t->menu()) toAction_t->menu()->hide();
+	if(QDateTime::currentMSecsSinceEpoch() > prev_test_time + 200) {
+		std::cout << "SLOW:" << expressionEdit->toPlainText().toStdString() << std::endl;
+		prev_test_type = 10;
+	}
+	if(prev_test_type == 10) expressionEdit->clear();
+	int type = (prev_test_type == 1 ? rand() % 15 + 8 : rand() % 23);
+	QString s;
+	if(prev_test_type == 9 && type < 9) {
+		s = QString::fromStdString(CALCULATOR->units[rand() % CALCULATOR->units.size()]->referenceName());
+		prev_test_type = 8;
+	} else if(type < 10) {
+		s = QString::number(rand() % 10000 - 200);
+		if(rand() % 3 == 0) {s += "."; s += QString::number(rand() % 10000);}
+		prev_test_type = 1;
+	} else if(type < 12) {
+		std::string operator_s = OPERATORS VECTOR_WRAPS;
+		s = operator_s[rand() % operator_s.length()];
+		prev_test_type = 2;
+	} else if(type == 12) {
+		s = ",";
+		prev_test_type = 3;
+	} else if(type < 15) {
+		s = ";";
+		prev_test_type = 4;
+	} else if(type == 15) {
+		if(rand() % 5 == 0) s = QChar(rand() % 1000000 + 32);
+		else s = ((char) (rand() % (126 - 32) + 32));
+		prev_test_type = 5;
+	} else if(type == 16) {
+		s = QString::fromStdString(CALCULATOR->functions[rand() % CALCULATOR->functions.size()]->referenceName() + "(");
+		prev_test_type = 6;
+	} else if(type == 17) {
+		s = QString::fromStdString(CALCULATOR->variables[rand() % CALCULATOR->variables.size()]->referenceName());
+		prev_test_type = 7;
+	} else if(type == 18) {
+		s = QString::fromStdString(CALCULATOR->units[rand() % CALCULATOR->units.size()]->referenceName());
+		prev_test_type = 8;
+	} else if(type == 19) {
+		s = "(";
+		prev_test_type = 2;
+	} else if(type == 20) {
+		s = ")";
+		prev_test_type = 2;
+	}
+	int t = 0;
+	if(type == 21 && rand() % 3 == 0) {
+		toAction_t->animateClick();
+		t = 200;
+		prev_test_type = 9;
+	}if(type == 21 && rand() % 2 == 0) {
+		s = "->";
+		prev_test_type = 9;
+	} else if(type >= 21) {
+		if(!expressionEdit->toPlainText().startsWith("/")) {
+			calculate();
+			toAction_t->animateClick();
+		}
+		t = 100;
+		prev_test_type = 10;
+	} else {
+		if(expressionEdit->document()->isEmpty() && s == '/') {
+			testTimeout();
+			return;
+		}
+		qDebug() << (expressionEdit->toPlainText() + s);
+		expressionEdit->textCursor().insertText(s);
+		t = pow(2, (rand() % 6) + 1);
+	}
+	testTimer->setInterval(t);
+	prev_test_time = QDateTime::currentMSecsSinceEpoch() + t;
+}
 
 void QalculateWindow::initializeFunctionsMenu() {
 	if(functionsMenu->isEmpty()) updateFunctionsMenu();
@@ -3366,6 +3450,10 @@ void QalculateWindow::socketReadyRead() {
 				command = command.mid(i);
 			}
 		}
+	} else if(command[0] == 't') {
+		startTest();
+	} else if(command[0] == 'e' && testTimer) {
+		testTimer->stop();
 	}
 	command = command.mid(1).trimmed();
 	if(!command.isEmpty()) {expressionEdit->setExpression(command); calculate();}
@@ -3391,6 +3479,7 @@ void QalculateWindow::onActivateRequested(const QStringList &arguments, const QS
 }
 void QalculateWindow::setCommandLineParser(QCommandLineParser *p) {
 	parser = p;
+	if(parser->isSet("run-test")) startTest();
 }
 void QalculateWindow::calculate() {
 	calculateExpression();
@@ -5730,6 +5819,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		was_busy = true;
 	}
 	while(CALCULATOR->busy()) {
+		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
 		sleep_ms(100);
 	}
@@ -6150,6 +6240,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		was_busy = true;
 	}
 	while(b_busy && commandThread->running) {
+		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
 		sleep_ms(100);
 	}
@@ -6381,7 +6472,7 @@ void QalculateWindow::onHistoryReloaded() {
 		mauto.setAborted();
 		auto_error = false;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
-		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+		if(!settings->status_in_history) updateWindowTitleResult(result_text);
 		if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true);
 	}
 }
@@ -6397,7 +6488,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_result = "";
 		auto_error = false;
 		mauto.setAborted();
-		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+		updateWindowTitleResult(result_text);
 	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options)) || current_text[0] == '#') {
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
@@ -6408,7 +6499,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		mauto.setAborted();
 		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
-		updateWindowTitle(QString(), true);
+		updateWindowTitleResult("");
 	} else {
 		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty()))) {
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
@@ -6431,7 +6522,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 				historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 			}
 			if(had_error || expression_from_history) {
-				updateWindowTitle(QString(), true);
+				updateWindowTitleResult("");
 				return;
 			}
 			if(!autoCalculateTimer) {
@@ -6461,7 +6552,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->parseComments(str, settings->evalops.parse_options);
 	if(str.empty()) {
 		CALCULATOR->endTemporaryStopMessages();
-		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+		updateWindowTitleResult(result_text);
 		return;
 	}
 	ComplexNumberForm cnf_bak = settings->evalops.complex_number_form;
@@ -6481,7 +6572,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		if(from_str.empty()) {
 			CALCULATOR->stopControl();
 			CALCULATOR->endTemporaryStopMessages();
-			updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+			updateWindowTitleResult(result_text);
 			return;
 		}
 		remove_duplicate_blanks(to_str);
@@ -6946,7 +7037,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 
 	if(!b_error && !b_warning && !auto_error && !auto_calculation_updated && !auto_format_updated && auto_result == result && (settings->auto_calculate_delay > 0 || auto_expression == current_status.toStdString())) {
-		if(result.empty()) updateWindowTitle(QString(), true);
+		if(result.empty()) updateWindowTitleResult("");
 		return;
 	}
 	auto_expression = current_status.toStdString();
@@ -6978,7 +7069,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		auto_result = "";
 		mauto.setAborted();
 		if(settings->auto_calculate_delay > 0) {
-			updateWindowTitle(QString(), true);
+			updateWindowTitleResult("");
 			return;
 		}
 	}
@@ -6986,7 +7077,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->addMessages(&messages);
 	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
 	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true, values.empty() ? "" : single_result);
-	updateWindowTitle(QString::fromStdString(unhtmlize(auto_result)), true);
+	updateWindowTitleResult(auto_result);
 }
 
 void QalculateWindow::onBinaryBitsChanged() {
@@ -7415,6 +7506,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		was_busy = true;
 	}
 	while(b_busy && viewThread->running) {
+		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
 		sleep_ms(100);
 	}
@@ -7429,7 +7521,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	if(!do_stack) {
 		if(basesDock->isVisible()) updateResultBases();
-		updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+		updateWindowTitleResult(result_text);
 	}
 	if(register_moved) {
 		update_parse = true;
@@ -7941,6 +8033,8 @@ void QalculateWindow::keyPressEvent(QKeyEvent *e) {
 	QMainWindow::keyPressEvent(e);
 }
 void QalculateWindow::closeEvent(QCloseEvent *e) {
+	if(testTimer) testTimer->stop();
+	if(autoCalculateTimer) autoCalculateTimer->stop();
 	if(!settings->current_workspace.empty()) {
 		int i = askSaveWorkspace();
 		if(i < 0) return;
@@ -7972,35 +8066,24 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 	qApp->closeAllWindows();
 }
 
-void QalculateWindow::onToActivated(bool button) {
+void QalculateWindow::onToActivated(bool) {
 	QTextCursor cur = expressionEdit->textCursor();
 	int b_result = 0;
 	if(!expressionEdit->expressionHasChanged() && settings->current_result) b_result = 1;
 	else if(settings->status_in_history && !mauto.isAborted() && expressionEdit->expressionHasChanged()) b_result = 2;
-	bool b_addto = (b_result == 0);
-	if(b_addto && button && CALCULATOR->hasToExpression(expressionEdit->toPlainText().toStdString(), true, settings->evalops)) {
-		std::string str = expressionEdit->toPlainText().toStdString(), to_str;
-		CALCULATOR->separateToExpression(str, to_str, settings->evalops, true, true);
-		if(to_str.empty()) b_addto = false;
-	}
-	if(b_result != 1) expressionEdit->blockCompletion(true, button);
-	if(b_addto) {
+	if(b_result != 1) expressionEdit->blockCompletion(true, true);
+	expressionEdit->complete(b_result == 1 ? mstruct : (b_result == 2 ? &mauto : NULL), b_result == 1 ? parsed_mstruct : (b_result == 2 ? &mauto_parsed : NULL), toMenu, b_result == 2);
+	if(toMenu->isEmpty()) {
 		expressionEdit->blockParseStatus();
 		expressionEdit->moveCursor(QTextCursor::End);
 		expressionEdit->insertText("➞");
 		expressionEdit->blockParseStatus(false);
 		expressionEdit->displayParseStatus(true, false);
-	}
-	if(b_result || button) {
-		expressionEdit->complete(b_result == 1 ? mstruct : (b_result == 2 ? &mauto : NULL), b_result == 1 ? parsed_mstruct : (b_result == 2 ? &mauto_parsed : NULL), toMenu, b_result == 2);
-		if(!toMenu->isEmpty()) {
-			toAction_t->setMenu(toMenu);
-			toAction_t->showMenu();
-			toAction_t->setMenu(NULL);
-			toMenu->clear();
-		}
 	} else {
-		expressionEdit->complete();
+		toAction_t->setMenu(toMenu);
+		toAction_t->showMenu();
+		toAction_t->setMenu(NULL);
+		toMenu->clear();
 	}
 	if(b_result != 1) expressionEdit->blockCompletion(false);
 }
@@ -8314,6 +8397,11 @@ void QalculateWindow::onBasesVisibilityChanged(bool b) {
 }
 bool QalculateWindow::displayMessages() {
 	return settings->displayMessages(this);
+}
+void QalculateWindow::updateWindowTitleResult(const std::string &str) {
+	if(!title_modified && (settings->title_type == TITLE_RESULT || settings->title_type == TITLE_APP_RESULT)) {
+		updateWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(str, 1000))), true);
+	}
 }
 bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool type_change) {
 	if(title_modified) return false;
