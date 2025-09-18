@@ -327,7 +327,7 @@ bool title_matches(ExpressionItem *item, const std::string &str, size_t minlengt
 	while(true) {
 		while(true) {
 			if(i >= title.length()) return false;
-			if(title[i] != ' ') break;
+			if(title[i] != ' ' && title[i] != '(') break;
 			i++;
 		}
 		size_t i2 = title.find(' ', i);
@@ -4222,7 +4222,7 @@ void ExpressionEdit::setCurrentObject() {
 				non_number_before = true;
 			}
 		}
-		
+
 		cdata->editing_to_expression1 = (l_to == 0);
 		if(pos2 > pos) {
 			current_object_start = -1;

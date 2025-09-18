@@ -399,7 +399,7 @@ class MathSpinBox : public QSpinBox {
 
 		int valueFromText(const QString &text) const override;
 		QValidator::State validate(QString &text, int &pos) const override;
-		void keyPressEvent(QKeyEvent *event);
+		void keyPressEvent(QKeyEvent *event) override;
 
 	signals:
 

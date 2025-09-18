@@ -95,6 +95,7 @@ enum {
 	COMMAND_CONVERT_STRING,
 	COMMAND_CONVERT_BASE,
 	COMMAND_CONVERT_OPTIMAL,
+	COMMAND_CONVERT_MIXED,
 	COMMAND_CALCULATE,
 	COMMAND_EVAL
 };
@@ -128,7 +129,7 @@ int to_caf = -1;
 unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
-std::string auto_expression, auto_result, current_status_expression;
+std::string auto_expression, auto_result, current_status_expression, auto_exact_text, auto_result_text;
 bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
@@ -1054,12 +1055,12 @@ void QalculateWindow::startTest() {
 }
 void QalculateWindow::testTimeout() {
 	if(toAction_t->menu()) toAction_t->menu()->hide();
-	if(QDateTime::currentMSecsSinceEpoch() > prev_test_time + 200) {
-		std::cout << "SLOW:" << expressionEdit->toPlainText().toStdString() << std::endl;
+	if(QDateTime::currentMSecsSinceEpoch() > prev_test_time + (prev_test_type == 10 ? 500 : 200)) {
+		std::cout << "SLOW: " << expressionEdit->toPlainText().toStdString() << std::endl;
 		prev_test_type = 10;
 	}
 	if(prev_test_type == 10) expressionEdit->clear();
-	int type = (prev_test_type == 1 ? rand() % 15 + 8 : rand() % 23);
+	int type = (prev_test_type == 1 ? rand() % 15 + 8 : rand() % 24);
 	QString s;
 	if(prev_test_type == 9 && type < 9) {
 		s = QString::fromStdString(CALCULATOR->units[rand() % CALCULATOR->units.size()]->referenceName());
@@ -1097,30 +1098,36 @@ void QalculateWindow::testTimeout() {
 	} else if(type == 20) {
 		s = ")";
 		prev_test_type = 2;
+	} else if(type == 21) {
+		s = "->";
+		prev_test_type = 9;
 	}
-	int t = 0;
-	if(type == 21 && rand() % 3 == 0) {
+	int t = 1;
+	if(type == 22 && rand() % 3 == 0) {
 		toAction_t->animateClick();
 		t = 200;
 		prev_test_type = 9;
-	}if(type == 21 && rand() % 2 == 0) {
-		s = "->";
-		prev_test_type = 9;
-	} else if(type >= 21) {
+	} else if(type >= 22) {
 		if(!expressionEdit->toPlainText().startsWith("/")) {
+			std::cerr << "CALCULATE: " << expressionEdit->toPlainText().toStdString() << std::endl;
 			calculate();
+			if(QDateTime::currentMSecsSinceEpoch() > prev_test_time + 5000) {
+				std::cout << "ABORTED? " << expressionEdit->toPlainText().toStdString() << std::endl;
+				qApp->closeAllWindows();
+				return;
+			}
 			toAction_t->animateClick();
+			t = 200;
 		}
-		t = 100;
 		prev_test_type = 10;
 	} else {
 		if(expressionEdit->document()->isEmpty() && s == '/') {
 			testTimeout();
 			return;
 		}
-		qDebug() << (expressionEdit->toPlainText() + s);
+		std::cerr << (expressionEdit->toPlainText() + s).toStdString() << std::endl;
 		expressionEdit->textCursor().insertText(s);
-		t = pow(2, (rand() % 6) + 1);
+		//t = pow(2, (rand() % 6) + 1);
 	}
 	testTimer->setInterval(t);
 	prev_test_time = QDateTime::currentMSecsSinceEpoch() + t;
@@ -4583,10 +4590,13 @@ void QalculateWindow::toggleResultFraction() {
 			NumberFractionFormat frac_bak = settings->printops.number_fraction_format;
 			int dfrac_bak = settings->dual_fraction;
 			settings->dual_fraction = 0;
-			if(unhtmlize(auto_result).find(settings->printops.decimalpoint()) != std::string::npos) settings->printops.number_fraction_format = FRACTION_COMBINED;
+			if(unhtmlize(auto_result_text).find(settings->printops.decimalpoint()) != std::string::npos) settings->printops.number_fraction_format = FRACTION_COMBINED;
 			else settings->printops.number_fraction_format = FRACTION_DECIMAL;
 			auto_format_updated = true;
+			int acd_bak = settings->auto_calculate_delay;
+			settings->auto_calculate_delay = 0;
 			expressionEdit->displayParseStatus(true);
+			settings->auto_calculate_delay = acd_bak;
 			settings->printops.number_fraction_format = frac_bak;
 			settings->dual_fraction = dfrac_bak;
 		}
@@ -5533,18 +5543,15 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				str_conv = "";
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "mixed") || equalsIgnoreCase(to_str, tr("mixed").toStdString())) {
+				if(from_str.empty()) {
+					b_busy--;
+					executeCommand(COMMAND_CONVERT_MIXED);
+					if(current_expr) setPreviousExpression();
+					return;
+				}
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_NONE;
 				settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
-				if(from_str.empty()) {
-					b_busy--;
-					if(!previous_expression.empty()) calculateExpression(force, do_mathoperation, op, f, do_stack, stack_index, previous_expression);
-					if(current_expr) setPreviousExpression();
-					settings->evalops.auto_post_conversion = save_auto_post_conversion;
-					settings->evalops.mixed_units_conversion = save_mixed_units_conversion;
-					settings->evalops.parse_options.units_enabled = b_units_saved;
-					return;
-				}
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "factors") || equalsIgnoreCase(to_str, tr("factors").toStdString()) || equalsIgnoreCase(to_str, "factor")) {
 				if(from_str.empty()) {
@@ -5797,7 +5804,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		CALCULATOR->calculate(mstruct, original_expression, 0, settings->evalops, parsed_mstruct, parsed_tostruct);
 	}
 
-	bool title_set = false, was_busy = false;
+	bool title_set = false;
+	int was_busy = 0;
 
 	QProgressDialog *dialog = NULL;
 
@@ -5816,12 +5824,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		dialog->setWindowModality(Qt::WindowModal);
 		dialog->show();
 		QApplication::setOverrideCursor(Qt::WaitCursor);
-		was_busy = true;
+		was_busy = 1;
 	}
 	while(CALCULATOR->busy()) {
 		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
 		sleep_ms(100);
+		was_busy++;
 	}
 
 	if(was_busy) {
@@ -5948,6 +5957,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if((!settings->rpn_mode || (!do_stack && !do_mathoperation)) && (!do_calendars || !mstruct->isDateTime()) && (settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) && !do_bases) {
 		long int i_timeleft = 0;
 		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
+		if(was_busy > 3) i_timeleft /= 2;
 		if(i_timeleft > 0) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mstruct_exact, mstruct, original_expression, parsed_mstruct, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), i_timeleft, -1);
@@ -6013,15 +6023,22 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
 			} else if(settings->replace_expression == CLEAR_EXPRESSION) {
 				expressionEdit->clear();
+				previous_expression = "";
 			} else if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT_IF_SHORTER) {
 				if(settings->replace_expression == REPLACE_EXPRESSION_WITH_RESULT || (!exact_text.empty() && unicode_length(exact_text) < unicode_length(from_str))) {
-					if(exact_text == "0" || result_text == "0") expressionEdit->clear();
-					else if(exact_text.empty()) {
+					if(exact_text == "0" || result_text == "0") {
+						expressionEdit->clear();
+						previous_expression = "";
+					} else if(exact_text.empty()) {
 						std::string str = settings->replaceResultSeparators(unhtmlize(result_text));
-						if(unicode_length(str) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+						if(unicode_length(str) < 10000) {
+							expressionEdit->setExpression(QString::fromStdString(str));
+							previous_expression = str;
+						}
 					} else {
 						if(settings->replace_expression != REPLACE_EXPRESSION_WITH_RESULT || unicode_length(exact_text) < 10000) {
 							expressionEdit->setExpression(QString::fromStdString(settings->replaceResultSeparators(exact_text)));
+							previous_expression = settings->replaceResultSeparators(exact_text);
 						}
 					}
 				} else {
@@ -6030,6 +6047,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 						CALCULATOR->separateToExpression(from_str, str, settings->evalops, true, true);
 					}
 					expressionEdit->setExpression(QString::fromStdString(from_str));
+					previous_expression = from_str;
 				}
 			}
 			if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
@@ -6137,6 +6155,14 @@ void CommandThread::run() {
 				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convertToBaseUnits(*((MathStructure*) x2), eo2));
 				break;
 			}
+			case COMMAND_CONVERT_MIXED: {
+				eo2.auto_post_conversion = POST_CONVERSION_NONE;
+				eo2.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
+				((MathStructure*) x)->set(CALCULATOR->convertToMixedUnits(*((MathStructure*) x), eo2));
+				eo2.approximation = APPROXIMATION_EXACT;
+				if(x2) ((MathStructure*) x2)->set(CALCULATOR->convertToMixedUnits(*((MathStructure*) x2), eo2));
+				break;
+			}
 			case COMMAND_CALCULATE: {
 				eo2.calculate_functions = false;
 				eo2.sync_units = false;
@@ -6175,7 +6201,7 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 			command_convert_units_string = ceu_str;
 			command_convert_unit = u;
 		}
-		if(command_type == COMMAND_CONVERT_UNIT || command_type == COMMAND_CONVERT_STRING || command_type == COMMAND_CONVERT_BASE || command_type == COMMAND_CONVERT_OPTIMAL) {
+		if(command_type == COMMAND_CONVERT_UNIT || command_type == COMMAND_CONVERT_STRING || command_type == COMMAND_CONVERT_BASE || command_type == COMMAND_CONVERT_MIXED || command_type == COMMAND_CONVERT_OPTIMAL) {
 			to_prefix = 0;
 		}
 	}
@@ -6486,6 +6512,8 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		historyView->clearTemporary();
 		auto_expression = "";
 		auto_result = "";
+		auto_result_text = "";
+		auto_exact_text = "";
 		auto_error = false;
 		mauto.setAborted();
 		updateWindowTitleResult(result_text);
@@ -6496,6 +6524,8 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		std::vector<std::string> values;
 		auto_expression = status.toStdString();
 		auto_result = "";
+		auto_result_text = "";
+		auto_exact_text = "";
 		mauto.setAborted();
 		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
@@ -6514,6 +6544,8 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		if(had_error || expression_from_history || settings->auto_calculate_delay > 0) {
 			if(had_error || expression_from_history || had_warning || auto_error || !auto_result.empty() || auto_expression != status.toStdString()) {
 				auto_result = "";
+				auto_result_text = "";
+				auto_exact_text = "";
 				mauto.setAborted();
 				auto_expression = status.toStdString();
 				auto_error = had_error || had_warning;
@@ -6987,7 +7019,9 @@ void QalculateWindow::autoCalculateTimeout() {
 			}
 		}
 		b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
+		if(b_exact) auto_exact_text = unhtmlize(single_result);
 		if(!values.empty()) {
+			auto_exact_text = unhtmlize(values[0]);
 			result = "";
 			for(size_t i = 0; i < values.size(); i++) {
 				if(i > 0) result += " = ";
@@ -7038,6 +7072,7 @@ void QalculateWindow::autoCalculateTimeout() {
 
 	if(!b_error && !b_warning && !auto_error && !auto_calculation_updated && !auto_format_updated && auto_result == result && (settings->auto_calculate_delay > 0 || auto_expression == current_status.toStdString())) {
 		if(result.empty()) updateWindowTitleResult("");
+		auto_exact_text = "";
 		return;
 	}
 	auto_expression = current_status.toStdString();
@@ -7045,6 +7080,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	QString flag;
 	if(!b_error && !result.empty() && (mauto.countTotalChildren(false) < 10 || historyView->testTemporaryResultLength(result))) {
 		auto_result = result;
+		auto_result_text = single_result;
 		if((mauto.isMultiplication() && mauto.size() == 2 && mauto[1].isUnit() && mauto[1].unit()->isCurrency()) || (mauto.isUnit() && mauto.unit()->isCurrency())) {
 			flag = ":/data/flags/" + QString::fromStdString(mauto.isUnit() ? mauto.unit()->referenceName() : mauto[1].unit()->referenceName()) + ".png";
 			if(!QFile::exists(flag)) flag.clear();
@@ -7067,6 +7103,8 @@ void QalculateWindow::autoCalculateTimeout() {
 		values.push_back(result);
 	} else {
 		auto_result = "";
+		auto_result_text = "";
+		auto_exact_text = "";
 		mauto.setAborted();
 		if(settings->auto_calculate_delay > 0) {
 			updateWindowTitleResult("");
@@ -7595,6 +7633,8 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		if(b_add) {
 			auto_expression = "";
 			auto_result = "";
+			auto_result_text = "";
+			auto_exact_text = "";
 			mauto.setAborted();
 			auto_error = false;
 			if(autoCalculateTimer) autoCalculateTimer->stop();
@@ -7765,7 +7805,7 @@ bool QalculateWindow::warnAssumptions(MathStructure &m, bool dry_run) {
 	MathStructure mvar = m.find_x_var();
 	if(!mvar.isSymbolic() && !mvar.isVariable()) return false;
 	if(mvar.isVariable() && (mvar.variable()->isKnown() || ((UnknownVariable*) mvar.variable())->assumptions())) return false;
-	CALCULATOR->error(false, tr("Unknown variables (e.g. x, y, z) are by default assumed real.").toUtf8(), NULL);
+	CALCULATOR->error(false, tr("Unknown variables (e.g. x, y, z) are by default assumed real.").toUtf8().data(), NULL);
 	if(!dry_run) settings->assumptions_warning_shown = true;
 	return true;
 }
@@ -8141,7 +8181,7 @@ void QalculateWindow::exportCSV() {
 }
 void QalculateWindow::onStoreActivated() {
 	ExpressionItem *replaced_item = NULL;
-	KnownVariable *v = VariableEditDialog::newVariable(this, !auto_result.empty() ? &mauto : (expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact)), !auto_result.empty() ? QString::fromStdString(unhtmlize(auto_result)) : (expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : QString::fromStdString(exact_text)), &replaced_item);
+	KnownVariable *v = VariableEditDialog::newVariable(this, !auto_result.empty() ? &mauto : (expressionEdit->expressionHasChanged() || settings->history_answer.empty() ? NULL : (mstruct_exact.isUndefined() ? mstruct : &mstruct_exact)), !auto_result.empty() ? QString::fromStdString(unhtmlize(auto_exact_text)) : (expressionEdit->expressionHasChanged() ? expressionEdit->toPlainText() : QString::fromStdString(exact_text)), &replaced_item);
 	if(v) {
 		expressionEdit->updateCompletion();
 		if(variablesDialog) variablesDialog->updateVariables();
@@ -8415,7 +8455,7 @@ bool QalculateWindow::updateWindowTitle(const QString &str, bool is_result, bool
 		}
 		if(settings->title_type == TITLE_RESULT || settings->title_type == TITLE_APP_RESULT) {
 			if(result_text.empty()) {
-				if(!auto_result.empty()) setWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(auto_result, 1000))));
+				if(!auto_result_text.empty()) setWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(auto_result_text, 1000))));
 				else if(settings->title_type == TITLE_RESULT) setWindowTitle("Qalculate!");
 			} else {
 				setWindowTitle(QString::fromStdString(unhtmlize(ellipsize_result(result_text, 1000))));
@@ -9933,7 +9973,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 				std::string seltext, str2;
 				if(expressionEdit->textCursor().hasSelection()) seltext = expressionEdit->textCursor().selectedText().toStdString();
 				else seltext = expressionEdit->toPlainText().toStdString();
-				bool use_current_result = (!auto_result.empty() || (!expressionEdit->expressionHasChanged() && !settings->history_answer.empty() && settings->current_result)) && (!expressionEdit->textCursor().hasSelection() || seltext == expressionEdit->toPlainText().toStdString());
+				bool use_current_result = (!auto_exact_text.empty() || (!expressionEdit->expressionHasChanged() && !settings->history_answer.empty() && settings->current_result)) && (!expressionEdit->textCursor().hasSelection() || seltext == expressionEdit->toPlainText().toStdString());
 				CALCULATOR->separateToExpression(seltext, str2, settings->evalops, true);
 				remove_blank_ends(seltext);
 				if(!seltext.empty()) {
@@ -9970,7 +10010,9 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 						}
 					} else {
 						if(use_current_result) {
-							if(exact_text.empty()) {
+							if(!auto_exact_text.empty()) {
+								((QLineEdit*) fd->entry[i])->setText(QString::fromStdString(auto_exact_text));
+							} else if(exact_text.empty()) {
 								Number nr(settings->history_answer.size(), 1, 0);
 								((QLineEdit*) fd->entry[i])->setText(QStringLiteral("%1(%2)").arg(QString::fromStdString(settings->f_answer->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) fd->entry[i]).formattedName(TYPE_FUNCTION, true))).arg(QString::fromStdString(print_with_evalops(nr))));
 							} else {

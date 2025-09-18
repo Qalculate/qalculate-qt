@@ -419,7 +419,7 @@ void HistoryView::clearTemporary() {
 
 bool HistoryView::testTemporaryResultLength(const std::string &str) {
 	QFontMetrics fm(font());
-	return fm.boundingRect(QStringLiteral("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() < width() * 1.65;
+	return fm.boundingRect(QStringLiteral("#9999") + "= " + unhtmlize(QString::fromStdString(str))).width() + 2 < width() * 1.65;
 }
 
 int HistoryView::maxTemporaryCharacters() {
@@ -565,8 +565,12 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		if(initial_load && settings->v_protected[index]) {
 			if(has_lock_symbol < 0) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+				if(QFontDatabase::families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
+#else
 				QFontDatabase database;
 				if(database.families(QFontDatabase::Symbol).contains("Noto Color Emoji")) has_lock_symbol = 1;
+#endif
 				else has_lock_symbol = 0;
 			}
 			if(has_lock_symbol) str += " <small><sup>🔒</sup></small>";
@@ -616,7 +620,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			continue;
 		}
 		QFontMetrics fm(font());
-		int w_number = fm.boundingRect("#9999").width();
+		int w_number = fm.boundingRect(i_answer > 9999 ? (i_answer > 99999 ? "#999999" : "#99999") : "#9999").width() + 2;
 		int w = 0;
 		str += "<tr><td valign=\"center\" width=\""; str += QString::number(w_number); str += "\">";
 		if(!initial_load || initial_load > 2) {
@@ -708,6 +712,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		n++;
 	}
 	str.replace("\n", "<br>");
+	str.replace(QChar(0x2028), "<br>");
 	int i = 0;
 	if(!previous_temporary && (!expression.empty() || !parse.empty())) {
 		previous_html2 = previous_html;

@@ -563,8 +563,11 @@ void PreferencesDialog::multiplicationSignChanged(int i) {
 	emit symbolsUpdated();
 }
 void PreferencesDialog::divisionSlashToggled(bool b) {
-	if(b) settings->printops.division_sign = DIVISION_SIGN_DIVISION_SLASH;
-	else settings->printops.division_sign = DIVISION_SIGN_SLASH;
+	if(b) {
+		settings->printops.division_sign = DIVISION_SIGN_DIVISION_SLASH;
+	} else {
+		settings->printops.division_sign = DIVISION_SIGN_SLASH;
+	}
 	emit resultDisplayUpdated();
 	emit symbolsUpdated();
 }
@@ -573,8 +576,11 @@ void PreferencesDialog::spellOutToggled(bool b) {
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::eToggled(bool b) {
-	if(b) settings->printops.exp_display = EXP_LOWERCASE_E;
-	else settings->printops.exp_display = EXP_POWER_OF_10;
+	if(b) {
+		settings->printops.exp_display = EXP_LOWERCASE_E;
+	} else {
+		settings->printops.exp_display = EXP_POWER_OF_10;
+	}
 	emit resultDisplayUpdated();
 }
 void PreferencesDialog::imaginaryJToggled(bool b) {
@@ -675,8 +681,11 @@ void PreferencesDialog::simplifiedPercentageToggled(bool b) {
 	emit expressionFormatUpdated(true);
 }
 void PreferencesDialog::readPrecisionToggled(bool b) {
-	if(b) settings->evalops.parse_options.read_precision = READ_PRECISION_WHEN_DECIMALS;
-	else settings->evalops.parse_options.read_precision = DONT_READ_PRECISION;
+	if(b) {
+		settings->evalops.parse_options.read_precision = READ_PRECISION_WHEN_DECIMALS;
+	} else {
+		settings->evalops.parse_options.read_precision = DONT_READ_PRECISION;
+	}
 	emit expressionFormatUpdated(true);
 }
 void PreferencesDialog::rpnKeysToggled(bool b) {
@@ -735,8 +744,11 @@ void PreferencesDialog::disableCursorBlinkingToggled(bool b) {
 	else qApp->setCursorFlashTime(1000);
 }
 void PreferencesDialog::mixedUnitsToggled(bool b) {
-	if(b) settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
-	else settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_NONE;
+	if(b) {
+		settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_DEFAULT;
+	} else {
+		settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_NONE;
+	}
 	emit expressionCalculationUpdated(0);
 }
 void PreferencesDialog::conversionChanged(int i) {
@@ -933,8 +945,11 @@ void PreferencesDialog::styleChanged(int i) {
 	settings->updateStyle();
 }
 void PreferencesDialog::factorizeToggled(bool b) {
-	if(b) settings->evalops.structuring = STRUCTURING_FACTORIZE;
-	else settings->evalops.structuring = STRUCTURING_EXPAND;
+	if(b) {
+		settings->evalops.structuring = STRUCTURING_FACTORIZE;
+	} else {
+		settings->evalops.structuring = STRUCTURING_EXPAND;
+	}
 	emit expressionCalculationUpdated(0);
 }
 void PreferencesDialog::closeEvent(QCloseEvent *e) {

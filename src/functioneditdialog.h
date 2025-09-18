@@ -71,7 +71,7 @@ class MathTextEdit : public QPlainTextEdit {
 		MathTextEdit(QWidget *parent);
 		~MathTextEdit();
 
-		QSize sizeHint() const;
+		QSize sizeHint() const override;
 		void insertText(const QString&);
 
 	protected:
