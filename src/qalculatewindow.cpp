@@ -1116,6 +1116,7 @@ void QalculateWindow::testTimeout() {
 				qApp->closeAllWindows();
 				return;
 			}
+			if(settings->v_expression.size() > 100) historyView->editClear();
 			toAction_t->animateClick();
 			t = 200;
 		}
@@ -6569,6 +6570,23 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 	}
 }
 
+bool contains_updating_time(const MathStructure &m) {
+	if((m.isVariable() && (m.variable()->id() == VARIABLE_ID_NOW || m.variable()->id() == VARIABLE_ID_UPTIME)) || (m.isFunction() && (m.function()->id() == FUNCTION_ID_TIME))) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_updating_time(m[i])) return true;
+		if(m[i].isDateTime() && m.isFunction() && m.function()->getArgumentDefinition(i + 1) && m.function()->getArgumentDefinition(i + 1)->type() == ARGUMENT_TYPE_DATE) {
+			QalculateDateTime dnow;
+			dnow.setToCurrentTime();
+			if(dnow == *m[i].datetime()) return true;
+			if(dnow > *m[i].datetime()) {
+				dnow.addSeconds(-5);
+				if(dnow < *m[i].datetime()) return true;
+			}
+		}
+	}
+	return false;
+}
+
 void QalculateWindow::autoCalculateTimeout() {
 	mauto.setAborted();
 	bool is_approximate = false;
@@ -7116,6 +7134,15 @@ void QalculateWindow::autoCalculateTimeout() {
 	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
 	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true, values.empty() ? "" : single_result);
 	updateWindowTitleResult(auto_result);
+	if(contains_updating_time(mauto_parsed)) {
+		auto_calculation_updated = true;
+		if(!autoCalculateTimer) {
+			autoCalculateTimer = new QTimer(this);
+			autoCalculateTimer->setSingleShot(true);
+			connect(autoCalculateTimer, SIGNAL(timeout()), this, SLOT(autoCalculateTimeout()));
+		}
+		autoCalculateTimer->start(1000);
+	}
 }
 
 void QalculateWindow::onBinaryBitsChanged() {

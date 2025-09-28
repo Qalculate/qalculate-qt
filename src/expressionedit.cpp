@@ -260,10 +260,9 @@ bool equalsIgnoreCase(const std::string &str1, const std::string &str2, size_t i
 	size_t l = 0;
 	if(i2_end == std::string::npos) i2_end = str2.length();
 	for(size_t i1 = 0;; i1++, i2++) {
-		if(i2 >= i2_end) {
-			return i1 >= str1.length();
-		}
+		if(i2 >= i2_end) return i1 >= str1.length();
 		if(i1 >= str1.length()) break;
+		if(i2 >= str2.length()) return false;
 		if(((signed char) str1[i1] < 0 && i1 + 1 < str1.length()) || ((signed char) str2[i2] < 0 && i2 + 1 < str2.length())) {
 			size_t iu1 = 1, iu2 = 1;
 			size_t n1 = 1, n2 = 1;
@@ -341,18 +340,38 @@ bool title_matches(ExpressionItem *item, const std::string &str, size_t minlengt
 	}
 	return false;
 }
+bool test_unicode_length_from(const std::string &str, size_t i, size_t l) {
+	if(l == 0) return true;
+	for(; i < str.length(); i++) {
+		if((signed char) str[i] > 0 || (unsigned char) str[i] >= 0xC0) {
+			l--;
+			if(l == 0) return true;
+		}
+	}
+	return false;
+}
 bool name_matches(ExpressionItem *item, const std::string &str) {
 	for(size_t i2 = 1; i2 <= item->countNames(); i2++) {
-		if(item->getName(i2).case_sensitive) {
-			if(str == item->getName(i2).name.substr(0, str.length())) {
+		const ExpressionName *ename = &item->getName(i2);
+		if(ename->case_sensitive) {
+			if(str == ename->name.substr(0, str.length())) {
 				return true;
 			}
 		} else {
-			if(equalsIgnoreCase(str, item->getName(i2).name, 0, str.length(), 0)) {
+			if(equalsIgnoreCase(str, ename->name, 0, str.length(), 0)) {
 				return true;
 			}
-			std::unordered_map<const ExpressionName*, std::string>::iterator cap_it = capitalized_names.find(&item->getName(i2));
+			std::unordered_map<const ExpressionName*, std::string>::iterator cap_it = capitalized_names.find(ename);
 			if(cap_it != capitalized_names.end() && equalsIgnoreCase(str, cap_it->second, 0, str.length(), 0)) {
+				return true;
+			}
+		}
+		size_t i = 0;
+		while(true) {
+			i = ename->name.find("_", i);
+			if(i == std::string::npos || !test_unicode_length_from(ename->name, i + 1, 2)) break;
+			i++;
+			if((ename->case_sensitive && str == ename->name.substr(i, str.length())) || (!ename->case_sensitive && equalsIgnoreCase(str, ename->name, i, str.length() + i, 0))) {
 				return true;
 			}
 		}
@@ -360,16 +379,27 @@ bool name_matches(ExpressionItem *item, const std::string &str) {
 	return false;
 }
 int name_matches2(ExpressionItem *item, const std::string &str, size_t minlength, size_t *i_match = NULL) {
-	if(minlength > 1 && unicode_length(str) == 1) return 0;
+	if(minlength > 1 && !test_unicode_length_from(str, 0, 2)) return 0;
 	bool b_match = false;
 	for(size_t i2 = 1; i2 <= item->countNames(); i2++) {
-		if(equalsIgnoreCase(str, item->getName(i2).name, 0, str.length(), 0)) {
-			if(!item->getName(i2).case_sensitive && item->getName(i2).name.length() == str.length()) {
+		const ExpressionName *ename = &item->getName(i2);
+		if(equalsIgnoreCase(str, ename->name, 0, str.length(), 0)) {
+			if(!ename->case_sensitive && ename->name.length() == str.length()) {
 				if(i_match) *i_match = i2;
 				return 1;
 			}
 			if(i_match && *i_match == 0) *i_match = i2;
 			b_match = true;
+		}
+		size_t i = 0;
+		while(true) {
+			i = ename->name.find("_", i);
+			if(i == std::string::npos || !test_unicode_length_from(ename->name, i + 1, 2)) break;
+			i++;
+			if((ename->case_sensitive && str.length() <= ename->name.length() - i && str == ename->name.substr(i, str.length())) || (!ename->case_sensitive && equalsIgnoreCase(str, ename->name, i, str.length() + i, minlength))) {
+				b_match = true;
+				break;
+			}
 		}
 	}
 	return b_match ? 2 : 0;
@@ -436,7 +466,7 @@ void HTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 	doc.setDefaultFont(optionV4.font);
 	doc.setHtml(optionV4.text);
 
-	/// Painting item without text
+	// Painting item without text
 	optionV4.text = QString();
 	style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter);
 
@@ -694,7 +724,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					if(b_match == 6) break;
 				}
 			}
-			if(b_match == 6 && item->isHidden() && ((Unit*) item)->isCurrency() && item != CALCULATOR->getLocalCurrency()) b_match = 0;
+			if(b_match == 6 && item->isHidden() && item != CALCULATOR->getLocalCurrency()) b_match = 0;
 			if(b_match == 6) {
 				QString qstr = index.data(Qt::DisplayRole).toString();
 				if(!qstr.isEmpty() && qstr[0] == '<') {
@@ -783,7 +813,7 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 						if(!contains_rational_number(*cdata->current_from_struct)) b_match = 0;
 						if(str.empty()) {
 							ExpressionEdit *expression_edit = qobject_cast<ExpressionEdit*>(parent());
-							if(expression_edit && !expression_edit->expressionHasChanged()) {
+							if(expression_edit && !expression_edit->expressionHasChanged() && !settings->v_result.empty()) {
 								bool has_decimal = false;
 								bool has_fraction = false;
 								for(size_t i = 0; i < 2 && i < settings->v_result.back().size() && (!has_decimal || !has_fraction); i++) {
@@ -1297,7 +1327,11 @@ void ExpressionEdit::updateCompletion() {
 	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
 		Unit *u = CALCULATOR->units[i];
 		if(u->isActive()) {
-			if(u->subtype() != SUBTYPE_COMPOSITE_UNIT) {
+			CompositeUnit *cu = (u->subtype() == SUBTYPE_COMPOSITE_UNIT ? (CompositeUnit*) u : NULL);
+			if(!cu && u->isHidden() && u->subtype() == SUBTYPE_ALIAS_UNIT && ((AliasUnit*) u)->firstBaseUnit()->subtype() == SUBTYPE_COMPOSITE_UNIT && !((AliasUnit*) u)->firstBaseUnit()->isHidden() && ((AliasUnit*) u)->firstBaseUnit()->isActive()) {
+				cu = (CompositeUnit*) ((AliasUnit*) u)->firstBaseUnit();
+			}
+			if(!cu) {
 				const ExpressionName *ename, *ename_r;
 				bool b = false;
 				ename_r = &u->preferredInputName(false, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
@@ -1360,8 +1394,7 @@ void ExpressionEdit::updateCompletion() {
 					}
 					COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title2.isEmpty() ? title : title2, 1, u)
 				}
-			} else if(!u->isHidden()) {
-				CompositeUnit *cu = (CompositeUnit*) u;
+			} else if(!cu->isHidden()) {
 				title = QString::fromStdString(cu->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				title2 = title;
 				bool tp = title2[title2.length() - 1] == ')';
@@ -1369,7 +1402,8 @@ void ExpressionEdit::updateCompletion() {
 				if(!tp) title2 += "(";
 				Prefix *prefix = NULL;
 				int exp = 1;
-				if(cu->countUnits() == 1 && (u = cu->get(1, &exp, &prefix)) != NULL && prefix != NULL && exp == 1) {
+				Unit *u_i = NULL;
+				if(cu->countUnits() == 1 && (u_i = cu->get(1, &exp, &prefix)) != NULL && prefix != NULL && exp == 1) {
 					str = "";
 					for(size_t name_i = 0; name_i < 2; name_i++) {
 						const ExpressionName *ename;
@@ -1378,7 +1412,7 @@ void ExpressionEdit::updateCompletion() {
 							bool b_italic = !str.empty();
 							if(b_italic) str += " <i>";
 							str += ename->formattedName(-1, false, true);
-							const ExpressionName *ename2 = &u->preferredInputName(name_i != 1, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
+							const ExpressionName *ename2 = &u_i->preferredInputName(name_i != 1, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, completionView);
 							str += ename2->formattedName(TYPE_UNIT, true, true);
 							if(b_italic) str += "</i>";
 							if(!b_italic) {
@@ -1414,7 +1448,7 @@ void ExpressionEdit::updateCompletion() {
 						else title = QString::fromStdString(cu->category().substr(i_slash, cu->category().length() - i_slash));
 					}
 				}
-				COMPLETION_APPEND_2(QString::fromStdString(str), title, title2, 1, cu)
+				COMPLETION_APPEND_2(QString::fromStdString(str), title, title2, 1, u)
 			}
 		}
 	}
@@ -3840,14 +3874,19 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	if(i_type == 3 && p) return;
 	if(p_type == 1) item = (ExpressionItem*) p;
 	else if(p_type == 2) prefix = (Prefix*) p;
-	if(item && item->type() == TYPE_UNIT && ((Unit*) item)->subtype() == SUBTYPE_COMPOSITE_UNIT && (((CompositeUnit*) item)->countUnits() > 1 || !((CompositeUnit*) item)->get(1, &exp, &prefix) || exp != 1)) {
+	if(item && item->isHidden() && item->type() == TYPE_UNIT && item->subtype() == SUBTYPE_ALIAS_UNIT && ((AliasUnit*) item)->firstBaseUnit()->subtype() == SUBTYPE_COMPOSITE_UNIT && !((AliasUnit*) item)->firstBaseUnit()->isHidden() && ((AliasUnit*) item)->firstBaseUnit()->isActive()) {
+		PrintOptions po = settings->printops;
+		po.can_display_unicode_string_arg = (void*) this;
+		po.abbreviate_names = true;
+		str = ((AliasUnit*) item)->firstBaseUnit()->print(po, false, TAG_TYPE_HTML, true, false);
+	} else if(item && item->type() == TYPE_UNIT && item->subtype() == SUBTYPE_COMPOSITE_UNIT && (((CompositeUnit*) item)->countUnits() > 1 || !((CompositeUnit*) item)->get(1, &exp, &prefix) || exp != 1)) {
 		PrintOptions po = settings->printops;
 		po.can_display_unicode_string_arg = (void*) this;
 		po.abbreviate_names = true;
 		str = ((Unit*) item)->print(po, false, TAG_TYPE_HTML, true, false);
 	} else if(item) {
 		CompositeUnit *cu = NULL;
-		if(item->type() == TYPE_UNIT && ((Unit*) item)->subtype() == SUBTYPE_COMPOSITE_UNIT) {
+		if(item->type() == TYPE_UNIT && item->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 			cu = (CompositeUnit*) item;
 			item = cu->get(1);
 		}

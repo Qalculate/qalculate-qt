@@ -100,9 +100,9 @@ int main(int argc, char **argv) {
 		}
 #else
 			QString lang = settings->custom_lang;
-			if(lang.indexOf(".") < 0) lang += ".utf8";
+			if(lang.indexOf(".") < 0 && lang.indexOf("_") > 0) lang += ".utf8";
 			setenv("LANGUAGE", lang.toLocal8Bit().data(), 1);
-			setenv("LC_MESSAGES", lang.toLocal8Bit().data(), 1);
+			if(lang.indexOf(".") > 0) setenv("LC_MESSAGES", lang.toLocal8Bit().data(), 1);
 		}
 #endif
 #ifndef TRANSLATIONS_DIR

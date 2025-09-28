@@ -467,7 +467,7 @@ void PreferencesDialog::langChanged(int i) {
 		case 7: {settings->custom_lang = "nl_NL"; break;}
 		case 8: {settings->custom_lang = "pt_PT"; break;}
 		case 9: {settings->custom_lang = "pt_BR"; break;}
-		case 10: {settings->custom_lang = "ru"; break;}
+		case 10: {settings->custom_lang = "ru_RU"; break;}
 		case 11: {settings->custom_lang = "sl_SL"; break;}
 		case 12: {settings->custom_lang = "sv_SE"; break;}
 		case 13: {settings->custom_lang = "zh_CN"; break;}

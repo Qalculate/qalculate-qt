@@ -661,7 +661,7 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	OPERATOR_BUTTON3(settings->multiplicationSign(), "&", "<<", 1, c);
 	button->setToolTip(tr("Multiplication"), tr("Bitwise AND"), tr("Bitwise Shift"));
 	multiplicationButton[i] = button;
-	// Standard calculator button. Do not use more than three characters.
+	//: Standard calculator button. Do not use more than three characters.
 	button = new KeypadButton(tr("DEL"), this, true);
 	connect(button, SIGNAL(clicked()), this, SIGNAL(delClicked()));
 	connect(button, SIGNAL(clicked2()), this, SIGNAL(backspaceClicked()));
@@ -684,7 +684,7 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	divisionButton[i] = button;
 	button->setProperty(BUTTON_DATA, settings->divisionSign(false));
 	button->setToolTip(tr("Division"), tr("Bitwise OR"), tr("Bitwise NOT"));
-	// Standard calculator button. Do not use more than three characters.
+	//: Standard calculator button. Do not use more than three characters.
 	button = new KeypadButton(tr("C"), this);
 	button->setToolTip(tr("Clear expression"));
 	connect(button, SIGNAL(clicked()), this, SIGNAL(clearClicked()));
