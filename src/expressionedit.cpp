@@ -1263,7 +1263,7 @@ void ExpressionEdit::updateCompletion() {
 			}
 			ellipsize_completion_names(str);
 			if(!v->title(false).empty()) {
-				title = QString::fromStdString(v->title(false));
+				title = QString::fromStdString(v->title(false)).replace("MeV/c^2", "MeV/c²");
 			} else {
 				if(v->isKnown()) {
 					if(((KnownVariable*) v)->isExpression() && !v->isLocal()) {

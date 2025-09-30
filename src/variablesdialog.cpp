@@ -429,6 +429,7 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 					po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 					po.base = 10;
 					po.number_fraction_format = FRACTION_DECIMAL_EXACT;
+					po.restrict_to_parent_precision = false;
 					po.allow_non_usable = true;
 					po.is_approximate = &is_approximate;
 					if(v->isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
@@ -592,7 +593,7 @@ void VariablesDialog::updateVariables() {
 				has_uncat = true;
 			}
 		}
-		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)));
+		QStandardItem *item = new QStandardItem(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) variablesView)).replace("MeV/c^2", "MeV/c²"));
 		item->setEditable(false);
 		item->setData(QVariant::fromValue((void*) v), Qt::UserRole);
 		sourceModel->appendRow(item);
@@ -641,7 +642,7 @@ void VariablesDialog::updateVariables() {
 	while(item) {
 		str += "/";
 		str += item->item;
-		l.clear(); l << QString::fromStdString(item->item); l << QString::fromStdString(str);
+		l.clear(); l << QString::fromStdString(item->item).replace("MeV*c^(-2)", "MeV/c²"); l << QString::fromStdString(str);
 		iter = new QTreeWidgetItem(iter2, l);
 		if(str == selected_category) {
 			iter->setExpanded(true);

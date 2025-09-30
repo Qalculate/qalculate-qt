@@ -1060,7 +1060,7 @@ void QalculateWindow::testTimeout() {
 		prev_test_type = 10;
 	}
 	if(prev_test_type == 10) expressionEdit->clear();
-	int type = (prev_test_type == 1 ? rand() % 15 + 8 : rand() % 24);
+	int type = (prev_test_type == 1 ? rand() % 16 + 8 : rand() % 25);
 	QString s;
 	if(prev_test_type == 9 && type < 9) {
 		s = QString::fromStdString(CALCULATOR->units[rand() % CALCULATOR->units.size()]->referenceName());
@@ -1084,30 +1084,48 @@ void QalculateWindow::testTimeout() {
 		else s = ((char) (rand() % (126 - 32) + 32));
 		prev_test_type = 5;
 	} else if(type == 16) {
-		s = QString::fromStdString(CALCULATOR->functions[rand() % CALCULATOR->functions.size()]->referenceName() + "(");
+		MathFunction *f = CALCULATOR->functions[rand() % CALCULATOR->functions.size()];
+		s = QString::fromStdString(f->referenceName() + "(");
+		size_t n = f->minargs();
+		if(f->maxargs() > f->minargs()) n += rand() % (f->maxargs() - f->minargs() + 1);
+		if(f->maxargs() < 0) n += rand() % 3;
+		if(rand() % 5 == 0) n++;
+		for(size_t i = 0; i < n; i++) {
+			if(i > 0) s += ";";
+			s += QString::number(rand() % 10000 - 200);
+			if(rand() % 3 == 0) {s += "."; s += QString::number(rand() % 10000);}
+		}
+		s += ")";
 		prev_test_type = 6;
 	} else if(type == 17) {
+		MathFunction *f = CALCULATOR->functions[rand() % CALCULATOR->functions.size()];
+		s = QString::fromStdString(f->referenceName() + "(");
+		prev_test_type = 6;
+	} else if(type == 18) {
 		s = QString::fromStdString(CALCULATOR->variables[rand() % CALCULATOR->variables.size()]->referenceName());
 		prev_test_type = 7;
-	} else if(type == 18) {
+	} else if(type == 19) {
 		s = QString::fromStdString(CALCULATOR->units[rand() % CALCULATOR->units.size()]->referenceName());
 		prev_test_type = 8;
-	} else if(type == 19) {
+	} else if(type == 20) {
 		s = "(";
 		prev_test_type = 2;
-	} else if(type == 20) {
+	} else if(type == 21) {
 		s = ")";
 		prev_test_type = 2;
-	} else if(type == 21) {
+	} else if(type == 22) {
 		s = "->";
 		prev_test_type = 9;
 	}
 	int t = 1;
-	if(type == 22 && rand() % 3 == 0) {
+	/*if(type >= 23) {
+		expressionEdit->clear();
+		prev_test_type = 10;
+	} else */if(type == 24 && rand() % 3 == 0) {
 		toAction_t->animateClick();
 		t = 200;
 		prev_test_type = 9;
-	} else if(type >= 22) {
+	} else if(type >= 23) {
 		if(!expressionEdit->toPlainText().startsWith("/")) {
 			std::cerr << "CALCULATE: " << expressionEdit->toPlainText().toStdString() << std::endl;
 			calculate();
@@ -2613,7 +2631,7 @@ void QalculateWindow::updateVariablesMenu() {
 		if(!user_variables.empty()) {
 			sub = variablesMenu->addMenu(tr("User variables"));
 			for(size_t i = 0; i < user_variables.size(); i++) {
-				action = sub->addAction(QString::fromStdString(user_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+				action = sub->addAction(QString::fromStdString(user_variables[i]->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)).replace("MeV/c^2", "MeV/c²"), this, SLOT(variableActivated()));
 				action->setData(QVariant::fromValue((void*) user_variables[i]));
 			}
 			first_index++;
@@ -2622,13 +2640,14 @@ void QalculateWindow::updateVariablesMenu() {
 		while(titem) {
 			if(!titem->items.empty() || !titem->objects.empty()) {
 				gsub("&", "&&", titem->item);
+				gsub("MeV*c^(-2)", "MeV/c²", titem->item);
 				sub = new QMenu(QString::fromStdString(titem->item));
 				sub3->insertMenu(sub3->actions().value(sub3 == variablesMenu ? first_index : 0), sub);
 				menus.push(sub);
 				sub3 = sub;
 				for(size_t i = 0; i < titem->objects.size(); i++) {
 					v = (Variable*) titem->objects[i];
-					action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)), this, SLOT(variableActivated()));
+					action = sub->addAction(QString::fromStdString(v->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) this)).replace("MeV/c^2", "MeV/c²"), this, SLOT(variableActivated()));
 					action->setData(QVariant::fromValue((void*) v));
 				}
 			} else {
@@ -6587,6 +6606,20 @@ bool contains_updating_time(const MathStructure &m) {
 	return false;
 }
 
+bool contains_extreme_number(const MathStructure &m) {
+	if(m.isNumber()) {
+		if(m.number().isFloatingPoint() && (mpfr_get_exp(m.number().internalUpperFloat()) > 10000000L || mpfr_get_exp(m.number().internalLowerFloat()) < -10000000L)) {
+			return true;
+		} else if(m.number().isInteger() && ::abs(m.number().integerLength()) > 10000000L) {
+			return true;
+		}
+	}
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_extreme_number(m[i])) return true;
+	}
+	return false;
+}
+
 void QalculateWindow::autoCalculateTimeout() {
 	mauto.setAborted();
 	bool is_approximate = false;
@@ -6884,7 +6917,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	po.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
 	if(do_calendars || do_bases) mauto.setAborted();
 	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
-	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500 || mauto_parsed.contains(m_undefined)) {
+	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500 || mauto_parsed.contains(m_undefined) || contains_extreme_number(mauto)) {
 		mauto.setAborted();
 		result = "";
 	}
@@ -7038,6 +7071,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		}
 		b_exact = (exact_comparison || (!is_approximate && !mauto.isApproximate()));
 		if(b_exact) auto_exact_text = unhtmlize(single_result);
+		else auto_exact_text = "";
 		if(!values.empty()) {
 			auto_exact_text = unhtmlize(values[0]);
 			result = "";
@@ -7133,7 +7167,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	CALCULATOR->addMessages(&messages);
 	if(!values.empty() && (mauto.isComparison() || ((mauto.isLogicalAnd() || mauto.isLogicalOr()) && mauto.containsType(STRUCT_COMPARISON, true, false, false))) && (exact_comparison || b_exact || values[0].find(SIGN_ALMOST_EQUAL) != std::string::npos)) b_exact = -1;
 	historyView->addResult(values, "", true, auto_expression, b_exact, false, flag, NULL, 0, 0, true, values.empty() ? "" : single_result);
-	updateWindowTitleResult(auto_result);
+	updateWindowTitleResult(auto_result_text);
 	if(contains_updating_time(mauto_parsed)) {
 		auto_calculation_updated = true;
 		if(!autoCalculateTimer) {

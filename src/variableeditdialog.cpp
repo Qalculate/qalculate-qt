@@ -259,6 +259,7 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 			po.is_approximate = NULL;
 			po.allow_non_usable = false;
 			po.preserve_precision = true;
+			po.restrict_to_parent_precision = false;
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			if(po.number_fraction_format == FRACTION_DECIMAL) po.number_fraction_format = FRACTION_DECIMAL_EXACT;
 			po.base = 10;
@@ -276,6 +277,7 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 		po.is_approximate = NULL;
 		po.allow_non_usable = false;
 		po.preserve_precision = true;
+		po.restrict_to_parent_precision = false;
 		po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 		if(po.number_fraction_format == FRACTION_DECIMAL) po.number_fraction_format = FRACTION_DECIMAL_EXACT;
 		po.base = 10;
