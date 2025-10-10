@@ -130,7 +130,7 @@ unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
 std::string auto_expression, auto_result, current_status_expression, auto_exact_text, auto_result_text;
-bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false;
+bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false, auto_aborted = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
 bool title_modified = false;
@@ -1140,7 +1140,7 @@ void QalculateWindow::testTimeout() {
 		}
 		prev_test_type = 10;
 	} else {
-		if(expressionEdit->document()->isEmpty() && s == '/') {
+		if(expressionEdit->document()->isEmpty() && s == "/") {
 			testTimeout();
 			return;
 		}
@@ -3284,9 +3284,9 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
 		po.can_display_unicode_string_arg = (void*) expressionEdit;
-		expressionEdit->insertText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true)));
+		expressionEdit->insertText(QString::fromStdString(((CompositeUnit*) u)->print(po, false, TAG_TYPE_HTML, true, false)));
 	} else {
-		expressionEdit->insertText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
+		expressionEdit->insertText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
@@ -3294,7 +3294,7 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 void QalculateWindow::onPrefixClicked(Prefix *p) {
 	if(!p) return;
 	expressionEdit->blockCompletion();
-	expressionEdit->insertText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, true, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
+	expressionEdit->insertText(QString::fromStdString(p->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(-1, true)));
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -4643,6 +4643,12 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	if(autoCalculateTimer) autoCalculateTimer->stop();
 
+	auto_expression = "";
+	auto_result = "";
+	auto_result_text = "";
+	auto_exact_text = "";
+	auto_aborted = false;
+
 	expressionEdit->hideCompletion();
 
 	b_busy++;
@@ -5829,12 +5835,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	QProgressDialog *dialog = NULL;
 
-	int i = 0;
-	while(CALCULATOR->busy() && i < 50) {
-		sleep_ms(10);
-		i++;
+	PREPARE_TIMECHECK(500)
+	for(int i = 0; CALCULATOR->busy() && i < 10000; i++) {
+		sleep_ms(1);
+		DO_TIMECHECK {break;}
 	}
-	i = 0;
 
 	if(CALCULATOR->busy() && !was_busy) {
 		if(!do_stack && updateWindowTitle(tr("Calculating…"))) title_set = true;
@@ -5846,10 +5851,10 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		was_busy = 1;
 	}
+	if(CALCULATOR->busy() && testTimer && testTimer->isActive()) CALCULATOR->abort();
 	while(CALCULATOR->busy()) {
-		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
-		sleep_ms(100);
+		sleep_ms(10);
 		was_busy++;
 	}
 
@@ -5977,7 +5982,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	if((!settings->rpn_mode || (!do_stack && !do_mathoperation)) && (!do_calendars || !mstruct->isDateTime()) && (settings->dual_approximation > 0 || settings->printops.base == BASE_DECIMAL) && !do_bases) {
 		long int i_timeleft = 0;
 		i_timeleft = mstruct->containsType(STRUCT_COMPARISON) ? 2000 : 1000;
-		if(was_busy > 3) i_timeleft /= 2;
+		if(was_busy > 30) i_timeleft /= 2;
 		if(i_timeleft > 0) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mstruct_exact, mstruct, original_expression, parsed_mstruct, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), i_timeleft, -1);
@@ -6229,12 +6234,12 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 	bool title_set = false, was_busy = false;
 	QProgressDialog *dialog = NULL;
 
-	int i = 0;
-
 	MathStructure *mfactor = new MathStructure(*mstruct);
 	MathStructure *mfactor2 = NULL;
 	if(!mstruct_exact.isUndefined()) mfactor2 = new MathStructure(mstruct_exact);
 	MathStructure parsebak(*parsed_mstruct);
+
+	PREPARE_TIMECHECK(500)
 
 	rerun_command:
 
@@ -6246,11 +6251,10 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		return;
 	}
 
-	while(b_busy && commandThread->running && i < 50) {
-		sleep_ms(10);
-		i++;
+	for(int i = 0; b_busy && commandThread->running && i < 10000; i++) {
+		sleep_ms(1);
+		DO_TIMECHECK {break;}
 	}
-	i = 0;
 
 	if(!was_busy && b_busy && commandThread->running) {
 		QString progress_str;
@@ -6285,10 +6289,10 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		was_busy = true;
 	}
+	if(b_busy && testTimer && testTimer->isActive()) CALCULATOR->abort();
 	while(b_busy && commandThread->running) {
-		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
-		sleep_ms(100);
+		sleep_ms(10);
 	}
 	if(!commandThread->running) command_aborted = true;
 
@@ -6534,6 +6538,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_result = "";
 		auto_result_text = "";
 		auto_exact_text = "";
+		auto_aborted = false;
 		auto_error = false;
 		mauto.setAborted();
 		updateWindowTitleResult(result_text);
@@ -6546,6 +6551,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_result = "";
 		auto_result_text = "";
 		auto_exact_text = "";
+		auto_aborted = false;
 		mauto.setAborted();
 		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
@@ -6562,6 +6568,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		current_status = status;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(had_error || expression_from_history || settings->auto_calculate_delay > 0) {
+			auto_aborted = false;
 			if(had_error || expression_from_history || had_warning || auto_error || !auto_result.empty() || auto_expression != status.toStdString()) {
 				auto_result = "";
 				auto_result_text = "";
@@ -6646,7 +6653,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	AutoPostConversion save_auto_post_conversion = settings->evalops.auto_post_conversion;
 	MixedUnitsConversion save_mixed_units_conversion = settings->evalops.mixed_units_conversion;
 
-	CALCULATOR->startControl(100);
+	CALCULATOR->startControl(auto_aborted ? 50 : 100);
 
 	had_to_expression = false;
 	std::string from_str = str;
@@ -6918,6 +6925,7 @@ void QalculateWindow::autoCalculateTimeout() {
 	if(do_calendars || do_bases) mauto.setAborted();
 	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
 	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500 || mauto_parsed.contains(m_undefined) || contains_extreme_number(mauto)) {
+		if(!do_calendars && !do_bases) auto_aborted = true;
 		mauto.setAborted();
 		result = "";
 	}
@@ -7587,12 +7595,11 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 
 	QProgressDialog *dialog = NULL;
 
-	int i = 0;
-	while(b_busy && viewThread->running && i < 50) {
-		sleep_ms(10);
-		i++;
+	PREPARE_TIMECHECK(500)
+	for(int i = 0; b_busy && viewThread->running && i < 10000; i++) {
+		sleep_ms(1);
+		DO_TIMECHECK {break;}
 	}
-	i = 0;
 
 	if(b_busy && viewThread->running) {
 		if(!do_stack && updateWindowTitle(tr("Processing…"))) title_set = true;
@@ -7604,10 +7611,10 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 		QApplication::setOverrideCursor(Qt::WaitCursor);
 		was_busy = true;
 	}
+	if(b_busy && testTimer && testTimer->isActive()) CALCULATOR->abort();
 	while(b_busy && viewThread->running) {
-		if(testTimer && testTimer->isActive()) CALCULATOR->abort();
 		qApp->processEvents();
-		sleep_ms(100);
+		sleep_ms(10);
 	}
 	b_busy++;
 
@@ -7831,10 +7838,10 @@ void QalculateWindow::abort() {
 }
 void QalculateWindow::abortCommand() {
 	CALCULATOR->abort();
-	int msecs = 5000;
-	while(b_busy && msecs > 0) {
+	PREPARE_TIMECHECK(5000)
+	for(int i = 0; b_busy && i < 10000; i++) {
 		sleep_ms(10);
-		msecs -= 10;
+		DO_TIMECHECK {break;}
 	}
 	if(b_busy) {
 		commandThread->cancel();

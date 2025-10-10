@@ -586,10 +586,11 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 				if(au->firstBaseUnit()->subtype() == SUBTYPE_COMPOSITE_UNIT) m.multiply(((CompositeUnit*) au->firstBaseUnit())->generateMathStructure());
 				else m.multiply(au->firstBaseUnit());
 				if(!mexp.isOne()) m.last() ^= mexp;
+				m.format(po);
+				std::string value = m.print(po, true, false, TAG_TYPE_HTML);
 				if(m.isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
 				else str += "= ";
-				m.format(po);
-				str += m.print(po, true, false, TAG_TYPE_HTML);
+				str += value;
 				if(au->hasNonlinearExpression() && !au->inverseExpression().empty()) {
 					str += "<br>";
 					m.set("x");
@@ -611,10 +612,11 @@ void UnitsDialog::selectedUnitChanged(const QModelIndex &index, const QModelInde
 					au->convertFromFirstBaseUnit(m, mexp);
 					m.multiply(au);
 					if(!mexp.isOne()) m.last() ^= mexp;
+					m.format(po);
+					value = m.print(po, true, false, TAG_TYPE_HTML);
 					if(m.isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
 					else str += "= ";
-					m.format(po);
-					str += m.print(po, true, false, TAG_TYPE_HTML);
+					str += value;
 				}
 			} else if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 				str += "= ";

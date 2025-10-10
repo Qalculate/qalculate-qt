@@ -478,7 +478,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 						serror += "";
 						if(CALCULATOR->message()->stage() == MESSAGE_STAGE_PARSING) b_parse_error = true;
 						serror += "\">";
-						if(n == 0 && (mstr.isEmpty() || mstr[0] != "-")) first_error_index = serror.length();
+						if(n == 0 && (mstr.isEmpty() || mstr[0] != '-')) first_error_index = serror.length();
 						if(n == 1 && first_error_index >= 0) serror.insert(first_error_index, "• ");
 						if(n > 0 && !mstr.startsWith("-")) serror += "• ";
 						serror += mstr.toHtmlEscaped();

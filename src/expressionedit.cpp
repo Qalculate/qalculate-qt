@@ -3032,8 +3032,8 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 			bool cit1 = 0, cit2 = 0;
 			int vpar = 0;
 			for(first_pos = last_pos; first_pos < str.length(); first_pos++) {
-				if(!cit1 && str[first_pos] == "\"") cit2 = !cit2;
-				else if(!cit2 && str[first_pos] == "\'") cit1 = !cit1;
+				if(!cit1 && str[first_pos] == '\"') cit2 = !cit2;
+				else if(!cit2 && str[first_pos] == '\'') cit1 = !cit1;
 				else if(!cit1 && !cit2 && vpar > 0 && str[first_pos] == RIGHT_VECTOR_WRAP_CH) vpar--;
 				else if(!cit1 && !cit2 && str[first_pos] == LEFT_VECTOR_WRAP_CH) vpar++;
 				if(!cit1 && !cit2 && !vpar && (str[first_pos].isDigit() || str[first_pos] == dec || str[first_pos] == alt_dec)) break;
@@ -3240,7 +3240,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 			return false;
 		}
 	} else {
-		if(current_object_text.length() < (size_t) settings->completion_min) {hideCompletion(); MFROM_CLEANUP; return false;}
+		if(unicode_length(current_object_text) < (size_t) settings->completion_min) {hideCompletion(); MFROM_CLEANUP; return false;}
 	}
 	if(cdata->editing_to_expression && cdata->editing_to_expression1 && cdata->current_from_struct) {
 		if((cdata->current_from_struct->isUnit() && cdata->current_from_struct->unit()->isCurrency()) || (cdata->current_from_struct->isMultiplication() && cdata->current_from_struct->size() == 2 && (*cdata->current_from_struct)[0].isNumber() && (*cdata->current_from_struct)[1].isUnit() && (*cdata->current_from_struct)[1].unit()->isCurrency())) {
@@ -3271,7 +3271,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	if(!mstruct_from && !menu && cdata->current_function && cdata->current_function->subtype() == SUBTYPE_DATA_SET) {
 		cdata->arg = cdata->current_function->getArgumentDefinition(cdata->current_function_index);
 		if(cdata->arg && (cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT || cdata->arg->type() == ARGUMENT_TYPE_DATA_PROPERTY)) {
-			if(cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT && (current_object_text.empty() || current_object_text.length() < (size_t) settings->completion_min)) {hideCompletion(); MFROM_CLEANUP; return false;}
+			if(cdata->arg->type() == ARGUMENT_TYPE_DATA_OBJECT && (current_object_text.empty() || unicode_length(current_object_text) < (size_t) settings->completion_min)) {hideCompletion(); MFROM_CLEANUP; return false;}
 			if(cdata->current_function_index == 1) {
 				for(size_t i = 1; i <= cdata->current_function->countNames(); i++) {
 					if(current_object_text.find(cdata->current_function->getName(i).name) != std::string::npos) {
@@ -3376,13 +3376,13 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 	}
 	cdata->prefixes.clear();
 	cdata->pstr.clear();
-	if(!mstruct_from && !menu && !cdata->arg && current_object_text.length() > (size_t) settings->completion_min) {
+	if(!mstruct_from && !menu && !cdata->arg && unicode_length(current_object_text) >= (size_t) settings->completion_min) {
 		for(size_t pi = 1; ; pi++) {
 			Prefix *prefix = CALCULATOR->getPrefix(pi);
 			if(!prefix) break;
 			for(size_t name_i = 1; name_i <= prefix->countNames(); name_i++) {
 				const std::string *pname = &prefix->getName(name_i).name;
-				if(!pname->empty() && pname->length() < current_object_text.length() - settings->completion_min + 1) {
+				if(!pname->empty() && pname->length() < current_object_text.length()) {
 					bool pmatch = true;
 					for(size_t i = 0; i < pname->length(); i++) {
 						if((*pname)[i] != current_object_text[i]) {

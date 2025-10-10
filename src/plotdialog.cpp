@@ -130,7 +130,7 @@ PlotDialog::PlotDialog(QWidget *parent) : QDialog(parent) {
 	rateButton = new QRadioButton(tr("Sampling rate:"), this); group->addButton(rateButton, 0); grid->addWidget(rateButton, r, 0);
 	rateSpin = new QSpinBox(this); grid->addWidget(rateSpin, r, 1); r++;
 	rateSpin->setSingleStep(2);
-	rateSpin->setRange(1, INT_MAX); rateSpin->setValue(settings->default_plot_sampling_rate);
+	rateSpin->setRange(1, 1000000); rateSpin->setValue(settings->default_plot_sampling_rate);
 	rateButton->setChecked(settings->default_plot_use_sampling_rate);
 	rateSpin->setEnabled(settings->default_plot_use_sampling_rate);
 	stepButton = new QRadioButton(tr("Step size:"), this); group->addButton(stepButton, 1); grid->addWidget(stepButton, r, 0);
@@ -346,12 +346,11 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 	if(!plotThread->running) plotThread->start();
 	if(plotThread->write(1) && plotThread->write((void*) *y_vector) && plotThread->write((void*) *x_vector)) {
 		QProgressDialog *dialog = NULL;
-		int i = 0;
-		while(plot_busy && plotThread->running && i < 100) {
-			sleep_ms(10);
-			i++;
+		PREPARE_TIMECHECK(1000)
+		for(int i = 0; plot_busy && plotThread->running && i < 10000; i++) {
+			sleep_ms(1);
+			DO_TIMECHECK {break;}
 		}
-		i = 0;
 		if(plot_busy && plotThread->running) {
 			dialog = new QProgressDialog(tr("Calculating…"), tr("Cancel"), 0, 0, this);
 			dialog->setWindowTitle(tr("Calculating…"));
@@ -362,7 +361,7 @@ void PlotDialog::generatePlotSeries(MathStructure **x_vector, MathStructure **y_
 		}
 		while(plot_busy && plotThread->running) {
 			qApp->processEvents();
-			sleep_ms(100);
+			sleep_ms(10);
 		}
 
 		if(dialog) {
@@ -493,12 +492,11 @@ void PlotDialog::updatePlot() {
 	if(!plotThread->running) plotThread->start();
 	if(plotThread->write(2)) {
 		QProgressDialog *dialog = NULL;
-		int i = 0;
-		while(plot_busy && plotThread->running && i < 100) {
-			sleep_ms(10);
-			i++;
+		PREPARE_TIMECHECK(1000)
+		for(int i = 0; plot_busy && plotThread->running && i < 10000; i++) {
+			sleep_ms(1);
+			DO_TIMECHECK {break;}
 		}
-		i = 0;
 		if(plot_busy && plotThread->running) {
 			dialog = new QProgressDialog(tr("Processing…"), tr("Cancel"), 0, 0, this);
 			connect(dialog, SIGNAL(canceled()), this, SLOT(abort()));
@@ -508,7 +506,7 @@ void PlotDialog::updatePlot() {
 		}
 		while(plot_busy && plotThread->running) {
 			qApp->processEvents();
-			sleep_ms(100);
+			sleep_ms(10);
 		}
 
 		if(dialog) {

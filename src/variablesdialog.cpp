@@ -432,9 +432,10 @@ void VariablesDialog::selectedVariableChanged(const QModelIndex &index, const QM
 					po.restrict_to_parent_precision = false;
 					po.allow_non_usable = true;
 					po.is_approximate = &is_approximate;
+					std::string value = CALCULATOR->print(((KnownVariable*) v)->get(), 1000, po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
 					if(v->isApproximate() || is_approximate) str += SIGN_ALMOST_EQUAL " ";
 					else str += "= ";
-					str += CALCULATOR->print(((KnownVariable*) v)->get(), 1000, po, settings->format_result, settings->colorize_result ? settings->color : 0, TAG_TYPE_HTML);
+					str += value;
 				}
 			} else {
 				if(((UnknownVariable*) v)->assumptions()) {

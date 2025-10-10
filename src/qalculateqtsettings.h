@@ -55,6 +55,36 @@ void base_from_string(std::string str, int &base, Number &nbase, bool input_base
 long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
 bool is_equation_solutions(const MathStructure &m);
 
+#ifndef CLOCK_MONOTONIC
+#	define PREPARE_TIMECHECK(ms) \
+					struct timeval tv_end; \
+					gettimeofday(&tv_end, NULL); \
+					tv_end.tv_usec += ((ms) % 1000) * 1000; \
+					tv_end.tv_sec += ((ms) / 1000); \
+					if(tv_end.tv_usec >= 1000000L) { \
+						tv_end.tv_sec++; \
+						tv_end.tv_usec -= 1000000L; \
+					}
+#	define DO_TIMECHECK \
+					struct timeval tv; \
+					gettimeofday(&tv, NULL); \
+					if(tv.tv_sec > tv_end.tv_sec || (tv.tv_sec == tv_end.tv_sec && tv.tv_usec >= tv_end.tv_usec))
+#else
+#	define PREPARE_TIMECHECK(ms) \
+					struct timespec tv_end; \
+					clock_gettime(CLOCK_MONOTONIC, &tv_end); \
+					tv_end.tv_nsec += ((ms) % 1000) * 1000000L; \
+					tv_end.tv_sec += ((ms) / 1000); \
+					if(tv_end.tv_nsec >= 1000000000L) { \
+						tv_end.tv_sec++; \
+						tv_end.tv_nsec -= 1000000000L; \
+					}
+#	define DO_TIMECHECK \
+					struct timespec tv; \
+					clock_gettime(CLOCK_MONOTONIC, &tv); \
+					if(tv.tv_sec > tv_end.tv_sec || (tv.tv_sec == tv_end.tv_sec && tv.tv_nsec >= tv_end.tv_nsec))
+#endif
+
 enum {
 	TITLE_APP,
 	TITLE_RESULT,
