@@ -51,6 +51,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QScrollBar>
+#include <QStatusBar>
 #if defined _WIN32 && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 #	include <QStyleHints>
 #endif
@@ -428,6 +429,11 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tbAction->setCheckable(true);
 	connect(tbAction, SIGNAL(triggered(bool)), tb, SLOT(setVisible(bool)));
 
+	statusLabel = new QLabel();
+	statusBar()->addPermanentWidget(new QWidget(), 1);
+	statusBar()->addPermanentWidget(statusLabel, 0);
+	if(!settings->show_statusbar) statusBar()->hide();
+
 	tmenu = NULL;
 	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
 
@@ -530,6 +536,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->evalops.parse_options.angle_unit == ANGLE_UNIT_GRADIANS) action->setChecked(true);
 	menu2 = menu;
 	angleMenu = menu2->addMenu(tr("Other"));
+	updateAngleUnitsMenu();
 	menu = menu2;
 
 	ADD_SECTION(tr("Approximation"));
@@ -791,13 +798,19 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	}
 	expressionEdit->setFont(font);
 	expressionEdit->setFocus();
-	ehSplitter->addWidget(expressionEdit);
+
 	historyView = new HistoryView(this);
 	historyView->expressionEdit = expressionEdit;
 
-	ehSplitter->addWidget(historyView);
-	ehSplitter->setStretchFactor(0, 0);
-	ehSplitter->setStretchFactor(1, 1);
+	if(settings->expression_pos == 0) {
+		ehSplitter->addWidget(expressionEdit);
+		ehSplitter->addWidget(historyView);
+	} else {
+		ehSplitter->addWidget(historyView);
+		ehSplitter->addWidget(expressionEdit);
+	}
+	ehSplitter->setStretchFactor(0, settings->expression_pos == 0 ? 0 : 1);
+	ehSplitter->setStretchFactor(1, settings->expression_pos == 0 ? 1 : 0);
 	ehSplitter->setCollapsible(0, false);
 	ehSplitter->setCollapsible(1, false);
 
@@ -960,6 +973,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
 
 	loadShortcuts();
+
+	updateStatusText();
 
 	connect(functionsMenu, SIGNAL(aboutToShow()), this, SLOT(initializeFunctionsMenu()));
 	connect(variablesMenu, SIGNAL(aboutToShow()), this, SLOT(initializeVariablesMenu()));
@@ -1160,6 +1175,185 @@ void QalculateWindow::initializeVariablesMenu() {
 }
 void QalculateWindow::initializeUnitsMenu() {
 	if(unitsMenu->isEmpty()) updateUnitsMenu();
+}
+
+void QalculateWindow::onShowStatusBarChanged() {
+	if(settings->show_statusbar) statusBar()->show();
+	else statusBar()->hide();
+}
+void QalculateWindow::onExpressionPositionChanged() {
+	if(ehSplitter->indexOf(expressionEdit) == settings->expression_pos) return;
+	QList<int> sizes = ehSplitter->sizes();
+	historyView->setParent(NULL);
+	expressionEdit->setParent(NULL);
+	ehSplitter->insertWidget(settings->expression_pos == 0 ? 1 : 0, historyView);
+	ehSplitter->insertWidget(settings->expression_pos == 0 ? 0 : 1, expressionEdit);
+	ehSplitter->setStretchFactor(0, settings->expression_pos == 0 ? 0 : 1);
+	ehSplitter->setStretchFactor(1, settings->expression_pos == 0 ? 1 : 0);
+	int p = sizes[1];
+	sizes[1] = sizes[0];
+	sizes[0] = p;
+	ehSplitter->setSizes(sizes);
+	expressionEdit->setFocus();
+}
+
+#define STATUS_SPACE	if(b) str += "&nbsp;&nbsp;"; else b = true;
+
+void QalculateWindow::updateStatusText() {
+
+	QString str = "<small>";
+
+	bool b = false;
+	if(settings->evalops.approximation == APPROXIMATION_EXACT) {
+		STATUS_SPACE
+		str += "EXACT";
+	} else if(settings->evalops.approximation == APPROXIMATION_APPROXIMATE) {
+		STATUS_SPACE
+		str += "APPROX";
+	}
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_RPN) {
+		STATUS_SPACE
+		str += "RPN";
+	}
+	if(settings->evalops.parse_options.parsing_mode == PARSING_MODE_CHAIN) {
+		STATUS_SPACE
+		// Chain mode
+		str += "CHN";
+	}
+	switch(settings->evalops.parse_options.base) {
+		case BASE_DECIMAL: {
+			break;
+		}
+		case BASE_BINARY: {
+			STATUS_SPACE
+			str += "BIN";
+			break;
+		}
+		case BASE_OCTAL: {
+			STATUS_SPACE
+			str += "OCT";
+			break;
+		}
+		case 12: {
+			STATUS_SPACE
+			str += "DUO";
+			break;
+		}
+		case BASE_HEXADECIMAL: {
+			STATUS_SPACE
+			str += "HEX";
+			break;
+		}
+		case BASE_ROMAN_NUMERALS: {
+			STATUS_SPACE
+			str += "ROMAN";
+			break;
+		}
+		case BASE_BIJECTIVE_26: {
+			STATUS_SPACE
+			str += "B26";
+			break;
+		}
+		case BASE_BINARY_DECIMAL: {
+			STATUS_SPACE
+			str += "BCD";
+			break;
+		}
+		case BASE_CUSTOM: {
+			STATUS_SPACE
+			str += QString::fromStdString(CALCULATOR->customInputBase().print(CALCULATOR->messagePrintOptions()));
+			break;
+		}
+		case BASE_GOLDEN_RATIO: {
+			STATUS_SPACE
+			str += "φ";
+			break;
+		}
+		case BASE_SUPER_GOLDEN_RATIO: {
+			STATUS_SPACE
+			str += "ψ";
+			break;
+		}
+		case BASE_PI: {
+			STATUS_SPACE
+			str += "π";
+			break;
+		}
+		case BASE_E: {
+			STATUS_SPACE
+			str += "e";
+			break;
+		}
+		case BASE_SQRT2: {
+			STATUS_SPACE
+			str += "√2";
+			break;
+		}
+		case BASE_UNICODE: {
+			STATUS_SPACE
+			str += "UNICODE";
+			break;
+		}
+		default: {
+			STATUS_SPACE
+			str += QString::number(settings->evalops.parse_options.base);
+			break;
+		}
+	}
+	switch (settings->evalops.parse_options.angle_unit) {
+		case ANGLE_UNIT_DEGREES: {
+			STATUS_SPACE
+			str += "DEG";
+			break;
+		}
+		case ANGLE_UNIT_RADIANS: {
+			STATUS_SPACE
+			str += "RAD";
+			break;
+		}
+		case ANGLE_UNIT_GRADIANS: {
+			STATUS_SPACE
+			str += "GRA";
+			break;
+		}
+		default: {}
+	}
+	if(settings->evalops.parse_options.read_precision != DONT_READ_PRECISION) {
+		STATUS_SPACE
+		str += "PREC";
+	}
+	if(!settings->evalops.parse_options.functions_enabled) {
+		STATUS_SPACE
+		str += "<s>";
+		str += "FUNC";
+		str += "</s>";
+	}
+	if(!settings->evalops.parse_options.units_enabled) {
+		STATUS_SPACE
+		str += "<s>";
+		str += "UNIT";
+		str += "</s>";
+	}
+	if(!settings->evalops.parse_options.variables_enabled) {
+		STATUS_SPACE
+		str += "<s>";
+		str += "VAR";
+		str += "</s>";
+	}
+	if(!settings->evalops.allow_infinite) {
+		STATUS_SPACE
+		str += "<s>";
+		str += "INF";
+		str += "</s>";
+	}
+	if(!settings->evalops.allow_complex) {
+		STATUS_SPACE
+		str += "<s>";
+		str += "CPLX";
+		str += "</s>";
+	}
+	str += "</small>";
+	statusLabel->setText(str);
 }
 
 void QalculateWindow::keypadPreferencesChanged() {
@@ -3570,6 +3764,7 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 		calculateExpression(false);
 	}
 	if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
+	updateStatusText();
 }
 void QalculateWindow::expressionCalculationUpdated(int delay) {
 	if(ecTimer) ecTimer->stop();
@@ -3594,6 +3789,7 @@ void QalculateWindow::expressionCalculationUpdated(int delay) {
 		calculateExpression(false);
 	}
 	if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
+	updateStatusText();
 }
 
 int s2b(const std::string &str) {
@@ -9282,6 +9478,8 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(statusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
 	connect(preferencesDialog, SIGNAL(buttonLocationChanged()), keypad, SLOT(updateButtonLocation()));
 	connect(preferencesDialog, SIGNAL(automaticDigitGroupingChanged()), expressionEdit, SLOT(updateDigitGroups()));
+	connect(preferencesDialog, SIGNAL(expressionPositionChanged()), this, SLOT(onExpressionPositionChanged()));
+	connect(preferencesDialog, SIGNAL(showStatusBarChanged()), this, SLOT(onShowStatusBarChanged()));
 	connect(preferencesDialog, SIGNAL(dialogClosed()), this, SLOT(onPreferencesClosed()));
 	if(settings->always_on_top) preferencesDialog->setWindowFlags(preferencesDialog->windowFlags() | Qt::WindowStaysOnTopHint);
 	preferencesDialog->show();

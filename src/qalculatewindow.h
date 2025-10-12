@@ -82,7 +82,7 @@ class QalculateWindow : public QMainWindow {
 		ExpressionEdit *expressionEdit;
 		HistoryView *historyView;
 		QSplitter *ehSplitter;
-		QLabel *statusLabel, *statusIconLabel;
+		QLabel *statusLabel;
 		PreferencesDialog *preferencesDialog;
 		DataSetsDialog *datasetsDialog;
 		FunctionsDialog *functionsDialog;
@@ -154,6 +154,7 @@ class QalculateWindow : public QMainWindow {
 		void beforeShowDock(QDockWidget*, bool);
 		void afterShowDock(QDockWidget*);
 		void updateInsertFunctionDialogs();
+		void updateStatusText();
 
 	protected slots:
 
@@ -317,6 +318,8 @@ class QalculateWindow : public QMainWindow {
 		void resultBasesLinkActivated(const QString&);
 		void showBasesContextMenu(const QPoint&);
 		void copyBases();
+		void onExpressionPositionChanged();
+		void onShowStatusBarChanged();
 
 	public slots:
 

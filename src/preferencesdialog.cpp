@@ -131,6 +131,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 		box2->setChecked(settings->preserve_history_height > 0);
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
+	BOX(tr("Place expression field below history"), settings->expression_pos == 1, expressionPositionToggled(bool));
+	BOX(tr("Show status bar"), settings->show_statusbar, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Application name"), TITLE_APP);
@@ -493,6 +495,14 @@ void PreferencesDialog::preserveHeightChanged(int state) {
 	settings->preserve_history_height = (state == Qt::Checked);
 	settings->keypad_appended = false;
 	settings->bases_appended = false;
+}
+void PreferencesDialog::expressionPositionToggled(bool b) {
+	settings->expression_pos = (b ? 1 : 0);
+	emit expressionPositionChanged();
+}
+void PreferencesDialog::showStatusBarToggled(bool b) {
+	settings->show_statusbar = b;
+	emit showStatusBarChanged();
 }
 void PreferencesDialog::keepAboveToggled(bool b) {
 	settings->always_on_top = b;

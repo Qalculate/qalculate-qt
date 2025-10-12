@@ -291,6 +291,8 @@ class QalculateQtSettings : QObject {
 		int default_signed = -1, default_bits = -1;
 		int keypad_type;
 		bool separate_keypad_menu_buttons, show_percent_in_numpad;
+		int expression_pos;
+		bool show_statusbar;
 		int toolbar_style;
 		int show_keypad;
 		int show_bases;

@@ -464,6 +464,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		show_all_variables = v;
 	} else if(!is_workspace && svar == "use_function_dialog") {
 		use_function_dialog = v;
+	} else if(!is_workspace && svar == "expression_pos") {
+		if(v >= 0 && v <= 1) expression_pos = v;
+	} else if(!is_workspace && svar == "show_statusbar") {
+		show_statusbar = v;
 	} else if(svar == "keypad_type") {
 		if(v >= 0 && v <= 4) keypad_type = v;
 	} else if(svar == "programming_base_changed") {
@@ -1092,6 +1096,8 @@ void QalculateQtSettings::loadPreferences() {
 	auto_calculate_delay = 500;
 	prefixes_default = true;
 	keypad_type = 0;
+	expression_pos = 0;
+	show_statusbar = false;
 	toolbar_style = Qt::ToolButtonIconOnly;
 	separate_keypad_menu_buttons = false;
 	show_percent_in_numpad = false;
@@ -1584,6 +1590,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	}
 	if(!is_workspace) {
 		fprintf(file, "rpn_keys=%i\n", rpn_keys);
+		if(expression_pos != 0) fprintf(file, "expression_pos=%i\n", expression_pos);
+		if(show_statusbar) fprintf(file, "show_statusbar=%i\n", show_statusbar);
 		fprintf(file, "show_all_functions=%i\n", show_all_functions);
 		fprintf(file, "show_all_units=%i\n", show_all_units);
 		fprintf(file, "show_all_variables=%i\n", show_all_variables);

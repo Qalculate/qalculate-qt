@@ -1998,10 +1998,12 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>DEL</source>
+        <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
         <translation>УДЛ</translation>
     </message>
     <message>
         <source>C</source>
+        <extracomment>Standard calculator button. Do not use more than three characters.</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2615,7 +2617,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Use dot as multiplication sign</source>
-        <translation>Использовать точку как знак умножения</translation>
+        <translation type="vanished">Использовать точку как знак умножения</translation>
     </message>
     <message>
         <source>Use Unicode division slash in output</source>
@@ -3036,6 +3038,38 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Custom history font:</source>
         <translation type="unfinished">Шрифт история:</translation>
+    </message>
+    <message>
+        <source>Multiplication sign:</source>
+        <translation>Знак умножения:</translation>
+    </message>
+    <message>
+        <source>multiplication sign</source>
+        <extracomment>Unicode character name</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dot operator</source>
+        <extracomment>Unicode character name</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>middle dot</source>
+        <extracomment>Unicode character name</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>asterisk</source>
+        <extracomment>Unicode character name</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place expression field below history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show status bar</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4743,6 +4777,10 @@ and matrix/vector elements</source>
     <message>
         <source>simple</source>
         <translation type="unfinished">простой</translation>
+    </message>
+    <message>
+        <source>RPN</source>
+        <translation type="obsolete">ПОЛИЗ</translation>
     </message>
 </context>
 <context>
