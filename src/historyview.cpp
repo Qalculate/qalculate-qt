@@ -160,6 +160,7 @@ HistoryView::HistoryView(QWidget *parent) : QTextEdit(parent) {
 	previous_cursor = 0;
 	previous_temporary = 0;
 	last_ans = 0;
+	b_reversed = false;
 #ifdef _WIN32
 	has_lock_symbol = 1;
 #else
@@ -379,6 +380,10 @@ void HistoryView::loadInitial(bool reload) {
 	initial_loaded = true;
 	QFontMetrics fm(font());
 	prev_fonti = fm.boundingRect("Öy");
+	if(b_reversed) {
+		previous_cursor = textCursor().position();
+		previous_cursor2 = previous_cursor;
+	}
 }
 
 #define PASTE_H QFontMetrics fm(font()); \
@@ -389,27 +394,29 @@ void HistoryView::clearTemporary() {
 	if(!previous_temporary || previous_html.isEmpty()) return;
 	QTextCursor cur = textCursor();
 	cur.setPosition(previous_cursor);
-	cur.setPosition(0, QTextCursor::KeepAnchor);
+	if(b_reversed) cur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+	else cur.setPosition(0, QTextCursor::KeepAnchor);
 	setTextCursor(cur);
 	cur.deleteChar();
 	if(!previous_html2.isEmpty()) {
 		cur.setPosition(previous_cursor2);
-		cur.setPosition(0, QTextCursor::KeepAnchor);
+		if(b_reversed) cur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+		else cur.setPosition(0, QTextCursor::KeepAnchor);
 		setTextCursor(cur);
 		cur.deleteChar();
 		insertHtml("<table width=\"100%\">" + previous_html2 + "</table>");
 		previous_html = previous_html2;
-		previous_cursor = textCursor().position();
+		if(!b_reversed) previous_cursor = textCursor().position();
 	} else {
 		previous_html.clear();
-		previous_cursor = 0;
+		if(!b_reversed) previous_cursor = 0;
 	}
 	previous_temporary = false;
 	i_pos = i_pos2;
 	i_pos_p = i_pos_p2;
 	last_ans = last_ans2;
 	last_ref = last_ref2;
-	previous_cursor2 = 0;
+	if(!b_reversed) previous_cursor2 = 0;
 	i_pos2 = 0;
 	i_pos_p2 = 0;
 	previous_html2.clear();
@@ -497,7 +504,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 	bool comment = false;
 	if(!expression.empty() || !parse.empty()) {
 		comment = !temporary && expression.empty() && parse == "#";
-		if(initial_load && index != settings->v_expression.size() - 1) str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left").arg(comment ? 0 : paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
+		if((initial_load && index != settings->v_expression.size() - 1) || b_reversed) str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: %3px; border-top: 1px dashed %2; text-align:left").arg(comment ? 0 : paste_h / 4).arg(text_color.name()).arg(paste_h / 2);
 		else str += QStringLiteral("<tr><td colspan=\"2\" style=\"padding-bottom: %1 px; padding-top: 0px; border-top: 0px none %2; text-align:left").arg(comment ? 0 : paste_h / 4).arg(text_color.name());
 		if(comment) str += "; line-height: 1%";
 		str += "\">";
@@ -735,7 +742,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 		}
 		QTextCursor cur = textCursor();
 		cur.setPosition(previous_cursor);
-		cur.setPosition(0, QTextCursor::KeepAnchor);
+		if(b_reversed) cur.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+		else cur.setPosition(0, QTextCursor::KeepAnchor);
 		setTextCursor(cur);
 		cur.deleteChar();
 	}
@@ -761,28 +769,35 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			s_text.insert(i_pos, str);
 		} else {
 			QTextCursor cur = textCursor();
-			cur.setPosition(0);
+			if(b_reversed) cur.movePosition(QTextCursor::End);
+			else cur.setPosition(0);
 			setTextCursor(cur);
-			previous_html.insert(i_pos_p, str);
+			if(b_reversed) previous_html += str;
+			else previous_html.insert(i_pos_p, str);
 			insertHtml("<table width=\"100%\">" + previous_html + "</table>");
-			previous_cursor = textCursor().position();
+			if(!b_reversed) previous_cursor = textCursor().position();
 			previous_html2 = previous_html;
 			i_pos2 = i_pos;
 			i_pos_p2 = i_pos_p;
 			last_ans2 = last_ans;
 			last_ref2 = last_ref;
+			if(b_reversed) moveCursor(QTextCursor::End);
 		}
 	} else {
 		if(initial_load) {
 			if(index == settings->v_expression.size() - 1) {
 				QTextCursor cur = textCursor();
-				cur.setPosition(0);
+				if(b_reversed) cur.movePosition(QTextCursor::End);
+				else cur.setPosition(0);
+				if(b_reversed) previous_cursor = textCursor().position();
 				setTextCursor(cur);
 				insertHtml("<table width=\"100%\">" + str + "</table>");
 				previous_html = str;
-				previous_cursor = textCursor().position();
+				if(!b_reversed) previous_cursor = textCursor().position();
+				if(b_reversed) moveCursor(QTextCursor::End);
 			} else {
-				s_text.insert(0, "<table width=\"100%\">" + str + "</table>");
+				if(b_reversed) s_text += "<table width=\"100%\">" + str + "</table>";
+				else s_text.insert(0, "<table width=\"100%\">" + str + "</table>");
 			}
 		} else {
 			if(previous_html.isEmpty()) {
@@ -794,17 +809,24 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				}
 				replace_one(previous_html, "border-top: 0px none", "border-top: 1px dashed");
 				replace_one(previous_html, "padding-top: 0px", "padding-top: " + QString::number(paste_h / 2) + "px");
+
 				insertHtml("<table width=\"100%\">" + previous_html + "</table>");
 			}
 			QTextCursor cur = textCursor();
-			cur.setPosition(0);
+			if(b_reversed) cur.movePosition(QTextCursor::End);
+			else cur.setPosition(0);
+			if(b_reversed) previous_cursor = textCursor().position();
 			setTextCursor(cur);
 			insertHtml("<table width=\"100%\">" + str + "</table>");
 			previous_html = str;
-			previous_cursor = textCursor().position();
+			if(!b_reversed) previous_cursor = textCursor().position();
+			if(b_reversed) moveCursor(QTextCursor::End);
 		}
 	}
 	previous_temporary = temporary;
+}
+void HistoryView::setReversed(bool b) {
+	b_reversed = b;
 }
 void HistoryView::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
@@ -1294,10 +1316,10 @@ void HistoryView::setMenuAndToolbarItems(QMenu *mode, QMenu *menu, QAction *acti
 	}
 }
 void HistoryView::doFind() {
-	if(!find(searchEdit->text())) {
+	if(!find(searchEdit->text(), b_reversed ? QTextDocument::FindBackward : QTextDocument::FindFlags())) {
 		QTextCursor c = textCursor();
 		QTextCursor cbak = c;
-		c.movePosition(QTextCursor::Start);
+		c.movePosition(b_reversed ? QTextCursor::End : QTextCursor::Start);
 		setTextCursor(c);
 		if(!find(searchEdit->text())) {
 			setTextCursor(cbak);

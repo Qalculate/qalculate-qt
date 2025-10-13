@@ -3009,7 +3009,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Automatically group digits in input (experimental)</source>
-        <translation>Автоматически группировать цифры во входных данных (экспериментально)</translation>
+        <translation type="vanished">Автоматически группировать цифры во входных данных (экспериментально)</translation>
     </message>
     <message>
         <source>Disable cursor blinking</source>
@@ -3064,12 +3064,16 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Place expression field below history</source>
+        <source>Show status bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show status bar</source>
+        <source>Place expression field below history (experimental)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically group digits in input</source>
+        <translation>Автоматически группировать цифры во входных данных</translation>
     </message>
 </context>
 <context>

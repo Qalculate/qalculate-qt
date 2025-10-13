@@ -131,7 +131,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 		box2->setChecked(settings->preserve_history_height > 0);
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
-	BOX(tr("Place expression field below history"), settings->expression_pos == 1, expressionPositionToggled(bool));
+	BOX(tr("Place expression field below history (experimental)"), settings->expression_pos == 1, expressionPositionToggled(bool));
 	BOX(tr("Show status bar"), settings->show_statusbar, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -330,7 +330,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->setCurrentIndex(combo->findData(settings->printops.digit_grouping));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(groupingChanged(int)));
 	l->addWidget(combo, r, 1); r++;
-	BOX(tr("Automatically group digits in input (experimental)"), settings->automatic_digit_grouping, automaticDigitGroupingToggled(bool));
+	BOX(tr("Automatically group digits in input"), settings->automatic_digit_grouping, automaticDigitGroupingToggled(bool));
 	l->addWidget(new QLabel(tr("Interval display:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Adaptive"), -1);

@@ -801,6 +801,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	historyView = new HistoryView(this);
 	historyView->expressionEdit = expressionEdit;
+	historyView->setReversed(settings->expression_pos == 1);
 
 	if(settings->expression_pos == 0) {
 		ehSplitter->addWidget(expressionEdit);
@@ -1195,6 +1196,10 @@ void QalculateWindow::onExpressionPositionChanged() {
 	sizes[0] = p;
 	ehSplitter->setSizes(sizes);
 	expressionEdit->setFocus();
+	historyView->setReversed(settings->expression_pos == 1);
+	historyView->reloadHistory();
+	if(settings->expression_pos == 1) historyView->moveCursor(QTextCursor::End);
+	else historyView->moveCursor(QTextCursor::Start);
 }
 
 #define STATUS_SPACE	if(b) str += "&nbsp;&nbsp;"; else b = true;

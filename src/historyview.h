@@ -45,6 +45,7 @@ class HistoryView : public QTextEdit {
 		void updateMinimumHeight();
 		bool testTemporaryResultLength(const std::string&);
 		int maxTemporaryCharacters();
+		void setReversed(bool);
 
 	protected:
 
@@ -61,6 +62,7 @@ class HistoryView : public QTextEdit {
 		size_t last_ans, last_ans2;
 		QString last_ref, last_ref2;
 		bool initial_loaded;
+		bool b_reversed;
 
 		void mouseDoubleClickEvent(QMouseEvent *e) override;
 		void mouseReleaseEvent(QMouseEvent *e) override;
