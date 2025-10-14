@@ -31,6 +31,7 @@
 #include <QDesktopServices>
 #include <QToolTip>
 #include <QPlainTextEdit>
+#include <QTextFrame>
 #include <QDebug>
 
 #include <libqalculate/qalculate.h>
@@ -340,7 +341,7 @@ void HistoryView::loadInitial(bool reload) {
 		}
 	}
 	if(settings->v_expression.empty()) {
-		if(!settings->clear_history_on_exit && !reload) {
+		if(!settings->clear_history_on_exit && !reload && !b_reversed) {
 			setHtml("<body color=\"" + text_color.name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
 		} else {
 			setHtml("<body color=\"" + text_color.name() + "\"></body>");
@@ -381,14 +382,25 @@ void HistoryView::loadInitial(bool reload) {
 	QFontMetrics fm(font());
 	prev_fonti = fm.boundingRect("Öy");
 	if(b_reversed) {
-		previous_cursor = textCursor().position();
-		previous_cursor2 = previous_cursor;
+		previous_cursor2 = textCursor().position();
+		updateTopMargin();
 	}
 }
 
 #define PASTE_H QFontMetrics fm(font()); \
 	int paste_h = fm.ascent() * 0.75; \
 	if(paste_h < 12) paste_h = 12;
+
+void HistoryView::updateTopMargin() {
+	if(!b_reversed) return;
+	int dh = document()->size().height();
+	int h = height();
+	QTextFrameFormat ffmt = document()->rootFrame()->frameFormat();
+	dh -= ffmt.topMargin();
+	if(dh - ffmt.bottomMargin() * 2 < h) ffmt.setTopMargin(h - dh - ffmt.bottomMargin());
+	else ffmt.setTopMargin(ffmt.bottomMargin());
+	document()->rootFrame()->setFrameFormat(ffmt);
+}
 
 void HistoryView::clearTemporary() {
 	if(!previous_temporary || previous_html.isEmpty()) return;
@@ -404,12 +416,13 @@ void HistoryView::clearTemporary() {
 		else cur.setPosition(0, QTextCursor::KeepAnchor);
 		setTextCursor(cur);
 		cur.deleteChar();
+		if(b_reversed) previous_cursor = textCursor().position();
 		insertHtml("<table width=\"100%\">" + previous_html2 + "</table>");
 		previous_html = previous_html2;
 		if(!b_reversed) previous_cursor = textCursor().position();
 	} else {
 		previous_html.clear();
-		if(!b_reversed) previous_cursor = 0;
+		previous_cursor = 0;
 	}
 	previous_temporary = false;
 	i_pos = i_pos2;
@@ -422,6 +435,7 @@ void HistoryView::clearTemporary() {
 	previous_html2.clear();
 	last_ans2 = 0;
 	last_ref2 = "";
+	if(b_reversed) updateTopMargin();
 }
 
 bool HistoryView::testTemporaryResultLength(const std::string &str) {
@@ -781,7 +795,10 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			i_pos_p2 = i_pos_p;
 			last_ans2 = last_ans;
 			last_ref2 = last_ref;
-			if(b_reversed) moveCursor(QTextCursor::End);
+			if(b_reversed) {
+				moveCursor(QTextCursor::End);
+				updateTopMargin();
+			}
 		}
 	} else {
 		if(initial_load) {
@@ -789,12 +806,15 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				QTextCursor cur = textCursor();
 				if(b_reversed) cur.movePosition(QTextCursor::End);
 				else cur.setPosition(0);
-				if(b_reversed) previous_cursor = textCursor().position();
 				setTextCursor(cur);
+				if(b_reversed) previous_cursor = textCursor().position();
 				insertHtml("<table width=\"100%\">" + str + "</table>");
 				previous_html = str;
 				if(!b_reversed) previous_cursor = textCursor().position();
-				if(b_reversed) moveCursor(QTextCursor::End);
+				if(b_reversed) {
+					moveCursor(QTextCursor::End);
+					updateTopMargin();
+				}
 			} else {
 				if(b_reversed) s_text += "<table width=\"100%\">" + str + "</table>";
 				else s_text.insert(0, "<table width=\"100%\">" + str + "</table>");
@@ -815,12 +835,15 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			QTextCursor cur = textCursor();
 			if(b_reversed) cur.movePosition(QTextCursor::End);
 			else cur.setPosition(0);
-			if(b_reversed) previous_cursor = textCursor().position();
 			setTextCursor(cur);
+			if(b_reversed) previous_cursor = textCursor().position();
 			insertHtml("<table width=\"100%\">" + str + "</table>");
 			previous_html = str;
 			if(!b_reversed) previous_cursor = textCursor().position();
-			if(b_reversed) moveCursor(QTextCursor::End);
+			if(b_reversed) {
+				moveCursor(QTextCursor::End);
+				updateTopMargin();
+			}
 		}
 	}
 	previous_temporary = temporary;
@@ -990,6 +1013,13 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 	if(!e->isAccepted() && !e->commitString().isEmpty()) {
 		expressionEdit->setFocus();
 		expressionEdit->inputMethodEvent(e);
+	}
+}
+void HistoryView::resizeEvent(QResizeEvent *e) {
+	QTextEdit::resizeEvent(e);
+	if(b_reversed) {
+		moveCursor(QTextCursor::End);
+		updateTopMargin();
 	}
 }
 void HistoryView::editClear() {

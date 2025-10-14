@@ -71,7 +71,9 @@ class HistoryView : public QTextEdit {
 		void keyPressEvent(QKeyEvent *e) override;
 		void inputMethodEvent(QInputMethodEvent*) override;
 		void changeEvent(QEvent*) override;
+		void resizeEvent(QResizeEvent*) override;
 		void editComment(int, int);
+		void updateTopMargin();
 
 	protected slots:
 
