@@ -109,6 +109,9 @@ enum {
 #	define DEFAULT_WIDTH 600
 #endif
 
+#define RESULT_FONT_FACTOR 1.35
+#define STATUS_FONT_FACTOR 0.95
+
 std::vector<std::string> alt_results;
 int b_busy = 0, block_result_update = 0;
 bool exact_comparison, command_aborted;
@@ -429,10 +432,21 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tbAction->setCheckable(true);
 	connect(tbAction, SIGNAL(triggered(bool)), tb, SLOT(setVisible(bool)));
 
-	statusLabel = new QLabel();
-	statusBar()->addPermanentWidget(new QWidget(), 1);
-	statusBar()->addPermanentWidget(statusLabel, 0);
-	if(!settings->show_statusbar) statusBar()->hide();
+	statusLabelLeft = new QLabel();
+	//statusLabelLeft->setTextFormat(Qt::RichText);
+	statusLabelLeft->setIndent(4);
+	statusLabelRight = new QLabel();
+	QFont font = statusLabelLeft->font();
+	if(font.pixelSize() >= 0) {
+		font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
+	} else {
+		font.setPointSize(font.pointSize() * STATUS_FONT_FACTOR);
+	}
+	statusLabelLeft->setFont(font);
+	statusLabelRight->setFont(font);
+	statusBar()->addPermanentWidget(statusLabelLeft, 1);
+	statusBar()->addPermanentWidget(statusLabelRight, 0);
+	if(!settings->show_statusbar && !settings->status_in_status) statusBar()->hide();
 
 	tmenu = NULL;
 	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
@@ -789,12 +803,12 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addWidget(menuAction_t);
 	menuAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
-	expressionEdit = new ExpressionEdit(this, tb);
-	QFont font = expressionEdit->font();
+	expressionEdit = new ExpressionEdit(this, tb, statusLabelLeft);
+	font = expressionEdit->font();
 	if(font.pixelSize() >= 0) {
-		font.setPixelSize(font.pixelSize() * 1.35);
+		font.setPixelSize(font.pixelSize() * RESULT_FONT_FACTOR);
 	} else {
-		font.setPointSize(font.pointSize() * 1.35);
+		font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 	}
 	expressionEdit->setFont(font);
 	expressionEdit->setFocus();
@@ -967,11 +981,13 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	if(settings->custom_result_font.empty()) settings->custom_result_font = historyView->font().toString().toStdString();
 	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
+	if(settings->custom_status_font.empty()) settings->custom_status_font = statusLabelLeft->font().toString().toStdString();
 	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
 	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
+	if(settings->use_custom_status_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_status_font)); statusLabelLeft->setFont(font); statusLabelRight->setFont(font);}
 
 	loadShortcuts();
 
@@ -1206,7 +1222,7 @@ void QalculateWindow::onExpressionPositionChanged() {
 
 void QalculateWindow::updateStatusText() {
 
-	QString str = "<small>";
+	QString str = "<span>";
 
 	bool b = false;
 	if(settings->evalops.approximation == APPROXIMATION_EXACT) {
@@ -1357,8 +1373,9 @@ void QalculateWindow::updateStatusText() {
 		str += "CPLX";
 		str += "</s>";
 	}
-	str += "</small>";
-	statusLabel->setText(str);
+	str += "</span>";
+	statusLabelRight->setText(str);
+	if(statusLabelRight->isVisible() && (settings->status_in_history || settings->status_in_status)) expressionEdit->showCurrentStatus();
 }
 
 void QalculateWindow::keypadPreferencesChanged() {
@@ -3746,7 +3763,7 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 	workspace_changed = true;
 	setResult(NULL, true, false, false);
 	auto_format_updated = true;
-	if((!settings->status_in_history && !QToolTip::text().isEmpty()) || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
+	if((!settings->status_in_history && !settings->status_in_status && !QToolTip::text().isEmpty()) || (settings->status_in_status && !statusLabelLeft->text().isEmpty()) || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
 }
 void QalculateWindow::resultDisplayUpdated() {
 	resultFormatUpdated();
@@ -7997,11 +8014,18 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		rpnDeleteAction->setIcon(LOAD_ICON("edit-delete"));
 		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
-		QFont font(QApplication::font());
 		if(!settings->use_custom_expression_font) {
-			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
-			else font.setPointSize(font.pointSize() * 1.35);
+			QFont font(QApplication::font());
+			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * RESULT_FONT_FACTOR);
+			else font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 			expressionEdit->setFont(font);
+		}
+		if(!settings->use_custom_status_font) {
+			QFont font(QApplication::font());
+			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
+			else font.setPointSize(font.pointSize() * STATUS_FONT_FACTOR);
+			statusLabelLeft->setFont(font);
+			statusLabelRight->setFont(font);
 		}
 		QFont binfont(QApplication::font());
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
@@ -8011,6 +8035,12 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		updateBinEditSize();
 	}
 	QMainWindow::changeEvent(e);
+}
+void QalculateWindow::resizeEvent(QResizeEvent *e) {
+	if(statusLabelLeft->isVisible() && (settings->status_in_history || settings->status_in_status)) {
+		expressionEdit->showCurrentStatus();
+	}
+	QMainWindow::resizeEvent(e);
 }
 
 void QalculateWindow::updateBinEditSize(QFont *font) {
@@ -9009,9 +9039,20 @@ void QalculateWindow::onExpressionFontChanged() {
 		QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);
 	} else {
 		QFont font = QApplication::font();
-		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
-		else font.setPointSize(font.pointSize() * 1.35);
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * RESULT_FONT_FACTOR);
+		else font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 		expressionEdit->setFont(font);
+	}
+}
+void QalculateWindow::onStatusFontChanged() {
+	if(settings->use_custom_status_font) {
+		QFont font; font.fromString(QString::fromStdString(settings->custom_status_font)); statusLabelLeft->setFont(font); statusLabelRight->setFont(font);
+	} else {
+		QFont font = QApplication::font();
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
+		else font.setPointSize(font.pointSize() * STATUS_FONT_FACTOR);
+		statusLabelLeft->setFont(font);
+		statusLabelRight->setFont(font);
 	}
 }
 void QalculateWindow::onKeypadFontChanged() {
@@ -9027,10 +9068,17 @@ void QalculateWindow::onAppFontChanged() {
 	else QApplication::setFont(settings->saved_app_font);
 	if(!settings->use_custom_expression_font) {
 		QFont font = QApplication::font();
-		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * 1.35);
-		else font.setPointSize(font.pointSize() * 1.35);
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * RESULT_FONT_FACTOR);
+		else font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 		expressionEdit->setFont(font);
 		if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
+	}
+	if(!settings->use_custom_status_font) {
+		QFont font = QApplication::font();
+		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
+		else font.setPointSize(font.pointSize() * STATUS_FONT_FACTOR);
+		statusLabelLeft->setFont(font);
+		statusLabelRight->setFont(font);
 	}
 	if(!settings->use_custom_result_font) {
 		historyView->setFont(QApplication::font());
@@ -9046,6 +9094,7 @@ void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 		auto_error = "";
 		mauto.setAborted();
 		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
+		statusBar()->setVisible(settings->status_in_status || settings->show_statusbar);
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		expressionEdit->displayParseStatus(true);
 	}
@@ -9475,6 +9524,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(titleTypeChanged()), this, SLOT(onTitleTypeChanged()));
 	connect(preferencesDialog, SIGNAL(resultFontChanged()), this, SLOT(onResultFontChanged()));
 	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));
+	connect(preferencesDialog, SIGNAL(statusFontChanged()), this, SLOT(onStatusFontChanged()));
 	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));

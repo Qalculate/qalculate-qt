@@ -820,6 +820,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			use_custom_result_font = v;
 		} else if(svar == "use_custom_expression_font") {
 			use_custom_expression_font = v;
+		} else if(svar == "use_custom_status_font") {
+			use_custom_status_font = v;
 		} else if(svar == "use_custom_keypad_font") {
 			use_custom_keypad_font = v;
 		} else if(svar == "use_custom_application_font") {
@@ -830,6 +832,9 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "custom_expression_font") {
 			custom_expression_font = svalue;
 			save_custom_expression_font = true;
+		} else if(svar == "custom_status_font") {
+			custom_status_font = svalue;
+			save_custom_status_font = true;
 		} else if(svar == "custom_keypad_font") {
 			custom_keypad_font = svalue;
 			save_custom_keypad_font = true;
@@ -965,6 +970,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			auto_calculate_delay = v;
 		} else if(svar == "status_in_history") {
 			status_in_history = v;
+		} else if(svar == "status_in_status") {
+			status_in_status = v;
 		} else if(svar == "autocalc_selection") {
 			autocalc_selection = v;
 		}
@@ -1057,6 +1064,7 @@ void QalculateQtSettings::loadPreferences() {
 	programming_base_changed = false;
 	auto_calculate = true;
 	status_in_history = true;
+	status_in_status = false;
 	autocalc_selection = false;
 	dot_question_asked = false;
 	implicit_question_asked = false;
@@ -1106,14 +1114,17 @@ void QalculateQtSettings::loadPreferences() {
 	show_bases = -1;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
+	use_custom_status_font = false;
 	use_custom_keypad_font = false;
 	use_custom_app_font = false;
 	save_custom_result_font = false;
 	save_custom_expression_font = false;
+	save_custom_status_font = false;
 	save_custom_keypad_font = false;
 	save_custom_app_font = false;
 	custom_result_font = "";
 	custom_expression_font = "";
+	custom_status_font = "";
 	custom_keypad_font = "";
 	custom_app_font = "";
 	style = "";
@@ -1565,10 +1576,12 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(!format_result) fprintf(file, "format=%i\n", format_result);
 		fprintf(file, "use_custom_result_font=%i\n", use_custom_result_font);
 		fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
+		fprintf(file, "use_custom_status_font=%i\n", use_custom_status_font);
 		fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);
 		fprintf(file, "use_custom_application_font=%i\n", use_custom_app_font);
 		if(use_custom_result_font || save_custom_result_font) fprintf(file, "custom_result_font=%s\n", custom_result_font.c_str());
 		if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
+		if(use_custom_status_font || save_custom_status_font) fprintf(file, "custom_status_font=%s\n", custom_status_font.c_str());
 		if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
 		if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
 		if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
@@ -1690,6 +1703,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
 		fprintf(file, "calculate_as_you_type_delay=%i\n", auto_calculate_delay);
 		fprintf(file, "status_in_history=%i\n", status_in_history);
+		if(status_in_status) fprintf(file, "status_in_status=%i\n", status_in_status);
 		fprintf(file, "autocalc_selection=%i\n", autocalc_selection);
 		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}

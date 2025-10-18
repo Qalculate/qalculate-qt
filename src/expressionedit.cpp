@@ -926,7 +926,7 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 	invalidateFilter();
 }
 
-ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEdit(parent) {
+ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl) : QPlainTextEdit(parent), statusLabel(sl) {
 #ifndef _WIN32
 	setAttribute(Qt::WA_InputMethodEnabled, settings->enable_input_method);
 #endif
@@ -968,6 +968,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar) : QPlainTextEd
 	completer->setModel(completionModel);
 	completionView = new QTableView();
 	completionView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	completionView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	completionView->setShowGrid(false);
 	completionView->verticalHeader()->hide();
 	completionView->horizontalHeader()->hide();
@@ -2048,6 +2049,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 		action = menu->addAction(tr("Off"), this, SLOT(onStatusModeChanged())); action->setData(0); action->setCheckable(true); group->addAction(action); statusOffAction = action;
 		action = menu->addAction(tr("In history list"), this, SLOT(onStatusModeChanged())); action->setData(1); action->setCheckable(true); group->addAction(action); statusHistoryAction = action;
 		action = menu->addAction(tr("In expression field"), this, SLOT(onStatusModeChanged())); action->setData(2); action->setCheckable(true); group->addAction(action); statusExpressionAction = action;
+		action = menu->addAction(tr("In status bar"), this, SLOT(onStatusModeChanged())); action->setData(5); action->setCheckable(true); group->addAction(action); statusStatusAction = action;
 		menu->addSeparator();
 		group = new QActionGroup(this);
 		action = menu->addAction(tr("With delay"), this, SLOT(onStatusModeChanged())); action->setData(3); action->setCheckable(true); group->addAction(action); statusDelayAction = action;
@@ -2079,6 +2081,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	clearHistoryAction->setEnabled(!settings->expression_history.empty());
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
 	else if(settings->status_in_history) statusHistoryAction->setChecked(true);
+	else if(settings->status_in_status) statusStatusAction->setChecked(true);
 	else statusExpressionAction->setChecked(true);
 	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
@@ -2181,16 +2184,17 @@ void ExpressionEdit::onStatusModeChanged() {
 		if(settings->status_in_history) settings->auto_calculate_delay = 0;
 		else settings->expression_status_delay = 0;
 	}
-	if(i < 3) {
+	if(i < 3 || i > 4) {
 		settings->display_expression_status = (i > 0);
 		settings->status_in_history = (i == 1);
+		settings->status_in_status = (i == 5);
 		if(settings->status_in_history && settings->display_expression_status) {
 			settings->expression_status_delay = 1000;
 		} else if(settings->auto_calculate_delay == 0) {
 			settings->expression_status_delay = 0;
 		}
 	}
-	emit expressionStatusModeChanged(i < 3);
+	emit expressionStatusModeChanged(i < 3 || i > 4);
 }
 void ExpressionEdit::editUndo() {
 	if(undo_index == 0) return;
@@ -2246,6 +2250,7 @@ void ExpressionEdit::blockCompletion(bool b, bool h) {
 void ExpressionEdit::blockParseStatus(bool b) {
 	if(b) {
 		HIDE_TOOLTIP
+		statusLabel->clear(); statusLabel->setToolTip(QString());
 		if(toolTipTimer) toolTipTimer->stop();
 		parse_blocked++;
 	} else {
@@ -2257,9 +2262,12 @@ void ExpressionEdit::blockUndo(bool b) {
 	else block_add_to_undo--;
 }
 void ExpressionEdit::showCurrentStatus() {
+	statusLabel->setToolTip(QString());
 	if((!expression_has_changed && current_status_type != 4) || current_status_text.isEmpty() || (completionView->isVisible() && (completionView->selectionModel()->hasSelection() || current_status_type == 3))) {
 		HIDE_TOOLTIP
+		statusLabel->clear();
 	} else {
+		bool show_in_status = statusLabel->isVisible() && (settings->status_in_history || settings->status_in_status);
 		QString str = current_status_type == 4 ? "" : current_status_text;
 		std::string str_nohtml = current_status_type == 4 ? current_status_text.toStdString() : unhtmlize(current_status_text.toStdString());
 		std::string current_text = current_status_type == 4 ? str_nohtml : toPlainText().toStdString();
@@ -2276,33 +2284,70 @@ void ExpressionEdit::showCurrentStatus() {
 			if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode & ~PARSE_PERCENT_AS_ORDINARY_CONSTANT);
 			std::string result_nohtml = unhtmlize(result);
 			remove_spaces(result_nohtml);
+			remove_spaces(str_nohtml);
 			if(current_status_type == 4 && parsed_text != CALCULATOR->timedOutString()) str = QString::fromStdString(parsed_text);
 			if(!CALCULATOR->endTemporaryStopMessages() && !result.empty() && result_nohtml.length() < 200 && result_nohtml != str_nohtml && result_nohtml != current_text && result != CALCULATOR->timedOutString() && result != parsed_text) {
-				str += "&nbsp;";
+				if(show_in_status) str += " ";
+				else str += "&nbsp;";
+				int rpos = str.length();
 				if(is_approximate) str += SIGN_ALMOST_EQUAL " ";
 				else str += "= ";
 				if(b_comp) str += "(";
 				str += QString::fromStdString(result);
 				if(b_comp) str += ")";
 				str_nohtml = "";
+				if(show_in_status) {
+					QFontMetrics fm(statusLabel->font());
+					if(fm.boundingRect(QString::fromStdString(unhtmlize(str.toStdString()))).width() > statusLabel->width() - statusLabel->indent()) {
+						statusLabel->setToolTip(str);
+						if(fm.boundingRect(QString::fromStdString(unhtmlize(str.mid(rpos).toStdString()))).width() > statusLabel->width() - statusLabel->indent()) {
+							str.remove(0, rpos);
+							str = QString::fromStdString(unhtmlize(str.toStdString()));
+							str = fm.elidedText(str, Qt::ElideRight, statusLabel->width() - statusLabel->indent());
+						} else {
+							str = QString::fromStdString(unhtmlize(str.toStdString()));
+							str = fm.elidedText(str, Qt::ElideLeft, statusLabel->width() - statusLabel->indent());
+						}
+					}
+				}
+			} else if(show_in_status) {
+				QFontMetrics fm(statusLabel->font());
+				if(fm.boundingRect(unhtmlize(str)).width() > statusLabel->width() - statusLabel->indent()) {
+					statusLabel->setToolTip(str);
+					str = unhtmlize(str);
+					str = fm.elidedText(str, Qt::ElideLeft, statusLabel->width());
+				}
 			}
 		} else {
+			if(show_in_status) {
+				QFontMetrics fm(statusLabel->font());
+				if(fm.boundingRect(unhtmlize(str)).width() > statusLabel->width() - statusLabel->indent()) {
+					statusLabel->setToolTip(str);
+					str = unhtmlize(str);
+					str = fm.elidedText(str, Qt::ElideRight, statusLabel->width());
+				}
+			}
 			remove_spaces(current_text);
 		}
 		if(str.isEmpty() || str_nohtml == current_text || str_nohtml.length() > 2000) {
 			HIDE_TOOLTIP
-		} else if(tipLabel && tipLabel->isVisible()) {
-			tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
-			if(!tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
-				HIDE_TOOLTIP
-			}
+			statusLabel->clear();
 		} else {
-			if(tipLabel) tipLabel->deleteLater();
-			tipLabel = new ExpressionTipLabel(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), this);
-			if(tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
-				tipLabel->showNormal();
+			if(show_in_status) {
+				statusLabel->setText(str);
+			} else if(tipLabel && tipLabel->isVisible()) {
+				tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
+				if(!tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
+					HIDE_TOOLTIP
+				}
 			} else {
-				HIDE_TOOLTIP
+				if(tipLabel) tipLabel->deleteLater();
+				tipLabel = new ExpressionTipLabel(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), this);
+				if(tipLabel->placeTip(mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())), completionView->isVisible() ? completionView->geometry(): QRect())) {
+					tipLabel->showNormal();
+				} else {
+					HIDE_TOOLTIP
+				}
 			}
 		}
 	}
@@ -2314,9 +2359,11 @@ void ExpressionEdit::onSelectionChanged() {
 			setStatusText(cur.selectedText(), 4);
 		} else if(current_status_type == 4) {
 			HIDE_TOOLTIP
+			statusLabel->clear(); statusLabel->setToolTip(QString());
 		}
 	} else if(current_status_type == 4) {
 		HIDE_TOOLTIP
+		statusLabel->clear(); statusLabel->setToolTip(QString());
 	}
 }
 void ExpressionEdit::setStatusText(const QString &text, int stype) {
@@ -2324,6 +2371,7 @@ void ExpressionEdit::setStatusText(const QString &text, int stype) {
 	current_status_text = text;
 	if(text.isEmpty() || (stype != 4 && !settings->display_expression_status)) {
 		HIDE_TOOLTIP
+		statusLabel->clear(); statusLabel->setToolTip(QString());
 	} else {
 		bool prev_func = (current_status_type == 2);
 		current_status_type = stype;
@@ -3129,11 +3177,12 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 	}
 	if(!dont_change_index) history_index = -1;
 	highlightParentheses();
-	bool b = completionView->isVisible();
+	bool was_completed = completionView->isVisible();
 	expression_has_changed2 = true;
 	qApp->processEvents();
 	displayParseStatus();
 	if(!completion_blocked && settings->enable_completion) {
+		bool b = was_completed;
 		if(b && settings->completion_delay > 0) {
 			std::string prev_object_text = current_object_text;
 			setCurrentObject();
@@ -3165,7 +3214,7 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 		}
 	}
 	qApp->processEvents();
-	if(b && !completionView->isVisible()) {
+	if(was_completed && !completionView->isVisible()) {
 		cdata->current_function = settings->f_answer;
 		displayParseStatus();
 	}

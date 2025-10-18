@@ -82,7 +82,7 @@ class QalculateWindow : public QMainWindow {
 		ExpressionEdit *expressionEdit;
 		HistoryView *historyView;
 		QSplitter *ehSplitter;
-		QLabel *statusLabel;
+		QLabel *statusLabelLeft, *statusLabelRight;
 		PreferencesDialog *preferencesDialog;
 		DataSetsDialog *datasetsDialog;
 		FunctionsDialog *functionsDialog;
@@ -128,6 +128,7 @@ class QalculateWindow : public QMainWindow {
 		void setResult(Prefix *prefix = NULL, bool update_history = true, bool update_parse = false, bool force = false, std::string transformation = "", bool do_stack = false, size_t stack_index = 0, bool register_moved = false, bool supress_dialog = false, bool calculate_selection = false);
 		void executeCommand(int command_type, bool show_result = true, std::string ceu_str = "", Unit *u = NULL, int run = 1);
 		void changeEvent(QEvent *e) override;
+		void resizeEvent(QResizeEvent *e) override;
 		bool warnAssumptions(MathStructure&, bool = false);
 		bool askTC(MathStructure&, bool = false);
 		bool askSinc(MathStructure&, bool = false);
@@ -215,6 +216,7 @@ class QalculateWindow : public QMainWindow {
 		void onTitleTypeChanged();
 		void onResultFontChanged();
 		void onExpressionFontChanged();
+		void onStatusFontChanged();
 		void onKeypadFontChanged();
 		void onAppFontChanged();
 		void onAppFontTimer();

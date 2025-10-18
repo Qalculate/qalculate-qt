@@ -308,6 +308,10 @@ void replace_one(QString &str, const QString &origstr, const QString &newstr, bo
 	}
 }
 
+#define SAVE_SCROLLBAR_POS int vpos = verticalScrollBar()->value(); if(b_reversed) vpos = verticalScrollBar()->maximum() - vpos;
+#define RESTORE_SCROLLBAR_POS verticalScrollBar()->setValue(b_reversed ? verticalScrollBar()->maximum() - vpos : vpos);
+#define SCROLL_TO_BEGINNING verticalScrollBar()->setValue(b_reversed ? verticalScrollBar()->maximum() : 0);
+
 void HistoryView::loadInitial(bool reload) {
 	if(reload && !initial_loaded) return;
 	s_text.clear();
@@ -435,7 +439,10 @@ void HistoryView::clearTemporary() {
 	previous_html2.clear();
 	last_ans2 = 0;
 	last_ref2 = "";
-	if(b_reversed) updateTopMargin();
+	if(b_reversed) {
+		SCROLL_TO_BEGINNING
+		updateTopMargin();
+	}
 }
 
 bool HistoryView::testTemporaryResultLength(const std::string &str) {
@@ -796,7 +803,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			last_ans2 = last_ans;
 			last_ref2 = last_ref;
 			if(b_reversed) {
-				moveCursor(QTextCursor::End);
+				SCROLL_TO_BEGINNING
 				updateTopMargin();
 			}
 		}
@@ -812,7 +819,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 				previous_html = str;
 				if(!b_reversed) previous_cursor = textCursor().position();
 				if(b_reversed) {
-					moveCursor(QTextCursor::End);
+					SCROLL_TO_BEGINNING
 					updateTopMargin();
 				}
 			} else {
@@ -841,7 +848,7 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			previous_html = str;
 			if(!b_reversed) previous_cursor = textCursor().position();
 			if(b_reversed) {
-				moveCursor(QTextCursor::End);
+				SCROLL_TO_BEGINNING
 				updateTopMargin();
 			}
 		}
@@ -1018,10 +1025,11 @@ void HistoryView::inputMethodEvent(QInputMethodEvent *e) {
 void HistoryView::resizeEvent(QResizeEvent *e) {
 	QTextEdit::resizeEvent(e);
 	if(b_reversed) {
-		moveCursor(QTextCursor::End);
+		SCROLL_TO_BEGINNING
 		updateTopMargin();
 	}
 }
+
 void HistoryView::editClear() {
 	for(size_t i1 = 0; i1 < settings->v_protected.size();) {
 		if(!settings->v_protected[i1]) {
@@ -1040,7 +1048,7 @@ void HistoryView::editClear() {
 			i1++;
 		}
 	}
-	verticalScrollBar()->setValue(0);
+	SCROLL_TO_BEGINNING
 	reloadHistory();
 }
 void HistoryView::editMoveToTop() {
@@ -1072,14 +1080,14 @@ void HistoryView::editMoveToTop() {
 	settings->v_value.erase(settings->v_value.begin() + i1);
 	settings->v_messages.erase(settings->v_messages.begin() + i1);
 	settings->v_parseerror.erase(settings->v_parseerror.begin() + i1);
-	verticalScrollBar()->setValue(0);
+	SCROLL_TO_BEGINNING
 	reloadHistory();
 }
 void HistoryView::reloadHistory() {
-	int vpos = verticalScrollBar()->value();
+	SAVE_SCROLLBAR_POS
 	loadInitial(true);
 	emit historyReloaded();
-	verticalScrollBar()->setValue(vpos);
+	RESTORE_SCROLLBAR_POS
 }
 void HistoryView::editRemove() {
 	int i1 = -1, i2 = -1;
@@ -1114,9 +1122,9 @@ void HistoryView::editRemove() {
 		settings->v_messages.erase(settings->v_messages.begin() + i1);
 		settings->v_parseerror.erase(settings->v_parseerror.begin() + i1);
 	}
-	int vpos = verticalScrollBar()->value();
+	SAVE_SCROLLBAR_POS
 	reloadHistory();
-	verticalScrollBar()->setValue(vpos);
+	RESTORE_SCROLLBAR_POS
 }
 void HistoryView::editComment(int i1, int i2) {
 	bool b_edit = !settings->v_result[i1][i2].empty() && settings->v_result[i1][i2][0] == '#';
@@ -1153,9 +1161,9 @@ void HistoryView::editComment(int i1, int i2) {
 			if(b_edit) {
 				if(settings->v_result[i1][i2] != str.toStdString()) {
 					settings->v_result[i1][i2] = str.toStdString();
-					int vpos = verticalScrollBar()->value();
+					SAVE_SCROLLBAR_POS
 					reloadHistory();
-					verticalScrollBar()->setValue(vpos);
+					RESTORE_SCROLLBAR_POS
 				}
 			} else if(!settings->history_answer.empty() && i1 == (int) settings->v_result.size() - 1 && i2 == 0) {
 				std::vector<std::string> values;
@@ -1166,9 +1174,9 @@ void HistoryView::editComment(int i1, int i2) {
 				settings->v_result[i1].insert(settings->v_result[i1].begin(), str.toStdString());
 				settings->v_exact[i1].insert(settings->v_exact[i1].begin(), settings->v_exact[i1][i2]);
 				settings->v_value[i1].insert(settings->v_value[i1].begin(), settings->v_value[i1][i2]);
-				int vpos = verticalScrollBar()->value();
+				SAVE_SCROLLBAR_POS
 				reloadHistory();
-				verticalScrollBar()->setValue(vpos);
+				RESTORE_SCROLLBAR_POS
 			}
 		}
 	}
@@ -1187,9 +1195,9 @@ void HistoryView::editProtect() {
 	if(i1 < 0 || i1 >= (int) settings->v_protected.size()) return;
 	settings->v_protected[i1] = protectAction->isChecked();
 	if(i1 == 0) settings->current_result = NULL;
-	int vpos = verticalScrollBar()->value();
+	SAVE_SCROLLBAR_POS
 	reloadHistory();
-	verticalScrollBar()->setValue(vpos);
+	RESTORE_SCROLLBAR_POS
 }
 void HistoryView::indexAtPos(const QPoint &pos, int *expression_index, int *result_index, int *value_index, QString *anchorstr) {
 	*expression_index = -1;

@@ -90,6 +90,8 @@ class PreferencesDialog : public QDialog {
 		void resultFontToggled(bool);
 		void expressionFontClicked();
 		void expressionFontToggled(bool);
+		void statusFontClicked();
+		void statusFontToggled(bool);
 		void keypadFontClicked();
 		void keypadFontToggled(bool);
 		void appFontClicked();
@@ -141,6 +143,7 @@ class PreferencesDialog : public QDialog {
 		void titleTypeChanged();
 		void resultFontChanged();
 		void expressionFontChanged();
+		void statusFontChanged();
 		void keypadFontChanged();
 		void appFontChanged();
 		void symbolsUpdated();

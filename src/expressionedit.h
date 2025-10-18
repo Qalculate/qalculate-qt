@@ -23,6 +23,7 @@ class QStandardItemModel;
 class QTableView;
 class QMenu;
 class QAction;
+class QLabel;
 class QTimer;
 class ExpressionTipLabel;
 
@@ -61,8 +62,9 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu, *fileMenu, *modeMenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *autocalcSelectionAction, *calculateSelectionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *statusStatusAction, *autocalcSelectionAction, *calculateSelectionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
 		QTimer *completionTimer, *toolTipTimer;
+		QLabel *statusLabel;
 		ExpressionTipLabel *tipLabel;
 		QWidget *tb;
 
@@ -109,7 +111,7 @@ class ExpressionEdit : public QPlainTextEdit {
 
 	public:
 
-		ExpressionEdit(QWidget *parent = NULL, QWidget *toolbar = NULL);
+		ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl);
 		virtual ~ExpressionEdit();
 
 		std::string expression() const;
@@ -144,11 +146,11 @@ class ExpressionEdit : public QPlainTextEdit {
 		void onCompletionModeChanged();
 		void onAutocalcSelectionChanged();
 		void onStatusModeChanged();
-		void showCurrentStatus();
 		void onSelectionChanged();
 
 	public slots:
 
+		void showCurrentStatus();
 		void updateCompletion();
 		void setExpression(std::string);
 		void setExpression(const QString &str);

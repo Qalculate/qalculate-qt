@@ -73,6 +73,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	QWidget *w2 = new QWidget(this);
 	QWidget *w3 = new QWidget(this);
 	QWidget *w4 = new QWidget(this);
+	QWidget *w5 = new QWidget(this);
 	QAbstractButton *box; QGridLayout *l; QComboBox *combo;
 	int r = 0;
 	l = new QGridLayout(w1);
@@ -132,7 +133,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
 	BOX(tr("Place expression field below history (experimental)"), settings->expression_pos == 1, expressionPositionToggled(bool));
-	BOX(tr("Show status bar"), settings->show_statusbar, showStatusBarToggled(bool));
+	BOX(tr("Show status bar"), settings->show_statusbar || settings->status_in_status, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Application name"), TITLE_APP);
@@ -172,18 +173,6 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Disable cursor blinking"), settings->disable_cursor_blinking, disableCursorBlinkingToggled(bool));
 	BOX(tr("Colorize result"), settings->colorize_result, colorizeToggled(bool));
 	BOX(tr("Format result"), settings->format_result, formatToggled(bool));
-	BOX1(tr("Custom history font:"), settings->use_custom_result_font, resultFontToggled(bool));
-	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
-	button = new QPushButton(font_string(settings->custom_expression_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(expressionFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX1(tr("Custom keypad font:"), settings->use_custom_keypad_font, keypadFontToggled(bool));
-	button = new QPushButton(font_string(settings->custom_keypad_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
-	button = new QPushButton(font_string(settings->custom_app_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	l->setRowStretch(r, 1);
 	r = 0;
 	l = new QGridLayout(w4);
@@ -192,8 +181,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Off"), 0);
 	combo->addItem(tr("In history list"), 1);
 	combo->addItem(tr("In expression field"), 2);
+	combo->addItem(tr("In status bar"), 3);
 	if(!settings->display_expression_status) combo->setCurrentIndex(0);
 	else if(settings->status_in_history) combo->setCurrentIndex(1);
+	else if(settings->status_in_status) combo->setCurrentIndex(3);
 	else combo->setCurrentIndex(2);
 	statusCombo = combo;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusModeChanged(int)));
@@ -429,22 +420,42 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 		exratesSpin->setPrefix(str.right(index));
 	}
 	l->setRowStretch(r, 1);
+	l = new QGridLayout(w5);
+	r = 0;
+	BOX1(tr("Custom history font:"), settings->use_custom_result_font, resultFontToggled(bool));
+	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_expression_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(expressionFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX1(tr("Custom status font:"), settings->use_custom_status_font, statusFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_status_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(statusFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX1(tr("Custom keypad font:"), settings->use_custom_keypad_font, keypadFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_keypad_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_app_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	l->setRowStretch(r, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	QSize size = get_screen_geometry(this).size();
-	QSize sh = w1->sizeHint().expandedTo(w2->sizeHint().expandedTo(w3->sizeHint().expandedTo(w4->sizeHint())));
+	QSize sh = w1->sizeHint().expandedTo(w2->sizeHint().expandedTo(w3->sizeHint().expandedTo(w4->sizeHint().expandedTo(w5->sizeHint()))));
 	if(size.width() >= sh.width() + 100) tabs->setUsesScrollButtons(false);
 	bool use_child_hint = size.height() >= sh.height() + 100;
 	QScrollArea *s1 = new PreferencesPageScroll(this, w1, use_child_hint);
 	QScrollArea *s2 = new PreferencesPageScroll(this, w2, use_child_hint);
 	QScrollArea *s3 = new PreferencesPageScroll(this, w3, use_child_hint);
 	QScrollArea *s4 = new PreferencesPageScroll(this, w4, use_child_hint);
+	QScrollArea *s5 = new PreferencesPageScroll(this, w5, use_child_hint);
 	tabs->addTab(s1, tr("Look && Feel"));
+	tabs->addTab(s5, tr("Fonts"));
 	tabs->addTab(s2, tr("Numbers && Operators"));
-	tabs->addTab(s3, tr("Units && Currencies"));
-	tabs->addTab(s4, tr("Parsing && Calculation"));
+	tabs->addTab(s3, tr("Units"));
+	tabs->addTab(s4, tr("Calculation"));
 }
 PreferencesDialog::~PreferencesDialog() {}
 
@@ -502,6 +513,11 @@ void PreferencesDialog::expressionPositionToggled(bool b) {
 }
 void PreferencesDialog::showStatusBarToggled(bool b) {
 	settings->show_statusbar = b;
+	if(!b) {
+		settings->status_in_status = false;
+		settings->status_in_history = true;
+		emit statusModeChanged();
+	}
 	emit showStatusBarChanged();
 }
 void PreferencesDialog::keepAboveToggled(bool b) {
@@ -518,6 +534,7 @@ void PreferencesDialog::tooltipsChanged(int i) {
 void PreferencesDialog::statusModeChanged(int i) {
 	settings->display_expression_status = (i > 0);
 	settings->status_in_history = (i == 1);
+	settings->status_in_status = (i == 3);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	calculateDelayWidget->setEnabled(settings->status_in_history);
 	emit statusModeChanged();
@@ -895,6 +912,23 @@ void PreferencesDialog::expressionFontToggled(bool b) {
 	settings->use_custom_expression_font = b;
 	emit expressionFontChanged();
 }
+void PreferencesDialog::statusFontClicked() {
+	QFont font; font.fromString(QString::fromStdString(settings->custom_status_font));
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
+		settings->save_custom_status_font = true;
+		settings->use_custom_status_font = true;
+		settings->custom_status_font = dialog->selectedFont().toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_status_font));
+		emit statusFontChanged();
+	}
+	dialog->deleteLater();
+}
+void PreferencesDialog::statusFontToggled(bool b) {
+	settings->use_custom_status_font = b;
+	emit statusFontChanged();
+}
 void PreferencesDialog::keypadFontClicked() {
 	QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font));
 	QFontDialog *dialog = new QFontDialog(font, this);
@@ -1001,6 +1035,7 @@ void PreferencesDialog::updateExpressionStatus() {
 	statusCombo->blockSignals(true);
 	if(!settings->display_expression_status) statusCombo->setCurrentIndex(0);
 	else if(settings->status_in_history) statusCombo->setCurrentIndex(1);
+	else if(settings->status_in_status) statusCombo->setCurrentIndex(3);
 	else statusCombo->setCurrentIndex(2);
 	statusDelayWidget->setValue(settings->expression_status_delay);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
