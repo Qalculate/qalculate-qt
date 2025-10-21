@@ -446,7 +446,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	statusLabelRight->setFont(font);
 	statusBar()->addPermanentWidget(statusLabelLeft, 1);
 	statusBar()->addPermanentWidget(statusLabelRight, 0);
-	if(!settings->show_statusbar && !settings->status_in_status) statusBar()->hide();
+	if(!settings->show_statusbar && !settings->status_in_statusbar) statusBar()->hide();
 
 	tmenu = NULL;
 	connect(tb, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showToolbarContextMenu(const QPoint&)));
@@ -1375,7 +1375,7 @@ void QalculateWindow::updateStatusText() {
 	}
 	str += "</span>";
 	statusLabelRight->setText(str);
-	if(statusLabelRight->isVisible() && (settings->status_in_history || settings->status_in_status)) expressionEdit->showCurrentStatus();
+	if(statusLabelRight->isVisible() && (settings->status_in_history || settings->status_in_statusbar)) expressionEdit->showCurrentStatus();
 }
 
 void QalculateWindow::keypadPreferencesChanged() {
@@ -3763,7 +3763,7 @@ void QalculateWindow::resultFormatUpdated(int delay) {
 	workspace_changed = true;
 	setResult(NULL, true, false, false);
 	auto_format_updated = true;
-	if((!settings->status_in_history && !settings->status_in_status && !QToolTip::text().isEmpty()) || (settings->status_in_status && !statusLabelLeft->text().isEmpty()) || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
+	if((!settings->status_in_history && !settings->status_in_statusbar && !QToolTip::text().isEmpty()) || (settings->status_in_statusbar && !statusLabelLeft->text().isEmpty()) || (settings->status_in_history && expressionEdit->expressionHasChanged())) expressionEdit->displayParseStatus(true);
 }
 void QalculateWindow::resultDisplayUpdated() {
 	resultFormatUpdated();
@@ -6264,6 +6264,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				if(exact_text == "0" || result_text == "0") expressionEdit->clear();
 				std::string str = unhtmlize(result_text);
 				if(unicode_length(result_text) < 10000) expressionEdit->setExpression(QString::fromStdString(str));
+			} else if(settings->rpn_mode) {
 			} else if(settings->replace_expression == CLEAR_EXPRESSION) {
 				expressionEdit->clear();
 				previous_expression = "";
@@ -8037,7 +8038,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 	QMainWindow::changeEvent(e);
 }
 void QalculateWindow::resizeEvent(QResizeEvent *e) {
-	if(statusLabelLeft->isVisible() && (settings->status_in_history || settings->status_in_status)) {
+	if(statusLabelLeft->isVisible() && (settings->status_in_history || settings->status_in_statusbar)) {
 		expressionEdit->showCurrentStatus();
 	}
 	QMainWindow::resizeEvent(e);
@@ -9094,7 +9095,7 @@ void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 		auto_error = "";
 		mauto.setAborted();
 		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
-		statusBar()->setVisible(settings->status_in_status || settings->show_statusbar);
+		statusBar()->setVisible(settings->status_in_statusbar || settings->show_statusbar);
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		expressionEdit->displayParseStatus(true);
 	}

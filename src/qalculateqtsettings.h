@@ -239,6 +239,7 @@ class QalculateQtSettings : QObject {
 		void updateMessagePrintOptions();
 		void updateFavourites();
 		void setCustomAngleUnit();
+		void setDefaultCurrency();
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
@@ -267,7 +268,7 @@ class QalculateQtSettings : QObject {
 		int simplified_percentage;
 		bool programming_base_changed;
 		int previous_precision;
-		std::string custom_angle_unit;
+		std::string custom_angle_unit, default_currency;
 		QString custom_lang;
 		int rounding_mode;
 		int allow_multiple_instances;
@@ -301,7 +302,7 @@ class QalculateQtSettings : QObject {
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		int max_history_lines;
 		bool rpn_shown;
-		bool auto_calculate, status_in_history, status_in_status, autocalc_selection;
+		bool auto_calculate, status_in_history, status_in_statusbar, autocalc_selection;
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
 		bool close_with_esc;

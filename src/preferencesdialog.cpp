@@ -133,7 +133,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
 	BOX(tr("Place expression field below history (experimental)"), settings->expression_pos == 1, expressionPositionToggled(bool));
-	BOX(tr("Show status bar"), settings->show_statusbar || settings->status_in_status, showStatusBarToggled(bool));
+	BOX(tr("Show status bar"), settings->show_statusbar || settings->status_in_statusbar, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Application name"), TITLE_APP);
@@ -184,7 +184,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("In status bar"), 3);
 	if(!settings->display_expression_status) combo->setCurrentIndex(0);
 	else if(settings->status_in_history) combo->setCurrentIndex(1);
-	else if(settings->status_in_status) combo->setCurrentIndex(3);
+	else if(settings->status_in_statusbar) combo->setCurrentIndex(3);
 	else combo->setCurrentIndex(2);
 	statusCombo = combo;
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(statusModeChanged(int)));
@@ -419,6 +419,30 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	} else {
 		exratesSpin->setPrefix(str.right(index));
 	}
+	l->addWidget(new QLabel(tr("Default currency:"), this), r, 0);
+	combo = new QComboBox(this);
+	QStringList curs;
+	for(size_t i = 0; i < CALCULATOR->units.size(); i++) {
+		if(CALCULATOR->units[i]->isCurrency() && CALCULATOR->units[i]->referenceName().length() == 3) {
+			curs << QString::fromStdString(CALCULATOR->units[i]->title()) + " (" + QString::fromStdString(CALCULATOR->units[i]->referenceName()) + ")";
+		}
+	}
+	curs.sort();
+	combo->addItems(curs);
+	if(CALCULATOR->getLocalCurrency()) {
+		QString scur;
+		scur = QString::fromStdString(CALCULATOR->getLocalCurrency()->referenceName());
+		for(int i = 0; i < curs.size(); i++) {
+			if(curs[i].indexOf(scur) == curs[i].length() - 4) {
+				combo->setCurrentIndex(i);
+				break;
+			}
+		}
+	}
+	combo->setMinimumContentsLength(20);
+	combo->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	l->addWidget(combo, r, 1); r++;
+	connect(combo, SIGNAL(currentTextChanged(const QString&)), this, SLOT(defaultCurrencyChanged(const QString&)));
 	l->setRowStretch(r, 1);
 	l = new QGridLayout(w5);
 	r = 0;
@@ -428,7 +452,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_expression_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(expressionFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX1(tr("Custom status font:"), settings->use_custom_status_font, statusFontToggled(bool));
+	BOX1(tr("Custom status bar font:"), settings->use_custom_status_font, statusFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_status_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(statusFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	BOX1(tr("Custom keypad font:"), settings->use_custom_keypad_font, keypadFontToggled(bool));
@@ -514,7 +538,7 @@ void PreferencesDialog::expressionPositionToggled(bool b) {
 void PreferencesDialog::showStatusBarToggled(bool b) {
 	settings->show_statusbar = b;
 	if(!b) {
-		settings->status_in_status = false;
+		settings->status_in_statusbar = false;
 		settings->status_in_history = true;
 		emit statusModeChanged();
 	}
@@ -534,7 +558,7 @@ void PreferencesDialog::tooltipsChanged(int i) {
 void PreferencesDialog::statusModeChanged(int i) {
 	settings->display_expression_status = (i > 0);
 	settings->status_in_history = (i == 1);
-	settings->status_in_status = (i == 3);
+	settings->status_in_statusbar = (i == 3);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	calculateDelayWidget->setEnabled(settings->status_in_history);
 	emit statusModeChanged();
@@ -1010,6 +1034,11 @@ void PreferencesDialog::historyExpressionChanged(int i) {
 	settings->history_expression_type = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
 	emit historyExpressionTypeChanged();
 }
+void PreferencesDialog::defaultCurrencyChanged(const QString &str) {
+	settings->default_currency = str.mid(str.length() - 4, 3).toStdString();
+	Unit *u = CALCULATOR->getActiveUnit(settings->default_currency);
+	if(u) CALCULATOR->setLocalCurrency(u);
+}
 
 void PreferencesDialog::updateDot() {
 	decimalCommaBox->blockSignals(true);
@@ -1035,7 +1064,7 @@ void PreferencesDialog::updateExpressionStatus() {
 	statusCombo->blockSignals(true);
 	if(!settings->display_expression_status) statusCombo->setCurrentIndex(0);
 	else if(settings->status_in_history) statusCombo->setCurrentIndex(1);
-	else if(settings->status_in_status) statusCombo->setCurrentIndex(3);
+	else if(settings->status_in_statusbar) statusCombo->setCurrentIndex(3);
 	else statusCombo->setCurrentIndex(2);
 	statusDelayWidget->setValue(settings->expression_status_delay);
 	statusDelayWidget->setEnabled(settings->display_expression_status);

@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
 	app.setDesktopFileName("io.github.Qalculate.qalculate-qt");
 #endif
-	app.setApplicationVersion("5.8.0");
+	app.setApplicationVersion("5.8.1");
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 	app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -254,6 +254,7 @@ int main(int argc, char **argv) {
 	if(u && u->category().find(settings->volume_category) == 0) settings->alternative_volume_categories.push_back(u->category());
 
 	settings->setCustomAngleUnit();
+	settings->setDefaultCurrency();
 	settings->updateFavourites();
 
 	QColor c = QApplication::palette().base().color();

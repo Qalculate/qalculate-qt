@@ -1164,6 +1164,10 @@ Do you want to overwrite the function?</source>
         <source>simple notation</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>In status bar</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -2427,11 +2431,11 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Units &amp;&amp; Currencies</source>
-        <translation>Единицы измерения и валюты</translation>
+        <translation type="vanished">Единицы измерения и валюты</translation>
     </message>
     <message>
         <source>Parsing &amp;&amp; Calculation</source>
-        <translation>Разбор и вычисление</translation>
+        <translation type="vanished">Разбор и вычисление</translation>
     </message>
     <message>
         <source>Ignore system language (requires restart)</source>
@@ -3074,6 +3078,30 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Automatically group digits in input</source>
         <translation>Автоматически группировать цифры во входных данных</translation>
+    </message>
+    <message>
+        <source>In status bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fonts</source>
+        <translation type="unfinished">Шрифты</translation>
+    </message>
+    <message>
+        <source>Units</source>
+        <translation type="unfinished">Единицы измерения</translation>
+    </message>
+    <message>
+        <source>Calculation</source>
+        <translation type="unfinished">Вычисление</translation>
+    </message>
+    <message>
+        <source>Custom status bar font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default currency:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

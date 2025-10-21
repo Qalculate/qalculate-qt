@@ -786,6 +786,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			format_result = v;
 		} else if(svar == "language") {
 			custom_lang = QString::fromStdString(svalue);
+		} else if(svar == "default_currency") {
+			default_currency = svalue;
 		} else if(svar == "ignore_locale") {
 			ignore_locale = v;
 		} else if(svar == "window_title_mode") {
@@ -970,8 +972,10 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			auto_calculate_delay = v;
 		} else if(svar == "status_in_history") {
 			status_in_history = v;
-		} else if(svar == "status_in_status") {
-			status_in_status = v;
+			if(status_in_history) status_in_statusbar = false;
+		} else if(svar == "status_in_statusbar") {
+			status_in_statusbar = v;
+			if(status_in_statusbar) status_in_history = false;
 		} else if(svar == "autocalc_selection") {
 			autocalc_selection = v;
 		}
@@ -1064,7 +1068,7 @@ void QalculateQtSettings::loadPreferences() {
 	programming_base_changed = false;
 	auto_calculate = true;
 	status_in_history = true;
-	status_in_status = false;
+	status_in_statusbar = false;
 	autocalc_selection = false;
 	dot_question_asked = false;
 	implicit_question_asked = false;
@@ -1207,7 +1211,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 5;
 	preferences_version[1] = 8;
-	preferences_version[2] = 0;
+	preferences_version[2] = 1;
 
 	if(file) {
 		char line[1000000L];
@@ -1327,6 +1331,12 @@ void QalculateQtSettings::setCustomAngleUnit() {
 		if(CALCULATOR->customAngleUnit()) custom_angle_unit = CALCULATOR->customAngleUnit()->referenceName();
 	}
 	if(evalops.parse_options.angle_unit == ANGLE_UNIT_CUSTOM && !CALCULATOR->customAngleUnit()) evalops.parse_options.angle_unit = ANGLE_UNIT_NONE;
+}
+void QalculateQtSettings::setDefaultCurrency() {
+	if(!default_currency.empty()) {
+		Unit *u = CALCULATOR->getActiveUnit(default_currency);
+		if(u) CALCULATOR->setLocalCurrency(u);
+	}
 }
 void QalculateQtSettings::updateFavourites() {
 	if(favourite_functions_pre.empty()) {
@@ -1525,6 +1535,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 	if(!is_workspace) {
 		fprintf(file, "allow_multiple_instances=%i\n", allow_multiple_instances);
 		if(!custom_lang.isEmpty()) fprintf(file, "language=%s\n", custom_lang.toUtf8().data());
+		if(!default_currency.empty()) fprintf(file, "default_currency=%s\n", default_currency.c_str());
 		fprintf(file, "ignore_locale=%i\n", ignore_locale);
 		fprintf(file, "check_version=%i\n", check_version);
 		if(check_version) {
@@ -1702,8 +1713,8 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
 		fprintf(file, "calculate_as_you_type_delay=%i\n", auto_calculate_delay);
-		fprintf(file, "status_in_history=%i\n", status_in_history);
-		if(status_in_status) fprintf(file, "status_in_status=%i\n", status_in_status);
+		if(status_in_statusbar) fprintf(file, "status_in_statusbar=%i\n", status_in_statusbar);
+		else fprintf(file, "status_in_history=%i\n", status_in_history);
 		fprintf(file, "autocalc_selection=%i\n", autocalc_selection);
 		if(previous_precision > 0) fprintf(file, "previous_precision=%i\n", previous_precision);
 	}

@@ -64,6 +64,7 @@ class PreferencesDialog : public QDialog {
 		void parsingModeChanged(int);
 		void unknownsToggled(bool);
 		void temperatureCalculationChanged(int);
+		void defaultCurrencyChanged(const QString&);
 		void exratesToggled(bool);
 		void exratesChanged(int);
 		void unitsToggled(bool);

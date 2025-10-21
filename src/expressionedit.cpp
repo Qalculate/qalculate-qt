@@ -2081,7 +2081,7 @@ void ExpressionEdit::contextMenuEvent(QContextMenuEvent *e) {
 	clearHistoryAction->setEnabled(!settings->expression_history.empty());
 	if(!settings->display_expression_status) statusOffAction->setChecked(true);
 	else if(settings->status_in_history) statusHistoryAction->setChecked(true);
-	else if(settings->status_in_status) statusStatusAction->setChecked(true);
+	else if(settings->status_in_statusbar) statusStatusAction->setChecked(true);
 	else statusExpressionAction->setChecked(true);
 	if((settings->status_in_history && settings->auto_calculate_delay > 0) || (!settings->status_in_history && settings->expression_status_delay > 0)) statusDelayAction->setChecked(true);
 	else statusNoDelayAction->setChecked(true);
@@ -2187,7 +2187,7 @@ void ExpressionEdit::onStatusModeChanged() {
 	if(i < 3 || i > 4) {
 		settings->display_expression_status = (i > 0);
 		settings->status_in_history = (i == 1);
-		settings->status_in_status = (i == 5);
+		settings->status_in_statusbar = (i == 5);
 		if(settings->status_in_history && settings->display_expression_status) {
 			settings->expression_status_delay = 1000;
 		} else if(settings->auto_calculate_delay == 0) {
@@ -2267,7 +2267,7 @@ void ExpressionEdit::showCurrentStatus() {
 		HIDE_TOOLTIP
 		statusLabel->clear();
 	} else {
-		bool show_in_status = statusLabel->isVisible() && (settings->status_in_history || settings->status_in_status);
+		bool show_in_status = statusLabel->isVisible() && (settings->status_in_history || settings->status_in_statusbar);
 		QString str = current_status_type == 4 ? "" : current_status_text;
 		std::string str_nohtml = current_status_type == 4 ? current_status_text.toStdString() : unhtmlize(current_status_text.toStdString());
 		std::string current_text = current_status_type == 4 ? str_nohtml : toPlainText().toStdString();
