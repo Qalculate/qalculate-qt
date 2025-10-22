@@ -308,6 +308,29 @@ bool QalculateQtSettings::isAnswerVariable(Variable *v) {
 	return v == vans[0] || v == vans[1] || v == vans[2] || v == vans[3] || v == vans[4];
 }
 
+#include <QResource>
+#include <QTemporaryFile>
+QIcon QalculateQtSettings::loadColoredIcon(const QString &str, QWidget *w) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+	QColor c = w->palette().buttonText().color();
+	bool light = c.red() + c.green() + c.blue() < 255;
+	if(!light && c.lightness() >= 235 && c.saturation() <= 5) return QIcon(":/icons/dark/actions/scalable/" + str + ".svg");
+	else if(light && c.lightness() <= 50 && c.saturation() <= 50) return QIcon(":/icons/actions/scalable/" + str + ".svg");
+	QResource r((light ? ":/icons/actions/scalable/" : ":/icons/dark/actions/scalable/") + str + ".svg");
+	QByteArray d = r.uncompressedData();
+	d.replace(light ? "#232629" : "#eff0f1", c.name().toUtf8());
+	QTemporaryFile f;
+	if(!f.open()) return load_icon(str, w);
+	QTextStream out(&f);
+	out << d;
+	f.setAutoRemove(false);
+	tempfiles << f.fileName();
+	f.close();
+	return QIcon(f.fileName());
+#else
+	return load_icon(str, w);
+#endif
+}
 QIcon load_icon(const QString &str, QWidget *w) {
 	QColor c = w->palette().buttonText().color();
 	if(c.red() + c.green() + c.blue() < 255) return QIcon(":/icons/actions/scalable/" + str + ".svg");

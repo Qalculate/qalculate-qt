@@ -211,7 +211,7 @@ void PeriodicTableDialog::elementClicked() {
 			if(!sval.empty()) {
 				grid->addWidget(new QLabel(QStringLiteral("<div style=\"font-weight: bold\">%1</div>").arg(tr("%1:").arg(QString::fromStdString(dp->title()))), dialog), row, 0);
 				grid->addWidget(new QLabel(QString::fromStdString(sval), dialog), row, 1);
-				QPushButton *button = new QPushButton(LOAD_ICON("edit-paste"), QString(), dialog);
+				QPushButton *button = new QPushButton(LOAD_COLORED_ICON("edit-paste"), QString(), dialog);
 				grid->addWidget(button, row, 2);
 				button->setProperty("ELEMENT OBJECT", QVariant::fromValue((void*) e));
 				button->setProperty("ELEMENT PROPERTY", QVariant::fromValue((void*) dp));

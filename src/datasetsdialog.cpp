@@ -390,7 +390,7 @@ void DataSetsDialog::selectedObjectChanged(QTreeWidgetItem *item, QTreeWidgetIte
 			item->setData(0, Qt::UserRole, QVariant::fromValue((void*) dp));
 			item->setFont(0, bold_font);
 			item->setText(2, QString());
-			item->setIcon(2, LOAD_ICON("edit-paste"));
+			item->setIcon(2, LOAD_COLORED_ICON("edit-paste"));
 			item->setTextAlignment(2, Qt::AlignRight);
 		}
 		dp = ds->getNextProperty(&it);

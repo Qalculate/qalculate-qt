@@ -460,7 +460,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	QFont appfont;
 	if(settings->use_custom_app_font) appfont.fromString(QString::fromStdString(settings->custom_app_font));
 
-	menuAction_t = new QToolButton(this); menuAction_t->setIcon(LOAD_ICON("menu")); menuAction_t->setText(tr("Menu"));
+	menuAction_t = new QToolButton(this); menuAction_t->setIcon(LOAD_COLORED_ICON("menu")); menuAction_t->setText(tr("Menu"));
 	menuAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(tr("Menu"), this);
 	menuAction_t->setMenu(menu);
@@ -516,7 +516,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	menu->addSeparator();
 	quitAction = menu->addAction(tr("Quit"), qApp, SLOT(closeAllWindows()));
 
-	modeAction_t = new QToolButton(this); modeAction_t->setIcon(LOAD_ICON("configure")); modeAction_t->setText(tr("Mode"));
+	modeAction_t = new QToolButton(this); modeAction_t->setIcon(LOAD_COLORED_ICON("configure")); modeAction_t->setText(tr("Mode"));
 	modeAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(tr("Mode"), this);
 	modeAction_t->setMenu(menu);
@@ -735,28 +735,28 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addWidget(modeAction_t);
 	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
-	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_ICON("convert")); toAction_t->setText(tr("Convert"));
+	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_COLORED_ICON("convert")); toAction_t->setText(tr("Convert"));
 	toAction_t->setEnabled(false);
 	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
 	connect(toAction_t, SIGNAL(middleButtonClicked()), this, SLOT(onToActivatedAlt()));
 	toMenu = new QMenu(this);
 	tb->addWidget(toAction_t);
 	toAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
-	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_ICON("document-save")); storeAction_t->setText(tr("Store"));
+	storeAction_t = new QalculateToolButton(this); storeAction_t->setIcon(LOAD_COLORED_ICON("document-save")); storeAction_t->setText(tr("Store"));
 	storeAction_t->setPopupMode(QToolButton::MenuButtonPopup);
 	connect(storeAction_t, SIGNAL(clicked()), this, SLOT(onStoreActivated()));
 	variablesMenu = new QMenu(this);
 	storeAction_t->setMenu(variablesMenu);
 	tb->addWidget(storeAction_t);
 	storeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
-	functionsAction_t = new QalculateToolButton(this); functionsAction_t->setIcon(LOAD_ICON("function")); functionsAction_t->setText(tr("Functions"));
+	functionsAction_t = new QalculateToolButton(this); functionsAction_t->setIcon(LOAD_COLORED_ICON("function")); functionsAction_t->setText(tr("Functions"));
 	functionsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
 	connect(functionsAction_t, SIGNAL(clicked()), this, SLOT(openFunctions()));
 	functionsMenu = new QMenu(this);
 	functionsAction_t->setMenu(functionsMenu);
 	tb->addWidget(functionsAction_t);
 	functionsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
-	unitsAction_t = new QalculateToolButton(this); unitsAction_t->setIcon(LOAD_ICON("units")); unitsAction_t->setText(tr("Units"));
+	unitsAction_t = new QalculateToolButton(this); unitsAction_t->setIcon(LOAD_COLORED_ICON("units")); unitsAction_t->setText(tr("Units"));
 	unitsAction_t->setPopupMode(QToolButton::MenuButtonPopup);
 	connect(unitsAction_t, SIGNAL(clicked()), this, SLOT(openUnits()));
 	unitsMenu = new QMenu(this);
@@ -764,17 +764,17 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	tb->addWidget(unitsAction_t);
 	unitsAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 	if(CALCULATOR->canPlot()) {
-		plotAction_t = new QAction(LOAD_ICON("plot"), tr("Plot"), this);
+		plotAction_t = new QAction(LOAD_COLORED_ICON("plot"), tr("Plot"), this);
 		connect(plotAction_t, SIGNAL(triggered(bool)), this, SLOT(openPlot()));
 		tb->addAction(plotAction_t);
 	} else {
 		plotAction_t = NULL;
 	}
-	basesAction = new QAction(LOAD_ICON("number-bases"), tr("Number bases"), this);
+	basesAction = new QAction(LOAD_COLORED_ICON("number-bases"), tr("Number bases"), this);
 	connect(basesAction, SIGNAL(triggered(bool)), this, SLOT(onBasesActivated(bool)));
 	basesAction->setCheckable(true);
 	tb->addAction(basesAction);
-	keypadAction_t = new QToolButton(this); keypadAction_t->setIcon(LOAD_ICON("keypad")); keypadAction_t->setText(tr("Keypad"));
+	keypadAction_t = new QToolButton(this); keypadAction_t->setIcon(LOAD_COLORED_ICON("keypad")); keypadAction_t->setText(tr("Keypad"));
 	keypadAction_t->setToolTip(tr("Keypad")); keypadAction_t->setPopupMode(QToolButton::InstantPopup);
 	menu = new QMenu(this);
 	keypadAction_t->setMenu(menu);
@@ -934,25 +934,25 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	rpnTB->setToolButtonStyle(Qt::ToolButtonIconOnly);
 	rpnTB->setOrientation(Qt::Vertical);
 	rpnBox->addWidget(rpnTB);
-	rpnUpAction = new QAction(LOAD_ICON("go-up"), "RPN Up", this); rpnUpAction->setEnabled(false);
+	rpnUpAction = new QAction(LOAD_COLORED_ICON("go-up"), "RPN Up", this); rpnUpAction->setEnabled(false);
 	connect(rpnUpAction, SIGNAL(triggered(bool)), this, SLOT(registerUp()));
 	rpnTB->addAction(rpnUpAction);
-	rpnDownAction = new QAction(LOAD_ICON("go-down"), "RPN Down", this); rpnDownAction->setEnabled(false);
+	rpnDownAction = new QAction(LOAD_COLORED_ICON("go-down"), "RPN Down", this); rpnDownAction->setEnabled(false);
 	connect(rpnDownAction, SIGNAL(triggered(bool)), this, SLOT(registerDown()));
 	rpnTB->addAction(rpnDownAction);
-	rpnSwapAction = new QAction(LOAD_ICON("rpn-swap"), "RPN Swap", this); rpnSwapAction->setEnabled(false);
+	rpnSwapAction = new QAction(LOAD_COLORED_ICON("rpn-swap"), "RPN Swap", this); rpnSwapAction->setEnabled(false);
 	connect(rpnSwapAction, SIGNAL(triggered(bool)), this, SLOT(registerSwap()));
 	rpnTB->addAction(rpnSwapAction);
-	rpnCopyAction = new QAction(LOAD_ICON("edit-copy"), "RPN Copy", this); rpnCopyAction->setEnabled(false);
+	rpnCopyAction = new QAction(LOAD_COLORED_ICON("edit-copy"), "RPN Copy", this); rpnCopyAction->setEnabled(false);
 	connect(rpnCopyAction, SIGNAL(triggered(bool)), this, SLOT(copyRegister()));
 	rpnTB->addAction(rpnCopyAction);
-	rpnLastxAction = new QAction(LOAD_ICON("edit-undo"), "RPN LastX", this); rpnLastxAction->setEnabled(false);
+	rpnLastxAction = new QAction(LOAD_COLORED_ICON("edit-undo"), "RPN LastX", this); rpnLastxAction->setEnabled(false);
 	connect(rpnLastxAction, SIGNAL(triggered(bool)), this, SLOT(rpnLastX()));
 	rpnTB->addAction(rpnLastxAction);
-	rpnDeleteAction = new QAction(LOAD_ICON("edit-delete"), "RPN Delete", this); rpnDeleteAction->setEnabled(false);
+	rpnDeleteAction = new QAction(LOAD_COLORED_ICON("edit-delete"), "RPN Delete", this); rpnDeleteAction->setEnabled(false);
 	connect(rpnDeleteAction, SIGNAL(triggered(bool)), this, SLOT(deleteRegister()));
 	rpnTB->addAction(rpnDeleteAction);
-	rpnClearAction = new QAction(LOAD_ICON("edit-clear"), "RPN Clear", this); rpnClearAction->setEnabled(false);
+	rpnClearAction = new QAction(LOAD_COLORED_ICON("edit-clear"), "RPN Clear", this); rpnClearAction->setEnabled(false);
 	connect(rpnClearAction, SIGNAL(triggered(bool)), this, SLOT(clearStack()));
 	rpnTB->addAction(rpnClearAction);
 	rpnDock->setWidget(rpnWidget);
@@ -7998,22 +7998,22 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		QColor c = QApplication::palette().base().color();
 		if(c.red() + c.green() + c.blue() < 255) settings->color = 2;
 		else settings->color = 1;
-		menuAction_t->setIcon(LOAD_ICON("menu"));
-		toAction_t->setIcon(LOAD_ICON("convert"));
-		storeAction_t->setIcon(LOAD_ICON("document-save"));
-		functionsAction_t->setIcon(LOAD_ICON("function"));
-		unitsAction_t->setIcon(LOAD_ICON("units"));
-		if(plotAction_t) plotAction_t->setIcon(LOAD_ICON("plot"));
-		keypadAction_t->setIcon(LOAD_ICON("keypad"));
-		basesAction->setIcon(LOAD_ICON("number-bases"));
-		modeAction_t->setIcon(LOAD_ICON("configure"));
-		rpnUpAction->setIcon(LOAD_ICON("go-up"));
-		rpnDownAction->setIcon(LOAD_ICON("go-down"));
-		rpnSwapAction->setIcon(LOAD_ICON("rpn-swap"));
-		rpnCopyAction->setIcon(LOAD_ICON("edit-copy"));
-		rpnLastxAction->setIcon(LOAD_ICON("edit-undo"));
-		rpnDeleteAction->setIcon(LOAD_ICON("edit-delete"));
-		rpnClearAction->setIcon(LOAD_ICON("edit-clear"));
+		menuAction_t->setIcon(LOAD_COLORED_ICON("menu"));
+		toAction_t->setIcon(LOAD_COLORED_ICON("convert"));
+		storeAction_t->setIcon(LOAD_COLORED_ICON("document-save"));
+		functionsAction_t->setIcon(LOAD_COLORED_ICON("function"));
+		unitsAction_t->setIcon(LOAD_COLORED_ICON("units"));
+		if(plotAction_t) plotAction_t->setIcon(LOAD_COLORED_ICON("plot"));
+		keypadAction_t->setIcon(LOAD_COLORED_ICON("keypad"));
+		basesAction->setIcon(LOAD_COLORED_ICON("number-bases"));
+		modeAction_t->setIcon(LOAD_COLORED_ICON("configure"));
+		rpnUpAction->setIcon(LOAD_COLORED_ICON("go-up"));
+		rpnDownAction->setIcon(LOAD_COLORED_ICON("go-down"));
+		rpnSwapAction->setIcon(LOAD_COLORED_ICON("rpn-swap"));
+		rpnCopyAction->setIcon(LOAD_COLORED_ICON("edit-copy"));
+		rpnLastxAction->setIcon(LOAD_COLORED_ICON("edit-undo"));
+		rpnDeleteAction->setIcon(LOAD_COLORED_ICON("edit-delete"));
+		rpnClearAction->setIcon(LOAD_COLORED_ICON("edit-clear"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
 		if(!settings->use_custom_expression_font) {
 			QFont font(QApplication::font());
@@ -8391,6 +8391,9 @@ void QalculateWindow::closeEvent(QCloseEvent *e) {
 			if(answer == QMessageBox::Ignore) break;
 			else if(answer == QMessageBox::Cancel) return;
 		}
+	}
+	for(int i = 0; i < settings->tempfiles.size(); i++) {
+		QFile::remove(settings->tempfiles[i]);
 	}
 	CALCULATOR->abort();
 	CALCULATOR->terminateThreads();
@@ -10230,7 +10233,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
 		}
 		if(arg && arg->type() == ARGUMENT_TYPE_FILE) {
-			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_COLORED_ICON("document-open"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
@@ -10240,7 +10243,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			typestr = "";
 			connect(action, SIGNAL(triggered()), this, SLOT(onEntrySelectFile()));
 		} else if(arg && arg->type() == ARGUMENT_TYPE_MATRIX) {
-			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("table"), QLineEdit::TrailingPosition);
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_COLORED_ICON("table"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);

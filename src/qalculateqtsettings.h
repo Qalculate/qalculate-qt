@@ -30,6 +30,7 @@ bool can_display_unicode_string_function(const char *str, void *w);
 
 #define LOAD_APP_ICON(x) QIcon(":/icons/apps/scalable/" x ".svg")
 #define LOAD_ICON(x) load_icon(x, this)
+#define LOAD_COLORED_ICON(x) settings->loadColoredIcon(x, this)
 
 #define USE_QUOTES(arg, f) (arg && (arg->suggestsQuotes() || arg->type() == ARGUMENT_TYPE_TEXT) && f->id() != FUNCTION_ID_BASE && f->id() != FUNCTION_ID_BIN && f->id() != FUNCTION_ID_OCT && f->id() != FUNCTION_ID_DEC && f->id() != FUNCTION_ID_HEX)
 
@@ -240,6 +241,7 @@ class QalculateQtSettings : QObject {
 		void updateFavourites();
 		void setCustomAngleUnit();
 		void setDefaultCurrency();
+		QIcon loadColoredIcon(const QString &str, QWidget*);
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
@@ -319,6 +321,7 @@ class QalculateQtSettings : QObject {
 		QByteArray datasets_geometry, datasets_vsplitter_state, datasets_hsplitter_state;
 		bool disable_cursor_blinking;
 		bool wayland_platform;
+		QStringList tempfiles;
 
 		int preserve_history_height;
 		bool keypad_appended, bases_appended;

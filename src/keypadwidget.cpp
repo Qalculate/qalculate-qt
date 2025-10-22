@@ -363,13 +363,13 @@ void KeypadWidget::createKeypad(int i) {
 		unitButton->setToolTip(QString::fromStdString(u ? u->title(true, settings->printops.use_unicode_signs) : sunit), p1 ? QString::fromStdString(p1->longName()) : QString(), p2 ? QString::fromStdString(p2->longName()) : QString());
 		CREATE_MENU
 		connect(menu, SIGNAL(aboutToShow()), this, SLOT(updateUnitsMenu()));
-		backButton = new KeypadButton(LOAD_ICON("go-back"), this, true);
+		backButton = new KeypadButton(LOAD_COLORED_ICON("go-back"), this, true);
 		backButton->setToolTip(tr("Move cursor left"), tr("Move cursor to start"));
 		connect(backButton, SIGNAL(clicked()), this, SIGNAL(leftClicked()));
 		connect(backButton, SIGNAL(clicked2()), this, SIGNAL(startClicked()));
 		connect(backButton, SIGNAL(clicked3()), this, SIGNAL(startClicked()));
 		grid->addWidget(backButton, c, 3, 1, 1);
-		forwardButton = new KeypadButton(LOAD_ICON("go-forward"), this, true);
+		forwardButton = new KeypadButton(LOAD_COLORED_ICON("go-forward"), this, true);
 		forwardButton->setToolTip(tr("Move cursor right"), tr("Move cursor to end"));
 		connect(forwardButton, SIGNAL(clicked()), this, SIGNAL(rightClicked()));
 		connect(forwardButton, SIGNAL(clicked2()), this, SIGNAL(endClicked()));
@@ -474,7 +474,7 @@ void KeypadWidget::createKeypad(int i) {
 		grid = new QGridLayout(keypadC);
 		grid->setContentsMargins(0, 0, 0, 0);
 		customGrid = grid;
-		customEditButton = new KeypadButton(LOAD_ICON("document-edit"), this);
+		customEditButton = new KeypadButton(LOAD_COLORED_ICON("document-edit"), this);
 		customEditButton->setCheckable(true);
 		menu = new QMenu(this);
 		addColumnAction = menu->addAction(tr("Add column"), this, SLOT(addCustomColumn())); addColumnAction->setEnabled(settings->custom_button_columns < 100);
@@ -1631,9 +1631,9 @@ void KeypadWidget::updateSymbols() {
 }
 void KeypadWidget::changeEvent(QEvent *e) {
 	if(e->type() == QEvent::PaletteChange || e->type() == QEvent::ApplicationPaletteChange) {
-		if(backButton) backButton->setIcon(LOAD_ICON("go-back"));
-		if(forwardButton) forwardButton->setIcon(LOAD_ICON("go-forward"));
-		if(customEditButton) customEditButton->setIcon(LOAD_ICON("document-edit"));
+		if(backButton) backButton->setIcon(LOAD_COLORED_ICON("go-back"));
+		if(forwardButton) forwardButton->setIcon(LOAD_COLORED_ICON("go-forward"));
+		if(customEditButton) customEditButton->setIcon(LOAD_COLORED_ICON("document-edit"));
 	} else if(e->type() == QEvent::FontChange || e->type() == QEvent::ApplicationFontChange) {
 		QList<KeypadButton*> buttons = findChildren<KeypadButton*>();
 		for(int i = 0; i < buttons.count(); i++) {
@@ -1762,21 +1762,24 @@ void KeypadButton::menuOpened() {
 }
 void KeypadButton::menuClosed() {
 }
+#include <QAbstractTextDocumentLayout>
 void KeypadButton::paintEvent(QPaintEvent *p) {
 	QToolButton::paintEvent(p);
 	if(!richtext.isEmpty()) {
 		QPainter painter(this);
 		QTextDocument doc;
+		QAbstractTextDocumentLayout::PaintContext ctx;
+		ctx.palette.setColor(QPalette::Text, painter.pen().color());
 		doc.setHtml(richtext);
 		QFont f = font();
 		doc.setDefaultFont(f);
 		QPointF point = p->rect().center();
 		bool b_menu = (menu() && settings->separate_keypad_menu_buttons);
-		point.setY(point.y() - doc.size().height() / 2.0 + 2.0);
-		point.setX((point.x() - (b_menu ? 6.0 : 0.0)) - doc.size().width() / 2.0 + 2.0);
+		point.setY(point.y() - doc.size().height() / 2.0 + 1.0);
+		point.setX((point.x() - (b_menu ? 6.0 : 0.0)) - doc.size().width() / 2.0 + 1.0);
 		painter.translate(point);
 		painter.save();
-		doc.drawContents(&painter);
+		doc.documentLayout()->draw(&painter, ctx);
 		painter.restore();
 	}
 }
