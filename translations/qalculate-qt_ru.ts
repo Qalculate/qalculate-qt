@@ -2657,7 +2657,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers to even</source>
-        <translation>Округлять половинные числа до ближайшего чётного целого числа</translation>
+        <translation type="unfinished">Округлять половинные числа до чётного числа</translation>
     </message>
     <message>
         <source>Indicate repeating decimals</source>
@@ -2917,7 +2917,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Round halfway numbers to odd</source>
-        <translation>Округлять половинные числа до ближайшего нечётного целого числа</translation>
+        <translation type="unfinished">Округлять половинные числа до нечётного числа</translation>
     </message>
     <message>
         <source>Round halfway numbers toward zero</source>

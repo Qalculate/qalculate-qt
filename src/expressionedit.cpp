@@ -968,7 +968,6 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl) : 
 	completer->setModel(completionModel);
 	completionView = new QTableView();
 	completionView->setSelectionBehavior(QAbstractItemView::SelectRows);
-	completionView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	completionView->setShowGrid(false);
 	completionView->verticalHeader()->hide();
 	completionView->horizontalHeader()->hide();
@@ -1084,6 +1083,23 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						items.append(item); \
 						sourceModel->appendRow(items);}
 
+#define COMPLETION_APPEND_2T(x, y, y2, z, p, t)	{items.clear(); \
+						QStandardItem *item = new QStandardItem(x); \
+						item->setData(completionView->font(), Qt::FontRole); \
+						item->setData(QVariant::fromValue((void*) p), ITEM_ROLE); \
+						item->setData(QVariant::fromValue(z), TYPE_ROLE); \
+						item->setData(QVariant::fromValue(0), MATCH_ROLE); \
+						item->setData(QVariant::fromValue(0), IMATCH_ROLE); \
+						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
+						items.append(item); \
+						item = new QStandardItem(y); \
+						item->setData(ifont, Qt::FontRole); \
+						if(!t.isEmpty()) item->setData("<p>" + t + "</p>", Qt::ToolTipRole);\
+						items.append(item); \
+						item = new QStandardItem(y2); \
+						items.append(item); \
+						sourceModel->appendRow(items);}
+
 #define COMPLETION_APPEND_C(x, y, z, p)		COMPLETION_APPEND_2(x, y, y, z, p)
 
 #define COMPLETION_APPEND_T(x, y, z, p, t)	{items.clear(); \
@@ -1114,9 +1130,10 @@ bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
 						items.append(item); \
 						sourceModel->appendRow(items);}
 
-#define COMPLETION_APPEND_FLAG(x, y, y2, z, p)	if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {COMPLETION_APPEND_2(x, y, y2, z, p)} \
-						else if(flagheight <= 0) {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)} \
-						else {COMPLETION_APPEND_2(x, QStringLiteral("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p)}
+#define COMPLETION_APPEND_FLAG(x, y, y2, z, p, t) \
+						if(!QFile::exists(":/data/flags/" + QString::fromStdString(u->referenceName() + ".png"))) {COMPLETION_APPEND_2T(x, y, y2, z, p, t)} \
+						else if(flagheight <= 0) {COMPLETION_APPEND_2T(x, QStringLiteral("%1&nbsp;&nbsp;<img src=\":/data/flags/%2\"/>").arg(y).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p, t)} \
+						else {COMPLETION_APPEND_2T(x, QStringLiteral("%1&nbsp;&nbsp;<img height=\"%2\" src=\":/data/flags/%3\"/>").arg(y).arg(flagheight).arg(QString::fromStdString(u->referenceName())), QStringLiteral("%1<img src=\":/data/flags/%2\"/>").arg(y2).arg(QString::fromStdString(u->referenceName())), z, p, t)}
 
 #define MAX_COMPLETION_LENGTH_1 25
 #define MAX_COMPLETION_LENGTH_2 25
@@ -1145,6 +1162,18 @@ bool ellipsize_completion_names(std::string &str) {
 		}
 	}
 	return false;
+}
+
+void ellipsize_title(QString &str, int max_length) {
+	if(str.length() > max_length) {
+		int i = str.lastIndexOf("(");
+		if(i <= max_length && i > max_length - 10) {
+			str.truncate(i);
+		} else {
+			str.truncate(max_length - 4);
+			str += "…";
+		}
+	}
 }
 
 bool name_has_formatting(const ExpressionName *ename) {
@@ -1180,13 +1209,20 @@ std::string format_name(const ExpressionName *ename, int type) {
 }
 
 void ExpressionEdit::updateCompletion() {
+	QFont ifont(completionInitialized() ? qApp->font() : completionView->font());
 	sourceModel->clear();
 	capitalized_names.clear();
 	std::string str, strs;
-	QString title, title2;
+	QString title, title2, tooltip;
 	QList<QStandardItem *> items;
-	QFont ifont(completionView->font());
 	QFontMetrics fm(ifont);
+	int max_length = ((width() * 2) / 3) / fm.averageCharWidth();
+	if(max_length > 50) {
+		max_length = (width() / 2) / fm.averageCharWidth();
+		if(max_length < 50) max_length = 50;
+	} else if(max_length < 40) {
+		max_length = 40;
+	}
 	int flagheight = fm.ascent();
 	ifont.setStyle(QFont::StyleItalic);
 	for(size_t i = 0; i < CALCULATOR->functions.size(); i++) {
@@ -1207,7 +1243,13 @@ void ExpressionEdit::updateCompletion() {
 				}
 			}
 			ellipsize_completion_names(str);
-			COMPLETION_APPEND_T(QString::fromStdString(str), QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView)), 1, f, QString::fromStdString(f->description()))
+			tooltip = QString::fromStdString(f->description());
+			title = QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
+			if(title.length() > max_length) {
+				if(tooltip.isEmpty()) tooltip = title;
+				ellipsize_title(title, max_length);
+			}
+			COMPLETION_APPEND_T(QString::fromStdString(str), title, 1, f, tooltip)
 		}
 	}
 	for(size_t i = 0; i < CALCULATOR->variables.size(); i++) {
@@ -1263,8 +1305,13 @@ void ExpressionEdit::updateCompletion() {
 				}
 			}
 			ellipsize_completion_names(str);
+			tooltip.clear();
 			if(!v->title(false).empty()) {
 				title = QString::fromStdString(v->title(false)).replace("MeV/c^2", "MeV/c²");
+				if(title.length() > max_length) {
+					tooltip = title;
+					ellipsize_title(title, max_length);
+				}
 			} else {
 				if(v->isKnown()) {
 					if(((KnownVariable*) v)->isExpression() && !v->isLocal()) {
@@ -1316,9 +1363,15 @@ void ExpressionEdit::updateCompletion() {
 					}
 				}
 			}
-			if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT)) COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title + " (%)", 1, v)
-			else if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title + " (‰)", 1, v)
-			else COMPLETION_APPEND(QString::fromStdString(b ? str : ename_r->name), title, 1, v)
+			if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || v == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE)) {
+				if(tooltip.isEmpty()) title2 = title;
+				else title2 = tooltip;
+				if(v == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT)) title2 += " (%)";
+				else title2 += " (‰)";
+				COMPLETION_APPEND_2T(QString::fromStdString(b ? str : ename_r->name), title, title2, 1, v, tooltip)
+			} else {
+				COMPLETION_APPEND_T(QString::fromStdString(b ? str : ename_r->name), title, 1, v, tooltip)
+			}
 		}
 	}
 	PrintOptions po = settings->printops;
@@ -1380,7 +1433,13 @@ void ExpressionEdit::updateCompletion() {
 				}
 				title = QString::fromStdString(u->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
 				if(u->isCurrency()) {
-					COMPLETION_APPEND_FLAG(QString::fromStdString(b ? str : ename_r->name), title, title2, 1, u)
+					if(title.length() > max_length) {
+						tooltip = title;
+						ellipsize_title(title, max_length);
+					} else {
+						tooltip.clear();
+					}
+					COMPLETION_APPEND_FLAG(QString::fromStdString(b ? str : ename_r->name), title, title2, 1, u, tooltip)
 				} else {
 					if(u->isSIUnit() && !u->category().empty() && title[title.length() - 1] != ')') {
 						size_t i_slash = std::string::npos;
@@ -1393,7 +1452,14 @@ void ExpressionEdit::updateCompletion() {
 							title += ")";
 						}
 					}
-					COMPLETION_APPEND_2(QString::fromStdString(b ? str : ename_r->name), title, title2.isEmpty() ? title : title2, 1, u)
+					if(title.length() > max_length) {
+						tooltip = title;
+						if(title2.isEmpty()) title2 = title;
+						ellipsize_title(title, max_length);
+					} else {
+						tooltip.clear();
+					}
+					COMPLETION_APPEND_2T(QString::fromStdString(b ? str : ename_r->name), title, title2.isEmpty() ? title : title2, 1, u, tooltip)
 				}
 			} else if(!cu->isHidden()) {
 				title = QString::fromStdString(cu->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, completionView));
@@ -1438,6 +1504,7 @@ void ExpressionEdit::updateCompletion() {
 				size_t i_slash = std::string::npos;
 				if(cu->category().length() > 1) i_slash = cu->category().rfind("/", cu->category().length() - 2);
 				if(i_slash != std::string::npos) i_slash++;
+				tooltip.clear();
 				if(cu->isSIUnit() && !cu->category().empty()) {
 					if(title.length() + cu->category().length() - (i_slash == std::string::npos ? 0 : i_slash) < MAX_COMPLETION_LENGTH_1 && title[title.length() - 1] != ')') {
 						title += " (";
@@ -1445,11 +1512,16 @@ void ExpressionEdit::updateCompletion() {
 						else title += QString::fromStdString(cu->category().substr(i_slash, cu->category().length() - i_slash));
 						title += ")";
 					} else {
+						tooltip = title;
 						if(i_slash == std::string::npos) title = QString::fromStdString(cu->category());
 						else title = QString::fromStdString(cu->category().substr(i_slash, cu->category().length() - i_slash));
 					}
 				}
-				COMPLETION_APPEND_2(QString::fromStdString(str), title, title2, 1, u)
+				if(title.length() > max_length) {
+					if(tooltip.isEmpty()) tooltip = title;
+					ellipsize_title(title, max_length);
+				}
+				COMPLETION_APPEND_2T(QString::fromStdString(str), title, title2, 1, u, tooltip)
 			}
 		}
 	}
@@ -3506,6 +3578,8 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 				}
 				completionView->horizontalHeader()->setStretchLastSection(true);
 			}
+		} else if(completionView->verticalScrollBar()) {
+			w += completionView->verticalScrollBar()->sizeHint().width();
 		}
 		if(!settings->wayland_platform || !completionView->isVisible()) {
 			prev_rect = rect;

@@ -309,6 +309,7 @@ bool QalculateQtSettings::isAnswerVariable(Variable *v) {
 }
 
 #include <QResource>
+#include <QDir>
 #include <QTemporaryFile>
 QIcon QalculateQtSettings::loadColoredIcon(const QString &str, QWidget *w) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
@@ -319,7 +320,7 @@ QIcon QalculateQtSettings::loadColoredIcon(const QString &str, QWidget *w) {
 	QResource r((light ? ":/icons/actions/scalable/" : ":/icons/dark/actions/scalable/") + str + ".svg");
 	QByteArray d = r.uncompressedData();
 	d.replace(light ? "#232629" : "#eff0f1", c.name().toUtf8());
-	QTemporaryFile f;
+	QTemporaryFile f(QDir::temp().filePath(qApp->applicationName() + "_XXXXXX.svg"));
 	if(!f.open()) return load_icon(str, w);
 	QTextStream out(&f);
 	out << d;

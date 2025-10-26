@@ -8021,6 +8021,7 @@ void QalculateWindow::changeEvent(QEvent *e) {
 			else font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 			expressionEdit->setFont(font);
 		}
+		if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
 		if(!settings->use_custom_status_font) {
 			QFont font(QApplication::font());
 			if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
@@ -9075,8 +9076,8 @@ void QalculateWindow::onAppFontChanged() {
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * RESULT_FONT_FACTOR);
 		else font.setPointSize(font.pointSize() * RESULT_FONT_FACTOR);
 		expressionEdit->setFont(font);
-		if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
 	}
+	if(expressionEdit->completionInitialized()) expressionEdit->updateCompletion();
 	if(!settings->use_custom_status_font) {
 		QFont font = QApplication::font();
 		if(font.pixelSize() >= 0) font.setPixelSize(font.pixelSize() * STATUS_FONT_FACTOR);
