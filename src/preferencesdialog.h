@@ -105,6 +105,7 @@ class PreferencesDialog : public QDialog {
 		void replaceExpressionChanged(int);
 		void autocopyResultToggled(bool);
 		void multipleInstancesToggled(bool);
+		void checkVersionToggled(bool);
 		void clearHistoryToggled(bool);
 		void maxHistoryLinesChanged(int);
 		void historyExpressionChanged(int);

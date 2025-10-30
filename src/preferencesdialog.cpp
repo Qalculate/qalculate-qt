@@ -117,6 +117,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(langChanged(int)));
 	l->addWidget(combo, r, 1); r++; langCombo = combo;
 	BOX(tr("Allow multiple instances"), settings->allow_multiple_instances > 0, multipleInstancesToggled(bool));
+	BOX(tr("Notify when a new version is available"), settings->check_version, checkVersionToggled(bool));
 	BOX(tr("Clear history on exit"), settings->clear_history_on_exit, clearHistoryToggled(bool));
 	l->addWidget(new QLabel(tr("Max history lines saved:"), this), r, 0); QSpinBox *spin = new QSpinBox(this); spin->setRange(0, 100000); spin->setValue(settings->max_history_lines); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(maxHistoryLinesChanged(int))); l->addWidget(spin, r, 1); r++;
 	BOX(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
@@ -518,6 +519,9 @@ void PreferencesDialog::langChanged(int i) {
 }
 void PreferencesDialog::multipleInstancesToggled(bool b) {
 	settings->allow_multiple_instances = b;
+}
+void PreferencesDialog::checkVersionToggled(bool b) {
+	settings->check_version = b;
 }
 void PreferencesDialog::clearHistoryToggled(bool b) {
 	settings->clear_history_on_exit = b;

@@ -3103,6 +3103,10 @@ Do you want to overwrite the function?</source>
         <source>Default currency:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Notify when a new version is available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
