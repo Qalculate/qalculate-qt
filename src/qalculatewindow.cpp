@@ -7491,12 +7491,13 @@ void ViewThread::run() {
 				po.max_decimals = 5;
 				po.preserve_format = false;
 			}
-			po.abbreviate_names = false;
+			bool compact = (settings->history_expression_type == HISTORY_EXPRESSION_TYPE_PARSED_COMPACT || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT);
+			po.abbreviate_names = compact;
 			po.digit_grouping = settings->printops.digit_grouping;
 			po.use_unicode_signs = settings->printops.use_unicode_signs;
 			po.multiplication_sign = settings->printops.multiplication_sign;
 			po.division_sign = settings->printops.division_sign;
-			po.short_multiplication = false;
+			po.short_multiplication = compact;
 			po.excessive_parenthesis = true;
 			po.improve_division_multipliers = false;
 			po.restrict_to_parent_precision = false;
@@ -7504,6 +7505,7 @@ void ViewThread::run() {
 			po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 			MathStructure mp(*mparse);
 			mp.format(po);
+			if(compact) po.preserve_format = false;
 			parsed_text = mp.print(po, settings->format_result, settings->color, TAG_TYPE_HTML);
 			if(po.base == BASE_CUSTOM) {
 				CALCULATOR->setCustomOutputBase(nr_base);

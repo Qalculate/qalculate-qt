@@ -750,7 +750,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "autocopy_result") {
 			autocopy_result = v;
 		} else if(svar == "history_expression_type") {
-			history_expression_type = v;
+			if(v >= 0 && v < 5) history_expression_type = v;
 		} else if(svar == "window_geometry") {
 			window_geometry = QByteArray::fromBase64(svalue.c_str());
 		} else if(svar == "splitter_state") {

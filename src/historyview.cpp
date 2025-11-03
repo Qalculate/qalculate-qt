@@ -555,8 +555,8 @@ void HistoryView::addResult(std::vector<std::string> values, std::string express
 			}
 		}
 		gsub("</i>", "<img src=\"data://img1px.png\" width=\"1\"/></i>", parse);
-		if(!comment && !temporary && !expression.empty() && (settings->history_expression_type > 0 || parse.empty())) {
-			if(!parse.empty() && settings->history_expression_type > 1 && parse != expression) {
+		if(!comment && !temporary && !expression.empty() && (settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT || parse.empty())) {
+			if(!parse.empty() && (settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT) && parse != expression) {
 				str += QStringLiteral("<a name=\"e%1\" style=\"text-decoration: none\">").arg(initial_load ? (int) index : settings->v_expression.size() - 1);
 				str += QString::fromStdString(expression).toHtmlEscaped();
 				str += "</a>";
@@ -1427,7 +1427,7 @@ void HistoryView::editFindDate() {
 #else
 			if(settings->v_time[i - 1] != 0 && QDateTime::fromMSecsSinceEpoch(settings->v_time[i - 1] * 1000).date() <= date) {
 #endif
-				if(settings->history_expression_type > 1) scrollToAnchor("e" + QString::number(i - 1));
+				if(settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT) scrollToAnchor("e" + QString::number(i - 1));
 				else scrollToAnchor(QString::number(i - 1));
 				break;
 			}
@@ -1628,7 +1628,7 @@ void HistoryView::editCopy(int ascii) {
 		if(i1 < 0 && !b_temp) return;
 		if(i2 < 0 && !b_temp) {
 			if(i1 >= 0 && (size_t) i1 < settings->v_expression.size()) {
-				if(astr[0] == 'e' || (astr[0] != 'a' && settings->history_expression_type == 1 && !settings->v_expression[i1].empty())) {
+				if(astr[0] == 'e' || (astr[0] != 'a' && settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED && !settings->v_expression[i1].empty())) {
 					if(ascii > 0 || (ascii < 0 && settings->copy_ascii)) {
 						QApplication::clipboard()->setText(QString::fromStdString(unformat(settings->v_expression[i1])));
 					} else {

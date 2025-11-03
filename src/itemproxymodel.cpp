@@ -72,24 +72,45 @@ bool ItemProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) const 
 void ItemProxyModel::setFilter(std::string scat, std::string sfilter) {
 	remove_blank_ends(sfilter);
 	if(cat != scat || filter != sfilter) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		beginFilterChange();
+#endif
 		cat = scat;
 		if(cat[0] == '/') subcat = cat.substr(1, cat.length() - 1);
 		else subcat = "";
 		filter = sfilter;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		endFilterChange(Direction::Rows);
+#else
 		invalidateFilter();
+#endif
 	}
 }
 void ItemProxyModel::setSecondaryFilter(std::string sfilter) {
 	remove_blank_ends(sfilter);
 	if(filter != sfilter) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		beginFilterChange();
+#endif
 		filter = sfilter;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		endFilterChange(Direction::Rows);
+#else
 		invalidateFilter();
+#endif
 	}
 }
 void ItemProxyModel::setShowHidden(bool b) {
 	if(b != show_hidden) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		beginFilterChange();
+#endif
 		show_hidden = b;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+		endFilterChange(Direction::Rows);
+#else
 		invalidateFilter();
+#endif
 	}
 }
 std::string ItemProxyModel::currentFilter() const {

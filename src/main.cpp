@@ -83,15 +83,22 @@ int main(int argc, char **argv) {
 			if(GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &nlang, NULL, &n)) {
 				WCHAR wlocale[n];
 				if(GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &nlang, wlocale, &n)) {
+					for(size_t i = 2; nlang > 1 && i < n - 1; i++) {
+						if(wlocale[i] == '\0') {
+							if(wlocale[i + 1] == '\0') break;
+							wlocale[i] = ':';
+							nlang--;
+						}
+					}
 					std::string lang = utf8_encode(wlocale);
 					if(!lang.empty()) {
 						gsub("-", "_", lang);
-						if(lang != QLocale().name().toStdString()) {
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
+						if(lang.substr(0, lang.find(":")) != QLocale().name().toStdString()) {
+#	if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
 							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).territory()));
-#else
+#	else
 							QLocale::setDefault(QLocale(QLocale(QString::fromStdString(lang)).language(), QLocale(QString::fromStdString(lang)).country()));
-#endif
+#	endif
 						}
 						_putenv_s("LANGUAGE", lang.c_str());
 					}

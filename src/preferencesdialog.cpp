@@ -213,9 +213,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Automatically calculate selection"), settings->autocalc_selection, autocalcSelectionToggled(bool));
 	l->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
-	combo->addItem(tr("Parsed"), 0);
-	combo->addItem(tr("Entered"), 1);
-	combo->addItem(tr("Entered + parsed"), 2);
+	combo->addItem(tr("Parsed"), HISTORY_EXPRESSION_TYPE_PARSED);
+	combo->addItem(tr("Parsed (compact)"), HISTORY_EXPRESSION_TYPE_PARSED_COMPACT);
+	combo->addItem(tr("Entered"), HISTORY_EXPRESSION_TYPE_ENTERED);
+	combo->addItem(tr("Entered + parsed"), HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED);
+	combo->addItem(tr("Entered + parsed (compact)"), HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT);
 	combo->setCurrentIndex(combo->findData(settings->history_expression_type));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(historyExpressionChanged(int)));
 	l->addWidget(combo, r, 1); r++;

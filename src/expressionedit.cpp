@@ -922,8 +922,15 @@ bool ExpressionProxyModel::lessThan(const QModelIndex &index1, const QModelIndex
 	return QSortFilterProxyModel::lessThan(index1, index2);
 }
 void ExpressionProxyModel::setFilter(std::string sfilter) {
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+	beginFilterChange();
+#endif
 	str = sfilter;
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+	endFilterChange(Direction::Rows);
+#else
 	invalidateFilter();
+#endif
 }
 
 ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl) : QPlainTextEdit(parent), statusLabel(sl) {
@@ -2788,13 +2795,14 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			po.max_decimals = 5;
 			po.preserve_format = false;
 		}
-		po.abbreviate_names = false;
+		bool compact = ((settings->history_expression_type == HISTORY_EXPRESSION_TYPE_PARSED_COMPACT || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT) && settings->status_in_history);
+		po.abbreviate_names = compact;
 		po.hide_underscore_spaces = true;
 		po.use_unicode_signs = settings->printops.use_unicode_signs;
 		po.digit_grouping = settings->printops.digit_grouping;
 		po.multiplication_sign = settings->printops.multiplication_sign;
 		po.division_sign = settings->printops.division_sign;
-		po.short_multiplication = false;
+		po.short_multiplication = compact;
 		po.excessive_parenthesis = true;
 		po.improve_division_multipliers = false;
 		po.can_display_unicode_string_function = &can_display_unicode_string_function;
@@ -2817,6 +2825,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		} else {
 			CALCULATOR->beginTemporaryStopMessages();
 			mparse.format(po);
+			if(compact) po.preserve_format = false;
 			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			CALCULATOR->endTemporaryStopMessages();
 		}
