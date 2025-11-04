@@ -1,0 +1,27 @@
+diff --git a/qalculate-qt.pro b/qalculate-qt.pro
+index 5b3a2f8..22e4fc2 100644
+--- a/qalculate-qt.pro
++++ b/qalculate-qt.pro
+@@ -55,22 +55,6 @@ defineReplace(prependAll) {
+ 	return($$result)
+ }
+ 
+-!win32 {
+-	TRANSLATIONS = $$prependAll(LANGUAGES, $$PWD/translations/qalculate-qt_, .ts)
+-	TRANSLATIONS_FILES =
+-	qtPrepareTool(LRELEASE, lrelease) for(tsfile, TRANSLATIONS) {
+-		qmfile = $$shadowed($$tsfile)
+-		qmfile ~= s,.ts$,.qm,
+-		qmdir = $$dirname(qmfile)
+-		exists($$qmdir) {
+-			mkpath($$qmdir)|error("Aborting.")
+-		}
+-		command = $$LRELEASE -removeidentical $$tsfile -qm $$qmfile
+-		system($$command)|error("Failed to run: $$command")
+-		TRANSLATIONS_FILES += $$qmfile
+-	}
+-}
+-
+ unix:!equals(COMPILE_RESOURCES,"yes"):!android:!macx {
+ 
+ 	target.path = $$BINDIR

@@ -1,6 +1,10 @@
 name: qalculate-qt
+confinement: strict
+grade: stable
+base: core24
+adopt-info: qalculate-qt
 title: Qalculate! (Qt)
-version: '5.8.1'
+version: 5.8.1
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -13,43 +17,46 @@ description: |
   uncertainty propagation, interval arithmetic, plotting, and a user-friendly
   interface.
 
-grade: stable
-confinement: strict
-base: core18
-
-compression: lzo
-
-architectures:
-  - amd64
-
 apps:
-  qalc:
-    environment:
-        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
-    command: desktop-launch qalc
-    extensions: [kde-neon]
-    plugs: [network, home, removable-media]
   qalculate-qt:
+    extensions:
+      - kde-neon-6
+    common-id: io.github.Qalculate.qalculate-qt
+    desktop: usr/share/applications/io.github.Qalculate.qalculate-qt.desktop
+    command: usr/bin/qalculate-qt
     environment:
-        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
-    command:  desktop-launch $SNAP/usr/local/bin/qalculate-qt
-    extensions: [kde-neon]
-    plugs: [unity7, gsettings, network, home, removable-media]
+        GNUPLOT_DRIVER_DIR: "$SNAP/usr/libexec/gnuplot/6.0"
+    plugs:
+      - home
+      - browser-support
+  qalc:
+    extensions:
+      - kde-neon-6
+    command: usr/bin/qalc
+    environment:
+        GNUPLOT_DRIVER_DIR: "$SNAP/usr/libexec/gnuplot/6.0"
   gnuplot:
-    environment: 
-        GNUPLOT_DRIVER_DIR: $SNAP/libexec/gnuplot/5.2
-    command: desktop-launch gnuplot
-    extensions: [kde-neon]
-    plugs: [unity7, gsettings, home, removable-media]
+    extensions:
+      - kde-neon-6
+    command: usr/bin/gnuplot
+    environment:
+        GNUPLOT_DRIVER_DIR: "$SNAP/usr/libexec/gnuplot/6.0"
 
+slots:
+  session-dbus-interface:
+    interface: dbus
+    name: io.github.Qalculate.qalculate-qt
+    bus: session
 parts:
   libqalculate:
     source: https://github.com/Qalculate/libqalculate.git
     source-tag: v5.8.1
     source-depth: 1
     plugin: autotools
+    autotools-configure-parameters:
+      - --prefix=/usr
     build-environment:
-      - CXXFLAGS: "$CXXFLAGS -fsigned-char"
+      - CXXFLAGS: -O2 -fsigned-char
     build-packages:
       - libncurses5-dev
       - libreadline-dev
@@ -60,15 +67,16 @@ parts:
       - libmpfr-dev
       - intltool
       - doxygen
+      - pkg-config
     stage-packages:
       - libmpfr6
       - libgmp10
     override-build: |
-      cat $SNAPCRAFT_STAGE/qalculate-snap/patches/lib/snap-path.patch | patch -p1
+      cat $SNAPCRAFT_PROJECT_DIR/patches/snap-path.patch | patch -p1
       ./autogen.sh
-      snapcraftctl build
+      craftctl default
       echo Stripping qalc
-      strip $SNAPCRAFT_PART_INSTALL/bin/qalc
+      strip $CRAFT_PART_INSTALL/usr/bin/qalc
     after:
       - patches
     prime:
@@ -83,51 +91,52 @@ parts:
     source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.8.1/qalculate-qt-5.8.1.tar.gz
     source-checksum: sha512/1609b71051895f202dd91ca031d763bfdb2f8708b52e54797c05d88c8c7d87a90ab6ba872436e51129c207dd05d27e61869819c4c655c7706c91cee63e792ab5
     plugin: qmake
+    qmake-parameters:
+      - COMPILES_RESOURCES=yes PREFIX=/usr
+    build-environment:
+      - LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy:/snap/kf6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/usr
+      - PKG_CONFIG_PATH: $CRAFT_STAGE//usr/lib/pkgconfig:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig
+      - PATH: /snap/kde-qt6-core24-sdk/current/usr/bin/qt6:$PATH
     build-snaps:
-      - kde-frameworks-5-core18-sdk
+      - core24
+      - kf6-core24
     build-packages:
       - libgmp-dev
       - libxml2-dev
-      - qttools5-dev-tools
     after:
       - libqalculate
       - patches
     prime:
       - -share/applications
+    override-pull: |
+      craftctl default
+      cat $SNAPCRAFT_PROJECT_DIR/patches/snap.patch | patch -p1
+      cat $SNAPCRAFT_PROJECT_DIR/patches/snap-icon.patch | patch -p1
 
   gnuplot:
-    source: https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.8/gnuplot-5.2.8.tar.gz
-    source-checksum: sha512/513dff15236dcb58c3c5471cdaa0713242787dbf30ef860c3f69152cb87c6392e4973caff5eb178707bbb84c78548e806b2920864a37686bce49425fbfdc4e8c
+    source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.3.tar.gz
+    source-checksum: sha256/ec52e3af8c4083d4538152b3f13db47f6d29929a3f6ecec5365c834e77f251ab
     plugin: autotools
-    configflags:
+    autotools-configure-parameters:
+      - --prefix=/usr
       - --without-gd
       - --without-libcerf
-      - --without-linux-vga
       - --without-lua
       - --with-readline=gnu
-      - --with-qt
-    build-snaps:
-      - kde-frameworks-5-core18-sdk
-    build-packages:
-      - libqt5svg5-dev
-      - qttools5-dev-tools
+      - --without-qt
     prime:
       - -share/applications
       - -share/doc
       - -share/man
     override-build: |
-      snapcraftctl build
+      craftctl default
       echo Stripping gnuplot
-      strip $SNAPCRAFT_PART_INSTALL/bin/gnuplot
-      strip $SNAPCRAFT_PART_INSTALL/libexec/gnuplot/5.2/gnuplot_x11
-      strip $SNAPCRAFT_PART_INSTALL/libexec/gnuplot/5.2/gnuplot_qt
+      strip $CRAFT_PART_INSTALL/usr/bin/gnuplot
 
   patches:
-    source: https://github.com/Qalculate/qalculate-snap.git
-    source-depth: 1
+    source: patches
     plugin: dump
     organize:
-      "*": qalculate-snap/
+      "*": patches/
     prime:
       - -*
-
