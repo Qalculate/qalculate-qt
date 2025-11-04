@@ -135,8 +135,7 @@ parts:
       strip $CRAFT_PART_INSTALL/usr/bin/gnuplot
 
   patches:
-    source: $SNAPCRAFT_PROJECT_DIR/patches
-    source-type: local
+    source: snap/patches
     plugin: dump
     organize:
       "*": patches/
