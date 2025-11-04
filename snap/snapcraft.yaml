@@ -73,7 +73,7 @@ parts:
       - libmpfr6
       - libgmp10
     override-build: |
-      cat $SNAPCRAFT_PROJECT_DIR/patches/snap-path.patch | patch -p1
+      cat $CRAFT_STAGE/patches/snap-path.patch | patch -p1
       ./autogen.sh
       craftctl default
       echo Stripping qalc
@@ -111,8 +111,8 @@ parts:
       - -share/applications
     override-pull: |
       craftctl default
-      cat $SNAPCRAFT_PROJECT_DIR/patches/snap.patch | patch -p1
-      cat $SNAPCRAFT_PROJECT_DIR/patches/snap-icon.patch | patch -p1
+      cat $CRAFT_STAGE/patches/snap.patch | patch -p1
+      cat $CRAFT_STAGE/patches/snap-icon.patch | patch -p1
 
   gnuplot:
     source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.3.tar.gz
