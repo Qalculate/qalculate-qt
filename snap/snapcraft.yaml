@@ -2,6 +2,7 @@ name: qalculate-qt
 confinement: strict
 grade: stable
 base: core24
+compression: lzo
 adopt-info: qalculate-qt
 title: Qalculate! (Qt)
 version: 5.8.1
@@ -134,7 +135,8 @@ parts:
       strip $CRAFT_PART_INSTALL/usr/bin/gnuplot
 
   patches:
-    source: patches
+    source: $SNAPCRAFT_PROJECT_DIR/patches
+    source-type: local
     plugin: dump
     organize:
       "*": patches/
