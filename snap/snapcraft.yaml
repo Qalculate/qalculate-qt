@@ -1,7 +1,7 @@
 name: qalculate-qt
 adopt-info: qalculate-qt
 title: Qalculate! (Qt)
-version: 5.8.1
+version: '5.8.1'
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -27,8 +27,6 @@ apps:
   qalculate-qt:
     extensions:
       - kde-neon-6
-    common-id: io.github.Qalculate.qalculate-qt
-    desktop: usr/share/applications/io.github.Qalculate.qalculate-qt.desktop
     command: usr/bin/qalculate-qt
     environment:
         GNUPLOT_DRIVER_DIR: "$SNAP/usr/libexec/gnuplot/6.0"
@@ -48,11 +46,6 @@ apps:
     environment:
         GNUPLOT_DRIVER_DIR: "$SNAP/usr/libexec/gnuplot/6.0"
 
-slots:
-  session-dbus-interface:
-    interface: dbus
-    name: io.github.Qalculate.qalculate-qt
-    bus: session
 parts:
   libqalculate:
     source: https://github.com/Qalculate/libqalculate.git
@@ -98,10 +91,11 @@ parts:
     source-checksum: sha512/1609b71051895f202dd91ca031d763bfdb2f8708b52e54797c05d88c8c7d87a90ab6ba872436e51129c207dd05d27e61869819c4c655c7706c91cee63e792ab5
     plugin: qmake
     qmake-parameters:
-      - COMPILES_RESOURCES=yes PREFIX=/usr
+      - COMPILE_RESOURCES=yes
+      - PREFIX=/usr
     build-environment:
-      - LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy:/snap/kf6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:$CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/usr
-      - PKG_CONFIG_PATH: $CRAFT_STAGE//usr/lib/pkgconfig:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig
+      - LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/usr
+      - PKG_CONFIG_PATH: $CRAFT_STAGE/usr/lib/pkgconfig:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig
       - PATH: /snap/kde-qt6-core24-sdk/current/usr/bin/qt6:$PATH
     build-snaps:
       - core24
@@ -117,7 +111,6 @@ parts:
     override-pull: |
       craftctl default
       patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/snap.patch
-      patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/snap-icon.patch
 
   gnuplot:
     source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.3.tar.gz
