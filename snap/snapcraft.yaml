@@ -19,6 +19,10 @@ grade: stable
 base: core24
 compression: lzo
 
+platforms:
+  amd64:
+  arm64:
+
 apps:
   qalculate-qt:
     extensions:
@@ -126,6 +130,9 @@ parts:
       - --without-lua
       - --with-readline=gnu
       - --without-qt
+      - --enable-wxwidgets
+    after:
+      - wxwidgets-sdk
     prime:
       - -share/applications
       - -share/doc
@@ -134,6 +141,70 @@ parts:
       craftctl default
       echo Stripping gnuplot
       strip $CRAFT_PART_INSTALL/usr/bin/gnuplot
+
+  wxwidgets-sdk:
+    source: https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.8.1/wxWidgets-3.2.8.1.tar.bz2
+    source-checksum: sha256/ad0cf6c18815dcf1a6a89ad3c3d21a306cd7b5d99a602f77372ef1d92cb7d756
+    plugin: autotools
+    autotools-configure-parameters:
+      - --enable-shared
+      - --disable-aui
+      - --disable-html
+      - --disable-mdi
+      - --disable-mediactrl
+      - --disable-propgrid
+      - --disable-ribbon
+      - --disable-richtext
+      - --disable-webview
+      - --disable-xrc
+      - --enable-unicode
+      - --with-gtk=3
+      - --without-opengl
+      - --without-libnotify
+      - --with-libjpeg
+      - --with-libpng
+      - --with-zlib
+      - --prefix=/usr
+    organize:
+      snap/qalculate/current/usr: usr
+    build-packages:
+      - gcc
+      - g++
+      - gettext
+      - libcairo2-dev
+      - libexpat1-dev
+      - libgtk-3-dev
+      - libjpeg-dev
+      - libpng-dev
+      - libsecret-1-dev
+      - libtiff5-dev
+      - libxtst-dev
+      - zlib1g-dev
+    override-build: |
+      set \
+        -o errexit \
+        -o nounset;
+      craftctl default;
+      # Fix-up wx-config link
+      ln \
+        --force \
+        --relative \
+        --symbolic \
+        "${CRAFT_PART_INSTALL}"/usr/lib/wx/config/* \
+        "${CRAFT_PART_INSTALL}"/usr/bin/wx-config;
+      # Fix-up installation prefix
+      # command line - How to use sed to replace only the first occurrence in a file? - Stack Overflow
+      # https://stackoverflow.com/questions/148451/how-to-use-sed-to-replace-only-the-first-occurrence-in-a-file
+      sed \
+        --follow-symlinks \
+        --in-place \
+        "0,/^prefix=.*\$/ s##prefix=\"${SNAPCRAFT_STAGE}\"/usr#" \
+        "${CRAFT_PART_INSTALL}"/usr/bin/wx-config;
+    prime:
+      - usr/lib/libwx_baseu-*
+      - usr/lib/libwx-baseu_xml*
+      - usr/lib/libwx_gtk3u_core*
+      - usr/lib/libwx_gtk3u_adv*
 
   patches:
     source: snap/patches
