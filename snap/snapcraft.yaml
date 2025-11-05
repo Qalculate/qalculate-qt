@@ -1,8 +1,4 @@
 name: qalculate-qt
-confinement: strict
-grade: stable
-base: core24
-compression: lzo
 adopt-info: qalculate-qt
 title: Qalculate! (Qt)
 version: 5.8.1
@@ -17,6 +13,11 @@ description: |
   symbolic calculations (including integrals and equations), arbitrary precision,
   uncertainty propagation, interval arithmetic, plotting, and a user-friendly
   interface.
+
+confinement: strict
+grade: stable
+base: core24
+compression: lzo
 
 apps:
   qalculate-qt:
@@ -73,7 +74,7 @@ parts:
       - libmpfr6
       - libgmp10
     override-build: |
-      cat $CRAFT_STAGE/patches/snap-path.patch | patch -p1
+      patch -p1 < $CRAFT_STAGE/patches/snap-path.patch
       ./autogen.sh
       craftctl default
       echo Stripping qalc
@@ -111,8 +112,8 @@ parts:
       - -share/applications
     override-pull: |
       craftctl default
-      cat $CRAFT_STAGE/patches/snap.patch | patch -p1
-      cat $CRAFT_STAGE/patches/snap-icon.patch | patch -p1
+      patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/snap.patch
+      patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/snap-icon.patch
 
   gnuplot:
     source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.3.tar.gz
