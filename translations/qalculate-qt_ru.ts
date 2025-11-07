@@ -3107,6 +3107,18 @@ Do you want to overwrite the function?</source>
         <source>Notify when a new version is available</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Parsed (compact)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entered + parsed (compact)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -3966,7 +3978,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Approximation</source>
-        <translation>Приближение</translation>
+        <translation type="vanished">Приближение</translation>
     </message>
     <message>
         <source>Automatic</source>
@@ -4817,6 +4829,14 @@ and matrix/vector elements</source>
     <message>
         <source>RPN</source>
         <translation type="obsolete">ПОЛИЗ</translation>
+    </message>
+    <message>
+        <source>Approximation &amp;&amp; Fractions</source>
+        <translation type="obsolete">Приближение и дроби</translation>
+    </message>
+    <message>
+        <source>Approximation and Fractions</source>
+        <translation type="unfinished">Приближение и дроби</translation>
     </message>
 </context>
 <context>

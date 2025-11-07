@@ -553,8 +553,8 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	updateAngleUnitsMenu();
 	menu = menu2;
 
-	ADD_SECTION(tr("Approximation"));
-	w2 = fm1.boundingRect(tr("Approximation")).width() * 1.5; if(w2 > w) w = w2;
+	ADD_SECTION(tr("Approximation and Fractions"));
+	w2 = fm1.boundingRect(tr("Approximation and Fractions")).width() * 1.5; if(w2 > w) w = w2;
 	group = new QActionGroup(this);
 	action = menu->addAction(tr("Automatic", "Automatic approximation"), this, SLOT(approximationActivated())); action->setCheckable(true); group->addAction(action); action->setObjectName("action_autoappr");
 	action->setData(-1); assumptionTypeActions[0] = action; if(settings->dual_approximation < 0) action->setChecked(true);

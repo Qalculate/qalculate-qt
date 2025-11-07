@@ -5683,811 +5683,811 @@ Jo želite prepisati?</translation>
 <context>
     <name>ExpressionEdit</name>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1324"/>
+        <location filename="../src/expressionedit.cpp" line="1331"/>
         <source>matrix</source>
         <translation type="unfinished">matrika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1326"/>
+        <location filename="../src/expressionedit.cpp" line="1333"/>
         <source>vector</source>
         <translation type="unfinished">vektor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1342"/>
+        <location filename="../src/expressionedit.cpp" line="1349"/>
         <source>positive</source>
         <translation type="unfinished">pozitivno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1343"/>
+        <location filename="../src/expressionedit.cpp" line="1350"/>
         <source>non-positive</source>
         <translation type="unfinished">nepozitivno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1344"/>
+        <location filename="../src/expressionedit.cpp" line="1351"/>
         <source>negative</source>
         <translation type="unfinished">negativno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1345"/>
+        <location filename="../src/expressionedit.cpp" line="1352"/>
         <source>non-negative</source>
         <translation type="unfinished">nenegativno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1346"/>
+        <location filename="../src/expressionedit.cpp" line="1353"/>
         <source>non-zero</source>
         <translation type="unfinished">neničelno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1351"/>
+        <location filename="../src/expressionedit.cpp" line="1358"/>
         <source>boolean</source>
         <translation type="unfinished">logična vrednost</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1352"/>
+        <location filename="../src/expressionedit.cpp" line="1359"/>
         <source>integer</source>
         <translation type="unfinished">celo število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1353"/>
+        <location filename="../src/expressionedit.cpp" line="1360"/>
         <source>rational</source>
         <translation type="unfinished">racionalno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1354"/>
+        <location filename="../src/expressionedit.cpp" line="1361"/>
         <source>real</source>
         <translation type="unfinished">realno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1355"/>
+        <location filename="../src/expressionedit.cpp" line="1362"/>
         <source>complex</source>
         <translation type="unfinished">kompleksno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1356"/>
+        <location filename="../src/expressionedit.cpp" line="1363"/>
         <source>number</source>
         <translation type="unfinished">številka</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1357"/>
+        <location filename="../src/expressionedit.cpp" line="1364"/>
         <source>(not matrix)</source>
         <translation type="unfinished">(ni matrika)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1360"/>
+        <location filename="../src/expressionedit.cpp" line="1367"/>
         <source>unknown</source>
         <translation type="unfinished">neznano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1362"/>
+        <location filename="../src/expressionedit.cpp" line="1369"/>
         <source>default assumptions</source>
         <translation type="unfinished">privzete predpostavke</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1528"/>
+        <location filename="../src/expressionedit.cpp" line="1535"/>
         <source>Prefix:</source>
         <translation type="unfinished">Predpona:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1568"/>
+        <location filename="../src/expressionedit.cpp" line="1575"/>
         <source>Complex Angle/Phasor Notation</source>
         <translation type="unfinished">Kompleksna kazalčna/fazorska notacija</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1572"/>
+        <location filename="../src/expressionedit.cpp" line="1579"/>
         <source>Base units</source>
         <translation type="unfinished">Osnovne enote</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1575"/>
+        <location filename="../src/expressionedit.cpp" line="1582"/>
         <source>Number Base</source>
         <translation type="unfinished">Številska osnova</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1576"/>
+        <location filename="../src/expressionedit.cpp" line="1583"/>
         <source>Binary-Coded Decimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1578"/>
+        <location filename="../src/expressionedit.cpp" line="1585"/>
         <source>Bijective Base-26</source>
         <translation type="unfinished">Bijektivna osnova 26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1580"/>
+        <location filename="../src/expressionedit.cpp" line="1587"/>
         <source>Binary Number</source>
         <translation type="unfinished">Binarno število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1582"/>
+        <location filename="../src/expressionedit.cpp" line="1589"/>
         <source>Calendars</source>
         <translation type="unfinished">Koledarji</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1584"/>
+        <location filename="../src/expressionedit.cpp" line="1591"/>
         <source>Complex cis Form</source>
         <translation type="unfinished">Kompleksna oblika cis</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1588"/>
+        <location filename="../src/expressionedit.cpp" line="1595"/>
         <source>Decimal Number</source>
         <translation type="unfinished">Desetiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1590"/>
+        <location filename="../src/expressionedit.cpp" line="1597"/>
         <source>Duodecimal Number</source>
         <translation type="unfinished">Dvanajstiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1594"/>
+        <location filename="../src/expressionedit.cpp" line="1601"/>
         <source>Complex Exponential Form</source>
         <translation type="unfinished">Kompleksna eksponentna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1596"/>
+        <location filename="../src/expressionedit.cpp" line="1603"/>
         <source>Factors</source>
         <translation type="unfinished">Deleži</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1598"/>
+        <location filename="../src/expressionedit.cpp" line="1605"/>
         <source>16-bit Floating Point Binary Format</source>
         <translation type="unfinished">16-bitna binarna oblika s plavajočo vejico</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1600"/>
+        <location filename="../src/expressionedit.cpp" line="1607"/>
         <source>32-bit Floating Point Binary Format</source>
         <translation type="unfinished">32-bitna binarna oblika s plavajočo vejico</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1602"/>
+        <location filename="../src/expressionedit.cpp" line="1609"/>
         <source>64-bit Floating Point Binary Format</source>
         <translation type="unfinished">64-bitna binarna oblika s plavajočo vejico</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1604"/>
+        <location filename="../src/expressionedit.cpp" line="1611"/>
         <source>80-bit (x86) Floating Point Binary Format</source>
         <translation type="unfinished">80-bitna (x86) binarna oblika s plavajočo vejico</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1606"/>
+        <location filename="../src/expressionedit.cpp" line="1613"/>
         <source>128-bit Floating Point Binary Format</source>
         <translation type="unfinished">128-bitna binarna oblika s plavajočo vejico</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1608"/>
-        <location filename="../src/expressionedit.cpp" line="1610"/>
+        <location filename="../src/expressionedit.cpp" line="1615"/>
+        <location filename="../src/expressionedit.cpp" line="1617"/>
         <source>Fraction</source>
         <translation type="unfinished">Ulomek</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1586"/>
+        <location filename="../src/expressionedit.cpp" line="1593"/>
         <source>Decimal Fraction</source>
         <translation type="unfinished">Desetiški ulomek</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1612"/>
+        <location filename="../src/expressionedit.cpp" line="1619"/>
         <source>Hexadecimal Number</source>
         <translation type="unfinished">Šestnajstiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1614"/>
+        <location filename="../src/expressionedit.cpp" line="1621"/>
         <source>Latitude</source>
         <translation type="unfinished">Zemljepisna širina</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1616"/>
+        <location filename="../src/expressionedit.cpp" line="1623"/>
         <source>Longitude</source>
         <translation type="unfinished">Zemljepisne dolžine</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1618"/>
+        <location filename="../src/expressionedit.cpp" line="1625"/>
         <source>Mixed Units</source>
         <translation type="unfinished">Mešane enote</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1620"/>
+        <location filename="../src/expressionedit.cpp" line="1627"/>
         <source>Octal Number</source>
         <translation type="unfinished">Osmiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1622"/>
+        <location filename="../src/expressionedit.cpp" line="1629"/>
         <source>Optimal Unit</source>
         <translation type="unfinished">Najustreznejša enota</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1624"/>
+        <location filename="../src/expressionedit.cpp" line="1631"/>
         <source>Optimal Prefix</source>
         <translation type="unfinished">Najustreznejša predpona</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1626"/>
+        <location filename="../src/expressionedit.cpp" line="1633"/>
         <source>Expanded Partial Fractions</source>
         <translation type="unfinished">Razširjeni parcialni ulomki</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1628"/>
+        <location filename="../src/expressionedit.cpp" line="1635"/>
         <source>Complex Polar Form</source>
         <translation type="unfinished">Kompleksna polarna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1630"/>
+        <location filename="../src/expressionedit.cpp" line="1637"/>
         <source>Complex Rectangular Form</source>
         <translation type="unfinished">Kompleksna pravokotna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1632"/>
+        <location filename="../src/expressionedit.cpp" line="1639"/>
         <source>Roman Numerals</source>
         <translation type="unfinished">Rimske številke</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1636"/>
+        <location filename="../src/expressionedit.cpp" line="1643"/>
         <source>Sexagesimal Number</source>
         <translation type="unfinished">Šestdesetiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1640"/>
+        <location filename="../src/expressionedit.cpp" line="1647"/>
         <source>Time Format</source>
         <translation type="unfinished">Časovna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1642"/>
-        <location filename="../src/expressionedit.cpp" line="2884"/>
+        <location filename="../src/expressionedit.cpp" line="1649"/>
+        <location filename="../src/expressionedit.cpp" line="2893"/>
         <source>Unicode</source>
         <translation type="unfinished">Unicode</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1644"/>
+        <location filename="../src/expressionedit.cpp" line="1651"/>
         <source>UTC Time Zone</source>
         <translation type="unfinished">Časovna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1634"/>
+        <location filename="../src/expressionedit.cpp" line="1641"/>
         <source>Scientific Notation</source>
         <translation type="unfinished">Znanstveno notacijo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1638"/>
+        <location filename="../src/expressionedit.cpp" line="1645"/>
         <source>Simple Notation</source>
         <translation type="unfinished">Preprosto notacijo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1573"/>
+        <location filename="../src/expressionedit.cpp" line="1580"/>
         <source>Custom</source>
         <translation type="unfinished">Po meri</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2068"/>
+        <location filename="../src/expressionedit.cpp" line="2075"/>
         <source>Undo</source>
         <translation type="unfinished">Razveljavi</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2071"/>
+        <location filename="../src/expressionedit.cpp" line="2078"/>
         <source>Redo</source>
         <translation type="unfinished">Uveljavi</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2075"/>
+        <location filename="../src/expressionedit.cpp" line="2082"/>
         <source>Cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2078"/>
+        <location filename="../src/expressionedit.cpp" line="2085"/>
         <source>Copy</source>
         <translation type="unfinished">Kopiraj</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2081"/>
+        <location filename="../src/expressionedit.cpp" line="2088"/>
         <source>Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2084"/>
+        <location filename="../src/expressionedit.cpp" line="2091"/>
         <source>Delete</source>
         <translation type="unfinished">Izbriši</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2087"/>
+        <location filename="../src/expressionedit.cpp" line="2094"/>
         <source>Calculate Selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2089"/>
+        <location filename="../src/expressionedit.cpp" line="2096"/>
         <source>Insert Date…</source>
         <translation type="unfinished">Vnesi datum...</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2090"/>
+        <location filename="../src/expressionedit.cpp" line="2097"/>
         <source>Insert Matrix…</source>
         <translation type="unfinished">Vnesi matriko...</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2092"/>
+        <location filename="../src/expressionedit.cpp" line="2099"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2095"/>
+        <location filename="../src/expressionedit.cpp" line="2102"/>
         <source>Clear</source>
         <translation type="unfinished">Počisti</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2098"/>
+        <location filename="../src/expressionedit.cpp" line="2105"/>
         <source>Clear History</source>
         <translation type="unfinished">Počisti zgodovino</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2100"/>
+        <location filename="../src/expressionedit.cpp" line="2107"/>
         <source>Completion</source>
         <translation type="unfinished">Dopolnjevanje</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2112"/>
+        <location filename="../src/expressionedit.cpp" line="2119"/>
         <source>No completion</source>
         <translation type="unfinished">Brez dopolnjevanja</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2113"/>
+        <location filename="../src/expressionedit.cpp" line="2120"/>
         <source>Limited strict completion</source>
         <translation type="unfinished">Omejeno strogo dopolnjevanje</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2114"/>
+        <location filename="../src/expressionedit.cpp" line="2121"/>
         <source>Strict completion</source>
         <translation type="unfinished">Strogo dopolnjevanje</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2115"/>
+        <location filename="../src/expressionedit.cpp" line="2122"/>
         <source>Limited full completion</source>
         <translation type="unfinished">Omejeno polno dopolnjevanje</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2116"/>
+        <location filename="../src/expressionedit.cpp" line="2123"/>
         <source>Full completion</source>
         <translation type="unfinished">Polno dopolnjevanje</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2118"/>
+        <location filename="../src/expressionedit.cpp" line="2125"/>
         <source>Delayed completion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2119"/>
+        <location filename="../src/expressionedit.cpp" line="2126"/>
         <source>Expression Status</source>
         <translation type="unfinished">Stanje izraza</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2121"/>
+        <location filename="../src/expressionedit.cpp" line="2128"/>
         <source>Off</source>
         <translation type="unfinished">Izklopljeno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2122"/>
+        <location filename="../src/expressionedit.cpp" line="2129"/>
         <source>In history list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2123"/>
+        <location filename="../src/expressionedit.cpp" line="2130"/>
         <source>In expression field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2124"/>
+        <location filename="../src/expressionedit.cpp" line="2131"/>
         <source>In status bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2127"/>
+        <location filename="../src/expressionedit.cpp" line="2134"/>
         <source>With delay</source>
         <translation type="unfinished">Z zamudo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2128"/>
+        <location filename="../src/expressionedit.cpp" line="2135"/>
         <source>Without delay</source>
         <translation type="unfinished">Brez zamude</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2130"/>
+        <location filename="../src/expressionedit.cpp" line="2137"/>
         <source>Automatically calculate selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2132"/>
+        <location filename="../src/expressionedit.cpp" line="2139"/>
         <source>Use input method</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2214"/>
+        <location filename="../src/expressionedit.cpp" line="2221"/>
         <source>Matrix</source>
         <translation type="unfinished">Matrika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2477"/>
+        <location filename="../src/expressionedit.cpp" line="2484"/>
         <source>Too many arguments for %1().</source>
         <translation type="unfinished">Preveč argumentov za %1().</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2508"/>
+        <location filename="../src/expressionedit.cpp" line="2515"/>
         <source>argument</source>
         <translation type="unfinished">argument</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2527"/>
+        <location filename="../src/expressionedit.cpp" line="2534"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2621"/>
-        <location filename="../src/expressionedit.cpp" line="2623"/>
+        <location filename="../src/expressionedit.cpp" line="2628"/>
+        <location filename="../src/expressionedit.cpp" line="2630"/>
         <source>comment</source>
         <translation type="unfinished">komentar</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2644"/>
-        <location filename="../src/expressionedit.cpp" line="2646"/>
+        <location filename="../src/expressionedit.cpp" line="2651"/>
+        <location filename="../src/expressionedit.cpp" line="2653"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2653"/>
-        <location filename="../src/expressionedit.cpp" line="2655"/>
+        <location filename="../src/expressionedit.cpp" line="2660"/>
+        <location filename="../src/expressionedit.cpp" line="2662"/>
         <source>MS (memory store)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2662"/>
-        <location filename="../src/expressionedit.cpp" line="2664"/>
+        <location filename="../src/expressionedit.cpp" line="2669"/>
+        <location filename="../src/expressionedit.cpp" line="2671"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2671"/>
-        <location filename="../src/expressionedit.cpp" line="2673"/>
+        <location filename="../src/expressionedit.cpp" line="2678"/>
+        <location filename="../src/expressionedit.cpp" line="2680"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2686"/>
-        <location filename="../src/expressionedit.cpp" line="2688"/>
+        <location filename="../src/expressionedit.cpp" line="2693"/>
+        <location filename="../src/expressionedit.cpp" line="2695"/>
         <source>factorize</source>
         <translation type="unfinished">faktoriziraj</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2689"/>
-        <location filename="../src/expressionedit.cpp" line="2691"/>
+        <location filename="../src/expressionedit.cpp" line="2696"/>
+        <location filename="../src/expressionedit.cpp" line="2698"/>
         <source>expand</source>
         <translation type="unfinished">razširi</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2847"/>
+        <location filename="../src/expressionedit.cpp" line="2856"/>
         <source>hexadecimal</source>
         <translation type="unfinished">šestnajstiško</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2848"/>
-        <location filename="../src/expressionedit.cpp" line="2968"/>
+        <location filename="../src/expressionedit.cpp" line="2857"/>
+        <location filename="../src/expressionedit.cpp" line="2977"/>
         <source>hexadecimal number</source>
         <translation type="unfinished">šestnajstiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2849"/>
+        <location filename="../src/expressionedit.cpp" line="2858"/>
         <source>octal</source>
         <translation type="unfinished">osmiško</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2850"/>
+        <location filename="../src/expressionedit.cpp" line="2859"/>
         <source>octal number</source>
         <translation type="unfinished">osmiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2851"/>
+        <location filename="../src/expressionedit.cpp" line="2860"/>
         <source>decimal</source>
         <translation type="unfinished">desetiško</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2852"/>
+        <location filename="../src/expressionedit.cpp" line="2861"/>
         <source>decimal number</source>
         <translation type="unfinished">desetiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2853"/>
+        <location filename="../src/expressionedit.cpp" line="2862"/>
         <source>duodecimal</source>
         <translation type="unfinished">dvanajstiško</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2854"/>
-        <location filename="../src/expressionedit.cpp" line="2856"/>
+        <location filename="../src/expressionedit.cpp" line="2863"/>
+        <location filename="../src/expressionedit.cpp" line="2865"/>
         <source>duodecimal number</source>
         <translation type="unfinished">dvanajstiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2857"/>
+        <location filename="../src/expressionedit.cpp" line="2866"/>
         <source>binary</source>
         <translation type="unfinished">binarno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2858"/>
-        <location filename="../src/expressionedit.cpp" line="2962"/>
+        <location filename="../src/expressionedit.cpp" line="2867"/>
+        <location filename="../src/expressionedit.cpp" line="2971"/>
         <source>binary number</source>
         <translation type="unfinished">binarno število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2859"/>
+        <location filename="../src/expressionedit.cpp" line="2868"/>
         <source>roman</source>
         <translation type="unfinished">rimsko</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2860"/>
+        <location filename="../src/expressionedit.cpp" line="2869"/>
         <source>roman numerals</source>
         <translation type="unfinished">rimske številke</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2861"/>
+        <location filename="../src/expressionedit.cpp" line="2870"/>
         <source>bijective</source>
         <translation type="unfinished">bijektivno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2862"/>
+        <location filename="../src/expressionedit.cpp" line="2871"/>
         <source>bijective base-26</source>
         <translation type="unfinished">bijektivna osnova 26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2864"/>
+        <location filename="../src/expressionedit.cpp" line="2873"/>
         <source>binary-coded decimal</source>
         <translation type="unfinished">BCD</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2865"/>
+        <location filename="../src/expressionedit.cpp" line="2874"/>
         <source>sexagesimal</source>
         <translation type="unfinished">šestdesetiško</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2866"/>
+        <location filename="../src/expressionedit.cpp" line="2875"/>
         <source>sexagesimal number</source>
         <translation type="unfinished">šestdesetiško število</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2867"/>
-        <location filename="../src/expressionedit.cpp" line="2868"/>
+        <location filename="../src/expressionedit.cpp" line="2876"/>
+        <location filename="../src/expressionedit.cpp" line="2877"/>
         <source>latitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2869"/>
-        <location filename="../src/expressionedit.cpp" line="2870"/>
+        <location filename="../src/expressionedit.cpp" line="2878"/>
+        <location filename="../src/expressionedit.cpp" line="2879"/>
         <source>longitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2872"/>
+        <location filename="../src/expressionedit.cpp" line="2881"/>
         <source>32-bit floating point</source>
         <translation type="unfinished">32-bitna plavajoča vejica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2874"/>
+        <location filename="../src/expressionedit.cpp" line="2883"/>
         <source>64-bit floating point</source>
         <translation type="unfinished">64-bitna plavajoča vejica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2876"/>
+        <location filename="../src/expressionedit.cpp" line="2885"/>
         <source>16-bit floating point</source>
         <translation type="unfinished">16-bitna plavajoča vejica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2878"/>
+        <location filename="../src/expressionedit.cpp" line="2887"/>
         <source>80-bit (x86) floating point</source>
         <translation type="unfinished">80-bitna (x86) plavajoča vejica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2880"/>
+        <location filename="../src/expressionedit.cpp" line="2889"/>
         <source>128-bit floating point</source>
         <translation type="unfinished">128-bitna plavajoča vejica</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2881"/>
+        <location filename="../src/expressionedit.cpp" line="2890"/>
         <source>time</source>
         <translation type="unfinished">čas</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2882"/>
+        <location filename="../src/expressionedit.cpp" line="2891"/>
         <source>time format</source>
         <translation type="unfinished">časovna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2885"/>
+        <location filename="../src/expressionedit.cpp" line="2894"/>
         <source>scientific</source>
         <translation type="unfinished">znanstveni</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2886"/>
+        <location filename="../src/expressionedit.cpp" line="2895"/>
         <source>scientific notation</source>
         <translation type="unfinished">znanstveno notacijo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2887"/>
+        <location filename="../src/expressionedit.cpp" line="2896"/>
         <source>engineering</source>
         <translation type="unfinished">inženirski</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2888"/>
+        <location filename="../src/expressionedit.cpp" line="2897"/>
         <source>engineering notation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2889"/>
+        <location filename="../src/expressionedit.cpp" line="2898"/>
         <source>simple</source>
         <translation type="unfinished">preprost</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2890"/>
+        <location filename="../src/expressionedit.cpp" line="2899"/>
         <source>simple notation</source>
         <translation type="unfinished">preprosto notacijo</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2891"/>
+        <location filename="../src/expressionedit.cpp" line="2900"/>
         <source>bases</source>
         <translation type="unfinished">osnove</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2892"/>
+        <location filename="../src/expressionedit.cpp" line="2901"/>
         <source>number bases</source>
         <translation type="unfinished">številske osnove</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2893"/>
-        <location filename="../src/expressionedit.cpp" line="2894"/>
+        <location filename="../src/expressionedit.cpp" line="2902"/>
+        <location filename="../src/expressionedit.cpp" line="2903"/>
         <source>calendars</source>
         <translation type="unfinished">koledarji</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2895"/>
+        <location filename="../src/expressionedit.cpp" line="2904"/>
         <source>optimal</source>
         <translation type="unfinished">najustreznejše</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2896"/>
+        <location filename="../src/expressionedit.cpp" line="2905"/>
         <source>optimal unit</source>
         <translation type="unfinished">najustreznejša enota</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2897"/>
+        <location filename="../src/expressionedit.cpp" line="2906"/>
         <source>prefix</source>
         <translation type="unfinished">predpona</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2898"/>
+        <location filename="../src/expressionedit.cpp" line="2907"/>
         <source>optimal prefix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2899"/>
-        <location filename="../src/expressionedit.cpp" line="2972"/>
+        <location filename="../src/expressionedit.cpp" line="2908"/>
+        <location filename="../src/expressionedit.cpp" line="2981"/>
         <source>base</source>
         <translation type="unfinished">osnova</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2900"/>
+        <location filename="../src/expressionedit.cpp" line="2909"/>
         <source>base units</source>
         <translation type="unfinished">osnovne enote</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2901"/>
+        <location filename="../src/expressionedit.cpp" line="2910"/>
         <source>mixed</source>
         <translation type="unfinished">mešano</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2902"/>
+        <location filename="../src/expressionedit.cpp" line="2911"/>
         <source>mixed units</source>
         <translation type="unfinished">mešane enote</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2974"/>
+        <location filename="../src/expressionedit.cpp" line="2983"/>
         <source>decimals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2975"/>
+        <location filename="../src/expressionedit.cpp" line="2984"/>
         <source>decimal fraction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2978"/>
-        <location filename="../src/expressionedit.cpp" line="2980"/>
-        <location filename="../src/expressionedit.cpp" line="2986"/>
+        <location filename="../src/expressionedit.cpp" line="2987"/>
+        <location filename="../src/expressionedit.cpp" line="2989"/>
+        <location filename="../src/expressionedit.cpp" line="2995"/>
         <source>fraction</source>
         <translation type="unfinished">ulomek</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2903"/>
-        <location filename="../src/expressionedit.cpp" line="2904"/>
+        <location filename="../src/expressionedit.cpp" line="2912"/>
+        <location filename="../src/expressionedit.cpp" line="2913"/>
         <source>factors</source>
         <translation type="unfinished">deleži</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="1592"/>
+        <location filename="../src/expressionedit.cpp" line="1599"/>
         <source>Engineering Notation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2905"/>
+        <location filename="../src/expressionedit.cpp" line="2914"/>
         <source>partial fraction</source>
         <translation type="unfinished">parcialni ulomek</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2906"/>
+        <location filename="../src/expressionedit.cpp" line="2915"/>
         <source>expanded partial fractions</source>
         <translation type="unfinished">razširjeni parcialni ulomki</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2907"/>
+        <location filename="../src/expressionedit.cpp" line="2916"/>
         <source>rectangular</source>
         <translation type="unfinished">pravokotno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2907"/>
+        <location filename="../src/expressionedit.cpp" line="2916"/>
         <source>cartesian</source>
         <translation type="unfinished">kartezično</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2908"/>
+        <location filename="../src/expressionedit.cpp" line="2917"/>
         <source>complex rectangular form</source>
         <translation type="unfinished">kompleksna pravokotna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2909"/>
+        <location filename="../src/expressionedit.cpp" line="2918"/>
         <source>exponential</source>
         <translation type="unfinished">eksponentno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2910"/>
+        <location filename="../src/expressionedit.cpp" line="2919"/>
         <source>complex exponential form</source>
         <translation type="unfinished">kompleksna eksponentna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2911"/>
+        <location filename="../src/expressionedit.cpp" line="2920"/>
         <source>polar</source>
         <translation type="unfinished">polarno</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2912"/>
+        <location filename="../src/expressionedit.cpp" line="2921"/>
         <source>complex polar form</source>
         <translation type="unfinished">kompleksna polarna oblika</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2914"/>
+        <location filename="../src/expressionedit.cpp" line="2923"/>
         <source>complex cis form</source>
         <translation type="unfinished">kompleksna oblika cis</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2915"/>
+        <location filename="../src/expressionedit.cpp" line="2924"/>
         <source>angle</source>
         <translation type="unfinished">kot</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2916"/>
+        <location filename="../src/expressionedit.cpp" line="2925"/>
         <source>complex angle notation</source>
         <translation type="unfinished">kompleksna kazalčna notacija</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2917"/>
+        <location filename="../src/expressionedit.cpp" line="2926"/>
         <source>phasor</source>
         <translation type="unfinished">fazor</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2918"/>
+        <location filename="../src/expressionedit.cpp" line="2927"/>
         <source>complex phasor notation</source>
         <translation type="unfinished">kompleksna fazorska notacija</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2920"/>
+        <location filename="../src/expressionedit.cpp" line="2929"/>
         <source>UTC time zone</source>
         <translation type="unfinished">Časovni pas UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2973"/>
+        <location filename="../src/expressionedit.cpp" line="2982"/>
         <source>number base %1</source>
         <translation type="unfinished">številska osnova %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3456"/>
+        <location filename="../src/expressionedit.cpp" line="3465"/>
         <source>Data object</source>
         <translation type="unfinished">Podatkovni objekt</translation>
     </message>
@@ -8120,93 +8120,93 @@ in pritisnite Enter.</translation>
 <context>
     <name>PreferencesDialog</name>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="479"/>
+        <location filename="../src/preferencesdialog.cpp" line="488"/>
         <source>Look &amp;&amp; Feel</source>
-        <translation type="unfinished">Videz in občutek</translation>
+        <translation type="unfinished">Videz &amp;&amp; občutek</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="481"/>
+        <location filename="../src/preferencesdialog.cpp" line="490"/>
         <source>Numbers &amp;&amp; Operators</source>
-        <translation type="unfinished">Številke &amp; operatorji</translation>
+        <translation type="unfinished">Številke &amp;&amp; operatorji</translation>
     </message>
     <message>
         <source>Units &amp;&amp; Currencies</source>
         <translation type="obsolete">Enote &amp; valute</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="80"/>
+        <location filename="../src/preferencesdialog.cpp" line="81"/>
         <source>Ignore system language (requires restart)</source>
         <translation type="unfinished">Prezri sistemski jezik (zahteva vnovičen zagon)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="119"/>
+        <location filename="../src/preferencesdialog.cpp" line="120"/>
         <source>Allow multiple instances</source>
         <translation>Dovoli več oken naenkrat</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="121"/>
+        <location filename="../src/preferencesdialog.cpp" line="122"/>
         <source>Clear history on exit</source>
         <translation type="unfinished">Počisti zgodovino ob izhodu</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="123"/>
+        <location filename="../src/preferencesdialog.cpp" line="124"/>
         <source>Close application with Escape key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="126"/>
+        <location filename="../src/preferencesdialog.cpp" line="127"/>
         <source>Keep above other windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="138"/>
+        <location filename="../src/preferencesdialog.cpp" line="139"/>
         <source>Window title:</source>
         <translation type="unfinished">Nastavi ime okna:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="140"/>
+        <location filename="../src/preferencesdialog.cpp" line="141"/>
         <source>Application name</source>
         <translation type="unfinished">Ime programa</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="141"/>
+        <location filename="../src/preferencesdialog.cpp" line="142"/>
         <source>Result</source>
         <translation type="unfinished">Rezultat</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="142"/>
+        <location filename="../src/preferencesdialog.cpp" line="143"/>
         <source>Application name + result</source>
         <translation type="unfinished">Ime programa + rezultat</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="143"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="145"/>
         <source>Application name + workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="156"/>
+        <location filename="../src/preferencesdialog.cpp" line="157"/>
         <source>Style:</source>
         <translation type="unfinished">Slog:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="159"/>
+        <location filename="../src/preferencesdialog.cpp" line="160"/>
         <source>Default (requires restart)</source>
         <comment>Default style</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="170"/>
-        <location filename="../src/preferencesdialog.cpp" line="172"/>
+        <location filename="../src/preferencesdialog.cpp" line="171"/>
+        <location filename="../src/preferencesdialog.cpp" line="173"/>
         <source>Dark mode</source>
         <translation type="unfinished">Temni način</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="175"/>
+        <location filename="../src/preferencesdialog.cpp" line="176"/>
         <source>Colorize result</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8231,22 +8231,22 @@ in pritisnite Enter.</translation>
         <translation type="obsolete">Pisava rezultata:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="453"/>
+        <location filename="../src/preferencesdialog.cpp" line="462"/>
         <source>Custom expression font:</source>
         <translation type="unfinished">Pisava izraza:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="456"/>
+        <location filename="../src/preferencesdialog.cpp" line="465"/>
         <source>Custom status bar font:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="459"/>
+        <location filename="../src/preferencesdialog.cpp" line="468"/>
         <source>Custom keypad font:</source>
         <translation type="unfinished">Pisava tipkovnice:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="462"/>
+        <location filename="../src/preferencesdialog.cpp" line="471"/>
         <source>Custom application font:</source>
         <translation type="unfinished">Pisava programa:</translation>
     </message>
@@ -8255,93 +8255,93 @@ in pritisnite Enter.</translation>
         <translation type="obsolete">Prikaži stanje izraza</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="222"/>
+        <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Expression after calculation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="224"/>
+        <location filename="../src/preferencesdialog.cpp" line="227"/>
         <source>Keep expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="225"/>
+        <location filename="../src/preferencesdialog.cpp" line="228"/>
         <source>Clear expression</source>
         <translation type="unfinished">Počisti izraz</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="226"/>
+        <location filename="../src/preferencesdialog.cpp" line="229"/>
         <source>Replace with result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="227"/>
+        <location filename="../src/preferencesdialog.cpp" line="230"/>
         <source>Replace with result if shorter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="124"/>
+        <location filename="../src/preferencesdialog.cpp" line="125"/>
         <source>Use keyboard keys for RPN</source>
         <translation type="unfinished">Uporabi tipkovnične tipke za RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="232"/>
+        <location filename="../src/preferencesdialog.cpp" line="235"/>
         <source>Parsing mode:</source>
         <translation type="unfinished">Način obdelave:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="234"/>
-        <location filename="../src/preferencesdialog.cpp" line="328"/>
+        <location filename="../src/preferencesdialog.cpp" line="237"/>
+        <location filename="../src/preferencesdialog.cpp" line="337"/>
         <source>Adaptive</source>
         <translation type="unfinished">Prilagodljivo</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="235"/>
+        <location filename="../src/preferencesdialog.cpp" line="238"/>
         <source>Conventional</source>
         <translation type="unfinished">Običajna</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="236"/>
+        <location filename="../src/preferencesdialog.cpp" line="239"/>
         <source>Implicit multiplication first</source>
         <translation type="unfinished">Sprva implicitno množenje</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="237"/>
+        <location filename="../src/preferencesdialog.cpp" line="240"/>
         <source>Chain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="238"/>
+        <location filename="../src/preferencesdialog.cpp" line="241"/>
         <source>RPN</source>
         <translation type="unfinished">RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="244"/>
+        <location filename="../src/preferencesdialog.cpp" line="247"/>
         <source>Read precision</source>
         <translation type="unfinished">Točnost branja</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="246"/>
+        <location filename="../src/preferencesdialog.cpp" line="249"/>
         <source>Limit implicit multiplication</source>
         <translation type="unfinished">Omejitev implicitnega množenja</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="248"/>
+        <location filename="../src/preferencesdialog.cpp" line="251"/>
         <source>Interval calculation:</source>
         <translation type="unfinished">Izračun intervala:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="250"/>
+        <location filename="../src/preferencesdialog.cpp" line="253"/>
         <source>Variance formula</source>
         <translation type="unfinished">Enačba za varianco</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="251"/>
+        <location filename="../src/preferencesdialog.cpp" line="254"/>
         <source>Interval arithmetic</source>
         <translation type="unfinished">Intervalna aritmetika</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="256"/>
+        <location filename="../src/preferencesdialog.cpp" line="259"/>
         <source>Factorize result</source>
         <translation type="unfinished">Faktoriziraj rezultat</translation>
     </message>
@@ -8354,12 +8354,12 @@ in pritisnite Enter.</translation>
         <translation type="obsolete">Upodobitev šestnajstiškega dvojiškega komplementa</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="282"/>
+        <location filename="../src/preferencesdialog.cpp" line="285"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation type="unfinished">Uporabi male črke v nedesetiških številih</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="298"/>
+        <location filename="../src/preferencesdialog.cpp" line="301"/>
         <source>Spell out logical operators</source>
         <translation type="unfinished">Črkuj logične operatorje</translation>
     </message>
@@ -8368,49 +8368,49 @@ in pritisnite Enter.</translation>
         <translation type="obsolete">Uporabi E-notacijo namesto 10^x</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="68"/>
+        <location filename="../src/preferencesdialog.cpp" line="69"/>
         <source>Preferences</source>
         <translation type="unfinished">Nastavitve</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="198"/>
-        <location filename="../src/preferencesdialog.cpp" line="208"/>
+        <location filename="../src/preferencesdialog.cpp" line="199"/>
+        <location filename="../src/preferencesdialog.cpp" line="209"/>
         <source>ms</source>
         <extracomment>milliseconds</extracomment>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="299"/>
+        <location filename="../src/preferencesdialog.cpp" line="302"/>
         <source>Use E-notation instead of 10^n</source>
         <translation type="unfinished">Uporabi E-notacijo namesto 10^n</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="300"/>
+        <location filename="../src/preferencesdialog.cpp" line="303"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation type="unfinished">Uporabi &apos;j&apos; za imaginarno enoto</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="301"/>
+        <location filename="../src/preferencesdialog.cpp" line="304"/>
         <source>Use comma as decimal separator</source>
         <translation type="unfinished">Uporabi vejico kot desetiški ločilnik</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="303"/>
+        <location filename="../src/preferencesdialog.cpp" line="306"/>
         <source>Ignore comma in numbers</source>
         <translation type="unfinished">Prezri vejice v številih</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="304"/>
+        <location filename="../src/preferencesdialog.cpp" line="307"/>
         <source>Ignore dots in numbers</source>
         <translation type="unfinished">Prezri pike v številih</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="344"/>
+        <location filename="../src/preferencesdialog.cpp" line="353"/>
         <source>Round halfway numbers away from zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="345"/>
+        <location filename="../src/preferencesdialog.cpp" line="354"/>
         <source>Round halfway numbers to even</source>
         <translation type="unfinished">Zaokroži polovična števila na soda</translation>
     </message>
@@ -8419,552 +8419,567 @@ in pritisnite Enter.</translation>
         <translation type="obsolete">Navedi ponavljajoče se decimalke</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="82"/>
+        <location filename="../src/preferencesdialog.cpp" line="83"/>
         <source>Language:</source>
         <translation type="unfinished">Jezik:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="122"/>
+        <location filename="../src/preferencesdialog.cpp" line="123"/>
         <source>Max history lines saved:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="125"/>
+        <location filename="../src/preferencesdialog.cpp" line="126"/>
         <source>Use caret for bitwise XOR</source>
         <translation type="unfinished">Uporabi strešico za bitni XOR</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="127"/>
+        <location filename="../src/preferencesdialog.cpp" line="128"/>
         <source>Preserve history height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="135"/>
+        <location filename="../src/preferencesdialog.cpp" line="136"/>
         <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="136"/>
+        <location filename="../src/preferencesdialog.cpp" line="137"/>
         <source>Place expression field below history (experimental)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="137"/>
+        <location filename="../src/preferencesdialog.cpp" line="138"/>
         <source>Show status bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Tooltips:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="150"/>
+        <location filename="../src/preferencesdialog.cpp" line="151"/>
         <source>Show all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="151"/>
+        <location filename="../src/preferencesdialog.cpp" line="152"/>
         <source>Hide in keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="153"/>
         <source>Hide all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="174"/>
+        <location filename="../src/preferencesdialog.cpp" line="175"/>
         <source>Disable cursor blinking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="176"/>
+        <location filename="../src/preferencesdialog.cpp" line="177"/>
         <source>Format result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="450"/>
+        <location filename="../src/preferencesdialog.cpp" line="459"/>
         <source>Custom history font:</source>
         <translation type="unfinished">Pisava za zgodovino:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="180"/>
+        <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Expression status:</source>
         <translation type="unfinished">Stanje izraza:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="182"/>
-        <location filename="../src/preferencesdialog.cpp" line="311"/>
+        <location filename="../src/preferencesdialog.cpp" line="183"/>
+        <location filename="../src/preferencesdialog.cpp" line="314"/>
         <source>Off</source>
         <translation type="unfinished">Izklopljeno</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="183"/>
+        <location filename="../src/preferencesdialog.cpp" line="184"/>
         <source>In history list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="184"/>
+        <location filename="../src/preferencesdialog.cpp" line="185"/>
         <source>In expression field</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="185"/>
+        <location filename="../src/preferencesdialog.cpp" line="186"/>
         <source>In status bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="193"/>
+        <location filename="../src/preferencesdialog.cpp" line="194"/>
         <source>Status tooltip delay:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="213"/>
+        <location filename="../src/preferencesdialog.cpp" line="214"/>
         <source>Automatically calculate selection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="214"/>
+        <location filename="../src/preferencesdialog.cpp" line="215"/>
         <source>Expression in history:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="216"/>
+        <location filename="../src/preferencesdialog.cpp" line="217"/>
         <source>Parsed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="217"/>
+        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <source>Parsed (compact)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="219"/>
         <source>Entered</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <location filename="../src/preferencesdialog.cpp" line="220"/>
         <source>Entered + parsed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="231"/>
+        <location filename="../src/preferencesdialog.cpp" line="221"/>
+        <source>Entered + parsed (compact)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="234"/>
         <source>Automatically copy result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="243"/>
+        <location filename="../src/preferencesdialog.cpp" line="246"/>
         <source>Simplified percentage calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="245"/>
+        <location filename="../src/preferencesdialog.cpp" line="248"/>
         <source>Allow concise uncertainty input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="247"/>
+        <location filename="../src/preferencesdialog.cpp" line="250"/>
         <source>Interpret unrecognized symbols as variables</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="261"/>
+        <location filename="../src/preferencesdialog.cpp" line="264"/>
         <source>Two&apos;s complement output:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="262"/>
+        <location filename="../src/preferencesdialog.cpp" line="265"/>
         <source>Two&apos;s complement input:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="263"/>
-        <location filename="../src/preferencesdialog.cpp" line="265"/>
+        <location filename="../src/preferencesdialog.cpp" line="266"/>
+        <location filename="../src/preferencesdialog.cpp" line="268"/>
         <source>Binary</source>
         <translation type="unfinished">Binarno</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="264"/>
-        <location filename="../src/preferencesdialog.cpp" line="266"/>
+        <location filename="../src/preferencesdialog.cpp" line="267"/>
+        <location filename="../src/preferencesdialog.cpp" line="269"/>
         <source>Hexadecimal</source>
         <translation type="unfinished">Šestnajstiško</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="267"/>
+        <location filename="../src/preferencesdialog.cpp" line="270"/>
         <source>Binary bits:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="269"/>
+        <location filename="../src/preferencesdialog.cpp" line="272"/>
         <source>Automatic</source>
         <translation type="unfinished">Samodejno</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="283"/>
+        <location filename="../src/preferencesdialog.cpp" line="286"/>
         <source>Use special duodecimal symbols</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="297"/>
+        <location filename="../src/preferencesdialog.cpp" line="300"/>
         <source>Use Unicode division slash in output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="307"/>
+        <location filename="../src/preferencesdialog.cpp" line="310"/>
         <source>Copy unformatted ASCII by default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="308"/>
+        <location filename="../src/preferencesdialog.cpp" line="311"/>
         <source>Place percent button in number pad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="309"/>
+        <location filename="../src/preferencesdialog.cpp" line="312"/>
         <source>Indicate repeating decimals:</source>
         <translation type="unfinished">Navedi ponavljajoče se decimalke:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="312"/>
+        <location filename="../src/preferencesdialog.cpp" line="315"/>
         <source>Ellipsis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="313"/>
+        <location filename="../src/preferencesdialog.cpp" line="316"/>
         <source>Overline</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="317"/>
+        <location filename="../src/preferencesdialog.cpp" line="320"/>
         <source>Digit grouping:</source>
         <translation type="unfinished">Števke v skupinah:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="319"/>
+        <location filename="../src/preferencesdialog.cpp" line="322"/>
         <source>None</source>
         <translation type="unfinished">Brez</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="320"/>
+        <location filename="../src/preferencesdialog.cpp" line="323"/>
         <source>Standard</source>
         <translation type="unfinished">Običajno</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="321"/>
+        <location filename="../src/preferencesdialog.cpp" line="324"/>
         <source>Local</source>
         <translation type="unfinished">Lokalno</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="326"/>
+        <location filename="../src/preferencesdialog.cpp" line="325"/>
+        <source>Custom</source>
+        <translation type="unfinished">Po meri</translation>
+    </message>
+    <message>
+        <location filename="../src/preferencesdialog.cpp" line="335"/>
         <source>Interval display:</source>
         <translation type="unfinished">Intervalni prikaz:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="329"/>
+        <location filename="../src/preferencesdialog.cpp" line="338"/>
         <source>Significant digits</source>
         <translation type="unfinished">Pomembne števke</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="330"/>
+        <location filename="../src/preferencesdialog.cpp" line="339"/>
         <source>Interval</source>
         <translation type="unfinished">Interval</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="331"/>
+        <location filename="../src/preferencesdialog.cpp" line="340"/>
         <source>Plus/minus</source>
         <translation type="unfinished">Plus/minus</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="333"/>
+        <location filename="../src/preferencesdialog.cpp" line="342"/>
         <source>Concise</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="334"/>
+        <location filename="../src/preferencesdialog.cpp" line="343"/>
         <source>Midpoint</source>
         <translation type="unfinished">Sredina</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="335"/>
+        <location filename="../src/preferencesdialog.cpp" line="344"/>
         <source>Lower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="336"/>
+        <location filename="../src/preferencesdialog.cpp" line="345"/>
         <source>Upper</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="342"/>
+        <location filename="../src/preferencesdialog.cpp" line="351"/>
         <source>Rounding:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="358"/>
+        <location filename="../src/preferencesdialog.cpp" line="367"/>
         <source>Complex number form:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="360"/>
+        <location filename="../src/preferencesdialog.cpp" line="369"/>
         <source>Rectangular</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="361"/>
+        <location filename="../src/preferencesdialog.cpp" line="370"/>
         <source>Exponential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="362"/>
+        <location filename="../src/preferencesdialog.cpp" line="371"/>
         <source>Polar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="363"/>
+        <location filename="../src/preferencesdialog.cpp" line="372"/>
         <source>Angle/phasor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="371"/>
+        <location filename="../src/preferencesdialog.cpp" line="380"/>
         <source>Enable units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="372"/>
+        <location filename="../src/preferencesdialog.cpp" line="381"/>
         <source>Abbreviate names</source>
         <translation type="unfinished">Skrajšaj imena</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="373"/>
+        <location filename="../src/preferencesdialog.cpp" line="382"/>
         <source>Use binary prefixes for information units</source>
         <translation type="unfinished">Uporabi binarne predpone za informacijske enote</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="374"/>
+        <location filename="../src/preferencesdialog.cpp" line="383"/>
         <source>Automatic unit conversion:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="376"/>
+        <location filename="../src/preferencesdialog.cpp" line="385"/>
         <source>No conversion</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="377"/>
+        <location filename="../src/preferencesdialog.cpp" line="386"/>
         <source>Base units</source>
         <translation type="unfinished">Osnovne enote</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="378"/>
+        <location filename="../src/preferencesdialog.cpp" line="387"/>
         <source>Optimal units</source>
         <translation type="unfinished">Najustreznejše enote</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="379"/>
+        <location filename="../src/preferencesdialog.cpp" line="388"/>
         <source>Optimal SI units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="383"/>
+        <location filename="../src/preferencesdialog.cpp" line="392"/>
         <source>Convert to mixed units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="384"/>
+        <location filename="../src/preferencesdialog.cpp" line="393"/>
         <source>Automatic unit prefixes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="401"/>
+        <location filename="../src/preferencesdialog.cpp" line="410"/>
         <source>Copy unformatted ASCII without units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="423"/>
+        <location filename="../src/preferencesdialog.cpp" line="432"/>
         <source>Default currency:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="480"/>
+        <location filename="../src/preferencesdialog.cpp" line="489"/>
         <source>Fonts</source>
         <translation type="unfinished">Pisave</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="482"/>
+        <location filename="../src/preferencesdialog.cpp" line="491"/>
         <source>Units</source>
         <translation type="unfinished">Enote</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="483"/>
+        <location filename="../src/preferencesdialog.cpp" line="492"/>
         <source>Calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="518"/>
+        <location filename="../src/preferencesdialog.cpp" line="527"/>
         <source>Restart required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="518"/>
+        <location filename="../src/preferencesdialog.cpp" line="527"/>
         <source>Please restart the program for the language change to take effect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="85"/>
-        <location filename="../src/preferencesdialog.cpp" line="386"/>
+        <location filename="../src/preferencesdialog.cpp" line="86"/>
+        <location filename="../src/preferencesdialog.cpp" line="395"/>
         <source>Default</source>
         <translation type="unfinished">Privzeto</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="120"/>
+        <location filename="../src/preferencesdialog.cpp" line="121"/>
         <source>Notify when a new version is available</source>
         <translation type="unfinished">Obvesti, ko je na voljo nova različica</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="203"/>
+        <location filename="../src/preferencesdialog.cpp" line="204"/>
         <source>Calculate as you type delay:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="284"/>
+        <location filename="../src/preferencesdialog.cpp" line="287"/>
         <source>Multiplication sign:</source>
         <translation type="unfinished">Znak za množenje:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="287"/>
+        <location filename="../src/preferencesdialog.cpp" line="290"/>
         <source>multiplication sign</source>
         <extracomment>Unicode character name</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="289"/>
+        <location filename="../src/preferencesdialog.cpp" line="292"/>
         <source>dot operator</source>
         <extracomment>Unicode character name</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="291"/>
+        <location filename="../src/preferencesdialog.cpp" line="294"/>
         <source>middle dot</source>
         <extracomment>Unicode character name</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="293"/>
+        <location filename="../src/preferencesdialog.cpp" line="296"/>
         <source>asterisk</source>
         <extracomment>Unicode character name</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="325"/>
+        <location filename="../src/preferencesdialog.cpp" line="334"/>
         <source>Automatically group digits in input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="346"/>
+        <location filename="../src/preferencesdialog.cpp" line="355"/>
         <source>Round halfway numbers to odd</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="347"/>
+        <location filename="../src/preferencesdialog.cpp" line="356"/>
         <source>Round halfway numbers toward zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="348"/>
+        <location filename="../src/preferencesdialog.cpp" line="357"/>
         <source>Round halfway numbers to random</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="349"/>
+        <location filename="../src/preferencesdialog.cpp" line="358"/>
         <source>Round halfway numbers up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="350"/>
+        <location filename="../src/preferencesdialog.cpp" line="359"/>
         <source>Round halfway numbers down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="351"/>
+        <location filename="../src/preferencesdialog.cpp" line="360"/>
         <source>Round toward zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="352"/>
+        <location filename="../src/preferencesdialog.cpp" line="361"/>
         <source>Round away from zero</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="353"/>
+        <location filename="../src/preferencesdialog.cpp" line="362"/>
         <source>Round up</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="354"/>
+        <location filename="../src/preferencesdialog.cpp" line="363"/>
         <source>Round down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="387"/>
+        <location filename="../src/preferencesdialog.cpp" line="396"/>
         <source>No prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="388"/>
+        <location filename="../src/preferencesdialog.cpp" line="397"/>
         <source>Prefixes for some units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="389"/>
+        <location filename="../src/preferencesdialog.cpp" line="398"/>
         <source>Prefixes also for currencies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="390"/>
+        <location filename="../src/preferencesdialog.cpp" line="399"/>
         <source>Prefixes for all units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="398"/>
+        <location filename="../src/preferencesdialog.cpp" line="407"/>
         <source>Enable all SI-prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="399"/>
+        <location filename="../src/preferencesdialog.cpp" line="408"/>
         <source>Enable denominator prefixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="400"/>
+        <location filename="../src/preferencesdialog.cpp" line="409"/>
         <source>Enable units in physical constants</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="402"/>
+        <location filename="../src/preferencesdialog.cpp" line="411"/>
         <source>Temperature calculation:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="404"/>
+        <location filename="../src/preferencesdialog.cpp" line="413"/>
         <source>Absolute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="332"/>
-        <location filename="../src/preferencesdialog.cpp" line="405"/>
+        <location filename="../src/preferencesdialog.cpp" line="341"/>
+        <location filename="../src/preferencesdialog.cpp" line="414"/>
         <source>Relative</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="406"/>
+        <location filename="../src/preferencesdialog.cpp" line="415"/>
         <source>Hybrid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="411"/>
+        <location filename="../src/preferencesdialog.cpp" line="420"/>
         <source>Exchange rates updates:</source>
         <translation type="unfinished">Posodobitve menjalnih razmerij:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/preferencesdialog.cpp" line="414"/>
-        <location filename="../src/preferencesdialog.cpp" line="712"/>
+        <location filename="../src/preferencesdialog.cpp" line="423"/>
+        <location filename="../src/preferencesdialog.cpp" line="721"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n dan</numerusform>
@@ -8986,53 +9001,53 @@ in pritisnite Enter.</translation>
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../src/main.cpp" line="122"/>
+        <location filename="../src/main.cpp" line="129"/>
         <source>Execute expressions and commands from a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="122"/>
-        <location filename="../src/main.cpp" line="130"/>
+        <location filename="../src/main.cpp" line="129"/>
+        <location filename="../src/main.cpp" line="137"/>
         <source>FILE</source>
         <translation type="unfinished">DATOTEKA</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="124"/>
+        <location filename="../src/main.cpp" line="131"/>
         <source>Start a new instance of the application</source>
         <translation type="unfinished">Zaženi nov primerek programa</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="133"/>
         <source>Specify the window title</source>
         <translation type="unfinished">Določi ime okna</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="126"/>
+        <location filename="../src/main.cpp" line="133"/>
         <source>TITLE</source>
         <translation type="unfinished">TITLE</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="128"/>
+        <location filename="../src/main.cpp" line="135"/>
         <source>Display the application version</source>
         <translation type="unfinished">Prikaži različico programa</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="130"/>
+        <location filename="../src/main.cpp" line="137"/>
         <source>Open workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="142"/>
+        <location filename="../src/main.cpp" line="149"/>
         <source>Expression to calculate</source>
         <translation type="unfinished">Izraz za izračun</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="142"/>
+        <location filename="../src/main.cpp" line="149"/>
         <source>[EXPRESSION]</source>
         <translation type="unfinished">[EXPRESSION]</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="158"/>
+        <location filename="../src/main.cpp" line="165"/>
         <source>By default, only one instance (one main window) of %1 is allowed.
 
 If multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.
@@ -9045,17 +9060,17 @@ Do you, despite this, want to change the default behavior and allow multiple sim
 Želite vseeno dovoliti več primerkov programa?</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="158"/>
+        <location filename="../src/main.cpp" line="165"/>
         <source>Allow multiple instances?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="177"/>
+        <location filename="../src/main.cpp" line="184"/>
         <source>%1 is already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="229"/>
+        <location filename="../src/main.cpp" line="236"/>
         <source>Failed to load global definitions!
 </source>
         <translation type="unfinished">Napaka pri nalaganju globalnih definicij!
@@ -9063,7 +9078,7 @@ Do you, despite this, want to change the default behavior and allow multiple sim
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="214"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="1324"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1346"/>
         <source>answer</source>
         <translation type="unfinished">odgovor</translation>
     </message>
@@ -9083,76 +9098,76 @@ Do you, despite this, want to change the default behavior and allow multiple sim
         <translation type="unfinished">Zgodovinski indeks %s ne obstaja.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1322"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1344"/>
         <source>Last Answer</source>
         <translation type="unfinished">Zadnji odgovor</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1326"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1348"/>
         <source>Answer 2</source>
         <translation type="unfinished">Odgovor 2</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1327"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1349"/>
         <source>Answer 3</source>
         <translation type="unfinished">Odgovor 3</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1328"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1350"/>
         <source>Answer 4</source>
         <translation type="unfinished">Odgovor 4</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1329"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1351"/>
         <source>Answer 5</source>
         <translation type="unfinished">Odgovor 5</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1330"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1352"/>
         <source>Memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1507"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2399"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2410"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2425"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2437"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2455"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1529"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2416"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2423"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2434"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2449"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2461"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2479"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1507"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1529"/>
         <source>Couldn&apos;t write preferences to
 %1</source>
         <translation type="unfinished">Pisanje nastavitev v
 %1 neuspešno</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2416"/>
         <source>Function not found.</source>
         <translation type="unfinished">Funkcija ni bila najdena.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2399"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2423"/>
         <source>Variable not found.</source>
         <translation type="unfinished">Spremenljivka ni bila najdena.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2410"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2434"/>
         <source>Unit not found.</source>
         <translation type="unfinished">Enota ni bila najdena.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2425"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2449"/>
         <source>Unsupported base.</source>
         <translation type="unfinished">Nepodprta osnova.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2437"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2455"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2461"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2479"/>
         <source>Unsupported value.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9160,12 +9175,12 @@ Do you, despite this, want to change the default behavior and allow multiple sim
 <context>
     <name>QalculateQtSettings</name>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2031"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2055"/>
         <source>Update exchange rates?</source>
         <translation type="unfinished">Posodobi menjalna razmerja?</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/qalculateqtsettings.cpp" line="2031"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2055"/>
         <source>It has been %n day(s) since the exchange rates last were updated.
 
 Do you wish to update the exchange rates now?</source>
@@ -9189,68 +9204,68 @@ Do you wish to update the exchange rates now?</source>
         <translation type="obsolete">Pridobivam menjalna razmerja.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="1323"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="1345"/>
         <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2059"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2060"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2083"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2084"/>
         <source>Fetching exchange rates…</source>
         <translation type="unfinished">Pridobivam menjalna razmerja…</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2094"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2107"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2116"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2167"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2118"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2131"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2140"/>
         <location filename="../src/qalculateqtsettings.cpp" line="2191"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2215"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2095"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2119"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2096"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2192"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2198"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2203"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2213"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2120"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2216"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2222"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2227"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2237"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2107"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2131"/>
         <source>Path of executable not found.</source>
         <translation type="unfinished">Pot do zagonske datoteke ni bila najdena.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2116"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2140"/>
         <source>curl not found.</source>
         <translation type="unfinished">Orodje curl ni bilo najdeno.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2167"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2191"/>
         <source>Failed to run update script.
 %1</source>
         <translation type="unfinished">Napaka pri zagonu posodobitvenega skripta.
 %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2191"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2215"/>
         <source>Failed to check for updates.</source>
         <translation type="unfinished">Napaka pri preverjanju posodobitev.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2192"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2216"/>
         <source>No updates found.</source>
         <translation type="unfinished">Ni novih posodobitev.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2198"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2222"/>
         <source>A new version of %1 is available at %2.
 
 Do you wish to update to version %3?</source>
@@ -9259,8 +9274,8 @@ Do you wish to update to version %3?</source>
 Želite nadgraditi na različico %3?</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2203"/>
-        <location filename="../src/qalculateqtsettings.cpp" line="2213"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2227"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2237"/>
         <source>A new version of %1 is available.
 
 You can get version %3 at %2.</source>
@@ -9269,527 +9284,527 @@ You can get version %3 at %2.</source>
 Različico %3 lahko pridobite na %2.</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2206"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2230"/>
         <source>Download</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2278"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2302"/>
         <source>%1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2282"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2306"/>
         <source>Insert function</source>
         <translation type="unfinished">Vnesi funkcijo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2283"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2307"/>
         <source>Insert function (dialog)</source>
         <translation type="unfinished">Vnesi funkcijo (obrazec)</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2284"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2308"/>
         <source>Insert variable</source>
         <translation type="unfinished">Vnesi spremenljivko</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2285"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2309"/>
         <source>Approximate result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2286"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2310"/>
         <source>Negate</source>
         <translation type="unfinished">Negiraj</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2287"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2311"/>
         <source>Invert</source>
         <translation type="unfinished">Inverz</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2288"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2312"/>
         <source>Insert unit</source>
         <translation type="unfinished">Vnesi enoto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2289"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2313"/>
         <source>Insert text</source>
         <translation type="unfinished">Vnesi besedilo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2290"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2314"/>
         <source>Insert operator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2291"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2315"/>
         <source>Insert date</source>
         <translation type="unfinished">Vnesi datum</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2292"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2316"/>
         <source>Insert matrix</source>
         <translation type="unfinished">Vnesi matriko</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2293"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2317"/>
         <source>Insert smart parentheses</source>
         <translation type="unfinished">Vnesi pametne oklepaje</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2294"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2318"/>
         <source>Convert to unit</source>
         <translation type="unfinished">Pretvori v enoto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2295"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2319"/>
         <source>Convert</source>
         <translation type="unfinished">Pretvori</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2296"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2320"/>
         <source>Convert to optimal unit</source>
         <translation type="unfinished">Pretvori v najustreznejšo enoto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2297"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2321"/>
         <source>Convert to base units</source>
         <translation type="unfinished">Pretvori v osnovne enote</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2298"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2322"/>
         <source>Convert to optimal prefix</source>
         <translation type="unfinished">Pretvori v najustreznejšo predpono</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2299"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2323"/>
         <source>Convert to number base</source>
         <translation type="unfinished">Pretvori v številsko osnovo</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2300"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2324"/>
         <source>Factorize result</source>
         <translation type="unfinished">Faktoriziraj rezultat</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2301"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2325"/>
         <source>Expand result</source>
         <translation type="unfinished">Razširi rezultat</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2302"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2326"/>
         <source>Expand partial fractions</source>
         <translation type="unfinished">Razširi parcialne ulomke</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2303"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2327"/>
         <source>RPN: down</source>
         <translation type="unfinished">RPN: dol</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2304"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2328"/>
         <source>RPN: up</source>
         <translation type="unfinished">RPN: gor</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2305"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2329"/>
         <source>RPN: swap</source>
         <translation type="unfinished">RPN: izmenjaj</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2306"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2330"/>
         <source>RPN: copy</source>
         <translation type="unfinished">RPN: kopiraj</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2307"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2331"/>
         <source>RPN: lastx</source>
         <translation type="unfinished">RPN: lastx</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2308"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2332"/>
         <source>RPN: delete register</source>
         <translation type="unfinished">RPN: izbriši register</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2309"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2333"/>
         <source>RPN: clear stack</source>
         <translation type="unfinished">RPN: počisti sklad</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2310"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2334"/>
         <source>Set expression base</source>
         <translation type="unfinished">Nastavi osnovo izraza</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2311"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2335"/>
         <source>Set result base</source>
         <translation type="unfinished">Nastavi osnovo rezultata</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2312"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2336"/>
         <source>Set angle unit to degrees</source>
         <translation type="unfinished">Nastavi kotne enote v stopinje</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2313"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2337"/>
         <source>Set angle unit to radians</source>
         <translation type="unfinished">Nastavi kotne enote v radiane</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2314"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2338"/>
         <source>Set angle unit to gradians</source>
         <translation type="unfinished">Nastavi kotne enote v gradiane</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2315"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2339"/>
         <source>Active normal display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2316"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2340"/>
         <source>Activate scientific display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2317"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2341"/>
         <source>Activate engineering display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2318"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2342"/>
         <source>Activate simple display mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2319"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2343"/>
         <source>Toggle precision</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2320"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2344"/>
         <source>Toggle max decimals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2321"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2345"/>
         <source>Toggle min decimals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2322"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2346"/>
         <source>Toggle max/min decimals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2323"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2347"/>
         <source>Toggle RPN mode</source>
         <translation type="unfinished">Prikaži/skrij način RPN</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2324"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2348"/>
         <source>Show general keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2325"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2349"/>
         <source>Toggle programming keypad</source>
         <translation type="unfinished">Prikaži/skrij tipkovnico</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2326"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2350"/>
         <source>Toggle algebra keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2327"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2351"/>
         <source>Toggle custom keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2328"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2352"/>
         <source>Show/hide keypad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2329"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2353"/>
         <source>Search history</source>
         <translation type="unfinished">Zgodovina iskanj</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2330"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2354"/>
         <source>Clear history</source>
         <translation type="unfinished">Počisti zgodovino</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2331"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2355"/>
         <source>Show variables</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2332"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2356"/>
         <source>Show functions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2333"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2357"/>
         <source>Show units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2334"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2358"/>
         <source>Show data sets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2335"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2359"/>
         <source>Store result</source>
         <translation type="unfinished">Shrani rezultat</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2336"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2360"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2337"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2361"/>
         <source>MR (memory recall)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2338"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2362"/>
         <source>MS (memory store)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2339"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2363"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2340"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2364"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2341"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2365"/>
         <source>New variable</source>
         <translation type="unfinished">Nova spremenljivka</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2342"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2366"/>
         <source>New function</source>
         <translation type="unfinished">Nova funkcija</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2343"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2367"/>
         <source>Open plot functions/data</source>
         <translation type="unfinished">Odpri orodje za izris funkcij/podatkov</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2344"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2368"/>
         <source>Open convert number bases</source>
         <translation type="unfinished">Odpri orodje za pretvorbo številskih osnov</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2345"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2369"/>
         <source>Open floating point conversion</source>
         <translation type="unfinished">Odpri orodje za pretvorbo plavajoče vejice</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2346"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2370"/>
         <source>Open calender conversion</source>
         <translation type="unfinished">Odpri orodje za pretvorbo koledarjev</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2347"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2371"/>
         <source>Open percentage calculation tool</source>
         <translation type="unfinished">Odpri orodje za izračun odstotkov</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2348"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2372"/>
         <source>Open periodic table</source>
         <translation type="unfinished">Odpri periodni sistem</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2349"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2373"/>
         <source>Update exchange rates</source>
         <translation type="unfinished">Posodobi menjalna razmerja</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2350"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2374"/>
         <source>Copy result</source>
         <translation type="unfinished">Kopiraj rezultat</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2351"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2375"/>
         <source>Insert result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2352"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2376"/>
         <source>Open mode menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2353"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2377"/>
         <source>Open menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2354"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2378"/>
         <source>Help</source>
         <translation type="unfinished">Pomoč</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2355"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2379"/>
         <source>Quit</source>
         <translation type="unfinished">Izhod</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2356"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2380"/>
         <source>Toggle chain mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2357"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2381"/>
         <source>Toggle keep above</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2358"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
         <source>Show completion (activate first item)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2359"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2383"/>
         <source>Clear expression</source>
         <translation type="unfinished">Počisti izraz</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2360"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2384"/>
         <source>Delete</source>
         <translation type="unfinished">Izbriši</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2361"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2385"/>
         <source>Backspace</source>
         <translation type="unfinished">Backspace</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2362"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2386"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2363"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2387"/>
         <source>End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2364"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2388"/>
         <source>Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2365"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2389"/>
         <source>Left</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2366"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2390"/>
         <source>Up</source>
         <translation type="unfinished">Gor</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2367"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2391"/>
         <source>Down</source>
         <translation type="unfinished">Dol</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2368"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
         <source>Undo</source>
         <translation type="unfinished">Razveljavi</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2369"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2393"/>
         <source>Redo</source>
         <translation type="unfinished">Uveljavi</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2370"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2394"/>
         <source>Calculate expression</source>
         <translation type="unfinished">Izračunaj izraz</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2371"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2395"/>
         <source>Expression history next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2372"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2396"/>
         <source>Expression history previous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2373"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2397"/>
         <source>Open functions menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2374"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2398"/>
         <source>Open units menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2375"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2399"/>
         <source>Open variables menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2376"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2400"/>
         <source>Toggle fraction format in current result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Default</source>
         <translation type="unfinished">Privzeto</translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Formatted result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Unformatted ASCII result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Unformatted ASCII result without units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Formatted expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Unformatted ASCII expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Formatted expression + result</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
+        <location filename="../src/qalculateqtsettings.cpp" line="2406"/>
         <source>Unformatted ASCII expression + result</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9797,67 +9812,67 @@ Različico %3 lahko pridobite na %2.</translation>
 <context>
     <name>QalculateTranslator</name>
     <message>
-        <location filename="../src/main.cpp" line="310"/>
+        <location filename="../src/main.cpp" line="317"/>
         <source>OK</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">Vredu</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="312"/>
+        <location filename="../src/main.cpp" line="319"/>
         <source>Cancel</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">Prekliči</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="314"/>
+        <location filename="../src/main.cpp" line="321"/>
         <source>Close</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">Zapri</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="316"/>
+        <location filename="../src/main.cpp" line="323"/>
         <source>&amp;Yes</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">&amp;Da</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="318"/>
+        <location filename="../src/main.cpp" line="325"/>
         <source>&amp;No</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">&amp;Ne</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="320"/>
+        <location filename="../src/main.cpp" line="327"/>
         <source>&amp;Open</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">&amp;Odpri</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="322"/>
+        <location filename="../src/main.cpp" line="329"/>
         <source>&amp;Save</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished">&amp;Shrani</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="324"/>
+        <location filename="../src/main.cpp" line="331"/>
         <source>&amp;Select All</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="326"/>
+        <location filename="../src/main.cpp" line="333"/>
         <source>Look in:</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="328"/>
+        <location filename="../src/main.cpp" line="335"/>
         <source>File &amp;name:</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="330"/>
+        <location filename="../src/main.cpp" line="337"/>
         <source>Files of type:</source>
         <extracomment>Only used when Qt translation is missing</extracomment>
         <translation type="unfinished"></translation>
@@ -10001,7 +10016,7 @@ Različico %3 lahko pridobite na %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="507"/>
-        <location filename="../src/qalculatewindow.cpp" line="9467"/>
+        <location filename="../src/qalculatewindow.cpp" line="9469"/>
         <source>Keyboard Shortcuts</source>
         <translation type="unfinished">Tipkovne bližnjice</translation>
     </message>
@@ -10098,10 +10113,8 @@ Različico %3 lahko pridobite na %2.</translation>
         <translation type="unfinished">Gradiani</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="556"/>
-        <location filename="../src/qalculatewindow.cpp" line="557"/>
         <source>Approximation</source>
-        <translation type="unfinished">Približek</translation>
+        <translation type="obsolete">Približek</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="559"/>
@@ -10236,6 +10249,12 @@ Različico %3 lahko pridobite na %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="2119"/>
         <source>Other</source>
         <translation type="unfinished">Drugo</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="556"/>
+        <location filename="../src/qalculatewindow.cpp" line="557"/>
+        <source>Approximation and Fractions</source>
+        <translation type="unfinished">Približek in ulomki</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="613"/>
@@ -10523,18 +10542,18 @@ Različico %3 lahko pridobite na %2.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4983"/>
-        <location filename="../src/qalculatewindow.cpp" line="8391"/>
-        <location filename="../src/qalculatewindow.cpp" line="9372"/>
-        <location filename="../src/qalculatewindow.cpp" line="10834"/>
-        <location filename="../src/qalculatewindow.cpp" line="10847"/>
-        <location filename="../src/qalculatewindow.cpp" line="10857"/>
-        <location filename="../src/qalculatewindow.cpp" line="10877"/>
+        <location filename="../src/qalculatewindow.cpp" line="8393"/>
+        <location filename="../src/qalculatewindow.cpp" line="9374"/>
+        <location filename="../src/qalculatewindow.cpp" line="10836"/>
+        <location filename="../src/qalculatewindow.cpp" line="10849"/>
+        <location filename="../src/qalculatewindow.cpp" line="10859"/>
+        <location filename="../src/qalculatewindow.cpp" line="10879"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="4983"/>
-        <location filename="../src/qalculatewindow.cpp" line="8391"/>
+        <location filename="../src/qalculatewindow.cpp" line="8393"/>
         <source>Couldn&apos;t write definitions</source>
         <translation type="unfinished">Pisanje definicij neuspešno</translation>
     </message>
@@ -10863,13 +10882,13 @@ Različico %3 lahko pridobite na %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6064"/>
         <location filename="../src/qalculatewindow.cpp" line="6503"/>
-        <location filename="../src/qalculatewindow.cpp" line="7825"/>
+        <location filename="../src/qalculatewindow.cpp" line="7827"/>
         <source>Cancel</source>
         <translation type="unfinished">Prekliči</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6112"/>
-        <location filename="../src/qalculatewindow.cpp" line="7659"/>
+        <location filename="../src/qalculatewindow.cpp" line="7661"/>
         <source>RPN Operation</source>
         <translation type="unfinished">Operacija RPN</translation>
     </message>
@@ -10894,173 +10913,173 @@ Različico %3 lahko pridobite na %2.</translation>
         <translation type="unfinished">Pretvarjam...</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7655"/>
+        <location filename="../src/qalculatewindow.cpp" line="7657"/>
         <source>RPN Register Moved</source>
         <translation type="unfinished">Register RPN premaknjen</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7824"/>
-        <location filename="../src/qalculatewindow.cpp" line="7825"/>
         <location filename="../src/qalculatewindow.cpp" line="7826"/>
+        <location filename="../src/qalculatewindow.cpp" line="7827"/>
+        <location filename="../src/qalculatewindow.cpp" line="7828"/>
         <source>Processing…</source>
         <translation type="unfinished">Obdelujem...</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7971"/>
-        <location filename="../src/qalculatewindow.cpp" line="10405"/>
+        <location filename="../src/qalculatewindow.cpp" line="7973"/>
+        <location filename="../src/qalculatewindow.cpp" line="10407"/>
         <source>Matrix</source>
         <translation type="unfinished">Matrika</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8109"/>
+        <location filename="../src/qalculatewindow.cpp" line="8111"/>
         <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8130"/>
-        <location filename="../src/qalculatewindow.cpp" line="8175"/>
+        <location filename="../src/qalculatewindow.cpp" line="8132"/>
+        <location filename="../src/qalculatewindow.cpp" line="8177"/>
         <source>Temperature Calculation Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8136"/>
+        <location filename="../src/qalculatewindow.cpp" line="8138"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8139"/>
+        <location filename="../src/qalculatewindow.cpp" line="8141"/>
         <source>Absolute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8143"/>
+        <location filename="../src/qalculatewindow.cpp" line="8145"/>
         <source>Relative</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8147"/>
+        <location filename="../src/qalculatewindow.cpp" line="8149"/>
         <source>Hybrid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8181"/>
+        <location filename="../src/qalculatewindow.cpp" line="8183"/>
         <source>Please select desired variant of the sinc function.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8184"/>
+        <location filename="../src/qalculatewindow.cpp" line="8186"/>
         <source>Unnormalized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8188"/>
+        <location filename="../src/qalculatewindow.cpp" line="8190"/>
         <source>Normalized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8223"/>
+        <location filename="../src/qalculatewindow.cpp" line="8225"/>
         <source>Interpretation of dots</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8223"/>
+        <location filename="../src/qalculatewindow.cpp" line="8225"/>
         <source>Interpretation of comma</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8229"/>
+        <location filename="../src/qalculatewindow.cpp" line="8231"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8229"/>
+        <location filename="../src/qalculatewindow.cpp" line="8231"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8232"/>
+        <location filename="../src/qalculatewindow.cpp" line="8234"/>
         <source>Both dot and comma as decimal separators</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8236"/>
+        <location filename="../src/qalculatewindow.cpp" line="8238"/>
         <source>Dot as thousands separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8236"/>
+        <location filename="../src/qalculatewindow.cpp" line="8238"/>
         <source>Comma as thousands separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8240"/>
+        <location filename="../src/qalculatewindow.cpp" line="8242"/>
         <source>Only dot as decimal separator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8288"/>
+        <location filename="../src/qalculatewindow.cpp" line="8290"/>
         <source>Parsing Mode</source>
         <translation type="unfinished">Način obdelave</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8294"/>
+        <location filename="../src/qalculatewindow.cpp" line="8296"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8299"/>
+        <location filename="../src/qalculatewindow.cpp" line="8301"/>
         <source>Implicit multiplication first</source>
         <translation type="unfinished">Sprva implicitno množenje</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8306"/>
+        <location filename="../src/qalculatewindow.cpp" line="8308"/>
         <source>Conventional</source>
         <translation type="unfinished">Običajna</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8312"/>
+        <location filename="../src/qalculatewindow.cpp" line="8314"/>
         <source>Adaptive</source>
         <translation type="unfinished">Prilagodljivo</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8338"/>
+        <location filename="../src/qalculatewindow.cpp" line="8340"/>
         <source>Percentage Interpretation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8344"/>
+        <location filename="../src/qalculatewindow.cpp" line="8346"/>
         <source>Please select interpretation of percentage addition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8347"/>
+        <location filename="../src/qalculatewindow.cpp" line="8349"/>
         <source>Add percentage of original value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8352"/>
+        <location filename="../src/qalculatewindow.cpp" line="8354"/>
         <source>Add percentage multiplied by 1/100</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9166"/>
-        <location filename="../src/qalculatewindow.cpp" line="9316"/>
+        <location filename="../src/qalculatewindow.cpp" line="9168"/>
+        <location filename="../src/qalculatewindow.cpp" line="9318"/>
         <source>Add Action (%1)</source>
         <translation type="unfinished">Dodaj dejanje (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9264"/>
+        <location filename="../src/qalculatewindow.cpp" line="9266"/>
         <source>Edit Keyboard Shortcut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9264"/>
+        <location filename="../src/qalculatewindow.cpp" line="9266"/>
         <source>New Keyboard Shortcut</source>
         <translation type="unfinished">Nova tipkovna bližnjica</translation>
     </message>
@@ -11069,130 +11088,130 @@ Please select interpretation of expressions with implicit multiplication
         <translation type="obsolete">Dejanje:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9306"/>
+        <location filename="../src/qalculatewindow.cpp" line="9308"/>
         <source>Value:</source>
         <translation type="unfinished">Vrednost:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9351"/>
+        <location filename="../src/qalculatewindow.cpp" line="9353"/>
         <source>Set key combination</source>
         <translation type="unfinished">Nastavi zaporedje tipk</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9354"/>
+        <location filename="../src/qalculatewindow.cpp" line="9356"/>
         <source>Press the key combination you wish to use for the action.</source>
         <translation type="unfinished">Pritisnite zaporedje tipk, ki ga želite uporabiti za to dejanje.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9372"/>
+        <location filename="../src/qalculatewindow.cpp" line="9374"/>
         <source>Reserved key combination</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9379"/>
+        <location filename="../src/qalculatewindow.cpp" line="9381"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation type="unfinished">To zaporedje tipk je že v uporabi.
 Ali ga želite prepisati s tem dejanjem (%1)?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9379"/>
+        <location filename="../src/qalculatewindow.cpp" line="9381"/>
         <source>Question</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9496"/>
+        <location filename="../src/qalculatewindow.cpp" line="9498"/>
         <source>Add…</source>
         <translation type="unfinished">Dodaj…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9499"/>
+        <location filename="../src/qalculatewindow.cpp" line="9501"/>
         <source>Edit…</source>
         <translation type="unfinished">Uredi…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9503"/>
+        <location filename="../src/qalculatewindow.cpp" line="9505"/>
         <source>Remove</source>
         <translation type="unfinished">Odstrani</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9817"/>
+        <location filename="../src/qalculatewindow.cpp" line="9819"/>
         <source>Gnuplot was not found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9817"/>
+        <location filename="../src/qalculatewindow.cpp" line="9819"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10011"/>
+        <location filename="../src/qalculatewindow.cpp" line="10013"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation type="unfinished">Primer:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10053"/>
+        <location filename="../src/qalculatewindow.cpp" line="10055"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10053"/>
+        <location filename="../src/qalculatewindow.cpp" line="10055"/>
         <source>Calculate</source>
         <translation type="unfinished">Izračunaj</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10054"/>
-        <location filename="../src/qalculatewindow.cpp" line="10539"/>
+        <location filename="../src/qalculatewindow.cpp" line="10056"/>
+        <location filename="../src/qalculatewindow.cpp" line="10541"/>
         <source>Apply to Stack</source>
         <translation type="unfinished">Premakni na sklad</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10054"/>
-        <location filename="../src/qalculatewindow.cpp" line="10539"/>
+        <location filename="../src/qalculatewindow.cpp" line="10056"/>
+        <location filename="../src/qalculatewindow.cpp" line="10541"/>
         <source>Insert</source>
         <translation type="unfinished">Vnesi</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10834"/>
+        <location filename="../src/qalculatewindow.cpp" line="10836"/>
         <source>Failed to open workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10847"/>
-        <location filename="../src/qalculatewindow.cpp" line="10857"/>
-        <location filename="../src/qalculatewindow.cpp" line="10877"/>
+        <location filename="../src/qalculatewindow.cpp" line="10849"/>
+        <location filename="../src/qalculatewindow.cpp" line="10859"/>
+        <location filename="../src/qalculatewindow.cpp" line="10879"/>
         <source>Couldn&apos;t save workspace</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10868"/>
+        <location filename="../src/qalculatewindow.cpp" line="10870"/>
         <source>Save file?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10868"/>
+        <location filename="../src/qalculatewindow.cpp" line="10870"/>
         <source>Do you want to save the current workspace?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10869"/>
+        <location filename="../src/qalculatewindow.cpp" line="10871"/>
         <source>Do not ask again</source>
         <translation type="unfinished">Ne vprašaj znova</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10045"/>
+        <location filename="../src/qalculatewindow.cpp" line="10047"/>
         <source>Keep open</source>
         <translation type="unfinished">Obdrži odprto</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10070"/>
+        <location filename="../src/qalculatewindow.cpp" line="10072"/>
         <source>Value</source>
         <translation type="unfinished">Vrednost</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10072"/>
+        <location filename="../src/qalculatewindow.cpp" line="10074"/>
         <source>Argument</source>
         <translation type="unfinished">Argument</translation>
     </message>
@@ -11200,9 +11219,13 @@ Ali ga želite prepisati s tem dejanjem (%1)?</translation>
         <location filename="../src/qalculatewindow.cpp" line="3303"/>
         <location filename="../src/qalculatewindow.cpp" line="3331"/>
         <location filename="../src/qalculatewindow.cpp" line="3395"/>
-        <location filename="../src/qalculatewindow.cpp" line="10087"/>
+        <location filename="../src/qalculatewindow.cpp" line="10089"/>
         <source>%1:</source>
         <translation type="unfinished">%1:</translation>
+    </message>
+    <message>
+        <source>Approximation &amp;&amp; Fractions</source>
+        <translation type="obsolete">Približek &amp;&amp; ulomki</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="767"/>
@@ -11359,46 +11382,46 @@ Ali ga želite prepisati s tem dejanjem (%1)?</translation>
         <translation type="unfinished">Počisti sklad RPN</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8240"/>
+        <location filename="../src/qalculatewindow.cpp" line="8242"/>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9270"/>
-        <location filename="../src/qalculatewindow.cpp" line="9475"/>
+        <location filename="../src/qalculatewindow.cpp" line="9272"/>
+        <location filename="../src/qalculatewindow.cpp" line="9477"/>
         <source>Action</source>
         <translation type="unfinished">Dejanje</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9475"/>
+        <location filename="../src/qalculatewindow.cpp" line="9477"/>
         <source>Key combination</source>
         <translation type="unfinished">Tipkovno zaporedje</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10142"/>
+        <location filename="../src/qalculatewindow.cpp" line="10144"/>
         <source>True</source>
         <translation type="unfinished">Pravilno</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10145"/>
+        <location filename="../src/qalculatewindow.cpp" line="10147"/>
         <source>False</source>
         <translation type="unfinished">Napačno</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10171"/>
+        <location filename="../src/qalculatewindow.cpp" line="10173"/>
         <source>Info</source>
         <translation type="unfinished">Info</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10223"/>
-        <location filename="../src/qalculatewindow.cpp" line="10231"/>
+        <location filename="../src/qalculatewindow.cpp" line="10225"/>
+        <location filename="../src/qalculatewindow.cpp" line="10233"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation type="unfinished">neobvezno</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10602"/>
+        <location filename="../src/qalculatewindow.cpp" line="10604"/>
         <source>Failed to open %1.
 %2</source>
         <translation type="unfinished">Napaka pri odpiranju datoteke %1.
