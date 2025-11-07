@@ -662,7 +662,16 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 	} else if(svar == "digit_grouping") {
 		if(v >= DIGIT_GROUPING_NONE && v <= DIGIT_GROUPING_LOCALE) {
 			printops.digit_grouping = (DigitGrouping) v;
+		} else if(v == DIGIT_GROUPING_LOCALE + 1) {
+			custom_digit_grouping = true;
+			printops.digit_grouping = DIGIT_GROUPING_LOCALE;
 		}
+	} else if(svar == "custom_digit_group_separator") {
+		custom_digit_group_separator = svalue;
+		custom_digit_group_changed = true;
+	} else if(svar == "custom_digit_group_format") {
+		custom_digit_group_format = svalue;
+		custom_digit_group_changed = true;
 	} else if(svar == "round_halfway_to_even") {
 		if(v) printops.rounding = ROUNDING_HALF_TO_EVEN;
 	} else if(svar == "rounding_mode") {
@@ -1111,6 +1120,10 @@ void QalculateQtSettings::loadPreferences() {
 	rpn_shown = false;
 	caret_as_xor = false;
 	automatic_digit_grouping = false;
+	custom_digit_grouping = false;
+	custom_digit_group_changed = false;
+	custom_digit_group_separator = ",";
+	custom_digit_group_format = "3";
 	copy_ascii = false;
 	copy_ascii_without_units = false;
 	do_imaginary_j = false;
@@ -1264,6 +1277,15 @@ void QalculateQtSettings::loadPreferences() {
 		v_pexact.push_back(true);
 	}
 
+	if(custom_digit_grouping) {
+		saved_local_dgs = CALCULATOR->local_digit_group_separator;
+		saved_local_dgf = CALCULATOR->local_digit_group_format;
+		CALCULATOR->local_digit_group_separator = custom_digit_group_separator;
+		CALCULATOR->local_digit_group_format = "";
+		for(size_t i = 0; i < custom_digit_group_format.size(); i++) {
+			CALCULATOR->local_digit_group_format += custom_digit_group_format[i] - '0';
+		}
+	}
 	keyboard_shortcut *ks;
 #define ADD_SHORTCUT(k, t, v) ks = new keyboard_shortcut; ks->key = k; ks->type.push_back(t); ks->value.push_back(v); ks->action = NULL; ks->new_action = false; keyboard_shortcuts.push_back(ks);
 	if(default_shortcuts) {
@@ -1715,7 +1737,9 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "close_with_esc=%i\n", close_with_esc);
 		fprintf(file, "copy_ascii=%i\n", copy_ascii);
 		fprintf(file, "copy_ascii_without_units=%i\n", copy_ascii_without_units);
-		fprintf(file, "digit_grouping=%i\n", printops.digit_grouping);
+		fprintf(file, "digit_grouping=%i\n", custom_digit_grouping ? DIGIT_GROUPING_LOCALE + 1 : printops.digit_grouping);
+		if(custom_digit_group_changed) fprintf(file, "custom_digit_group_separator=%s\n", custom_digit_group_separator.c_str());
+		if(custom_digit_group_changed) fprintf(file, "custom_digit_group_format=%s\n", custom_digit_group_format.c_str());
 		fprintf(file, "decimal_comma=%i\n", decimal_comma);
 		fprintf(file, "dot_as_separator=%i\n", dot_question_asked ? evalops.parse_options.dot_as_separator : -1);
 		fprintf(file, "comma_as_separator=%i\n", evalops.parse_options.comma_as_separator);

@@ -20,6 +20,7 @@ class QAbstractButton;
 class QCheckBox;
 class QSpinBox;
 class QComboBox;
+class QLineEdit;
 
 class PreferencesDialog : public QDialog {
 
@@ -29,8 +30,9 @@ class PreferencesDialog : public QDialog {
 
 		QAbstractButton *decimalCommaBox, *ignoreCommaBox, *ignoreDotBox, *ignoreLocaleBox, *variableUnitsBox, *conciseUncertaintyInputBox, *rpnKeysBox;
 		QCheckBox *preserveHeightBox;
-		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget;
+		QSpinBox *exratesSpin, *statusDelayWidget, *calculateDelayWidget, *cgfSpin;
 		QComboBox *styleCombo, *parseCombo, *tcCombo, *langCombo, *complexFormCombo, *intervalDisplayCombo, *intervalCalculationCombo, *statusCombo;
+		QLineEdit *cgsEdit;
 
 		void closeEvent(QCloseEvent*) override;
 
@@ -82,7 +84,10 @@ class PreferencesDialog : public QDialog {
 		void allPrefixesToggled(bool);
 		void denominatorPrefixToggled(bool);
 		void variableUnitsToggled(bool);
+		void updateCustomDigitGrouping();
 		void groupingChanged(int);
+		void cgfChanged(int);
+		void cgsChanged(const QString&);
 		void intervalDisplayChanged(int);
 		void conciseUncertaintyInputToggled(bool);
 		void limitImplicitToggled(bool);

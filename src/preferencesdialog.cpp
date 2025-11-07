@@ -13,6 +13,7 @@
 #include <QRadioButton>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QLineEdit>
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QGridLayout>
@@ -321,9 +322,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("None"), DIGIT_GROUPING_NONE);
 	combo->addItem(tr("Standard"), DIGIT_GROUPING_STANDARD);
 	combo->addItem(tr("Local"), DIGIT_GROUPING_LOCALE);
-	combo->setCurrentIndex(combo->findData(settings->printops.digit_grouping));
+	combo->addItem(tr("Custom"), DIGIT_GROUPING_LOCALE + 1);
+	combo->setCurrentIndex(combo->findData(settings->custom_digit_grouping ? DIGIT_GROUPING_LOCALE + 1 : settings->printops.digit_grouping));
 	connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(groupingChanged(int)));
 	l->addWidget(combo, r, 1); r++;
+	QHBoxLayout *cgl = new QHBoxLayout();
+	spin = new QSpinBox(this); spin->setRange(settings->custom_digit_grouping ? 1 : 0, 70); spin->setValue(settings->max_history_lines); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(cgfChanged(int))); cgl->addWidget(spin); cgfSpin = spin;
+	cgsEdit = new QLineEdit(this); connect(cgsEdit, SIGNAL(textEdited(const QString&)), this, SLOT(cgsChanged(const QString&))); cgl->addWidget(cgsEdit);
+	updateCustomDigitGrouping();
+	l->addLayout(cgl, r, 1); r++;
 	BOX(tr("Automatically group digits in input"), settings->automatic_digit_grouping, automaticDigitGroupingToggled(bool));
 	l->addWidget(new QLabel(tr("Interval display:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -836,9 +843,46 @@ void PreferencesDialog::updateVariableUnits() {
 	variableUnitsBox->setChecked(CALCULATOR->variableUnitsEnabled());
 	variableUnitsBox->blockSignals(false);
 }
+void PreferencesDialog::updateCustomDigitGrouping() {
+	cgfSpin->blockSignals(true);
+	cgsEdit->blockSignals(true);
+	if(settings->custom_digit_grouping) {
+		cgfSpin->setMinimum(1);
+		cgfSpin->setValue(settings->custom_digit_group_format.empty() ? 3 : settings->custom_digit_group_format[0] - '0');
+		cgsEdit->setText(QString::fromStdString(settings->custom_digit_group_separator));
+	} else {
+		cgfSpin->setMinimum(0);
+		cgfSpin->setValue(settings->printops.digit_grouping == DIGIT_GROUPING_NONE ? 0 : (settings->printops.digit_grouping == DIGIT_GROUPING_STANDARD || CALCULATOR->local_digit_group_format.empty() || CALCULATOR->local_digit_group_format[0] == CHAR_MAX ? 3 : (int) CALCULATOR->local_digit_group_format[0]));
+		cgsEdit->setText(settings->printops.digit_grouping == DIGIT_GROUPING_NONE ? QString() : (settings->printops.digit_grouping == DIGIT_GROUPING_STANDARD ? THIN_SPACE : QString::fromStdString(CALCULATOR->local_digit_group_separator)));
+	}
+	cgfSpin->blockSignals(false);
+	cgsEdit->blockSignals(false);
+	cgfSpin->setEnabled(settings->custom_digit_grouping);
+	cgsEdit->setEnabled(settings->custom_digit_grouping);
+}
 void PreferencesDialog::groupingChanged(int i) {
-	settings->printops.digit_grouping = (DigitGrouping) qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
-	if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.comma_as_separator || CALCULATOR->getDecimalPoint() == COMMA) && CALCULATOR->local_digit_group_separator == COMMA) {
+	int v = qobject_cast<QComboBox*>(sender())->itemData(i).toInt();
+	if(settings->custom_digit_grouping) {
+		CALCULATOR->local_digit_group_separator = settings->saved_local_dgs;
+		CALCULATOR->local_digit_group_format = settings->saved_local_dgf;
+	} else if(v == DIGIT_GROUPING_LOCALE + 1) {
+		settings->saved_local_dgs = CALCULATOR->local_digit_group_separator;
+		settings->saved_local_dgf = CALCULATOR->local_digit_group_format;
+	}
+	if(v == DIGIT_GROUPING_LOCALE + 1) {
+		settings->printops.digit_grouping = DIGIT_GROUPING_LOCALE;
+		CALCULATOR->local_digit_group_format = "";
+		for(size_t i = 0; i < settings->custom_digit_group_format.size(); i++) {
+			CALCULATOR->local_digit_group_format += settings->custom_digit_group_format[i] - '0';
+		}
+		CALCULATOR->local_digit_group_separator = settings->custom_digit_group_separator;
+		settings->custom_digit_grouping = true;
+	} else {
+		settings->printops.digit_grouping = (DigitGrouping) v;
+		settings->custom_digit_grouping = false;
+	}
+	updateCustomDigitGrouping();
+	if(v == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.comma_as_separator || CALCULATOR->getDecimalPoint() == COMMA) && CALCULATOR->local_digit_group_separator == COMMA) {
 		if(CALCULATOR->getDecimalPoint() == COMMA) {
 			settings->evalops.parse_options.comma_as_separator = true;
 			settings->evalops.parse_options.dot_as_separator = false;
@@ -852,7 +896,7 @@ void PreferencesDialog::groupingChanged(int i) {
 		} else {
 			ignoreCommaBox->toggle();
 		}
-	} else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.dot_as_separator || CALCULATOR->getDecimalPoint() == DOT) && CALCULATOR->local_digit_group_separator == DOT) {
+	} else if(v == DIGIT_GROUPING_LOCALE && (!settings->evalops.parse_options.dot_as_separator || CALCULATOR->getDecimalPoint() == DOT) && CALCULATOR->local_digit_group_separator == DOT) {
 		if(CALCULATOR->getDecimalPoint() == DOT) {
 			settings->evalops.parse_options.dot_as_separator = true;
 			settings->evalops.parse_options.comma_as_separator = false;
@@ -869,6 +913,23 @@ void PreferencesDialog::groupingChanged(int i) {
 	} else {
 		emit resultFormatUpdated();
 	}
+}
+void PreferencesDialog::cgfChanged(int i) {
+	if(!settings->custom_digit_grouping) return;
+	settings->custom_digit_group_format = '0' + i;
+	CALCULATOR->local_digit_group_format = "";
+	for(size_t i = 0; i < settings->custom_digit_group_format.size(); i++) {
+		CALCULATOR->local_digit_group_format += settings->custom_digit_group_format[i] - '0';
+	}
+	settings->custom_digit_group_changed = true;
+	emit resultFormatUpdated();
+}
+void PreferencesDialog::cgsChanged(const QString &str) {
+	if(!settings->custom_digit_grouping) return;
+	settings->custom_digit_group_separator = str.toStdString();
+	CALCULATOR->local_digit_group_separator = settings->custom_digit_group_separator;
+	settings->custom_digit_group_changed = true;
+	emit resultFormatUpdated();
 }
 void PreferencesDialog::intervalDisplayChanged(int i) {
 	if(i == 0) {
