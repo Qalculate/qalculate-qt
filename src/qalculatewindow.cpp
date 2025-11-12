@@ -3149,7 +3149,10 @@ void QalculateWindow::onInsertValueRequested(int i) {
 }
 void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion();
+	int delay_bak = settings->auto_calculate_delay;
+	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 	expressionEdit->insertText(str);
+	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -3189,9 +3192,12 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 	} else if(str == "!") {
 		QTextCursor cur = expressionEdit->textCursor();
 		do_exec = (str == "!") && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+		int delay_bak = settings->auto_calculate_delay;
+		if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 		if(do_exec) expressionEdit->blockParseStatus();
 		expressionEdit->wrapSelection(str);
 		if(do_exec) expressionEdit->blockParseStatus(false);
+		settings->auto_calculate_delay = delay_bak;
 	} else if(str == "E" || str == "e") {
 		if(expressionEdit->textCursor().hasSelection() && !expressionEdit->overwriteMode()) expressionEdit->wrapSelection(QString::fromUtf8(settings->multiplicationSign()) + "10^");
 		else expressionEdit->insertText(settings->printops.exp_display == EXP_UPPERCASE_E ? "E" : "e");
@@ -3489,13 +3495,18 @@ void QalculateWindow::negate() {
 void QalculateWindow::onVariableClicked(Variable *v) {
 	if(!v) return;
 	expressionEdit->blockCompletion();
+	int delay_bak = settings->auto_calculate_delay;
+	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 	expressionEdit->insertText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_VARIABLE, true)));
+	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onUnitClicked(Unit *u) {
 	if(!u) return;
 	expressionEdit->blockCompletion();
+	int delay_bak = settings->auto_calculate_delay;
+	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 	if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
@@ -3504,6 +3515,7 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 	} else {
 		expressionEdit->insertText(QString::fromStdString(u->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_UNIT, true)));
 	}
+	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -3516,17 +3528,23 @@ void QalculateWindow::onPrefixClicked(Prefix *p) {
 }
 void QalculateWindow::onDelClicked() {
 	expressionEdit->blockCompletion();
+	int delay_bak = settings->auto_calculate_delay;
+	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 	QTextCursor cur = expressionEdit->textCursor();
 	if(cur.atEnd()) cur.deletePreviousChar();
 	else cur.deleteChar();
+	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
 void QalculateWindow::onBackspaceClicked() {
 	expressionEdit->blockCompletion();
+	int delay_bak = settings->auto_calculate_delay;
+	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
 	QTextCursor cur = expressionEdit->textCursor();
 	if(!cur.atStart()) cur.deletePreviousChar();
 	else cur.deleteChar();
+	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 	expressionEdit->blockCompletion(false);
 }
@@ -7493,6 +7511,7 @@ void ViewThread::run() {
 			}
 			bool compact = (settings->history_expression_type == HISTORY_EXPRESSION_TYPE_PARSED_COMPACT || settings->history_expression_type == HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT);
 			po.abbreviate_names = compact;
+			po.hide_underscore_spaces = true;
 			po.digit_grouping = settings->printops.digit_grouping;
 			po.use_unicode_signs = settings->printops.use_unicode_signs;
 			po.multiplication_sign = settings->printops.multiplication_sign;

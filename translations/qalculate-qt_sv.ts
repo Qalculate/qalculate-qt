@@ -9533,17 +9533,17 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="218"/>
         <source>Parsed (compact)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tolkat uttryck (kompakt)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="221"/>
         <source>Entered + parsed (compact)</source>
-        <translation type="unfinished"></translation>
+        <translation>Inknappat + tolkat uttryck (kompakt)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="325"/>
         <source>Custom</source>
-        <translation type="unfinished">Anpassad</translation>
+        <translation>Anpassad</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="432"/>

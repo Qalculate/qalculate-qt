@@ -1248,7 +1248,7 @@ void QalculateQtSettings::loadPreferences() {
 
 	preferences_version[0] = 5;
 	preferences_version[1] = 8;
-	preferences_version[2] = 1;
+	preferences_version[2] = 2;
 
 	if(file) {
 		char line[1000000L];
@@ -2023,14 +2023,6 @@ void MathLineEdit::keyPressEvent(QKeyEvent *event) {
 					insert(" xor ");
 					return;
 				}
-				break;
-			}
-			case Qt::Key_BraceLeft: {
-				if(!b_function) {return;}
-				break;
-			}
-			case Qt::Key_BraceRight: {
-				if(!b_function) {return;}
 				break;
 			}
 		}

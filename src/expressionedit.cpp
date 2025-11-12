@@ -959,6 +959,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl) : 
 	expression_has_changed2 = false;
 	tabbed_index = -1;
 	enable_tab = false;
+	use_bold_highlight = -1;
 	previous_epos = 0;
 	parsed_had_errors = false;
 	parsed_had_warnings = false;
@@ -1015,7 +1016,10 @@ void ExpressionEdit::updateMinimumHeight() {
 #endif
 }
 void ExpressionEdit::changeEvent(QEvent *e) {
-	if(e->type() == QEvent::FontChange) updateMinimumHeight();
+	if(e->type() == QEvent::FontChange) {
+		updateMinimumHeight();
+		use_bold_highlight = -1;
+	}
 	QPlainTextEdit::changeEvent(e);
 }
 bool ExpressionEdit::eventFilter(QObject *o, QEvent *e) {
@@ -1853,8 +1857,6 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				}
 				break;
 			}
-			/*case Qt::Key_BraceLeft: {return;}
-			case Qt::Key_BraceRight: {return;}*/
 		}
 	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
@@ -2602,6 +2604,16 @@ void find_matching_units(const MathStructure &m, const MathStructure *mparse, st
 	}
 }
 
+void replace_control_characters_qt(std::string &str) {
+	for(size_t i = 0; i < str.size();) {
+		if((str[i] > 0 && str[i] < 9) || ((str[i] > 13 && str[i] < 32) && str[i] != '\e')) {
+			str.erase(i, 1);
+		} else {
+			i++;
+		}
+	}
+}
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) return;
@@ -2685,6 +2697,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	CALCULATOR->beginTemporaryStopMessages();
 	gsub(ID_WRAP_LEFT, LEFT_PARENTHESIS, text);
 	gsub(ID_WRAP_RIGHT, RIGHT_PARENTHESIS, text);
+	replace_control_characters_qt(text);
 	std::string parsed_expression, parsed_expression_tooltip;
 	remove_duplicate_blanks(text);
 	size_t i = text.find_first_of(SPACES);
@@ -2703,7 +2716,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	QTextCursor cursor = textCursor();
 	MathStructure mparse, mfunc;
 	bool full_parsed = false;
-	std::string str_e, str_u, str_w, str_sub;
+	std::string str_e, str_u, str_w;
 	bool had_errors = false, had_warnings = false;
 	settings->evalops.parse_options.preserve_format = true;
 	if(!settings->simplified_percentage) settings->evalops.parse_options.parsing_mode = (ParsingMode) (settings->evalops.parse_options.parsing_mode | PARSE_PERCENT_AS_ORDINARY_CONSTANT);
@@ -2715,7 +2728,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
 			b = CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops) || b;
 			if(!b) {
-				str_sub = str_e;
 				CALCULATOR->beginTemporaryStopMessages();
 				CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 				CALCULATOR->endTemporaryStopMessages();
@@ -2784,6 +2796,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		po.twos_complement = settings->printops.twos_complement;
 		po.hexadecimal_twos_complement = settings->printops.hexadecimal_twos_complement;
 		po.base = settings->evalops.parse_options.base;
+		po.allow_non_usable = settings->status_in_history;
 		Number nr_base;
 		if(po.base == BASE_CUSTOM && (CALCULATOR->usesIntervalArithmetic() || CALCULATOR->customInputBase().isRational()) && (CALCULATOR->customInputBase().isInteger() || !CALCULATOR->customInputBase().isNegative()) && (CALCULATOR->customInputBase() > 1 || CALCULATOR->customInputBase() < -1)) {
 			nr_base = CALCULATOR->customOutputBase();
@@ -2815,10 +2828,14 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
 			mparse.format(po);
+			if(compact) po.preserve_format = false;
 			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
+			if(compact) po.preserve_format = true;
 			parsed_expression += CALCULATOR->localWhereString();
 			mwhere.format(po);
+			if(compact) po.preserve_format = false;
 			parsed_expression += mwhere.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
+			if(compact) po.preserve_format = true;
 			CALCULATOR->endTemporaryStopMessages();
 		} else if(str_e.empty()) {
 			parsed_expression = "";
@@ -2827,6 +2844,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			mparse.format(po);
 			if(compact) po.preserve_format = false;
 			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
+			if(compact) po.preserve_format = true;
 			CALCULATOR->endTemporaryStopMessages();
 		}
 		if(!str_u.empty()) {
@@ -3066,7 +3084,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
 						} else {
 							CALCULATOR->beginTemporaryStopMessages();
+							if(compact) po.preserve_format = false;
 							parsed_expression += mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
+							if(compact) po.preserve_format = true;
 							CALCULATOR->endTemporaryStopMessages();
 						}
 						had_to_conv = true;
@@ -3683,7 +3703,7 @@ void ExpressionEdit::highlightParentheses() {
 			else if(document()->characterAt(ipar2) == '(') pars--;
 			if(pars == 0) break;
 		}
-		b = (pars == 0);
+		if(pars != 0) ipar2 = -1;
 	} else {
 		b = pos < l && document()->characterAt(pos) == '(';
 		if(!b && pos > 0 && document()->characterAt(pos - 1) == '(') {
@@ -3699,21 +3719,43 @@ void ExpressionEdit::highlightParentheses() {
 				else if(document()->characterAt(ipar2) == ')') pars--;
 				if(pars == 0) break;
 			}
-			b = (pars == 0);
+			if(pars != 0) {
+				ipar2 = -1;
+				b = (pos < l - 1);
+			}
 		}
 	}
 	if(b) {
 		block_text_change++;
 		QTextCharFormat format;
-		if(settings->color == 1) format.setForeground(QColor(0, 128, 0));
-		else format.setForeground(QColor(0, 255, 0));
+		if(ipar2 >= 0) {
+			if(settings->color == 1) format.setForeground(QColor(0, 159, 0));
+			else format.setForeground(QColor(96, 255, 96));
+		} else {
+			if(settings->color == 1) format.setForeground(QColor(183, 0, 0));
+			else format.setForeground(QColor(255, 128, 128));
+		}
+		if(use_bold_highlight < 0) {
+			QFontMetrics fm(font());
+			QFont bfont(font());
+			bfont.setWeight(QFont::Bold);
+			QFontMetrics fmb(bfont);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+			use_bold_highlight = (fm.horizontalAdvance('(') == fmb.horizontalAdvance('('));
+#else
+			use_bold_highlight = (fm.averageCharWidth() == fmb.averageCharWidth());
+#endif
+		}
+		if(use_bold_highlight) format.setFontWeight(QFont::Bold);
 		QTextCursor cur = textCursor();
 		cur.setPosition(pos, QTextCursor::MoveAnchor);
 		cur.setPosition(pos + 1, QTextCursor::KeepAnchor);
 		cur.setCharFormat(format);
-		cur.setPosition(ipar2, QTextCursor::MoveAnchor);
-		cur.setPosition(ipar2 + 1, QTextCursor::KeepAnchor);
-		cur.setCharFormat(format);
+		if(ipar2 >= 0) {
+			cur.setPosition(ipar2, QTextCursor::MoveAnchor);
+			cur.setPosition(ipar2 + 1, QTextCursor::KeepAnchor);
+			cur.setCharFormat(format);
+		}
 		setCurrentCharFormat(QTextCharFormat());
 		block_text_change--;
 		parentheses_highlighted = true;

@@ -50,15 +50,18 @@ QString font_string(std::string str) {
 class PreferencesPageScroll : public QScrollArea {
 	protected:
 		QWidget *child_widget;
-		bool use_child_hint;
+		bool use_child_hint_h, use_child_hint_w;
 	public:
-		PreferencesPageScroll(QWidget *parent, QWidget *child, bool b) : QScrollArea(parent), child_widget(child), use_child_hint(b) {
+		PreferencesPageScroll(QWidget *parent, QWidget *child, bool bh, bool bw) : QScrollArea(parent), child_widget(child), use_child_hint_h(bh), use_child_hint_w(bw) {
 			setWidget(child);
 		}
 		QSize sizeHint() const {
-			if(use_child_hint) {
+			if(use_child_hint_w || use_child_hint_h) {
 				QSize s = child_widget->sizeHint();
-				s.setHeight(s.height() + 1);
+				if(use_child_hint_w) s.setWidth(s.width() + 2);
+				else s.setWidth(QScrollArea::sizeHint().width());
+				if(use_child_hint_h) s.setHeight(s.height() + 2);
+				else s.setHeight(QScrollArea::sizeHint().height());
 				return s;
 			}
 			return QScrollArea::sizeHint();
@@ -478,13 +481,14 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 	QSize size = get_screen_geometry(this).size();
 	QSize sh = w1->sizeHint().expandedTo(w2->sizeHint().expandedTo(w3->sizeHint().expandedTo(w4->sizeHint().expandedTo(w5->sizeHint()))));
-	if(size.width() >= sh.width() + 100) tabs->setUsesScrollButtons(false);
-	bool use_child_hint = size.height() >= sh.height() + 100;
-	QScrollArea *s1 = new PreferencesPageScroll(this, w1, use_child_hint);
-	QScrollArea *s2 = new PreferencesPageScroll(this, w2, use_child_hint);
-	QScrollArea *s3 = new PreferencesPageScroll(this, w3, use_child_hint);
-	QScrollArea *s4 = new PreferencesPageScroll(this, w4, use_child_hint);
-	QScrollArea *s5 = new PreferencesPageScroll(this, w5, use_child_hint);
+	bool use_child_hint_h = size.height() >= sh.height() + 100;
+	bool use_child_hint_w = size.width() >= sh.width() + 100;
+	if(use_child_hint_w) tabs->setUsesScrollButtons(false);
+	QScrollArea *s1 = new PreferencesPageScroll(this, w1, use_child_hint_h, use_child_hint_w);
+	QScrollArea *s2 = new PreferencesPageScroll(this, w2, use_child_hint_h, use_child_hint_w);
+	QScrollArea *s3 = new PreferencesPageScroll(this, w3, use_child_hint_h, use_child_hint_w);
+	QScrollArea *s4 = new PreferencesPageScroll(this, w4, use_child_hint_h, use_child_hint_w);
+	QScrollArea *s5 = new PreferencesPageScroll(this, w5, use_child_hint_h, use_child_hint_w);
 	tabs->addTab(s1, tr("Look && Feel"));
 	tabs->addTab(s5, tr("Fonts"));
 	tabs->addTab(s2, tr("Numbers && Operators"));
