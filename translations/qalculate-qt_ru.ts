@@ -1168,6 +1168,10 @@ Do you want to overwrite the function?</source>
         <source>In status bar</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>With adaptive delay</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FPConversionDialog</name>
@@ -3072,10 +3076,6 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Place expression field below history (experimental)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically group digits in input</source>
         <translation>Автоматически группировать цифры во входных данных</translation>
     </message>
@@ -3117,6 +3117,14 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adaptive delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Place expression field below history</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3457,7 +3465,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>Active normal display mode</source>
-        <translation>Активировать простой режим отображения</translation>
+        <translation type="vanished">Активировать простой режим отображения</translation>
     </message>
     <message>
         <source>Activate scientific display mode</source>
@@ -3754,6 +3762,10 @@ You can get version %3 at %2.</source>
     <message>
         <source>Toggle fraction format in current result</source>
         <translation>Переключить формат дробей в текущем результате</translation>
+    </message>
+    <message>
+        <source>Activate normal display mode</source>
+        <translation>Активировать простой режим отображения</translation>
     </message>
 </context>
 <context>

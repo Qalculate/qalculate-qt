@@ -134,7 +134,8 @@ unsigned int to_bits = 0;
 Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
 std::string auto_expression, auto_result, current_status_expression, auto_exact_text, auto_result_text;
-bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false, auto_aborted = false;
+bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false;
+size_t auto_aborted = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
 bool title_modified = false;
@@ -965,7 +966,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(server, SIGNAL(newConnection()), this, SLOT(serverNewConnection()));
 
 	mstruct = new MathStructure();
-	settings->current_result = NULL;
 	mstruct_exact.setUndefined();
 	prepend_mstruct.setUndefined();
 	parsed_mstruct = new MathStructure();
@@ -3150,7 +3150,7 @@ void QalculateWindow::onInsertValueRequested(int i) {
 void QalculateWindow::onSymbolClicked(const QString &str) {
 	expressionEdit->blockCompletion();
 	int delay_bak = settings->auto_calculate_delay;
-	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+	if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 	expressionEdit->insertText(str);
 	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
@@ -3193,7 +3193,7 @@ void QalculateWindow::onOperatorClicked(const QString &str) {
 		QTextCursor cur = expressionEdit->textCursor();
 		do_exec = (str == "!") && cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 		int delay_bak = settings->auto_calculate_delay;
-		if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+		if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 		if(do_exec) expressionEdit->blockParseStatus();
 		expressionEdit->wrapSelection(str);
 		if(do_exec) expressionEdit->blockParseStatus(false);
@@ -3496,7 +3496,7 @@ void QalculateWindow::onVariableClicked(Variable *v) {
 	if(!v) return;
 	expressionEdit->blockCompletion();
 	int delay_bak = settings->auto_calculate_delay;
-	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+	if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 	expressionEdit->insertText(QString::fromStdString(v->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_VARIABLE, true)));
 	settings->auto_calculate_delay = delay_bak;
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
@@ -3506,7 +3506,7 @@ void QalculateWindow::onUnitClicked(Unit *u) {
 	if(!u) return;
 	expressionEdit->blockCompletion();
 	int delay_bak = settings->auto_calculate_delay;
-	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+	if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 	if(u->subtype() == SUBTYPE_COMPOSITE_UNIT) {
 		PrintOptions po = settings->printops;
 		po.is_approximate = NULL;
@@ -3529,7 +3529,7 @@ void QalculateWindow::onPrefixClicked(Prefix *p) {
 void QalculateWindow::onDelClicked() {
 	expressionEdit->blockCompletion();
 	int delay_bak = settings->auto_calculate_delay;
-	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+	if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 	QTextCursor cur = expressionEdit->textCursor();
 	if(cur.atEnd()) cur.deletePreviousChar();
 	else cur.deleteChar();
@@ -3540,7 +3540,7 @@ void QalculateWindow::onDelClicked() {
 void QalculateWindow::onBackspaceClicked() {
 	expressionEdit->blockCompletion();
 	int delay_bak = settings->auto_calculate_delay;
-	if(settings->status_in_history || settings->status_in_statusbar) settings->auto_calculate_delay = 0;
+	if(settings->adaptive_autocalc_delay && settings->status_in_history) settings->auto_calculate_delay = 0;
 	QTextCursor cur = expressionEdit->textCursor();
 	if(!cur.atStart()) cur.deletePreviousChar();
 	else cur.deleteChar();
@@ -6763,6 +6763,7 @@ void QalculateWindow::onHistoryReloaded() {
 		if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true);
 	}
 }
+
 void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool had_error, bool had_warning, bool expression_from_history) {
 	if(!settings->status_in_history || settings->rpn_mode) return;
 	std::string current_text = expressionEdit->toPlainText().trimmed().toStdString();
@@ -6779,7 +6780,8 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_error = false;
 		mauto.setAborted();
 		updateWindowTitleResult(result_text);
-	} else if(!is_expression || !settings->auto_calculate || contains_plot_or_save(CALCULATOR->unlocalizeExpression(current_text, settings->evalops.parse_options)) || current_text[0] == '#') {
+	} else if(!is_expression || !settings->auto_calculate || !expressionEdit->parsedCalculable()) {
+		if(!settings->auto_calculate || !is_expression) auto_aborted = false;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
 		auto_error = had_error || had_warning;
@@ -6788,25 +6790,24 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_result = "";
 		auto_result_text = "";
 		auto_exact_text = "";
-		auto_aborted = false;
 		mauto.setAborted();
 		CALCULATOR->addMessages(&expressionEdit->status_messages);
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 		updateWindowTitleResult("");
 	} else {
-		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty()))) {
+		if((!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty()))) && (!settings->adaptive_autocalc_delay || current_text.back() != RIGHT_PARENTHESIS_CH || !auto_result.empty())) {
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
 				autoCalculateTimer->stop();
 				autoCalculateTimer->start(settings->auto_calculate_delay);
 			}
 			return;
 		}
+		if(auto_aborted && auto_aborted > current_text.length()) auto_aborted = false;
 		current_status_expression = current_text;
 		current_status = status;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
-		if(had_error || expression_from_history || settings->auto_calculate_delay > 0) {
-			auto_aborted = false;
-			if(had_error || expression_from_history || had_warning || auto_error || !auto_result.empty() || auto_expression != status.toStdString()) {
+		if(had_error || expression_from_history || settings->auto_calculate_delay > 0 || (auto_aborted && settings->adaptive_autocalc_delay)) {
+			if(had_error || had_warning || auto_error || !auto_result.empty() || auto_expression != status.toStdString()) {
 				auto_result = "";
 				auto_result_text = "";
 				auto_exact_text = "";
@@ -6817,8 +6818,12 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 				CALCULATOR->addMessages(&expressionEdit->status_messages);
 				historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 			}
-			if(had_error || expression_from_history) {
+			if(had_error) {
 				updateWindowTitleResult("");
+				return;
+			}
+			if(settings->adaptive_autocalc_delay && !auto_aborted && expressionEdit->parsedCalculable() == 1 && !expression_from_history) {
+				autoCalculateTimeout();
 				return;
 			}
 			if(!autoCalculateTimer) {
@@ -6826,7 +6831,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 				autoCalculateTimer->setSingleShot(true);
 				connect(autoCalculateTimer, SIGNAL(timeout()), this, SLOT(autoCalculateTimeout()));
 			}
-			autoCalculateTimer->start(settings->auto_calculate_delay);
+			autoCalculateTimer->start(auto_aborted || expression_from_history ? (settings->auto_calculate_delay <= 0 ? 500 : settings->auto_calculate_delay * 2) : settings->auto_calculate_delay);
 		} else {
 			autoCalculateTimeout();
 		}
@@ -6863,8 +6868,16 @@ bool contains_extreme_number(const MathStructure &m) {
 	}
 	return false;
 }
+bool contains_subvector(const MathStructure &m, bool top = true) {
+	if(!top && m.isVector()) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_subvector(m[i], top && m.isVector())) return true;
+	}
+	return false;
+}
 
 void QalculateWindow::autoCalculateTimeout() {
+
 	mauto.setAborted();
 	bool is_approximate = false;
 	PrintOptions po = settings->printops;
@@ -7159,18 +7172,21 @@ void QalculateWindow::autoCalculateTimeout() {
 	MathStructure mexact, mto;
 	mexact.setUndefined();
 	po.allow_factorization = (settings->evalops.structuring == STRUCTURING_FACTORIZE);
-	if(do_calendars || do_bases) mauto.setAborted();
-	else mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
-	if(mauto.isAborted() || CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500 || mauto_parsed.contains(m_undefined) || contains_extreme_number(mauto)) {
-		if(!do_calendars && !do_bases) auto_aborted = true;
+	size_t new_auto_aborted = false;
+	if(do_calendars || do_bases) {
 		mauto.setAborted();
-		result = "";
+	} else {
+		mauto = CALCULATOR->calculate(CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), settings->evalops, &mauto_parsed, &mto);
+		if(mauto.isAborted() || CALCULATOR->aborted()) {
+			new_auto_aborted = current_status_expression.length();
+			mauto.setAborted();
+		} else if(mauto.size() > 50 || mauto.countTotalChildren(false) > 500 || (mauto.isMatrix() && mauto.rows() * mauto.columns() > 50) || contains_subvector(mauto) || contains_extreme_number(mauto)) {
+			mauto.setAborted();
+		}
 	}
-	if(mauto.isZero() && mauto_parsed.isFunction() && mauto_parsed.function()->subtype() == SUBTYPE_DATA_SET && mauto_parsed.size() >= 2 && mauto_parsed[1].isSymbolic() && equalsIgnoreCase(mauto_parsed[1].symbol(), "info")) {
-		mauto.setAborted();
+	if(mauto.isAborted()) {
 		result = "";
-	}
-	if(!mauto.isAborted()) {
+	} else {
 		if(settings->dual_approximation > 0 || po.base == BASE_DECIMAL) {
 			if(delay_complex) settings->evalops.complex_number_form = COMPLEX_NUMBER_FORM_RECTANGULAR;
 			calculate_dual_exact(mexact, &mauto, CALCULATOR->unlocalizeExpression(str, settings->evalops.parse_options), &mauto_parsed, settings->evalops, settings->dual_approximation < 0 ? AUTOMATIC_APPROXIMATION_AUTO : (settings->dual_approximation > 0 ? AUTOMATIC_APPROXIMATION_DUAL : AUTOMATIC_APPROXIMATION_OFF), 0, -1);
@@ -7197,7 +7213,10 @@ void QalculateWindow::autoCalculateTimeout() {
 				mauto.expand(settings->evalops);
 				po.allow_factorization = false;
 			}
-			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) mauto.setAborted();
+			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
+				mauto.setAborted();
+				new_auto_aborted = current_status_expression.length();
+			}
 		}
 	}
 
@@ -7342,7 +7361,10 @@ void QalculateWindow::autoCalculateTimeout() {
 		}
 		warnAssumptions(mauto_parsed, true);
 	}
+	if(CALCULATOR->aborted()) new_auto_aborted = current_status_expression.length();
 	CALCULATOR->stopControl();
+
+	if(!auto_aborted || new_auto_aborted < auto_aborted) auto_aborted = new_auto_aborted;
 
 	settings->evalops.complex_number_form = cnf_bak;
 	settings->evalops.auto_post_conversion = save_auto_post_conversion;
@@ -7945,6 +7967,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 			auto_exact_text = "";
 			mauto.setAborted();
 			auto_error = false;
+			auto_aborted = false;
 			if(autoCalculateTimer) autoCalculateTimer->stop();
 			historyView->addResult(alt_results, update_parse ? prev_result_text : "", !parsed_approx, update_parse ? parsed_text : "", b_exact, alt_results.size() > 1 && !mstruct_exact.isUndefined(), flag, !supress_dialog && update_parse && settings->evalops.parse_options.parsing_mode <= PARSING_MODE_CONVENTIONAL && update_history ? &implicit_warning : NULL);
 		} else if(update_parse) {

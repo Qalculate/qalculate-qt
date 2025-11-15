@@ -62,7 +62,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QStandardItemModel *sourceModel;
 		QTableView *completionView;
 		QMenu *cmenu, *fileMenu, *modeMenu;
-		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *statusStatusAction, *autocalcSelectionAction, *calculateSelectionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
+		QAction *undoAction, *redoAction, *cutAction, *copyAction, *pasteAction, *deleteAction, *selectAllAction, *clearAction, *statusOffAction, *statusDelayAction, *statusAdaptiveDelayAction, *statusNoDelayAction, *statusHistoryAction, *statusExpressionAction, *statusStatusAction, *autocalcSelectionAction, *calculateSelectionAction, *clearHistoryAction, *fileAction, *fileSeparator, *tbAction;
 		QTimer *completionTimer, *toolTipTimer;
 		QLabel *statusLabel;
 		ExpressionTipLabel *tipLabel;
@@ -96,6 +96,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		int previous_epos;
 		QPoint function_pos;
 		bool parentheses_highlighted;
+		int auto_calculable;
 		int default_frame;
 		QRect prev_rect;
 
@@ -132,6 +133,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void setMenuAndToolbarItems(QMenu*, QMenu*, QAction*);
 		bool completionInitialized();
 		void insertText(const QString&);
+		int parsedCalculable();
 
 		std::vector<CalculatorMessage> status_messages;
 

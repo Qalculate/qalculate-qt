@@ -267,6 +267,7 @@ int AnswerFunction::calculate(MathStructure &mstruct, const MathStructure &vargs
 }
 
 QalculateQtSettings::QalculateQtSettings() {
+	current_result = NULL;
 	ignore_locale = false;
 	fetch_exchange_rates_at_startup = false;
 	current_history_time = 0;
@@ -1003,6 +1004,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			auto_calculate = v;
 		} else if(svar == "calculate_as_you_type_delay") {
 			auto_calculate_delay = v;
+		} else if(svar == "adaptive_autocalc_delay") {
+			adaptive_autocalc_delay = v;
 		} else if(svar == "status_in_history") {
 			status_in_history = v;
 			if(status_in_history) status_in_statusbar = false;
@@ -1143,6 +1146,7 @@ void QalculateQtSettings::loadPreferences() {
 	display_expression_status = true;
 	expression_status_delay = 1000;
 	auto_calculate_delay = 500;
+	adaptive_autocalc_delay = true;
 	prefixes_default = true;
 	keypad_type = 0;
 	expression_pos = 0;
@@ -1761,6 +1765,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "use_binary_prefixes=%i\n", CALCULATOR->usesBinaryPrefixes());
 		fprintf(file, "calculate_as_you_type=%i\n", auto_calculate);
 		fprintf(file, "calculate_as_you_type_delay=%i\n", auto_calculate_delay);
+		fprintf(file, "adaptive_autocalc_delay=%i\n", adaptive_autocalc_delay);
 		if(status_in_statusbar) fprintf(file, "status_in_statusbar=%i\n", status_in_statusbar);
 		else fprintf(file, "status_in_history=%i\n", status_in_history);
 		fprintf(file, "autocalc_selection=%i\n", autocalc_selection);
@@ -2328,7 +2333,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_DEGREES: {return tr("Set angle unit to degrees");}
 		case SHORTCUT_TYPE_RADIANS: {return tr("Set angle unit to radians");}
 		case SHORTCUT_TYPE_GRADIANS: {return tr("Set angle unit to gradians");}
-		case SHORTCUT_TYPE_NORMAL_NOTATION: {return tr("Active normal display mode");}
+		case SHORTCUT_TYPE_NORMAL_NOTATION: {return tr("Activate normal display mode");}
 		case SHORTCUT_TYPE_SCIENTIFIC_NOTATION: {return tr("Activate scientific display mode");}
 		case SHORTCUT_TYPE_ENGINEERING_NOTATION: {return tr("Activate engineering display mode");}
 		case SHORTCUT_TYPE_SIMPLE_NOTATION: {return tr("Activate simple display mode");}

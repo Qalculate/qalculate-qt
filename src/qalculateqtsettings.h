@@ -286,6 +286,7 @@ class QalculateQtSettings : QObject {
 		int allow_multiple_instances;
 		int decimal_comma, dual_fraction, dual_approximation, auto_update_exchange_rates, title_type;
 		int completion_delay, expression_status_delay, auto_calculate_delay;
+		bool adaptive_autocalc_delay;
 		int completion_min, completion_min2;
 		QString style;
 		int palette;

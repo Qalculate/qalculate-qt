@@ -137,7 +137,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 		box2->setChecked(settings->preserve_history_height > 0);
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
-	BOX(tr("Place expression field below history (experimental)"), settings->expression_pos == 1, expressionPositionToggled(bool));
+	BOX(tr("Place expression field below history"), settings->expression_pos == 1, expressionPositionToggled(bool));
 	BOX(tr("Show status bar"), settings->show_statusbar || settings->status_in_statusbar, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);
@@ -214,7 +214,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	calculateDelayWidget->setEnabled(settings->status_in_history);
 	connect(calculateDelayWidget, SIGNAL(valueChanged(int)), this, SLOT(calculateDelayChanged(int)));
 	l->addWidget(calculateDelayWidget, r, 1); r++;
-	BOX(tr("Automatically calculate selection"), settings->autocalc_selection, autocalcSelectionToggled(bool));
+	BOX(tr("Adaptive delay"), settings->adaptive_autocalc_delay, adaptiveDelayToggled(bool)); box->setEnabled(settings->status_in_history); adaptiveDelayBox = box;
+	BOX(tr("Automatically calculate selection"), settings->autocalc_selection, autocalcSelectionToggled(bool)); autocalcSelectionBox = box;
 	l->addWidget(new QLabel(tr("Expression in history:"), this), r, 0);
 	combo = new QComboBox(this);
 	combo->addItem(tr("Parsed"), HISTORY_EXPRESSION_TYPE_PARSED);
@@ -578,6 +579,10 @@ void PreferencesDialog::statusModeChanged(int i) {
 	settings->status_in_statusbar = (i == 3);
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	calculateDelayWidget->setEnabled(settings->status_in_history);
+	adaptiveDelayBox->setEnabled(settings->status_in_history);
+	adaptiveDelayBox->blockSignals(true);
+	adaptiveDelayBox->setChecked(settings->status_in_history && settings->adaptive_autocalc_delay);
+	adaptiveDelayBox->blockSignals(false);
 	emit statusModeChanged();
 }
 void PreferencesDialog::statusDelayChanged(int v) {
@@ -585,6 +590,9 @@ void PreferencesDialog::statusDelayChanged(int v) {
 }
 void PreferencesDialog::calculateDelayChanged(int v) {
 	settings->auto_calculate_delay = v;
+}
+void PreferencesDialog::adaptiveDelayToggled(bool b) {
+	settings->adaptive_autocalc_delay = b;
 }
 void PreferencesDialog::autocalcSelectionToggled(bool b) {
 	settings->autocalc_selection = b;
@@ -1133,6 +1141,8 @@ void PreferencesDialog::updateExpressionStatus() {
 	statusDelayWidget->blockSignals(true);
 	calculateDelayWidget->blockSignals(true);
 	statusCombo->blockSignals(true);
+	autocalcSelectionBox->blockSignals(true);
+	adaptiveDelayBox->blockSignals(true);
 	if(!settings->display_expression_status) statusCombo->setCurrentIndex(0);
 	else if(settings->status_in_history) statusCombo->setCurrentIndex(1);
 	else if(settings->status_in_statusbar) statusCombo->setCurrentIndex(3);
@@ -1141,9 +1151,14 @@ void PreferencesDialog::updateExpressionStatus() {
 	statusDelayWidget->setEnabled(settings->display_expression_status);
 	calculateDelayWidget->setValue(settings->auto_calculate_delay);
 	calculateDelayWidget->setEnabled(settings->status_in_history);
+	adaptiveDelayBox->setEnabled(settings->status_in_history);
+	adaptiveDelayBox->setChecked(settings->status_in_history && settings->adaptive_autocalc_delay);
+	autocalcSelectionBox->setChecked(settings->autocalc_selection);
 	statusDelayWidget->blockSignals(false);
 	calculateDelayWidget->blockSignals(false);
 	statusCombo->blockSignals(false);
+	autocalcSelectionBox->blockSignals(false);
+	adaptiveDelayBox->blockSignals(false);
 }
 void PreferencesDialog::updateTemperatureCalculation() {
 	tcCombo->blockSignals(true);
