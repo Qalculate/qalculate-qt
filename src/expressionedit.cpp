@@ -2443,6 +2443,8 @@ void ExpressionEdit::showCurrentStatus() {
 			statusLabel->clear();
 		} else {
 			if(show_in_status) {
+				str.replace("<br>", " ");
+				str.replace("\n", " ");
 				statusLabel->setText(str);
 			} else if(tipLabel && tipLabel->isVisible()) {
 				tipLabel->reuseTip(str, mapToGlobal((current_status_type == 2 ? function_pos : cursorRect().bottomRight())));
@@ -2644,7 +2646,10 @@ void replace_control_characters_qt(std::string &str) {
 
 bool test_autocalculatable(const MathStructure &m, bool top = true) {
 	if(m.isFunction()) {
-		if(m.size() < (size_t) m.function()->minargs() && (m.size() != 1 || m[0].representsScalar())) return false;
+		if(m.size() < (size_t) m.function()->minargs() && (m.size() != 1 || m[0].representsScalar())) {
+			CALCULATOR->error(false, "", NULL);
+			return false;
+		}
 		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND) return false;
 		if(m.size() > 0 && (m.function()->id() == FUNCTION_ID_FACTORIAL || m.function()->id() == FUNCTION_ID_DOUBLE_FACTORIAL || m.function()->id() == FUNCTION_ID_MULTI_FACTORIAL) && m[0].isInteger() && m[0].number().integerLength() > 17) {
 			return false;
@@ -2857,7 +2862,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				cdata->current_from_categories.clear();
 			}
 		}
-		if(!test_autocalculatable(mparse) || (mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2))) {
+		if((mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2)) || !test_autocalculatable(mparse)) {
 			auto_calculable = 0;
 		} else if(last_is_name || (mfunc.isFunction() && cursor.atEnd() && str_e.find("(") != std::string::npos)) {
 			auto_calculable = 2;
@@ -3002,7 +3007,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("optimal unit").toStdString();
 				} else if(equalsIgnoreCase(str_u, "prefix") || equalsIgnoreCase(str_u, tr("prefix").toStdString()) || str_u == "?" || (str_u.length() == 2 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd'))) {
 					parsed_expression += tr("optimal prefix").toStdString();
-				} else if(equalsIgnoreCase(str_u, "base") || equalsIgnoreCase(str_u, tr("base").toStdString())) {
+				} else if(equalsIgnoreCase(str_u, "base") || equalsIgnoreCase(str_u, tr("base", "base units").toStdString())) {
 					parsed_expression += tr("base units").toStdString();
 				} else if(equalsIgnoreCase(str_u, "mixed") || equalsIgnoreCase(str_u, tr("mixed").toStdString())) {
 					parsed_expression += tr("mixed units").toStdString();
@@ -3075,7 +3080,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				} else if(str_u == "CET") {
 					parsed_expression += "UTC";
 					parsed_expression += "+01";
-				} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
+				} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base", "number base").toStdString())) {
 					parsed_expression += (tr("number base %1").arg(QString::fromStdString(to_str2))).toStdString();
 				} else if(equalsIgnoreCase(str_u, "decimals") || equalsIgnoreCase(str_u, tr("decimals").toStdString())) {
 					parsed_expression += tr("decimal fraction").toStdString();

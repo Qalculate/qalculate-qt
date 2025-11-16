@@ -933,7 +933,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1659"/>
-        <location filename="../src/expressionedit.cpp" line="2990"/>
+        <location filename="../src/expressionedit.cpp" line="2995"/>
         <source>Unicode</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1103,389 +1103,395 @@ Do you want to overwrite the function?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2514"/>
+        <location filename="../src/expressionedit.cpp" line="2516"/>
         <source>Too many arguments for %1().</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2545"/>
+        <location filename="../src/expressionedit.cpp" line="2547"/>
         <source>argument</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2564"/>
+        <location filename="../src/expressionedit.cpp" line="2566"/>
         <source>%1:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2692"/>
-        <location filename="../src/expressionedit.cpp" line="2694"/>
+        <location filename="../src/expressionedit.cpp" line="2697"/>
+        <location filename="../src/expressionedit.cpp" line="2699"/>
         <source>comment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2717"/>
-        <location filename="../src/expressionedit.cpp" line="2719"/>
+        <location filename="../src/expressionedit.cpp" line="2722"/>
+        <location filename="../src/expressionedit.cpp" line="2724"/>
         <source>MC (memory clear)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2727"/>
-        <location filename="../src/expressionedit.cpp" line="2729"/>
+        <location filename="../src/expressionedit.cpp" line="2732"/>
+        <location filename="../src/expressionedit.cpp" line="2734"/>
         <source>MS (memory store)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2737"/>
-        <location filename="../src/expressionedit.cpp" line="2739"/>
+        <location filename="../src/expressionedit.cpp" line="2742"/>
+        <location filename="../src/expressionedit.cpp" line="2744"/>
         <source>M+ (memory plus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2747"/>
-        <location filename="../src/expressionedit.cpp" line="2749"/>
+        <location filename="../src/expressionedit.cpp" line="2752"/>
+        <location filename="../src/expressionedit.cpp" line="2754"/>
         <source>M− (memory minus)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2763"/>
-        <location filename="../src/expressionedit.cpp" line="2765"/>
+        <location filename="../src/expressionedit.cpp" line="2768"/>
+        <location filename="../src/expressionedit.cpp" line="2770"/>
         <source>factorize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2766"/>
-        <location filename="../src/expressionedit.cpp" line="2768"/>
+        <location filename="../src/expressionedit.cpp" line="2771"/>
+        <location filename="../src/expressionedit.cpp" line="2773"/>
         <source>expand</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2953"/>
+        <location filename="../src/expressionedit.cpp" line="2958"/>
         <source>hexadecimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2954"/>
-        <location filename="../src/expressionedit.cpp" line="3074"/>
+        <location filename="../src/expressionedit.cpp" line="2959"/>
+        <location filename="../src/expressionedit.cpp" line="3079"/>
         <source>hexadecimal number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2955"/>
+        <location filename="../src/expressionedit.cpp" line="2960"/>
         <source>octal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2956"/>
+        <location filename="../src/expressionedit.cpp" line="2961"/>
         <source>octal number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2957"/>
+        <location filename="../src/expressionedit.cpp" line="2962"/>
         <source>decimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2958"/>
+        <location filename="../src/expressionedit.cpp" line="2963"/>
         <source>decimal number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2959"/>
+        <location filename="../src/expressionedit.cpp" line="2964"/>
         <source>duodecimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2960"/>
-        <location filename="../src/expressionedit.cpp" line="2962"/>
+        <location filename="../src/expressionedit.cpp" line="2965"/>
+        <location filename="../src/expressionedit.cpp" line="2967"/>
         <source>duodecimal number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2963"/>
+        <location filename="../src/expressionedit.cpp" line="2968"/>
         <source>binary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2964"/>
-        <location filename="../src/expressionedit.cpp" line="3068"/>
+        <location filename="../src/expressionedit.cpp" line="2969"/>
+        <location filename="../src/expressionedit.cpp" line="3073"/>
         <source>binary number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2965"/>
+        <location filename="../src/expressionedit.cpp" line="2970"/>
         <source>roman</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2966"/>
+        <location filename="../src/expressionedit.cpp" line="2971"/>
         <source>roman numerals</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2967"/>
+        <location filename="../src/expressionedit.cpp" line="2972"/>
         <source>bijective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2968"/>
+        <location filename="../src/expressionedit.cpp" line="2973"/>
         <source>bijective base-26</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2970"/>
+        <location filename="../src/expressionedit.cpp" line="2975"/>
         <source>binary-coded decimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2971"/>
+        <location filename="../src/expressionedit.cpp" line="2976"/>
         <source>sexagesimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2972"/>
+        <location filename="../src/expressionedit.cpp" line="2977"/>
         <source>sexagesimal number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2973"/>
-        <location filename="../src/expressionedit.cpp" line="2974"/>
+        <location filename="../src/expressionedit.cpp" line="2978"/>
+        <location filename="../src/expressionedit.cpp" line="2979"/>
         <source>latitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2975"/>
-        <location filename="../src/expressionedit.cpp" line="2976"/>
+        <location filename="../src/expressionedit.cpp" line="2980"/>
+        <location filename="../src/expressionedit.cpp" line="2981"/>
         <source>longitude</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2978"/>
+        <location filename="../src/expressionedit.cpp" line="2983"/>
         <source>32-bit floating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2980"/>
+        <location filename="../src/expressionedit.cpp" line="2985"/>
         <source>64-bit floating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2982"/>
+        <location filename="../src/expressionedit.cpp" line="2987"/>
         <source>16-bit floating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2984"/>
+        <location filename="../src/expressionedit.cpp" line="2989"/>
         <source>80-bit (x86) floating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2986"/>
+        <location filename="../src/expressionedit.cpp" line="2991"/>
         <source>128-bit floating point</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2987"/>
+        <location filename="../src/expressionedit.cpp" line="2992"/>
         <source>time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2988"/>
+        <location filename="../src/expressionedit.cpp" line="2993"/>
         <source>time format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2991"/>
+        <location filename="../src/expressionedit.cpp" line="2996"/>
         <source>scientific</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2992"/>
+        <location filename="../src/expressionedit.cpp" line="2997"/>
         <source>scientific notation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2993"/>
+        <location filename="../src/expressionedit.cpp" line="2998"/>
         <source>engineering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2994"/>
+        <location filename="../src/expressionedit.cpp" line="2999"/>
         <source>engineering notation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2995"/>
+        <location filename="../src/expressionedit.cpp" line="3000"/>
         <source>simple</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2996"/>
+        <location filename="../src/expressionedit.cpp" line="3001"/>
         <source>simple notation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2997"/>
+        <location filename="../src/expressionedit.cpp" line="3002"/>
         <source>bases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2998"/>
+        <location filename="../src/expressionedit.cpp" line="3003"/>
         <source>number bases</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2999"/>
-        <location filename="../src/expressionedit.cpp" line="3000"/>
+        <location filename="../src/expressionedit.cpp" line="3004"/>
+        <location filename="../src/expressionedit.cpp" line="3005"/>
         <source>calendars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3001"/>
+        <location filename="../src/expressionedit.cpp" line="3006"/>
         <source>optimal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3002"/>
+        <location filename="../src/expressionedit.cpp" line="3007"/>
         <source>optimal unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3003"/>
+        <location filename="../src/expressionedit.cpp" line="3008"/>
         <source>prefix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3004"/>
+        <location filename="../src/expressionedit.cpp" line="3009"/>
         <source>optimal prefix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3005"/>
-        <location filename="../src/expressionedit.cpp" line="3078"/>
-        <source>base</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3006"/>
-        <source>base units</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3007"/>
-        <source>mixed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3008"/>
-        <source>mixed units</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3009"/>
         <location filename="../src/expressionedit.cpp" line="3010"/>
-        <source>factors</source>
+        <source>base</source>
+        <comment>base units</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3011"/>
-        <source>partial fraction</source>
+        <source>base units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3012"/>
-        <source>expanded partial fractions</source>
+        <source>mixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3013"/>
-        <source>rectangular</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3013"/>
-        <source>cartesian</source>
+        <source>mixed units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3014"/>
-        <source>complex rectangular form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/expressionedit.cpp" line="3015"/>
-        <source>exponential</source>
+        <source>factors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3016"/>
-        <source>complex exponential form</source>
+        <source>partial fraction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3017"/>
-        <source>polar</source>
+        <source>expanded partial fractions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3018"/>
-        <source>complex polar form</source>
+        <source>rectangular</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3018"/>
+        <source>cartesian</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3019"/>
+        <source>complex rectangular form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3020"/>
-        <source>complex cis form</source>
+        <source>exponential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3021"/>
-        <source>angle</source>
+        <source>complex exponential form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3022"/>
-        <source>complex angle notation</source>
+        <source>polar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3023"/>
-        <source>phasor</source>
+        <source>complex polar form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3024"/>
-        <source>complex phasor notation</source>
+        <location filename="../src/expressionedit.cpp" line="3025"/>
+        <source>complex cis form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3026"/>
+        <source>angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3027"/>
+        <source>complex angle notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3028"/>
+        <source>phasor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3029"/>
+        <source>complex phasor notation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3031"/>
         <source>UTC time zone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3079"/>
-        <source>number base %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3080"/>
-        <source>decimals</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/expressionedit.cpp" line="3081"/>
-        <source>decimal fraction</source>
+        <location filename="../src/expressionedit.cpp" line="3083"/>
+        <source>base</source>
+        <comment>number base</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3084"/>
+        <source>number base %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3085"/>
+        <source>decimals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/expressionedit.cpp" line="3086"/>
-        <location filename="../src/expressionedit.cpp" line="3092"/>
+        <source>decimal fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/expressionedit.cpp" line="3089"/>
+        <location filename="../src/expressionedit.cpp" line="3091"/>
+        <location filename="../src/expressionedit.cpp" line="3097"/>
         <source>fraction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3565"/>
+        <location filename="../src/expressionedit.cpp" line="3570"/>
         <source>Data object</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5213,7 +5219,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="630"/>
         <location filename="../src/qalculatewindow.cpp" line="679"/>
-        <source>Binary-encoded decimal (BCD)</source>
+        <source>Binary-coded decimal (BCD)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5741,10 +5747,9 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5796"/>
-        <location filename="../src/qalculatewindow.cpp" line="5836"/>
         <location filename="../src/qalculatewindow.cpp" line="7097"/>
-        <location filename="../src/qalculatewindow.cpp" line="7113"/>
         <source>base</source>
+        <comment>base units</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5763,6 +5768,13 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="5827"/>
         <location filename="../src/qalculatewindow.cpp" line="7110"/>
         <source>partial fraction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="5836"/>
+        <location filename="../src/qalculatewindow.cpp" line="7113"/>
+        <source>base</source>
+        <comment>number base</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>

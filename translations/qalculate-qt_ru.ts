@@ -990,7 +990,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>base</source>
-        <translation>основание</translation>
+        <translation type="vanished">основание</translation>
     </message>
     <message>
         <source>base units</source>
@@ -1171,6 +1171,16 @@ Do you want to overwrite the function?</source>
     <message>
         <source>With adaptive delay</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>base</source>
+        <comment>base units</comment>
+        <translation type="unfinished">основание</translation>
+    </message>
+    <message>
+        <source>base</source>
+        <comment>number base</comment>
+        <translation type="unfinished">основание</translation>
     </message>
 </context>
 <context>
@@ -4119,7 +4129,7 @@ You can get version %3 at %2.</source>
         <translation>Биективное основание-26</translation>
     </message>
     <message>
-        <source>Binary-encoded decimal (BCD)</source>
+        <source>Binary-coded decimal (BCD)</source>
         <translation>Двоично-десятичный код</translation>
     </message>
     <message>
@@ -4303,7 +4313,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <source>base</source>
-        <translation>основание</translation>
+        <translation type="vanished">основание</translation>
     </message>
     <message>
         <source>mixed</source>
@@ -4849,6 +4859,16 @@ and matrix/vector elements</source>
     <message>
         <source>Approximation and Fractions</source>
         <translation type="unfinished">Приближение и дроби</translation>
+    </message>
+    <message>
+        <source>base</source>
+        <comment>base units</comment>
+        <translation type="unfinished">основание</translation>
+    </message>
+    <message>
+        <source>base</source>
+        <comment>number base</comment>
+        <translation type="unfinished">основание</translation>
     </message>
 </context>
 <context>

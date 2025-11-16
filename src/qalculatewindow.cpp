@@ -627,7 +627,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_FP32); if(settings->printops.base == BASE_FP32) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction("Double", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_FP64); if(settings->printops.base == BASE_FP64) {base_checked = true; action->setChecked(true);}
-	action = menu->addAction(tr("Binary-encoded decimal (BCD)"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Binary-coded decimal (BCD)"), this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BINARY_DECIMAL); if(settings->printops.base == BASE_BINARY_DECIMAL) action->setChecked(true);
 	action = menu->addAction("φ", this, SLOT(outputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_GOLDEN_RATIO); if(settings->printops.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
@@ -676,7 +676,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(BASE_UNICODE); if(settings->evalops.parse_options.base == BASE_UNICODE) {base_checked = true; action->setChecked(true);}
 	action = menu->addAction(tr("Bijective base-26"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BIJECTIVE_26); if(settings->evalops.parse_options.base == BASE_BIJECTIVE_26) action->setChecked(true);
-	action = menu->addAction(tr("Binary-encoded decimal (BCD)"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
+	action = menu->addAction(tr("Binary-coded decimal (BCD)"), this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_BINARY_DECIMAL); if(settings->evalops.parse_options.base == BASE_BINARY_DECIMAL) action->setChecked(true);
 	action = menu->addAction("φ", this, SLOT(inputBaseActivated())); action->setCheckable(true); group->addAction(action);
 	action->setData(BASE_GOLDEN_RATIO); if(settings->evalops.parse_options.base == BASE_GOLDEN_RATIO) {base_checked = true; action->setChecked(true);}
@@ -5793,7 +5793,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.parse_options.units_enabled = true;
 				to_prefix = 1;
 				do_to = true;
-			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base").toStdString())) {
+			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base", "base units").toStdString())) {
 				if(from_str.empty()) {
 					b_busy--;
 					executeCommand(COMMAND_CONVERT_BASE);
@@ -5833,7 +5833,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				}
 				do_pfe = true;
 				execute_str = from_str;
-			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
+			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base", "number base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
 				to_duo_syms = false;
 				do_to = true;
@@ -7094,7 +7094,7 @@ void QalculateWindow::autoCalculateTimeout() {
 				settings->evalops.parse_options.units_enabled = true;
 				to_prefix = 1;
 				do_to = true;
-			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base").toStdString())) {
+			} else if(equalsIgnoreCase(to_str, "base") || equalsIgnoreCase(to_str, tr("base", "base units").toStdString())) {
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_BASE;
 				str_conv = "";
@@ -7110,7 +7110,7 @@ void QalculateWindow::autoCalculateTimeout() {
 			} else if(equalsIgnoreCase(to_str, "partial fraction") || equalsIgnoreCase(to_str, tr("partial fraction").toStdString())) {
 				do_pfe = true;
 				str = from_str;
-			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base").toStdString())) {
+			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base", "number base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
 				to_duo_syms = false;
 				do_to = true;
