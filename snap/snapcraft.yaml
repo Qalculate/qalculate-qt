@@ -88,7 +88,7 @@ parts:
 
   qalculate-qt:
     source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.8.2/qalculate-qt-5.8.2.tar.gz
-    source-checksum: sha512/db843bbebf3ef74bd37959711ef3dc8732397352e8d64d34828417f9303970eed3be93aa9e787df6837d8f499de7cc2fa8732c1b96ef722df004ca4ed5c45303
+    source-checksum: sha512/b01a009829073fc1198443973a665e7fad3be9f4b7b070ca606b1355b88aeac467fe75eb729ced054d619d91881c6b26ba01e4c62ab2e30279f37b65e063dc68
     plugin: qmake
     qmake-parameters:
       - COMPILE_RESOURCES=yes

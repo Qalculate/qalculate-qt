@@ -926,7 +926,7 @@ void ExpressionProxyModel::setFilter(std::string sfilter) {
 	beginFilterChange();
 #endif
 	str = sfilter;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
 	endFilterChange(Direction::Rows);
 #else
 	invalidateFilter();

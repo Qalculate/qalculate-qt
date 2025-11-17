@@ -79,7 +79,7 @@ void ItemProxyModel::setFilter(std::string scat, std::string sfilter) {
 		if(cat[0] == '/') subcat = cat.substr(1, cat.length() - 1);
 		else subcat = "";
 		filter = sfilter;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
 		endFilterChange(Direction::Rows);
 #else
 		invalidateFilter();
@@ -93,7 +93,7 @@ void ItemProxyModel::setSecondaryFilter(std::string sfilter) {
 		beginFilterChange();
 #endif
 		filter = sfilter;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
 		endFilterChange(Direction::Rows);
 #else
 		invalidateFilter();
@@ -106,7 +106,7 @@ void ItemProxyModel::setShowHidden(bool b) {
 		beginFilterChange();
 #endif
 		show_hidden = b;
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 9, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 10, 0))
 		endFilterChange(Direction::Rows);
 #else
 		invalidateFilter();
