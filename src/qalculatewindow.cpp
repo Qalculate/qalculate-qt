@@ -135,6 +135,7 @@ Number to_nbase;
 std::string result_bin, result_oct, result_dec, result_hex;
 std::string auto_expression, auto_result, current_status_expression, auto_exact_text, auto_result_text;
 bool auto_calculation_updated = false, auto_format_updated = false, auto_error = false;
+int prev_autocalculable = 0;
 size_t auto_aborted = false;
 bool bases_is_result = false;
 Number max_bases, min_bases;
@@ -4884,6 +4885,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 	auto_result_text = "";
 	auto_exact_text = "";
 	auto_aborted = false;
+	prev_autocalculable = 1;
 
 	expressionEdit->hideCompletion();
 
@@ -5170,11 +5172,11 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					b = false;
 				}
 				if(b) {
-					if(expr.find("\\") == std::string::npos) {
-						gsub("x", "\\x", expr);
-						gsub("y", "\\y", expr);
-						gsub("z", "\\z", expr);
-					}
+					gsub("{", "\a", expr);
+					gsub("}", "\b", expr);
+					fix_expression(expr);
+					gsub("\a", "{", expr);
+					gsub("\b", "}", expr);
 					if(f && f->isLocal() && f->subtype() == SUBTYPE_USER_FUNCTION) {
 						((UserFunction*) f)->setFormula(expr);
 						if(f->countNames() == 0) {
@@ -6758,6 +6760,7 @@ void QalculateWindow::onHistoryReloaded() {
 		auto_expression = "";
 		mauto.setAborted();
 		auto_error = false;
+		prev_autocalculable = 0;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!settings->status_in_history) updateWindowTitleResult(result_text);
 		if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true);
@@ -6778,9 +6781,11 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		auto_exact_text = "";
 		auto_aborted = false;
 		auto_error = false;
+		prev_autocalculable = 0;
 		mauto.setAborted();
 		updateWindowTitleResult(result_text);
 	} else if(!is_expression || !settings->auto_calculate || !expressionEdit->parsedCalculable()) {
+		prev_autocalculable = 0;
 		if(!settings->auto_calculate || !is_expression) auto_aborted = false;
 		if(autoCalculateTimer) autoCalculateTimer->stop();
 		if(!had_error && (!had_warning || last_op) && !auto_error && auto_result.empty() && (auto_expression == status.toStdString() || (last_op && auto_expression.empty() && auto_result.empty()))) return;
@@ -6795,13 +6800,15 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 		updateWindowTitleResult("");
 	} else {
-		if((!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty()))) && (!settings->adaptive_autocalc_delay || current_text.back() != RIGHT_PARENTHESIS_CH || !auto_result.empty())) {
+		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((prev_autocalculable != 0 && auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty())) && (last_op || !settings->adaptive_autocalc_delay || prev_autocalculable != 2 || expressionEdit->parsedCalculable() != 1 || !auto_result.empty())) {
+			prev_autocalculable = expressionEdit->parsedCalculable();
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
 				autoCalculateTimer->stop();
 				autoCalculateTimer->start(settings->auto_calculate_delay);
 			}
 			return;
 		}
+		prev_autocalculable = expressionEdit->parsedCalculable();
 		if(auto_aborted && auto_aborted > current_text.length()) auto_aborted = false;
 		current_status_expression = current_text;
 		current_status = status;
@@ -6872,6 +6879,21 @@ bool contains_subvector(const MathStructure &m, bool top = true) {
 	if(!top && m.isVector()) return true;
 	for(size_t i = 0; i < m.size(); i++) {
 		if(contains_subvector(m[i], top && m.isVector())) return true;
+	}
+	return false;
+}
+bool contains_incompatible_units(const MathStructure &m) {
+	if(!m.isAddition() || m.size() < 2) return false;
+	if(m[m.size() - 1].isUnitCompatible(m[m.size() - 2]) == 0) {
+		const MathStructure *u1 = NULL, *u2 = NULL;
+		if(m[m.size() - 1].isUnit_exp()) u1 = m.getChild(m.size());
+		else if(m[m.size() - 1].isMultiplication() && m[m.size() - 1].last().isUnit_exp()) u1 = m[m.size() - 1].getChild(m[m.size() - 1].size());
+		if(m[m.size() - 2].isUnit()) u2 = m.getChild(m.size() - 1);
+		else if(m[m.size() - 2].isMultiplication() && m[m.size() - 2].last().isUnit_exp()) u2 = m[m.size() - 2].getChild(m[m.size() - 1].size());
+		if(u1 && u1->isPower()) u1 = u1->base();
+		if(u2 && u2->isPower()) u2 = u2->base();
+		if(u1 && u2 && u1->unit() != u2->unit() && u1->unit()->baseUnit() == u2->unit()->baseUnit()) return false;
+		return true;
 	}
 	return false;
 }
@@ -7180,7 +7202,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		if(mauto.isAborted() || CALCULATOR->aborted()) {
 			new_auto_aborted = current_status_expression.length();
 			mauto.setAborted();
-		} else if(mauto.size() > 50 || mauto.countTotalChildren(false) > 500 || (mauto.isMatrix() && mauto.rows() * mauto.columns() > 50) || contains_subvector(mauto) || contains_extreme_number(mauto)) {
+		} else if(mauto.size() > 50 || mauto.countTotalChildren(false) > 500 || (mauto.isMatrix() && mauto.rows() * mauto.columns() > 50) || contains_subvector(mauto) || contains_extreme_number(mauto) || (settings->adaptive_autocalc_delay && contains_incompatible_units(mauto))) {
 			mauto.setAborted();
 		}
 	}

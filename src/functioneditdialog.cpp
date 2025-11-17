@@ -1002,7 +1002,11 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
 	else NamesEditDialog::modifyName(f, nameEdit->text());
 	str = expressionEdit->toPlainText().trimmed().toStdString();
+	gsub("{", "\a", str);
+	gsub("}", "\b", str);
 	fix_expression(str);
+	gsub("\a", "{", str);
+	gsub("\b", "}", str);
 	((UserFunction*) f)->setFormula(str);
 	CALCULATOR->addFunction(f);
 	return f;
@@ -1049,7 +1053,11 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 1)->checkState() == Qt::Checked);
 		}
 		str = expressionEdit->toPlainText().trimmed().toStdString();
+		gsub("{", "\a", str);
+		gsub("}", "\b", str);
 		fix_expression(str);
+		gsub("\a", "{", str);
+		gsub("\b", "}", str);
 		((UserFunction*) f)->setFormula(str);
 	}
 	return true;

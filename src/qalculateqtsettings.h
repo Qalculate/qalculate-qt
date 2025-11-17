@@ -55,6 +55,7 @@ bool contains_plot_or_save(const std::string &str);
 void base_from_string(std::string str, int &base, Number &nbase, bool input_base = false);
 long int get_fixed_denominator_qt(const std::string &str, int &to_fraction, const QString &localized_fraction, bool qalc_command = false);
 bool is_equation_solutions(const MathStructure &m);
+void fix_expression(std::string &str);
 
 #ifndef CLOCK_MONOTONIC
 #	define PREPARE_TIMECHECK(ms) \

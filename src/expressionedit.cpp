@@ -2647,7 +2647,8 @@ void replace_control_characters_qt(std::string &str) {
 bool test_autocalculatable(const MathStructure &m, bool top = true) {
 	if(m.isFunction()) {
 		if(m.size() < (size_t) m.function()->minargs() && (m.size() != 1 || m[0].representsScalar())) {
-			CALCULATOR->error(false, "", NULL);
+			MathStructure mfunc(m);
+			mfunc.calculateFunctions(settings->evalops, false);
 			return false;
 		}
 		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND) return false;
@@ -2678,7 +2679,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	}
 	status_messages.clear();
 	if(document()->isEmpty()) {
-		auto_calculable = 1;
+		auto_calculable = 0;
 		function_pos = QPoint();
 		setStatusText("");
 		if(settings->status_in_history) emit statusChanged(QString(), false, false, false, expression_from_history);
@@ -2691,7 +2692,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(text.find("#") != std::string::npos) {
 		CALCULATOR->parseComments(text, settings->evalops.parse_options);
 		if(text.empty()) {
-			auto_calculable = false;
+			auto_calculable = 0;
 			if(settings->status_in_history) {
 				setStatusText("");
 				emit statusChanged(tr("comment"), false, false, false, expression_from_history);
@@ -2705,7 +2706,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(text[0] == '/' && text.length() > 1) {
 		size_t i = text.find_first_not_of(SPACES, 1);
 		if(i != std::string::npos && (signed char) text[i] > 0 && is_not_in(NUMBER_ELEMENTS OPERATORS, text[i])) {
-			auto_calculable = false;
+			auto_calculable = 0;
 			if(settings->status_in_history) {
 				setStatusText("");
 				emit statusChanged("qalc command", false, false, false, expression_from_history);
@@ -2716,7 +2717,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			return;
 		}
 	} else if(text == "MC") {
-		auto_calculable = 1;
+		auto_calculable = 0;
 		if(settings->status_in_history) {
 			setStatusText("");
 			emit statusChanged(tr("MC (memory clear)"), false, false, false, expression_from_history);
@@ -2726,7 +2727,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		}
 		return;
 	} else if(text == "MS") {
-		auto_calculable = 1;
+		auto_calculable = 0;
 		if(settings->status_in_history) {
 			setStatusText("");
 			emit statusChanged(tr("MS (memory store)"), false, false, false, expression_from_history);
@@ -2736,7 +2737,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		}
 		return;
 	} else if(text == "M+") {
-		auto_calculable = 1;
+		auto_calculable = 0;
 		if(settings->status_in_history) {
 			setStatusText("");
 			emit statusChanged(tr("M+ (memory plus)"), false, false, false, expression_from_history);
@@ -2746,7 +2747,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		}
 		return;
 	} else if(text == "M-" || text == "M−") {
-		auto_calculable = 1;
+		auto_calculable = 0;
 		if(settings->status_in_history) {
 			setStatusText("");
 			emit statusChanged(tr("M− (memory minus)"), false, false, false, expression_from_history);
@@ -2800,7 +2801,20 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			bool b = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, false, true);
 			b = CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops) || b;
 			if(!b) {
-				CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
+				if(str_e.length() > 1 && str_e.back() == LEFT_PARENTHESIS_CH) {
+					CALCULATOR->beginTemporaryStopMessages();
+					CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
+					CALCULATOR->endTemporaryStopMessages(mfunc.isFunction());
+					if(!mfunc.isFunction()) CALCULATOR->parse(&mparse, str_e.substr(0, str_e.length() - 1), settings->evalops.parse_options);
+				} else if(str_e.length() > 4 && str_e.find(LEFT_PARENTHESIS SIGN_MINUS, str_e.length() - 4) != std::string::npos) {
+					CALCULATOR->beginTemporaryStopMessages();
+					CALCULATOR->parse(&mparse, str_e.substr(0, str_e.length() - 3), settings->evalops.parse_options);
+					CALCULATOR->endTemporaryStopMessages(mfunc.isFunction());
+					if(!mfunc.isFunction()) CALCULATOR->parse(&mparse, str_e.substr(0, str_e.length() - 4), settings->evalops.parse_options);
+					else if(mfunc.size() == 0) mfunc.addChild(m_zero);
+				} else {
+					CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
+				}
 				full_parsed = true;
 			}
 		}
@@ -2821,7 +2835,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			b_func = displayFunctionHint(mfunc.function(), mfunc.countChildren());
 			if(mfunc.last().isZero()) {
 				size_t i = str_e.find_last_not_of(SPACES);
-				if(i != std::string::npos && (str_e[i] == ';' || str_e[i] == ',' || str_e[i] == '.')) function_index--;
+				if(i != std::string::npos && (str_e[i] == COMMA_CH || str_e[i] == ';')) function_index--;
 			}
 		}
 	}
@@ -2829,18 +2843,22 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(expression_has_changed2) {
 		bool last_is_space = false;
 		parsed_expression_tooltip = "";
-		bool last_is_name = false;
-		if(!str_e.empty()) {
+		auto_calculable = 1;
+		if((mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2)) || !test_autocalculatable(mparse)) {
+			auto_calculable = 0;
+		}
+		if(auto_calculable == 1 && !str_e.empty()) {
 			std::string s = str_e;
 			CALCULATOR->parseSigns(s);
-			last_is_name = is_not_in(NUMBERS NOT_IN_NAMES "xyz", s.back());
+			if(is_not_in(NUMBERS NOT_IN_NAMES "xyz", s.back())) auto_calculable = 2;
 		}
 		if(!full_parsed) {
 			str_e = CALCULATOR->unlocalizeExpression(text, settings->evalops.parse_options);
 			transform_expression_for_equals_save(str_e, settings->evalops.parse_options);
 			last_is_space = is_in(SPACES, str_e[str_e.length() - 1]);
 			bool b_to = CALCULATOR->separateToExpression(str_e, str_u, settings->evalops, true, true);
-			CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops);
+			if(b_to && str_u.empty()) auto_calculable = 0;
+			if(CALCULATOR->separateWhereExpression(str_e, str_w, settings->evalops) && str_w.empty()) auto_calculable = 0;
 			if(!str_e.empty()) CALCULATOR->parse(&mparse, str_e, settings->evalops.parse_options);
 			if(b_to && !str_e.empty()) {
 				if(!cdata->current_from_struct && test_autocalculatable(mparse)) {
@@ -2862,13 +2880,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				cdata->current_from_categories.clear();
 			}
 		}
-		if((mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2)) || !test_autocalculatable(mparse)) {
-			auto_calculable = 0;
-		} else if(last_is_name || (mfunc.isFunction() && cursor.atEnd() && str_e.find("(") != std::string::npos)) {
-			auto_calculable = 2;
-		} else  {
-			auto_calculable = 1;
-		}
+		if(auto_calculable && str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) auto_calculable = 0;
+		else if(auto_calculable && str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos) auto_calculable = 0;
+		else if(auto_calculable == 1 && mfunc.isFunction() && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
 		PrintOptions po;
 		po.preserve_format = true;
 		po.show_ending_zeroes = settings->evalops.parse_options.read_precision != DONT_READ_PRECISION && !CALCULATOR->usesIntervalArithmetic() && settings->evalops.parse_options.base > BASE_CUSTOM;

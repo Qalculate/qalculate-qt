@@ -87,6 +87,7 @@
       <li>Optional compact variant of parsed expression in history</li>
       <li>Highlight unmatched parenthesis (with red color)</li>
       <li>New default adaptive calculate-as-you-type delay (without delay in most cases)</li>
+      <li>Improve decision to not do calculate-as-you-type or not show result of it</li>
       <li>"Approximation" caption changed to "Approximation and Fractions"</li>
       <li>New functions: reshape(), circshift(), replacePart()</li>
       <li>Functions mergevectors() and area() renamed to slice() and part()</li>
