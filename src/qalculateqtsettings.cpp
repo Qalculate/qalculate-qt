@@ -312,6 +312,16 @@ bool QalculateQtSettings::isAnswerVariable(Variable *v) {
 #include <QResource>
 #include <QDir>
 #include <QTemporaryFile>
+bool QalculateQtSettings::useColoredIcon(QWidget *w) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+	QColor c = w->palette().buttonText().color();
+	bool light = c.red() + c.green() + c.blue() < 255;
+	if(!light && c.lightness() >= 235 && c.saturation() <= 5) return false;
+	else if(light && c.lightness() <= 50 && c.saturation() <= 50) return false;
+	return true;
+#endif
+	return false;
+}
 QIcon QalculateQtSettings::loadColoredIcon(const QString &str, QWidget *w) {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
 	QColor c = w->palette().buttonText().color();
@@ -433,7 +443,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		int c = 0, r = 0;
 		char *str = new char[svalue.length()];
 		int n = sscanf(svalue.c_str(), "%i %i %[^\n]", &r, &c, str);
-		if(n == 3 && c > 0 && r > 0) {
+		if(n == 3 && c >= 0 && r > 0) {
 			size_t index = 0;
 			for(size_t i = custom_buttons.size(); i > 0; i--) {
 				if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
@@ -457,7 +467,7 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		char *str = new char[svalue.length()];
 		int cb_type = -1;
 		int n = sscanf(svalue.c_str(), "%i %i %u %i %[^\n]", &c, &r, &bi, &cb_type, str);
-		if((n == 4 || n == 5) && bi <= 2 && c > 0 && r > 0) {
+		if((n == 4 || n == 5) && bi <= 2 && c >= 0 && r > 0) {
 			size_t index = 0;
 			for(size_t i = custom_buttons.size(); i > 0; i--) {
 				if(custom_buttons[i - 1].r == r && custom_buttons[i - 1].c == c) {
@@ -505,6 +515,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		show_percent_in_numpad = v;
 	} else if(svar == "hide_numpad") {
 		hide_numpad = v;
+	} else if(svar == "show_custom_keypad_column") {
+		show_custom_keypad_column = v;
 	} else if(svar == "show_keypad") {
 		show_keypad = v;
 	} else if(svar == "show_bases") {
@@ -1149,13 +1161,14 @@ void QalculateQtSettings::loadPreferences() {
 	adaptive_autocalc_delay = true;
 	prefixes_default = true;
 	keypad_type = 0;
-	expression_pos = 0;
+	expression_pos = -1;
 	show_statusbar = false;
 	toolbar_style = Qt::ToolButtonIconOnly;
 	separate_keypad_menu_buttons = false;
 	show_percent_in_numpad = false;
 	show_keypad = -1;
 	hide_numpad = false;
+	show_custom_keypad_column = false;
 	show_bases = -1;
 	use_custom_result_font = false;
 	use_custom_expression_font = false;
@@ -1567,7 +1580,7 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 					} else if(!clear_history_on_exit && stmp == "[History]") {
 						b_history = true;
 					} else if((i = stmp.find_first_of("=")) != std::string::npos) {
-						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_keypad" || stmp.substr(0, i) == "show_bases") {
+						if(stmp.substr(0, i) == "keypad_type" || stmp.substr(0, i) == "show_custom_keypad_column" || stmp.substr(0, i) == "hide_numpad" || stmp.substr(0, i) == "show_keypad" || stmp.substr(0, i) == "show_bases") {
 							sgeneral += stmp;
 							sgeneral += "\n";
 						}
@@ -1660,11 +1673,12 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		if(show_keypad >= 0) fprintf(file, "show_keypad=%i\n", show_keypad);
 		if(programming_base_changed) fprintf(file, "programming_base_changed=%i\n", programming_base_changed);
 		fprintf(file, "hide_numpad=%i\n", hide_numpad);
+		fprintf(file, "show_custom_keypad_column=%i\n", show_custom_keypad_column);
 		fprintf(file, "show_bases=%i\n", show_bases);
 	}
 	if(!is_workspace) {
 		fprintf(file, "rpn_keys=%i\n", rpn_keys);
-		if(expression_pos != 0) fprintf(file, "expression_pos=%i\n", expression_pos);
+		if(expression_pos >= 0) fprintf(file, "expression_pos=%i\n", expression_pos);
 		if(show_statusbar) fprintf(file, "show_statusbar=%i\n", show_statusbar);
 		fprintf(file, "show_all_functions=%i\n", show_all_functions);
 		fprintf(file, "show_all_units=%i\n", show_all_units);

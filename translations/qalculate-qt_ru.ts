@@ -1573,6 +1573,10 @@ Do you want to overwrite the function?</source>
         <source>Edit Comment…</source>
         <translation>Изменить комментарий…</translation>
     </message>
+    <message>
+        <source>Type a mathematical expression below, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
+        <translation type="unfinished">Введите математическое выражение ниже, например «5 + 2 / 3», и нажмите клавишу ВВОД (Enter).</translation>
+    </message>
 </context>
 <context>
     <name>KeypadButton</name>
@@ -4869,6 +4873,10 @@ and matrix/vector elements</source>
         <source>base</source>
         <comment>number base</comment>
         <translation type="unfinished">основание</translation>
+    </message>
+    <message>
+        <source>Show Custom Column</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

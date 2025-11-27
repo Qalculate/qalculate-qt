@@ -137,7 +137,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 		box2->setChecked(settings->preserve_history_height > 0);
 	}
 	box2->setToolTip(tr("Do not change the height of history list when keypad or number bases are show or hidden."));
-	BOX(tr("Place expression field below history"), settings->expression_pos == 1, expressionPositionToggled(bool));
+	BOX(tr("Place expression field below history"), settings->expression_pos != 0, expressionPositionToggled(bool));
 	BOX(tr("Show status bar"), settings->show_statusbar || settings->status_in_statusbar, showStatusBarToggled(bool));
 	l->addWidget(new QLabel(tr("Window title:"), this), r, 0);
 	combo = new QComboBox(this);

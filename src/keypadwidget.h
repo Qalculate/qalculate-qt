@@ -91,23 +91,25 @@ class KeypadWidget : public QWidget {
 
 		KeypadButton *sinButton, *cosButton, *tanButton, *delButton[2], *acButton[2], *backButton, *forwardButton, *dotButton[2], *commaButton[2], *multiplicationButton[2], *divisionButton[2], *imaginaryButton, *binButton, *octButton, *decButton, *hexButton, *aButton, *bButton, *cButton, *dButton, *eButton, *fButton, *unitButton, *storeButton, *xButton, *parButton, *percentButton;
 		QPushButton *customOKButton;
-		QToolButton *customEditButton;
+		QToolButton *customEditButton, *customEditButton2;
 		QWidget *keypadG, *keypadP, *keypadX, *keypadC, *keypadN;
 		QVector<QVector<KeypadButton*> > customButtons;
+		QVector<KeypadButton*> customButtons2;
 		QStackedLayout *leftStack;
-		QGridLayout *customGrid;
+		QGridLayout *customGrid, *customGrid2;
 		QLineEdit *labelEdit;
 		QComboBox *valueEdit;
 		QLabel *valueLabel;
 		QTreeWidget *actionList;
-		QWidget *numpad;
+		QWidget *numpad, *customButtonColumn;
 		QDialog *customActionDialog;
 		QAction *addRowAction, *addColumnAction, *removeRowAction, *removeColumnAction;
-		bool b_edit;
+		bool b_edit, b_edit2;
 		void changeEvent(QEvent *e);
 		void editCustomAction(KeypadButton*, int);
 		void updateStretch();
 		void createKeypad(int);
+		void createCustomButtonColumn();
 		void createNumpad(QWidget*, int);
 
 	protected slots:
@@ -130,12 +132,16 @@ class KeypadWidget : public QWidget {
 		void onCustomButtonClicked();
 		void onCustomButtonClicked2();
 		void onCustomButtonClicked3();
+		void onCustomButton2Clicked();
+		void onCustomButton2Clicked2();
+		void onCustomButton2Clicked3();
 		void onHypToggled(bool);
 		void assumptionsTypeActivated();
 		void assumptionsSignActivated();
 		void defaultAssumptionsActivated();
 		void updateAssumptions();
 		void onCustomEditClicked(bool);
+		void onCustomEdit2Clicked(bool);
 		void removeCustomRow();
 		void addCustomRow();
 		void removeCustomColumn();
@@ -173,6 +179,7 @@ class KeypadWidget : public QWidget {
 		void updateSymbols();
 		void setKeypadType(int);
 		void hideNumpad(bool);
+		void showCustomButtonColumn(bool);
 		void showSeparateKeypadMenuButtons(bool);
 		void updateButtonLocation();
 

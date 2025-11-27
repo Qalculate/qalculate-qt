@@ -105,7 +105,7 @@ class QalculateWindow : public QMainWindow {
 		QToolBar *tb;
 		QToolButton *menuAction_t, *modeAction_t, *keypadAction_t, *storeAction_t, *functionsAction_t, *unitsAction_t, *toAction_t;
 		QMenu *tmenu, *basesMenu;
-		QAction *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *nKeypadAction, *showNumpadAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction, *copyBasesAction, *tbAction;
+		QAction *plotAction_t, *basesAction, *customOutputBaseAction, *customInputBaseAction, *newVariableAction, *newFunctionAction, *variablesAction, *functionsAction, *unitsAction, *datasetsAction, *plotAction, *fpAction, *calendarsAction, *percentageAction, *periodicTableAction, *exratesAction, *quitAction, *helpAction, *keypadAction, *rpnAction, *chainAction, *gKeypadAction, *pKeypadAction, *xKeypadAction, *cKeypadAction, *nKeypadAction, *showNumpadAction, *showCustomKeypadColumnAction, *resetKeypadPositionAction, *radAction, *degAction, *graAction, *normalAction, *sciAction, *engAction, *simpleAction, *copyBasesAction, *tbAction;
 		QMenu *recentVariablesMenu, *favouriteVariablesMenu, *variablesMenu, *functionsMenu, *recentFunctionsMenu, *favouriteFunctionsMenu, *unitsMenu, *recentUnitsMenu, *favouriteUnitsMenu, *angleMenu, *toMenu;
 		QAction *assumptionTypeActions[5], *assumptionSignActions[6];
 		QMenu *recentWSMenu;
@@ -193,6 +193,7 @@ class QalculateWindow : public QMainWindow {
 		void onStoreActivated();
 		void keypadTypeActivated();
 		void showNumpad(bool);
+		void showCustomKeypadColumn(bool);
 		void showSeparateKeypadMenuButtons(bool);
 		void resetKeypadPosition();
 		void onEMHTimeout();
@@ -220,6 +221,7 @@ class QalculateWindow : public QMainWindow {
 		void onKeypadFontChanged();
 		void onAppFontChanged();
 		void onAppFontTimer();
+		void fixSplitterPos();
 		void angleUnitActivated();
 		void normalActivated();
 		void scientificActivated();

@@ -251,6 +251,7 @@ class QalculateQtSettings : QObject {
 		void setCustomAngleUnit();
 		void setDefaultCurrency();
 		QIcon loadColoredIcon(const QString &str, QWidget*);
+		bool useColoredIcon(QWidget*);
 		bool checkExchangeRates(QWidget *parent);
 		void fetchExchangeRates(int timeout, int n = -1, QWidget *parent = NULL);
 		bool displayMessages(QWidget *parent);
@@ -311,7 +312,7 @@ class QalculateQtSettings : QObject {
 		int toolbar_style;
 		int show_keypad;
 		int show_bases;
-		bool hide_numpad;
+		bool hide_numpad, show_custom_keypad_column;
 		bool keep_function_dialog_open;
 		bool save_defs_on_exit, save_mode_on_exit, clear_history_on_exit;
 		int max_history_lines;

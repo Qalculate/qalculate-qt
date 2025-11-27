@@ -738,7 +738,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	modeAction_t->setToolButtonStyle((Qt::ToolButtonStyle) settings->toolbar_style);
 
 	toAction_t = new QalculateToolButton(this); toAction_t->setIcon(LOAD_COLORED_ICON("convert")); toAction_t->setText(tr("Convert"));
-	toAction_t->setEnabled(false);
+	toAction_t->setEnabled(settings->useColoredIcon(this));
 	connect(toAction_t, SIGNAL(clicked()), this, SLOT(onToActivated()));
 	connect(toAction_t, SIGNAL(middleButtonClicked()), this, SLOT(onToActivatedAlt()));
 	toMenu = new QMenu(this);
@@ -795,6 +795,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	action->setData(-1); action->setChecked(true); keypadAction = action;
 	menu->addSeparator();
 	action = menu->addAction(tr("Always Show Number Pad"), this, SLOT(showNumpad(bool))); action->setCheckable(true); action->setChecked(!settings->hide_numpad); showNumpadAction = action;
+	action = menu->addAction(tr("Show Custom Column"), this, SLOT(showCustomKeypadColumn(bool))); action->setCheckable(true); action->setChecked(settings->show_custom_keypad_column); showCustomKeypadColumnAction = action;
 	action = menu->addAction(tr("Separate Menu Buttons"), this, SLOT(showSeparateKeypadMenuButtons(bool))); action->setCheckable(true); action->setChecked(settings->separate_keypad_menu_buttons);
 	action = menu->addAction(tr("Reset Keypad Position"), this, SLOT(resetKeypadPosition())); action->setEnabled(false); resetKeypadPositionAction = action;
 	tb->addWidget(keypadAction_t);
@@ -817,7 +818,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	historyView = new HistoryView(this);
 	historyView->expressionEdit = expressionEdit;
-	historyView->setReversed(settings->expression_pos == 1);
+	historyView->setReversed(settings->expression_pos != 0);
 
 	if(settings->expression_pos == 0) {
 		ehSplitter->addWidget(expressionEdit);
@@ -1059,7 +1060,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(!settings->window_geometry.isEmpty()) restoreGeometry(settings->window_geometry);
 	if(settings->window_geometry.isEmpty() || (settings->preferences_version[0] == 3 && settings->preferences_version[1] < 22 && height() == 650 && width() == 600)) try_resize(this, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	if(!settings->window_state.isEmpty()) restoreState(settings->window_state);
-	if(!settings->splitter_state.isEmpty()) ehSplitter->restoreState(settings->splitter_state);
+	if(!settings->splitter_state.isEmpty()) {
+		ehSplitter->restoreState(settings->splitter_state);
+		if((settings->preferences_version[0] < 5 || (settings->preferences_version[0] == 5 && (settings->preferences_version[1] < 8 || (settings->preferences_version[1] == 8 && settings->preferences_version[2] < 3)))) && settings->expression_pos < 0) {
+			QTimer *timer = new QTimer();
+			timer->setSingleShot(true);
+			connect(timer, SIGNAL(timeout()), this, SLOT(fixSplitterPos()));
+			timer->start(1);
+		}
+	}
 
 	if(settings->show_bases >= 0) basesDock->setVisible(settings->show_bases > 0);
 	if(settings->show_keypad >= 0) keypadDock->setVisible(settings->show_keypad > 0);
@@ -1185,6 +1194,19 @@ void QalculateWindow::testTimeout() {
 	prev_test_time = QDateTime::currentMSecsSinceEpoch() + t;
 }
 
+void QalculateWindow::fixSplitterPos() {
+	QList<int> sizes = ehSplitter->sizes();
+	if(sizes[1] > sizes[0]) {
+		QTimer *timer = new QTimer();
+		timer->setSingleShot(true);
+		connect(timer, SIGNAL(timeout()), this, SLOT(onAppFontTimer()));
+		timer->start(1);
+		int p = sizes[1] + 2;
+		sizes[1] = sizes[0] - 2;
+		sizes[0] = p;
+		ehSplitter->setSizes(sizes);
+	}
+}
 void QalculateWindow::initializeFunctionsMenu() {
 	if(functionsMenu->isEmpty()) updateFunctionsMenu();
 }
@@ -1200,7 +1222,7 @@ void QalculateWindow::onShowStatusBarChanged() {
 	else statusBar()->hide();
 }
 void QalculateWindow::onExpressionPositionChanged() {
-	if(ehSplitter->indexOf(expressionEdit) == settings->expression_pos) return;
+	if(ehSplitter->indexOf(expressionEdit) == (settings->expression_pos == 0 ? 0 : 1)) return;
 	QList<int> sizes = ehSplitter->sizes();
 	historyView->setParent(NULL);
 	expressionEdit->setParent(NULL);
@@ -1213,10 +1235,10 @@ void QalculateWindow::onExpressionPositionChanged() {
 	sizes[0] = p;
 	ehSplitter->setSizes(sizes);
 	expressionEdit->setFocus();
-	historyView->setReversed(settings->expression_pos == 1);
+	historyView->setReversed(settings->expression_pos != 0);
 	historyView->reloadHistory();
-	if(settings->expression_pos == 1) historyView->moveCursor(QTextCursor::End);
-	else historyView->moveCursor(QTextCursor::Start);
+	if(settings->expression_pos == 0) historyView->moveCursor(QTextCursor::Start);
+	else historyView->moveCursor(QTextCursor::End);
 }
 
 #define STATUS_SPACE	if(b) str += "&nbsp;&nbsp;"; else b = true;
@@ -6720,7 +6742,7 @@ bool contains_plot_or_save(const std::string &str) {
 }
 
 void QalculateWindow::onExpressionChanged() {
-	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty());
+	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty() || settings->useColoredIcon(this));
 	if(!basesDock->isVisible()) return;
 	if(!expressionEdit->expressionHasChanged()) {
 		if(!result_bin.empty() && !bases_is_result && expressionEdit->document()->isEmpty()) {
@@ -8634,6 +8656,11 @@ void QalculateWindow::showNumpad(bool b) {
 	nKeypadAction->setEnabled(!b);
 	if(b && settings->keypad_type == KEYPAD_NUMBERPAD) gKeypadAction->trigger();
 }
+void QalculateWindow::showCustomKeypadColumn(bool b) {
+	keypad->showCustomButtonColumn(b);
+	settings->show_custom_keypad_column = b;
+	workspace_changed = true;
+}
 void QalculateWindow::showSeparateKeypadMenuButtons(bool b) {
 	settings->separate_keypad_menu_buttons = b;
 	keypad->showSeparateKeypadMenuButtons(b);
@@ -10300,7 +10327,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			connect(fd->entry[i], SIGNAL(returnPressed()), this, SLOT(onInsertFunctionEntryActivated()));
 		}
 		if(arg && arg->type() == ARGUMENT_TYPE_FILE) {
-			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_COLORED_ICON("document-open"), QLineEdit::TrailingPosition);
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("document-open"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
@@ -10310,7 +10337,7 @@ void QalculateWindow::insertFunction(MathFunction *f, QWidget *parent) {
 			typestr = "";
 			connect(action, SIGNAL(triggered()), this, SLOT(onEntrySelectFile()));
 		} else if(arg && arg->type() == ARGUMENT_TYPE_MATRIX) {
-			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_COLORED_ICON("table"), QLineEdit::TrailingPosition);
+			QAction *action = ((QLineEdit*) fd->entry[i])->addAction(LOAD_ICON("table"), QLineEdit::TrailingPosition);
 #ifdef _WIN32
 #	if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 			((QLineEdit*) fd->entry[i])->setTextMargins(0, 0, 22, 0);
@@ -10746,7 +10773,7 @@ void QalculateWindow::onRPNVisibilityChanged(bool b) {
 			}
 			QAction *w = findChild<QAction*>("action_rpnmode");
 			if(w) w->setChecked(true);
-			toAction_t->setEnabled(false);
+			toAction_t->setEnabled(settings->useColoredIcon(this));
 			updateInsertFunctionDialogs();
 		}
 	}
@@ -10767,7 +10794,7 @@ void QalculateWindow::rpnModeActivated() {
 		if(!settings->rpn_shown) {rpnDock->setFloating(true); settings->rpn_shown = true;}
 		rpnDock->show();
 		rpnDock->raise();
-		toAction_t->setEnabled(false);
+		toAction_t->setEnabled(settings->useColoredIcon(this));
 		updateInsertFunctionDialogs();
 	}
 }
@@ -10803,8 +10830,6 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 	bool rpn_mode_prev = settings->rpn_mode;
 	bool chain_mode_prev = settings->chain_mode;
 	if(settings->loadWorkspace(filename.toLocal8Bit().data())) {
-		settings->preferences_version[0] = 4;
-		settings->preferences_version[1] = 1;
 		mstruct->unref();
 		mstruct = new MathStructure();
 		mstruct_exact.setUndefined();
@@ -10826,9 +10851,11 @@ void QalculateWindow::loadWorkspace(const QString &filename) {
 		QAction *action = find_child_data(this, "group_keypad", settings->show_keypad == 0 ? -1 : settings->keypad_type);
 		if(action) action->setChecked(true);
 		showNumpadAction->setChecked(!settings->hide_numpad);
+		showCustomKeypadColumnAction->setChecked(settings->show_custom_keypad_column);
 		keypad->setKeypadType(settings->keypad_type);
 		updateKeypadTitle();
 		keypad->hideNumpad(settings->hide_numpad);
+		keypad->showCustomButtonColumn(settings->show_custom_keypad_column);
 		nKeypadAction->setEnabled(settings->hide_numpad);
 		if(preferencesDialog) {
 			preferencesDialog->hide();

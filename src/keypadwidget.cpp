@@ -519,8 +519,10 @@ void KeypadWidget::createKeypad(int i) {
 					button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
 				}
 				i++;
-			} else {
+			} else if(cb->c > 0) {
 				settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+			} else {
+				i++;
 			}
 		}
 		b_edit = false;
@@ -702,7 +704,50 @@ void KeypadWidget::createNumpad(QWidget *w, int i) {
 	for(c = 0; c < 6; c++) grid->setColumnStretch(c, 1);
 	for(int r = 0; r < 4; r++) grid->setRowStretch(r, 1);
 }
-
+void KeypadWidget::createCustomButtonColumn() {
+	if(customEditButton2) return;
+	KeypadButton *button;
+	QGridLayout *grid = new QGridLayout(customButtonColumn);
+	grid->setContentsMargins(0, 0, grid->spacing(), 0);
+	customGrid2 = grid;
+	customEditButton2 = new KeypadButton(LOAD_COLORED_ICON("document-edit"), this);
+	customEditButton2->setCheckable(true);
+	connect(customEditButton2, SIGNAL(toggled(bool)), this, SLOT(onCustomEdit2Clicked(bool)));
+	grid->addWidget(customEditButton2, 4, 0);
+	customButtons2.resize(4);
+	for(int r = 0; r < 4; r++) {
+		button = new KeypadButton(QString(), this);
+		connect(button, SIGNAL(clicked()), this, SLOT(onCustomButton2Clicked()));
+		connect(button, SIGNAL(clicked2()), this, SLOT(onCustomButton2Clicked2()));
+		connect(button, SIGNAL(clicked3()), this, SLOT(onCustomButton2Clicked3()));
+		grid->addWidget(button, r, 0);
+		customButtons2[r] = button;
+		grid->setRowStretch(r, 1);
+	}
+	for(size_t i = 0; i < settings->custom_buttons.size();) {
+		custom_button *cb = &settings->custom_buttons[i];
+		if(cb->c == 0 && cb->r <= customButtons2.size()) {
+			button = customButtons2[cb->r - 1];
+			if(button) {
+				if(cb->label.contains("</")) button->setRichText(cb->label);
+				else button->setText(cb->label);
+				button->setProperty(BUTTON_DATA, cb->type[0]);
+				button->setProperty(BUTTON_VALUE, QString::fromStdString(cb->value[0]));
+				button->setProperty(BUTTON_DATA2, cb->type[1]);
+				button->setProperty(BUTTON_VALUE2, QString::fromStdString(cb->value[1]));
+				button->setProperty(BUTTON_DATA3, cb->type[2]);
+				button->setProperty(BUTTON_VALUE3, QString::fromStdString(cb->value[2]));
+				button->setToolTip(settings->shortcutText(cb->type[0], cb->value[0]), settings->shortcutText(cb->type[1], cb->value[1]), settings->shortcutText(cb->type[2], cb->value[2]));
+			}
+			i++;
+		} else if(cb->c == 0) {
+			settings->custom_buttons.erase(settings->custom_buttons.begin() + i);
+		} else {
+			i++;
+		}
+	}
+	b_edit2 = false;
+}
 
 KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 
@@ -711,6 +756,10 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 
 	box->addLayout(leftStack, 11);
 	box->addSpacing(box->spacing());
+
+	customButtonColumn = new QWidget(this);
+	if(!settings->show_custom_keypad_column) customButtonColumn->hide();
+	box->addWidget(customButtonColumn, 1);
 
 	numpad = new QWidget(this);
 	if(settings->hide_numpad) numpad->hide();
@@ -758,6 +807,9 @@ KeypadWidget::KeypadWidget(QWidget *parent) : QWidget(parent) {
 	storeButton = NULL;
 	customOKButton = NULL;
 	customEditButton = NULL;
+	customEditButton2 = NULL;
+	customGrid = NULL;
+	customGrid2 = NULL;
 	xButton = NULL;
 	percentButton = NULL;
 	parButton = NULL;
@@ -1240,10 +1292,19 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	else actionList->setFocus();
 	dialog->resize(dialog->sizeHint().width(), dialog->sizeHint().width() * 1.25);
 	if(dialog->exec() == QDialog::Accepted) {
-		int grid_i = customGrid->indexOf(button);
 		int c = 0, r = 0, cs = 0, rs = 0;
-		customGrid->getItemPosition(grid_i, &r, &c, &rs, &cs);
-		c++; r++;
+		int grid_i = -1;
+		if(customGrid) grid_i = customGrid->indexOf(button);
+		if(grid_i >= 0) {
+			customGrid->getItemPosition(grid_i, &r, &c, &rs, &cs);
+			c++; r++;
+		} else if(customGrid2) {
+			grid_i = customGrid2->indexOf(button);
+			if(grid_i >= 0) {
+				customGrid2->getItemPosition(grid_i, &r, &c, &rs, &cs);
+				r++;
+			}
+		}
 		size_t index = 0;
 		for(size_t i = settings->custom_buttons.size(); i > 0; i--) {
 			if(settings->custom_buttons[i - 1].r == r && settings->custom_buttons[i - 1].c == c) {
@@ -1274,6 +1335,9 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 }
 void KeypadWidget::onCustomEditClicked(bool b) {
 	b_edit = b;
+}
+void KeypadWidget::onCustomEdit2Clicked(bool b) {
+	b_edit2 = b;
 }
 void KeypadWidget::addCustomRow() {
 	settings->custom_button_rows++;
@@ -1368,6 +1432,30 @@ void KeypadWidget::onCustomButtonClicked2() {
 void KeypadWidget::onCustomButtonClicked3() {
 	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
 	if(b_edit || !sender()->property(BUTTON_DATA3).isValid() || sender()->property(BUTTON_DATA3).toInt() < 0) {
+		editCustomAction(button, 3);
+	} else {
+		emit shortcutClicked(sender()->property(BUTTON_DATA3).toInt(), sender()->property(BUTTON_VALUE3).toString());
+	}
+}
+void KeypadWidget::onCustomButton2Clicked() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit2 || !sender()->property(BUTTON_DATA).isValid() || sender()->property(BUTTON_DATA).toInt() < 0) {
+		editCustomAction(button, 1);
+	} else {
+		emit shortcutClicked(sender()->property(BUTTON_DATA).toInt(), sender()->property(BUTTON_VALUE).toString());
+	}
+}
+void KeypadWidget::onCustomButton2Clicked2() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit2 || !sender()->property(BUTTON_DATA2).isValid() || sender()->property(BUTTON_DATA2).toInt() < 0) {
+		editCustomAction(button, 2);
+	} else {
+		emit shortcutClicked(sender()->property(BUTTON_DATA2).toInt(), sender()->property(BUTTON_VALUE2).toString());
+	}
+}
+void KeypadWidget::onCustomButton2Clicked3() {
+	KeypadButton *button = qobject_cast<KeypadButton*>(sender());
+	if(b_edit2 || !sender()->property(BUTTON_DATA3).isValid() || sender()->property(BUTTON_DATA3).toInt() < 0) {
 		editCustomAction(button, 3);
 	} else {
 		emit shortcutClicked(sender()->property(BUTTON_DATA3).toInt(), sender()->property(BUTTON_VALUE3).toString());
@@ -1570,6 +1658,7 @@ void KeypadWidget::setKeypadType(int i) {
 	if(i < 0 || i > KEYPAD_NUMBERPAD) i = 0;
 	createKeypad(i);
 	hideNumpad(settings->hide_numpad);
+	showCustomButtonColumn(settings->show_custom_keypad_column);
 	if(leftStack->currentIndex() == KEYPAD_PROGRAMMING && settings->programming_base_changed) {
 		settings->programming_base_changed = false;
 		emit baseClicked(BASE_DECIMAL, true, false);
@@ -1580,12 +1669,17 @@ void KeypadWidget::hideNumpad(bool b) {
 	if(!b) createNumpad(numpad, 0);
 	numpad->setVisible(!b);
 }
+void KeypadWidget::showCustomButtonColumn(bool b) {
+	if(b) createCustomButtonColumn();
+	customButtonColumn->setVisible(b);
+}
 void KeypadWidget::updateStretch() {
 	int left_size = 5;
 	if(settings->separate_keypad_menu_buttons) left_size++;
 	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
 	((QBoxLayout*) layout())->setStretchFactor(leftStack, (left_size * 2) + 1);
 	((QBoxLayout*) layout())->setStretchFactor(numpad, 12);
+	((QBoxLayout*) layout())->setStretchFactor(customButtonColumn, 1);
 }
 void KeypadWidget::showSeparateKeypadMenuButtons(bool b) {
 	QList<KeypadButton*> buttons = findChildren<KeypadButton*>();

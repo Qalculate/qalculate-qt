@@ -345,8 +345,8 @@ void HistoryView::loadInitial(bool reload) {
 		}
 	}
 	if(settings->v_expression.empty()) {
-		if(!settings->clear_history_on_exit && !reload && !b_reversed) {
-			setHtml("<body color=\"" + text_color.name() + "\">" + tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.") + "</body>");
+		if(!settings->clear_history_on_exit && !reload) {
+			setHtml("<body color=\"" + text_color.name() + "\">" + (b_reversed ? tr("Type a mathematical expression below, e.g. \"5 + 2 / 3\", and press the enter key.") : tr("Type a mathematical expression above, e.g. \"5 + 2 / 3\", and press the enter key.")) + "</body>");
 		} else {
 			setHtml("<body color=\"" + text_color.name() + "\"></body>");
 		}
