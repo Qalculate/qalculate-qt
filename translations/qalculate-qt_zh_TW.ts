@@ -6093,7 +6093,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="2039"/>
         <source>No completion</source>
-        <translation>無補全</translation>
+        <translation>沒有補全</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2040"/>
