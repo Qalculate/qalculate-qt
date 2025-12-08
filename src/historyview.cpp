@@ -885,9 +885,11 @@ void HistoryView::addMessages() {
 void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 	QString str = anchorAt(e->pos());
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+	QPoint p = e->pos();
+	p.ry() += verticalScrollBar()->value();
 	bool b_tooltip = false;
-	if(str.isEmpty() && (document()->documentLayout()->imageAt(e->pos()).indexOf(":/icons") == 0 || (e->pos().x() > width() - 150 && document()->documentLayout()->imageAt(e->pos()).indexOf(":/data/flags") == 0))) {
-		QPoint p(viewport()->mapFromParent(e->pos()));
+	if(str.isEmpty() && (document()->documentLayout()->imageAt(p).indexOf(":/icons") == 0 || (e->pos().x() > width() - 150 && document()->documentLayout()->imageAt(p).indexOf(":/data/flags") == 0))) {
+		p = viewport()->mapFromParent(e->pos());
 		for(int n = 0; n < 5; n++) {
 			QTextCursor cur = cursorForPosition(p);
 			cur.movePosition(QTextCursor::StartOfBlock, QTextCursor::KeepAnchor);
