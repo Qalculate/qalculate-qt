@@ -2862,7 +2862,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		bool last_is_space = false;
 		parsed_expression_tooltip = "";
 		auto_calculable = 1;
-		if((mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2)) || !test_autocalculatable(mparse)) {
+		if((mfunc.isFunction() && (int) function_index < mfunc.function()->minargs() && (cursor.atEnd() || cursor.position() >= document()->characterCount() - 2))) {
 			auto_calculable = 0;
 		}
 		if(!full_parsed) {
@@ -2898,7 +2898,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				cdata->current_from_categories.clear();
 			}
 		}
-		if(auto_calculable && str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) auto_calculable = 0;
+		if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
+		else if(auto_calculable && str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) auto_calculable = 0;
 		else if(auto_calculable && str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos) auto_calculable = 0;
 		else if(auto_calculable == 1 && mfunc.isFunction() && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
 		if(auto_calculable == 1 && pos_c) {
