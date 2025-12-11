@@ -9800,12 +9800,11 @@ void remove_nonunits(MathStructure &m) {
 		else m.setPrefix(NULL);
 	}
 	if(m.size() > 0) {
-		for(size_t i = 0; i < m.size();) {
-			if(!m.isUnit_exp() && !m[i].containsType(STRUCT_UNIT, true)) {
-				m.delChild(i + 1);
+		for(size_t i = m.size(); i > 0; i--) {
+			if(!m.isUnit_exp() && !m[i - 1].containsType(STRUCT_UNIT, true)) {
+				m.delChild(i);
 			} else {
-				remove_nonunits(m[i]);
-				i++;
+				remove_nonunits(m[i - 1]);
 			}
 		}
 		if(m.size() == 1) m.setToChild(1);

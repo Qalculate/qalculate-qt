@@ -903,7 +903,7 @@ void HistoryView::mouseMoveEvent(QMouseEvent *e) {
 					if(str == "temporary_error") str = temporary_error;
 					else str.replace("\\n", "\n");
 					if(!str.isEmpty()) {
-						QToolTip::showText(mapToGlobal(e->pos()), str);
+						QToolTip::showText(mapToGlobal(e->pos()), str, this);
 						b_tooltip = true;
 					}
 				}
