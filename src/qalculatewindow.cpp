@@ -6905,17 +6905,21 @@ bool contains_subvector(const MathStructure &m, bool top = true) {
 	return false;
 }
 bool contains_incompatible_units(const MathStructure &m) {
-	if(!m.isAddition() || m.size() < 2) return false;
-	if(m[m.size() - 1].isUnitCompatible(m[m.size() - 2]) == 0) {
+	if(m.isAddition() && m.size() >= 2 && m[m.size() - 1].isUnitCompatible(m[m.size() - 2]) == 0) {
 		const MathStructure *u1 = NULL, *u2 = NULL;
 		if(m[m.size() - 1].isUnit_exp()) u1 = m.getChild(m.size());
 		else if(m[m.size() - 1].isMultiplication() && m[m.size() - 1].last().isUnit_exp()) u1 = m[m.size() - 1].getChild(m[m.size() - 1].size());
 		if(m[m.size() - 2].isUnit()) u2 = m.getChild(m.size() - 1);
-		else if(m[m.size() - 2].isMultiplication() && m[m.size() - 2].last().isUnit_exp()) u2 = m[m.size() - 2].getChild(m[m.size() - 1].size());
+		else if(m[m.size() - 2].isMultiplication() && m[m.size() - 2].last().isUnit_exp()) u2 = m[m.size() - 2].getChild(m[m.size() - 2].size());
 		if(u1 && u1->isPower()) u1 = u1->base();
 		if(u2 && u2->isPower()) u2 = u2->base();
 		if(u1 && u2 && u1->unit() != u2->unit() && u1->unit()->baseUnit() == u2->unit()->baseUnit()) return false;
 		return true;
+	} else if(m.isPower() && ((m[0].isUnit() && !m[1].isNumber()) || m[1].containsType(STRUCT_UNIT, false, false, true) > 0)) {
+		return true;
+	}
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_incompatible_units(m[i])) return true;
 	}
 	return false;
 }

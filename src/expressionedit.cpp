@@ -2674,6 +2674,10 @@ bool test_autocalculatable(const MathStructure &m, bool top = true) {
 	return true;
 }
 
+#define NONDIGIT_INPUT_BASE 	((settings->evalops.parse_options.base > 10 && settings->evalops.parse_options.base <= 36) || settings->evalops.parse_options.base == BASE_UNICODE || settings->evalops.parse_options.base == BASE_BIJECTIVE_26 || (settings->evalops.parse_options.base == BASE_CUSTOM && (CALCULATOR->customInputBase() > 10 || CALCULATOR->customInputBase() < -10)))
+
+#define CURRENT_TEXT_ARGUMENT	(cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->suggestsQuotes())
+
 void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(toolTipTimer) toolTipTimer->stop();
 	if(parse_blocked) {
@@ -2899,14 +2903,11 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			}
 		}
 		if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
-		else if(auto_calculable && str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) auto_calculable = 0;
-		else if(auto_calculable && str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos) auto_calculable = 0;
-		else if(auto_calculable == 1 && mfunc.isFunction() && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
-		if(auto_calculable == 1 && pos_c) {
+		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
+		else if(auto_calculable == 1 && cdata->current_function && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
+		if(auto_calculable != 0 && pos_c == 'e' && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
 			size_t pos2 = pos;
 			std::string *str_cur = &str_e;
-			if(pos_c == 'u') str_cur = &str_u;
-			if(pos_c == 'w') str_cur = &str_w;
 			std::string str;
 			while(pos > 0) {
 				size_t l = 1;
@@ -2919,6 +2920,17 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					pos++;
 					break;
 				}
+			}
+			if(pos > 0 && mparse.containsType(STRUCT_SYMBOLIC, true)) {
+				bool cit1 = false, cit2 = false;
+				for(size_t i = 0; i < pos; i++) {
+					if(!cit1 && (*str_cur)[i] == '\"') {
+						cit2 = !cit2;
+					} else if(!cit2 && (*str_cur)[i] == '\'') {
+						cit1 = !cit1;
+					}
+				}
+				if(cit1 || cit2) pos = pos2 + 1;
 			}
 			if(pos <= pos2) {
 				while(pos2 < str_cur->length()) {
@@ -2934,50 +2946,68 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					str = str_cur->substr(pos, pos2 - pos);
 				}
 			}
-			if(!str.empty()) {
+			if(!str.empty() && str_cur->find("0x") == std::string::npos && str_cur->find("0d") == std::string::npos) {
 				CALCULATOR->beginTemporaryStopMessages();
 				MathStructure m;
 				CALCULATOR->parse(&m, str, settings->evalops.parse_options);
 				int w_n = 0;
-				if(CALCULATOR->endTemporaryStopMessages(NULL, &w_n) || w_n > 0) {
-					auto_calculable = 2;
-				} else if(!m.isFunction() && !m.isVariable() && (!m.isUnit() || !use_with_prefix(m.unit(), m.prefix()))) {
-					if(m.isMultiplication()) {
-						bool b = true;
-						for(size_t i = 0; i < m.size(); i++) {
-							if(!m[i].isUnit() || !use_with_prefix(m[i].unit(), m[i].prefix())) {
-								b = false;
-								break;
-							}
-						}
-						if(b) {
-							b = false;
-							for(size_t i = 0; i < CALCULATOR->units.size() && !b; i++) {
-								Unit *u = CALCULATOR->units[i];
-								if(u->isActive() && u->subtype() == SUBTYPE_COMPOSITE_UNIT && ((CompositeUnit*) u)->countUnits() == m.size()) {
-									b = true;
-									for(size_t i2 = 0; i2 < m.size(); i2++) {
-										int exp = 1;
-										Unit *ui = ((CompositeUnit*) u)->get(i2 + 1, &exp);
-										if(exp != 1 || m[i2].unit() != ui) {
-											b = false;
-											break;
-										}
-									}
+				if(!CALCULATOR->endTemporaryStopMessages(NULL, &w_n)) {
+					MathStructure *mfunc = NULL;
+					if(m.isFunction() && m.size() > 0) mfunc = &m;
+					else if(m.isMultiplication() && m.size() > 0 && m.last().isFunction() && m.last().size() > 0) mfunc = &m.last();
+					if(mfunc) {
+						if((*mfunc)[0].isMultiplication()) {
+							for(size_t i = 0; i < (*mfunc)[0].size(); i++) {
+								if(!(*mfunc)[0][i].isVariable() || ((*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+									auto_calculable = 0;
+									break;
 								}
+
 							}
-						} else {
-							b = true;
+						} else if(!(*mfunc)[0].isVariable() || ((*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+							auto_calculable = 0;
+						}
+					}
+					if(auto_calculable == 1 && w_n > 0) {
+						auto_calculable = 2;
+					} else if(auto_calculable == 1 && !m.isNumber() && !m.isFunction() && !m.isVariable() && (!m.isUnit() || !use_with_prefix(m.unit(), m.prefix()))) {
+						if(m.isMultiplication()) {
+							bool b = true;
 							for(size_t i = 0; i < m.size(); i++) {
-								if(!m[i].isVariable() || (m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+								if(!m[i].isUnit() || !use_with_prefix(m[i].unit(), m[i].prefix())) {
 									b = false;
 									break;
 								}
 							}
+							if(b) {
+								b = false;
+								for(size_t i = 0; i < CALCULATOR->units.size() && !b; i++) {
+									Unit *u = CALCULATOR->units[i];
+									if(u->isActive() && u->subtype() == SUBTYPE_COMPOSITE_UNIT && ((CompositeUnit*) u)->countUnits() == m.size()) {
+										b = true;
+										for(size_t i2 = 0; i2 < m.size(); i2++) {
+											int exp = 1;
+											Unit *ui = ((CompositeUnit*) u)->get(i2 + 1, &exp);
+											if(exp != 1 || m[i2].unit() != ui) {
+												b = false;
+												break;
+											}
+										}
+									}
+								}
+							} else {
+								b = true;
+								for(size_t i = 0; i < m.size(); i++) {
+									if(!m[i].isVariable() || (m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+										b = false;
+										break;
+									}
+								}
+							}
+							if(!b) auto_calculable = 2;
+						} else {
+							auto_calculable = 2;
 						}
-						if(!b) auto_calculable = 2;
-					} else {
-						auto_calculable = 2;
 					}
 				}
 			}
@@ -3024,6 +3054,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
 			if(auto_calculable && !test_autocalculatable(mwhere)) auto_calculable = 0;
+			else if(auto_calculable == 1 && !mwhere.isComparison() && !mwhere.isLogicalAnd() && !mwhere.isLogicalOr()) auto_calculable = 2;
 			mparse.format(po);
 			if(compact) po.preserve_format = false;
 			parsed_expression = mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
@@ -3033,7 +3064,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			if(compact) po.preserve_format = false;
 			parsed_expression += mwhere.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
 			if(compact) po.preserve_format = true;
-			CALCULATOR->endTemporaryStopMessages();
+			if(CALCULATOR->endTemporaryStopMessages() && auto_calculable == 1) auto_calculable = 2;
 		} else if(str_e.empty()) {
 			parsed_expression = "";
 		} else {
@@ -3271,6 +3302,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 								pa.units_enabled = true;
 								CALCULATOR->parse(&mparse, str_u, pa);
 								if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
+								else if(auto_calculable == 1 && !mparse.isNumber()) auto_calculable = 2;
 							} else {
 								if(i_warn > 0) had_warnings = true;
 								mparse = cu.generateMathStructure(true);
@@ -3566,6 +3598,11 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		if(menu) {MFROM_CLEANUP; return false;}
 		do_completion_signal = 0;
 		if(!current_object_is_set) setCurrentObject();
+	}
+	if(!cdata->editing_to_expression && NONDIGIT_INPUT_BASE) {
+		hideCompletion();
+		MFROM_CLEANUP
+		return false;
 	}
 	cdata->show_custom_to = (menu != NULL);
 	cdata->to_type = 0;
@@ -4576,6 +4613,7 @@ void ExpressionEdit::setCurrentObject() {
 	current_object_text = "";
 	cdata->editing_to_expression = false;
 	cdata->editing_to_expression1 = false;
+	bool current_object_in_quotes = false;
 	std::string str;
 	size_t l_to = 0, pos = 0, pos2 = 0;
 	if(textCursor().position() > 0) {
@@ -4587,14 +4625,20 @@ void ExpressionEdit::setCurrentObject() {
 		pos = current_object_text.length();
 		pos2 = pos;
 		if(l_to > 0 && current_object_text[0] == '/') return;
+		bool cit1 = false, cit2 = false;
 		for(size_t i = 0; i < l_to; i++) {
-			if(current_object_text[i] == '#') {
+			if(!cit1 && current_object_text[i] == '\"') {
+				cit2 = !cit2;
+			} else if(!cit2 && current_object_text[i] == '\'') {
+				cit1 = !cit1;
+			} else if(!cit1 && !cit2 && current_object_text[i] == '#') {
 				current_object_start = -1;
 				current_object_end = -1;
 				current_object_text = "";
 				break;
 			}
 		}
+		current_object_in_quotes = (cit1 || cit2);
 	}
 	if(current_object_start >= 0) {
 		if(CALCULATOR->hasToExpression(current_object_text, true, settings->evalops)) {
@@ -4628,8 +4672,12 @@ void ExpressionEdit::setCurrentObject() {
 			l_to -= l;
 			current_object_start--;
 			if(!CALCULATOR->utf8_pos_is_valid_in_name((char*) current_object_text.c_str() + sizeof(char) * pos2)) {
-				pos2 += l;
-				current_object_start++;
+				if(l == 1 && (((char*) current_object_text.c_str() + sizeof(char) * pos2)[0] == '\\' || (current_object_in_quotes && !cdata->editing_to_expression && (((char*) current_object_text.c_str() + sizeof(char) * pos2)[0] == '\'' || ((char*) current_object_text.c_str() + sizeof(char) * pos2)[0] == '\"')))) {
+					pos2 = pos + 1;
+				} else {
+					pos2 += l;
+					current_object_start++;
+				}
 				break;
 			} else if(l == 1 && is_in(NUMBERS, current_object_text[pos2])) {
 				if(non_number_before) {
