@@ -3734,6 +3734,8 @@ void QalculateWindow::socketReadyRead() {
 				command = command.mid(i);
 			}
 		}
+	} else if(command[0] == 'u') {
+		fetchExchangeRates();
 	} else if(command[0] == 't') {
 		startTest();
 	} else if(command[0] == 'e' && testTimer) {

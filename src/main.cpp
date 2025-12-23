@@ -132,6 +132,8 @@ int main(int argc, char **argv) {
 	parser->addOption(nOption);
 	QCommandLineOption tOption(QStringList() << "title", QApplication::tr("Specify the window title"), QApplication::tr("TITLE"));
 	parser->addOption(tOption);
+	QCommandLineOption uOption(QStringList() << "update-exchange-rates", QApplication::tr("Update exchange rates"));
+	parser->addOption(uOption);
 	QCommandLineOption vOption(QStringList() << "v" << "version", QApplication::tr("Display the application version"));
 	parser->addOption(vOption);
 	QCommandLineOption wOption(QStringList() << "w" << "workspace", QApplication::tr("Open workspace"), QApplication::tr("FILE"));
@@ -192,6 +194,8 @@ int main(int argc, char **argv) {
 					} else if(!parser->value(wOption).isEmpty()) {
 						command = "w";
 						command += parser->value(wOption);
+					} else if(parser->isSet(uOption)) {
+						command = "u";
 					} else if(parser->isSet(testOption)) {
 						command = "t";
 					} else if(parser->isSet(stopTestOption)) {
@@ -221,6 +225,10 @@ int main(int argc, char **argv) {
 #endif
 
 	new Calculator(settings->ignore_locale);
+
+	if(parser->isSet(uOption)) {
+		return !CALCULATOR->fetchExchangeRates();
+	}
 
 	CALCULATOR->setExchangeRatesWarningEnabled(!CALCULATOR->canFetch());
 
