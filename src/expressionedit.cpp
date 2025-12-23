@@ -2657,8 +2657,8 @@ void replace_control_characters_qt(std::string &str) {
 bool test_autocalculatable(const MathStructure &m, bool top = true) {
 	if(m.isFunction()) {
 		if(m.size() < (size_t) m.function()->minargs() && (m.size() != 1 || m[0].representsScalar())) {
-			MathStructure mfunc(m);
-			mfunc.calculateFunctions(settings->evalops, false);
+			MathStructure mf(m);
+			mf.calculateFunctions(settings->evalops, false);
 			return false;
 		}
 		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND) return false;
@@ -2791,7 +2791,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		}
 	}
 	QTextCursor cursor = textCursor();
-	MathStructure mparse, mfunc;
+	MathStructure mparse;
+	mfunc.clear();
 	bool full_parsed = false;
 	std::string str_e, str_u, str_w;
 	bool had_errors = false, had_warnings = false;
@@ -2928,6 +2929,12 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						cit2 = !cit2;
 					} else if(!cit2 && (*str_cur)[i] == '\'') {
 						cit1 = !cit1;
+					} else if(i > 0 && i + 1 < pos && (*str_cur)[i] == 'x' && (*str_cur)[i - 1] == '0' && (((*str_cur)[i + 1] >= '0' && (*str_cur)[i + 1] >= '9') || ((*str_cur)[i + 1] >= 'a' && (*str_cur)[i + 1] >= 'f') || ((*str_cur)[i + 1] >= 'A' && (*str_cur)[i + 1] >= 'F'))) {
+						cit1 = true;
+						break;
+					} else if(i > 0 && i + 2 < pos && (*str_cur)[i] == 'd' && (*str_cur)[i - 1] == '0' && (((*str_cur)[i + 1] >= '0' && (*str_cur)[i + 1] >= '9') || ((*str_cur)[i + 1] >= 'a' && (*str_cur)[i + 1] >= 'b') || ((*str_cur)[i + 1] >= 'A' && (*str_cur)[i + 1] >= 'B')) && (((*str_cur)[i + 2] >= '0' && (*str_cur)[i + 2] >= '9') || ((*str_cur)[i + 2] >= 'a' && (*str_cur)[i + 2] >= 'b') || ((*str_cur)[i + 2] >= 'A' && (*str_cur)[i + 2] >= 'B'))) {
+						cit1 = true;
+						break;
 					}
 				}
 				if(cit1 || cit2) pos = pos2 + 1;
@@ -2946,25 +2953,25 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					str = str_cur->substr(pos, pos2 - pos);
 				}
 			}
-			if(!str.empty() && str_cur->find("0x") == std::string::npos && str_cur->find("0d") == std::string::npos) {
+			if(!str.empty()) {
 				CALCULATOR->beginTemporaryStopMessages();
 				MathStructure m;
 				CALCULATOR->parse(&m, str, settings->evalops.parse_options);
 				int w_n = 0;
 				if(!CALCULATOR->endTemporaryStopMessages(NULL, &w_n)) {
-					MathStructure *mfunc = NULL;
-					if(m.isFunction() && m.size() > 0) mfunc = &m;
-					else if(m.isMultiplication() && m.size() > 0 && m.last().isFunction() && m.last().size() > 0) mfunc = &m.last();
-					if(mfunc) {
-						if((*mfunc)[0].isMultiplication()) {
-							for(size_t i = 0; i < (*mfunc)[0].size(); i++) {
-								if(!(*mfunc)[0][i].isVariable() || ((*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*mfunc)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+					MathStructure *func = NULL;
+					if(m.isFunction() && m.size() > 0) func = &m;
+					else if(m.isMultiplication() && m.size() > 0 && m.last().isFunction() && m.last().size() > 0) func = &m.last();
+					if(func && cdata->current_function) {
+						if((*func)[0].isMultiplication()) {
+							for(size_t i = 0; i < (*func)[0].size(); i++) {
+								if(!(*func)[0][i].isVariable() || ((*func)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*func)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*func)[0][i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
 									auto_calculable = 0;
 									break;
 								}
 
 							}
-						} else if(!(*mfunc)[0].isVariable() || ((*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*mfunc)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+						} else if(!(*func)[0].isVariable() || ((*func)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && (*func)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && (*func)[0].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
 							auto_calculable = 0;
 						}
 					}
@@ -3600,6 +3607,11 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		if(!current_object_is_set) setCurrentObject();
 	}
 	if(!cdata->editing_to_expression && NONDIGIT_INPUT_BASE) {
+		hideCompletion();
+		MFROM_CLEANUP
+		return false;
+	}
+	if(!current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic() && mfunc[cdata->current_function_index - 1].symbol() == current_object_text) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
@@ -4625,18 +4637,38 @@ void ExpressionEdit::setCurrentObject() {
 		pos = current_object_text.length();
 		pos2 = pos;
 		if(l_to > 0 && current_object_text[0] == '/') return;
-		bool cit1 = false, cit2 = false;
+		bool cit1 = false, cit2 = false, hex = false, duo = false;
 		for(size_t i = 0; i < l_to; i++) {
 			if(!cit1 && current_object_text[i] == '\"') {
 				cit2 = !cit2;
+				hex = false;
+				duo = false;
 			} else if(!cit2 && current_object_text[i] == '\'') {
 				cit1 = !cit1;
+				hex = false;
+				duo = false;
+			} else if(!hex && !cit1 && !cit2 && i + 2 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'x' && current_object_text[i + 2] != ' ') {
+				hex = true;
+				duo = false;
+				i++;
+			} else if(!hex && !duo && !cit1 && !cit2 && i + 3 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'd' && current_object_text[i + 2] != ' ' && current_object_text[i + 2] != ' ') {
+				duo = true;
+				i++;
 			} else if(!cit1 && !cit2 && current_object_text[i] == '#') {
 				current_object_start = -1;
 				current_object_end = -1;
 				current_object_text = "";
 				break;
+			} else if(hex && current_object_text[i] != ' ' && (current_object_text[i] < '0' || current_object_text[i] > '9') && (current_object_text[i] < 'a' || current_object_text[i] > 'f') && (current_object_text[i] < 'A' || current_object_text[i] > 'F')) {
+				hex = false;
+			} else if(duo && current_object_text[i] != ' ' && (current_object_text[i] < '0' || current_object_text[i] > '9') && (current_object_text[i] < 'a' || current_object_text[i] > 'b') && (current_object_text[i] < 'A' || current_object_text[i] > 'B')) {
+				duo = false;
 			}
+		}
+		if(hex || duo) {
+			current_object_start = -1;
+			current_object_end = -1;
+			current_object_text = "";
 		}
 		current_object_in_quotes = (cit1 || cit2);
 	}

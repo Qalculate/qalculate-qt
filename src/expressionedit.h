@@ -83,6 +83,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		int current_object_start, current_object_end;
 		int current_function_index;
 		std::string current_object_text;
+		MathStructure mfunc;
 		int completion_blocked, parse_blocked, block_add_to_undo;
 		int block_text_change;
 		int do_completion_signal;
