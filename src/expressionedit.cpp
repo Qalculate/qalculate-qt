@@ -449,6 +449,30 @@ int completion_names_match(std::string name, const std::string &str, size_t minl
 	return (b_match ? 2 : 0);
 }
 
+bool is_digit_q(QChar qc, int base) {
+	char c = qc.toLatin1();
+	// 0-9 is always treated as a digit
+	if(c >= '0' && c <= '9') return true;
+	// in non standard bases every character might be a digit
+	if(base == -1) return true;
+	// duodecimal bases uses 0-9, E, X
+	if(base == -12) return c == 'E' || c == 'X' || c == 'A' || c == 'B' || c == 'a' || c == 'b';
+	if(base <= 10) return false;
+	// bases 11-36 is case insensitive
+	if(base <= 36) {
+		if(c >= 'a' && c < 'a' + (base - 10)) return true;
+		if(c >= 'A' && c < 'A' + (base - 10)) return true;
+		return false;
+	}
+	// bases 37-62 is case sensitive
+	if(base <= 62) {
+		if(c >= 'a' && c < 'a' + (base - 36)) return true;
+		if(c >= 'A' && c < 'Z') return true;
+		return false;
+	}
+	return true;
+}
+
 class HTMLDelegate : public QStyledItemDelegate {
 	public:
 		void paint(QPainter * painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
@@ -1736,7 +1760,7 @@ bool ExpressionEdit::completeOrActivateFirst(bool backwards) {
 	} else {
 		int cm_bak = settings->completion_min;
 		settings->completion_min = 1;
-		complete();
+		complete(NULL, NULL, NULL, false, true);
 		settings->completion_min = cm_bak;
 	}
 	return completionView->isVisible();
@@ -2667,6 +2691,8 @@ bool test_autocalculatable(const MathStructure &m, bool top = true) {
 		}
 		if(m.function()->id() == FUNCTION_ID_LOGN && m.size() == 2 && m[0].isUndefined() && m[1].isNumber()) return false;
 		if(top && m.function()->subtype() == SUBTYPE_DATA_SET && m.size() >= 2 && m[1].isSymbolic() && equalsIgnoreCase(m[1].symbol(), "info")) return false;
+	} else if(m.isSymbolic() && contains_plot_or_save(m.symbol())) {
+		return false;
 	}
 	for(size_t i = 0; i < m.size(); i++) {
 		if(!test_autocalculatable(m[i], false)) return false;
@@ -2687,6 +2713,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	if(update) expression_has_changed2 = true;
 	bool prev_func = cdata->current_function;
 	cdata->current_function = NULL;
+	mfunc.clear();
+	if(expression_has_changed2) current_status_struct.clear();
 	if(block_display_parse) {
 		auto_calculable = 0;
 		return;
@@ -2792,7 +2820,6 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 	}
 	QTextCursor cursor = textCursor();
 	MathStructure mparse;
-	mfunc.clear();
 	bool full_parsed = false;
 	std::string str_e, str_u, str_w;
 	bool had_errors = false, had_warnings = false;
@@ -2903,6 +2930,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 				cdata->current_from_categories.clear();
 			}
 		}
+		current_status_struct = mparse;
 		if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
 		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
 		else if(auto_calculable == 1 && cdata->current_function && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
@@ -2929,10 +2957,10 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						cit2 = !cit2;
 					} else if(!cit2 && (*str_cur)[i] == '\'') {
 						cit1 = !cit1;
-					} else if(i > 0 && i + 1 < pos && (*str_cur)[i] == 'x' && (*str_cur)[i - 1] == '0' && (((*str_cur)[i + 1] >= '0' && (*str_cur)[i + 1] >= '9') || ((*str_cur)[i + 1] >= 'a' && (*str_cur)[i + 1] >= 'f') || ((*str_cur)[i + 1] >= 'A' && (*str_cur)[i + 1] >= 'F'))) {
+					} else if(i > 0 && i + 1 < pos && (*str_cur)[i] == 'x' && (*str_cur)[i - 1] == '0' && is_digit_q((*str_cur)[i + 1], 16)) {
 						cit1 = true;
 						break;
-					} else if(i > 0 && i + 2 < pos && (*str_cur)[i] == 'd' && (*str_cur)[i - 1] == '0' && (((*str_cur)[i + 1] >= '0' && (*str_cur)[i + 1] >= '9') || ((*str_cur)[i + 1] >= 'a' && (*str_cur)[i + 1] >= 'b') || ((*str_cur)[i + 1] >= 'A' && (*str_cur)[i + 1] >= 'B')) && (((*str_cur)[i + 2] >= '0' && (*str_cur)[i + 2] >= '9') || ((*str_cur)[i + 2] >= 'a' && (*str_cur)[i + 2] >= 'b') || ((*str_cur)[i + 2] >= 'A' && (*str_cur)[i + 2] >= 'B'))) {
+					} else if(i > 0 && i + 2 < pos && (*str_cur)[i] == 'd' && (*str_cur)[i - 1] == '0' && is_digit_q((*str_cur)[i + 1], 12) && is_digit_q((*str_cur)[i + 2], 12)) {
 						cit1 = true;
 						break;
 					}
@@ -3396,20 +3424,22 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 	if(tipLabel && settings->expression_status_delay > 0 && current_status_type != 2) tipLabel->hideTip();
 	if(!force_update_groups && block_text_change) return;
 	previous_pos = textCursor().position();
-	if(settings->automatic_digit_grouping && settings->evalops.parse_options.base == BASE_DECIMAL && (force_update_groups || previous_text != str) && !str.isEmpty()) {
+	if(settings->automatic_digit_grouping && (settings->evalops.parse_options.base == BASE_DECIMAL || settings->evalops.parse_options.base == BASE_BINARY) && (force_update_groups || previous_text != str) && !str.isEmpty()) {
 		QString sbak = str;
-		char sep = ' ';
 		char dec = '.', alt_dec = '.';
 		dec = CALCULATOR->getDecimalPoint()[0];
 		if(dec != '.' && settings->evalops.parse_options.dot_as_separator) alt_dec = dec;
-		if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE) {
-			if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
-			else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
-		}
 		int first_pos = 0, last_pos = 0;
 		int sel_anchor = textCursor().selectionStart();
 		if(sel_anchor == previous_pos) sel_anchor = textCursor().selectionEnd();
 		while(true) {
+			char sep = ' ';
+			int base = 10;
+			if(settings->evalops.parse_options.base == BASE_BINARY) base = 2;
+			if(base == 10 && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE) {
+				if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
+				else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
+			}
 			if(last_pos == 0 && previous_pos > 0 && sep == ' ' && str[previous_pos - 1].isSpace() && str.length() - 1 == previous_text.length()) {
 				QString stest = str;
 				stest.remove(previous_pos - 1, 1);
@@ -3422,14 +3452,36 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 				else if(!cit2 && str[first_pos] == '\'') cit1 = !cit1;
 				else if(!cit1 && !cit2 && vpar > 0 && str[first_pos] == RIGHT_VECTOR_WRAP_CH) vpar--;
 				else if(!cit1 && !cit2 && str[first_pos] == LEFT_VECTOR_WRAP_CH) vpar++;
-				if(!cit1 && !cit2 && !vpar && (str[first_pos].isDigit() || str[first_pos] == dec || str[first_pos] == alt_dec)) break;
+				if(!cit1 && !cit2 && !vpar && (is_digit_q(str[first_pos], base) || str[first_pos] == dec || str[first_pos] == alt_dec)) break;
 			}
 			if(first_pos >= str.length()) break;
 			for(last_pos = first_pos + 1; last_pos < str.length(); last_pos++) {
-				if(!str[last_pos].isDigit() && str[last_pos] != dec && str[last_pos] != alt_dec && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || (!str[last_pos + 1].isDigit() && str[last_pos + 1] != dec && str[last_pos + 1] != alt_dec))) {
+				if(last_pos == first_pos + 1 && str[last_pos] == 'x' && str[first_pos] == '0') {
+					base = 16;
+					sep = ' ';
+					first_pos = last_pos + 1;
+				} else if(last_pos == first_pos + 1 && str[last_pos] == 'b' && str[first_pos] == '0') {
+					base = 2;
+					sep = ' ';
+					first_pos = last_pos + 1;
+				} else if(last_pos == first_pos + 1 && str[last_pos] == 'd' && str[first_pos] == '0') {
+					base = 12;
+					sep = ' ';
+					first_pos = last_pos + 1;
+				} else if(last_pos == first_pos + 1 && str[last_pos] == 'o' && str[first_pos] == '0') {
+					base = 8;
+					sep = ' ';
+					first_pos = last_pos + 1;
+				} else if(!is_digit_q(str[last_pos], base) && str[last_pos] != dec && str[last_pos] != alt_dec && ((sep == ' ' && !str[last_pos].isSpace()) || (sep != ' ' && str[last_pos] != sep) || last_pos == str.length() - 1 || (!is_digit_q(str[last_pos + 1], base) && str[last_pos + 1] != dec && str[last_pos + 1] != alt_dec))) {
 					break;
 				}
 			}
+			size_t group_index = 0;
+			int group_size = 3;
+			if(base == 2) group_size = 4;
+			if(base == 8) group_size = 3;
+			else if(base == 16) group_size = 2;
+			else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_format[group_index] != CHAR_MAX) group_size = CALCULATOR->local_digit_group_format[group_index];
 			last_pos--;
 			int n = 0, nd = 0, ns = 0, ns_p = 0;
 			int dec_pos = -1;
@@ -3438,14 +3490,14 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 					dec_pos = i;
 					nd = n;
 					n = 0;
-				} else if(str[i].isDigit()) {
+				} else if(is_digit_q(str[i], base)) {
 					n++;
-				} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && (str[i - 1].isDigit() || str[i - 1] == dec || str[i - 1] == alt_dec)) {
+				} else if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep)) && i > 0 && (is_digit_q(str[i - 1], base) || str[i - 1] == dec || str[i - 1] == alt_dec)) {
 					if(i < previous_pos) ns_p++;
 					ns++;
 				}
 			}
-			if(n > 4 || (nd > 4 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0 || previous_pos < str.length()))) {
+			if(n > group_size + 1 || (nd > group_size + 1 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0 || previous_pos < str.length()))) {
 				for(int i = last_pos - 1; ns > 0 && i >= 0;) {
 					if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
 						str.remove(i, 1);
@@ -3459,16 +3511,20 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 				}
 				previous_pos -= ns_p;
 				ns_p = 0;
-				for(int i = (dec_pos >= 0 ? dec_pos - 3 : last_pos - 2); n > 4 && i > first_pos; i -= 3) {
-					if(sep == ' ') str.insert(i, THIN_SPACE);
+				for(int i = (dec_pos >= 0 ? dec_pos - group_size : last_pos - (group_size - 1)); n > group_size + 1 && i > first_pos; i -= group_size) {
+					if(sep == ' ' && base != 2) str.insert(i, THIN_SPACE);
 					else str.insert(i, sep);
 					if(i < previous_pos) ns_p++;
 					last_pos++;
 					dec_pos++;
 					if(i < sel_anchor) sel_anchor++;
+					if(base == 10 && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_format[group_index + 1] != CHAR_MAX) {
+						group_size = CALCULATOR->local_digit_group_format[group_index + 1];
+						group_index++;
+					}
 				}
-				for(int i = dec_pos + 4; nd > 4 && i <= last_pos && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE; i += 4) {
-					if(sep == ' ') str.insert(i, THIN_SPACE);
+				for(int i = dec_pos + group_size + 1; nd > group_size + 1 && i <= last_pos && (base == 10 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE); i += group_size + 1) {
+					if(sep == ' ' && base != 2) str.insert(i, THIN_SPACE);
 					else str.insert(i, sep);
 					if(i < previous_pos + ns_p) ns_p++;
 					last_pos++;
@@ -3569,8 +3625,25 @@ void ExpressionEdit::onCompletionMenuItemActivated() {
 }
 bool ExpressionEdit::completionInitialized() {return sourceModel->hasChildren();}
 
+extern bool function_differentiable(MathFunction*);
+bool test_x_count_sub(const MathStructure &m, int &x, int &y, int &z) {
+	if(m.isVariable() && !m.variable()->isKnown()) {
+		if(x > 0 && m.variable()->referenceName() == "x") x--;
+		else if(y > 0 && m.variable()->referenceName() == "y") y--;
+		else if(z > 0 && m.variable()->referenceName() == "z") z--;
+	}
+	if(m.isFunction() && !function_differentiable(m.function())) return false;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(test_x_count_sub(m[i], x, y, z)) return true;
+	}
+	return x == 0 || y == 0 || z == 0;
+}
+bool test_x_count(const MathStructure &m, int x = -1, int y = -1, int z = -1) {
+	return test_x_count_sub(m, x, y, z);
+}
+
 #define MFROM_CLEANUP if(mstruct_from) {cdata->current_from_struct = from_struct_bak; cdata->current_from_units = from_units_bak; cdata->current_from_categories = from_cats_bak;}
-bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set) {
+bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruct_parsed, QMenu *menu, bool current_object_is_set, bool force) {
 	if(completionTimer) completionTimer->stop();
 	if(!sourceModel->hasChildren()) updateCompletion();
 	MathStructure *from_struct_bak = cdata->current_from_struct;
@@ -3606,12 +3679,17 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		do_completion_signal = 0;
 		if(!current_object_is_set) setCurrentObject();
 	}
-	if(!cdata->editing_to_expression && NONDIGIT_INPUT_BASE) {
+	if(!force && !cdata->editing_to_expression && NONDIGIT_INPUT_BASE) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
 	}
-	if(!current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic() && mfunc[cdata->current_function_index - 1].symbol() == current_object_text) {
+	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic() && mfunc[cdata->current_function_index - 1].symbol() == current_object_text) {
+		hideCompletion();
+		MFROM_CLEANUP
+		return false;
+	}
+	if(!force && !cdata->editing_to_expression && ((current_object_text.length() == 1 && (current_object_text[0] == 'x' || current_object_text[0] == 'y' || current_object_text[0] == 'z')) || (current_object_text.length() == 2 && ((current_object_text[0] == 'x' && current_object_text[1] == 'y') || (current_object_text[0] == 'x' && current_object_text[1] == 'z') || (current_object_text[0] == 'y' && current_object_text[1] == 'z'))) || (current_object_text.length() == 3 && current_object_text[0] == 'x' && current_object_text[1] == 'y' && current_object_text[2] == 'z')) && (test_x_count(current_status_struct, current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1) || (cdata->current_function && cdata->current_function_index > 0 && test_x_count(mfunc[cdata->current_function_index - 1], current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1)))) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;

@@ -127,7 +127,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX(tr("Close application with Escape key"), settings->close_with_esc, closeWithEscToggled(bool));
 	BOX(tr("Use keyboard keys for RPN"), settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN, rpnKeysToggled(bool)); rpnKeysBox = box; rpnKeysBox->setEnabled(settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN);
 	BOX(tr("Use caret for bitwise XOR"), settings->caret_as_xor, caretAsXorToggled(bool));
-	BOX(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool));
+	BOX(tr("Keep above other windows"), settings->always_on_top, keepAboveToggled(bool)); if(settings->wayland_platform) box->hide();
 	QCheckBox *box2 = new QCheckBox(tr("Preserve history height"), this); l->addWidget(box2, r, 0, 1, 2); connect(box2, SIGNAL(stateChanged(int)), this, SLOT(preserveHeightChanged(int))); r++;
 	preserveHeightBox = box2;
 	if(settings->preserve_history_height < 0) {
@@ -925,6 +925,7 @@ void PreferencesDialog::groupingChanged(int i) {
 	} else {
 		emit resultFormatUpdated();
 	}
+	if(settings->automatic_digit_grouping) emit automaticDigitGroupingChanged();
 }
 void PreferencesDialog::cgfChanged(int i) {
 	if(!settings->custom_digit_grouping) return;
@@ -935,6 +936,7 @@ void PreferencesDialog::cgfChanged(int i) {
 	}
 	settings->custom_digit_group_changed = true;
 	emit resultFormatUpdated();
+	if(settings->automatic_digit_grouping) emit automaticDigitGroupingChanged();
 }
 void PreferencesDialog::cgsChanged(const QString &str) {
 	if(!settings->custom_digit_grouping) return;
@@ -942,6 +944,7 @@ void PreferencesDialog::cgsChanged(const QString &str) {
 	CALCULATOR->local_digit_group_separator = settings->custom_digit_group_separator;
 	settings->custom_digit_group_changed = true;
 	emit resultFormatUpdated();
+	if(settings->automatic_digit_grouping) emit automaticDigitGroupingChanged();
 }
 void PreferencesDialog::intervalDisplayChanged(int i) {
 	if(i == 0) {

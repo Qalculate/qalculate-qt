@@ -6902,7 +6902,7 @@ bool contains_extreme_number(const MathStructure &m) {
 bool contains_subvector(const MathStructure &m, bool top = true) {
 	if(!top && m.isVector()) return true;
 	for(size_t i = 0; i < m.size(); i++) {
-		if(contains_subvector(m[i], top && m.isVector())) return true;
+		if(contains_subvector(m[i], top && m.isMatrix())) return true;
 	}
 	return false;
 }
