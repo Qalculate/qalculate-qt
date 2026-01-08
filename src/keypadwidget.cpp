@@ -1679,7 +1679,7 @@ void KeypadWidget::updateStretch() {
 	if(settings->custom_button_columns > left_size) left_size = settings->custom_button_columns;
 	((QBoxLayout*) layout())->setStretchFactor(leftStack, (left_size * 2) + 1);
 	((QBoxLayout*) layout())->setStretchFactor(numpad, 12);
-	((QBoxLayout*) layout())->setStretchFactor(customButtonColumn, 1);
+	((QBoxLayout*) layout())->setStretchFactor(customButtonColumn, 2);
 }
 void KeypadWidget::showSeparateKeypadMenuButtons(bool b) {
 	QList<KeypadButton*> buttons = findChildren<KeypadButton*>();

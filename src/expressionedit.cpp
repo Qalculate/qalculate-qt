@@ -454,10 +454,10 @@ bool is_digit_q(QChar qc, int base) {
 	// 0-9 is always treated as a digit
 	if(c >= '0' && c <= '9') return true;
 	// in non standard bases every character might be a digit
-	if(base == -1) return true;
-	// duodecimal bases uses 0-9, E, X
-	if(base == -12) return c == 'E' || c == 'X' || c == 'A' || c == 'B' || c == 'a' || c == 'b';
+	if(base < 0) return true;
 	if(base <= 10) return false;
+	// duodecimal bases uses 0-9, E, X
+	if(base == 12) return c == 'E' || c == 'X' || c == 'A' || c == 'B' || c == 'a' || c == 'b';
 	// bases 11-36 is case insensitive
 	if(base <= 36) {
 		if(c >= 'a' && c < 'a' + (base - 10)) return true;
@@ -2932,7 +2932,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		}
 		current_status_struct = mparse;
 		if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
-		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_e.find(" where", str_e.length() - 6) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
+		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_u.empty() && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_w.empty() && str_e.find(" where", str_e.length() - 6) != std::string::npos) || (str_e.length() > 2 && str_e.find("/.", str_e.length() - 2) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
 		else if(auto_calculable == 1 && cdata->current_function && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
 		if(auto_calculable != 0 && pos_c == 'e' && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
 			size_t pos2 = pos;
@@ -3188,7 +3188,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					parsed_expression += tr("optimal prefix").toStdString();
 				} else if(equalsIgnoreCase(str_u, "base") || equalsIgnoreCase(str_u, tr("base", "base units").toStdString())) {
 					parsed_expression += tr("base units").toStdString();
-				} else if(equalsIgnoreCase(str_u, "mixed") || equalsIgnoreCase(str_u, tr("mixed").toStdString())) {
+				} else if(equalsIgnoreCase(str_u, "mixed") || equalsIgnoreCase(str_u, tr("mixed").toStdString()) || str_u == "+") {
 					parsed_expression += tr("mixed units").toStdString();
 				} else if(equalsIgnoreCase(str_u, "factors") || equalsIgnoreCase(str_u, tr("factors").toStdString()) || equalsIgnoreCase(str_u, "factor")) {
 					parsed_expression += tr("factors").toStdString();
@@ -3275,7 +3275,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					} else if(fden < 0) {
 						parsed_expression += tr("fraction").toStdString();
 					} else {
+						char c0 = 0;
 						if(str_u[0] == '0' || str_u[0] == '?' || str_u[0] == '+' || str_u[0] == '-') {
+							if(str_u[0] != '?') c0 = str_u[0];
 							str_u = str_u.substr(1, str_u.length() - 1);
 							remove_blank_ends(str_u);
 						} else if(str_u.length() > 1 && str_u[1] == '?' && (str_u[0] == 'b' || str_u[0] == 'a' || str_u[0] == 'd')) {
@@ -3311,7 +3313,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							mparse = u;
 						} else if(v) {
 							mparse = v;
-						} else if(!p) {
+						} else if(!p && !str_u.empty()) {
 							CALCULATOR->beginTemporaryStopMessages();
 							CompositeUnit cu("", settings->evalops.parse_options.limit_implicit_multiplication ? "01" : "00", "", str_u);
 							int i_warn = 0, i_error = CALCULATOR->endTemporaryStopMessages(NULL, &i_warn);
@@ -3335,6 +3337,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							if(i_error) {
 								ParseOptions pa = settings->evalops.parse_options;
 								pa.units_enabled = true;
+								if(c0 != 0) str_u.insert(0, 1, c0);
 								CALCULATOR->parse(&mparse, str_u, pa);
 								if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
 								else if(auto_calculable == 1 && !mparse.isNumber()) auto_calculable = 2;
@@ -3347,7 +3350,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 						CALCULATOR->stopControl();
 						if(p) {
 							parsed_expression += p->preferredDisplayName(po.abbreviate_names, po.use_unicode_signs, false, false, po.can_display_unicode_string_function, po.can_display_unicode_string_arg).formattedName(-1, true, TAG_TYPE_HTML, 0, true, po.hide_underscore_spaces);
-						} else {
+						} else if(!str_u.empty()) {
 							CALCULATOR->beginTemporaryStopMessages();
 							if(compact) po.preserve_format = false;
 							parsed_expression += mparse.print(po, true, settings->status_in_history ? settings->color : false, TAG_TYPE_HTML);
@@ -3497,7 +3500,7 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 					ns++;
 				}
 			}
-			if(n > group_size + 1 || (nd > group_size + 1 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0 || previous_pos < str.length()))) {
+			if(base <= 10 && (n > group_size + 1 || (nd > group_size + 1 && settings->printops.digit_grouping != DIGIT_GROUPING_LOCALE) || (ns > 0 && (str.length() < previous_text.length() || dec_pos >= 0 || previous_pos < str.length())))) {
 				for(int i = last_pos - 1; ns > 0 && i >= 0;) {
 					if(((sep == ' ' && str[i].isSpace()) || (sep != ' ' && str[i] == sep))) {
 						str.remove(i, 1);
@@ -3684,7 +3687,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		MFROM_CLEANUP
 		return false;
 	}
-	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic() && mfunc[cdata->current_function_index - 1].symbol() == current_object_text) {
+	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic()) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
@@ -4715,7 +4718,7 @@ void ExpressionEdit::setCurrentObject() {
 		pos = current_object_text.length();
 		pos2 = pos;
 		if(l_to > 0 && current_object_text[0] == '/') return;
-		bool cit1 = false, cit2 = false, hex = false, duo = false;
+		bool cit1 = false, cit2 = false, hex = false, duo = false, after_space = false;
 		for(size_t i = 0; i < l_to; i++) {
 			if(!cit1 && current_object_text[i] == '\"') {
 				cit2 = !cit2;
@@ -4725,22 +4728,27 @@ void ExpressionEdit::setCurrentObject() {
 				cit1 = !cit1;
 				hex = false;
 				duo = false;
-			} else if(!hex && !cit1 && !cit2 && i + 2 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'x' && current_object_text[i + 2] != ' ') {
+			} else if(!hex && !cit1 && !cit2 && i + 2 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'x' && is_digit_q(current_object_text[i + 2], 16)) {
 				hex = true;
 				duo = false;
-				i++;
-			} else if(!hex && !duo && !cit1 && !cit2 && i + 3 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'd' && current_object_text[i + 2] != ' ' && current_object_text[i + 2] != ' ') {
+				after_space = false;
+				i += 2;
+			} else if(!hex && !duo && !cit1 && !cit2 && i + 3 < l_to && current_object_text[i] == '0' && current_object_text[i + 1] == 'd' && is_digit_q(current_object_text[i + 2], 12) && is_digit_q(current_object_text[i + 3], 12)) {
 				duo = true;
-				i++;
+				after_space = false;
+				i += 3;
 			} else if(!cit1 && !cit2 && current_object_text[i] == '#') {
 				current_object_start = -1;
 				current_object_end = -1;
 				current_object_text = "";
 				break;
-			} else if(hex && current_object_text[i] != ' ' && (current_object_text[i] < '0' || current_object_text[i] > '9') && (current_object_text[i] < 'a' || current_object_text[i] > 'f') && (current_object_text[i] < 'A' || current_object_text[i] > 'F')) {
-				hex = false;
-			} else if(duo && current_object_text[i] != ' ' && (current_object_text[i] < '0' || current_object_text[i] > '9') && (current_object_text[i] < 'a' || current_object_text[i] > 'b') && (current_object_text[i] < 'A' || current_object_text[i] > 'B')) {
+			} else if((hex || duo) && current_object_text[i] == ' ') {
+				after_space = true;
+			} else if((hex || duo) && after_space && (current_object_text[i] < '0' || current_object_text[i] < '9')) {
+				after_space = false;
+			} else if((hex || duo) && ((after_space && !is_digit_q(current_object_text[i], hex ? 16 : 12)) || !CALCULATOR->utf8_pos_is_valid_in_name((char*) current_object_text.c_str() + sizeof(char) * i))) {
 				duo = false;
+				hex = false;
 			}
 		}
 		if(hex || duo) {

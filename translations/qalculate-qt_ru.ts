@@ -3276,6 +3276,10 @@ Do you, despite this, want to change the default behavior and allow multiple sim
         <source>Allow multiple instances?</source>
         <translation>Разрешить несколько экземпляров?</translation>
     </message>
+    <message>
+        <source>Update exchange rates</source>
+        <translation type="unfinished">Обновить курсы валют</translation>
+    </message>
 </context>
 <context>
     <name>QalculateQtSettings</name>
