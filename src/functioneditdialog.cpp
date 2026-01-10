@@ -996,7 +996,11 @@ UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	}
 	for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 		str = subfunctionsModel->item(i, 0)->text().trimmed().toStdString();
+		gsub("{", "\a", str);
+		gsub("}", "\b", str);
 		fix_expression(str);
+		gsub("\a", "{", str);
+		gsub("\b", "}", str);
 		f->addSubfunction(str, subfunctionsModel->item(i, 1)->checkState() == Qt::Checked);
 	}
 	if(namesEditDialog) namesEditDialog->modifyNames(f, nameEdit->text());
@@ -1049,7 +1053,11 @@ bool FunctionEditDialog::modifyFunction(MathFunction *f, MathFunction **replaced
 		((UserFunction*) f)->clearSubfunctions();
 		for(int i = 0; i < subfunctionsModel->rowCount(); i++) {
 			str = subfunctionsModel->item(i, 0)->text().trimmed().toStdString();
+			gsub("{", "\a", str);
+			gsub("}", "\b", str);
 			fix_expression(str);
+			gsub("\a", "{", str);
+			gsub("\b", "}", str);
 			((UserFunction*) f)->addSubfunction(str, subfunctionsModel->item(i, 1)->checkState() == Qt::Checked);
 		}
 		str = expressionEdit->toPlainText().trimmed().toStdString();
