@@ -8244,7 +8244,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Keep above other windows</source>
-        <translation>保持在其他視窗上方</translation>
+        <translation>保持在其他視窗上面</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="142"/>
@@ -8583,7 +8583,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="140"/>
         <source>Place expression field below history</source>
-        <translation>將表達式欄位放在歷史記錄下方面</translation>
+        <translation>將表達式欄位放在歷史記錄下面</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="186"/>
@@ -9767,7 +9767,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
         <source>Toggle keep above</source>
-        <translation>切換保持在其他視窗上方</translation>
+        <translation>切換保持在上面</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2393"/>
