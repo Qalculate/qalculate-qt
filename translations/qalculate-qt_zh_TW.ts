@@ -6143,7 +6143,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="2172"/>
         <source>In status bar</source>
-        <translation type="unfinished"></translation>
+        <translation>在狀態列中</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2175"/>
@@ -6153,7 +6153,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/expressionedit.cpp" line="2176"/>
         <source>With adaptive delay</source>
-        <translation type="unfinished"></translation>
+        <translation>自適應延遟</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2177"/>
@@ -6484,7 +6484,7 @@ Do you want to overwrite the function?</source>
         <location filename="../src/expressionedit.cpp" line="3189"/>
         <source>base</source>
         <comment>base units</comment>
-        <translation type="unfinished">基本</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3195"/>
@@ -6565,7 +6565,7 @@ Do you want to overwrite the function?</source>
         <location filename="../src/expressionedit.cpp" line="3262"/>
         <source>base</source>
         <comment>number base</comment>
-        <translation type="unfinished">基本</translation>
+        <translation>底數</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3263"/>
@@ -7041,7 +7041,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/historyview.cpp" line="349"/>
         <source>Type a mathematical expression below, e.g. &quot;5 + 2 / 3&quot;, and press the enter key.</source>
-        <translation type="unfinished"></translation>
+        <translation>在下面鍵入數學表達式，例如&quot;5 + 2 / 3&quot;，然後按Enter鍵。</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/historyview.cpp" line="727"/>
@@ -8244,7 +8244,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Keep above other windows</source>
-        <translation>保持在其他視窗上方</translation>
+        <translation>保持在其他視窗上面</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="142"/>
@@ -8578,12 +8578,12 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="124"/>
         <source>Notify when a new version is available</source>
-        <translation type="unfinished">當有新版本時通知我</translation>
+        <translation>當有新版本時通知我</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="140"/>
         <source>Place expression field below history</source>
-        <translation type="unfinished"></translation>
+        <translation>將表達式欄位放在歷史記錄下面</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="186"/>
@@ -8604,7 +8604,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="189"/>
         <source>In status bar</source>
-        <translation type="unfinished"></translation>
+        <translation>在狀態列中</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="197"/>
@@ -8614,7 +8614,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="217"/>
         <source>Adaptive delay</source>
-        <translation type="unfinished"></translation>
+        <translation>自適應延遟</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="218"/>
@@ -8634,7 +8634,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="222"/>
         <source>Parsed (compact)</source>
-        <translation type="unfinished"></translation>
+        <translation>剖析(緊湊)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="223"/>
@@ -8649,7 +8649,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Entered + parsed (compact)</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入+剖析(緊湊)</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="238"/>
@@ -8761,7 +8761,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="329"/>
         <source>Custom</source>
-        <translation type="unfinished">自訂</translation>
+        <translation>自訂</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="339"/>
@@ -8896,27 +8896,27 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="436"/>
         <source>Default currency:</source>
-        <translation type="unfinished"></translation>
+        <translation>預設貨幣:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="469"/>
         <source>Custom status bar font:</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂狀態列字型:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="494"/>
         <source>Fonts</source>
-        <translation type="unfinished"></translation>
+        <translation>字型</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="496"/>
         <source>Units</source>
-        <translation type="unfinished">單位</translation>
+        <translation>單位</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="497"/>
         <source>Calculation</source>
-        <translation type="unfinished"></translation>
+        <translation>計算</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="532"/>
@@ -9125,7 +9125,7 @@ and press the enter key.</source>
     <message>
         <location filename="../src/main.cpp" line="135"/>
         <source>Update exchange rates</source>
-        <translation type="unfinished">更新匯率</translation>
+        <translation>更新匯率</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="137"/>
@@ -9557,7 +9557,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2350"/>
         <source>Activate normal display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>啟用正常顯示模式</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2351"/>
@@ -9767,7 +9767,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
         <source>Toggle keep above</source>
-        <translation>切換保持在其他視窗上方</translation>
+        <translation>切換保持在上面</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2393"/>
@@ -10933,7 +10933,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="7147"/>
         <source>base</source>
         <comment>base units</comment>
-        <translation type="unfinished">基本</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5853"/>
@@ -10946,7 +10946,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="7163"/>
         <source>base</source>
         <comment>number base</comment>
-        <translation type="unfinished">基本</translation>
+        <translation>底數</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5866"/>
@@ -11328,13 +11328,13 @@ Do you wish to replace the current action (%1)?</source>
         <location filename="../src/qalculatewindow.cpp" line="558"/>
         <location filename="../src/qalculatewindow.cpp" line="559"/>
         <source>Approximation and Fractions</source>
-        <translation type="unfinished"></translation>
+        <translation>近似和分數</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="631"/>
         <location filename="../src/qalculatewindow.cpp" line="680"/>
         <source>Binary-coded decimal (BCD)</source>
-        <translation type="unfinished"></translation>
+        <translation>二進碼十進數(BCD)</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="769"/>
@@ -11374,7 +11374,7 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="798"/>
         <source>Show Custom Column</source>
-        <translation type="unfinished"></translation>
+        <translation>顯示自訂欄</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="799"/>
