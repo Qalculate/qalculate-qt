@@ -983,6 +983,7 @@ ExpressionEdit::ExpressionEdit(QWidget *parent, QWidget *toolbar, QLabel *sl) : 
 	block_add_to_undo = 0;
 	expression_from_history = false;
 	undo_index = 0;
+	prev_group_separator = 0;
 	cdata = new CompletionData;
 	history_index = -1;
 	disable_history_arrow_keys = false;
@@ -2678,14 +2679,15 @@ void replace_control_characters_qt(std::string &str) {
 	}
 }
 
-bool test_autocalculatable(const MathStructure &m, bool top = true) {
+bool test_autocalculatable(const MathStructure &m, bool where = false, bool top = true) {
+	if(where && top && ((m.isVariable() && !m.variable()->isKnown()) || m.isNumber())) return false;
 	if(m.isFunction()) {
-		if(m.size() < (size_t) m.function()->minargs() && (m.size() != 1 || m[0].representsScalar())) {
+		if(m.size() < (size_t) m.function()->minargs() && (!where || m.size() != 0) && (m.size() != 1 || m[0].representsScalar())) {
 			MathStructure mf(m);
 			mf.calculateFunctions(settings->evalops, false);
 			return false;
 		}
-		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND) return false;
+		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND || (m.function()->subtype() == SUBTYPE_USER_FUNCTION && ((UserFunction*) m.function())->formula().find("plot(") != std::string::npos)) return false;
 		if(m.size() > 0 && (m.function()->id() == FUNCTION_ID_FACTORIAL || m.function()->id() == FUNCTION_ID_DOUBLE_FACTORIAL || m.function()->id() == FUNCTION_ID_MULTI_FACTORIAL) && m[0].isInteger() && m[0].number().integerLength() > 17) {
 			return false;
 		}
@@ -2695,7 +2697,7 @@ bool test_autocalculatable(const MathStructure &m, bool top = true) {
 		return false;
 	}
 	for(size_t i = 0; i < m.size(); i++) {
-		if(!test_autocalculatable(m[i], false)) return false;
+		if(!test_autocalculatable(m[i], where || (m.isFunction() && m.function()->id() == FUNCTION_ID_REPLACE && i > 0), false)) return false;
 	}
 	return true;
 }
@@ -2933,8 +2935,9 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		current_status_struct = mparse;
 		if(auto_calculable && !test_autocalculatable(mparse)) auto_calculable = 0;
 		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_u.empty() && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_w.empty() && str_e.find(" where", str_e.length() - 6) != std::string::npos) || (str_e.length() > 2 && str_e.find("/.", str_e.length() - 2) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
+		else if(auto_calculable && !str_w.empty() && (str_w.back() == '>' || str_w.back() == '<' || str_w.back() == '=' || (str_w.length() >= 3 && (str_w.find("≤", str_w.length() - 3) != std::string::npos || str_w.find("≥", str_w.length() - 3) != std::string::npos || str_w.find("≠", str_w.length() - 3) != std::string::npos)))) auto_calculable = 0;
 		else if(auto_calculable == 1 && cdata->current_function && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
-		if(auto_calculable != 0 && pos_c == 'e' && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
+		if(auto_calculable != 0 && pos_c == 'e' && str_w.empty() && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
 			size_t pos2 = pos;
 			std::string *str_cur = &str_e;
 			std::string str;
@@ -2950,22 +2953,22 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					break;
 				}
 			}
-			if(pos > 0 && mparse.containsType(STRUCT_SYMBOLIC, true)) {
-				bool cit1 = false, cit2 = false;
+			if(pos > 0) {
+				bool cit1 = false, cit2 = false, xbase = false;
 				for(size_t i = 0; i < pos; i++) {
 					if(!cit1 && (*str_cur)[i] == '\"') {
 						cit2 = !cit2;
 					} else if(!cit2 && (*str_cur)[i] == '\'') {
 						cit1 = !cit1;
 					} else if(i > 0 && i + 1 < pos && (*str_cur)[i] == 'x' && (*str_cur)[i - 1] == '0' && is_digit_q((*str_cur)[i + 1], 16)) {
-						cit1 = true;
+						xbase = true;
 						break;
 					} else if(i > 0 && i + 2 < pos && (*str_cur)[i] == 'd' && (*str_cur)[i - 1] == '0' && is_digit_q((*str_cur)[i + 1], 12) && is_digit_q((*str_cur)[i + 2], 12)) {
-						cit1 = true;
+						xbase = true;
 						break;
 					}
 				}
-				if(cit1 || cit2) pos = pos2 + 1;
+				if(xbase || ((cit1 || cit2) && mparse.containsType(STRUCT_SYMBOLIC, true))) pos = pos2 + 1;
 			}
 			if(pos <= pos2) {
 				while(pos2 < str_cur->length()) {
@@ -3003,6 +3006,14 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 							auto_calculable = 0;
 						}
 					}
+					if(auto_calculable == 1 && m.isMultiplication()) {
+						for(size_t i = 1; i < m.size(); i++) {
+							if(m[i].isVariable() && m[i].variable() == CALCULATOR->getVariableById(VARIABLE_ID_I) && m[i - 1].isUnit() && m[i - 1].unit()->baseUnit() != CALCULATOR->getRadUnit()) {
+								auto_calculable = 0;
+								break;
+							}
+						}
+					}
 					if(auto_calculable == 1 && w_n > 0) {
 						auto_calculable = 2;
 					} else if(auto_calculable == 1 && !m.isNumber() && !m.isFunction() && !m.isVariable() && (!m.isUnit() || !use_with_prefix(m.unit(), m.prefix()))) {
@@ -3034,6 +3045,10 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 								b = true;
 								for(size_t i = 0; i < m.size(); i++) {
 									if(!m[i].isVariable() || (m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_X) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Y) && m[i].variable() != CALCULATOR->getVariableById(VARIABLE_ID_Z))) {
+										if(i == 0 && m[0].isUnit() && m[0].unit() == CALCULATOR->getDegUnit() && str.find("°") == 0) {
+											if(m.size() == 2 && !m[1].isUnit()) break;
+											continue;
+										}
 										b = false;
 										break;
 									}
@@ -3088,7 +3103,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 			CALCULATOR->beginTemporaryStopMessages();
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
-			if(auto_calculable && !test_autocalculatable(mwhere)) auto_calculable = 0;
+			if(auto_calculable && (!test_autocalculatable(mwhere, true))) auto_calculable = 0;
 			else if(auto_calculable == 1 && !mwhere.isComparison() && !mwhere.isLogicalAnd() && !mwhere.isLogicalOr()) auto_calculable = 2;
 			mparse.format(po);
 			if(compact) po.preserve_format = false;
@@ -3443,6 +3458,18 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 				if(CALCULATOR->local_digit_group_separator == "." && settings->evalops.parse_options.dot_as_separator) sep = '.';
 				else if(CALCULATOR->local_digit_group_separator == "," && settings->evalops.parse_options.comma_as_separator) sep = ',';
 			}
+			if(base == 10 && (force_update_groups || prev_group_separator == 0) && last_pos == 0) {
+				if(prev_group_separator > 0 && prev_group_separator != sep && str.length() > 2) {
+					for(int i = 1; i < str.length() - 1; i++) {
+						if(((prev_group_separator == ' ' && str[i] == QChar(0x2009)) || (prev_group_separator != ' ' && str[i] == prev_group_separator)) && str[i - 1].isDigit() && str[i + 1].isDigit()) {
+							if(i < previous_pos) previous_pos--;
+							if(i < sel_anchor) sel_anchor--;
+							str.remove(i, 1);
+						}
+					}
+				}
+				prev_group_separator = sep;
+			}
 			if(last_pos == 0 && previous_pos > 0 && sep == ' ' && str[previous_pos - 1].isSpace() && str.length() - 1 == previous_text.length()) {
 				QString stest = str;
 				stest.remove(previous_pos - 1, 1);
@@ -3482,9 +3509,9 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 			size_t group_index = 0;
 			int group_size = 3;
 			if(base == 2) group_size = 4;
-			if(base == 8) group_size = 3;
+			else if(base == 8) group_size = 3;
 			else if(base == 16) group_size = 2;
-			else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_format[group_index] != CHAR_MAX) group_size = CALCULATOR->local_digit_group_format[group_index];
+			else if(settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && group_index < CALCULATOR->local_digit_group_format.size() && CALCULATOR->local_digit_group_format[group_index] != CHAR_MAX) group_size = CALCULATOR->local_digit_group_format[group_index];
 			last_pos--;
 			int n = 0, nd = 0, ns = 0, ns_p = 0;
 			int dec_pos = -1;
@@ -3521,7 +3548,7 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 					last_pos++;
 					dec_pos++;
 					if(i < sel_anchor) sel_anchor++;
-					if(base == 10 && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_format[group_index + 1] != CHAR_MAX) {
+					if(base == 10 && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && group_index + 1 < CALCULATOR->local_digit_group_format.size() && CALCULATOR->local_digit_group_format[group_index + 1] != CHAR_MAX) {
 						group_size = CALCULATOR->local_digit_group_format[group_index + 1];
 						group_index++;
 					}
@@ -3687,12 +3714,12 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		MFROM_CLEANUP
 		return false;
 	}
-	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc[cdata->current_function_index - 1].isSymbolic()) {
+	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc.isFunction() && (size_t) cdata->current_function_index <= mfunc.size() && mfunc[cdata->current_function_index - 1].isSymbolic()) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
 	}
-	if(!force && !cdata->editing_to_expression && ((current_object_text.length() == 1 && (current_object_text[0] == 'x' || current_object_text[0] == 'y' || current_object_text[0] == 'z')) || (current_object_text.length() == 2 && ((current_object_text[0] == 'x' && current_object_text[1] == 'y') || (current_object_text[0] == 'x' && current_object_text[1] == 'z') || (current_object_text[0] == 'y' && current_object_text[1] == 'z'))) || (current_object_text.length() == 3 && current_object_text[0] == 'x' && current_object_text[1] == 'y' && current_object_text[2] == 'z')) && (test_x_count(current_status_struct, current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1) || (cdata->current_function && cdata->current_function_index > 0 && test_x_count(mfunc[cdata->current_function_index - 1], current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1)))) {
+	if(!force && !cdata->editing_to_expression && ((current_object_text.length() == 1 && (current_object_text[0] == 'x' || current_object_text[0] == 'y' || current_object_text[0] == 'z')) || (current_object_text.length() == 2 && ((current_object_text[0] == 'x' && current_object_text[1] == 'y') || (current_object_text[0] == 'x' && current_object_text[1] == 'z') || (current_object_text[0] == 'y' && current_object_text[1] == 'z'))) || (current_object_text.length() == 3 && current_object_text[0] == 'x' && current_object_text[1] == 'y' && current_object_text[2] == 'z')) && (test_x_count(current_status_struct, current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1) || (cdata->current_function && cdata->current_function_index > 0 && (size_t) cdata->current_function_index <= mfunc.size() && test_x_count(mfunc[cdata->current_function_index - 1], current_object_text.find("x") != std::string::npos ? 2 : 1, current_object_text.find("y") != std::string::npos ? 2 : 1, current_object_text.find("z") != std::string::npos ? 2 : 1)))) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;

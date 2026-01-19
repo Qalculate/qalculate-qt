@@ -88,7 +88,7 @@ parts:
 
   qalculate-qt:
     source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.9.0/qalculate-qt-5.9.0.tar.gz
-    source-checksum: sha512/b01a009829073fc1198443973a665e7fad3be9f4b7b070ca606b1355b88aeac467fe75eb729ced054d619d91881c6b26ba01e4c62ab2e30279f37b65e063dc68
+    source-checksum: sha512/943746116215b893a6c552592af76b2be163b62153c55f9916df7e8468c15d52f1dc7982db722c9b57e08e6d4bb7b8362edb21415b7ea20fe28f93c3f381c341
     plugin: qmake
     qmake-parameters:
       - COMPILE_RESOURCES=yes
@@ -113,8 +113,8 @@ parts:
       patch -p1 < $CRAFT_PROJECT_DIR/snap/patches/snap.patch
 
   gnuplot:
-    source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.3.tar.gz
-    source-checksum: sha256/ec52e3af8c4083d4538152b3f13db47f6d29929a3f6ecec5365c834e77f251ab
+    source: https://downloads.sourceforge.net/gnuplot/gnuplot-6.0.4.tar.gz
+    source-checksum: sha256/458d94769625e73d5f6232500f49cbadcb2b183380d43d2266a0f9701aeb9c5b
     plugin: autotools
     autotools-configure-parameters:
       - --prefix=/usr

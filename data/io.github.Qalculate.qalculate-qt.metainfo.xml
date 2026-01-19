@@ -90,10 +90,11 @@
       <li>Improve automatic digit groups, in input, for non-decimal numbers and group sizes other than 3</li>
       <li>Add --update-exchange-rates command line option</li>
       <li>Fix tooltips for warning and flag in result when expression is placed below history</li>
+      <li>Hide keep above option, in preferences, on Wayland</li>
       <li>Improve speed of sort(), rank(), and mode() functions (and other dependent functions)</li>
       <li>Parse ± before implicit multiplication when not preceded by number (e.g. "7 km ± 5m")</li>
       <li>Always consider x^(a + b) equivalent to x^a × x^b (fixes "x^(y + z) − x^y × x^z")</li>
-      <li>Simplify (x = a || x ≥ a + 1) and (x = a || x ≤ a − 1) when x is an unknown integer (fixes "abs(x − 1) = abs(1 − x)")</li>
+      <li>Simplify (x = a || x ≥ a + 1) and (x ≤ a || x ≥ a + 1), and similar, when x and a are integers (fixes "abs(x − 1) = abs(1 − x)")</li>
       <li>Do not remove duplicate whitespace characters from text strings (in quotation marks)</li>
       <li>Fix floating point conversion when comma is used as decimal separator</li>
       <li>Fix (almost) endless loop with increasingly complex equations in some cases when x + x^(1/a) is transformed to x = (b − x)^a)</li>

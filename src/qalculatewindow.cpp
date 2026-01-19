@@ -1141,7 +1141,8 @@ void QalculateWindow::testTimeout() {
 		prev_test_type = 6;
 	} else if(type == 17) {
 		MathFunction *f = CALCULATOR->functions[rand() % CALCULATOR->functions.size()];
-		s = QString::fromStdString(f->referenceName() + "(");
+		if(rand() % 2) s = QString::fromStdString(f->referenceName() + "(");
+		else s = QString::fromStdString(f->referenceName());
 		prev_test_type = 6;
 	} else if(type == 18) {
 		s = QString::fromStdString(CALCULATOR->variables[rand() % CALCULATOR->variables.size()]->referenceName());
@@ -1156,7 +1157,7 @@ void QalculateWindow::testTimeout() {
 		s = ")";
 		prev_test_type = 2;
 	} else if(type == 22) {
-		s = "->";
+		s = "+/-";
 		prev_test_type = 9;
 	}
 	int t = 1;
@@ -6769,7 +6770,9 @@ void QalculateWindow::onExpressionChanged() {
 	std::string stmp;
 	CALCULATOR->separateToExpression(str, stmp, eo);
 	CALCULATOR->separateWhereExpression(str, stmp, eo);
-	if(contains_plot_or_save(str) || !CALCULATOR->calculate(&m, str, 100, eo)) {
+	if(!mauto.isAborted()) {
+		set_result_bases(mauto);
+	} else if(auto_error || auto_aborted || !expressionEdit->parsedCalculable() || !CALCULATOR->calculate(&m, str, 100, eo)) {
 		result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
 	} else {
 		set_result_bases(m);

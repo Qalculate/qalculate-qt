@@ -77,6 +77,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		QString previous_text;
 		bool enable_tab;
 		int use_bold_highlight;
+		char prev_group_separator;
 		
 		CompletionData *cdata;
 		

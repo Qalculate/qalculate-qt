@@ -694,12 +694,18 @@ void PreferencesDialog::decimalCommaToggled(bool b) {
 void PreferencesDialog::ignoreDotToggled(bool b) {
 	settings->evalops.parse_options.dot_as_separator = b;
 	settings->dot_question_asked = true;
+	if(settings->automatic_digit_grouping && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_separator == DOT) {
+		emit automaticDigitGroupingChanged();
+	}
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::ignoreCommaToggled(bool b) {
 	settings->evalops.parse_options.comma_as_separator = b;
 	CALCULATOR->useDecimalPoint(settings->evalops.parse_options.comma_as_separator);
 	settings->dot_question_asked = true;
+	if(settings->automatic_digit_grouping && settings->printops.digit_grouping == DIGIT_GROUPING_LOCALE && CALCULATOR->local_digit_group_separator == COMMA) {
+		emit automaticDigitGroupingChanged();
+	}
 	emit expressionFormatUpdated(false);
 	emit symbolsUpdated();
 }

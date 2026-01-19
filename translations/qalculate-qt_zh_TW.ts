@@ -6794,37 +6794,37 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="959"/>
-        <location filename="../src/functioneditdialog.cpp" line="1016"/>
+        <location filename="../src/functioneditdialog.cpp" line="1020"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="959"/>
-        <location filename="../src/functioneditdialog.cpp" line="1016"/>
+        <location filename="../src/functioneditdialog.cpp" line="1020"/>
         <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
         <translation>在函數中不支援轉換(使用&quot;to&quot;)。</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="966"/>
-        <location filename="../src/functioneditdialog.cpp" line="1022"/>
+        <location filename="../src/functioneditdialog.cpp" line="1026"/>
         <source>Question</source>
         <translation>問題</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="966"/>
-        <location filename="../src/functioneditdialog.cpp" line="1022"/>
+        <location filename="../src/functioneditdialog.cpp" line="1026"/>
         <source>A function with the same name already exists.
 Do you want to overwrite the function?</source>
         <translation>具有相同名稱的函數已存在。
 你想覆寫函數嗎?</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1330"/>
+        <location filename="../src/functioneditdialog.cpp" line="1338"/>
         <source>Edit Function</source>
         <translation>編輯函數</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1343"/>
+        <location filename="../src/functioneditdialog.cpp" line="1351"/>
         <source>New Function</source>
         <translation>新函數</translation>
     </message>
@@ -9979,9 +9979,9 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="465"/>
         <location filename="../src/qalculatewindow.cpp" line="467"/>
-        <location filename="../src/qalculatewindow.cpp" line="1491"/>
-        <location filename="../src/qalculatewindow.cpp" line="1533"/>
-        <location filename="../src/qalculatewindow.cpp" line="1632"/>
+        <location filename="../src/qalculatewindow.cpp" line="1492"/>
+        <location filename="../src/qalculatewindow.cpp" line="1534"/>
+        <location filename="../src/qalculatewindow.cpp" line="1633"/>
         <source>Menu</source>
         <translation>選單</translation>
     </message>
@@ -10048,9 +10048,9 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="490"/>
         <location filename="../src/qalculatewindow.cpp" line="754"/>
-        <location filename="../src/qalculatewindow.cpp" line="1488"/>
-        <location filename="../src/qalculatewindow.cpp" line="1525"/>
-        <location filename="../src/qalculatewindow.cpp" line="1610"/>
+        <location filename="../src/qalculatewindow.cpp" line="1489"/>
+        <location filename="../src/qalculatewindow.cpp" line="1526"/>
+        <location filename="../src/qalculatewindow.cpp" line="1611"/>
         <source>Functions</source>
         <translation>函數</translation>
     </message>
@@ -10062,17 +10062,17 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="492"/>
         <location filename="../src/qalculatewindow.cpp" line="761"/>
-        <location filename="../src/qalculatewindow.cpp" line="1487"/>
-        <location filename="../src/qalculatewindow.cpp" line="1523"/>
-        <location filename="../src/qalculatewindow.cpp" line="1608"/>
+        <location filename="../src/qalculatewindow.cpp" line="1488"/>
+        <location filename="../src/qalculatewindow.cpp" line="1524"/>
+        <location filename="../src/qalculatewindow.cpp" line="1609"/>
         <source>Units</source>
         <translation>單位</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="495"/>
-        <location filename="../src/qalculatewindow.cpp" line="1485"/>
-        <location filename="../src/qalculatewindow.cpp" line="1519"/>
-        <location filename="../src/qalculatewindow.cpp" line="1606"/>
+        <location filename="../src/qalculatewindow.cpp" line="1486"/>
+        <location filename="../src/qalculatewindow.cpp" line="1520"/>
+        <location filename="../src/qalculatewindow.cpp" line="1607"/>
         <source>Plot Functions/Data</source>
         <translation>函數/資料繪圖</translation>
     </message>
@@ -10108,7 +10108,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="509"/>
-        <location filename="../src/qalculatewindow.cpp" line="9566"/>
+        <location filename="../src/qalculatewindow.cpp" line="9567"/>
         <source>Keyboard Shortcuts</source>
         <translation>鍵盤快捷鍵</translation>
     </message>
@@ -10135,7 +10135,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="516"/>
         <location filename="../src/qalculatewindow.cpp" line="517"/>
-        <location filename="../src/qalculatewindow.cpp" line="3164"/>
+        <location filename="../src/qalculatewindow.cpp" line="3165"/>
         <source>About %1</source>
         <translation>關於%1</translation>
     </message>
@@ -10147,9 +10147,9 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="521"/>
         <location filename="../src/qalculatewindow.cpp" line="523"/>
-        <location filename="../src/qalculatewindow.cpp" line="1492"/>
-        <location filename="../src/qalculatewindow.cpp" line="1531"/>
-        <location filename="../src/qalculatewindow.cpp" line="1630"/>
+        <location filename="../src/qalculatewindow.cpp" line="1493"/>
+        <location filename="../src/qalculatewindow.cpp" line="1532"/>
+        <location filename="../src/qalculatewindow.cpp" line="1631"/>
         <source>Mode</source>
         <translation>模式</translation>
     </message>
@@ -10338,7 +10338,7 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="554"/>
         <location filename="../src/qalculatewindow.cpp" line="614"/>
         <location filename="../src/qalculatewindow.cpp" line="671"/>
-        <location filename="../src/qalculatewindow.cpp" line="2142"/>
+        <location filename="../src/qalculatewindow.cpp" line="2143"/>
         <source>Other</source>
         <translation>其他</translation>
     </message>
@@ -10421,10 +10421,10 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="740"/>
-        <location filename="../src/qalculatewindow.cpp" line="1490"/>
-        <location filename="../src/qalculatewindow.cpp" line="1529"/>
-        <location filename="../src/qalculatewindow.cpp" line="1637"/>
+        <location filename="../src/qalculatewindow.cpp" line="1491"/>
+        <location filename="../src/qalculatewindow.cpp" line="1530"/>
         <location filename="../src/qalculatewindow.cpp" line="1638"/>
+        <location filename="../src/qalculatewindow.cpp" line="1639"/>
         <source>Convert</source>
         <translation>轉換</translation>
     </message>
@@ -10434,9 +10434,9 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="747"/>
-        <location filename="../src/qalculatewindow.cpp" line="1486"/>
-        <location filename="../src/qalculatewindow.cpp" line="1521"/>
-        <location filename="../src/qalculatewindow.cpp" line="1634"/>
+        <location filename="../src/qalculatewindow.cpp" line="1487"/>
+        <location filename="../src/qalculatewindow.cpp" line="1522"/>
+        <location filename="../src/qalculatewindow.cpp" line="1635"/>
         <source>Store</source>
         <translation>儲存</translation>
     </message>
@@ -10451,7 +10451,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="779"/>
         <location filename="../src/qalculatewindow.cpp" line="780"/>
-        <location filename="../src/qalculatewindow.cpp" line="1414"/>
+        <location filename="../src/qalculatewindow.cpp" line="1415"/>
         <source>Keypad</source>
         <translation>鍵盤</translation>
     </message>
@@ -10551,227 +10551,227 @@ You can get version %3 at %2.</source>
         <translation type="obsolete">清空RPN佇列（%1）</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2165"/>
+        <location filename="../src/qalculatewindow.cpp" line="2166"/>
         <source>New Function…</source>
         <translation>新函數…</translation>
-    </message>
-    <message>
-        <location filename="../src/qalculatewindow.cpp" line="2261"/>
-        <location filename="../src/qalculatewindow.cpp" line="2531"/>
-        <location filename="../src/qalculatewindow.cpp" line="2851"/>
-        <source>Favorites</source>
-        <translation>最愛</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="2262"/>
         <location filename="../src/qalculatewindow.cpp" line="2532"/>
         <location filename="../src/qalculatewindow.cpp" line="2852"/>
+        <source>Favorites</source>
+        <translation>最愛</translation>
+    </message>
+    <message>
+        <location filename="../src/qalculatewindow.cpp" line="2263"/>
+        <location filename="../src/qalculatewindow.cpp" line="2533"/>
+        <location filename="../src/qalculatewindow.cpp" line="2853"/>
         <source>Recent</source>
         <translation>最近</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2281"/>
+        <location filename="../src/qalculatewindow.cpp" line="2282"/>
         <source>User functions</source>
         <translation>使用者函數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2329"/>
+        <location filename="../src/qalculatewindow.cpp" line="2330"/>
         <source>Open dialog</source>
         <translation>開啟對話框</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2334"/>
+        <location filename="../src/qalculatewindow.cpp" line="2335"/>
         <source>Show all functions</source>
         <translation>顯示所有函數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2551"/>
+        <location filename="../src/qalculatewindow.cpp" line="2552"/>
         <source>User units</source>
         <translation>使用者單位</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2576"/>
+        <location filename="../src/qalculatewindow.cpp" line="2577"/>
         <source>more</source>
         <translation>更多</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2611"/>
+        <location filename="../src/qalculatewindow.cpp" line="2612"/>
         <source>Prefixes</source>
         <translation>前綴</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2635"/>
+        <location filename="../src/qalculatewindow.cpp" line="2636"/>
         <source>Show all units</source>
         <translation>顯示所有單位</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2871"/>
+        <location filename="../src/qalculatewindow.cpp" line="2872"/>
         <source>User variables</source>
         <translation>使用者變數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="2920"/>
+        <location filename="../src/qalculatewindow.cpp" line="2921"/>
         <source>Show all variables</source>
         <translation>顯示所有變數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3164"/>
+        <location filename="../src/qalculatewindow.cpp" line="3165"/>
         <source>Powerful and easy to use calculator</source>
         <translation>強大且易用的計算機</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3164"/>
+        <location filename="../src/qalculatewindow.cpp" line="3165"/>
         <source>License: GNU General Public License version 2 or later</source>
         <translation>授權條款: GNU通用公眾授權條款版本2或更高版本</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5027"/>
-        <location filename="../src/qalculatewindow.cpp" line="8485"/>
-        <location filename="../src/qalculatewindow.cpp" line="9471"/>
-        <location filename="../src/qalculatewindow.cpp" line="10932"/>
-        <location filename="../src/qalculatewindow.cpp" line="10945"/>
-        <location filename="../src/qalculatewindow.cpp" line="10955"/>
-        <location filename="../src/qalculatewindow.cpp" line="10975"/>
+        <location filename="../src/qalculatewindow.cpp" line="5028"/>
+        <location filename="../src/qalculatewindow.cpp" line="8486"/>
+        <location filename="../src/qalculatewindow.cpp" line="9472"/>
+        <location filename="../src/qalculatewindow.cpp" line="10933"/>
+        <location filename="../src/qalculatewindow.cpp" line="10946"/>
+        <location filename="../src/qalculatewindow.cpp" line="10956"/>
+        <location filename="../src/qalculatewindow.cpp" line="10976"/>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5027"/>
-        <location filename="../src/qalculatewindow.cpp" line="8485"/>
+        <location filename="../src/qalculatewindow.cpp" line="5028"/>
+        <location filename="../src/qalculatewindow.cpp" line="8486"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>無法寫入定義</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5583"/>
-        <location filename="../src/qalculatewindow.cpp" line="6984"/>
+        <location filename="../src/qalculatewindow.cpp" line="5584"/>
+        <location filename="../src/qalculatewindow.cpp" line="6985"/>
         <source>hexadecimal</source>
         <translation>十六進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5586"/>
-        <location filename="../src/qalculatewindow.cpp" line="6987"/>
+        <location filename="../src/qalculatewindow.cpp" line="5587"/>
+        <location filename="../src/qalculatewindow.cpp" line="6988"/>
         <source>octal</source>
         <translation>八進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5589"/>
-        <location filename="../src/qalculatewindow.cpp" line="6990"/>
+        <location filename="../src/qalculatewindow.cpp" line="5590"/>
+        <location filename="../src/qalculatewindow.cpp" line="6991"/>
         <source>decimal</source>
         <translation>十進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5593"/>
-        <location filename="../src/qalculatewindow.cpp" line="6994"/>
+        <location filename="../src/qalculatewindow.cpp" line="5594"/>
+        <location filename="../src/qalculatewindow.cpp" line="6995"/>
         <source>duodecimal</source>
         <translation>十二進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5601"/>
-        <location filename="../src/qalculatewindow.cpp" line="7002"/>
+        <location filename="../src/qalculatewindow.cpp" line="5602"/>
+        <location filename="../src/qalculatewindow.cpp" line="7003"/>
         <source>binary</source>
         <translation>二進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5604"/>
-        <location filename="../src/qalculatewindow.cpp" line="7005"/>
+        <location filename="../src/qalculatewindow.cpp" line="5605"/>
+        <location filename="../src/qalculatewindow.cpp" line="7006"/>
         <source>roman</source>
         <translation>羅馬</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5607"/>
-        <location filename="../src/qalculatewindow.cpp" line="7008"/>
+        <location filename="../src/qalculatewindow.cpp" line="5608"/>
+        <location filename="../src/qalculatewindow.cpp" line="7009"/>
         <source>bijective</source>
         <translation>雙射</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5613"/>
-        <location filename="../src/qalculatewindow.cpp" line="5616"/>
-        <location filename="../src/qalculatewindow.cpp" line="5619"/>
-        <location filename="../src/qalculatewindow.cpp" line="7014"/>
-        <location filename="../src/qalculatewindow.cpp" line="7017"/>
-        <location filename="../src/qalculatewindow.cpp" line="7020"/>
+        <location filename="../src/qalculatewindow.cpp" line="5614"/>
+        <location filename="../src/qalculatewindow.cpp" line="5617"/>
+        <location filename="../src/qalculatewindow.cpp" line="5620"/>
+        <location filename="../src/qalculatewindow.cpp" line="7015"/>
+        <location filename="../src/qalculatewindow.cpp" line="7018"/>
+        <location filename="../src/qalculatewindow.cpp" line="7021"/>
         <source>sexagesimal</source>
         <translation>六十進制</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5622"/>
-        <location filename="../src/qalculatewindow.cpp" line="5625"/>
-        <location filename="../src/qalculatewindow.cpp" line="7023"/>
-        <location filename="../src/qalculatewindow.cpp" line="7026"/>
+        <location filename="../src/qalculatewindow.cpp" line="5623"/>
+        <location filename="../src/qalculatewindow.cpp" line="5626"/>
+        <location filename="../src/qalculatewindow.cpp" line="7024"/>
+        <location filename="../src/qalculatewindow.cpp" line="7027"/>
         <source>latitude</source>
         <translation>緯度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5628"/>
-        <location filename="../src/qalculatewindow.cpp" line="5631"/>
-        <location filename="../src/qalculatewindow.cpp" line="7029"/>
-        <location filename="../src/qalculatewindow.cpp" line="7032"/>
+        <location filename="../src/qalculatewindow.cpp" line="5629"/>
+        <location filename="../src/qalculatewindow.cpp" line="5632"/>
+        <location filename="../src/qalculatewindow.cpp" line="7030"/>
+        <location filename="../src/qalculatewindow.cpp" line="7033"/>
         <source>longitude</source>
         <translation>經度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5649"/>
-        <location filename="../src/qalculatewindow.cpp" line="7050"/>
+        <location filename="../src/qalculatewindow.cpp" line="5650"/>
+        <location filename="../src/qalculatewindow.cpp" line="7051"/>
         <source>time</source>
         <translation>時間</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5708"/>
-        <location filename="../src/qalculatewindow.cpp" line="7103"/>
+        <location filename="../src/qalculatewindow.cpp" line="5709"/>
+        <location filename="../src/qalculatewindow.cpp" line="7104"/>
         <source>Time zone parsing failed.</source>
         <translation>時區剖析失敗。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5729"/>
-        <location filename="../src/qalculatewindow.cpp" line="7112"/>
+        <location filename="../src/qalculatewindow.cpp" line="5730"/>
+        <location filename="../src/qalculatewindow.cpp" line="7113"/>
         <source>bases</source>
         <translation>底數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5738"/>
-        <location filename="../src/qalculatewindow.cpp" line="7115"/>
+        <location filename="../src/qalculatewindow.cpp" line="5739"/>
+        <location filename="../src/qalculatewindow.cpp" line="7116"/>
         <source>calendars</source>
         <translation>曆法</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5747"/>
-        <location filename="../src/qalculatewindow.cpp" line="7118"/>
+        <location filename="../src/qalculatewindow.cpp" line="5748"/>
+        <location filename="../src/qalculatewindow.cpp" line="7119"/>
         <source>rectangular</source>
         <translation>直角</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5747"/>
-        <location filename="../src/qalculatewindow.cpp" line="7118"/>
+        <location filename="../src/qalculatewindow.cpp" line="5748"/>
+        <location filename="../src/qalculatewindow.cpp" line="7119"/>
         <source>cartesian</source>
         <translation>笛卡兒</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5759"/>
-        <location filename="../src/qalculatewindow.cpp" line="7122"/>
+        <location filename="../src/qalculatewindow.cpp" line="5760"/>
+        <location filename="../src/qalculatewindow.cpp" line="7123"/>
         <source>exponential</source>
         <translation>指數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5771"/>
-        <location filename="../src/qalculatewindow.cpp" line="7126"/>
+        <location filename="../src/qalculatewindow.cpp" line="5772"/>
+        <location filename="../src/qalculatewindow.cpp" line="7127"/>
         <source>polar</source>
         <translation>極座標</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5795"/>
-        <location filename="../src/qalculatewindow.cpp" line="7134"/>
+        <location filename="../src/qalculatewindow.cpp" line="5796"/>
+        <location filename="../src/qalculatewindow.cpp" line="7135"/>
         <source>phasor</source>
         <translation>相量</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5795"/>
-        <location filename="../src/qalculatewindow.cpp" line="7134"/>
+        <location filename="../src/qalculatewindow.cpp" line="5796"/>
+        <location filename="../src/qalculatewindow.cpp" line="7135"/>
         <source>angle</source>
         <translation>角度</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5807"/>
-        <location filename="../src/qalculatewindow.cpp" line="7138"/>
+        <location filename="../src/qalculatewindow.cpp" line="5808"/>
+        <location filename="../src/qalculatewindow.cpp" line="7139"/>
         <source>optimal</source>
         <translation>最佳</translation>
     </message>
@@ -10780,20 +10780,20 @@ You can get version %3 at %2.</source>
         <translation type="vanished">基本</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5833"/>
-        <location filename="../src/qalculatewindow.cpp" line="7152"/>
+        <location filename="../src/qalculatewindow.cpp" line="5834"/>
+        <location filename="../src/qalculatewindow.cpp" line="7153"/>
         <source>mixed</source>
         <translation>混合</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5872"/>
-        <location filename="../src/qalculatewindow.cpp" line="7173"/>
+        <location filename="../src/qalculatewindow.cpp" line="5873"/>
+        <location filename="../src/qalculatewindow.cpp" line="7174"/>
         <source>fraction</source>
         <translation>分數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5844"/>
-        <location filename="../src/qalculatewindow.cpp" line="7157"/>
+        <location filename="../src/qalculatewindow.cpp" line="5845"/>
+        <location filename="../src/qalculatewindow.cpp" line="7158"/>
         <source>factors</source>
         <translation>因子</translation>
     </message>
@@ -10811,7 +10811,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="792"/>
-        <location filename="../src/qalculatewindow.cpp" line="1419"/>
+        <location filename="../src/qalculatewindow.cpp" line="1420"/>
         <source>Number Pad</source>
         <translation>數字鍵盤</translation>
     </message>
@@ -10893,151 +10893,151 @@ You can get version %3 at %2.</source>
         <translation type="obsolete">CPLX</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1462"/>
+        <location filename="../src/qalculatewindow.cpp" line="1463"/>
         <source>Copy</source>
         <translation>複製</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1490"/>
-        <location filename="../src/qalculatewindow.cpp" line="1529"/>
-        <location filename="../src/qalculatewindow.cpp" line="1638"/>
+        <location filename="../src/qalculatewindow.cpp" line="1491"/>
+        <location filename="../src/qalculatewindow.cpp" line="1530"/>
+        <location filename="../src/qalculatewindow.cpp" line="1639"/>
         <source>&lt;i&gt;Middle-click&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;中鍵&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5655"/>
-        <location filename="../src/qalculatewindow.cpp" line="7056"/>
+        <location filename="../src/qalculatewindow.cpp" line="5656"/>
+        <location filename="../src/qalculatewindow.cpp" line="7057"/>
         <source>scientific</source>
         <translation>科學</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5658"/>
-        <location filename="../src/qalculatewindow.cpp" line="7059"/>
+        <location filename="../src/qalculatewindow.cpp" line="5659"/>
+        <location filename="../src/qalculatewindow.cpp" line="7060"/>
         <source>engineering</source>
         <translation>工程</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5661"/>
-        <location filename="../src/qalculatewindow.cpp" line="7062"/>
+        <location filename="../src/qalculatewindow.cpp" line="5662"/>
+        <location filename="../src/qalculatewindow.cpp" line="7063"/>
         <source>simple</source>
         <translation>簡單</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5818"/>
-        <location filename="../src/qalculatewindow.cpp" line="7143"/>
+        <location filename="../src/qalculatewindow.cpp" line="5819"/>
+        <location filename="../src/qalculatewindow.cpp" line="7144"/>
         <source>prefix</source>
         <translation>前綴</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5822"/>
-        <location filename="../src/qalculatewindow.cpp" line="7147"/>
+        <location filename="../src/qalculatewindow.cpp" line="5823"/>
+        <location filename="../src/qalculatewindow.cpp" line="7148"/>
         <source>base</source>
         <comment>base units</comment>
         <translation>基本</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5853"/>
-        <location filename="../src/qalculatewindow.cpp" line="7160"/>
+        <location filename="../src/qalculatewindow.cpp" line="5854"/>
+        <location filename="../src/qalculatewindow.cpp" line="7161"/>
         <source>partial fraction</source>
         <translation>部分分式</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5862"/>
-        <location filename="../src/qalculatewindow.cpp" line="7163"/>
+        <location filename="../src/qalculatewindow.cpp" line="5863"/>
+        <location filename="../src/qalculatewindow.cpp" line="7164"/>
         <source>base</source>
         <comment>number base</comment>
         <translation>底數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5866"/>
-        <location filename="../src/qalculatewindow.cpp" line="7167"/>
+        <location filename="../src/qalculatewindow.cpp" line="5867"/>
+        <location filename="../src/qalculatewindow.cpp" line="7168"/>
         <source>decimals</source>
         <translation>小數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5923"/>
-        <location filename="../src/qalculatewindow.cpp" line="7211"/>
+        <location filename="../src/qalculatewindow.cpp" line="5924"/>
+        <location filename="../src/qalculatewindow.cpp" line="7212"/>
         <source>factorize</source>
         <translation>分解為因子</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5926"/>
-        <location filename="../src/qalculatewindow.cpp" line="7214"/>
+        <location filename="../src/qalculatewindow.cpp" line="5927"/>
+        <location filename="../src/qalculatewindow.cpp" line="7215"/>
         <source>expand</source>
         <translation>展開</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6107"/>
         <location filename="../src/qalculatewindow.cpp" line="6108"/>
         <location filename="../src/qalculatewindow.cpp" line="6109"/>
-        <location filename="../src/qalculatewindow.cpp" line="6538"/>
+        <location filename="../src/qalculatewindow.cpp" line="6110"/>
+        <location filename="../src/qalculatewindow.cpp" line="6539"/>
         <source>Calculating…</source>
         <translation>計算中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6108"/>
-        <location filename="../src/qalculatewindow.cpp" line="6547"/>
-        <location filename="../src/qalculatewindow.cpp" line="7918"/>
+        <location filename="../src/qalculatewindow.cpp" line="6109"/>
+        <location filename="../src/qalculatewindow.cpp" line="6548"/>
+        <location filename="../src/qalculatewindow.cpp" line="7919"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6156"/>
-        <location filename="../src/qalculatewindow.cpp" line="7752"/>
+        <location filename="../src/qalculatewindow.cpp" line="6157"/>
+        <location filename="../src/qalculatewindow.cpp" line="7753"/>
         <source>RPN Operation</source>
         <translation>RPN運算</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6526"/>
+        <location filename="../src/qalculatewindow.cpp" line="6527"/>
         <source>Factorizing…</source>
         <translation>分解為因子中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6530"/>
+        <location filename="../src/qalculatewindow.cpp" line="6531"/>
         <source>Expanding partial fractions…</source>
         <translation>展開部分分式…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6534"/>
+        <location filename="../src/qalculatewindow.cpp" line="6535"/>
         <source>Expanding…</source>
         <translation>展開中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6542"/>
+        <location filename="../src/qalculatewindow.cpp" line="6543"/>
         <source>Converting…</source>
         <translation>轉換中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7748"/>
+        <location filename="../src/qalculatewindow.cpp" line="7749"/>
         <source>RPN Register Moved</source>
         <translation>RPN暫存器已移動</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7917"/>
         <location filename="../src/qalculatewindow.cpp" line="7918"/>
         <location filename="../src/qalculatewindow.cpp" line="7919"/>
+        <location filename="../src/qalculatewindow.cpp" line="7920"/>
         <source>Processing…</source>
         <translation>處理中…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8065"/>
-        <location filename="../src/qalculatewindow.cpp" line="10503"/>
+        <location filename="../src/qalculatewindow.cpp" line="8066"/>
+        <location filename="../src/qalculatewindow.cpp" line="10504"/>
         <source>Matrix</source>
         <translation>矩陣</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8203"/>
+        <location filename="../src/qalculatewindow.cpp" line="8204"/>
         <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
         <translation>未知變數(例如x、y、z)預設假設為實數。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8224"/>
-        <location filename="../src/qalculatewindow.cpp" line="8269"/>
+        <location filename="../src/qalculatewindow.cpp" line="8225"/>
+        <location filename="../src/qalculatewindow.cpp" line="8270"/>
         <source>Temperature Calculation Mode</source>
         <translation>溫度計算模式</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8230"/>
+        <location filename="../src/qalculatewindow.cpp" line="8231"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -11046,86 +11046,86 @@ Please select temperature calculation mode
 (可以稍後在偏好設定中變更模式)。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8233"/>
+        <location filename="../src/qalculatewindow.cpp" line="8234"/>
         <source>Absolute</source>
         <translation>絕對</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8237"/>
+        <location filename="../src/qalculatewindow.cpp" line="8238"/>
         <source>Relative</source>
         <translation>相對</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8241"/>
+        <location filename="../src/qalculatewindow.cpp" line="8242"/>
         <source>Hybrid</source>
         <translation>混合</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8275"/>
+        <location filename="../src/qalculatewindow.cpp" line="8276"/>
         <source>Please select desired variant of the sinc function.</source>
         <translation>請選擇期望的sinc函數變體。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8278"/>
+        <location filename="../src/qalculatewindow.cpp" line="8279"/>
         <source>Unnormalized</source>
         <translation>未正規化</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8282"/>
+        <location filename="../src/qalculatewindow.cpp" line="8283"/>
         <source>Normalized</source>
         <translation>正規化</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8317"/>
+        <location filename="../src/qalculatewindow.cpp" line="8318"/>
         <source>Interpretation of dots</source>
         <translation>點的判讀</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8317"/>
+        <location filename="../src/qalculatewindow.cpp" line="8318"/>
         <source>Interpretation of comma</source>
         <translation>逗號的判讀</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8323"/>
+        <location filename="../src/qalculatewindow.cpp" line="8324"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
         <translation>請選擇逗號(&quot;,&quot;)的判讀
 (可以稍後在偏好設定中變更)。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8323"/>
+        <location filename="../src/qalculatewindow.cpp" line="8324"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>請選擇點(&quot;.&quot;)的判讀
 (可以稍後在偏好設定中變更)。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8326"/>
+        <location filename="../src/qalculatewindow.cpp" line="8327"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>點和逗號都作為小數分隔符</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8330"/>
+        <location filename="../src/qalculatewindow.cpp" line="8331"/>
         <source>Dot as thousands separator</source>
         <translation>點作為千位分隔符</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8330"/>
+        <location filename="../src/qalculatewindow.cpp" line="8331"/>
         <source>Comma as thousands separator</source>
         <translation>逗號作為千位分隔符</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8334"/>
+        <location filename="../src/qalculatewindow.cpp" line="8335"/>
         <source>Only dot as decimal separator</source>
         <translation>只有點作為小數分隔符</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8382"/>
+        <location filename="../src/qalculatewindow.cpp" line="8383"/>
         <source>Parsing Mode</source>
         <translation>剖析模式</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8388"/>
+        <location filename="../src/qalculatewindow.cpp" line="8389"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -11134,53 +11134,53 @@ Please select interpretation of expressions with implicit multiplication
 (可以稍後在偏好設定中變更)。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8393"/>
+        <location filename="../src/qalculatewindow.cpp" line="8394"/>
         <source>Implicit multiplication first</source>
         <translation>隱式乘法優先</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8400"/>
+        <location filename="../src/qalculatewindow.cpp" line="8401"/>
         <source>Conventional</source>
         <translation>常規</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8406"/>
+        <location filename="../src/qalculatewindow.cpp" line="8407"/>
         <source>Adaptive</source>
         <translation>自適應</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8432"/>
+        <location filename="../src/qalculatewindow.cpp" line="8433"/>
         <source>Percentage Interpretation</source>
         <translation>百分比判讀</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8438"/>
+        <location filename="../src/qalculatewindow.cpp" line="8439"/>
         <source>Please select interpretation of percentage addition</source>
         <translation>請選擇百分比加法的判讀</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8441"/>
+        <location filename="../src/qalculatewindow.cpp" line="8442"/>
         <source>Add percentage of original value</source>
         <translation>加上原始值的百分比</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8446"/>
+        <location filename="../src/qalculatewindow.cpp" line="8447"/>
         <source>Add percentage multiplied by 1/100</source>
         <translation>加上百分比乘以1/100</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9265"/>
-        <location filename="../src/qalculatewindow.cpp" line="9415"/>
+        <location filename="../src/qalculatewindow.cpp" line="9266"/>
+        <location filename="../src/qalculatewindow.cpp" line="9416"/>
         <source>Add Action (%1)</source>
         <translation>加入動作(%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9363"/>
+        <location filename="../src/qalculatewindow.cpp" line="9364"/>
         <source>Edit Keyboard Shortcut</source>
         <translation>編輯鍵盤快捷鍵</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9363"/>
+        <location filename="../src/qalculatewindow.cpp" line="9364"/>
         <source>New Keyboard Shortcut</source>
         <translation>新鍵盤快捷鍵</translation>
     </message>
@@ -11189,138 +11189,138 @@ Please select interpretation of expressions with implicit multiplication
         <translation type="obsolete">動作:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9405"/>
+        <location filename="../src/qalculatewindow.cpp" line="9406"/>
         <source>Value:</source>
         <translation>值:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9450"/>
+        <location filename="../src/qalculatewindow.cpp" line="9451"/>
         <source>Set key combination</source>
         <translation>設定組合鍵</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9453"/>
+        <location filename="../src/qalculatewindow.cpp" line="9454"/>
         <source>Press the key combination you wish to use for the action.</source>
         <translation>按你希望用於動作的組合鍵。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9471"/>
+        <location filename="../src/qalculatewindow.cpp" line="9472"/>
         <source>Reserved key combination</source>
         <translation>保留組合鍵</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9478"/>
+        <location filename="../src/qalculatewindow.cpp" line="9479"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation>組合鍵已經在使用。
 你想取代目前的動作(%1)嗎?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9478"/>
+        <location filename="../src/qalculatewindow.cpp" line="9479"/>
         <source>Question</source>
         <translation>問題</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9595"/>
+        <location filename="../src/qalculatewindow.cpp" line="9596"/>
         <source>Add…</source>
         <translation>加入…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9598"/>
+        <location filename="../src/qalculatewindow.cpp" line="9599"/>
         <source>Edit…</source>
         <translation>編輯…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9602"/>
+        <location filename="../src/qalculatewindow.cpp" line="9603"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9915"/>
+        <location filename="../src/qalculatewindow.cpp" line="9916"/>
         <source>Gnuplot was not found</source>
         <translation>找不到Gnuplot</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9915"/>
+        <location filename="../src/qalculatewindow.cpp" line="9916"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>%1(%2)需要單獨安裝，並在可執行的搜尋路徑中找到，使繪圖能運作。</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10109"/>
+        <location filename="../src/qalculatewindow.cpp" line="10110"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>範例:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10151"/>
+        <location filename="../src/qalculatewindow.cpp" line="10152"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10151"/>
+        <location filename="../src/qalculatewindow.cpp" line="10152"/>
         <source>Calculate</source>
         <translation>計算</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10152"/>
-        <location filename="../src/qalculatewindow.cpp" line="10637"/>
+        <location filename="../src/qalculatewindow.cpp" line="10153"/>
+        <location filename="../src/qalculatewindow.cpp" line="10638"/>
         <source>Apply to Stack</source>
         <translation>套用到堆疊</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10152"/>
-        <location filename="../src/qalculatewindow.cpp" line="10637"/>
+        <location filename="../src/qalculatewindow.cpp" line="10153"/>
+        <location filename="../src/qalculatewindow.cpp" line="10638"/>
         <source>Insert</source>
         <translation>插入</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10932"/>
+        <location filename="../src/qalculatewindow.cpp" line="10933"/>
         <source>Failed to open workspace</source>
         <translation>無法開啟工作區</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10945"/>
-        <location filename="../src/qalculatewindow.cpp" line="10955"/>
-        <location filename="../src/qalculatewindow.cpp" line="10975"/>
+        <location filename="../src/qalculatewindow.cpp" line="10946"/>
+        <location filename="../src/qalculatewindow.cpp" line="10956"/>
+        <location filename="../src/qalculatewindow.cpp" line="10976"/>
         <source>Couldn&apos;t save workspace</source>
         <translation>無法儲存工作區</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10966"/>
+        <location filename="../src/qalculatewindow.cpp" line="10967"/>
         <source>Save file?</source>
         <translation>儲存檔案?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10966"/>
+        <location filename="../src/qalculatewindow.cpp" line="10967"/>
         <source>Do you want to save the current workspace?</source>
         <translation>你想儲存目前的工作區嗎?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10967"/>
+        <location filename="../src/qalculatewindow.cpp" line="10968"/>
         <source>Do not ask again</source>
         <translation>不再詢問</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10143"/>
+        <location filename="../src/qalculatewindow.cpp" line="10144"/>
         <source>Keep open</source>
         <translation>保持開啟</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10168"/>
+        <location filename="../src/qalculatewindow.cpp" line="10169"/>
         <source>Value</source>
         <translation>值</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10170"/>
+        <location filename="../src/qalculatewindow.cpp" line="10171"/>
         <source>Argument</source>
         <translation>引數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="3332"/>
-        <location filename="../src/qalculatewindow.cpp" line="3360"/>
-        <location filename="../src/qalculatewindow.cpp" line="3424"/>
-        <location filename="../src/qalculatewindow.cpp" line="10185"/>
+        <location filename="../src/qalculatewindow.cpp" line="3333"/>
+        <location filename="../src/qalculatewindow.cpp" line="3361"/>
+        <location filename="../src/qalculatewindow.cpp" line="3425"/>
+        <location filename="../src/qalculatewindow.cpp" line="10186"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
@@ -11343,31 +11343,31 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="784"/>
-        <location filename="../src/qalculatewindow.cpp" line="1415"/>
+        <location filename="../src/qalculatewindow.cpp" line="1416"/>
         <source>General</source>
         <translation>一般</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="786"/>
-        <location filename="../src/qalculatewindow.cpp" line="1416"/>
+        <location filename="../src/qalculatewindow.cpp" line="1417"/>
         <source>Programming</source>
         <translation>程式設計</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="788"/>
-        <location filename="../src/qalculatewindow.cpp" line="1417"/>
+        <location filename="../src/qalculatewindow.cpp" line="1418"/>
         <source>Algebra</source>
         <translation>代數</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="790"/>
-        <location filename="../src/qalculatewindow.cpp" line="1418"/>
+        <location filename="../src/qalculatewindow.cpp" line="1419"/>
         <source>Custom</source>
         <translation>自訂</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="794"/>
-        <location filename="../src/qalculatewindow.cpp" line="2141"/>
+        <location filename="../src/qalculatewindow.cpp" line="2142"/>
         <source>None</source>
         <translation>無</translation>
     </message>
@@ -11387,156 +11387,156 @@ Do you wish to replace the current action (%1)?</source>
         <translation>重設鍵盤位置</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1433"/>
+        <location filename="../src/qalculatewindow.cpp" line="1434"/>
         <source>Icons only</source>
         <translation>僅圖示</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1438"/>
+        <location filename="../src/qalculatewindow.cpp" line="1439"/>
         <source>Text only</source>
         <translation>僅文字</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1443"/>
+        <location filename="../src/qalculatewindow.cpp" line="1444"/>
         <source>Text beside icons</source>
         <translation>文字在圖示旁邊</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1448"/>
+        <location filename="../src/qalculatewindow.cpp" line="1449"/>
         <source>Text under icons</source>
         <translation>文字在圖示下面</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1486"/>
         <location filename="../src/qalculatewindow.cpp" line="1487"/>
         <location filename="../src/qalculatewindow.cpp" line="1488"/>
-        <location filename="../src/qalculatewindow.cpp" line="1521"/>
-        <location filename="../src/qalculatewindow.cpp" line="1523"/>
-        <location filename="../src/qalculatewindow.cpp" line="1525"/>
-        <location filename="../src/qalculatewindow.cpp" line="1608"/>
-        <location filename="../src/qalculatewindow.cpp" line="1610"/>
-        <location filename="../src/qalculatewindow.cpp" line="1634"/>
+        <location filename="../src/qalculatewindow.cpp" line="1489"/>
+        <location filename="../src/qalculatewindow.cpp" line="1522"/>
+        <location filename="../src/qalculatewindow.cpp" line="1524"/>
+        <location filename="../src/qalculatewindow.cpp" line="1526"/>
+        <location filename="../src/qalculatewindow.cpp" line="1609"/>
+        <location filename="../src/qalculatewindow.cpp" line="1611"/>
+        <location filename="../src/qalculatewindow.cpp" line="1635"/>
         <source>&lt;i&gt;Right-click/long press&lt;/i&gt;: %1</source>
         <translation>&lt;i&gt;右鍵/長按&lt;/i&gt;: %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1486"/>
         <location filename="../src/qalculatewindow.cpp" line="1487"/>
         <location filename="../src/qalculatewindow.cpp" line="1488"/>
-        <location filename="../src/qalculatewindow.cpp" line="1521"/>
-        <location filename="../src/qalculatewindow.cpp" line="1523"/>
-        <location filename="../src/qalculatewindow.cpp" line="1525"/>
-        <location filename="../src/qalculatewindow.cpp" line="1608"/>
-        <location filename="../src/qalculatewindow.cpp" line="1610"/>
-        <location filename="../src/qalculatewindow.cpp" line="1634"/>
+        <location filename="../src/qalculatewindow.cpp" line="1489"/>
+        <location filename="../src/qalculatewindow.cpp" line="1522"/>
+        <location filename="../src/qalculatewindow.cpp" line="1524"/>
+        <location filename="../src/qalculatewindow.cpp" line="1526"/>
+        <location filename="../src/qalculatewindow.cpp" line="1609"/>
+        <location filename="../src/qalculatewindow.cpp" line="1611"/>
+        <location filename="../src/qalculatewindow.cpp" line="1635"/>
         <source>Open menu</source>
         <translation>開啟選單</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1489"/>
-        <location filename="../src/qalculatewindow.cpp" line="1527"/>
-        <location filename="../src/qalculatewindow.cpp" line="1612"/>
+        <location filename="../src/qalculatewindow.cpp" line="1490"/>
+        <location filename="../src/qalculatewindow.cpp" line="1528"/>
+        <location filename="../src/qalculatewindow.cpp" line="1613"/>
         <source>Number Bases</source>
         <translation>底數</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1490"/>
-        <location filename="../src/qalculatewindow.cpp" line="1529"/>
-        <location filename="../src/qalculatewindow.cpp" line="1638"/>
+        <location filename="../src/qalculatewindow.cpp" line="1491"/>
+        <location filename="../src/qalculatewindow.cpp" line="1530"/>
+        <location filename="../src/qalculatewindow.cpp" line="1639"/>
         <source>Conversion operator</source>
         <translation>轉換運算子</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1493"/>
-        <location filename="../src/qalculatewindow.cpp" line="1535"/>
-        <location filename="../src/qalculatewindow.cpp" line="1614"/>
+        <location filename="../src/qalculatewindow.cpp" line="1494"/>
+        <location filename="../src/qalculatewindow.cpp" line="1536"/>
+        <location filename="../src/qalculatewindow.cpp" line="1615"/>
         <source>Rotate the stack or move the selected register up</source>
         <translation>向上旋轉堆疊或移動選擇的暫存器</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1494"/>
-        <location filename="../src/qalculatewindow.cpp" line="1537"/>
-        <location filename="../src/qalculatewindow.cpp" line="1616"/>
+        <location filename="../src/qalculatewindow.cpp" line="1495"/>
+        <location filename="../src/qalculatewindow.cpp" line="1538"/>
+        <location filename="../src/qalculatewindow.cpp" line="1617"/>
         <source>Rotate the stack or move the selected register down</source>
         <translation>向下旋轉堆疊或移動選擇的暫存器</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1495"/>
-        <location filename="../src/qalculatewindow.cpp" line="1539"/>
-        <location filename="../src/qalculatewindow.cpp" line="1618"/>
+        <location filename="../src/qalculatewindow.cpp" line="1496"/>
+        <location filename="../src/qalculatewindow.cpp" line="1540"/>
+        <location filename="../src/qalculatewindow.cpp" line="1619"/>
         <source>Swap the top two values or move the selected value to the top of the stack</source>
         <translation>交換兩個頂部值或將選擇的值移到堆疊頂部</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1496"/>
-        <location filename="../src/qalculatewindow.cpp" line="1541"/>
-        <location filename="../src/qalculatewindow.cpp" line="1620"/>
+        <location filename="../src/qalculatewindow.cpp" line="1497"/>
+        <location filename="../src/qalculatewindow.cpp" line="1542"/>
+        <location filename="../src/qalculatewindow.cpp" line="1621"/>
         <source>Delete the top or selected value</source>
         <translation>刪除頂部值或選擇的值</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1497"/>
-        <location filename="../src/qalculatewindow.cpp" line="1543"/>
-        <location filename="../src/qalculatewindow.cpp" line="1622"/>
+        <location filename="../src/qalculatewindow.cpp" line="1498"/>
+        <location filename="../src/qalculatewindow.cpp" line="1544"/>
+        <location filename="../src/qalculatewindow.cpp" line="1623"/>
         <source>Enter the top value from before the last numeric operation</source>
         <translation>輸入上次數字運算之前的頂部值</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1498"/>
-        <location filename="../src/qalculatewindow.cpp" line="1545"/>
-        <location filename="../src/qalculatewindow.cpp" line="1624"/>
+        <location filename="../src/qalculatewindow.cpp" line="1499"/>
+        <location filename="../src/qalculatewindow.cpp" line="1546"/>
+        <location filename="../src/qalculatewindow.cpp" line="1625"/>
         <source>Copy the selected or top value to the top of the stack</source>
         <translation>將選擇的或頂部值複製到堆疊的頂部</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="1499"/>
-        <location filename="../src/qalculatewindow.cpp" line="1547"/>
-        <location filename="../src/qalculatewindow.cpp" line="1626"/>
+        <location filename="../src/qalculatewindow.cpp" line="1500"/>
+        <location filename="../src/qalculatewindow.cpp" line="1548"/>
+        <location filename="../src/qalculatewindow.cpp" line="1627"/>
         <source>Clear the RPN stack</source>
         <translation>清除RPN堆疊</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8334"/>
+        <location filename="../src/qalculatewindow.cpp" line="8335"/>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
         <translation>逗號作為函數引數
 和矩陣/向量元素的分隔符</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9369"/>
-        <location filename="../src/qalculatewindow.cpp" line="9574"/>
+        <location filename="../src/qalculatewindow.cpp" line="9370"/>
+        <location filename="../src/qalculatewindow.cpp" line="9575"/>
         <source>Action</source>
         <translation>動作</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9574"/>
+        <location filename="../src/qalculatewindow.cpp" line="9575"/>
         <source>Key combination</source>
         <translation>組合鍵</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10240"/>
+        <location filename="../src/qalculatewindow.cpp" line="10241"/>
         <source>True</source>
         <translation>True</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10243"/>
+        <location filename="../src/qalculatewindow.cpp" line="10244"/>
         <source>False</source>
         <translation>False</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10269"/>
+        <location filename="../src/qalculatewindow.cpp" line="10270"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10321"/>
-        <location filename="../src/qalculatewindow.cpp" line="10329"/>
+        <location filename="../src/qalculatewindow.cpp" line="10322"/>
+        <location filename="../src/qalculatewindow.cpp" line="10330"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>選擇性</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10700"/>
+        <location filename="../src/qalculatewindow.cpp" line="10701"/>
         <source>Failed to open %1.
 %2</source>
         <translation>無法開啟%1。
