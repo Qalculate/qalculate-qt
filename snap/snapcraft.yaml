@@ -64,7 +64,6 @@ parts:
       - libxml2-dev
       - libgmp-dev
       - libmpfr-dev
-      - intltool
       - doxygen
       - pkg-config
     stage-packages:
@@ -94,7 +93,7 @@ parts:
       - COMPILE_RESOURCES=yes
       - PREFIX=/usr
     build-environment:
-      - LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/usr
+      - LD_LIBRARY_PATH: $LD_LIBRARY_PATH:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy:/usr
       - PKG_CONFIG_PATH: $CRAFT_STAGE/usr/lib/pkgconfig:/snap/kde-qt6-core24-sdk/current/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig
       - PATH: /snap/kde-qt6-core24-sdk/current/usr/bin/qt6:$PATH
     build-snaps:
