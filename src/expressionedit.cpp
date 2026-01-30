@@ -2937,7 +2937,7 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		else if(auto_calculable && !cdata->current_function && ((str_e.length() > 3 && str_u.empty() && str_e.find(" to", str_e.length() - 3) != std::string::npos) || (str_e.length() > 6 && str_w.empty() && str_e.find(" where", str_e.length() - 6) != std::string::npos) || (str_e.length() > 2 && str_e.find("/.", str_e.length() - 2) != std::string::npos)) && settings->evalops.parse_options.base != BASE_UNICODE && (settings->evalops.parse_options.base != BASE_CUSTOM || CALCULATOR->customInputBase() <= 62)) auto_calculable = 0;
 		else if(auto_calculable && !str_w.empty() && (str_w.back() == '>' || str_w.back() == '<' || str_w.back() == '=' || (str_w.length() >= 3 && (str_w.find("≤", str_w.length() - 3) != std::string::npos || str_w.find("≥", str_w.length() - 3) != std::string::npos || str_w.find("≠", str_w.length() - 3) != std::string::npos)))) auto_calculable = 0;
 		else if(auto_calculable == 1 && cdata->current_function && cursor.atEnd() && str_e.find("(") != std::string::npos) auto_calculable = 2;
-		if(auto_calculable != 0 && pos_c == 'e' && str_w.empty() && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
+		if(auto_calculable != 0 && pos_c == 'e' && pos <= str_e.length() && str_w.empty() && !NONDIGIT_INPUT_BASE && !CURRENT_TEXT_ARGUMENT) {
 			size_t pos2 = pos;
 			std::string *str_cur = &str_e;
 			std::string str;
