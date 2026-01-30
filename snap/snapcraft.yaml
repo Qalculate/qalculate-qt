@@ -86,8 +86,8 @@ parts:
       - -usr/share/lintian
 
   qalculate-qt:
-    source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.9.0/qalculate-qt-5.9.0.tar.gz
-    source-checksum: sha512/943746116215b893a6c552592af76b2be163b62153c55f9916df7e8468c15d52f1dc7982db722c9b57e08e6d4bb7b8362edb21415b7ea20fe28f93c3f381c341
+    source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.9.0/qalculate-qt-5.9.0b.tar.gz
+    source-checksum: sha512/8db4f1bf6e2b03af618420e715f133823854e391f5d74531f9609c80d0bd4bf7a3e22382aaa31257004565f29adbe5ad1abea60512fa5ca6898a84dfcea5ddbc
     plugin: qmake
     qmake-parameters:
       - COMPILE_RESOURCES=yes
