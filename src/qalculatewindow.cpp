@@ -1003,7 +1003,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	connect(historyView, SIGNAL(historyReloaded()), this, SLOT(onHistoryReloaded()));
 	connect(expressionEdit, SIGNAL(returnPressed()), this, SLOT(calculate()));
 	connect(expressionEdit, SIGNAL(calculateSelectionRequest()), this, SLOT(calculateSelection()));
-	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onExpressionChanged()));
+	connect(expressionEdit, SIGNAL(expressionChanged()), this, SLOT(onExpressionChanged()));
 	connect(expressionEdit, SIGNAL(statusChanged(QString, bool, bool, bool, bool)), this, SLOT(onStatusChanged(QString, bool, bool, bool, bool)));
 	connect(expressionEdit, SIGNAL(toConversionRequested(std::string)), this, SLOT(onToConversionRequested(std::string)));
 	connect(expressionEdit, SIGNAL(calculateRPNRequest(int)), this, SLOT(calculateRPN(int)));
@@ -1112,7 +1112,7 @@ void QalculateWindow::testTimeout() {
 		if(rand() % 3 == 0) {s += "."; s += QString::number(rand() % 10000);}
 		prev_test_type = 1;
 	} else if(type < 12) {
-		std::string operator_s = OPERATORS VECTOR_WRAPS;
+		std::string operator_s = OPERATORS VECTOR_WRAPS SPACE;
 		s = operator_s[rand() % operator_s.length()];
 		prev_test_type = 2;
 	} else if(type == 12) {
@@ -4916,7 +4916,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	b_busy++;
 
-	bool do_factors = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
+	bool do_factors = false, do_mixed = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
 	if(do_stack && !settings->rpn_mode) do_stack = false;
 	if(do_stack && do_mathoperation && f && stack_index == 0) do_stack = false;
 	if(!do_stack) stack_index = 0;
@@ -5816,6 +5816,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.auto_post_conversion = POST_CONVERSION_OPTIMAL_SI;
 				str_conv = "";
 				do_to = true;
+				do_mixed = false;
 			} else if(equalsIgnoreCase(to_str, "prefix") || equalsIgnoreCase(to_str, tr("prefix").toStdString())) {
 				settings->evalops.parse_options.units_enabled = true;
 				to_prefix = 1;
@@ -5831,6 +5832,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.auto_post_conversion = POST_CONVERSION_BASE;
 				str_conv = "";
 				do_to = true;
+				do_mixed = false;
 			} else if(equalsIgnoreCase(to_str, "mixed") || equalsIgnoreCase(to_str, tr("mixed").toStdString())) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -5842,6 +5844,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				settings->evalops.auto_post_conversion = POST_CONVERSION_NONE;
 				settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
 				do_to = true;
+				if(!str_conv.empty()) do_mixed = true;
 			} else if(equalsIgnoreCase(to_str, "factors") || equalsIgnoreCase(to_str, tr("factors").toStdString()) || equalsIgnoreCase(to_str, "factor")) {
 				if(from_str.empty()) {
 					b_busy--;
@@ -5850,6 +5853,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					return;
 				}
 				do_factors = true;
+				do_pfe = false;
+				do_expand = false;
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str, "partial fraction") || equalsIgnoreCase(to_str, tr("partial fraction").toStdString())) {
 				if(from_str.empty()) {
@@ -5859,6 +5864,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					return;
 				}
 				do_pfe = true;
+				do_factors = false;
+				do_expand = false;
 				execute_str = from_str;
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base", "number base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
@@ -5889,6 +5896,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 					if(delay_complex != (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS) && u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1) delay_complex = !delay_complex;
 					if(!str_conv.empty()) str_conv += " to ";
 					str_conv += to_str;
+					do_mixed = false;
 				}
 			}
 			if(str_left.empty()) break;
@@ -5924,9 +5932,13 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			if(to_str == "factor" || equalsIgnoreCase(to_str, "factorize") || equalsIgnoreCase(to_str, tr("factorize").toStdString())) {
 				execute_str = str.substr(i + 1);
 				do_factors = true;
+				do_pfe = false;
+				do_expand = false;
 			} else if(equalsIgnoreCase(to_str, "expand") || equalsIgnoreCase(to_str, tr("expand").toStdString())) {
 				execute_str = str.substr(i + 1);
 				do_expand = true;
+				do_factors = false;
+				do_pfe = false;
 			}
 		}
 	}
@@ -6261,17 +6273,22 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 
 	b_busy--;
 
-	if(do_factors || do_pfe || do_expand) {
+	if(do_factors || do_pfe || do_expand || do_mixed) {
+		int com = 0;
+		if(do_pfe) com = COMMAND_EXPAND_PARTIAL_FRACTIONS;
+		else if(do_expand) com = COMMAND_EXPAND;
+		else if(do_factors) com = COMMAND_FACTORIZE;
+		else if(do_mixed) com = COMMAND_CONVERT_MIXED;
 		if(do_stack && stack_index != 0) {
 			MathStructure *save_mstruct = mstruct;
 			mstruct = CALCULATOR->getRPNRegister(stack_index + 1);
-			if(do_factors && (mstruct->isNumber() || mstruct->isVector()) && to_fraction == 0 && to_fixed_fraction < 2) to_fraction = 2;
-			executeCommand(do_pfe ? COMMAND_EXPAND_PARTIAL_FRACTIONS : (do_expand ? COMMAND_EXPAND : COMMAND_FACTORIZE), false);
+			if(com == COMMAND_FACTORIZE && (mstruct->isNumber() || mstruct->isVector()) && to_fraction == 0 && to_fixed_fraction < 2) to_fraction = 2;
+			executeCommand(com, false);
 			mstruct = save_mstruct;
 		} else {
-			if(do_factors && mstruct->isInteger() && !parsed_mstruct->isNumber()) prepend_mstruct = *mstruct;
-			if(do_factors && (mstruct->isNumber() || mstruct->isVector()) && to_fraction == 0 && to_fixed_fraction < 2) to_fraction = 2;
-			executeCommand(do_pfe ? COMMAND_EXPAND_PARTIAL_FRACTIONS  : (do_expand ? COMMAND_EXPAND : COMMAND_FACTORIZE), false);
+			if(com == COMMAND_FACTORIZE && mstruct->isInteger() && !parsed_mstruct->isNumber()) prepend_mstruct = *mstruct;
+			if(com == COMMAND_FACTORIZE && (mstruct->isNumber() || mstruct->isVector()) && to_fraction == 0 && to_fixed_fraction < 2) to_fraction = 2;
+			executeCommand(com, false);
 			if(!prepend_mstruct.isUndefined() && mstruct->isInteger()) prepend_mstruct.setUndefined();
 		}
 	}
@@ -6656,6 +6673,8 @@ void QalculateWindow::updateResultBases() {
 	decEdit->setText(QString::fromStdString(result_dec));
 	hexEdit->setText(QString::fromStdString(result_hex));
 }
+
+bool result_updated_from_bases = false;
 void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	size_t n = s.toInt();
 	n += (n - 1) / 4;
@@ -6665,21 +6684,30 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	else if(result_bin[n] == '1') result_bin[n] = '0';
 	ParseOptions pa;
 	pa.base = BASE_BINARY;
-	pa.twos_complement = true;
+	pa.twos_complement = settings->printops.twos_complement;
 	PrintOptions po;
 	po.base = settings->evalops.parse_options.base;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
 	po.min_exp = 0;
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
+	result_updated_from_bases = true;
 	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
 }
 
 void set_result_bases(const MathStructure &m) {
 	result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
 	SET_BINARY_BITS
-	if(max_bases.isZero()) {max_bases = 2; max_bases ^= (binary_bits > 128 ? 128 : binary_bits); min_bases = 2; min_bases ^= (binary_bits > 128 ? 64 : binary_bits / 2); min_bases.negate();}
-	if(!CALCULATOR->aborted() && ((m.isNumber() && m.number() < max_bases && m.number() > min_bases) || (m.isNegate() && m[0].isNumber() && m[0].number() < max_bases && m[0].number() > min_bases))) {
+	if(max_bases.isZero() || (min_bases.isZero() == settings->printops.twos_complement)) {
+		if(settings->printops.twos_complement) {
+			max_bases = 2; max_bases ^= (binary_bits > 128 ? 127 : binary_bits - 1);
+			min_bases = 2; min_bases ^= (binary_bits > 128 ? 64 : binary_bits / 2); min_bases += 1; min_bases.negate();
+		} else {
+			max_bases = 2; max_bases ^= (binary_bits > 128 ? 128 : binary_bits);
+			min_bases.clear();
+		}
+	}
+	if(!CALCULATOR->aborted() && (result_updated_from_bases || ((m.isNumber() && m.number() < max_bases && m.number() > min_bases) || (m.isNegate() && m[0].isNumber() && m[0].number() < -min_bases)))) {
 		Number nr;
 		if(m.isNumber()) {
 			nr = m.number();
@@ -6696,6 +6724,7 @@ void set_result_bases(const MathStructure &m) {
 		po.min_exp = 0;
 		po.base = 2;
 		po.binary_bits = binary_bits;
+		if(nr.isNegative()) po.twos_complement = true;
 		result_bin = nr.print(po);
 		if(result_bin.length() > po.binary_bits + (po.binary_bits / 4) && result_bin.find("1") >= po.binary_bits + (po.binary_bits / 4)) result_bin.erase(0, po.binary_bits + (po.binary_bits / 4));
 		po.base = 8;
@@ -6719,6 +6748,7 @@ void set_result_bases(const MathStructure &m) {
 		}
 		if(result_hex.length() > i_after_minus + 1 && result_hex[i_after_minus + 1] == ' ') result_hex.insert(i_after_minus, 1, '0');
 	}
+	result_updated_from_bases = false;
 }
 
 bool contains_plot_or_save(const std::string &str) {
@@ -6939,7 +6969,7 @@ void QalculateWindow::autoCalculateTimeout() {
 
 	CALCULATOR->beginTemporaryStopMessages();
 
-	bool do_factors = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
+	bool do_factors = false, do_mixed = false, do_pfe = false, do_expand = false, do_bases = false, do_calendars = false;
 	to_fraction = 0; to_fixed_fraction = 0; to_prefix = 0; to_base = 0; to_duo_syms = false; to_bits = 0; to_nbase.clear(); to_caf = -1; to_form = TO_FORM_OFF;
 	std::string to_str, str_conv;
 	CALCULATOR->parseComments(str, settings->evalops.parse_options);
@@ -7142,6 +7172,7 @@ void QalculateWindow::autoCalculateTimeout() {
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_OPTIMAL_SI;
 				str_conv = "";
+				do_mixed = false;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "prefix") || equalsIgnoreCase(to_str, tr("prefix").toStdString())) {
 				settings->evalops.parse_options.units_enabled = true;
@@ -7151,17 +7182,23 @@ void QalculateWindow::autoCalculateTimeout() {
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_BASE;
 				str_conv = "";
+				do_mixed = false;
 				do_to = true;
 			} else if(equalsIgnoreCase(to_str, "mixed") || equalsIgnoreCase(to_str, tr("mixed").toStdString())) {
 				settings->evalops.parse_options.units_enabled = true;
 				settings->evalops.auto_post_conversion = POST_CONVERSION_NONE;
 				settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
 				do_to = true;
+				if(!str_conv.empty()) do_mixed = true;
 			} else if(equalsIgnoreCase(to_str, "factors") || equalsIgnoreCase(to_str, tr("factors").toStdString()) || equalsIgnoreCase(to_str, "factor")) {
 				do_factors = true;
+				do_pfe = false;
+				do_expand = false;
 				str = from_str;
 			} else if(equalsIgnoreCase(to_str, "partial fraction") || equalsIgnoreCase(to_str, tr("partial fraction").toStdString())) {
 				do_pfe = true;
+				do_factors = false;
+				do_expand = false;
 				str = from_str;
 			} else if(equalsIgnoreCase(to_str1, "base") || equalsIgnoreCase(to_str1, tr("base", "number base").toStdString())) {
 				base_from_string(to_str2, to_base, to_nbase);
@@ -7187,6 +7224,7 @@ void QalculateWindow::autoCalculateTimeout() {
 					if(delay_complex != (cnf != COMPLEX_NUMBER_FORM_POLAR && cnf != COMPLEX_NUMBER_FORM_CIS) && u && u->baseUnit() == CALCULATOR->getRadUnit() && u->baseExponent() == 1) delay_complex = !delay_complex;
 					if(!str_conv.empty()) str_conv += " to ";
 					str_conv += to_str;
+					do_mixed = false;
 				}
 			}
 			if(str_left.empty()) break;
@@ -7214,9 +7252,13 @@ void QalculateWindow::autoCalculateTimeout() {
 		if(to_str == "factor" || equalsIgnoreCase(to_str, "factorize") || equalsIgnoreCase(to_str, tr("factorize").toStdString())) {
 			str = str.substr(i + 1);
 			do_factors = true;
+			do_pfe = false;
+			do_expand = false;
 		} else if(equalsIgnoreCase(to_str, "expand") || equalsIgnoreCase(to_str, tr("expand").toStdString())) {
 			str = str.substr(i + 1);
 			do_expand = true;
+			do_pfe = false;
+			do_factors = false;
 		}
 	}
 
@@ -7253,18 +7295,21 @@ void QalculateWindow::autoCalculateTimeout() {
 			CALCULATOR->stopControl();
 			CALCULATOR->startControl(20);
 		}
-		if(do_factors || do_pfe || do_expand) {
-			if(do_factors) {
+		if(do_factors || do_pfe || do_expand || do_mixed) {
+			if(do_pfe) {
+				mauto.expandPartialFractions(settings->evalops);
+			} else if(do_expand) {
+				mauto.expand(settings->evalops);
+				po.allow_factorization = false;
+			} else if(do_factors) {
 				if((mauto.isNumber() || mauto.isVector()) && to_fraction == 0 && to_fixed_fraction == 0) to_fraction = 2;
 				if(!mauto.integerFactorize()) {
 					mauto.structure(STRUCTURING_FACTORIZE, settings->evalops, true);
 					po.allow_factorization = true;
 				}
-			} else if(do_pfe) {
-				mauto.expandPartialFractions(settings->evalops);
-			} else if(do_expand) {
-				mauto.expand(settings->evalops);
-				po.allow_factorization = false;
+			} else if(do_mixed) {
+				settings->evalops.mixed_units_conversion = MIXED_UNITS_CONVERSION_FORCE_INTEGER;
+				mauto.set(CALCULATOR->convertToMixedUnits(mauto, settings->evalops));
 			}
 			if(CALCULATOR->aborted() || mauto.countTotalChildren(false) > 500) {
 				mauto.setAborted();
@@ -9198,7 +9243,7 @@ void QalculateWindow::onExpressionStatusModeChanged(bool b) {
 	if(b) {
 		if(!settings->status_in_history) historyView->clearTemporary();
 		auto_expression = "";
-		auto_error = "";
+		auto_error = false;
 		mauto.setAborted();
 		if(!settings->status_in_history) updateWindowTitle(QString::fromStdString(unhtmlize(result_text)), true);
 		statusBar()->setVisible(settings->status_in_statusbar || settings->show_statusbar);

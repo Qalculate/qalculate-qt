@@ -186,6 +186,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void calculateSelectionRequest();
 		void expressionStatusModeChanged(bool);
 		void statusChanged(QString, bool, bool, bool, bool);
+		void expressionChanged();
 
 };
 

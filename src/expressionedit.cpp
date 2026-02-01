@@ -2007,8 +2007,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					if(settings->status_in_history) expression_from_history = false;
-					else blockParseStatus(false);
+					if(settings->status_in_history) {
+						expression_from_history = false;
+					} else {
+						blockParseStatus(false);
+						if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
+					}
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -2029,8 +2033,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 					if(history_index == -1) setExpression(current_history);
 					else if(settings->expression_history.empty()) history_index = -1;
 					else setExpression(QString::fromStdString(settings->expression_history[history_index]));
-					if(settings->status_in_history) expression_from_history = false;
-					else blockParseStatus(false);
+					if(settings->status_in_history) {
+						expression_from_history = false;
+					} else {
+						blockParseStatus(false);
+						if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
+					}
 					blockCompletion(false);
 					dont_change_index = false;
 				} else {
@@ -2068,8 +2076,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				if(settings->status_in_history) expression_from_history = false;
-				else blockParseStatus(false);
+				if(settings->status_in_history) {
+					expression_from_history = false;
+				} else {
+					blockParseStatus(false);
+					if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
+				}
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -2088,8 +2100,12 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 				} else {
 					setExpression(QString::fromStdString(settings->expression_history[history_index]));
 				}
-				if(settings->status_in_history) expression_from_history = false;
-				else blockParseStatus(false);
+				if(settings->status_in_history) {
+					expression_from_history = false;
+				} else {
+					blockParseStatus(false);
+					if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
+				}
 				blockCompletion(false);
 				dont_change_index = false;
 				if(event->key() == Qt::Key_Up) cursor_has_moved = false;
@@ -2355,6 +2371,7 @@ void ExpressionEdit::editUndo() {
 	blockCompletion(false);
 	blockParseStatus(false);
 	displayParseStatus(false, false);
+	if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
 }
 void ExpressionEdit::editRedo() {
 	if(undo_index >= expression_undo_buffer.size() - 1) return;
@@ -2372,6 +2389,7 @@ void ExpressionEdit::editRedo() {
 	blockCompletion(false);
 	blockParseStatus(false);
 	displayParseStatus(false, false);
+	if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
 }
 void ExpressionEdit::editDelete() {
 	textCursor().removeSelectedText();
@@ -3643,6 +3661,7 @@ void ExpressionEdit::onTextChanged(bool force_update_groups) {
 		displayParseStatus();
 	}
 	if(document()->isEmpty()) expression_has_changed = false;
+	if(!parse_blocked) emit expressionChanged();
 }
 bool ExpressionEdit::expressionHasChanged() {
 	return expression_has_changed && !document()->isEmpty() && !toPlainText().trimmed().isEmpty();
@@ -3708,6 +3727,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		if(menu) {MFROM_CLEANUP; return false;}
 		do_completion_signal = 0;
 		if(!current_object_is_set) setCurrentObject();
+		if(cdata->editing_to_expression && cdata->editing_to_expression1 && !textCursor().atEnd()) {MFROM_CLEANUP; return false;}
 	}
 	if(!force && !cdata->editing_to_expression && NONDIGIT_INPUT_BASE) {
 		hideCompletion();
@@ -4170,7 +4190,7 @@ void ExpressionEdit::insertText(const QString &s) {
 	}
 }
 void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool always_add_parentheses, bool add_comma, const QString &add_args, bool quote) {
-	parse_blocked++;
+	blockParseStatus();
 	QTextCursor cur = textCursor();
 	if(cur.hasSelection() && (!overwriteMode() || insert_before || always_add_parentheses || add_comma || !add_args.isEmpty())) {
 		QString qstr = toPlainText();
@@ -4197,10 +4217,10 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					} else if(!text.isEmpty()) {
 						insertPlainText(text);
 					} else {
-						parse_blocked--;
+						blockParseStatus(false);
 						return;
 					}
-					parse_blocked--;
+					blockParseStatus(false);
 					highlightParentheses();
 					displayParseStatus();
 					return;
@@ -4213,10 +4233,10 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					moveCursor(QTextCursor::End);
 				} else {
 					moveCursor(QTextCursor::End);
-					if(text.isEmpty()) {parse_blocked--; return;}
+					if(text.isEmpty()) {blockParseStatus(false); return;}
 					insertPlainText(text);
 				}
-				parse_blocked--;
+				blockParseStatus(false);
 				highlightParentheses();
 				displayParseStatus();
 				return;
@@ -4284,12 +4304,13 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	} else if(!text.isEmpty()) {
 		insertText(text);
 	} else {
-		parse_blocked--;
+		blockParseStatus(false);
 		return;
 	}
-	parse_blocked--;
+	blockParseStatus(false);
 	highlightParentheses();
 	displayParseStatus();
+	if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
 }
 void ExpressionEdit::smartParentheses() {
 	QString qexpr = toPlainText();
@@ -4703,6 +4724,7 @@ void ExpressionEdit::onCompletionActivated(const QModelIndex &index_pre) {
 	} else {
 		displayParseStatus();
 	}
+	if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
 }
 void ExpressionEdit::hideCompletion() {
 	completionView->hide();
