@@ -608,10 +608,12 @@ void PreferencesDialog::hexTwosToggled(bool b) {
 void PreferencesDialog::binTwosInputToggled(bool b) {
 	settings->evalops.parse_options.twos_complement = b;
 	if(b != settings->default_signed) settings->default_signed = -1;
+	emit twosChanged();
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::hexTwosInputToggled(bool b) {
 	settings->evalops.parse_options.hexadecimal_twos_complement = b;
+	emit twosChanged();
 	emit expressionFormatUpdated(false);
 }
 void PreferencesDialog::bitsChanged(int i) {

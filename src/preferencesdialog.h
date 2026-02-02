@@ -157,6 +157,7 @@ class PreferencesDialog : public QDialog {
 		void symbolsUpdated();
 		void historyExpressionTypeChanged();
 		void binaryBitsChanged();
+		void twosChanged();
 		void statusModeChanged();
 		void buttonLocationChanged();
 		void automaticDigitGroupingChanged();

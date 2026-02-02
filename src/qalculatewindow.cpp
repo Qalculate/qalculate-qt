@@ -3831,6 +3831,7 @@ void QalculateWindow::expressionFormatUpdated(bool recalculate) {
 	}
 	if(expressionEdit->expressionHasChanged()) expressionEdit->displayParseStatus(true, !QToolTip::text().isEmpty());
 	updateStatusText();
+	if(!recalculate) onExpressionChanged();
 }
 void QalculateWindow::expressionCalculationUpdated(int delay) {
 	if(ecTimer) ecTimer->stop();
@@ -4218,13 +4219,22 @@ void QalculateWindow::setOption(std::string str) {
 			settings->printops.base_display = (BaseDisplay) v;
 			resultDisplayUpdated();
 		}
-	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") SET_BOOL_D(settings->printops.twos_complement)
-	else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
-	else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") {
-		SET_BOOL_PF(settings->evalops.parse_options.twos_complement)
+	} else if(equalsIgnoreCase(svar, "two's complement") || svar == "twos") {
+		SET_BOOL_D(settings->printops.twos_complement)
+		onTwosChanged();
+	} else if(equalsIgnoreCase(svar, "hexadecimal two's") || svar == "hextwos") {
+		SET_BOOL_D(settings->printops.hexadecimal_twos_complement)
+		onTwosChanged();
+	} else if(equalsIgnoreCase(svar, "two's complement input") || svar == "twosin") {
+		SET_BOOL(settings->evalops.parse_options.twos_complement)
 		if(settings->evalops.parse_options.twos_complement != settings->default_signed) settings->default_signed = -1;
-	} else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") SET_BOOL_PF(settings->evalops.parse_options.hexadecimal_twos_complement)
-	else if(equalsIgnoreCase(svar, "binary bits") || svar == "bits") {
+		onTwosChanged();
+		expressionFormatUpdated(false);
+	} else if(equalsIgnoreCase(svar, "hexadecimal two's input") || svar == "hextwosin") {
+		SET_BOOL(settings->evalops.parse_options.hexadecimal_twos_complement)
+		onTwosChanged();
+		expressionFormatUpdated(false);
+	} else if(equalsIgnoreCase(svar, "binary bits") || svar == "bits") {
 		int v = -1;
 		if(empty_value) {
 			v = 0;
@@ -4238,6 +4248,7 @@ void QalculateWindow::setOption(std::string str) {
 			settings->printops.binary_bits = v;
 			settings->evalops.parse_options.binary_bits = v;
 			settings->default_bits = -1;
+			onBinaryBitsChanged();
 			if(settings->evalops.parse_options.twos_complement || settings->evalops.parse_options.hexadecimal_twos_complement) expressionFormatUpdated(true);
 			else resultDisplayUpdated();
 		}
@@ -6674,7 +6685,7 @@ void QalculateWindow::updateResultBases() {
 	hexEdit->setText(QString::fromStdString(result_hex));
 }
 
-bool result_updated_from_bases = false;
+bool result_negative = false;
 void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	size_t n = s.toInt();
 	n += (n - 1) / 4;
@@ -6684,37 +6695,29 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	else if(result_bin[n] == '1') result_bin[n] = '0';
 	ParseOptions pa;
 	pa.base = BASE_BINARY;
-	pa.twos_complement = settings->printops.twos_complement;
+	pa.twos_complement = settings->evalops.parse_options.twos_complement || result_negative;
 	PrintOptions po;
 	po.base = settings->evalops.parse_options.base;
 	po.twos_complement = settings->evalops.parse_options.twos_complement;
 	po.min_exp = 0;
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
-	result_updated_from_bases = true;
 	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
 }
 
 void set_result_bases(const MathStructure &m) {
 	result_bin = ""; result_oct = "", result_dec = "", result_hex = "";
+	result_negative = false;
 	SET_BINARY_BITS
-	if(max_bases.isZero() || (min_bases.isZero() == settings->printops.twos_complement)) {
-		if(settings->printops.twos_complement) {
-			max_bases = 2; max_bases ^= (binary_bits > 128 ? 127 : binary_bits - 1);
-			min_bases = 2; min_bases ^= (binary_bits > 128 ? 64 : binary_bits / 2); min_bases += 1; min_bases.negate();
-		} else {
-			max_bases = 2; max_bases ^= (binary_bits > 128 ? 128 : binary_bits);
-			min_bases.clear();
-		}
+	if(max_bases.isZero()) {
+		max_bases = 2;
+		if(settings->evalops.parse_options.twos_complement) max_bases ^= (binary_bits > 128 ? 127 : binary_bits - 1);
+		else max_bases ^= (binary_bits > 128 ? 128 : binary_bits);
+		max_bases--;
+		min_bases = 2; min_bases ^= (binary_bits > 128 ? 127 : binary_bits - 1); min_bases.negate();
 	}
-	if(!CALCULATOR->aborted() && (result_updated_from_bases || ((m.isNumber() && m.number() < max_bases && m.number() > min_bases) || (m.isNegate() && m[0].isNumber() && m[0].number() < -min_bases)))) {
-		Number nr;
-		if(m.isNumber()) {
-			nr = m.number();
-		} else {
-			nr = m[0].number();
-			nr.negate();
-		}
+	if(m.isNumber() && m.number() <= max_bases && m.number() >= min_bases) {
+		Number nr(m.number());
 		if(settings->rounding_mode == 2) nr.trunc();
 		else nr.round(settings->printops.round_halfway_to_even);
 		PrintOptions po = settings->printops;
@@ -6724,7 +6727,8 @@ void set_result_bases(const MathStructure &m) {
 		po.min_exp = 0;
 		po.base = 2;
 		po.binary_bits = binary_bits;
-		if(nr.isNegative()) po.twos_complement = true;
+		result_negative = nr.isNegative();
+		po.twos_complement = result_negative;
 		result_bin = nr.print(po);
 		if(result_bin.length() > po.binary_bits + (po.binary_bits / 4) && result_bin.find("1") >= po.binary_bits + (po.binary_bits / 4)) result_bin.erase(0, po.binary_bits + (po.binary_bits / 4));
 		po.base = 8;
@@ -6748,7 +6752,6 @@ void set_result_bases(const MathStructure &m) {
 		}
 		if(result_hex.length() > i_after_minus + 1 && result_hex[i_after_minus + 1] == ' ') result_hex.insert(i_after_minus, 1, '0');
 	}
-	result_updated_from_bases = false;
 }
 
 bool contains_plot_or_save(const std::string &str) {
@@ -7544,7 +7547,11 @@ void QalculateWindow::autoCalculateTimeout() {
 	}
 }
 
+void QalculateWindow::onTwosChanged() {
+	max_bases.clear();
+}
 void QalculateWindow::onBinaryBitsChanged() {
+	max_bases.clear();
 	if(basesDock->isVisible() && bases_is_result && settings->current_result) {
 		CALCULATOR->beginTemporaryStopMessages();
 		set_result_bases(*settings->current_result);
@@ -9682,6 +9689,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), historyView, SLOT(reloadHistory()));
 	connect(preferencesDialog, SIGNAL(binaryBitsChanged()), this, SLOT(onBinaryBitsChanged()));
+	connect(preferencesDialog, SIGNAL(twosChanged()), this, SLOT(onTwosChanged()));
 	connect(preferencesDialog, SIGNAL(statusModeChanged()), this, SLOT(onExpressionStatusModeChanged()));
 	connect(preferencesDialog, SIGNAL(buttonLocationChanged()), keypad, SLOT(updateButtonLocation()));
 	connect(preferencesDialog, SIGNAL(automaticDigitGroupingChanged()), expressionEdit, SLOT(updateDigitGroups()));
