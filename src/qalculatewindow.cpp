@@ -6962,6 +6962,46 @@ bool contains_incompatible_units(const MathStructure &m) {
 	return false;
 }
 
+int intervals_are_relative(const MathStructure &m) {
+	int ret = -1;
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_UNCERTAINTY && m.size() == 3) {
+		if(m[2].isOne() && m[1].isMultiplication() && m[1].size() > 1 && m[1].last().isVariable() && (m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD))) {
+			ret = 1;
+		} else {
+			return 0;
+		}
+	}
+	if(m.isFunction() && m.function()->id() == FUNCTION_ID_INTERVAL) return 0;
+	for(size_t i = 0; i < m.size(); i++) {
+		int ret_i = intervals_are_relative(m[i]);
+		if(ret_i == 0) return 0;
+		else if(ret_i > 0) ret = ret_i;
+	}
+	return ret;
+}
+
+IntervalDisplay adaptive_interval_display(const QString &expression_str, const MathStructure *mp) {
+	if((mp && mp->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) {
+		if(mp && intervals_are_relative(*mp) > 0) return INTERVAL_DISPLAY_RELATIVE;
+		return INTERVAL_DISPLAY_PLUSMINUS;
+	} else if(mp && mp->containsFunctionId(FUNCTION_ID_INTERVAL)) {
+		return INTERVAL_DISPLAY_INTERVAL;
+	} else {
+		bool b = false;
+		if(CALCULATOR->hasWhereExpression(expression_str.toStdString(), settings->evalops)) {
+			MathFunction *f = CALCULATOR->getFunctionById(FUNCTION_ID_INTERVAL);
+			for(size_t i = 1; f && i <= f->countNames(); i++) {
+				if(expression_str.contains(QString::fromStdString(f->getName(i).name))) {
+					b = true;
+					break;
+				}
+			}
+		}
+		if(b) return INTERVAL_DISPLAY_INTERVAL;
+	}
+	return  INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
+}
+
 void QalculateWindow::autoCalculateTimeout() {
 
 	mauto.setAborted();
@@ -7335,7 +7375,7 @@ void QalculateWindow::autoCalculateTimeout() {
 			if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_CIS) mauto.complexToCisForm(settings->evalops);
 			else if(settings->evalops.complex_number_form == COMPLEX_NUMBER_FORM_POLAR) mauto.complexToPolarForm(settings->evalops);
 		}
-
+		if(settings->adaptive_interval_display) po.interval_display = adaptive_interval_display(QString::fromStdString(current_status_expression), &mauto_parsed);
 		Number save_nbase;
 		bool custom_base_set = false;
 		int save_bin = CALCULATOR->usesBinaryPrefixes();
@@ -7735,24 +7775,6 @@ void ViewThread::run() {
 	}
 }
 
-int intervals_are_relative(MathStructure &m) {
-	int ret = -1;
-	if(m.isFunction() && m.function()->id() == FUNCTION_ID_UNCERTAINTY && m.size() == 3) {
-		if(m[2].isOne() && m[1].isMultiplication() && m[1].size() > 1 && m[1].last().isVariable() && (m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERCENT) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMILLE) || m[1].last().variable() == CALCULATOR->getVariableById(VARIABLE_ID_PERMYRIAD))) {
-			ret = 1;
-		} else {
-			return 0;
-		}
-	}
-	if(m.isFunction() && m.function()->id() == FUNCTION_ID_INTERVAL) return 0;
-	for(size_t i = 0; i < m.size(); i++) {
-		int ret_i = intervals_are_relative(m[i]);
-		if(ret_i == 0) return 0;
-		else if(ret_i > 0) ret = ret_i;
-	}
-	return ret;
-}
-
 void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update_parse, bool force, std::string transformation, bool do_stack, size_t stack_index, bool register_moved, bool supress_dialog, bool calculate_selection) {
 
 	if(block_result_update) return;
@@ -7807,14 +7829,7 @@ void QalculateWindow::setResult(Prefix *prefix, bool update_history, bool update
 				if(result_text == tr("RPN Operation").toStdString()) {
 					b_rpn_operation = true;
 				} else {
-					if(settings->adaptive_interval_display) {
-						QString expression_str = expressionEdit->toPlainText();
-						if((parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_UNCERTAINTY)) || expression_str.contains("+/-") || expression_str.contains("+/" SIGN_MINUS) || expression_str.contains("±")) {
-							if(parsed_mstruct && intervals_are_relative(*parsed_mstruct) > 0) settings->printops.interval_display = INTERVAL_DISPLAY_RELATIVE;
-							else settings->printops.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
-						} else if(parsed_mstruct && parsed_mstruct->containsFunctionId(FUNCTION_ID_INTERVAL)) settings->printops.interval_display = INTERVAL_DISPLAY_INTERVAL;
-						else settings->printops.interval_display = INTERVAL_DISPLAY_SIGNIFICANT_DIGITS;
-					}
+					if(settings->adaptive_interval_display) settings->printops.interval_display = adaptive_interval_display(expressionEdit->toPlainText(), parsed_mstruct);
 				}
 			}
 		} else if(!transformation.empty()) {
