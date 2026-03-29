@@ -6860,7 +6860,7 @@ void QalculateWindow::onStatusChanged(QString status, bool is_expression, bool h
 		historyView->addResult(values, current_text, true, auto_expression, false, false, QString(), NULL, 0, 0, true);
 		updateWindowTitleResult("");
 	} else {
-		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((prev_autocalculable != 0 && auto_expression == status.toStdString() && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty())) && (last_op || !settings->adaptive_autocalc_delay || prev_autocalculable != 2 || expressionEdit->parsedCalculable() != 1 || !auto_result.empty())) {
+		if(!had_error && (!had_warning || last_op) && !auto_error && !auto_calculation_updated && !auto_format_updated && ((prev_autocalculable != 0 && auto_expression == status.toStdString() && (last_op || (settings->history_expression_type != HISTORY_EXPRESSION_TYPE_PARSED_COMPACT && settings->history_expression_type != HISTORY_EXPRESSION_TYPE_ENTERED_AND_PARSED_COMPACT) || (expressionEdit->textCursor().atEnd() && expressionEdit->toPlainText().endsWith(" "))) && (last_op || auto_expression.find(CALCULATOR->localToString()) == std::string::npos)) || (last_op && auto_expression.empty() && auto_result.empty())) && (last_op || !settings->adaptive_autocalc_delay || prev_autocalculable != 2 || expressionEdit->parsedCalculable() != 1 || !auto_result.empty())) {
 			prev_autocalculable = expressionEdit->parsedCalculable();
 			if(autoCalculateTimer && autoCalculateTimer->isActive()) {
 				autoCalculateTimer->stop();

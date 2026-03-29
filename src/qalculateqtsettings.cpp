@@ -1264,7 +1264,7 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 5;
-	preferences_version[1] = 9;
+	preferences_version[1] = 10;
 	preferences_version[2] = 0;
 
 	if(file) {
