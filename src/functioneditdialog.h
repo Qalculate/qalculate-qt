@@ -38,6 +38,7 @@ class NamesEditDialog : public QDialog {
 		QStandardItemModel *namesModel;
 		QPushButton *addButton, *editButton, *delButton;
 		ExpressionItem *o_item;
+		bool box_clicked;
 		int i_type;
 
 	protected slots:
@@ -47,6 +48,7 @@ class NamesEditDialog : public QDialog {
 		void editClicked();
 		void selectedNameChanged(const QModelIndex&, const QModelIndex&);
 		void nameChanged(QStandardItem*);
+		void nameClicked(const QModelIndex&);
 
 	public:
 
@@ -160,11 +162,14 @@ class FunctionEditDialog : public QDialog {
 		QStandardItemModel *subfunctionsModel, *argumentsModel;
 		NamesEditDialog *namesEditDialog;
 		MathFunction *o_function;
-		bool name_edited;
+		bool name_edited, precalculate_box_clicked;
 
 	protected slots:
 
 		void onNameEdited(const QString&);
+		void subfunctionClicked(const QModelIndex &index);
+		void onSubfunctionChanged(QStandardItem *item);
+
 		void onFunctionChanged();
 		void subAddClicked();
 		void subEditClicked();

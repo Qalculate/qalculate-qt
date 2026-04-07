@@ -375,7 +375,9 @@ NamesEditDialog::NamesEditDialog(int type, QWidget *parent, bool read_only) : QD
 	topbox->addWidget(buttonBox);
 	connect(buttonBox->button(QDialogButtonBox::Close), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(namesView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedNameChanged(const QModelIndex&, const QModelIndex&)));
+	box_clicked = false;
 	connect(namesModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(nameChanged(QStandardItem*)));
+	connect(namesView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(nameClicked(const QModelIndex&)));
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
 }
 NamesEditDialog::~NamesEditDialog() {}
@@ -528,7 +530,19 @@ void NamesEditDialog::selectedNameChanged(const QModelIndex &index, const QModel
 		editButton->setEnabled(index.isValid());
 	}
 }
+void NamesEditDialog::nameClicked(const QModelIndex &index) {
+	if(box_clicked) {
+		box_clicked = false;
+		return;
+	}
+	QStandardItem *item = namesModel->itemFromIndex(index);
+	if(item && addButton->isEnabled() && item->isCheckable()) {
+		item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+		box_clicked = false;
+	}
+}
 void NamesEditDialog::nameChanged(QStandardItem *item) {
+	if(item->column() > 0) box_clicked = true;
 	if(i_type < 0 || item->column() != 0 || item->text().trimmed().isEmpty()) return;
 	if((i_type == TYPE_FUNCTION && !CALCULATOR->functionNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_VARIABLE && !CALCULATOR->variableNameIsValid(item->text().trimmed().toStdString())) || (i_type == TYPE_UNIT && !CALCULATOR->unitNameIsValid(item->text().trimmed().toStdString()))) {
 		namesModel->blockSignals(true);
@@ -936,7 +950,9 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	connect(argumentsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedArgumentChanged(const QModelIndex&, const QModelIndex&)));
 	connect(argumentsView, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(argumentActivated(const QModelIndex&)));
 	connect(argumentsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(argumentChanged(QStandardItem*)));
-	connect(subfunctionsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onFunctionChanged()));
+	precalculate_box_clicked = false;
+	connect(subfunctionsModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onSubfunctionChanged(QStandardItem*)));
+	connect(subfunctionsView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(subfunctionClicked(const QModelIndex&)));
 	connect(this, SIGNAL(rejected()), this, SLOT(onRejected()));
 	okButton->setEnabled(false);
 	if(settings->always_on_top) setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
@@ -1317,6 +1333,21 @@ void FunctionEditDialog::onNameEdited(const QString &str) {
 		nameEdit->setText(QString::fromStdString(CALCULATOR->convertToValidFunctionName(str.trimmed().toStdString())));
 	}
 	name_edited = true;
+	onFunctionChanged();
+}
+void FunctionEditDialog::subfunctionClicked(const QModelIndex &index) {
+	if(precalculate_box_clicked) {
+		precalculate_box_clicked = false;
+		return;
+	}
+	QStandardItem *item = subfunctionsModel->itemFromIndex(index);
+	if(item && !nameEdit->isReadOnly() && item->isCheckable()) {
+		item->setCheckState(item->checkState() == Qt::Checked ? Qt::Unchecked : Qt::Checked);
+		precalculate_box_clicked = false;
+	}
+}
+void FunctionEditDialog::onSubfunctionChanged(QStandardItem *item) {
+	if(item && item->isCheckable()) precalculate_box_clicked = true;
 	onFunctionChanged();
 }
 void FunctionEditDialog::onFunctionChanged() {
