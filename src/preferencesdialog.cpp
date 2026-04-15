@@ -417,6 +417,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	combo->addItem(tr("Absolute"), TEMPERATURE_CALCULATION_ABSOLUTE);
 	combo->addItem(tr("Relative"), TEMPERATURE_CALCULATION_RELATIVE);
 	combo->addItem(tr("Hybrid"), TEMPERATURE_CALCULATION_HYBRID);
+	combo->setItemData(0, "1 °C + 1 °C ≈ 274 K + 274 K ≈ 548 K\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 K\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C", Qt::ToolTipRole);
+	combo->setItemData(1, "1 °C + 1 °C = 2 °C\n1 °C + 5 °F = 1 °C + 5 °R ≈ 4 °C ≈ 277 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 1 °C - 5 °R ≈ −2 °C\n1 °C + 1 K = 2 °C", Qt::ToolTipRole);
+	combo->setItemData(2, "1 °C + 1 °C ≈ 2 °C\n1 °C + 5 °F ≈ 274 K + 258 K ≈ 532 K\n2 °C − 1 °C = 1 °C\n1 °C − 5 °F = 16 K\n1 °C + 1 K = 2 °C", Qt::ToolTipRole);
 	combo->setCurrentIndex(combo->findData(CALCULATOR->getTemperatureCalculationMode()));
 	tcCombo = combo;
 	l->addWidget(combo, r, 1); r++;

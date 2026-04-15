@@ -6942,6 +6942,13 @@ bool contains_subvector(const MathStructure &m, bool top = true) {
 	}
 	return false;
 }
+bool contains_undefined(const MathStructure &m) {
+	if(m.isUndefined() || (m.isPower() && m[0].isZero() && m[1].isNumber() && m[1].number().isNegative())) return true;
+	for(size_t i = 0; i < m.size(); i++) {
+		if(contains_undefined(m[i])) return true;
+	}
+	return false;
+}
 bool contains_incompatible_units(const MathStructure &m) {
 	if(m.isAddition() && m.size() >= 2 && m[m.size() - 1].isUnitCompatible(m[m.size() - 2]) == 0) {
 		const MathStructure *u1 = NULL, *u2 = NULL;
@@ -7318,7 +7325,7 @@ void QalculateWindow::autoCalculateTimeout() {
 		if(mauto.isAborted() || CALCULATOR->aborted()) {
 			new_auto_aborted = current_status_expression.length();
 			mauto.setAborted();
-		} else if(mauto.size() > 50 || mauto.countTotalChildren(false) > 500 || (mauto.isMatrix() && mauto.rows() * mauto.columns() > 50) || contains_subvector(mauto) || contains_extreme_number(mauto) || (settings->adaptive_autocalc_delay && contains_incompatible_units(mauto))) {
+		} else if(mauto.size() > 50 || mauto.countTotalChildren(false) > 500 || (mauto.isMatrix() && mauto.rows() * mauto.columns() > 50) || contains_subvector(mauto) || contains_extreme_number(mauto) || (settings->adaptive_autocalc_delay && (contains_incompatible_units(mauto) || contains_undefined(mauto)))) {
 			mauto.setAborted();
 		}
 	}
