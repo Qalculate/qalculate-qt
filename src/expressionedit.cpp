@@ -3118,6 +3118,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 		po.restrict_to_parent_precision = false;
 		po.interval_display = INTERVAL_DISPLAY_PLUSMINUS;
 		if(!str_w.empty()) {
+			CALCULATOR->endTemporaryStopMessages();
+			CALCULATOR->beginTemporaryStopMessages();
 			CALCULATOR->beginTemporaryStopMessages();
 			MathStructure mwhere;
 			CALCULATOR->parseExpressionAndWhere(&mparse, &mwhere, str_e, str_w, settings->evalops.parse_options);
