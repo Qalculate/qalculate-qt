@@ -803,12 +803,25 @@ bool ExpressionProxyModel::filterAcceptsRow(int source_row, const QModelIndex&) 
 					b_match = 0;
 				} else if(p_type >= 100 && p_type < 200) {
 					if(cdata->to_type == 5 || cdata->current_from_struct->containsType(STRUCT_UNIT) <= 0) b_match = 0;
-				} else if((p_type == 294 || p_type == 295 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
+				} else if((p_type == 294 || p_type == 295 || p_type == 293 || (p_type == 292 && cdata->to_type == 4)) && !cdata->current_from_units.empty()) {
 					bool b = false;
-					for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
-						if(cdata->current_from_units[i] == CALCULATOR->getDegUnit()) {
+					if(p_type == 293) {
+						if(cdata->current_from_struct->isUnit() && cdata->current_from_struct->unit()->baseUnit()->referenceName() == "s" && cdata->current_from_struct->unit()->baseExponent() == 1) {
 							b = true;
-							break;
+						} else if(cdata->current_from_struct->isMultiplication()) {
+							for(size_t i = 0; i < cdata->current_from_struct->size(); i++) {
+								if((*cdata->current_from_struct)[i].isUnit() && (*cdata->current_from_struct)[i].unit()->baseUnit()->referenceName() == "s" && (*cdata->current_from_struct)[i].unit()->baseExponent() == 1) {
+									b = true;
+									break;
+								}
+							}
+						}
+					} else {
+						for(size_t i = 0; i < cdata->current_from_units.size(); i++) {
+							if(cdata->current_from_units[i] == CALCULATOR->getDegUnit()) {
+								b = true;
+								break;
+							}
 						}
 					}
 					if(!b) {
@@ -3736,7 +3749,7 @@ bool ExpressionEdit::complete(MathStructure *mstruct_from, MathStructure *mstruc
 		MFROM_CLEANUP
 		return false;
 	}
-	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc.isFunction() && (size_t) cdata->current_function_index <= mfunc.size() && mfunc[cdata->current_function_index - 1].isSymbolic()) {
+	if(!force && !cdata->editing_to_expression && !current_object_text.empty() && cdata->current_function && cdata->current_function_index > 0 && cdata->current_function->getArgumentDefinition(cdata->current_function_index) && cdata->current_function->getArgumentDefinition(cdata->current_function_index)->type() == ARGUMENT_TYPE_TEXT && mfunc.isFunction() && (size_t) cdata->current_function_index <= mfunc.size() && mfunc[cdata->current_function_index - 1].isSymbolic() && (cdata->current_function_index != 1 || (cdata->current_function->id() != FUNCTION_ID_BIN && cdata->current_function->id() != FUNCTION_ID_OCT && cdata->current_function->id() != FUNCTION_ID_DEC && cdata->current_function->id() != FUNCTION_ID_FUNCTION))) {
 		hideCompletion();
 		MFROM_CLEANUP
 		return false;
