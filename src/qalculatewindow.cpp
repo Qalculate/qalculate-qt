@@ -8848,6 +8848,7 @@ void QalculateWindow::keypadTypeActivated() {
 	workspace_changed = true;
 }
 void QalculateWindow::onKeypadVisibilityChanged(bool b) {
+	if(!b && (windowState() & Qt::WindowMinimized)) return;
 	beforeShowDockCleanUp(keypadDock);
 	QAction *action = find_child_data(this, "group_keypad", b ? settings->keypad_type : -1);
 	if(action) action->setChecked(true);
@@ -8871,6 +8872,7 @@ void QalculateWindow::onKeypadVisibilityChanged(bool b) {
 	}
 }
 void QalculateWindow::onToolbarVisibilityChanged(bool b) {
+	if(!b && (windowState() & Qt::WindowMinimized)) return;
 	expressionEdit->setMenuAndToolbarItems(b ? NULL : modeAction_t->menu(), b ? NULL : menuAction_t->menu(), b ? NULL : tbAction);
 	historyView->setMenuAndToolbarItems(b ? NULL : modeAction_t->menu(), b ? NULL : menuAction_t->menu(), b ? NULL : tbAction);
 	tbAction->setChecked(b);
@@ -8898,6 +8900,7 @@ void QalculateWindow::onBasesActivated(bool b) {
 	afterShowDock(basesDock);
 }
 void QalculateWindow::onBasesVisibilityChanged(bool b) {
+	if(!b && (windowState() & Qt::WindowMinimized)) return;
 	beforeShowDockCleanUp(basesDock);
 	basesAction->setChecked(b);
 	if((settings->preserve_history_height > 0 || (settings->preserve_history_height < 0 && settings->bases_appended)) && !b && !init_in_progress && DOCK_IN_WINDOW(basesDock)) {
@@ -10841,6 +10844,7 @@ void QalculateWindow::normalModeActivated() {
 	updateInsertFunctionDialogs();
 }
 void QalculateWindow::onRPNVisibilityChanged(bool b) {
+	if(!b && (windowState() & Qt::WindowMinimized)) return;
 	if(settings->rpn_mode != b) {
 		if(b) {
 			settings->rpn_mode = true;
