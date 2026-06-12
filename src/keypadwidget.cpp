@@ -1246,15 +1246,20 @@ void KeypadWidget::editCustomAction(KeypadButton *button, int i) {
 	item->setData(0, Qt::UserRole, -1);
 	actionList->setCurrentItem(item);
 	for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
+		if(i == SHORTCUT_TYPE_SMART_PARENTHESES) {
+			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_PARENTHESES)));
+			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_PARENTHESES);
+			if(type == SHORTCUT_TYPE_PARENTHESES) actionList->setCurrentItem(item);
+		}
 		item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) i)));
 		item->setData(0, Qt::UserRole, i);
 		if(i == type) actionList->setCurrentItem(item);
 		if(i == SHORTCUT_TYPE_HISTORY_SEARCH) {
-			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_HISTORY_CLEAR)));
+			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_HISTORY_CLEAR)));
 			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_HISTORY_CLEAR);
 			if(type == SHORTCUT_TYPE_HISTORY_CLEAR) actionList->setCurrentItem(item);
 		} else if(i == SHORTCUT_TYPE_APPROXIMATE) {
-			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText((shortcut_type) SHORTCUT_TYPE_TOGGLE_FRACTION)));
+			item = new QTreeWidgetItem(actionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_TOGGLE_FRACTION)));
 			item->setData(0, Qt::UserRole, SHORTCUT_TYPE_TOGGLE_FRACTION);
 			if(type == SHORTCUT_TYPE_TOGGLE_FRACTION) actionList->setCurrentItem(item);
 		}

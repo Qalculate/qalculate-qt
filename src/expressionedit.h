@@ -164,7 +164,7 @@ class ExpressionEdit : public QPlainTextEdit {
 		void blockUndo(bool = true);
 		void hideCompletion();
 		void addToHistory();
-		void smartParentheses();
+		void smartParentheses(bool = true);
 		void insertBrackets();
 		void selectAll(bool b = true);
 		void editUndo();

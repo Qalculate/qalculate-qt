@@ -1332,7 +1332,7 @@ void QalculateQtSettings::loadPreferences() {
 		ADD_SHORTCUT("Alt+V", SHORTCUT_TYPE_VARIABLES_MENU, "")
 		ADD_SHORTCUT("F10", SHORTCUT_TYPE_MENU, "")
 		ADD_SHORTCUT("Ctrl+)", SHORTCUT_TYPE_SMART_PARENTHESES, "")
-		ADD_SHORTCUT("Ctrl+(", SHORTCUT_TYPE_SMART_PARENTHESES, "")
+		ADD_SHORTCUT("Ctrl+(", SHORTCUT_TYPE_PARENTHESES, "")
 		ADD_SHORTCUT("Ctrl+Up", SHORTCUT_TYPE_RPN_UP, "")
 		ADD_SHORTCUT("Ctrl+Down", SHORTCUT_TYPE_RPN_DOWN, "")
 		ADD_SHORTCUT("Ctrl+Right", SHORTCUT_TYPE_RPN_SWAP, "")
@@ -2325,6 +2325,7 @@ QString QalculateQtSettings::shortcutTypeText(shortcut_type type) {
 		case SHORTCUT_TYPE_OPERATOR: {return tr("Insert operator");}
 		case SHORTCUT_TYPE_DATE: {return tr("Insert date");}
 		case SHORTCUT_TYPE_MATRIX: {return tr("Insert matrix");}
+		case SHORTCUT_TYPE_PARENTHESES: {return tr("Insert parentheses");}
 		case SHORTCUT_TYPE_SMART_PARENTHESES: {return tr("Insert smart parentheses");}
 		case SHORTCUT_TYPE_CONVERT_TO: {return tr("Convert to unit");}
 		case SHORTCUT_TYPE_CONVERT: {return tr("Convert");}

@@ -3181,6 +3181,8 @@ void ExpressionEdit::displayParseStatus(bool update, bool show_tooltip) {
 					remove_blank_ends(to_str1);
 					to_str2 = str_u.substr(ispace + 1);
 					remove_blank_ends(to_str2);
+				} else {
+					to_str1 = "";
 				}
 				if(equalsIgnoreCase(str_u, "hex") || equalsIgnoreCase(str_u, "hexadecimal") || equalsIgnoreCase(str_u, tr("hexadecimal").toStdString())) {
 					parsed_expression += tr("hexadecimal number").toStdString();
@@ -4327,7 +4329,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 	displayParseStatus();
 	if(expressionHasChanged() && !parse_blocked) emit expressionChanged();
 }
-void ExpressionEdit::smartParentheses() {
+void ExpressionEdit::smartParentheses(bool smart) {
 	QString qexpr = toPlainText();
 	int istart = 0, iend = 0, ipos;
 	QTextCursor cur = textCursor();
@@ -4356,10 +4358,17 @@ void ExpressionEdit::smartParentheses() {
 		}
 	} else {
 		iend = ipos;
-		if(iend != 0) {
+		if(!smart) {
+			istart = ipos;
+		} else if(iend != 0) {
 			std::string str = CALCULATOR->unlocalizeExpression(qexpr.mid(istart, iend - istart).toStdString(), settings->evalops.parse_options);
 			CALCULATOR->parseSigns(str);
-			if(str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1])) {
+			bool right = (str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1]));
+			if(!right) {
+				size_t i = str.find_last_of(NOT_IN_NAMES);
+				if((i == std::string::npos || i < str.length() - 1) && CALCULATOR->getActiveFunction(i == std::string::npos ? str : str.substr(i + 1, str.length() - (i + 1)))) right = true;;
+			}
+			if(right) {
 				istart = iend;
 				iend = qexpr.length();
 				if(istart < iend) {

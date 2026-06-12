@@ -1744,6 +1744,10 @@ void QalculateWindow::triggerShortcut(int type, const std::string &value) {
 			expressionEdit->insertMatrix();
 			break;
 		}
+		case SHORTCUT_TYPE_PARENTHESES: {
+			expressionEdit->smartParentheses(false);
+			break;
+		}
 		case SHORTCUT_TYPE_SMART_PARENTHESES: {
 			expressionEdit->smartParentheses();
 			break;
@@ -5591,6 +5595,8 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 				remove_blank_ends(to_str1);
 				to_str2 = to_str.substr(ispace + 1);
 				remove_blank_ends(to_str2);
+			} else {
+				to_str1 = "";
 			}
 			if(equalsIgnoreCase(to_str, "hex") || equalsIgnoreCase(to_str, "hexadecimal") || equalsIgnoreCase(to_str, tr("hexadecimal").toStdString())) {
 				to_base = BASE_HEXADECIMAL;
@@ -7063,6 +7069,8 @@ void QalculateWindow::autoCalculateTimeout() {
 				remove_blank_ends(to_str1);
 				to_str2 = to_str.substr(ispace + 1);
 				remove_blank_ends(to_str2);
+			} else {
+				to_str1 = "";
 			}
 			if(equalsIgnoreCase(to_str, "hex") || equalsIgnoreCase(to_str, "hexadecimal") || equalsIgnoreCase(to_str, tr("hexadecimal").toStdString())) {
 				to_base = BASE_HEXADECIMAL;
@@ -9455,6 +9463,11 @@ bool QalculateWindow::editKeyboardShortcut(keyboard_shortcut *new_ks, keyboard_s
 		shortcutActionList->sortByColumn(-1, Qt::AscendingOrder);
 		grid->addWidget(shortcutActionList, 0, 0, 1, 2);
 		for(int i = SHORTCUT_TYPE_FUNCTION; i <= SHORTCUT_TYPE_QUIT; i++) {
+			if(i == SHORTCUT_TYPE_SMART_PARENTHESES) {
+				QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText(SHORTCUT_TYPE_PARENTHESES)));
+				item->setData(0, Qt::UserRole, SHORTCUT_TYPE_PARENTHESES);
+				if(new_ks->type.size() == 0 && ks && ks->type[0] == SHORTCUT_TYPE_PARENTHESES) shortcutActionList->setCurrentItem(item);
+			}
 			if(i < SHORTCUT_TYPE_EXPRESSION_CLEAR || i > SHORTCUT_TYPE_CALCULATE_EXPRESSION) {
 				QTreeWidgetItem *item = new QTreeWidgetItem(shortcutActionList, QStringList(settings->shortcutTypeText((shortcut_type) i)));
 				item->setData(0, Qt::UserRole, i);
