@@ -1745,6 +1745,70 @@ void ExpressionEdit::inputMethodEvent(QInputMethodEvent *event) {
 		wrapSelection(event->commitString());
 		return;
 	}
+	if(event->preeditString().isEmpty()) {
+		if(event->commitString() == "*") {
+			if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
+				emit calculateRPNRequest(OPERATION_MULTIPLY);
+				return;
+			}
+			if(expressionInQuotes()) {QPlainTextEdit::inputMethodEvent(event); return;}
+			if(doChainMode(settings->multiplicationSign())) return;
+			wrapSelection(settings->multiplicationSign());
+			return;
+		} else if(event->commitString() == "-") {
+			if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
+				int pos = 0;
+				if(textCursor().hasSelection()) pos = textCursor().selectionStart();
+				else pos = textCursor().position();
+				if(pos >= 2) {
+					pos--;
+					if((document()->characterAt(pos) == 'E' || document()->characterAt(pos) == 'e') && document()->characterAt(pos - 1).isNumber()) {
+						insertPlainText(settings->printops.use_unicode_signs ? SIGN_MINUS : "-");
+						return;
+					}
+				}
+				emit calculateRPNRequest(OPERATION_SUBTRACT);
+				return;
+			}
+			if(expressionInQuotes()) {QPlainTextEdit::inputMethodEvent(event); return;}
+			if(doChainMode(settings->printops.use_unicode_signs ? SIGN_MINUS : "-")) return;
+			wrapSelection(settings->printops.use_unicode_signs ? SIGN_MINUS : "-");
+			return;
+		} else if(event->commitString() == "^") {
+			if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
+				emit calculateRPNRequest(settings->caret_as_xor ? OPERATION_BITWISE_XOR : OPERATION_RAISE);
+				return;
+			}
+			if(expressionInQuotes()) {QPlainTextEdit::inputMethodEvent(event); return;}
+			if(doChainMode(settings->caret_as_xor ? " xor " : "^")) return;
+			wrapSelection(settings->caret_as_xor ? " xor " : "^");
+			return;
+		} else if(event->commitString() == "+") {
+			if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
+				emit calculateRPNRequest(OPERATION_ADD);
+				return;
+			}
+			if(expressionInQuotes()) {QPlainTextEdit::inputMethodEvent(event); return;}
+			if(doChainMode("+")) return;
+			wrapSelection("+");
+			return;
+		} else if(event->commitString() == "/") {
+			if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
+				emit calculateRPNRequest(OPERATION_DIVIDE);
+				return;
+			}
+			if(expressionInQuotes()) {QPlainTextEdit::inputMethodEvent(event); return;}
+			if(doChainMode(settings->divisionSign(false))) return;
+			wrapSelection(settings->divisionSign(false));
+			return;
+		} else if(event->commitString() == ")") {
+			QTextCursor cur = textCursor();
+			if(cur.hasSelection() || cur.position() == 0) {
+				smartParentheses();
+				return;
+			}
+		}
+	}
 	QPlainTextEdit::inputMethodEvent(event);
 }
 void ExpressionEdit::keyReleaseEvent(QKeyEvent *event) {
