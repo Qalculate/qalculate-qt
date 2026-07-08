@@ -2782,6 +2782,7 @@ bool test_autocalculatable(const MathStructure &m, bool where = false, bool top 
 			mf.calculateFunctions(settings->evalops, false);
 			return false;
 		}
+		if(m.function()->id() == FUNCTION_ID_INTEGRATE && m.size() >= 3 && m[2].isUndefined() && !m[1].isUndefined()) return false;
 		if(m.function()->id() == FUNCTION_ID_SAVE || m.function()->id() == FUNCTION_ID_PLOT || m.function()->id() == FUNCTION_ID_EXPORT || m.function()->id() == FUNCTION_ID_LOAD || m.function()->id() == FUNCTION_ID_COMMAND || (m.function()->subtype() == SUBTYPE_USER_FUNCTION && ((UserFunction*) m.function())->formula().find("plot(") != std::string::npos)) return false;
 		if(m.size() > 0 && (m.function()->id() == FUNCTION_ID_FACTORIAL || m.function()->id() == FUNCTION_ID_DOUBLE_FACTORIAL || m.function()->id() == FUNCTION_ID_MULTI_FACTORIAL) && m[0].isInteger() && m[0].number().integerLength() > 17) {
 			return false;
