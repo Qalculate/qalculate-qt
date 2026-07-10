@@ -3785,6 +3785,10 @@ You can get version %3 at %2.</source>
         <source>Activate normal display mode</source>
         <translation>Активировать простой режим отображения</translation>
     </message>
+    <message>
+        <source>Insert parentheses</source>
+        <translation type="unfinished">Вставить скобки</translation>
+    </message>
 </context>
 <context>
     <name>QalculateTranslator</name>

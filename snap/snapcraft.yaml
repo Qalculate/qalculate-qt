@@ -1,7 +1,7 @@
 name: qalculate-qt
 adopt-info: qalculate-qt
 title: Qalculate! (Qt)
-version: '5.11.0'
+version: '5.12.0'
 license: GPL-2.0+
 summary: The ultimate desktop calculator
 description: |
@@ -49,7 +49,7 @@ apps:
 parts:
   libqalculate:
     source: https://github.com/Qalculate/libqalculate.git
-    source-tag: v5.11.0
+    source-tag: v5.12.0
     source-depth: 1
     plugin: autotools
     autotools-configure-parameters:
@@ -86,8 +86,8 @@ parts:
       - -usr/share/lintian
 
   qalculate-qt:
-    source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.11.0/qalculate-qt-5.11.0.tar.gz
-    source-checksum: sha512/9b0e3426bfb73815d0076e23d5e3c178dac8045338efd149fe5764d4eb0999b7d82274fe94ea06f60b8e0d0f151d25fc31f4412d3d869e2cb5e27a0be03cb661
+    source: https://github.com/Qalculate/qalculate-qt/releases/download/v5.12.0/qalculate-qt-5.12.0.tar.gz
+    source-checksum: sha512/ebedff48784efa19200a4496d250c99b56af03e79626ce5eefb77da81bb5bf80cae35dae4482da87fd1303a875ff4467061c795bf7ba4a36044fd013b44e4d21
     plugin: qmake
     qmake-parameters:
       - COMPILE_RESOURCES=yes

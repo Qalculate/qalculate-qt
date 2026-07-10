@@ -4430,8 +4430,8 @@ void ExpressionEdit::smartParentheses(bool smart) {
 			CALCULATOR->parseSigns(str);
 			bool right = (str.empty() || is_in(OPERATORS SPACES SEXADOT DOT LEFT_VECTOR_WRAP LEFT_PARENTHESIS COMMAS, str[str.length() - 1]));
 			if(!right) {
-				size_t i = str.find_last_of(NOT_IN_NAMES);
-				if((i == std::string::npos || i < str.length() - 1) && CALCULATOR->getActiveFunction(i == std::string::npos ? str : str.substr(i + 1, str.length() - (i + 1)))) right = true;;
+				size_t i = str.find_last_of(NOT_IN_NAMES NUMBERS);
+				if((i == std::string::npos || i < str.length() - 1) && CALCULATOR->getActiveFunction(i == std::string::npos ? str : str.substr(i + 1, str.length() - (i + 1)))) right = true;
 			}
 			if(right) {
 				istart = iend;
