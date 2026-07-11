@@ -9443,7 +9443,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2328"/>
         <source>Insert parentheses</source>
-        <translation type="unfinished">插入括號</translation>
+        <translation>插入括號</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2329"/>
