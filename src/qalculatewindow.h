@@ -321,6 +321,7 @@ class QalculateWindow : public QMainWindow {
 		void updateKeypadTitle();
 		void keypadPreferencesChanged();
 		void resultBasesLinkActivated(const QString&);
+		void resultBasesLinkHovered(const QString&);
 		void showBasesContextMenu(const QPoint&);
 		void copyBases();
 		void onExpressionPositionChanged();

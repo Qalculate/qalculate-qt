@@ -903,6 +903,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexEdit->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(hexEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
 	connect(binEdit, SIGNAL(linkActivated(const QString&)), this, SLOT(resultBasesLinkActivated(const QString&)));
+	connect(binEdit, SIGNAL(linkHovered(const QString&)), this, SLOT(resultBasesLinkHovered(const QString&)));
 
 	keypad = new KeypadWidget(this);
 	keypadDock = new QalculateDockWidget(this, expressionEdit);
@@ -6709,6 +6710,26 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
 	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
+}
+
+void QalculateWindow::resultBasesLinkHovered(const QString &s) {
+	if(s.isEmpty()) {
+		QToolTip::hideText();
+		return;
+	}
+	QString str = tr("Bit %1").arg(s);
+	Number nr(s.toInt());
+	nr.exp2();
+	bool approx = false;
+	PrintOptions po;
+	po.digit_grouping = settings->printops.digit_grouping;
+	po.min_exp = 20;
+	po.is_approximate = &approx;
+	std::string snum = nr.print(po);
+	if(approx || nr.isApproximate()) str += " " SIGN_ALMOST_EQUAL " ";
+	else str += " = ";
+	str += QString::fromStdString(snum);
+	QToolTip::showText(QCursor::pos(), str);
 }
 
 void set_result_bases(const MathStructure &m) {
