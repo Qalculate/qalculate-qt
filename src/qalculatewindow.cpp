@@ -118,7 +118,7 @@ bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
 bool had_to_expression = false;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
-QString lastx_text, current_status;
+QString lastx_text, current_status, prev_base_set_expression;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
@@ -3660,6 +3660,7 @@ void QalculateWindow::onAnswerClicked() {
 	}
 }
 void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
+	int prev_inbase = settings->evalops.parse_options.base;
 	if(b && v != settings->evalops.parse_options.base) {
 		settings->evalops.parse_options.base = v;
 		QAction *action = find_child_data(this, "group_inbase", v);
@@ -3674,6 +3675,28 @@ void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 		QAction *action = find_child_data(this, "group_outbase", v);
 		if(action) action->setChecked(true);
 		if(b_update) resultFormatUpdated();
+	}
+	if(b && prev_inbase != settings->evalops.parse_options.base && (prev_inbase == 8 || prev_inbase == 10 || prev_inbase == 2 || prev_inbase == 16)) {
+		QTextCursor cur = expressionEdit->textCursor();
+		if(cur.atEnd() && !expressionEdit->document()->isEmpty()) {
+			QString str = expressionEdit->toPlainText();
+			if(str != prev_base_set_expression) {
+				MathFunction *f = NULL;
+				if(prev_inbase == 2) f = CALCULATOR->getFunctionById(FUNCTION_ID_BIN);
+				else if(prev_inbase == 8) f = CALCULATOR->getFunctionById(FUNCTION_ID_OCT);
+				else if(prev_inbase == 10) f = CALCULATOR->getFunctionById(FUNCTION_ID_DEC);
+				else if(prev_inbase == 16) f = CALCULATOR->getFunctionById(FUNCTION_ID_HEX);
+				int i = str.length();
+				while(i > 0 && (str[i - 1].isSpace() || last_is_operator(str.mid(0, i).toStdString(), prev_inbase != 16))) i--;
+				if(i > 0 && f) {
+					str.insert(i, ")");
+					str.insert(0, ")");
+					str.insert(0, QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)));
+					expressionEdit->setExpression(str);
+					prev_base_set_expression = str;
+				}
+			}
+		}
 	}
 	keypad->updateBase();
 }
@@ -6709,7 +6732,7 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	po.min_exp = 0;
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
-	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
+	expressionEdit->setExpression(Number(result_bin, pa).print(po));
 }
 
 void QalculateWindow::resultBasesLinkHovered(const QString &s) {
