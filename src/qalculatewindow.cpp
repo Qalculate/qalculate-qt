@@ -3690,7 +3690,7 @@ void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 				while(i > 0 && (str[i - 1].isSpace() || last_is_operator(str.mid(0, i).toStdString(), prev_inbase != 16))) i--;
 				if(i > 0 && f) {
 					str.insert(i, ")");
-					str.insert(0, ")");
+					str.insert(0, "(");
 					str.insert(0, QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)));
 					expressionEdit->setExpression(str);
 					prev_base_set_expression = str;
@@ -6732,7 +6732,10 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	po.min_exp = 0;
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
+	QTextCursor cur = expressionEdit->textCursor();
+	bool call = cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
 	expressionEdit->setExpression(Number(result_bin, pa).print(po));
+	if(call) expressionEdit->selectAll();
 }
 
 void QalculateWindow::resultBasesLinkHovered(const QString &s) {
