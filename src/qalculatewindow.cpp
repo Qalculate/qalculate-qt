@@ -846,7 +846,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
+	use_bold_bin1 = -1;
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
+	binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
 #endif
@@ -6670,6 +6673,17 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 void QalculateWindow::updateResultBases() {
 	SET_BINARY_BITS
 	if(result_bin.length() == (size_t) binary_bits + (binary_bits / 4) - 1) {
+		if(use_bold_bin1 < 0 && result_bin.find("1") != std::string::npos) {
+			QFontMetrics fm(binEdit->font());
+			QFont bfont(binEdit->font());
+			bfont.setWeight(QFont::Bold);
+			QFontMetrics fmb(bfont);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+			use_bold_bin1 = (fm.horizontalAdvance("01") == fmb.horizontalAdvance("01") && fm.lineSpacing() == fmb.lineSpacing());
+#else
+			use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
+#endif
+		}
 		QString sbin = "<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>", sbin_i;
 		int i2 = 0;
 		size_t pos = 0;
@@ -6684,8 +6698,11 @@ void QalculateWindow::updateResultBases() {
 							inhtml = true;
 						} else if(sbin_i[i2] == '<') {
 							inhtml = false;
-						} else if(!inhtml && (sbin_i[i2] == '0' || sbin_i[i2] == '1')) {
+						} else if(!inhtml && (sbin_i[i2] == '0' || (!use_bold_bin1 && sbin_i[i2] == '1'))) {
 							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
+							n++;
+						} else if(!inhtml && sbin_i[i2] == '1') {
+							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; font-weight: bold; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
 							n++;
 						}
 					}
@@ -6701,7 +6718,7 @@ void QalculateWindow::updateResultBases() {
 				sbin_i += "</td></tr><tr>";
 				i2 = sbin_i.length();
 			}
-			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
+			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"91%\">";
 			sbin_i += QString::number(i);
 			sbin_i += "</font></td>";
 		}
@@ -6755,7 +6772,7 @@ void QalculateWindow::resultBasesLinkHovered(const QString &s) {
 	if(approx || nr.isApproximate()) str += " " SIGN_ALMOST_EQUAL " ";
 	else str += " = ";
 	str += QString::fromStdString(snum);
-	QToolTip::showText(QCursor::pos(), str);
+	QToolTip::showText(QCursor::pos(), str, this);
 }
 
 void set_result_bases(const MathStructure &m) {
@@ -6977,7 +6994,7 @@ bool contains_updating_time(const MathStructure &m) {
 
 bool contains_extreme_number(const MathStructure &m) {
 	if(m.isNumber()) {
-		if(m.number().isFloatingPoint() && (mpfr_get_exp(m.number().internalUpperFloat()) > 10000000L || mpfr_get_exp(m.number().internalLowerFloat()) < -10000000L)) {
+		if(m.number().isFloatingPoint() && (mpfr_get_exp(m.number().internalUpperFloat()) > 10000000L || (m.number().isNonZero() && mpfr_get_exp(m.number().internalUpperFloat()) < -10000000L && mpfr_get_exp(m.number().internalLowerFloat()) < -10000000L))) {
 			return true;
 		} else if(m.number().isInteger() && ::abs(m.number().integerLength()) > 10000000L) {
 			return true;
@@ -8255,7 +8272,10 @@ void QalculateWindow::changeEvent(QEvent *e) {
 			statusLabelLeft->setFont(font);
 			statusLabelRight->setFont(font);
 		}
+		use_bold_bin1 = -1;
 		QFont binfont(QApplication::font());
+		binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+		binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 		binfont.setFeature("tnum", 1);
 #endif

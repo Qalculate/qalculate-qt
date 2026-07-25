@@ -116,6 +116,7 @@ class QalculateWindow : public QMainWindow {
 		QTimer *ecTimer, *rfTimer, *autoCalculateTimer, *decimalsTimer, *resizeTimer, *emhTimer, *testTimer;
 		qint64 prev_test_time;
 		int prev_test_type;
+		int use_bold_bin1;
 
 		QTableWidget *rpnView;
 		QAction *rpnUpAction, *rpnDownAction, *rpnSwapAction, *rpnCopyAction, *rpnLastxAction, *rpnDeleteAction, *rpnClearAction;
