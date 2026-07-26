@@ -3689,10 +3689,29 @@ void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 				else if(prev_inbase == 8) f = CALCULATOR->getFunctionById(FUNCTION_ID_OCT);
 				else if(prev_inbase == 10) f = CALCULATOR->getFunctionById(FUNCTION_ID_DEC);
 				else if(prev_inbase == 16) f = CALCULATOR->getFunctionById(FUNCTION_ID_HEX);
+				else f = CALCULATOR->getFunctionById(FUNCTION_ID_BASE);
+				if(f && f->id() != FUNCTION_ID_BASE) {
+					std::string sf = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true);
+					for(size_t i = 0; i < sf.length(); i++) {
+						if((sf[i] < 'a' || sf[i] > 'f') && (sf[i] < 'A' || sf[i] > 'F')) {
+							sf = "";
+							break;
+						}
+					}
+					if(!sf.empty()) f = CALCULATOR->getFunctionById(FUNCTION_ID_BASE);
+				}
 				int i = str.length();
 				while(i > 0 && (str[i - 1].isSpace() || last_is_operator(str.mid(0, i).toStdString(), prev_inbase != 16))) i--;
 				if(i > 0 && f) {
-					str.insert(i, ")");
+					if(f->id() == FUNCTION_ID_BASE) {
+						std::string str_end = CALCULATOR->getComma();
+						str_end += " ";
+						str_end += print_with_evalops(prev_inbase);
+						str_end += ")";
+						str.insert(i, QString::fromStdString(str_end));
+					} else {
+						str.insert(i, ")");
+					}
 					str.insert(0, "(");
 					str.insert(0, QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)));
 					expressionEdit->setExpression(str);
@@ -6683,6 +6702,18 @@ void QalculateWindow::updateResultBases() {
 #else
 			use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
 #endif
+			if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
+				use_bold_bin1 = -1;
+				QFont binfont(binEdit->font());
+				binfont.setHintingPreference(QFont::PreferVerticalHinting);
+				binEdit->setFont(binfont);
+				updateResultBases();
+				if(!use_bold_bin1) {
+					binfont.setHintingPreference(QFont::PreferDefaultHinting);
+					binEdit->setFont(binfont);
+				}
+				return;
+			}
 		}
 		QString sbin = "<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>", sbin_i;
 		int i2 = 0;
