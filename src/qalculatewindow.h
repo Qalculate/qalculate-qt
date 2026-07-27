@@ -161,7 +161,7 @@ class QalculateWindow : public QMainWindow {
 	protected slots:
 
 		void testTimeout();
-		void updateBinEditSize(QFont* = NULL);
+		void updateBinEditSize(bool initial = false);
 		void onBinaryBitsChanged();
 		void onTwosChanged();
 		void onSymbolClicked(const QString&);
@@ -221,6 +221,7 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionFontChanged();
 		void onStatusFontChanged();
 		void onKeypadFontChanged();
+		void onBasesFontChanged();
 		void onAppFontChanged();
 		void onAppFontTimer();
 		void fixSplitterPos();

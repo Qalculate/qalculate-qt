@@ -846,37 +846,37 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
+#ifdef _WIN32
+	use_bold_bin1 = 0;
+#else
 	use_bold_bin1 = -1;
+#endif
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
+	if(settings->use_custom_bases_font) binfont.fromString(QString::fromStdString(settings->custom_bases_font));
 	binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
 #endif
 	binEdit->setFont(binfont);
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
-	updateBinEditSize();
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
-	QFontMetrics fm2(settings->use_custom_app_font ? appfont : octEdit->font());
 	octEdit->setAlignment(Qt::AlignRight);
 	octEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	octEdit->setFocusPolicy(Qt::NoFocus);
-	octEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(octEdit, 1, 1);
 	decEdit = new QLabel("0");
 	decEdit->setAlignment(Qt::AlignRight);
 	decEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	decEdit->setFocusPolicy(Qt::NoFocus);
-	decEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(decEdit, 2, 1);
 	hexEdit = new QLabel("0");
 	hexEdit->setAlignment(Qt::AlignRight);
 	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	hexEdit->setFocusPolicy(Qt::NoFocus);
-	hexEdit->setMinimumHeight(fm2.lineSpacing());
 	SET_BINARY_BITS
 	result_bin = "";
 	result_hex = "";
@@ -989,11 +989,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
 	if(settings->custom_status_font.empty()) settings->custom_status_font = statusLabelLeft->font().toString().toStdString();
 	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
+	if(settings->custom_bases_font.empty()) settings->custom_bases_font = octEdit->font().toString().toStdString();
 	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
+	if(settings->use_custom_bases_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font)); octEdit->setFont(font); decEdit->setFont(font); hexEdit->setFont(font);}
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
 	if(settings->use_custom_status_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_status_font)); statusLabelLeft->setFont(font); statusLabelRight->setFont(font);}
+
+	updateBinEditSize(true);
 
 	loadShortcuts();
 
@@ -8303,15 +8307,20 @@ void QalculateWindow::changeEvent(QEvent *e) {
 			statusLabelLeft->setFont(font);
 			statusLabelRight->setFont(font);
 		}
-		use_bold_bin1 = -1;
-		QFont binfont(QApplication::font());
-		binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-		binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
+		if(!settings->use_custom_status_font) {
+			QFont binfont(QApplication::font());
+			binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+			binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-		binfont.setFeature("tnum", 1);
+			binfont.setFeature("tnum", 1);
 #endif
-		binEdit->setFont(binfont);
-		updateBinEditSize();
+			binEdit->setFont(binfont);
+			updateBinEditSize();
+#ifndef _WIN32
+			use_bold_bin1 = -1;
+			updateResultBases();
+#endif
+		}
 	}
 	QMainWindow::changeEvent(e);
 }
@@ -8322,18 +8331,30 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 	QMainWindow::resizeEvent(e);
 }
 
-void QalculateWindow::updateBinEditSize(QFont *font) {
-	QFontMetrics fm2(font ? *font : binEdit->font());
+void QalculateWindow::updateBinEditSize(bool initial) {
+	QFontMetrics fm2(binEdit->font());
 	SET_BINARY_BITS
 	int rows = binary_bits / 32;
 	if(binary_bits % 32 > 0) rows++;
-	QString row_string;
+	QString row_string = " ";
 	for(int i = binary_bits > 32 ? 32 : binary_bits; i > 0; i -= 4) {
 		if(i < 32 && i < binary_bits) row_string += " ";
 		row_string += "0000";
 	}
 	binEdit->setMinimumWidth(fm2.boundingRect(row_string).width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
 	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	QFontMetrics fm(octEdit->font());
+	octEdit->setMinimumHeight(fm.lineSpacing());
+	decEdit->setMinimumHeight(fm.lineSpacing());
+	hexEdit->setMinimumHeight(fm.lineSpacing());
+	if(!initial) {
+		qApp->processEvents();
+		QList<QDockWidget*> ld;
+		ld << basesDock;
+		QList<int> lh;
+		lh << basesDock->sizeHint().height();
+		resizeDocks(ld, lh, Qt::Vertical);
+	}
 }
 
 void QalculateWindow::fetchExchangeRates() {
@@ -9349,6 +9370,22 @@ void QalculateWindow::onKeypadFontChanged() {
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	else keypad->setFont(QApplication::font());
 }
+void QalculateWindow::onBasesFontChanged() {
+	if(settings->use_custom_bases_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font)); octEdit->setFont(font); decEdit->setFont(font); hexEdit->setFont(font);}
+	else {octEdit->setFont(QApplication::font()); decEdit->setFont(QApplication::font()); hexEdit->setFont(QApplication::font());}
+	QFont binfont(octEdit->font());
+	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	binfont.setFeature("tnum", 1);
+#endif
+	binEdit->setFont(binfont);
+	updateBinEditSize();
+#ifndef _WIN32
+	use_bold_bin1 = -1;
+	updateResultBases();
+#endif
+}
 void QalculateWindow::onAppFontTimer() {
 	onAppFontChanged();
 	loadInitialHistory();
@@ -9821,6 +9858,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));
 	connect(preferencesDialog, SIGNAL(statusFontChanged()), this, SLOT(onStatusFontChanged()));
 	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
+	connect(preferencesDialog, SIGNAL(basesFontChanged()), this, SLOT(onBasesFontChanged()));
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), historyView, SLOT(reloadHistory()));

@@ -475,6 +475,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX1(tr("Custom keypad font:"), settings->use_custom_keypad_font, keypadFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_keypad_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(keypadFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	BOX1(tr("Custom number bases font:"), settings->use_custom_bases_font, basesFontToggled(bool));
+	button = new QPushButton(font_string(settings->custom_bases_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(basesFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	BOX1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_app_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
@@ -1062,6 +1065,23 @@ void PreferencesDialog::keypadFontClicked() {
 void PreferencesDialog::keypadFontToggled(bool b) {
 	settings->use_custom_keypad_font = b;
 	emit keypadFontChanged();
+}
+void PreferencesDialog::basesFontClicked() {
+	QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font));
+	QFontDialog *dialog = new QFontDialog(font, this);
+	if(settings->always_on_top) dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
+	if(dialog->exec() == QDialog::Accepted) {
+		settings->save_custom_bases_font = true;
+		settings->use_custom_bases_font = true;
+		settings->custom_bases_font = dialog->selectedFont().toString().toStdString();
+		qobject_cast<QPushButton*>(sender())->setText(font_string(settings->custom_bases_font));
+		emit basesFontChanged();
+	}
+	dialog->deleteLater();
+}
+void PreferencesDialog::basesFontToggled(bool b) {
+	settings->use_custom_bases_font = b;
+	emit basesFontChanged();
 }
 void PreferencesDialog::appFontClicked() {
 	QFont font; font.fromString(QString::fromStdString(settings->custom_app_font));

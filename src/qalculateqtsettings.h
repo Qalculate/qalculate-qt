@@ -300,8 +300,8 @@ class QalculateQtSettings : QObject {
 		bool format_result;
 		bool first_time;
 		bool enable_input_method;
-		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font, use_custom_status_font;
-		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font, save_custom_status_font;
+		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font, use_custom_status_font, use_custom_bases_font;
+		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font, save_custom_status_font, save_custom_bases_font;
 		QFont saved_app_font;
 		int replace_expression;
 		bool autocopy_result;
@@ -322,7 +322,7 @@ class QalculateQtSettings : QObject {
 		int history_expression_type;
 		bool copy_ascii, copy_ascii_without_units;
 		bool close_with_esc;
-		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font, custom_status_font;
+		std::string custom_result_font, custom_expression_font, custom_keypad_font, custom_app_font, custom_status_font, custom_bases_font;
 		KnownVariable *vans[5], *v_memory;
 		MathStructure *current_result;
 		MathFunction *f_answer;
