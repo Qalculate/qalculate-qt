@@ -162,6 +162,7 @@ class QalculateWindow : public QMainWindow {
 
 		void testTimeout();
 		void updateBinEditSize(bool initial = false);
+		void modifyBinEditFont(QFont&);
 		void onBinaryBitsChanged();
 		void onTwosChanged();
 		void onSymbolClicked(const QString&);

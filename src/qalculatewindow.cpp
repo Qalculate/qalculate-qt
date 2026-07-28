@@ -846,18 +846,10 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
-#ifdef _WIN32
 	use_bold_bin1 = 0;
-#else
-	use_bold_bin1 = -1;
-#endif
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
 	if(settings->use_custom_bases_font) binfont.fromString(QString::fromStdString(settings->custom_bases_font));
-	binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-	binfont.setFeature("tnum", 1);
-#endif
+	modifyBinEditFont(binfont);
 	binEdit->setFont(binfont);
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
@@ -6696,29 +6688,6 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 void QalculateWindow::updateResultBases() {
 	SET_BINARY_BITS
 	if(result_bin.length() == (size_t) binary_bits + (binary_bits / 4) - 1) {
-		if(use_bold_bin1 < 0 && result_bin.find("1") != std::string::npos) {
-			QFontMetrics fm(binEdit->font());
-			QFont bfont(binEdit->font());
-			bfont.setWeight(QFont::Bold);
-			QFontMetrics fmb(bfont);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-			use_bold_bin1 = (fm.horizontalAdvance("01") == fmb.horizontalAdvance("01") && fm.lineSpacing() == fmb.lineSpacing());
-#else
-			use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
-#endif
-			if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
-				use_bold_bin1 = -1;
-				QFont binfont(binEdit->font());
-				binfont.setHintingPreference(QFont::PreferVerticalHinting);
-				binEdit->setFont(binfont);
-				updateResultBases();
-				if(!use_bold_bin1) {
-					binfont.setHintingPreference(QFont::PreferDefaultHinting);
-					binEdit->setFont(binfont);
-				}
-				return;
-			}
-		}
 		QString sbin = "<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>", sbin_i;
 		int i2 = 0;
 		size_t pos = 0;
@@ -6796,7 +6765,7 @@ void QalculateWindow::resultBasesLinkHovered(const QString &s) {
 		return;
 	}
 	QString str = tr("Bit %1").arg(s);
-	Number nr(s.toInt());
+	Number nr(s.toInt() - 1);
 	nr.exp2();
 	bool approx = false;
 	PrintOptions po;
@@ -8309,17 +8278,10 @@ void QalculateWindow::changeEvent(QEvent *e) {
 		}
 		if(!settings->use_custom_status_font) {
 			QFont binfont(QApplication::font());
-			binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-			binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-			binfont.setFeature("tnum", 1);
-#endif
+			modifyBinEditFont(binfont);
 			binEdit->setFont(binfont);
 			updateBinEditSize();
-#ifndef _WIN32
-			use_bold_bin1 = -1;
 			updateResultBases();
-#endif
 		}
 	}
 	QMainWindow::changeEvent(e);
@@ -8331,6 +8293,36 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 	QMainWindow::resizeEvent(e);
 }
 
+void QalculateWindow::modifyBinEditFont(QFont &binfont) {
+	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	binfont.setFeature("tnum", 1);
+#endif
+#ifndef _WIN32
+	QFontMetrics fm(binfont);
+	QFont bfont(binfont);
+	bfont.setWeight(QFont::Bold);
+	QFontMetrics fmb(bfont);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+	use_bold_bin1 = (fm.horizontalAdvance("01") == fmb.horizontalAdvance("01") && fm.lineSpacing() == fmb.lineSpacing());
+#else
+	use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
+#endif
+	if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
+		binfont.setHintingPreference(QFont::PreferVerticalHinting);
+		bfont.setHintingPreference(QFont::PreferVerticalHinting);
+		QFontMetrics fm2(binEdit->font());
+		QFontMetrics fmb2(bfont);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+		use_bold_bin1 = (fm2.horizontalAdvance("01") == fmb2.horizontalAdvance("01") && fm2.lineSpacing() == fmb2.lineSpacing());
+#else
+		use_bold_bin1 = (fm2.averageCharWidth() == fmb2.averageCharWidth() && fm2.lineSpacing() == fmb2.lineSpacing());
+#endif
+		if(!use_bold_bin1) binfont.setHintingPreference(QFont::PreferDefaultHinting);
+	}
+#endif
+}
 void QalculateWindow::updateBinEditSize(bool initial) {
 	QFontMetrics fm2(binEdit->font());
 	SET_BINARY_BITS
@@ -8342,7 +8334,7 @@ void QalculateWindow::updateBinEditSize(bool initial) {
 		row_string += "0000";
 	}
 	binEdit->setMinimumWidth(fm2.boundingRect(row_string).width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
-	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 - 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
 	QFontMetrics fm(octEdit->font());
 	octEdit->setMinimumHeight(fm.lineSpacing());
 	decEdit->setMinimumHeight(fm.lineSpacing());
@@ -9374,17 +9366,10 @@ void QalculateWindow::onBasesFontChanged() {
 	if(settings->use_custom_bases_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font)); octEdit->setFont(font); decEdit->setFont(font); hexEdit->setFont(font);}
 	else {octEdit->setFont(QApplication::font()); decEdit->setFont(QApplication::font()); hexEdit->setFont(QApplication::font());}
 	QFont binfont(octEdit->font());
-	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-	binfont.setFeature("tnum", 1);
-#endif
+	modifyBinEditFont(binfont);
 	binEdit->setFont(binfont);
 	updateBinEditSize();
-#ifndef _WIN32
-	use_bold_bin1 = -1;
 	updateResultBases();
-#endif
 }
 void QalculateWindow::onAppFontTimer() {
 	onAppFontChanged();

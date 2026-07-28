@@ -4199,7 +4199,7 @@ void ExpressionEdit::highlightParentheses() {
 			bfont.setWeight(QFont::Bold);
 			QFontMetrics fmb(bfont);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-			use_bold_highlight = (fm.horizontalAdvance('(') == fmb.horizontalAdvance('('));
+			use_bold_highlight = (fm.horizontalAdvance("()") == fmb.horizontalAdvance("()"));
 #else
 			use_bold_highlight = (fm.averageCharWidth() == fmb.averageCharWidth());
 #endif
