@@ -846,7 +846,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
-	use_bold_bin1 = 0;
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
 	if(settings->use_custom_bases_font) binfont.fromString(QString::fromStdString(settings->custom_bases_font));
 	modifyBinEditFont(binfont);
@@ -6688,45 +6687,75 @@ void QalculateWindow::executeCommand(int command_type, bool show_result, std::st
 void QalculateWindow::updateResultBases() {
 	SET_BINARY_BITS
 	if(result_bin.length() == (size_t) binary_bits + (binary_bits / 4) - 1) {
-		QString sbin = "<table align=\"right\" cellspacing=\"0\" border=\"0\"><tr><td>", sbin_i;
-		int i2 = 0;
-		size_t pos = 0;
-		QString link_color = binEdit->palette().text().color().name();
-		for(int i = binary_bits; i >= 0; i -= 8) {
-			if(i % 32 == 0 || i == binary_bits) {
-				if(!sbin_i.isEmpty()) {
-					bool inhtml = false;
-					int n = i + 1;
-					for(; i2 >= 0; i2--) {
-						if(sbin_i[i2] == '>') {
-							inhtml = true;
-						} else if(sbin_i[i2] == '<') {
-							inhtml = false;
-						} else if(!inhtml && (sbin_i[i2] == '0' || (!use_bold_bin1 && sbin_i[i2] == '1'))) {
-							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
-							n++;
-						} else if(!inhtml && sbin_i[i2] == '1') {
-							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; font-weight: bold; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
-							n++;
-						}
+		QString sbin;
+
+		int num_chunks = (binary_bits + 31) / 32;
+
+		// Single flat table for ALL chunks — align right to match the other bases
+		sbin += "<table cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"margin:0;padding:0;float:right\">";
+
+		// one chunk: 32 bits shown in one table row, together with a second row that shows the position numbers
+		for(int chunk = 0; chunk < num_chunks; chunk++) {
+			int chunk_msb = binary_bits - 1 - chunk * 32;
+			int chunk_lsb = chunk_msb - 31;
+			if(chunk_lsb < 0) chunk_lsb = 0;
+
+			// Row 1: Bit data
+			sbin += "<tr>";
+			for(int bit = chunk_msb; bit >= chunk_lsb; bit--) {
+				if(bit < chunk_msb) {
+					if((bit + 1) % 8 == 0) {
+						sbin += "<td>&nbsp;&nbsp;</td>";
+					} else if((bit + 1) % 4 == 0) {
+						sbin += "<td>&nbsp;</td>";
 					}
-					if(pos > 39) sbin += "</td></tr><tr>";
-					sbin += sbin_i;
 				}
-				if(i == 0) break;
-				if(binary_bits <= 32) sbin_i = QString::fromStdString(result_bin);
-				else sbin_i = QString::fromStdString(result_bin.substr(pos, pos > 0 ? 40 : 39));
-				if(pos == 0) pos = 39;
-				else pos += 40;
-				sbin_i.replace(" ", "&nbsp;</td><td>");
-				sbin_i += "</td></tr><tr>";
-				i2 = sbin_i.length();
+
+				size_t pos = (size_t)((binary_bits - 1 - bit) + (binary_bits - 1 - bit) / 4);
+				char c = result_bin[pos];
+				QString bg, fg;
+				if(c == '1') { 
+					bg = "black"; 
+					fg = "white";
+				} else { 
+					bg = "white"; 
+					fg = "black"; 
+				}
+
+				sbin += QString("<td align=\"center\"><table cellspacing=\"0\" cellpadding=\"3\" border=\"1\" style=\"margin:0;padding:0\"><tr>");
+				sbin += QString("<td bgcolor=\"%1\"><a href=\"%2\" style=\"text-decoration: none; color: %3\">%4</a></td></tr></table></td>")
+					.arg(bg).arg(bit).arg(fg).arg(c);
 			}
-			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"91%\">";
-			sbin_i += QString::number(i);
-			sbin_i += "</font></td>";
+			sbin += "</tr>";
+
+			// Row 2: Bit position numbers
+			sbin += "<tr>";
+			for(int bit = chunk_msb; bit >= chunk_lsb; bit--) {
+				if(bit < chunk_msb) {
+					if((bit + 1) % 8 == 0) {
+						sbin += "<td>&nbsp;&nbsp;</td>";
+					} else if((bit + 1) % 4 == 0) {
+						sbin += "<td>&nbsp;</td>";
+					}
+				}
+
+				QString num_str;
+				if(bit == chunk_msb || bit % 8 == 0) {
+					num_str = QString::number(bit);
+				}
+				sbin += QString("<td align=\"center\" style=\"padding:0;margin:0\"><font color=\"gray\" size=\"1\">%1</font></td>")
+					.arg(num_str.isEmpty() ? QString::fromLatin1("&nbsp;") : num_str);
+			}
+			sbin += "</tr>";
+
+			// Minimal spacer row between chunks (only between, not after last)
+			if(chunk < num_chunks - 1) {
+				sbin += "<tr><td colspan=\"65\" style=\"padding:0;margin:0;line-height:1px;font-size:1px\">&nbsp;</td></tr>";
+			}
 		}
-		sbin += "</tr><table>";
+
+		sbin += "</table>";
+
 		binEdit->setText(sbin);
 	} else {
 		binEdit->setText(QString::fromStdString(result_bin));
@@ -6738,12 +6767,16 @@ void QalculateWindow::updateResultBases() {
 
 bool result_negative = false;
 void QalculateWindow::resultBasesLinkActivated(const QString &s) {
-	size_t n = s.toInt();
-	n += (n - 1) / 4;
-	if(n > result_bin.length()) return;
-	n = result_bin.length() - n;
-	if(result_bin[n] == '0') result_bin[n] = '1';
-	else if(result_bin[n] == '1') result_bin[n] = '0';
+	SET_BINARY_BITS
+	int bitNum = s.toInt();
+	if(bitNum < 0 || bitNum >= binary_bits) return;
+	// Calculate position in result_bin string (which has spaces every 4 chars)
+	size_t pos = (size_t)((binary_bits - 1 - bitNum) + (binary_bits - 1 - bitNum) / 4);
+	if(pos >= result_bin.length()) return;
+	if(result_bin[pos] == '0') 
+		result_bin[pos] = '1';
+	else if(result_bin[pos] == '1') 
+		result_bin[pos] = '0';
 	ParseOptions pa;
 	pa.base = BASE_BINARY;
 	pa.twos_complement = settings->evalops.parse_options.twos_complement || result_negative;
@@ -6764,8 +6797,9 @@ void QalculateWindow::resultBasesLinkHovered(const QString &s) {
 		QToolTip::hideText();
 		return;
 	}
-	QString str = tr("Bit %1").arg(s);
-	Number nr(s.toInt() - 1);
+	int bitNum = s.toInt();
+	QString str = tr("Bit %1").arg(bitNum);
+	Number nr(bitNum);
 	nr.exp2();
 	bool approx = false;
 	PrintOptions po;
@@ -8294,33 +8328,8 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 }
 
 void QalculateWindow::modifyBinEditFont(QFont &binfont) {
-	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
-#endif
-#ifndef _WIN32
-	QFontMetrics fm(binfont);
-	QFont bfont(binfont);
-	bfont.setWeight(QFont::Bold);
-	QFontMetrics fmb(bfont);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-	use_bold_bin1 = (fm.horizontalAdvance("01") == fmb.horizontalAdvance("01") && fm.lineSpacing() == fmb.lineSpacing());
-#else
-	use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
-#endif
-	if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
-		binfont.setHintingPreference(QFont::PreferVerticalHinting);
-		bfont.setHintingPreference(QFont::PreferVerticalHinting);
-		QFontMetrics fm2(binEdit->font());
-		QFontMetrics fmb2(bfont);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-		use_bold_bin1 = (fm2.horizontalAdvance("01") == fmb2.horizontalAdvance("01") && fm2.lineSpacing() == fmb2.lineSpacing());
-#else
-		use_bold_bin1 = (fm2.averageCharWidth() == fmb2.averageCharWidth() && fm2.lineSpacing() == fmb2.lineSpacing());
-#endif
-		if(!use_bold_bin1) binfont.setHintingPreference(QFont::PreferDefaultHinting);
-	}
 #endif
 }
 void QalculateWindow::updateBinEditSize(bool initial) {
