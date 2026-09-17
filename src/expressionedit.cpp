@@ -4312,7 +4312,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					return;
 				}
 				iend = unicode_length(str);
-			} else if(!always_add_parentheses && str.find_first_not_of(NUMBER_ELEMENTS SPACE) == std::string::npos) {
+			} else if(!always_add_parentheses && str.find_first_not_of(CALCULATOR->getDecimalPoint() == "," || settings->evalops.parse_options.comma_as_separator ? NUMBER_ELEMENTS SPACE "_" COMMA : NUMBER_ELEMENTS SPACE "_") == std::string::npos) {
 				if(insert_before && !text.isEmpty()) {
 					moveCursor(QTextCursor::Start);
 					insertPlainText(text);

@@ -8295,7 +8295,7 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 
 void QalculateWindow::modifyBinEditFont(QFont &binfont) {
 	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 115);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
 #endif
@@ -8304,21 +8304,13 @@ void QalculateWindow::modifyBinEditFont(QFont &binfont) {
 	QFont bfont(binfont);
 	bfont.setWeight(QFont::Bold);
 	QFontMetrics fmb(bfont);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-	use_bold_bin1 = (fm.horizontalAdvance("01") == fmb.horizontalAdvance("01") && fm.lineSpacing() == fmb.lineSpacing());
-#else
-	use_bold_bin1 = (fm.averageCharWidth() == fmb.averageCharWidth() && fm.lineSpacing() == fmb.lineSpacing());
-#endif
+	use_bold_bin1 = (fm.boundingRect("1111").width() == fmb.boundingRect("1111").width() && fm.lineSpacing() == fmb.lineSpacing());
 	if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
 		binfont.setHintingPreference(QFont::PreferVerticalHinting);
 		bfont.setHintingPreference(QFont::PreferVerticalHinting);
 		QFontMetrics fm2(binEdit->font());
 		QFontMetrics fmb2(bfont);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-		use_bold_bin1 = (fm2.horizontalAdvance("01") == fmb2.horizontalAdvance("01") && fm2.lineSpacing() == fmb2.lineSpacing());
-#else
-		use_bold_bin1 = (fm2.averageCharWidth() == fmb2.averageCharWidth() && fm2.lineSpacing() == fmb2.lineSpacing());
-#endif
+		use_bold_bin1 = (fm2.boundingRect("1111").width() == fmb2.boundingRect("1111").width() && fm2.lineSpacing() == fmb2.lineSpacing());
 		if(!use_bold_bin1) binfont.setHintingPreference(QFont::PreferDefaultHinting);
 	}
 #endif

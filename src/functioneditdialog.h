@@ -155,7 +155,7 @@ class FunctionEditDialog : public QDialog {
 
 		QLineEdit *nameEdit, *titleEdit, *conditionEdit, *exampleEdit;
 		QComboBox *categoryEdit;
-		QCheckBox *hideBox;
+		QCheckBox *hideBox, *temporaryBox;
 		QPlainTextEdit *expressionEdit, *descriptionEdit;
 		QPushButton *okButton, *argDelButton, *argAddButton, *argEditButton, *subDelButton, *subAddButton, *subEditButton;
 		QTreeView *subfunctionsView, *argumentsView;
@@ -183,6 +183,8 @@ class FunctionEditDialog : public QDialog {
 		void selectedArgumentChanged(const QModelIndex&, const QModelIndex&);
 		void onRejected();
 		void editNames();
+		void temporaryClicked();
+		void categoryChanged(const QString&);
 
 	public:
 

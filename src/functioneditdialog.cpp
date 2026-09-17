@@ -854,6 +854,9 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	expressionEdit = new MathTextEdit(this);
 	expressionEdit->setToolTip(tr("Use x, y, and z (e.g. \"(x+y)/2\"), or\n\\x, \\y, \\z, \\a, \\b, … (e.g. \"(\\x+\\y)/2\")"));
 	grid->addWidget(expressionEdit, 2, 0, 1, 2);
+	temporaryBox = new QCheckBox(tr("Temporary"), this);
+	temporaryBox->setChecked(false);
+	grid->addWidget(temporaryBox, 3, 0, 1, 2, Qt::AlignRight);
 	QHBoxLayout *box = new QHBoxLayout();
 	QButtonGroup *group = new QButtonGroup(this); group->setExclusive(true);
 	grid = new QGridLayout(w2);
@@ -937,13 +940,14 @@ FunctionEditDialog::FunctionEditDialog(QWidget *parent) : QDialog(parent) {
 	okButton = buttonBox->button(QDialogButtonBox::Ok);
 	topbox->addWidget(buttonBox);
 	connect(nameEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onNameEdited(const QString&)));
+	connect(temporaryBox, SIGNAL(clicked()), this, SLOT(temporaryClicked()));
 	connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionChanged()));
 	connect(descriptionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionChanged()));
 	connect(conditionEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
 	connect(hideBox, SIGNAL(clicked()), this, SLOT(onFunctionChanged()));
 	connect(titleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
 	connect(exampleEdit, SIGNAL(textEdited(const QString&)), this, SLOT(onFunctionChanged()));
-	connect(categoryEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(onFunctionChanged()));
+	connect(categoryEdit, SIGNAL(currentTextChanged(const QString&)), this, SLOT(categoryChanged(const QString&)));
 	connect(buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(reject()));
 	connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 	connect(subfunctionsView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(selectedSubfunctionChanged(const QModelIndex&, const QModelIndex&)));
@@ -969,7 +973,20 @@ void FunctionEditDialog::editNames() {
 	name_edited = false;
 	onFunctionChanged();
 }
-
+void FunctionEditDialog::categoryChanged(const QString &str) {
+	temporaryBox->setChecked(str == QString::fromStdString(CALCULATOR->temporaryCategory()));
+	onFunctionChanged();
+}
+void FunctionEditDialog::temporaryClicked() {
+	categoryEdit->blockSignals(true);
+	if(temporaryBox->isChecked()) {
+		categoryEdit->setCurrentText(QString::fromStdString(CALCULATOR->temporaryCategory()));
+	} else {
+		categoryEdit->setCurrentText(QString());
+	}
+	categoryEdit->blockSignals(false);
+	onFunctionChanged();
+}
 UserFunction *FunctionEditDialog::createFunction(MathFunction **replaced_item) {
 	if(CALCULATOR->hasToExpression(expressionEdit->toPlainText().trimmed().toStdString())) {
 		QMessageBox::warning(this, tr("Warning"), tr("Conversion (using \"to\") is not supported in functions."), QMessageBox::Ok);
@@ -1234,6 +1251,7 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	name_edited = false;
 	bool read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
+	temporaryBox->setChecked(f->category() == CALCULATOR->temporaryCategory());
 	if(namesEditDialog) namesEditDialog->setNames(f, nameEdit->text());
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);
