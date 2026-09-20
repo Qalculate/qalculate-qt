@@ -302,6 +302,8 @@ class QalculateQtSettings : QObject {
 		bool enable_input_method;
 		bool use_custom_result_font, use_custom_expression_font, use_custom_keypad_font, use_custom_app_font, use_custom_status_font, use_custom_bases_font;
 		bool save_custom_result_font, save_custom_expression_font, save_custom_keypad_font, save_custom_app_font, save_custom_status_font, save_custom_bases_font;
+		bool bold_binary_1;
+		int binary_letter_spacing;
 		QFont saved_app_font;
 		int replace_expression;
 		bool autocopy_result;

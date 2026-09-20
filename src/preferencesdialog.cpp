@@ -463,8 +463,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	l->setRowStretch(r, 1);
 	l = new QGridLayout(w5);
 	r = 0;
+	BOX1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
+	QPushButton *button = new QPushButton(font_string(settings->custom_app_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
+	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	BOX1(tr("Custom history font:"), settings->use_custom_result_font, resultFontToggled(bool));
-	QPushButton *button = new QPushButton(font_string(settings->custom_result_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
+	button = new QPushButton(font_string(settings->custom_result_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(resultFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
 	BOX1(tr("Custom expression font:"), settings->use_custom_expression_font, expressionFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_expression_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
@@ -478,9 +481,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) : QDialog(parent) {
 	BOX1(tr("Custom number bases font:"), settings->use_custom_bases_font, basesFontToggled(bool));
 	button = new QPushButton(font_string(settings->custom_bases_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked());; r++;
 	connect(button, SIGNAL(clicked()), this, SLOT(basesFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
-	BOX1(tr("Custom application font:"), settings->use_custom_app_font, appFontToggled(bool));
-	button = new QPushButton(font_string(settings->custom_app_font), this); l->addWidget(button, r, 1); button->setEnabled(box->isChecked()); r++;
-	connect(button, SIGNAL(clicked()), this, SLOT(appFontClicked())); connect(box, SIGNAL(toggled(bool)), button, SLOT(setEnabled(bool)));
+	l->addWidget(new QLabel(tr("Binary letter spacing:"), this), r, 0); spin = new QSpinBox(this); spin->setRange(10, 1000); spin->setValue(settings->binary_letter_spacing); spin->setSuffix("%"); connect(spin, SIGNAL(valueChanged(int)), this, SLOT(binaryLetterSpacingChanged(int))); l->addWidget(spin, r, 1); r++;
+	BOX(tr("Use bold binary \"1\""), settings->bold_binary_1, boldBinary1Toggled(bool));
 	l->setRowStretch(r, 1);
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
 	topbox->addWidget(buttonBox);
@@ -1081,6 +1083,14 @@ void PreferencesDialog::basesFontClicked() {
 }
 void PreferencesDialog::basesFontToggled(bool b) {
 	settings->use_custom_bases_font = b;
+	emit basesFontChanged();
+}
+void PreferencesDialog::boldBinary1Toggled(bool b) {
+	settings->bold_binary_1 = b;
+	emit basesFontChanged();
+}
+void PreferencesDialog::binaryLetterSpacingChanged(int i) {
+	settings->binary_letter_spacing = i;
 	emit basesFontChanged();
 }
 void PreferencesDialog::appFontClicked() {

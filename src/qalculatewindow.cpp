@@ -846,7 +846,6 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	basesGrid->addWidget(hexLabel, 3, 0);
 
 	binEdit = new QLabel();
-	use_bold_bin1 = 0;
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
 	if(settings->use_custom_bases_font) binfont.fromString(QString::fromStdString(settings->custom_bases_font));
 	modifyBinEditFont(binfont);
@@ -6702,7 +6701,7 @@ void QalculateWindow::updateResultBases() {
 							inhtml = true;
 						} else if(sbin_i[i2] == '<') {
 							inhtml = false;
-						} else if(!inhtml && (sbin_i[i2] == '0' || (!use_bold_bin1 && sbin_i[i2] == '1'))) {
+						} else if(!inhtml && (sbin_i[i2] == '0' || (!settings->bold_binary_1 && sbin_i[i2] == '1'))) {
 							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
 							n++;
 						} else if(!inhtml && sbin_i[i2] == '1') {
@@ -6812,6 +6811,8 @@ void set_result_bases(const MathStructure &m) {
 		if(i != std::string::npos && result_oct.length() > i + 1 && result_oct[i] == '0' && is_in(NUMBERS, result_oct[i + 1])) result_oct.erase(i, 1);
 		po.base = 10;
 		result_dec = nr.print(po);
+		gsub(THIN_SPACE, SPACE, result_dec);
+		gsub(NNBSP, SPACE, result_dec);
 		po.base = 16;
 		result_hex = nr.print(po);
 		gsub("0x", "", result_hex);
@@ -8295,24 +8296,9 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 
 void QalculateWindow::modifyBinEditFont(QFont &binfont) {
 	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
-	binfont.setLetterSpacing(QFont::PercentageSpacing, 110);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, settings->binary_letter_spacing);
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
 	binfont.setFeature("tnum", 1);
-#endif
-#ifndef _WIN32
-	QFontMetrics fm(binfont);
-	QFont bfont(binfont);
-	bfont.setWeight(QFont::Bold);
-	QFontMetrics fmb(bfont);
-	use_bold_bin1 = (fm.boundingRect("1111").width() == fmb.boundingRect("1111").width() && fm.lineSpacing() == fmb.lineSpacing());
-	if(!use_bold_bin1 && bfont.hintingPreference() != QFont::PreferVerticalHinting) {
-		binfont.setHintingPreference(QFont::PreferVerticalHinting);
-		bfont.setHintingPreference(QFont::PreferVerticalHinting);
-		QFontMetrics fm2(binEdit->font());
-		QFontMetrics fmb2(bfont);
-		use_bold_bin1 = (fm2.boundingRect("1111").width() == fmb2.boundingRect("1111").width() && fm2.lineSpacing() == fmb2.lineSpacing());
-		if(!use_bold_bin1) binfont.setHintingPreference(QFont::PreferDefaultHinting);
-	}
 #endif
 }
 void QalculateWindow::updateBinEditSize(bool initial) {
@@ -8331,6 +8317,7 @@ void QalculateWindow::updateBinEditSize(bool initial) {
 	octEdit->setMinimumHeight(fm.lineSpacing());
 	decEdit->setMinimumHeight(fm.lineSpacing());
 	hexEdit->setMinimumHeight(fm.lineSpacing());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
 	if(!initial) {
 		qApp->processEvents();
 		QList<QDockWidget*> ld;
@@ -8339,6 +8326,7 @@ void QalculateWindow::updateBinEditSize(bool initial) {
 		lh << basesDock->sizeHint().height();
 		resizeDocks(ld, lh, Qt::Vertical);
 	}
+#endif
 }
 
 void QalculateWindow::fetchExchangeRates() {
