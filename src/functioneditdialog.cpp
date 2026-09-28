@@ -1252,6 +1252,7 @@ void FunctionEditDialog::setFunction(MathFunction *f) {
 	bool read_only = !f->isLocal();
 	nameEdit->setText(QString::fromStdString(f->getName(1).name));
 	temporaryBox->setChecked(f->category() == CALCULATOR->temporaryCategory());
+	temporaryBox->setEnabled(!read_only);
 	if(namesEditDialog) namesEditDialog->setNames(f, nameEdit->text());
 	if(f->subtype() == SUBTYPE_USER_FUNCTION) {
 		expressionEdit->setEnabled(true);

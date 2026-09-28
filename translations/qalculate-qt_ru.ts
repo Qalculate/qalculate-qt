@@ -1370,6 +1370,10 @@ Do you want to overwrite the function?</source>
         <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
         <translation>Преобразование (с использованием «to») не поддерживается в функциях.</translation>
     </message>
+    <message>
+        <source>Temporary</source>
+        <translation type="unfinished">Временная</translation>
+    </message>
 </context>
 <context>
     <name>FunctionsDialog</name>
@@ -3141,6 +3145,18 @@ Do you want to overwrite the function?</source>
         <source>Place expression field below history</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Custom number bases font:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Binary letter spacing:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use bold binary &quot;1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QApplication</name>
@@ -4884,6 +4900,10 @@ and matrix/vector elements</source>
     </message>
     <message>
         <source>Show Custom Column</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
