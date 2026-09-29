@@ -6706,7 +6706,7 @@ Do you want to overwrite the function?</source>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="857"/>
         <source>Temporary</source>
-        <translation type="unfinished">臨時</translation>
+        <translation>臨時</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="863"/>
@@ -8911,17 +8911,17 @@ and press the enter key.</source>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="481"/>
         <source>Custom number bases font:</source>
-        <translation type="unfinished"></translation>
+        <translation>自訂底數字型:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="484"/>
         <source>Binary letter spacing:</source>
-        <translation type="unfinished"></translation>
+        <translation>二進制字母間距:</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="485"/>
         <source>Use bold binary &quot;1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>使用粗體二進制&quot;1&quot;</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="502"/>
@@ -11035,7 +11035,7 @@ You can get version %3 at %2.</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6766"/>
         <source>Bit %1</source>
-        <translation type="unfinished"></translation>
+        <translation>位元%1</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="7909"/>
