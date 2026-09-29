@@ -101,6 +101,10 @@ class PreferencesDialog : public QDialog {
 		void statusFontToggled(bool);
 		void keypadFontClicked();
 		void keypadFontToggled(bool);
+		void basesFontClicked();
+		void basesFontToggled(bool);
+		void boldBinary1Toggled(bool);
+		void binaryLetterSpacingChanged(int);
 		void appFontClicked();
 		void appFontToggled(bool);
 		void darkModeToggled(bool);
@@ -153,6 +157,7 @@ class PreferencesDialog : public QDialog {
 		void expressionFontChanged();
 		void statusFontChanged();
 		void keypadFontChanged();
+		void basesFontChanged();
 		void appFontChanged();
 		void symbolsUpdated();
 		void historyExpressionTypeChanged();

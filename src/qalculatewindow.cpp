@@ -118,7 +118,7 @@ bool exact_comparison, command_aborted;
 std::string original_expression, result_text, parsed_text, exact_text, previous_expression;
 bool had_to_expression = false;
 MathStructure *mstruct, *parsed_mstruct, *parsed_tostruct, matrix_mstruct, mstruct_exact, prepend_mstruct, lastx;
-QString lastx_text, current_status;
+QString lastx_text, current_status, prev_base_set_expression;
 std::string command_convert_units_string;
 Unit *command_convert_unit;
 bool block_expression_history = false;
@@ -847,33 +847,27 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 
 	binEdit = new QLabel();
 	QFont binfont(settings->use_custom_app_font ? appfont : binEdit->font());
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-	binfont.setFeature("tnum", 1);
-#endif
+	if(settings->use_custom_bases_font) binfont.fromString(QString::fromStdString(settings->custom_bases_font));
+	modifyBinEditFont(binfont);
 	binEdit->setFont(binfont);
 	binEdit->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::TextSelectableByKeyboard);
 	binEdit->setFocusPolicy(Qt::NoFocus);
-	updateBinEditSize();
 	binEdit->setAlignment(Qt::AlignRight | Qt::AlignTop);
 	basesGrid->addWidget(binEdit, 0, 1);
 	octEdit = new QLabel("0");
-	QFontMetrics fm2(settings->use_custom_app_font ? appfont : octEdit->font());
 	octEdit->setAlignment(Qt::AlignRight);
 	octEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	octEdit->setFocusPolicy(Qt::NoFocus);
-	octEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(octEdit, 1, 1);
 	decEdit = new QLabel("0");
 	decEdit->setAlignment(Qt::AlignRight);
 	decEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	decEdit->setFocusPolicy(Qt::NoFocus);
-	decEdit->setMinimumHeight(fm2.lineSpacing());
 	basesGrid->addWidget(decEdit, 2, 1);
 	hexEdit = new QLabel("0");
 	hexEdit->setAlignment(Qt::AlignRight);
 	hexEdit->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	hexEdit->setFocusPolicy(Qt::NoFocus);
-	hexEdit->setMinimumHeight(fm2.lineSpacing());
 	SET_BINARY_BITS
 	result_bin = "";
 	result_hex = "";
@@ -903,6 +897,7 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	hexEdit->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(hexEdit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBasesContextMenu(const QPoint&)));
 	connect(binEdit, SIGNAL(linkActivated(const QString&)), this, SLOT(resultBasesLinkActivated(const QString&)));
+	connect(binEdit, SIGNAL(linkHovered(const QString&)), this, SLOT(resultBasesLinkHovered(const QString&)));
 
 	keypad = new KeypadWidget(this);
 	keypadDock = new QalculateDockWidget(this, expressionEdit);
@@ -985,11 +980,15 @@ QalculateWindow::QalculateWindow() : QMainWindow() {
 	if(settings->custom_expression_font.empty()) settings->custom_expression_font = expressionEdit->font().toString().toStdString();
 	if(settings->custom_status_font.empty()) settings->custom_status_font = statusLabelLeft->font().toString().toStdString();
 	if(settings->custom_keypad_font.empty()) settings->custom_keypad_font = keypad->font().toString().toStdString();
+	if(settings->custom_bases_font.empty()) settings->custom_bases_font = octEdit->font().toString().toStdString();
 	if(settings->custom_app_font.empty()) settings->custom_app_font = QApplication::font().toString().toStdString();
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
+	if(settings->use_custom_bases_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font)); octEdit->setFont(font); decEdit->setFont(font); hexEdit->setFont(font);}
 	if(settings->use_custom_expression_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_expression_font)); expressionEdit->setFont(font);}
 	if(settings->use_custom_result_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_result_font)); historyView->setFont(font); rpnView->setFont(font);}
 	if(settings->use_custom_status_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_status_font)); statusLabelLeft->setFont(font); statusLabelRight->setFont(font);}
+
+	updateBinEditSize(true);
 
 	loadShortcuts();
 
@@ -3659,6 +3658,7 @@ void QalculateWindow::onAnswerClicked() {
 	}
 }
 void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
+	int prev_inbase = settings->evalops.parse_options.base;
 	if(b && v != settings->evalops.parse_options.base) {
 		settings->evalops.parse_options.base = v;
 		QAction *action = find_child_data(this, "group_inbase", v);
@@ -3673,6 +3673,47 @@ void QalculateWindow::onBaseClicked(int v, bool b, bool b_update) {
 		QAction *action = find_child_data(this, "group_outbase", v);
 		if(action) action->setChecked(true);
 		if(b_update) resultFormatUpdated();
+	}
+	if(b && prev_inbase != settings->evalops.parse_options.base && (prev_inbase == 8 || prev_inbase == 10 || prev_inbase == 2 || prev_inbase == 16)) {
+		QTextCursor cur = expressionEdit->textCursor();
+		if(cur.atEnd() && !expressionEdit->document()->isEmpty()) {
+			QString str = expressionEdit->toPlainText();
+			if(str != prev_base_set_expression) {
+				MathFunction *f = NULL;
+				if(prev_inbase == 2) f = CALCULATOR->getFunctionById(FUNCTION_ID_BIN);
+				else if(prev_inbase == 8) f = CALCULATOR->getFunctionById(FUNCTION_ID_OCT);
+				else if(prev_inbase == 10) f = CALCULATOR->getFunctionById(FUNCTION_ID_DEC);
+				else if(prev_inbase == 16) f = CALCULATOR->getFunctionById(FUNCTION_ID_HEX);
+				else f = CALCULATOR->getFunctionById(FUNCTION_ID_BASE);
+				if(f && f->id() != FUNCTION_ID_BASE) {
+					std::string sf = f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true);
+					for(size_t i = 0; i < sf.length(); i++) {
+						if((sf[i] < 'a' || sf[i] > 'f') && (sf[i] < 'A' || sf[i] > 'F')) {
+							sf = "";
+							break;
+						}
+					}
+					if(!sf.empty()) f = CALCULATOR->getFunctionById(FUNCTION_ID_BASE);
+				}
+				int i = str.length();
+				while(i > 0 && (str[i - 1].isSpace() || last_is_operator(str.mid(0, i).toStdString(), prev_inbase != 16))) i--;
+				if(i > 0 && f) {
+					if(f->id() == FUNCTION_ID_BASE) {
+						std::string str_end = CALCULATOR->getComma();
+						str_end += " ";
+						str_end += print_with_evalops(prev_inbase);
+						str_end += ")";
+						str.insert(i, QString::fromStdString(str_end));
+					} else {
+						str.insert(i, ")");
+					}
+					str.insert(0, "(");
+					str.insert(0, QString::fromStdString(f->preferredInputName(settings->printops.abbreviate_names, settings->printops.use_unicode_signs, false, false, &can_display_unicode_string_function, (void*) expressionEdit).formattedName(TYPE_FUNCTION, true)));
+					expressionEdit->setExpression(str);
+					prev_base_set_expression = str;
+				}
+			}
+		}
 	}
 	keypad->updateBase();
 }
@@ -6660,8 +6701,11 @@ void QalculateWindow::updateResultBases() {
 							inhtml = true;
 						} else if(sbin_i[i2] == '<') {
 							inhtml = false;
-						} else if(!inhtml && (sbin_i[i2] == '0' || sbin_i[i2] == '1')) {
+						} else if(!inhtml && (sbin_i[i2] == '0' || (!settings->bold_binary_1 && sbin_i[i2] == '1'))) {
 							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
+							n++;
+						} else if(!inhtml && sbin_i[i2] == '1') {
+							sbin_i.replace(i2, 1, QStringLiteral("<a href=\"%1\" style=\"text-decoration: none; font-weight: bold; color: %3\">%2</a>").arg(n).arg(sbin_i[i2]).arg(link_color));
 							n++;
 						}
 					}
@@ -6677,7 +6721,7 @@ void QalculateWindow::updateResultBases() {
 				sbin_i += "</td></tr><tr>";
 				i2 = sbin_i.length();
 			}
-			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"-1\">";
+			sbin_i += "<td colspan=\"2\" valign=\"top\"><font color=\"gray\" size=\"91%\">";
 			sbin_i += QString::number(i);
 			sbin_i += "</font></td>";
 		}
@@ -6708,7 +6752,30 @@ void QalculateWindow::resultBasesLinkActivated(const QString &s) {
 	po.min_exp = 0;
 	po.preserve_precision = true;
 	po.base_display = BASE_DISPLAY_NONE;
-	expressionEdit->setPlainText(QString::fromStdString(Number(result_bin, pa).print(po)));
+	QTextCursor cur = expressionEdit->textCursor();
+	bool call = cur.hasSelection() && cur.selectionStart() == 0 && cur.selectionEnd() == expressionEdit->toPlainText().length();
+	expressionEdit->setExpression(Number(result_bin, pa).print(po));
+	if(call) expressionEdit->selectAll();
+}
+
+void QalculateWindow::resultBasesLinkHovered(const QString &s) {
+	if(s.isEmpty()) {
+		QToolTip::hideText();
+		return;
+	}
+	QString str = tr("Bit %1").arg(s);
+	Number nr(s.toInt() - 1);
+	nr.exp2();
+	bool approx = false;
+	PrintOptions po;
+	po.digit_grouping = settings->printops.digit_grouping;
+	po.min_exp = 20;
+	po.is_approximate = &approx;
+	std::string snum = nr.print(po);
+	if(approx || nr.isApproximate()) str += " " SIGN_ALMOST_EQUAL " ";
+	else str += " = ";
+	str += QString::fromStdString(snum);
+	QToolTip::showText(QCursor::pos(), str, this);
 }
 
 void set_result_bases(const MathStructure &m) {
@@ -6744,6 +6811,8 @@ void set_result_bases(const MathStructure &m) {
 		if(i != std::string::npos && result_oct.length() > i + 1 && result_oct[i] == '0' && is_in(NUMBERS, result_oct[i + 1])) result_oct.erase(i, 1);
 		po.base = 10;
 		result_dec = nr.print(po);
+		gsub(THIN_SPACE, SPACE, result_dec);
+		gsub(NNBSP, SPACE, result_dec);
 		po.base = 16;
 		result_hex = nr.print(po);
 		gsub("0x", "", result_hex);
@@ -6930,7 +6999,7 @@ bool contains_updating_time(const MathStructure &m) {
 
 bool contains_extreme_number(const MathStructure &m) {
 	if(m.isNumber()) {
-		if(m.number().isFloatingPoint() && (mpfr_get_exp(m.number().internalUpperFloat()) > 10000000L || mpfr_get_exp(m.number().internalLowerFloat()) < -10000000L)) {
+		if(m.number().isFloatingPoint() && (mpfr_get_exp(m.number().internalUpperFloat()) > 10000000L || (m.number().isNonZero() && mpfr_get_exp(m.number().internalUpperFloat()) < -10000000L && mpfr_get_exp(m.number().internalLowerFloat()) < -10000000L))) {
 			return true;
 		} else if(m.number().isInteger() && ::abs(m.number().integerLength()) > 10000000L) {
 			return true;
@@ -8208,12 +8277,13 @@ void QalculateWindow::changeEvent(QEvent *e) {
 			statusLabelLeft->setFont(font);
 			statusLabelRight->setFont(font);
 		}
-		QFont binfont(QApplication::font());
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
-		binfont.setFeature("tnum", 1);
-#endif
-		binEdit->setFont(binfont);
-		updateBinEditSize();
+		if(!settings->use_custom_status_font) {
+			QFont binfont(QApplication::font());
+			modifyBinEditFont(binfont);
+			binEdit->setFont(binfont);
+			updateBinEditSize();
+			updateResultBases();
+		}
 	}
 	QMainWindow::changeEvent(e);
 }
@@ -8224,18 +8294,39 @@ void QalculateWindow::resizeEvent(QResizeEvent *e) {
 	QMainWindow::resizeEvent(e);
 }
 
-void QalculateWindow::updateBinEditSize(QFont *font) {
-	QFontMetrics fm2(font ? *font : binEdit->font());
+void QalculateWindow::modifyBinEditFont(QFont &binfont) {
+	if(!settings->use_custom_bases_font) binfont.setPointSizeF(binfont.pointSizeF() * 1.1);
+	binfont.setLetterSpacing(QFont::PercentageSpacing, settings->binary_letter_spacing);
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 7, 0))
+	binfont.setFeature("tnum", 1);
+#endif
+}
+void QalculateWindow::updateBinEditSize(bool initial) {
+	QFontMetrics fm2(binEdit->font());
 	SET_BINARY_BITS
 	int rows = binary_bits / 32;
 	if(binary_bits % 32 > 0) rows++;
-	QString row_string;
+	QString row_string = " ";
 	for(int i = binary_bits > 32 ? 32 : binary_bits; i > 0; i -= 4) {
 		if(i < 32 && i < binary_bits) row_string += " ";
 		row_string += "0000";
 	}
 	binEdit->setMinimumWidth(fm2.boundingRect(row_string).width() + binEdit->frameWidth() * 2 + binEdit->contentsMargins().left() + binEdit->contentsMargins().right());
-	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	binEdit->setMinimumHeight(fm2.lineSpacing() * rows * 2 - 2 + binEdit->frameWidth() * 2 + binEdit->contentsMargins().top() + binEdit->contentsMargins().bottom());
+	QFontMetrics fm(octEdit->font());
+	octEdit->setMinimumHeight(fm.lineSpacing());
+	decEdit->setMinimumHeight(fm.lineSpacing());
+	hexEdit->setMinimumHeight(fm.lineSpacing());
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+	if(!initial) {
+		qApp->processEvents();
+		QList<QDockWidget*> ld;
+		ld << basesDock;
+		QList<int> lh;
+		lh << basesDock->sizeHint().height();
+		resizeDocks(ld, lh, Qt::Vertical);
+	}
+#endif
 }
 
 void QalculateWindow::fetchExchangeRates() {
@@ -9251,6 +9342,15 @@ void QalculateWindow::onKeypadFontChanged() {
 	if(settings->use_custom_keypad_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_keypad_font)); keypad->setFont(font);}
 	else keypad->setFont(QApplication::font());
 }
+void QalculateWindow::onBasesFontChanged() {
+	if(settings->use_custom_bases_font) {QFont font; font.fromString(QString::fromStdString(settings->custom_bases_font)); octEdit->setFont(font); decEdit->setFont(font); hexEdit->setFont(font);}
+	else {octEdit->setFont(QApplication::font()); decEdit->setFont(QApplication::font()); hexEdit->setFont(QApplication::font());}
+	QFont binfont(octEdit->font());
+	modifyBinEditFont(binfont);
+	binEdit->setFont(binfont);
+	updateBinEditSize();
+	updateResultBases();
+}
 void QalculateWindow::onAppFontTimer() {
 	onAppFontChanged();
 	loadInitialHistory();
@@ -9723,6 +9823,7 @@ void QalculateWindow::editPreferences() {
 	connect(preferencesDialog, SIGNAL(expressionFontChanged()), this, SLOT(onExpressionFontChanged()));
 	connect(preferencesDialog, SIGNAL(statusFontChanged()), this, SLOT(onStatusFontChanged()));
 	connect(preferencesDialog, SIGNAL(keypadFontChanged()), this, SLOT(onKeypadFontChanged()));
+	connect(preferencesDialog, SIGNAL(basesFontChanged()), this, SLOT(onBasesFontChanged()));
 	connect(preferencesDialog, SIGNAL(appFontChanged()), this, SLOT(onAppFontChanged()));
 	connect(preferencesDialog, SIGNAL(symbolsUpdated()), keypad, SLOT(updateSymbols()));
 	connect(preferencesDialog, SIGNAL(historyExpressionTypeChanged()), historyView, SLOT(reloadHistory()));

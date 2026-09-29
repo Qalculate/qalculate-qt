@@ -872,6 +872,8 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 			use_custom_status_font = v;
 		} else if(svar == "use_custom_keypad_font") {
 			use_custom_keypad_font = v;
+		} else if(svar == "use_custom_bases_font") {
+			use_custom_bases_font = v;
 		} else if(svar == "use_custom_application_font") {
 			use_custom_app_font = v;
 		} else if(svar == "custom_result_font") {
@@ -886,9 +888,16 @@ void QalculateQtSettings::readPreferenceValue(const std::string &svar, const std
 		} else if(svar == "custom_keypad_font") {
 			custom_keypad_font = svalue;
 			save_custom_keypad_font = true;
+		} else if(svar == "custom_bases_font") {
+			custom_bases_font = svalue;
+			save_custom_bases_font = true;
 		} else if(svar == "custom_application_font") {
 			custom_app_font = svalue;
 			save_custom_app_font = true;
+		} else if(svar == "bold_binary_1") {
+			bold_binary_1 = v;
+		} else if(svar == "binary_letter_spacing") {
+			binary_letter_spacing = v;
 		} else if(svar == "multiplication_sign") {
 			if(v >= MULTIPLICATION_SIGN_ASTERISK && v <= MULTIPLICATION_SIGN_ALTDOT) {
 				printops.multiplication_sign = (MultiplicationSign) v;
@@ -1174,17 +1183,22 @@ void QalculateQtSettings::loadPreferences() {
 	use_custom_expression_font = false;
 	use_custom_status_font = false;
 	use_custom_keypad_font = false;
+	use_custom_bases_font = false;
 	use_custom_app_font = false;
 	save_custom_result_font = false;
 	save_custom_expression_font = false;
 	save_custom_status_font = false;
 	save_custom_keypad_font = false;
+	save_custom_bases_font = false;
 	save_custom_app_font = false;
 	custom_result_font = "";
 	custom_expression_font = "";
 	custom_status_font = "";
 	custom_keypad_font = "";
+	custom_bases_font = "";
 	custom_app_font = "";
+	bold_binary_1 = false;
+	binary_letter_spacing = 110;
 	style = "";
 	palette = -1;
 	disable_cursor_blinking = false;
@@ -1264,7 +1278,7 @@ void QalculateQtSettings::loadPreferences() {
 	max_plot_time = 5;
 
 	preferences_version[0] = 5;
-	preferences_version[1] = 12;
+	preferences_version[1] = 13;
 	preferences_version[2] = 0;
 
 	if(file) {
@@ -1652,12 +1666,16 @@ bool QalculateQtSettings::savePreferences(const char *filename, bool is_workspac
 		fprintf(file, "use_custom_expression_font=%i\n", use_custom_expression_font);
 		fprintf(file, "use_custom_status_font=%i\n", use_custom_status_font);
 		fprintf(file, "use_custom_keypad_font=%i\n", use_custom_keypad_font);
+		fprintf(file, "use_custom_bases_font=%i\n", use_custom_bases_font);
 		fprintf(file, "use_custom_application_font=%i\n", use_custom_app_font);
 		if(use_custom_result_font || save_custom_result_font) fprintf(file, "custom_result_font=%s\n", custom_result_font.c_str());
 		if(use_custom_expression_font || save_custom_expression_font) fprintf(file, "custom_expression_font=%s\n", custom_expression_font.c_str());
 		if(use_custom_status_font || save_custom_status_font) fprintf(file, "custom_status_font=%s\n", custom_status_font.c_str());
 		if(use_custom_keypad_font || save_custom_keypad_font) fprintf(file, "custom_keypad_font=%s\n", custom_keypad_font.c_str());
+		if(use_custom_bases_font || save_custom_bases_font) fprintf(file, "custom_bases_font=%s\n", custom_bases_font.c_str());
 		if(use_custom_app_font || save_custom_app_font) fprintf(file, "custom_application_font=%s\n", custom_app_font.c_str());
+		if(bold_binary_1) fprintf(file, "bold_binary_1=%i\n", bold_binary_1);
+		if(binary_letter_spacing != 110) fprintf(file, "binary_letter_spacing=%i\n", binary_letter_spacing);
 		if(printops.multiplication_sign != MULTIPLICATION_SIGN_X) fprintf(file, "multiplication_sign=%i\n", printops.multiplication_sign);
 		if(printops.division_sign != DIVISION_SIGN_DIVISION_SLASH) fprintf(file, "division_sign=%i\n", printops.division_sign);
 		if(implicit_question_asked) fprintf(file, "implicit_question_asked=%i\n", implicit_question_asked);

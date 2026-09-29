@@ -160,7 +160,8 @@ class QalculateWindow : public QMainWindow {
 	protected slots:
 
 		void testTimeout();
-		void updateBinEditSize(QFont* = NULL);
+		void updateBinEditSize(bool initial = false);
+		void modifyBinEditFont(QFont&);
 		void onBinaryBitsChanged();
 		void onTwosChanged();
 		void onSymbolClicked(const QString&);
@@ -220,6 +221,7 @@ class QalculateWindow : public QMainWindow {
 		void onExpressionFontChanged();
 		void onStatusFontChanged();
 		void onKeypadFontChanged();
+		void onBasesFontChanged();
 		void onAppFontChanged();
 		void onAppFontTimer();
 		void fixSplitterPos();
@@ -321,6 +323,7 @@ class QalculateWindow : public QMainWindow {
 		void updateKeypadTitle();
 		void keypadPreferencesChanged();
 		void resultBasesLinkActivated(const QString&);
+		void resultBasesLinkHovered(const QString&);
 		void showBasesContextMenu(const QPoint&);
 		void copyBases();
 		void onExpressionPositionChanged();

@@ -290,6 +290,7 @@ void VariableEditDialog::setVariable(KnownVariable *v) {
 		valueEdit->setReadOnly(!v->isLocal());
 	}
 	temporaryBox->setChecked(v->category() == CALCULATOR->temporaryCategory());
+	temporaryBox->setEnabled(v->isLocal());
 	descriptionEdit->blockSignals(true);
 	descriptionEdit->setPlainText(QString::fromStdString(v->description()));
 	descriptionEdit->blockSignals(false);

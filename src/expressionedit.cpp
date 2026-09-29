@@ -1976,6 +1976,10 @@ void ExpressionEdit::keyPressEvent(QKeyEvent *event) {
 			}
 		}
 	}
+	if(event->modifiers() == Qt::KeypadModifier && (event->key() == Qt::Key_Comma || event->key() == Qt::Key_Period)) {
+		insertPlainText(QString::fromStdString(CALCULATOR->getDecimalPoint()));
+		return;
+	}
 	if(event->key() == Qt::Key_Asterisk && (event->modifiers() == Qt::ControlModifier || event->modifiers() == (Qt::ControlModifier | Qt::KeypadModifier) || event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier))) {
 		if(settings->rpn_mode && settings->rpn_keys && settings->evalops.parse_options.parsing_mode != PARSING_MODE_RPN) {
 			emit calculateRPNRequest(OPERATION_RAISE);
@@ -4199,7 +4203,7 @@ void ExpressionEdit::highlightParentheses() {
 			bfont.setWeight(QFont::Bold);
 			QFontMetrics fmb(bfont);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-			use_bold_highlight = (fm.horizontalAdvance('(') == fmb.horizontalAdvance('('));
+			use_bold_highlight = (fm.horizontalAdvance("()") == fmb.horizontalAdvance("()"));
 #else
 			use_bold_highlight = (fm.averageCharWidth() == fmb.averageCharWidth());
 #endif
@@ -4308,7 +4312,7 @@ void ExpressionEdit::wrapSelection(const QString &text, bool insert_before, bool
 					return;
 				}
 				iend = unicode_length(str);
-			} else if(!always_add_parentheses && str.find_first_not_of(NUMBER_ELEMENTS SPACE) == std::string::npos) {
+			} else if(!always_add_parentheses && str.find_first_not_of(CALCULATOR->getDecimalPoint() == "," || settings->evalops.parse_options.comma_as_separator ? NUMBER_ELEMENTS SPACE "_" COMMA : NUMBER_ELEMENTS SPACE "_") == std::string::npos) {
 				if(insert_before && !text.isEmpty()) {
 					moveCursor(QTextCursor::Start);
 					insertPlainText(text);
