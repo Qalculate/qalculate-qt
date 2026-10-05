@@ -6829,29 +6829,6 @@ void set_result_bases(const MathStructure &m) {
 	}
 }
 
-bool contains_plot_or_save(const std::string &str) {
-	if(expression_contains_save_function(str, settings->evalops.parse_options, false)) return true;
-	for(size_t f_i = 0; f_i < 4; f_i++) {
-		int id = 0;
-		if(f_i == 0) id = FUNCTION_ID_PLOT;
-		else if(f_i == 1) id = FUNCTION_ID_EXPORT;
-		else if(f_i == 2) id = FUNCTION_ID_LOAD;
-		else if(f_i == 3) id = FUNCTION_ID_COMMAND;
-		MathFunction *f = CALCULATOR->getFunctionById(id);
-		for(size_t i = 1; f && i <= f->countNames(); i++) {
-			if(str.find(f->getName(i).name) != std::string::npos) {
-				MathStructure mtest;
-				CALCULATOR->beginTemporaryStopMessages();
-				CALCULATOR->parse(&mtest, str, settings->evalops.parse_options);
-				CALCULATOR->endTemporaryStopMessages();
-				if(mtest.containsFunctionId(FUNCTION_ID_PLOT) || mtest.containsFunctionId(FUNCTION_ID_EXPORT) || mtest.containsFunctionId(FUNCTION_ID_LOAD) || mtest.containsFunctionId(FUNCTION_ID_COMMAND)) return true;
-				return false;
-			}
-		}
-	}
-	return false;
-}
-
 void QalculateWindow::onExpressionChanged() {
 	toAction_t->setEnabled(expressionEdit->expressionHasChanged() || !settings->history_answer.empty() || settings->useColoredIcon(this));
 	if(!basesDock->isVisible()) return;

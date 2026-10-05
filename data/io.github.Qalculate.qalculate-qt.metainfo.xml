@@ -87,7 +87,7 @@
       <li>Insert decimal separator (regardless of reported key symbol) when separator key is pressed on keyboard number pad</li>
       <li>Customizable number bases font</li>
       <li>Use slightly larger font size and wider letter spacing for binary digits, by default, and add option to use bold font for binary "1"</li>
-      <li>Show tooltip with digit index and decimal value of bit when mouse is over binary digit in number bases view</li>
+      <li>Show tooltip with index and decimal value of bit when mouse is over binary digit in number bases view</li>
       <li>Preserve base of current expression when switching input number base using keypad buttons</li>
       <li>New function: ymd() (returns the number of calendar years, months, and days between two dates)</li>
       <li>Return exact value for more argument values in lambertw() function</li>
@@ -99,7 +99,10 @@
       <li>Fix a = 1 and b = 1 solution for a^x = b when the value of a and b are unknown</li>
       <li>Fix uncertainty propagation with duplicate equal data set functions</li>
       <li>Fix division by zero warning for some expressions with zero quantity (e.g. "1 m × 0 kg")</li>
+      <li>Fix trigonometric functions with function in argument not calculated when angle unit is not radians</li>
       <li>Fix result containing interval with zero as lower value not displayed automatically</li>
+      <li>Fix inconsistent (over)use of secondary exchanges rate sources</li>
+      <li>Fix number of decimals for currency quantity when currency is placed before quantity</li>
       <li>Minor bug fixes and feature enhancements</li>
      </ul>
    </description>
