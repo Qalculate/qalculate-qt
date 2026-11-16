@@ -937,7 +937,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1706"/>
-        <location filename="../src/expressionedit.cpp" line="3293"/>
+        <location filename="../src/expressionedit.cpp" line="3317"/>
         <source>Unicode</source>
         <translation>Unicode</translation>
     </message>
@@ -1122,380 +1122,380 @@ Do you want to overwrite the function?</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2842"/>
-        <location filename="../src/expressionedit.cpp" line="2844"/>
+        <location filename="../src/expressionedit.cpp" line="2866"/>
+        <location filename="../src/expressionedit.cpp" line="2868"/>
         <source>comment</source>
         <translation>коментар</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2867"/>
-        <location filename="../src/expressionedit.cpp" line="2869"/>
+        <location filename="../src/expressionedit.cpp" line="2891"/>
+        <location filename="../src/expressionedit.cpp" line="2893"/>
         <source>MC (memory clear)</source>
         <translation>MC (очистити пам&apos;ять)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2877"/>
-        <location filename="../src/expressionedit.cpp" line="2879"/>
+        <location filename="../src/expressionedit.cpp" line="2901"/>
+        <location filename="../src/expressionedit.cpp" line="2903"/>
         <source>MS (memory store)</source>
         <translation>MC (записати в пам&apos;ять)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2887"/>
-        <location filename="../src/expressionedit.cpp" line="2889"/>
+        <location filename="../src/expressionedit.cpp" line="2911"/>
+        <location filename="../src/expressionedit.cpp" line="2913"/>
         <source>M+ (memory plus)</source>
         <translation>M+ (memory plus)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2897"/>
-        <location filename="../src/expressionedit.cpp" line="2899"/>
+        <location filename="../src/expressionedit.cpp" line="2921"/>
+        <location filename="../src/expressionedit.cpp" line="2923"/>
         <source>M− (memory minus)</source>
         <translation>M− (відняти від пам&apos;яті)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2913"/>
-        <location filename="../src/expressionedit.cpp" line="2915"/>
+        <location filename="../src/expressionedit.cpp" line="2937"/>
+        <location filename="../src/expressionedit.cpp" line="2939"/>
         <source>factorize</source>
         <translation>розкласти на множники</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2916"/>
-        <location filename="../src/expressionedit.cpp" line="2918"/>
+        <location filename="../src/expressionedit.cpp" line="2940"/>
+        <location filename="../src/expressionedit.cpp" line="2942"/>
         <source>expand</source>
         <translation>розкрити</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3256"/>
+        <location filename="../src/expressionedit.cpp" line="3280"/>
         <source>hexadecimal</source>
         <translation>шістнадцяткове</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3257"/>
-        <location filename="../src/expressionedit.cpp" line="3377"/>
+        <location filename="../src/expressionedit.cpp" line="3281"/>
+        <location filename="../src/expressionedit.cpp" line="3401"/>
         <source>hexadecimal number</source>
         <translation>шістнадцяткове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3258"/>
+        <location filename="../src/expressionedit.cpp" line="3282"/>
         <source>octal</source>
         <translation>вісімкове</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3259"/>
+        <location filename="../src/expressionedit.cpp" line="3283"/>
         <source>octal number</source>
         <translation>вісімкове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3260"/>
+        <location filename="../src/expressionedit.cpp" line="3284"/>
         <source>decimal</source>
         <translation>десяткове</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3261"/>
+        <location filename="../src/expressionedit.cpp" line="3285"/>
         <source>decimal number</source>
         <translation>десяткове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3262"/>
+        <location filename="../src/expressionedit.cpp" line="3286"/>
         <source>duodecimal</source>
         <translation>дюжинна</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3263"/>
-        <location filename="../src/expressionedit.cpp" line="3265"/>
+        <location filename="../src/expressionedit.cpp" line="3287"/>
+        <location filename="../src/expressionedit.cpp" line="3289"/>
         <source>duodecimal number</source>
         <translation>дванадцяткове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3266"/>
+        <location filename="../src/expressionedit.cpp" line="3290"/>
         <source>binary</source>
         <translation>двійкова</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3267"/>
-        <location filename="../src/expressionedit.cpp" line="3371"/>
+        <location filename="../src/expressionedit.cpp" line="3291"/>
+        <location filename="../src/expressionedit.cpp" line="3395"/>
         <source>binary number</source>
         <translation>двійкове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3268"/>
+        <location filename="../src/expressionedit.cpp" line="3292"/>
         <source>roman</source>
         <translation>римське</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3269"/>
+        <location filename="../src/expressionedit.cpp" line="3293"/>
         <source>roman numerals</source>
         <translation>римські числа</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3270"/>
+        <location filename="../src/expressionedit.cpp" line="3294"/>
         <source>bijective</source>
         <translation>бієктивне</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3271"/>
+        <location filename="../src/expressionedit.cpp" line="3295"/>
         <source>bijective base-26</source>
         <translation>бієктивне з основою 26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3273"/>
+        <location filename="../src/expressionedit.cpp" line="3297"/>
         <source>binary-coded decimal</source>
         <translation>двійково закодоване десяткове</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3274"/>
+        <location filename="../src/expressionedit.cpp" line="3298"/>
         <source>sexagesimal</source>
         <translation>шістдесяткове</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3275"/>
+        <location filename="../src/expressionedit.cpp" line="3299"/>
         <source>sexagesimal number</source>
         <translation>шістдесяткове число</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3276"/>
-        <location filename="../src/expressionedit.cpp" line="3277"/>
+        <location filename="../src/expressionedit.cpp" line="3300"/>
+        <location filename="../src/expressionedit.cpp" line="3301"/>
         <source>latitude</source>
         <translation>широта</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3278"/>
-        <location filename="../src/expressionedit.cpp" line="3279"/>
+        <location filename="../src/expressionedit.cpp" line="3302"/>
+        <location filename="../src/expressionedit.cpp" line="3303"/>
         <source>longitude</source>
         <translation>довгота</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3281"/>
+        <location filename="../src/expressionedit.cpp" line="3305"/>
         <source>32-bit floating point</source>
         <translation>32-бітне з рухомою комою</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3283"/>
+        <location filename="../src/expressionedit.cpp" line="3307"/>
         <source>64-bit floating point</source>
         <translation>64-бітне з рухомою комою</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3285"/>
+        <location filename="../src/expressionedit.cpp" line="3309"/>
         <source>16-bit floating point</source>
         <translation>16-бітне з рухомою комою</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3287"/>
+        <location filename="../src/expressionedit.cpp" line="3311"/>
         <source>80-bit (x86) floating point</source>
         <translation>80-бітне (x86) з рухомою комою</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3289"/>
+        <location filename="../src/expressionedit.cpp" line="3313"/>
         <source>128-bit floating point</source>
         <translation>128-бітне з рухомою комою</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3290"/>
+        <location filename="../src/expressionedit.cpp" line="3314"/>
         <source>time</source>
         <translation>час</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3291"/>
+        <location filename="../src/expressionedit.cpp" line="3315"/>
         <source>time format</source>
         <translation>формат часу</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3294"/>
+        <location filename="../src/expressionedit.cpp" line="3318"/>
         <source>scientific</source>
         <translation>науковий</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3295"/>
+        <location filename="../src/expressionedit.cpp" line="3319"/>
         <source>scientific notation</source>
         <translation>науковий запис</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3296"/>
+        <location filename="../src/expressionedit.cpp" line="3320"/>
         <source>engineering</source>
         <translation>інженерний</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3297"/>
+        <location filename="../src/expressionedit.cpp" line="3321"/>
         <source>engineering notation</source>
         <translation>інженерний запис</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3298"/>
+        <location filename="../src/expressionedit.cpp" line="3322"/>
         <source>simple</source>
         <translation>простий</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3299"/>
+        <location filename="../src/expressionedit.cpp" line="3323"/>
         <source>simple notation</source>
         <translation>простий запис</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3300"/>
+        <location filename="../src/expressionedit.cpp" line="3324"/>
         <source>bases</source>
         <translation>основи</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3301"/>
+        <location filename="../src/expressionedit.cpp" line="3325"/>
         <source>number bases</source>
         <translation>системи числення</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3302"/>
-        <location filename="../src/expressionedit.cpp" line="3303"/>
+        <location filename="../src/expressionedit.cpp" line="3326"/>
+        <location filename="../src/expressionedit.cpp" line="3327"/>
         <source>calendars</source>
         <translation>календарі</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3304"/>
+        <location filename="../src/expressionedit.cpp" line="3328"/>
         <source>optimal</source>
         <translation>оптимальна</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3305"/>
+        <location filename="../src/expressionedit.cpp" line="3329"/>
         <source>optimal unit</source>
         <translation>оптимальна одиниця</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3306"/>
+        <location filename="../src/expressionedit.cpp" line="3330"/>
         <source>prefix</source>
         <translation>префікс</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3307"/>
+        <location filename="../src/expressionedit.cpp" line="3331"/>
         <source>optimal prefix</source>
         <translation>оптимальний префікс</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3308"/>
+        <location filename="../src/expressionedit.cpp" line="3332"/>
         <source>base</source>
         <comment>base units</comment>
         <translation>основні</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3309"/>
+        <location filename="../src/expressionedit.cpp" line="3333"/>
         <source>base units</source>
         <translation>основні одиниці</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3310"/>
+        <location filename="../src/expressionedit.cpp" line="3334"/>
         <source>mixed</source>
         <translation>мішані</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3311"/>
+        <location filename="../src/expressionedit.cpp" line="3335"/>
         <source>mixed units</source>
         <translation>мішані одиниці</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3312"/>
-        <location filename="../src/expressionedit.cpp" line="3313"/>
+        <location filename="../src/expressionedit.cpp" line="3336"/>
+        <location filename="../src/expressionedit.cpp" line="3337"/>
         <source>factors</source>
         <translation>множники</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3314"/>
+        <location filename="../src/expressionedit.cpp" line="3338"/>
         <source>partial fraction</source>
         <translation>прості дроби</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3315"/>
+        <location filename="../src/expressionedit.cpp" line="3339"/>
         <source>expanded partial fractions</source>
         <translation>розкриті прості дроби</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3316"/>
+        <location filename="../src/expressionedit.cpp" line="3340"/>
         <source>rectangular</source>
         <translation>прямокутні</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3316"/>
+        <location filename="../src/expressionedit.cpp" line="3340"/>
         <source>cartesian</source>
         <translation>декартові</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3317"/>
+        <location filename="../src/expressionedit.cpp" line="3341"/>
         <source>complex rectangular form</source>
         <translation>прямокутна комплексна форма</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3318"/>
+        <location filename="../src/expressionedit.cpp" line="3342"/>
         <source>exponential</source>
         <translation>експоненційні</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3319"/>
+        <location filename="../src/expressionedit.cpp" line="3343"/>
         <source>complex exponential form</source>
         <translation>експоненційна комплексна форма</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3320"/>
+        <location filename="../src/expressionedit.cpp" line="3344"/>
         <source>polar</source>
         <translation>полярні</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3321"/>
+        <location filename="../src/expressionedit.cpp" line="3345"/>
         <source>complex polar form</source>
         <translation>полярна комплексна форма</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3323"/>
+        <location filename="../src/expressionedit.cpp" line="3347"/>
         <source>complex cis form</source>
         <translation>комплексна cis-форма</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3324"/>
+        <location filename="../src/expressionedit.cpp" line="3348"/>
         <source>angle</source>
         <translation>кут</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3325"/>
+        <location filename="../src/expressionedit.cpp" line="3349"/>
         <source>complex angle notation</source>
         <translation>комплексний кутовий запис</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3326"/>
+        <location filename="../src/expressionedit.cpp" line="3350"/>
         <source>phasor</source>
         <translation>фазор</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3327"/>
+        <location filename="../src/expressionedit.cpp" line="3351"/>
         <source>complex phasor notation</source>
         <translation>комплексний фазорний запис</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3329"/>
+        <location filename="../src/expressionedit.cpp" line="3353"/>
         <source>UTC time zone</source>
         <translation>часовий пояс UTC</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3381"/>
+        <location filename="../src/expressionedit.cpp" line="3405"/>
         <source>base</source>
         <comment>number base</comment>
         <translation>система числення</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3382"/>
+        <location filename="../src/expressionedit.cpp" line="3406"/>
         <source>number base %1</source>
         <translation>система числення %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3383"/>
+        <location filename="../src/expressionedit.cpp" line="3407"/>
         <source>decimals</source>
         <translation>десяткові</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3384"/>
+        <location filename="../src/expressionedit.cpp" line="3408"/>
         <source>decimal fraction</source>
         <translation>десятковий дріб</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3387"/>
-        <location filename="../src/expressionedit.cpp" line="3389"/>
-        <location filename="../src/expressionedit.cpp" line="3395"/>
+        <location filename="../src/expressionedit.cpp" line="3411"/>
+        <location filename="../src/expressionedit.cpp" line="3413"/>
+        <location filename="../src/expressionedit.cpp" line="3419"/>
         <source>fraction</source>
         <translation>дріб</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3946"/>
+        <location filename="../src/expressionedit.cpp" line="3970"/>
         <source>Data object</source>
         <translation>Об&apos;єкт даних</translation>
     </message>
@@ -1738,12 +1738,12 @@ Do you want to overwrite the function?</source>
 Чи ви хочете замінити її?</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1387"/>
+        <location filename="../src/functioneditdialog.cpp" line="1388"/>
         <source>Edit Function</source>
         <translation>Змінити Функцію</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1400"/>
+        <location filename="../src/functioneditdialog.cpp" line="1401"/>
         <source>New Function</source>
         <translation>Нова Функція</translation>
     </message>
@@ -1762,7 +1762,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="62"/>
-        <location filename="../src/functionsdialog.cpp" line="596"/>
+        <location filename="../src/functionsdialog.cpp" line="597"/>
         <source>Function</source>
         <translation>Функція</translation>
     </message>
@@ -1778,8 +1778,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="87"/>
-        <location filename="../src/functionsdialog.cpp" line="516"/>
-        <location filename="../src/functionsdialog.cpp" line="519"/>
+        <location filename="../src/functionsdialog.cpp" line="517"/>
+        <location filename="../src/functionsdialog.cpp" line="520"/>
         <source>Deactivate</source>
         <translation>Вимкнути</translation>
     </message>
@@ -1813,14 +1813,14 @@ Do you want to overwrite the function?</source>
         <location filename="../src/functionsdialog.cpp" line="241"/>
         <location filename="../src/functionsdialog.cpp" line="355"/>
         <location filename="../src/functionsdialog.cpp" line="357"/>
-        <location filename="../src/functionsdialog.cpp" line="668"/>
+        <location filename="../src/functionsdialog.cpp" line="669"/>
         <source>Inactive</source>
         <translation>Вимкнені</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="191"/>
         <location filename="../src/functionsdialog.cpp" line="249"/>
-        <location filename="../src/functionsdialog.cpp" line="717"/>
+        <location filename="../src/functionsdialog.cpp" line="718"/>
         <source>Uncategorized</source>
         <translation>Поза категоріями</translation>
     </message>
@@ -1830,71 +1830,75 @@ Do you want to overwrite the function?</source>
         <translation>аргумент</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="420"/>
-        <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation>Добуває дані зі збірки %1 для даного об&apos;єкта та властивості. Якщо &quot;інформацію&quot; введено як властивість, покажеться діалогове вікно з усіма властивостями об&apos;єкта.</translation>
+        <location filename="../src/functionsdialog.cpp" line="421"/>
+        <source>Retrieves data from the %1 data set for a given object and property. If &quot;%2&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
+        <translation>Добуває дані зі збірки %1 для даного об&apos;єкта та властивості. Якщо &quot;%2&quot; введено як властивість, покажеться діалогове вікно з усіма властивостями об&apos;єкта.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="430"/>
+        <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
+        <translation type="vanished">Добуває дані зі збірки %1 для даного об&apos;єкта та властивості. Якщо &quot;інформацію&quot; введено як властивість, покажеться діалогове вікно з усіма властивостями об&apos;єкта.</translation>
+    </message>
+    <message>
+        <location filename="../src/functionsdialog.cpp" line="431"/>
         <source>Example:</source>
         <translation>Приклад:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="442"/>
+        <location filename="../src/functionsdialog.cpp" line="443"/>
         <source>Arguments</source>
         <translation>Аргументи</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="459"/>
+        <location filename="../src/functionsdialog.cpp" line="460"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>додатковий</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="462"/>
+        <location filename="../src/functionsdialog.cpp" line="463"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>типовий:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="478"/>
+        <location filename="../src/functionsdialog.cpp" line="479"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>Вимога:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="486"/>
+        <location filename="../src/functionsdialog.cpp" line="487"/>
         <source>Properties</source>
         <translation>Властивості</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="493"/>
+        <location filename="../src/functionsdialog.cpp" line="494"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="503"/>
+        <location filename="../src/functionsdialog.cpp" line="504"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>ключ</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="521"/>
+        <location filename="../src/functionsdialog.cpp" line="522"/>
         <source>Activate</source>
         <translation>Увімкнути</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="656"/>
+        <location filename="../src/functionsdialog.cpp" line="657"/>
         <source>Favorites</source>
         <translation>Улюблені</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="661"/>
+        <location filename="../src/functionsdialog.cpp" line="662"/>
         <source>User functions</source>
         <translation>Функції користувача</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="674"/>
+        <location filename="../src/functionsdialog.cpp" line="675"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>Усі</translation>
@@ -3130,771 +3134,771 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="89"/>
-        <location filename="../src/preferencesdialog.cpp" line="399"/>
+        <location filename="../src/preferencesdialog.cpp" line="401"/>
         <source>Default</source>
         <translation>Типова</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="123"/>
+        <location filename="../src/preferencesdialog.cpp" line="125"/>
         <source>Allow multiple instances</source>
         <translation>Дозволити кілька екземплярів</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="124"/>
+        <location filename="../src/preferencesdialog.cpp" line="126"/>
         <source>Notify when a new version is available</source>
         <translation>Сповіщати, коли виходить нова версія</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="125"/>
+        <location filename="../src/preferencesdialog.cpp" line="127"/>
         <source>Clear history on exit</source>
         <translation>Закінчуючи, очищувати історію</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="126"/>
+        <location filename="../src/preferencesdialog.cpp" line="128"/>
         <source>Max history lines saved:</source>
         <translation>Найбільша кількість рядків в історії:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="127"/>
+        <location filename="../src/preferencesdialog.cpp" line="129"/>
         <source>Close application with Escape key</source>
         <translation>Закривати програму клавішею Escape</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="128"/>
+        <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Use keyboard keys for RPN</source>
         <translation>Використовувати клавіатуру для ЗПЗ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="129"/>
+        <location filename="../src/preferencesdialog.cpp" line="131"/>
         <source>Use caret for bitwise XOR</source>
         <translation>Знак каретки ^ для побітового виключного АБО</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="130"/>
+        <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Keep above other windows</source>
         <translation>Показувати поверх інших вікон</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="131"/>
+        <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Preserve history height</source>
         <translation>Зберігати висоту історії</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="139"/>
+        <location filename="../src/preferencesdialog.cpp" line="141"/>
         <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
         <translation>Не міняти висоту списку дій, коли показано чи приховано клавіатуру або системи числення.</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="141"/>
+        <location filename="../src/preferencesdialog.cpp" line="143"/>
         <source>Show status bar</source>
         <translation>Показувати панель стану</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="142"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Window title:</source>
         <translation>Заголовок вікна:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="146"/>
         <source>Application name</source>
         <translation>Назва програми</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="145"/>
+        <location filename="../src/preferencesdialog.cpp" line="147"/>
         <source>Result</source>
         <translation>Результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="146"/>
+        <location filename="../src/preferencesdialog.cpp" line="148"/>
         <source>Application name + result</source>
         <translation>Назва програми + результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="147"/>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Workspace</source>
         <translation>Робочий простір</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <location filename="../src/preferencesdialog.cpp" line="150"/>
         <source>Application name + workspace</source>
         <translation>Назва програми + робочий простір</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="154"/>
         <source>Tooltips:</source>
         <translation>Підказки:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="154"/>
+        <location filename="../src/preferencesdialog.cpp" line="156"/>
         <source>Show all</source>
         <translation>Показувати всі</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="155"/>
+        <location filename="../src/preferencesdialog.cpp" line="157"/>
         <source>Hide in keypad</source>
         <translation>Сховати клавіатурні</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="156"/>
+        <location filename="../src/preferencesdialog.cpp" line="158"/>
         <source>Hide all</source>
         <translation>Сховати всі</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="160"/>
+        <location filename="../src/preferencesdialog.cpp" line="162"/>
         <source>Style:</source>
         <translation>Стиль:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="163"/>
+        <location filename="../src/preferencesdialog.cpp" line="165"/>
         <source>Default (requires restart)</source>
         <comment>Default style</comment>
         <translation>Типовий (доведеться перезапустити)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="174"/>
         <location filename="../src/preferencesdialog.cpp" line="176"/>
+        <location filename="../src/preferencesdialog.cpp" line="178"/>
         <source>Dark mode</source>
         <translation>Темний режим</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="178"/>
+        <location filename="../src/preferencesdialog.cpp" line="180"/>
         <source>Disable cursor blinking</source>
         <translation>Вимкнути блимання вказівника</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="179"/>
+        <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Colorize result</source>
         <translation>Фарбувати результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="180"/>
+        <location filename="../src/preferencesdialog.cpp" line="182"/>
         <source>Format result</source>
         <translation>Форматувати результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="469"/>
+        <location filename="../src/preferencesdialog.cpp" line="471"/>
         <source>Custom history font:</source>
         <translation>Власний шрифт історії:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="472"/>
+        <location filename="../src/preferencesdialog.cpp" line="474"/>
         <source>Custom expression font:</source>
         <translation>Власний шрифт виразів:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="475"/>
+        <location filename="../src/preferencesdialog.cpp" line="477"/>
         <source>Custom status bar font:</source>
         <translation>Власний шрифт панелі стану:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="478"/>
+        <location filename="../src/preferencesdialog.cpp" line="480"/>
         <source>Custom keypad font:</source>
         <translation>Власний шрифт клавіатури:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="466"/>
+        <location filename="../src/preferencesdialog.cpp" line="468"/>
         <source>Custom application font:</source>
         <translation>Власний шрифт програми:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="184"/>
+        <location filename="../src/preferencesdialog.cpp" line="186"/>
         <source>Expression status:</source>
         <translation>Стан виразу:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="140"/>
+        <location filename="../src/preferencesdialog.cpp" line="142"/>
         <source>Place expression field below history</source>
         <translation>Розміщувати поле виразу під історією</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="186"/>
-        <location filename="../src/preferencesdialog.cpp" line="318"/>
+        <location filename="../src/preferencesdialog.cpp" line="188"/>
+        <location filename="../src/preferencesdialog.cpp" line="320"/>
         <source>Off</source>
         <translation>Вимкнено</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="187"/>
+        <location filename="../src/preferencesdialog.cpp" line="189"/>
         <source>In history list</source>
         <translation>У списку історії</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="188"/>
+        <location filename="../src/preferencesdialog.cpp" line="190"/>
         <source>In expression field</source>
         <translation>У полі виразу</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="189"/>
+        <location filename="../src/preferencesdialog.cpp" line="191"/>
         <source>In status bar</source>
         <translation>На панелі стану</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="197"/>
+        <location filename="../src/preferencesdialog.cpp" line="199"/>
         <source>Status tooltip delay:</source>
         <translation>Затримка підказки стану:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="202"/>
-        <location filename="../src/preferencesdialog.cpp" line="212"/>
+        <location filename="../src/preferencesdialog.cpp" line="204"/>
+        <location filename="../src/preferencesdialog.cpp" line="214"/>
         <source>ms</source>
         <extracomment>milliseconds</extracomment>
         <translation>мс</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="207"/>
+        <location filename="../src/preferencesdialog.cpp" line="209"/>
         <source>Calculate as you type delay:</source>
         <translation>Затримка обчислення, коли ви друкуєте:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="217"/>
+        <location filename="../src/preferencesdialog.cpp" line="219"/>
         <source>Adaptive delay</source>
         <translation>Адаптивна затримка</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <location filename="../src/preferencesdialog.cpp" line="220"/>
         <source>Automatically calculate selection</source>
         <translation>Автоматично обчислювати виділення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="219"/>
+        <location filename="../src/preferencesdialog.cpp" line="221"/>
         <source>Expression in history:</source>
         <translation>Вираз в історії:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="221"/>
+        <location filename="../src/preferencesdialog.cpp" line="223"/>
         <source>Parsed</source>
         <translation>Оброблений</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="222"/>
+        <location filename="../src/preferencesdialog.cpp" line="224"/>
         <source>Parsed (compact)</source>
         <translation>Оброблений (стислий)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="223"/>
+        <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Entered</source>
         <translation>Введений</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="224"/>
+        <location filename="../src/preferencesdialog.cpp" line="226"/>
         <source>Entered + parsed</source>
         <translation>Введений + оброблений</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="225"/>
+        <location filename="../src/preferencesdialog.cpp" line="227"/>
         <source>Entered + parsed (compact)</source>
         <translation>Введений + оброблений (стислий)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="229"/>
+        <location filename="../src/preferencesdialog.cpp" line="231"/>
         <source>Expression after calculation:</source>
         <translation>Вираз після обчислення:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="231"/>
+        <location filename="../src/preferencesdialog.cpp" line="233"/>
         <source>Keep expression</source>
         <translation>Залишити вираз</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="232"/>
+        <location filename="../src/preferencesdialog.cpp" line="234"/>
         <source>Clear expression</source>
         <translation>Очистити вираз</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="233"/>
+        <location filename="../src/preferencesdialog.cpp" line="235"/>
         <source>Replace with result</source>
         <translation>Замінити результатом</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="234"/>
+        <location filename="../src/preferencesdialog.cpp" line="236"/>
         <source>Replace with result if shorter</source>
         <translation>Замінити результатом, якщо той коротший</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="238"/>
+        <location filename="../src/preferencesdialog.cpp" line="240"/>
         <source>Automatically copy result</source>
         <translation>Автоматично копіювати результат</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="239"/>
+        <location filename="../src/preferencesdialog.cpp" line="241"/>
         <source>Parsing mode:</source>
         <translation>Режим обробки:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="241"/>
-        <location filename="../src/preferencesdialog.cpp" line="341"/>
+        <location filename="../src/preferencesdialog.cpp" line="243"/>
+        <location filename="../src/preferencesdialog.cpp" line="343"/>
         <source>Adaptive</source>
         <translation>Адаптивний</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="242"/>
+        <location filename="../src/preferencesdialog.cpp" line="244"/>
         <source>Conventional</source>
         <translation>Загальноприйнятий</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="243"/>
+        <location filename="../src/preferencesdialog.cpp" line="245"/>
         <source>Implicit multiplication first</source>
         <translation>Спершу неявне множення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="244"/>
+        <location filename="../src/preferencesdialog.cpp" line="246"/>
         <source>Chain</source>
         <translation>Ланцюжковий</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="245"/>
+        <location filename="../src/preferencesdialog.cpp" line="247"/>
         <source>RPN</source>
         <translation>Зворотний польський запис</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="250"/>
+        <location filename="../src/preferencesdialog.cpp" line="252"/>
         <source>Simplified percentage calculation</source>
         <translation>Спрощене обчислення відсотків</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="251"/>
+        <location filename="../src/preferencesdialog.cpp" line="253"/>
         <source>Read precision</source>
         <translation>Читати точність</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="252"/>
+        <location filename="../src/preferencesdialog.cpp" line="254"/>
         <source>Allow concise uncertainty input</source>
         <translation>Дозволити стисле введення невизначеності</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="253"/>
+        <location filename="../src/preferencesdialog.cpp" line="255"/>
         <source>Limit implicit multiplication</source>
         <translation>Обмежити неявне множення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="254"/>
+        <location filename="../src/preferencesdialog.cpp" line="256"/>
         <source>Interpret unrecognized symbols as variables</source>
         <translation>Тлумачити невідомі символи як змінні</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="255"/>
+        <location filename="../src/preferencesdialog.cpp" line="257"/>
         <source>Interval calculation:</source>
         <translation>Обчислення проміжків:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="257"/>
+        <location filename="../src/preferencesdialog.cpp" line="259"/>
         <source>Variance formula</source>
         <translation>Формула дисперсії</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="258"/>
+        <location filename="../src/preferencesdialog.cpp" line="260"/>
         <source>Interval arithmetic</source>
         <translation>Інтервальна арифметика</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="263"/>
+        <location filename="../src/preferencesdialog.cpp" line="265"/>
         <source>Factorize result</source>
         <translation>Розкладати результат на множники</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="268"/>
+        <location filename="../src/preferencesdialog.cpp" line="270"/>
         <source>Two&apos;s complement output:</source>
         <translation>Результат у доповняльному коді:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="269"/>
+        <location filename="../src/preferencesdialog.cpp" line="271"/>
         <source>Two&apos;s complement input:</source>
         <translation>Уведення виразів у доповняльному коді:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="270"/>
         <location filename="../src/preferencesdialog.cpp" line="272"/>
+        <location filename="../src/preferencesdialog.cpp" line="274"/>
         <source>Binary</source>
         <translation>Двійковий</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="271"/>
         <location filename="../src/preferencesdialog.cpp" line="273"/>
+        <location filename="../src/preferencesdialog.cpp" line="275"/>
         <source>Hexadecimal</source>
         <translation>Шістнадцятковий</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="274"/>
+        <location filename="../src/preferencesdialog.cpp" line="276"/>
         <source>Binary bits:</source>
         <translation>Двійкові біти:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="276"/>
+        <location filename="../src/preferencesdialog.cpp" line="278"/>
         <source>Automatic</source>
         <translation>Автоматично</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="289"/>
+        <location filename="../src/preferencesdialog.cpp" line="291"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation>Уживати малі букви в недесяткових числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="290"/>
+        <location filename="../src/preferencesdialog.cpp" line="292"/>
         <source>Use special duodecimal symbols</source>
         <translation>Уживати спеціальні дванадцяткові символи</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="291"/>
+        <location filename="../src/preferencesdialog.cpp" line="293"/>
         <source>Multiplication sign:</source>
         <translation>Знак множення:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="294"/>
+        <location filename="../src/preferencesdialog.cpp" line="296"/>
         <source>multiplication sign</source>
         <extracomment>Unicode character name</extracomment>
         <translation>символ множення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="296"/>
+        <location filename="../src/preferencesdialog.cpp" line="298"/>
         <source>dot operator</source>
         <extracomment>Unicode character name</extracomment>
         <translation>крапка (dot operator в Unicode)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="298"/>
+        <location filename="../src/preferencesdialog.cpp" line="300"/>
         <source>middle dot</source>
         <extracomment>Unicode character name</extracomment>
         <translation>центральна крапка (middle dot в Unicode)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="300"/>
+        <location filename="../src/preferencesdialog.cpp" line="302"/>
         <source>asterisk</source>
         <extracomment>Unicode character name</extracomment>
         <translation>зірочка</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="304"/>
+        <location filename="../src/preferencesdialog.cpp" line="306"/>
         <source>Use Unicode division slash in output</source>
         <translation>Уживати риску дробу Unicode у відповіді</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="305"/>
+        <location filename="../src/preferencesdialog.cpp" line="307"/>
         <source>Spell out logical operators</source>
         <translation>Писати буквами логічні оператори</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="306"/>
+        <location filename="../src/preferencesdialog.cpp" line="308"/>
         <source>Use E-notation instead of 10^n</source>
         <translation>Використовувати E-запис, замість 10^n</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="307"/>
+        <location filename="../src/preferencesdialog.cpp" line="309"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation>Брати &apos;j&apos; за уявну одиницю</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="308"/>
+        <location filename="../src/preferencesdialog.cpp" line="310"/>
         <source>Use comma as decimal separator</source>
         <translation>Кома в десяткових дробах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="310"/>
+        <location filename="../src/preferencesdialog.cpp" line="312"/>
         <source>Ignore comma in numbers</source>
         <translation>Ігнорувати кому в числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="311"/>
+        <location filename="../src/preferencesdialog.cpp" line="313"/>
         <source>Ignore dots in numbers</source>
         <translation>Ігнорувати крапки в числах</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="314"/>
+        <location filename="../src/preferencesdialog.cpp" line="316"/>
         <source>Copy unformatted ASCII by default</source>
         <translation>Зазвичай копіювати неформатоване ASCII</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="315"/>
+        <location filename="../src/preferencesdialog.cpp" line="317"/>
         <source>Place percent button in number pad</source>
         <translation>Розташувати кнопку відсотків на цифровій клавіатурі</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="316"/>
+        <location filename="../src/preferencesdialog.cpp" line="318"/>
         <source>Indicate repeating decimals:</source>
         <translation>Показувати періодичні дроби:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="319"/>
+        <location filename="../src/preferencesdialog.cpp" line="321"/>
         <source>Ellipsis</source>
         <translation>Три крапки</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="320"/>
+        <location filename="../src/preferencesdialog.cpp" line="322"/>
         <source>Overline</source>
         <translation>Лінія над числом</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="324"/>
+        <location filename="../src/preferencesdialog.cpp" line="326"/>
         <source>Digit grouping:</source>
         <translation>Групування цифр:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="326"/>
+        <location filename="../src/preferencesdialog.cpp" line="328"/>
         <source>None</source>
         <translation>Ніяке</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="327"/>
+        <location filename="../src/preferencesdialog.cpp" line="329"/>
         <source>Standard</source>
         <translation>Стандартне</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="328"/>
+        <location filename="../src/preferencesdialog.cpp" line="330"/>
         <source>Local</source>
         <translation>Місцеве</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="329"/>
+        <location filename="../src/preferencesdialog.cpp" line="331"/>
         <source>Custom</source>
         <translation>Власне</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="338"/>
+        <location filename="../src/preferencesdialog.cpp" line="340"/>
         <source>Automatically group digits in input</source>
         <translation>Автоматично групувати цифри при введенні</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="339"/>
+        <location filename="../src/preferencesdialog.cpp" line="341"/>
         <source>Interval display:</source>
         <translation>Показ проміжків:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="342"/>
+        <location filename="../src/preferencesdialog.cpp" line="344"/>
         <source>Significant digits</source>
         <translation>Значущі цифри</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="343"/>
+        <location filename="../src/preferencesdialog.cpp" line="345"/>
         <source>Interval</source>
         <translation>Проміжок</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="344"/>
+        <location filename="../src/preferencesdialog.cpp" line="346"/>
         <source>Plus/minus</source>
         <translation>Плюс/мінус</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="345"/>
-        <location filename="../src/preferencesdialog.cpp" line="418"/>
+        <location filename="../src/preferencesdialog.cpp" line="347"/>
+        <location filename="../src/preferencesdialog.cpp" line="420"/>
         <source>Relative</source>
         <translation>Відносне</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="346"/>
+        <location filename="../src/preferencesdialog.cpp" line="348"/>
         <source>Concise</source>
         <translation>Стисло</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="347"/>
+        <location filename="../src/preferencesdialog.cpp" line="349"/>
         <source>Midpoint</source>
         <translation>Середня точка</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="348"/>
+        <location filename="../src/preferencesdialog.cpp" line="350"/>
         <source>Lower</source>
         <translation>Нижня</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="349"/>
+        <location filename="../src/preferencesdialog.cpp" line="351"/>
         <source>Upper</source>
         <translation>Верхній</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="355"/>
+        <location filename="../src/preferencesdialog.cpp" line="357"/>
         <source>Rounding:</source>
         <translation>Округлення:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="357"/>
+        <location filename="../src/preferencesdialog.cpp" line="359"/>
         <source>Round halfway numbers away from zero</source>
         <translation>Половинні числа подалі від нуля</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="358"/>
+        <location filename="../src/preferencesdialog.cpp" line="360"/>
         <source>Round halfway numbers to even</source>
         <translation>Половинні числа до парного</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="359"/>
+        <location filename="../src/preferencesdialog.cpp" line="361"/>
         <source>Round halfway numbers to odd</source>
         <translation>Половинні числа до непарного</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="360"/>
+        <location filename="../src/preferencesdialog.cpp" line="362"/>
         <source>Round halfway numbers toward zero</source>
         <translation>Половинні числа до нуля</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="361"/>
+        <location filename="../src/preferencesdialog.cpp" line="363"/>
         <source>Round halfway numbers to random</source>
         <translation>Половинні числа до випадкового</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="362"/>
+        <location filename="../src/preferencesdialog.cpp" line="364"/>
         <source>Round halfway numbers up</source>
         <translation>Половинні числа до більшого</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="363"/>
+        <location filename="../src/preferencesdialog.cpp" line="365"/>
         <source>Round halfway numbers down</source>
         <translation>Половинні числа до меншого</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="364"/>
+        <location filename="../src/preferencesdialog.cpp" line="366"/>
         <source>Round toward zero</source>
         <translation>До нуля</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="365"/>
+        <location filename="../src/preferencesdialog.cpp" line="367"/>
         <source>Round away from zero</source>
         <translation>Подалі від нуля</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="366"/>
+        <location filename="../src/preferencesdialog.cpp" line="368"/>
         <source>Round up</source>
         <translation>До більшого</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="367"/>
+        <location filename="../src/preferencesdialog.cpp" line="369"/>
         <source>Round down</source>
         <translation>До меншого</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="371"/>
+        <location filename="../src/preferencesdialog.cpp" line="373"/>
         <source>Complex number form:</source>
         <translation>Форма комплексних чисел:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="373"/>
+        <location filename="../src/preferencesdialog.cpp" line="375"/>
         <source>Rectangular</source>
         <translation>Прямокутна</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="374"/>
+        <location filename="../src/preferencesdialog.cpp" line="376"/>
         <source>Exponential</source>
         <translation>Експоненційна</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="375"/>
+        <location filename="../src/preferencesdialog.cpp" line="377"/>
         <source>Polar</source>
         <translation>Полярна</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="376"/>
+        <location filename="../src/preferencesdialog.cpp" line="378"/>
         <source>Angle/phasor</source>
         <translation>Кут/фазор</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="384"/>
+        <location filename="../src/preferencesdialog.cpp" line="386"/>
         <source>Enable units</source>
         <translation>Увімкнути одиниці виміру</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="385"/>
+        <location filename="../src/preferencesdialog.cpp" line="387"/>
         <source>Abbreviate names</source>
         <translation>Скорочувати назви</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="386"/>
+        <location filename="../src/preferencesdialog.cpp" line="388"/>
         <source>Use binary prefixes for information units</source>
         <translation>Уживати двійкові префікси з одиницями інформації</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="387"/>
+        <location filename="../src/preferencesdialog.cpp" line="389"/>
         <source>Automatic unit conversion:</source>
         <translation>Автоматичне переведення одиниць:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="389"/>
+        <location filename="../src/preferencesdialog.cpp" line="391"/>
         <source>No conversion</source>
         <translation>Без переведення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="390"/>
+        <location filename="../src/preferencesdialog.cpp" line="392"/>
         <source>Base units</source>
         <translation>Основні одиниці</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="391"/>
+        <location filename="../src/preferencesdialog.cpp" line="393"/>
         <source>Optimal units</source>
         <translation>Оптимальні одиниці</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="392"/>
+        <location filename="../src/preferencesdialog.cpp" line="394"/>
         <source>Optimal SI units</source>
         <translation>Оптимальні одиниці SI</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="396"/>
+        <location filename="../src/preferencesdialog.cpp" line="398"/>
         <source>Convert to mixed units</source>
         <translation>Перевести в мішані одиниці</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="397"/>
+        <location filename="../src/preferencesdialog.cpp" line="399"/>
         <source>Automatic unit prefixes:</source>
         <translation>Автоматичні префікси одиниць:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="400"/>
+        <location filename="../src/preferencesdialog.cpp" line="402"/>
         <source>No prefixes</source>
         <translation>Без префіксів</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="401"/>
+        <location filename="../src/preferencesdialog.cpp" line="403"/>
         <source>Prefixes for some units</source>
         <translation>Префікси для деяких одиниць</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="402"/>
+        <location filename="../src/preferencesdialog.cpp" line="404"/>
         <source>Prefixes also for currencies</source>
         <translation>Префікси також для валют</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="403"/>
+        <location filename="../src/preferencesdialog.cpp" line="405"/>
         <source>Prefixes for all units</source>
         <translation>Префікси для всіх одиниць</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="411"/>
+        <location filename="../src/preferencesdialog.cpp" line="413"/>
         <source>Enable all SI-prefixes</source>
         <translation>Увімкнути всі префікси SI</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="412"/>
+        <location filename="../src/preferencesdialog.cpp" line="414"/>
         <source>Enable denominator prefixes</source>
         <translation>Префікси в знаменнику</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="413"/>
+        <location filename="../src/preferencesdialog.cpp" line="415"/>
         <source>Enable units in physical constants</source>
         <translation>Одиниці у фізичних сталих</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="414"/>
+        <location filename="../src/preferencesdialog.cpp" line="416"/>
         <source>Copy unformatted ASCII without units</source>
         <translation>Копіювати неформатоване ASCII без одиниць</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="415"/>
+        <location filename="../src/preferencesdialog.cpp" line="417"/>
         <source>Temperature calculation:</source>
         <translation>Обчислення температури:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="417"/>
+        <location filename="../src/preferencesdialog.cpp" line="419"/>
         <source>Absolute</source>
         <translation>Абсолютне</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="419"/>
+        <location filename="../src/preferencesdialog.cpp" line="421"/>
         <source>Hybrid</source>
         <translation>Гібридне</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="427"/>
+        <location filename="../src/preferencesdialog.cpp" line="429"/>
         <source>Exchange rates updates:</source>
         <translation>Оновлення курсів валют:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/preferencesdialog.cpp" line="430"/>
-        <location filename="../src/preferencesdialog.cpp" line="749"/>
+        <location filename="../src/preferencesdialog.cpp" line="432"/>
+        <location filename="../src/preferencesdialog.cpp" line="752"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n день</numerusform>
@@ -3903,57 +3907,57 @@ Do you want to overwrite the function?</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="439"/>
+        <location filename="../src/preferencesdialog.cpp" line="441"/>
         <source>Default currency:</source>
         <translation>Стандартна валюта:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="481"/>
+        <location filename="../src/preferencesdialog.cpp" line="483"/>
         <source>Custom number bases font:</source>
         <translation>Власний шрифт систем числення:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="484"/>
+        <location filename="../src/preferencesdialog.cpp" line="486"/>
         <source>Binary letter spacing:</source>
         <translation>Відступ між двійковими знаками:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="485"/>
+        <location filename="../src/preferencesdialog.cpp" line="487"/>
         <source>Use bold binary &quot;1&quot;</source>
         <translation>Жирно писати двійкову цифру &quot;1&quot;</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="501"/>
+        <location filename="../src/preferencesdialog.cpp" line="503"/>
         <source>Look &amp;&amp; Feel</source>
         <translation>Дизайн і Вигляд</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="502"/>
+        <location filename="../src/preferencesdialog.cpp" line="504"/>
         <source>Fonts</source>
         <translation>Шрифти</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="503"/>
+        <location filename="../src/preferencesdialog.cpp" line="505"/>
         <source>Numbers &amp;&amp; Operators</source>
         <translation>Числа та Оператори</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="504"/>
+        <location filename="../src/preferencesdialog.cpp" line="506"/>
         <source>Units</source>
         <translation>Одиниці виміру</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="505"/>
+        <location filename="../src/preferencesdialog.cpp" line="507"/>
         <source>Calculation</source>
         <translation>Обчислення</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="540"/>
+        <location filename="../src/preferencesdialog.cpp" line="543"/>
         <source>Restart required</source>
         <translation>Потрібен перезапуск</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="540"/>
+        <location filename="../src/preferencesdialog.cpp" line="543"/>
         <source>Please restart the program for the language change to take effect.</source>
         <translation>Просимо перезапустити програму, щоб мова змінилася.</translation>
     </message>
@@ -5000,7 +5004,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="509"/>
-        <location filename="../src/qalculatewindow.cpp" line="9759"/>
+        <location filename="../src/qalculatewindow.cpp" line="9738"/>
         <source>Keyboard Shortcuts</source>
         <translation>Клавіатурні Скорочення</translation>
     </message>
@@ -5630,66 +5634,66 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="3336"/>
         <location filename="../src/qalculatewindow.cpp" line="3364"/>
         <location filename="../src/qalculatewindow.cpp" line="3428"/>
-        <location filename="../src/qalculatewindow.cpp" line="10380"/>
+        <location filename="../src/qalculatewindow.cpp" line="10359"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5084"/>
-        <location filename="../src/qalculatewindow.cpp" line="8661"/>
-        <location filename="../src/qalculatewindow.cpp" line="9664"/>
-        <location filename="../src/qalculatewindow.cpp" line="11128"/>
-        <location filename="../src/qalculatewindow.cpp" line="11141"/>
-        <location filename="../src/qalculatewindow.cpp" line="11151"/>
-        <location filename="../src/qalculatewindow.cpp" line="11171"/>
+        <location filename="../src/qalculatewindow.cpp" line="8640"/>
+        <location filename="../src/qalculatewindow.cpp" line="9643"/>
+        <location filename="../src/qalculatewindow.cpp" line="11107"/>
+        <location filename="../src/qalculatewindow.cpp" line="11120"/>
+        <location filename="../src/qalculatewindow.cpp" line="11130"/>
+        <location filename="../src/qalculatewindow.cpp" line="11150"/>
         <source>Error</source>
         <translation>Помилка</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5084"/>
-        <location filename="../src/qalculatewindow.cpp" line="8661"/>
+        <location filename="../src/qalculatewindow.cpp" line="8640"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>Не вдалося записати визначення</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5642"/>
-        <location filename="../src/qalculatewindow.cpp" line="7144"/>
+        <location filename="../src/qalculatewindow.cpp" line="7122"/>
         <source>hexadecimal</source>
         <translation>шістнадцятковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5645"/>
-        <location filename="../src/qalculatewindow.cpp" line="7147"/>
+        <location filename="../src/qalculatewindow.cpp" line="7125"/>
         <source>octal</source>
         <translation>вісімковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5648"/>
-        <location filename="../src/qalculatewindow.cpp" line="7150"/>
+        <location filename="../src/qalculatewindow.cpp" line="7128"/>
         <source>decimal</source>
         <translation>десятковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5652"/>
-        <location filename="../src/qalculatewindow.cpp" line="7154"/>
+        <location filename="../src/qalculatewindow.cpp" line="7132"/>
         <source>duodecimal</source>
         <translation>дванадцятковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5660"/>
-        <location filename="../src/qalculatewindow.cpp" line="7162"/>
+        <location filename="../src/qalculatewindow.cpp" line="7140"/>
         <source>binary</source>
         <translation>двійковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5663"/>
-        <location filename="../src/qalculatewindow.cpp" line="7165"/>
+        <location filename="../src/qalculatewindow.cpp" line="7143"/>
         <source>roman</source>
         <translation>римські</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5666"/>
-        <location filename="../src/qalculatewindow.cpp" line="7168"/>
+        <location filename="../src/qalculatewindow.cpp" line="7146"/>
         <source>bijective</source>
         <translation>бієктивні</translation>
     </message>
@@ -5697,251 +5701,251 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="5672"/>
         <location filename="../src/qalculatewindow.cpp" line="5675"/>
         <location filename="../src/qalculatewindow.cpp" line="5678"/>
-        <location filename="../src/qalculatewindow.cpp" line="7174"/>
-        <location filename="../src/qalculatewindow.cpp" line="7177"/>
-        <location filename="../src/qalculatewindow.cpp" line="7180"/>
+        <location filename="../src/qalculatewindow.cpp" line="7152"/>
+        <location filename="../src/qalculatewindow.cpp" line="7155"/>
+        <location filename="../src/qalculatewindow.cpp" line="7158"/>
         <source>sexagesimal</source>
         <translation>шістдесяткові</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5681"/>
         <location filename="../src/qalculatewindow.cpp" line="5684"/>
-        <location filename="../src/qalculatewindow.cpp" line="7183"/>
-        <location filename="../src/qalculatewindow.cpp" line="7186"/>
+        <location filename="../src/qalculatewindow.cpp" line="7161"/>
+        <location filename="../src/qalculatewindow.cpp" line="7164"/>
         <source>latitude</source>
         <translation>широта</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5687"/>
         <location filename="../src/qalculatewindow.cpp" line="5690"/>
-        <location filename="../src/qalculatewindow.cpp" line="7189"/>
-        <location filename="../src/qalculatewindow.cpp" line="7192"/>
+        <location filename="../src/qalculatewindow.cpp" line="7167"/>
+        <location filename="../src/qalculatewindow.cpp" line="7170"/>
         <source>longitude</source>
         <translation>довгота</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5708"/>
-        <location filename="../src/qalculatewindow.cpp" line="7210"/>
+        <location filename="../src/qalculatewindow.cpp" line="7188"/>
         <source>time</source>
         <translation>час</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5714"/>
-        <location filename="../src/qalculatewindow.cpp" line="7216"/>
+        <location filename="../src/qalculatewindow.cpp" line="7194"/>
         <source>scientific</source>
         <translation>науковий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5717"/>
-        <location filename="../src/qalculatewindow.cpp" line="7219"/>
+        <location filename="../src/qalculatewindow.cpp" line="7197"/>
         <source>engineering</source>
         <translation>інженерний</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5720"/>
-        <location filename="../src/qalculatewindow.cpp" line="7222"/>
+        <location filename="../src/qalculatewindow.cpp" line="7200"/>
         <source>simple</source>
         <translation>простий</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5767"/>
-        <location filename="../src/qalculatewindow.cpp" line="7263"/>
+        <location filename="../src/qalculatewindow.cpp" line="7241"/>
         <source>Time zone parsing failed.</source>
         <translation>Не вдалося прочитати часовий пояс.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5788"/>
-        <location filename="../src/qalculatewindow.cpp" line="7272"/>
+        <location filename="../src/qalculatewindow.cpp" line="7250"/>
         <source>bases</source>
         <translation>основи</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5797"/>
-        <location filename="../src/qalculatewindow.cpp" line="7275"/>
+        <location filename="../src/qalculatewindow.cpp" line="7253"/>
         <source>calendars</source>
         <translation>календарі</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5806"/>
-        <location filename="../src/qalculatewindow.cpp" line="7278"/>
+        <location filename="../src/qalculatewindow.cpp" line="7256"/>
         <source>rectangular</source>
         <translation>прямокутні</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5806"/>
-        <location filename="../src/qalculatewindow.cpp" line="7278"/>
+        <location filename="../src/qalculatewindow.cpp" line="7256"/>
         <source>cartesian</source>
         <translation>декартові</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5818"/>
-        <location filename="../src/qalculatewindow.cpp" line="7282"/>
+        <location filename="../src/qalculatewindow.cpp" line="7260"/>
         <source>exponential</source>
         <translation>експоненційні</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5830"/>
-        <location filename="../src/qalculatewindow.cpp" line="7286"/>
+        <location filename="../src/qalculatewindow.cpp" line="7264"/>
         <source>polar</source>
         <translation>полярні</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5854"/>
-        <location filename="../src/qalculatewindow.cpp" line="7294"/>
+        <location filename="../src/qalculatewindow.cpp" line="7272"/>
         <source>phasor</source>
         <translation>фазор</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5854"/>
-        <location filename="../src/qalculatewindow.cpp" line="7294"/>
+        <location filename="../src/qalculatewindow.cpp" line="7272"/>
         <source>angle</source>
         <translation>кут</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5866"/>
-        <location filename="../src/qalculatewindow.cpp" line="7298"/>
+        <location filename="../src/qalculatewindow.cpp" line="7276"/>
         <source>optimal</source>
         <translation>оптимальні</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5878"/>
-        <location filename="../src/qalculatewindow.cpp" line="7304"/>
+        <location filename="../src/qalculatewindow.cpp" line="7282"/>
         <source>prefix</source>
         <translation>префікс</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5882"/>
-        <location filename="../src/qalculatewindow.cpp" line="7308"/>
+        <location filename="../src/qalculatewindow.cpp" line="7286"/>
         <source>base</source>
         <comment>base units</comment>
         <translation>основні</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5894"/>
-        <location filename="../src/qalculatewindow.cpp" line="7314"/>
+        <location filename="../src/qalculatewindow.cpp" line="7292"/>
         <source>mixed</source>
         <translation>мішані</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5906"/>
-        <location filename="../src/qalculatewindow.cpp" line="7320"/>
+        <location filename="../src/qalculatewindow.cpp" line="7298"/>
         <source>factors</source>
         <translation>множники</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5917"/>
-        <location filename="../src/qalculatewindow.cpp" line="7325"/>
+        <location filename="../src/qalculatewindow.cpp" line="7303"/>
         <source>partial fraction</source>
         <translation>простий дріб</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5928"/>
-        <location filename="../src/qalculatewindow.cpp" line="7330"/>
+        <location filename="../src/qalculatewindow.cpp" line="7308"/>
         <source>base</source>
         <comment>number base</comment>
         <translation>основа числа</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5932"/>
-        <location filename="../src/qalculatewindow.cpp" line="7334"/>
+        <location filename="../src/qalculatewindow.cpp" line="7312"/>
         <source>decimals</source>
         <translation>десяткові</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5938"/>
-        <location filename="../src/qalculatewindow.cpp" line="7340"/>
+        <location filename="../src/qalculatewindow.cpp" line="7318"/>
         <source>fraction</source>
         <translation>дріб</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5990"/>
-        <location filename="../src/qalculatewindow.cpp" line="7379"/>
+        <location filename="../src/qalculatewindow.cpp" line="5991"/>
+        <location filename="../src/qalculatewindow.cpp" line="7358"/>
         <source>factorize</source>
         <translation>на множники</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5995"/>
-        <location filename="../src/qalculatewindow.cpp" line="7384"/>
+        <location filename="../src/qalculatewindow.cpp" line="5996"/>
+        <location filename="../src/qalculatewindow.cpp" line="7363"/>
         <source>expand</source>
         <translation>розкрити</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6178"/>
         <location filename="../src/qalculatewindow.cpp" line="6179"/>
         <location filename="../src/qalculatewindow.cpp" line="6180"/>
-        <location filename="../src/qalculatewindow.cpp" line="6614"/>
+        <location filename="../src/qalculatewindow.cpp" line="6181"/>
+        <location filename="../src/qalculatewindow.cpp" line="6615"/>
         <source>Calculating…</source>
         <translation>Обчислення…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6179"/>
-        <location filename="../src/qalculatewindow.cpp" line="6623"/>
-        <location filename="../src/qalculatewindow.cpp" line="8072"/>
+        <location filename="../src/qalculatewindow.cpp" line="6180"/>
+        <location filename="../src/qalculatewindow.cpp" line="6624"/>
+        <location filename="../src/qalculatewindow.cpp" line="8051"/>
         <source>Cancel</source>
         <translation>Скасувати</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6227"/>
-        <location filename="../src/qalculatewindow.cpp" line="7913"/>
+        <location filename="../src/qalculatewindow.cpp" line="6228"/>
+        <location filename="../src/qalculatewindow.cpp" line="7892"/>
         <source>RPN Operation</source>
         <translation>Операція ЗПЗ</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6602"/>
+        <location filename="../src/qalculatewindow.cpp" line="6603"/>
         <source>Factorizing…</source>
         <translation>Розкладаємо…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6606"/>
+        <location filename="../src/qalculatewindow.cpp" line="6607"/>
         <source>Expanding partial fractions…</source>
         <translation>Розкладаємо на прості дроби…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6610"/>
+        <location filename="../src/qalculatewindow.cpp" line="6611"/>
         <source>Expanding…</source>
         <translation>Розкриваємо…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6618"/>
+        <location filename="../src/qalculatewindow.cpp" line="6619"/>
         <source>Converting…</source>
         <translation>Переводимо…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6766"/>
+        <location filename="../src/qalculatewindow.cpp" line="6767"/>
         <source>Bit %1</source>
         <translation>Біт %1</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7909"/>
+        <location filename="../src/qalculatewindow.cpp" line="7888"/>
         <source>RPN Register Moved</source>
         <translation>Регістр ЗПЗ Переміщено</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8071"/>
-        <location filename="../src/qalculatewindow.cpp" line="8072"/>
-        <location filename="../src/qalculatewindow.cpp" line="8073"/>
+        <location filename="../src/qalculatewindow.cpp" line="8050"/>
+        <location filename="../src/qalculatewindow.cpp" line="8051"/>
+        <location filename="../src/qalculatewindow.cpp" line="8052"/>
         <source>Processing…</source>
         <translation>Обробка…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8219"/>
-        <location filename="../src/qalculatewindow.cpp" line="10698"/>
+        <location filename="../src/qalculatewindow.cpp" line="8198"/>
+        <location filename="../src/qalculatewindow.cpp" line="10677"/>
         <source>Matrix</source>
         <translation>Матриця</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8379"/>
+        <location filename="../src/qalculatewindow.cpp" line="8358"/>
         <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
         <translation>Невідомі змінні (напр. x, y, z) за замовчуванням уважаються дійсними.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8400"/>
-        <location filename="../src/qalculatewindow.cpp" line="8445"/>
+        <location filename="../src/qalculatewindow.cpp" line="8379"/>
+        <location filename="../src/qalculatewindow.cpp" line="8424"/>
         <source>Temperature Calculation Mode</source>
         <translation>Режим Обчислення Температури</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8406"/>
+        <location filename="../src/qalculatewindow.cpp" line="8385"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -5950,93 +5954,93 @@ Please select temperature calculation mode
 (його можна пізніше змінити в налаштуваннях).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8409"/>
+        <location filename="../src/qalculatewindow.cpp" line="8388"/>
         <source>Absolute</source>
         <translation>Абсолютне</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8413"/>
+        <location filename="../src/qalculatewindow.cpp" line="8392"/>
         <source>Relative</source>
         <translation>Відносний</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8417"/>
+        <location filename="../src/qalculatewindow.cpp" line="8396"/>
         <source>Hybrid</source>
         <translation>Гібридний</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8451"/>
+        <location filename="../src/qalculatewindow.cpp" line="8430"/>
         <source>Please select desired variant of the sinc function.</source>
         <translation>Будь ласка, виберіть бажаний варіант функції sinc.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8454"/>
+        <location filename="../src/qalculatewindow.cpp" line="8433"/>
         <source>Unnormalized</source>
         <translation>Не нормалізовано</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8458"/>
+        <location filename="../src/qalculatewindow.cpp" line="8437"/>
         <source>Normalized</source>
         <translation>Нормалізовано</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8493"/>
+        <location filename="../src/qalculatewindow.cpp" line="8472"/>
         <source>Interpretation of dots</source>
         <translation>Тлумачення крапок</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8493"/>
+        <location filename="../src/qalculatewindow.cpp" line="8472"/>
         <source>Interpretation of comma</source>
         <translation>Тлумачення коми</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8499"/>
+        <location filename="../src/qalculatewindow.cpp" line="8478"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
         <translation>Просимо вибрати тлумачення коми (&quot;,&quot;)
 (це можна пізніше змінити в налаштуваннях).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8499"/>
+        <location filename="../src/qalculatewindow.cpp" line="8478"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>Просимо вибрати тлумачення крапки (&quot;.&quot;)
 (це можна пізніше змінити в налаштуваннях).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8502"/>
+        <location filename="../src/qalculatewindow.cpp" line="8481"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>І крапка, і кома як десяткові роздільники</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8506"/>
+        <location filename="../src/qalculatewindow.cpp" line="8485"/>
         <source>Dot as thousands separator</source>
         <translation>Крапка як роздільник тисячних розрядів</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8506"/>
+        <location filename="../src/qalculatewindow.cpp" line="8485"/>
         <source>Comma as thousands separator</source>
         <translation>Кома як роздільник тисячних розрядів</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8510"/>
+        <location filename="../src/qalculatewindow.cpp" line="8489"/>
         <source>Only dot as decimal separator</source>
         <translation>Тільки крапка в десяткових дробах</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8510"/>
+        <location filename="../src/qalculatewindow.cpp" line="8489"/>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
         <translation>Кома як роздільник аргументів функції
 та елементів матриці/вектора</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8558"/>
+        <location filename="../src/qalculatewindow.cpp" line="8537"/>
         <source>Parsing Mode</source>
         <translation>Режим Обробки</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8564"/>
+        <location filename="../src/qalculatewindow.cpp" line="8543"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -6045,221 +6049,221 @@ Please select interpretation of expressions with implicit multiplication
 (це можна потім змінити в налаштуваннях).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8569"/>
+        <location filename="../src/qalculatewindow.cpp" line="8548"/>
         <source>Implicit multiplication first</source>
         <translation>Спершу неявне множення</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8576"/>
+        <location filename="../src/qalculatewindow.cpp" line="8555"/>
         <source>Conventional</source>
         <translation>Загальноприйняте</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8582"/>
+        <location filename="../src/qalculatewindow.cpp" line="8561"/>
         <source>Adaptive</source>
         <translation>Адаптивне</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8608"/>
+        <location filename="../src/qalculatewindow.cpp" line="8587"/>
         <source>Percentage Interpretation</source>
         <translation>Тлумачення Відсотків</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8614"/>
+        <location filename="../src/qalculatewindow.cpp" line="8593"/>
         <source>Please select interpretation of percentage addition</source>
         <translation>Просимо вибрати тлумачення додавання відсотків</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8617"/>
+        <location filename="../src/qalculatewindow.cpp" line="8596"/>
         <source>Add percentage of original value</source>
         <translation>Додати відсоток від оригінального числа</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8622"/>
+        <location filename="../src/qalculatewindow.cpp" line="8601"/>
         <source>Add percentage multiplied by 1/100</source>
         <translation>Додати відсоток, помножений на 1/100</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9453"/>
-        <location filename="../src/qalculatewindow.cpp" line="9608"/>
+        <location filename="../src/qalculatewindow.cpp" line="9432"/>
+        <location filename="../src/qalculatewindow.cpp" line="9587"/>
         <source>Add Action (%1)</source>
         <translation>Додати Дію (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9551"/>
+        <location filename="../src/qalculatewindow.cpp" line="9530"/>
         <source>Edit Keyboard Shortcut</source>
         <translation>Змінити Клавіатурне Скорочення</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9551"/>
+        <location filename="../src/qalculatewindow.cpp" line="9530"/>
         <source>New Keyboard Shortcut</source>
         <translation>Нове Клавіатурне Скорочення</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9557"/>
-        <location filename="../src/qalculatewindow.cpp" line="9767"/>
+        <location filename="../src/qalculatewindow.cpp" line="9536"/>
+        <location filename="../src/qalculatewindow.cpp" line="9746"/>
         <source>Action</source>
         <translation>Дія</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9598"/>
+        <location filename="../src/qalculatewindow.cpp" line="9577"/>
         <source>Value:</source>
         <translation>Значення:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9643"/>
+        <location filename="../src/qalculatewindow.cpp" line="9622"/>
         <source>Set key combination</source>
         <translation>Установити сполучення клавіш</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9646"/>
+        <location filename="../src/qalculatewindow.cpp" line="9625"/>
         <source>Press the key combination you wish to use for the action.</source>
         <translation>Натисніть сполучення клавіш, яке ви хочете використовувати для дії.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9664"/>
+        <location filename="../src/qalculatewindow.cpp" line="9643"/>
         <source>Reserved key combination</source>
         <translation>Зарезервоване сполучення клавіш</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9671"/>
+        <location filename="../src/qalculatewindow.cpp" line="9650"/>
         <source>Question</source>
         <translation>Питання</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9671"/>
+        <location filename="../src/qalculatewindow.cpp" line="9650"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation>Сполучення клавіш уже зайняте.
 Чи ви хочете замінити поточну дію (%1)?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9767"/>
+        <location filename="../src/qalculatewindow.cpp" line="9746"/>
         <source>Key combination</source>
         <translation>Сполучення клавіш</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9788"/>
+        <location filename="../src/qalculatewindow.cpp" line="9767"/>
         <source>Add…</source>
         <translation>Додати…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9791"/>
+        <location filename="../src/qalculatewindow.cpp" line="9770"/>
         <source>Edit…</source>
         <translation>Змінити…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9795"/>
+        <location filename="../src/qalculatewindow.cpp" line="9774"/>
         <source>Remove</source>
         <translation>Видалити</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10110"/>
+        <location filename="../src/qalculatewindow.cpp" line="10089"/>
         <source>Gnuplot was not found</source>
         <translation>Gnuplot не знайдено</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10110"/>
+        <location filename="../src/qalculatewindow.cpp" line="10089"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>Щоб побудова графіка працювала, %1 (%2) мають бути встановлені окремо і знаходитися в шляху пошуку програм.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10304"/>
+        <location filename="../src/qalculatewindow.cpp" line="10283"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>Приклад:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10338"/>
+        <location filename="../src/qalculatewindow.cpp" line="10317"/>
         <source>Keep open</source>
         <translation>Залишати відкритим</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10346"/>
+        <location filename="../src/qalculatewindow.cpp" line="10325"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>Ввести</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10346"/>
+        <location filename="../src/qalculatewindow.cpp" line="10325"/>
         <source>Calculate</source>
         <translation>Рахувати</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10347"/>
-        <location filename="../src/qalculatewindow.cpp" line="10832"/>
+        <location filename="../src/qalculatewindow.cpp" line="10326"/>
+        <location filename="../src/qalculatewindow.cpp" line="10811"/>
         <source>Apply to Stack</source>
         <translation>Застосувати до стеку</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10347"/>
-        <location filename="../src/qalculatewindow.cpp" line="10832"/>
+        <location filename="../src/qalculatewindow.cpp" line="10326"/>
+        <location filename="../src/qalculatewindow.cpp" line="10811"/>
         <source>Insert</source>
         <translation>Вставити</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10363"/>
+        <location filename="../src/qalculatewindow.cpp" line="10342"/>
         <source>Value</source>
         <translation>Значення</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10365"/>
+        <location filename="../src/qalculatewindow.cpp" line="10344"/>
         <source>Argument</source>
         <translation>Аргумент</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10435"/>
+        <location filename="../src/qalculatewindow.cpp" line="10414"/>
         <source>True</source>
         <translation>Істина</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10438"/>
+        <location filename="../src/qalculatewindow.cpp" line="10417"/>
         <source>False</source>
         <translation>Хиба</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10464"/>
+        <location filename="../src/qalculatewindow.cpp" line="10443"/>
         <source>Info</source>
         <translation>Інформація</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10516"/>
-        <location filename="../src/qalculatewindow.cpp" line="10524"/>
+        <location filename="../src/qalculatewindow.cpp" line="10495"/>
+        <location filename="../src/qalculatewindow.cpp" line="10503"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>додатковий</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10895"/>
+        <location filename="../src/qalculatewindow.cpp" line="10874"/>
         <source>Failed to open %1.
 %2</source>
         <translation>Не вдалося відкрити %1.
 %2</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11128"/>
+        <location filename="../src/qalculatewindow.cpp" line="11107"/>
         <source>Failed to open workspace</source>
         <translation>Не вдалося відкрити робочий простір</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11141"/>
-        <location filename="../src/qalculatewindow.cpp" line="11151"/>
-        <location filename="../src/qalculatewindow.cpp" line="11171"/>
+        <location filename="../src/qalculatewindow.cpp" line="11120"/>
+        <location filename="../src/qalculatewindow.cpp" line="11130"/>
+        <location filename="../src/qalculatewindow.cpp" line="11150"/>
         <source>Couldn&apos;t save workspace</source>
         <translation>Не вдалося зберегти робочий простір</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11162"/>
+        <location filename="../src/qalculatewindow.cpp" line="11141"/>
         <source>Save file?</source>
         <translation>Зберегти файл?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11162"/>
+        <location filename="../src/qalculatewindow.cpp" line="11141"/>
         <source>Do you want to save the current workspace?</source>
         <translation>Чи ви хочете зберегти поточний робочий простір?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11163"/>
+        <location filename="../src/qalculatewindow.cpp" line="11142"/>
         <source>Do not ask again</source>
         <translation>Більше не питати</translation>
     </message>
@@ -6363,7 +6367,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="112"/>
-        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
+        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and kelvin).</source>
         <translation>Відношення до основної одиниці. Для лінійних відношень це просто число. &lt;br&gt;&lt;br&gt;Для нелінійних відношень уживайте \x як множник та \y як степінь (напр. &quot;\x + 273.15&quot; для відношення між градусами Цельсія та кельвінами).</translation>
     </message>
     <message>
@@ -6560,9 +6564,64 @@ Do you want to overwrite it?</source>
         <translation>Тип:</translation>
     </message>
     <message>
+        <location filename="../src/unknowneditdialog.cpp" line="49"/>
+        <source>Number</source>
+        <translation type="unfinished">Число</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="50"/>
+        <source>Real number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="51"/>
+        <source>Rational number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="52"/>
+        <source>Integer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="53"/>
+        <source>Boolean</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/unknowneditdialog.cpp" line="55"/>
         <source>Sign:</source>
         <translation>Знак:</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="57"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="58"/>
+        <source>Non-zero</source>
+        <translation type="unfinished">Ненульовий</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="59"/>
+        <source>Positive</source>
+        <translation type="unfinished">Додатний</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="60"/>
+        <source>Non-negative</source>
+        <translation type="unfinished">Невід&apos;ємний</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="61"/>
+        <source>Negative</source>
+        <translation type="unfinished">Від&apos;ємний</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="62"/>
+        <source>Non-positive</source>
+        <translation type="unfinished">Недодатний</translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="64"/>
@@ -6661,13 +6720,13 @@ Do you want to overwrite it?</source>
 Чи ви хочете замінити її?</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="337"/>
+        <location filename="../src/variableeditdialog.cpp" line="338"/>
         <source>Edit Variable</source>
         <translation>Редагувати Змінну</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="351"/>
-        <location filename="../src/variableeditdialog.cpp" line="397"/>
+        <location filename="../src/variableeditdialog.cpp" line="352"/>
+        <location filename="../src/variableeditdialog.cpp" line="398"/>
         <source>New Variable</source>
         <translation>Нова Змінна</translation>
     </message>

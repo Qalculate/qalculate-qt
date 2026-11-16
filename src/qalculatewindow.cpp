@@ -5959,6 +5959,7 @@ void QalculateWindow::calculateExpression(bool force, bool do_mathoperation, Mat
 			}
 			if(str_left.empty()) break;
 			to_str = str_left;
+			str_left = "";
 		}
 		if(do_to) {
 			if(from_str.empty()) {
@@ -7333,6 +7334,7 @@ void QalculateWindow::autoCalculateTimeout() {
 			}
 			if(str_left.empty()) break;
 			to_str = str_left;
+			str_left = "";
 		}
 		if(do_to) {
 			str = from_str;

@@ -417,7 +417,8 @@ void FunctionsDialog::selectedFunctionChanged(const QModelIndex &index, const QM
 			str += "</i><br>";
 			if(f->subtype() == SUBTYPE_DATA_SET) {
 				str += "<br>";
-				str += tr("Retrieves data from the %1 data set for a given object and property. If \"info\" is typed as property, a dialog window will pop up with all properties of the object.").arg(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) descriptionView))).toHtmlEscaped().toStdString();
+				MathFunction *f_atom = CALCULATOR->getActiveFunction("atom");
+				str += tr("Retrieves data from the %1 data set for a given object and property. If \"%2\" is typed as property, a dialog window will pop up with all properties of the object.").arg(QString::fromStdString(f->title(true, settings->printops.use_unicode_signs, &can_display_unicode_string_function, (void*) descriptionView))).arg(f_atom ? QString::fromStdString(f_atom->getDefaultValue(2)) : QString("info")).toHtmlEscaped().toStdString();
 				str += "<br>";
 			}
 			if(!f->description().empty()) {

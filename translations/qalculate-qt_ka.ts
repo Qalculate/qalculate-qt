@@ -937,7 +937,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1706"/>
-        <location filename="../src/expressionedit.cpp" line="3293"/>
+        <location filename="../src/expressionedit.cpp" line="3317"/>
         <source>Unicode</source>
         <translation>უნიკოდი</translation>
     </message>
@@ -1122,380 +1122,380 @@ Do you want to overwrite the function?</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2842"/>
-        <location filename="../src/expressionedit.cpp" line="2844"/>
+        <location filename="../src/expressionedit.cpp" line="2866"/>
+        <location filename="../src/expressionedit.cpp" line="2868"/>
         <source>comment</source>
         <translation>კომენტარი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2867"/>
-        <location filename="../src/expressionedit.cpp" line="2869"/>
+        <location filename="../src/expressionedit.cpp" line="2891"/>
+        <location filename="../src/expressionedit.cpp" line="2893"/>
         <source>MC (memory clear)</source>
         <translation>MC (მეხსიერების გასუფთავება)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2877"/>
-        <location filename="../src/expressionedit.cpp" line="2879"/>
+        <location filename="../src/expressionedit.cpp" line="2901"/>
+        <location filename="../src/expressionedit.cpp" line="2903"/>
         <source>MS (memory store)</source>
         <translation>MS (მეხსიერებაში დამახსოვრება)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2887"/>
-        <location filename="../src/expressionedit.cpp" line="2889"/>
+        <location filename="../src/expressionedit.cpp" line="2911"/>
+        <location filename="../src/expressionedit.cpp" line="2913"/>
         <source>M+ (memory plus)</source>
         <translation>M+ (მიმატება მეხსიერებაში მყოფ მნიშვნელობაზე)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2897"/>
-        <location filename="../src/expressionedit.cpp" line="2899"/>
+        <location filename="../src/expressionedit.cpp" line="2921"/>
+        <location filename="../src/expressionedit.cpp" line="2923"/>
         <source>M− (memory minus)</source>
         <translation>M- (მეხსიერებაში მყოფ მნიშვნელობაზე გამოკლება)</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2913"/>
-        <location filename="../src/expressionedit.cpp" line="2915"/>
+        <location filename="../src/expressionedit.cpp" line="2937"/>
+        <location filename="../src/expressionedit.cpp" line="2939"/>
         <source>factorize</source>
         <translation>მამრავლებად დაშლა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="2916"/>
-        <location filename="../src/expressionedit.cpp" line="2918"/>
+        <location filename="../src/expressionedit.cpp" line="2940"/>
+        <location filename="../src/expressionedit.cpp" line="2942"/>
         <source>expand</source>
         <translation>ამოკეცვა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3256"/>
+        <location filename="../src/expressionedit.cpp" line="3280"/>
         <source>hexadecimal</source>
         <translation>თექვსმეტობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3257"/>
-        <location filename="../src/expressionedit.cpp" line="3377"/>
+        <location filename="../src/expressionedit.cpp" line="3281"/>
+        <location filename="../src/expressionedit.cpp" line="3401"/>
         <source>hexadecimal number</source>
         <translation>თექვსმეტობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3258"/>
+        <location filename="../src/expressionedit.cpp" line="3282"/>
         <source>octal</source>
         <translation>რვაობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3259"/>
+        <location filename="../src/expressionedit.cpp" line="3283"/>
         <source>octal number</source>
         <translation>რვაობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3260"/>
+        <location filename="../src/expressionedit.cpp" line="3284"/>
         <source>decimal</source>
         <translation>ათობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3261"/>
+        <location filename="../src/expressionedit.cpp" line="3285"/>
         <source>decimal number</source>
         <translation>ათობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3262"/>
+        <location filename="../src/expressionedit.cpp" line="3286"/>
         <source>duodecimal</source>
         <translation>თორმეტობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3263"/>
-        <location filename="../src/expressionedit.cpp" line="3265"/>
+        <location filename="../src/expressionedit.cpp" line="3287"/>
+        <location filename="../src/expressionedit.cpp" line="3289"/>
         <source>duodecimal number</source>
         <translation>თორმეტობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3266"/>
+        <location filename="../src/expressionedit.cpp" line="3290"/>
         <source>binary</source>
         <translation>ბინარული</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3267"/>
-        <location filename="../src/expressionedit.cpp" line="3371"/>
+        <location filename="../src/expressionedit.cpp" line="3291"/>
+        <location filename="../src/expressionedit.cpp" line="3395"/>
         <source>binary number</source>
         <translation>ორობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3268"/>
+        <location filename="../src/expressionedit.cpp" line="3292"/>
         <source>roman</source>
         <translation>რომანული</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3269"/>
+        <location filename="../src/expressionedit.cpp" line="3293"/>
         <source>roman numerals</source>
         <translation>რომაული რიცხვები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3270"/>
+        <location filename="../src/expressionedit.cpp" line="3294"/>
         <source>bijective</source>
         <translation>ბიექტურობა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3271"/>
+        <location filename="../src/expressionedit.cpp" line="3295"/>
         <source>bijective base-26</source>
         <translation>ბიექტური საბაზისო-26</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3273"/>
+        <location filename="../src/expressionedit.cpp" line="3297"/>
         <source>binary-coded decimal</source>
         <translation>ბინარულად კოდირებული ათობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3274"/>
+        <location filename="../src/expressionedit.cpp" line="3298"/>
         <source>sexagesimal</source>
         <translation>ექვსობითი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3275"/>
+        <location filename="../src/expressionedit.cpp" line="3299"/>
         <source>sexagesimal number</source>
         <translation>ექვსობითი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3276"/>
-        <location filename="../src/expressionedit.cpp" line="3277"/>
+        <location filename="../src/expressionedit.cpp" line="3300"/>
+        <location filename="../src/expressionedit.cpp" line="3301"/>
         <source>latitude</source>
         <translation>განედი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3278"/>
-        <location filename="../src/expressionedit.cpp" line="3279"/>
+        <location filename="../src/expressionedit.cpp" line="3302"/>
+        <location filename="../src/expressionedit.cpp" line="3303"/>
         <source>longitude</source>
         <translation>გრძედი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3281"/>
+        <location filename="../src/expressionedit.cpp" line="3305"/>
         <source>32-bit floating point</source>
         <translation>32-ბიტიანი მცურავმძიმიანი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3283"/>
+        <location filename="../src/expressionedit.cpp" line="3307"/>
         <source>64-bit floating point</source>
         <translation>64-ბიტიანი მცურავმძიმიანი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3285"/>
+        <location filename="../src/expressionedit.cpp" line="3309"/>
         <source>16-bit floating point</source>
         <translation>16-ბიტიანი მცურავმძიმიანი რიცხვი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3287"/>
+        <location filename="../src/expressionedit.cpp" line="3311"/>
         <source>80-bit (x86) floating point</source>
         <translation>80-ბიტიანი(x86) მცურავმძიმიანი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3289"/>
+        <location filename="../src/expressionedit.cpp" line="3313"/>
         <source>128-bit floating point</source>
         <translation>128-ბიტიანი მცურავმძიმიანი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3290"/>
+        <location filename="../src/expressionedit.cpp" line="3314"/>
         <source>time</source>
         <translation>დრო</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3291"/>
+        <location filename="../src/expressionedit.cpp" line="3315"/>
         <source>time format</source>
         <translation>დროის ფორმატი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3294"/>
+        <location filename="../src/expressionedit.cpp" line="3318"/>
         <source>scientific</source>
         <translation>სამეცნიერო</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3295"/>
+        <location filename="../src/expressionedit.cpp" line="3319"/>
         <source>scientific notation</source>
         <translation>სამეცნიერო ჩანაწერი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3296"/>
+        <location filename="../src/expressionedit.cpp" line="3320"/>
         <source>engineering</source>
         <translation>საინჟინრო</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3297"/>
+        <location filename="../src/expressionedit.cpp" line="3321"/>
         <source>engineering notation</source>
         <translation>საინჟინრო ნოტაცა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3298"/>
+        <location filename="../src/expressionedit.cpp" line="3322"/>
         <source>simple</source>
         <translation>მარტივი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3299"/>
+        <location filename="../src/expressionedit.cpp" line="3323"/>
         <source>simple notation</source>
         <translation>მარტივი ნოტაცია</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3300"/>
+        <location filename="../src/expressionedit.cpp" line="3324"/>
         <source>bases</source>
         <translation>ფუძეები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3301"/>
+        <location filename="../src/expressionedit.cpp" line="3325"/>
         <source>number bases</source>
         <translation>რიცხვის ფუძეები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3302"/>
-        <location filename="../src/expressionedit.cpp" line="3303"/>
+        <location filename="../src/expressionedit.cpp" line="3326"/>
+        <location filename="../src/expressionedit.cpp" line="3327"/>
         <source>calendars</source>
         <translation>კალენდრები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3304"/>
+        <location filename="../src/expressionedit.cpp" line="3328"/>
         <source>optimal</source>
         <translation>ოპტიმალური</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3305"/>
+        <location filename="../src/expressionedit.cpp" line="3329"/>
         <source>optimal unit</source>
         <translation>ოპტიმალური ერთეული</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3306"/>
+        <location filename="../src/expressionedit.cpp" line="3330"/>
         <source>prefix</source>
         <translation>პრეფიქსი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3307"/>
+        <location filename="../src/expressionedit.cpp" line="3331"/>
         <source>optimal prefix</source>
         <translation>ოპტიმალური პრეფიქსი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3308"/>
+        <location filename="../src/expressionedit.cpp" line="3332"/>
         <source>base</source>
         <comment>base units</comment>
         <translation>ბაზა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3309"/>
+        <location filename="../src/expressionedit.cpp" line="3333"/>
         <source>base units</source>
         <translation>ძირითადი ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3310"/>
+        <location filename="../src/expressionedit.cpp" line="3334"/>
         <source>mixed</source>
         <translation>შერეული</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3311"/>
+        <location filename="../src/expressionedit.cpp" line="3335"/>
         <source>mixed units</source>
         <translation>შერეული ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3312"/>
-        <location filename="../src/expressionedit.cpp" line="3313"/>
+        <location filename="../src/expressionedit.cpp" line="3336"/>
+        <location filename="../src/expressionedit.cpp" line="3337"/>
         <source>factors</source>
         <translation>factors</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3314"/>
+        <location filename="../src/expressionedit.cpp" line="3338"/>
         <source>partial fraction</source>
         <translation>ნაწილობრივი წილადი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3315"/>
+        <location filename="../src/expressionedit.cpp" line="3339"/>
         <source>expanded partial fractions</source>
         <translation>გაფართოებული ათწილადის წილადები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3316"/>
+        <location filename="../src/expressionedit.cpp" line="3340"/>
         <source>rectangular</source>
         <translation>მართკუთხედი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3316"/>
+        <location filename="../src/expressionedit.cpp" line="3340"/>
         <source>cartesian</source>
         <translation>დეკარტის</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3317"/>
+        <location filename="../src/expressionedit.cpp" line="3341"/>
         <source>complex rectangular form</source>
         <translation>კომპლექსური ოთხკუთხედი ფორმა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3318"/>
+        <location filename="../src/expressionedit.cpp" line="3342"/>
         <source>exponential</source>
         <translation>ექსპოტენციალური</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3319"/>
+        <location filename="../src/expressionedit.cpp" line="3343"/>
         <source>complex exponential form</source>
         <translation>კომპლექსური ექსპონენტური ფორმა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3320"/>
+        <location filename="../src/expressionedit.cpp" line="3344"/>
         <source>polar</source>
         <translation>პოლარული</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3321"/>
+        <location filename="../src/expressionedit.cpp" line="3345"/>
         <source>complex polar form</source>
         <translation>კომპლექსური პოლარული ფორმა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3323"/>
+        <location filename="../src/expressionedit.cpp" line="3347"/>
         <source>complex cis form</source>
         <translation>კომპლექსური ცის ფორმა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3324"/>
+        <location filename="../src/expressionedit.cpp" line="3348"/>
         <source>angle</source>
         <translation>angle</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3325"/>
+        <location filename="../src/expressionedit.cpp" line="3349"/>
         <source>complex angle notation</source>
         <translation>კომპლექსური რიცხვის კუთხის ნოტაცია</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3326"/>
+        <location filename="../src/expressionedit.cpp" line="3350"/>
         <source>phasor</source>
         <translation>ფაზური</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3327"/>
+        <location filename="../src/expressionedit.cpp" line="3351"/>
         <source>complex phasor notation</source>
         <translation>კომპლექსური რიცხვის ვექტორის ნოტაცია</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3329"/>
+        <location filename="../src/expressionedit.cpp" line="3353"/>
         <source>UTC time zone</source>
         <translation>UTC დროის სარტყელი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3381"/>
+        <location filename="../src/expressionedit.cpp" line="3405"/>
         <source>base</source>
         <comment>number base</comment>
         <translation>ბაზა</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3382"/>
+        <location filename="../src/expressionedit.cpp" line="3406"/>
         <source>number base %1</source>
         <translation>რიცხვის ბაზაა %1</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3383"/>
+        <location filename="../src/expressionedit.cpp" line="3407"/>
         <source>decimals</source>
         <translation>ათწილადები</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3384"/>
+        <location filename="../src/expressionedit.cpp" line="3408"/>
         <source>decimal fraction</source>
         <translation>ათწილადის წილადი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3387"/>
-        <location filename="../src/expressionedit.cpp" line="3389"/>
-        <location filename="../src/expressionedit.cpp" line="3395"/>
+        <location filename="../src/expressionedit.cpp" line="3411"/>
+        <location filename="../src/expressionedit.cpp" line="3413"/>
+        <location filename="../src/expressionedit.cpp" line="3419"/>
         <source>fraction</source>
         <translation>ნაწილი</translation>
     </message>
     <message>
-        <location filename="../src/expressionedit.cpp" line="3946"/>
+        <location filename="../src/expressionedit.cpp" line="3970"/>
         <source>Data object</source>
         <translation>მონაცემის ობიექტი</translation>
     </message>
@@ -1738,12 +1738,12 @@ Do you want to overwrite the function?</source>
 გნებავთ გადააწეროთ თავზე?</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1387"/>
+        <location filename="../src/functioneditdialog.cpp" line="1388"/>
         <source>Edit Function</source>
         <translation>ფუნქციის ჩასწორება</translation>
     </message>
     <message>
-        <location filename="../src/functioneditdialog.cpp" line="1400"/>
+        <location filename="../src/functioneditdialog.cpp" line="1401"/>
         <source>New Function</source>
         <translation>ახალი ფუნქცია</translation>
     </message>
@@ -1762,7 +1762,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="62"/>
-        <location filename="../src/functionsdialog.cpp" line="596"/>
+        <location filename="../src/functionsdialog.cpp" line="597"/>
         <source>Function</source>
         <translation>ფუნქცია</translation>
     </message>
@@ -1778,8 +1778,8 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="87"/>
-        <location filename="../src/functionsdialog.cpp" line="516"/>
-        <location filename="../src/functionsdialog.cpp" line="519"/>
+        <location filename="../src/functionsdialog.cpp" line="517"/>
+        <location filename="../src/functionsdialog.cpp" line="520"/>
         <source>Deactivate</source>
         <translation>დეაქტივაცია</translation>
     </message>
@@ -1813,14 +1813,14 @@ Do you want to overwrite the function?</source>
         <location filename="../src/functionsdialog.cpp" line="241"/>
         <location filename="../src/functionsdialog.cpp" line="355"/>
         <location filename="../src/functionsdialog.cpp" line="357"/>
-        <location filename="../src/functionsdialog.cpp" line="668"/>
+        <location filename="../src/functionsdialog.cpp" line="669"/>
         <source>Inactive</source>
         <translation>არააქტიური</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="191"/>
         <location filename="../src/functionsdialog.cpp" line="249"/>
-        <location filename="../src/functionsdialog.cpp" line="717"/>
+        <location filename="../src/functionsdialog.cpp" line="718"/>
         <source>Uncategorized</source>
         <translation>კატეგორიის გარეშე</translation>
     </message>
@@ -1830,71 +1830,75 @@ Do you want to overwrite the function?</source>
         <translation>არგუმენტი</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="420"/>
-        <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation>მიიღებს მონაცემებს %1 მონაცემთა ნაკრებიდან მოცემული ობიექტისთვის და თვისებისთვის თუ თვისებად შეყვანილია &quot;info&quot;, გაიხსნება დიალოგი ობიექტის ყველა თვისებით.</translation>
+        <location filename="../src/functionsdialog.cpp" line="421"/>
+        <source>Retrieves data from the %1 data set for a given object and property. If &quot;%2&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
+        <translation>მიიღებს მონაცემებს %1 მონაცემთა ნაკრებიდან მოცემული ობიექტისთვის და თვისებისთვის თუ თვისებად შეყვანილია &quot;%2&quot;, გაიხსნება დიალოგი ობიექტის ყველა თვისებით.</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="430"/>
+        <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
+        <translation type="vanished">მიიღებს მონაცემებს %1 მონაცემთა ნაკრებიდან მოცემული ობიექტისთვის და თვისებისთვის თუ თვისებად შეყვანილია &quot;info&quot;, გაიხსნება დიალოგი ობიექტის ყველა თვისებით.</translation>
+    </message>
+    <message>
+        <location filename="../src/functionsdialog.cpp" line="431"/>
         <source>Example:</source>
         <translation>მაგალითი:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="442"/>
+        <location filename="../src/functionsdialog.cpp" line="443"/>
         <source>Arguments</source>
         <translation>არგუმენტები</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="459"/>
+        <location filename="../src/functionsdialog.cpp" line="460"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>არასავალდებულო</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="462"/>
+        <location filename="../src/functionsdialog.cpp" line="463"/>
         <source>default:</source>
         <comment>argument default</comment>
         <translation>ნაგულისხმები:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="478"/>
+        <location filename="../src/functionsdialog.cpp" line="479"/>
         <source>Requirement:</source>
         <comment>Required condition for function</comment>
         <translation>მოთხოვნა:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="486"/>
+        <location filename="../src/functionsdialog.cpp" line="487"/>
         <source>Properties</source>
         <translation>თვისებები</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="493"/>
+        <location filename="../src/functionsdialog.cpp" line="494"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="503"/>
+        <location filename="../src/functionsdialog.cpp" line="504"/>
         <source>key</source>
         <extracomment>indicating that the property is a data set key</extracomment>
         <translation>გასაღები</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="521"/>
+        <location filename="../src/functionsdialog.cpp" line="522"/>
         <source>Activate</source>
         <translation>აქტივაცია</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="656"/>
+        <location filename="../src/functionsdialog.cpp" line="657"/>
         <source>Favorites</source>
         <translation>რჩეულები</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="661"/>
+        <location filename="../src/functionsdialog.cpp" line="662"/>
         <source>User functions</source>
         <translation>მომხმარებლის ფუნქციები</translation>
     </message>
     <message>
-        <location filename="../src/functionsdialog.cpp" line="674"/>
+        <location filename="../src/functionsdialog.cpp" line="675"/>
         <source>All</source>
         <comment>All functions</comment>
         <translation>ყველა</translation>
@@ -3128,771 +3132,771 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="89"/>
-        <location filename="../src/preferencesdialog.cpp" line="399"/>
+        <location filename="../src/preferencesdialog.cpp" line="401"/>
         <source>Default</source>
         <translation>ნაგულისხმევი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="123"/>
+        <location filename="../src/preferencesdialog.cpp" line="125"/>
         <source>Allow multiple instances</source>
         <translation>ერთზე მეტი გაშვებული ასლის დაშვება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="124"/>
+        <location filename="../src/preferencesdialog.cpp" line="126"/>
         <source>Notify when a new version is available</source>
         <translation>გამაფრთხილე, როცა ხელმისაწვდომი იქნება ახალი ვერსია</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="125"/>
+        <location filename="../src/preferencesdialog.cpp" line="127"/>
         <source>Clear history on exit</source>
         <translation>ისტორიის გასუფთავება გასვლისას</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="126"/>
+        <location filename="../src/preferencesdialog.cpp" line="128"/>
         <source>Max history lines saved:</source>
         <translation>მაქს. შენახული ისტორიის ხაზები:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="127"/>
+        <location filename="../src/preferencesdialog.cpp" line="129"/>
         <source>Close application with Escape key</source>
         <translation>აპლიკაციის დახურვა ღილაკით Escape</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="128"/>
+        <location filename="../src/preferencesdialog.cpp" line="130"/>
         <source>Use keyboard keys for RPN</source>
         <translation>კლავიატურის ღილაკების გამოყენება RPN-ისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="129"/>
+        <location filename="../src/preferencesdialog.cpp" line="131"/>
         <source>Use caret for bitwise XOR</source>
         <translation>კარეტის გამოყენება ბიტური XOR-ისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="130"/>
+        <location filename="../src/preferencesdialog.cpp" line="132"/>
         <source>Keep above other windows</source>
         <translation>დანარჩენი ფანჯრების ზემოთ ქონა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="131"/>
+        <location filename="../src/preferencesdialog.cpp" line="133"/>
         <source>Preserve history height</source>
         <translation>ისტორიის სიმაღლის შენარჩუნება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="139"/>
+        <location filename="../src/preferencesdialog.cpp" line="141"/>
         <source>Do not change the height of history list when keypad or number bases are show or hidden.</source>
         <translation>ისტორიის სიის სიმაღლე არ შეიცვლება, როცა ციფრული კლავიატურა, ან რიცხვის ფუძეები ნაჩვენები, ან დამალულია.</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="141"/>
+        <location filename="../src/preferencesdialog.cpp" line="143"/>
         <source>Show status bar</source>
         <translation>მდგომარეობის ზოლის ჩვენება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="142"/>
+        <location filename="../src/preferencesdialog.cpp" line="144"/>
         <source>Window title:</source>
         <translation>ფანჯრის სათაური:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="144"/>
+        <location filename="../src/preferencesdialog.cpp" line="146"/>
         <source>Application name</source>
         <translation>აპლიკაციის სახელი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="145"/>
+        <location filename="../src/preferencesdialog.cpp" line="147"/>
         <source>Result</source>
         <translation>შედეგი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="146"/>
+        <location filename="../src/preferencesdialog.cpp" line="148"/>
         <source>Application name + result</source>
         <translation>აპლიკაციის სახელი + შედეგი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="147"/>
+        <location filename="../src/preferencesdialog.cpp" line="149"/>
         <source>Workspace</source>
         <translation>სამუშაო სივრცე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="148"/>
+        <location filename="../src/preferencesdialog.cpp" line="150"/>
         <source>Application name + workspace</source>
         <translation>აპლიკაციის სახელი + სამუშაო სივრცე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="152"/>
+        <location filename="../src/preferencesdialog.cpp" line="154"/>
         <source>Tooltips:</source>
         <translation>მინიშნებები:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="154"/>
+        <location filename="../src/preferencesdialog.cpp" line="156"/>
         <source>Show all</source>
         <translation>ყველას ჩვენება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="155"/>
+        <location filename="../src/preferencesdialog.cpp" line="157"/>
         <source>Hide in keypad</source>
         <translation>დამალვა ციფრულ კლავიატურაში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="156"/>
+        <location filename="../src/preferencesdialog.cpp" line="158"/>
         <source>Hide all</source>
         <translation>ყველას დამალვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="160"/>
+        <location filename="../src/preferencesdialog.cpp" line="162"/>
         <source>Style:</source>
         <translation>სტილი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="163"/>
+        <location filename="../src/preferencesdialog.cpp" line="165"/>
         <source>Default (requires restart)</source>
         <comment>Default style</comment>
         <translation>ნაგულისხმევი (საჭიროებს გადატვირთვას)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="174"/>
         <location filename="../src/preferencesdialog.cpp" line="176"/>
+        <location filename="../src/preferencesdialog.cpp" line="178"/>
         <source>Dark mode</source>
         <translation>მუქი რეჟიმი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="178"/>
+        <location filename="../src/preferencesdialog.cpp" line="180"/>
         <source>Disable cursor blinking</source>
         <translation>კურსორის ციმციმის გამორთვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="179"/>
+        <location filename="../src/preferencesdialog.cpp" line="181"/>
         <source>Colorize result</source>
         <translation>შედეგის გაფერადება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="180"/>
+        <location filename="../src/preferencesdialog.cpp" line="182"/>
         <source>Format result</source>
         <translation>შედეგის დაფორმატება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="469"/>
+        <location filename="../src/preferencesdialog.cpp" line="471"/>
         <source>Custom history font:</source>
         <translation>მორგებული ისტორიის ფონტი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="472"/>
+        <location filename="../src/preferencesdialog.cpp" line="474"/>
         <source>Custom expression font:</source>
         <translation>მორგებული გამოხატულების ფონტი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="475"/>
+        <location filename="../src/preferencesdialog.cpp" line="477"/>
         <source>Custom status bar font:</source>
         <translation>მორგებული სტატუსის ზოლის ფონტი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="478"/>
+        <location filename="../src/preferencesdialog.cpp" line="480"/>
         <source>Custom keypad font:</source>
         <translation>მორგებული ციფრული კლავიატურის ფონტი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="466"/>
+        <location filename="../src/preferencesdialog.cpp" line="468"/>
         <source>Custom application font:</source>
         <translation>მორგებული აპლიკაციის ფონტი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="184"/>
+        <location filename="../src/preferencesdialog.cpp" line="186"/>
         <source>Expression status:</source>
         <translation>გამოსახულების სტატუსი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="140"/>
+        <location filename="../src/preferencesdialog.cpp" line="142"/>
         <source>Place expression field below history</source>
         <translation>გამოსახულების ველის ისტორიის ქვემოთ მოთავსება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="186"/>
-        <location filename="../src/preferencesdialog.cpp" line="318"/>
+        <location filename="../src/preferencesdialog.cpp" line="188"/>
+        <location filename="../src/preferencesdialog.cpp" line="320"/>
         <source>Off</source>
         <translation>გამორთ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="187"/>
+        <location filename="../src/preferencesdialog.cpp" line="189"/>
         <source>In history list</source>
         <translation>ისტორიის სიაში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="188"/>
+        <location filename="../src/preferencesdialog.cpp" line="190"/>
         <source>In expression field</source>
         <translation>გამოსახულების ველში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="189"/>
+        <location filename="../src/preferencesdialog.cpp" line="191"/>
         <source>In status bar</source>
         <translation>სტატუსის ზოლში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="197"/>
+        <location filename="../src/preferencesdialog.cpp" line="199"/>
         <source>Status tooltip delay:</source>
         <translation>სტატუსის მინიშნების დაყოვნება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="202"/>
-        <location filename="../src/preferencesdialog.cpp" line="212"/>
+        <location filename="../src/preferencesdialog.cpp" line="204"/>
+        <location filename="../src/preferencesdialog.cpp" line="214"/>
         <source>ms</source>
         <extracomment>milliseconds</extracomment>
         <translation>მწმ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="207"/>
+        <location filename="../src/preferencesdialog.cpp" line="209"/>
         <source>Calculate as you type delay:</source>
         <translation>აკრეფისას გამოთვლის დაყოვნება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="217"/>
+        <location filename="../src/preferencesdialog.cpp" line="219"/>
         <source>Adaptive delay</source>
         <translation>ადაპტიური დაყოვნებით</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="218"/>
+        <location filename="../src/preferencesdialog.cpp" line="220"/>
         <source>Automatically calculate selection</source>
         <translation>მონიშნულის ავტომატური გამოთვლა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="219"/>
+        <location filename="../src/preferencesdialog.cpp" line="221"/>
         <source>Expression in history:</source>
         <translation>გამოსახულება ისტორიაში:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="221"/>
+        <location filename="../src/preferencesdialog.cpp" line="223"/>
         <source>Parsed</source>
         <translation>დამუშავებული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="222"/>
+        <location filename="../src/preferencesdialog.cpp" line="224"/>
         <source>Parsed (compact)</source>
         <translation>დამუშავებული (კომპაქტური)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="223"/>
+        <location filename="../src/preferencesdialog.cpp" line="225"/>
         <source>Entered</source>
         <translation>შეყვანილი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="224"/>
+        <location filename="../src/preferencesdialog.cpp" line="226"/>
         <source>Entered + parsed</source>
         <translation>შეყვანილი + დამუშავებული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="225"/>
+        <location filename="../src/preferencesdialog.cpp" line="227"/>
         <source>Entered + parsed (compact)</source>
         <translation>შეყვანილი + დამუშავებული (კომპაქტური)</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="229"/>
+        <location filename="../src/preferencesdialog.cpp" line="231"/>
         <source>Expression after calculation:</source>
         <translation>გამოსახულება გამოთვლის შემდეგ:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="231"/>
+        <location filename="../src/preferencesdialog.cpp" line="233"/>
         <source>Keep expression</source>
         <translation>გამოსახულების შენარჩუნება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="232"/>
+        <location filename="../src/preferencesdialog.cpp" line="234"/>
         <source>Clear expression</source>
         <translation>გამოსახულების გასუფთავება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="233"/>
+        <location filename="../src/preferencesdialog.cpp" line="235"/>
         <source>Replace with result</source>
         <translation>ჩანაცვლება შედეგით</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="234"/>
+        <location filename="../src/preferencesdialog.cpp" line="236"/>
         <source>Replace with result if shorter</source>
         <translation>ჩანაცვლება შედეგით, თუ უფრო მოკლეა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="238"/>
+        <location filename="../src/preferencesdialog.cpp" line="240"/>
         <source>Automatically copy result</source>
         <translation>შედეგის ავტომატური კოპირება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="239"/>
+        <location filename="../src/preferencesdialog.cpp" line="241"/>
         <source>Parsing mode:</source>
         <translation>ანალიზის რეჟიმი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="241"/>
-        <location filename="../src/preferencesdialog.cpp" line="341"/>
+        <location filename="../src/preferencesdialog.cpp" line="243"/>
+        <location filename="../src/preferencesdialog.cpp" line="343"/>
         <source>Adaptive</source>
         <translation>შეგუებადი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="242"/>
+        <location filename="../src/preferencesdialog.cpp" line="244"/>
         <source>Conventional</source>
         <translation>მიღებული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="243"/>
+        <location filename="../src/preferencesdialog.cpp" line="245"/>
         <source>Implicit multiplication first</source>
         <translation>ჯერ მოხდება არაცხადი გამრავლებების ანალიზი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="244"/>
+        <location filename="../src/preferencesdialog.cpp" line="246"/>
         <source>Chain</source>
         <translation>ჯაჭვი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="245"/>
+        <location filename="../src/preferencesdialog.cpp" line="247"/>
         <source>RPN</source>
         <translation>RPN</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="250"/>
+        <location filename="../src/preferencesdialog.cpp" line="252"/>
         <source>Simplified percentage calculation</source>
         <translation>გაადვილებული პროცენტულობის გამოთვლა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="251"/>
+        <location filename="../src/preferencesdialog.cpp" line="253"/>
         <source>Read precision</source>
         <translation>კითხვის სიზუსტე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="252"/>
+        <location filename="../src/preferencesdialog.cpp" line="254"/>
         <source>Allow concise uncertainty input</source>
         <translation>მოკლე გაურკვევლობის შეყვანის დაშვება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="253"/>
+        <location filename="../src/preferencesdialog.cpp" line="255"/>
         <source>Limit implicit multiplication</source>
         <translation>არასწორი გამრავლების შეზღუდვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="254"/>
+        <location filename="../src/preferencesdialog.cpp" line="256"/>
         <source>Interpret unrecognized symbols as variables</source>
         <translation>უცნობი სიმბოლოების ცვლადებად ჩათვლა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="255"/>
+        <location filename="../src/preferencesdialog.cpp" line="257"/>
         <source>Interval calculation:</source>
         <translation>ინტერვალის გამოთვლა:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="257"/>
+        <location filename="../src/preferencesdialog.cpp" line="259"/>
         <source>Variance formula</source>
         <translation>დისპერსიის ფორმულა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="258"/>
+        <location filename="../src/preferencesdialog.cpp" line="260"/>
         <source>Interval arithmetic</source>
         <translation>ინტერვალების არითმეტიკა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="263"/>
+        <location filename="../src/preferencesdialog.cpp" line="265"/>
         <source>Factorize result</source>
         <translation>შედეგის მამრავლებად დაშლა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="268"/>
+        <location filename="../src/preferencesdialog.cpp" line="270"/>
         <source>Two&apos;s complement output:</source>
         <translation>დამატებითი კოდი გამოტანისთვის:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="269"/>
+        <location filename="../src/preferencesdialog.cpp" line="271"/>
         <source>Two&apos;s complement input:</source>
         <translation>ორის დამატებითი კოდი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="270"/>
         <location filename="../src/preferencesdialog.cpp" line="272"/>
+        <location filename="../src/preferencesdialog.cpp" line="274"/>
         <source>Binary</source>
         <translation>ორობითი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="271"/>
         <location filename="../src/preferencesdialog.cpp" line="273"/>
+        <location filename="../src/preferencesdialog.cpp" line="275"/>
         <source>Hexadecimal</source>
         <translation>თექვსმეტობითი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="274"/>
+        <location filename="../src/preferencesdialog.cpp" line="276"/>
         <source>Binary bits:</source>
         <translation>ორობითი ბიტები:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="276"/>
+        <location filename="../src/preferencesdialog.cpp" line="278"/>
         <source>Automatic</source>
         <translation>ავტომატური</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="289"/>
+        <location filename="../src/preferencesdialog.cpp" line="291"/>
         <source>Use lower case letters in non-decimal numbers</source>
         <translation>პატარა ასოების გამოყენება არა-ათობით რიცხვებში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="290"/>
+        <location filename="../src/preferencesdialog.cpp" line="292"/>
         <source>Use special duodecimal symbols</source>
         <translation>სპეციალური თორმეტობითის სიმბოლოების გამოყენება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="291"/>
+        <location filename="../src/preferencesdialog.cpp" line="293"/>
         <source>Multiplication sign:</source>
         <translation>გამრავლების ნიშანი:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="294"/>
+        <location filename="../src/preferencesdialog.cpp" line="296"/>
         <source>multiplication sign</source>
         <extracomment>Unicode character name</extracomment>
         <translation>გამრავლების ნიშანი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="296"/>
+        <location filename="../src/preferencesdialog.cpp" line="298"/>
         <source>dot operator</source>
         <extracomment>Unicode character name</extracomment>
         <translation>წერტილის ოპერატორი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="298"/>
+        <location filename="../src/preferencesdialog.cpp" line="300"/>
         <source>middle dot</source>
         <extracomment>Unicode character name</extracomment>
         <translation>შუა წერტილი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="300"/>
+        <location filename="../src/preferencesdialog.cpp" line="302"/>
         <source>asterisk</source>
         <extracomment>Unicode character name</extracomment>
         <translation>ვარსკვლავი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="304"/>
+        <location filename="../src/preferencesdialog.cpp" line="306"/>
         <source>Use Unicode division slash in output</source>
         <translation>უნიკოდის გაყოფის დახრილი ხაზის გამოყენება გამოტანისას</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="305"/>
+        <location filename="../src/preferencesdialog.cpp" line="307"/>
         <source>Spell out logical operators</source>
         <translation>ლოგიკური ოპერაციების ლოგიკურად გადმოცემა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="306"/>
+        <location filename="../src/preferencesdialog.cpp" line="308"/>
         <source>Use E-notation instead of 10^n</source>
         <translation>E-ნოტაციის გამოყენება 10^n-ის მაგიერ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="307"/>
+        <location filename="../src/preferencesdialog.cpp" line="309"/>
         <source>Use &apos;j&apos; as imaginary unit</source>
         <translation>&quot;j&quot;-ის გამოყენება წარმოსახვითი ერთეულისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="308"/>
+        <location filename="../src/preferencesdialog.cpp" line="310"/>
         <source>Use comma as decimal separator</source>
         <translation>მძიმის გამოყენება ათწილადის გამყოფად</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="310"/>
+        <location filename="../src/preferencesdialog.cpp" line="312"/>
         <source>Ignore comma in numbers</source>
         <translation>მძიმის გამოტოვება რიცხვებში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="311"/>
+        <location filename="../src/preferencesdialog.cpp" line="313"/>
         <source>Ignore dots in numbers</source>
         <translation>რიცხვებში წერტილების დაიგნორება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="314"/>
+        <location filename="../src/preferencesdialog.cpp" line="316"/>
         <source>Copy unformatted ASCII by default</source>
         <translation>კოპირება ნაგულისხმევად დაუფორმატებელი ASCII-ის სახით</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="315"/>
+        <location filename="../src/preferencesdialog.cpp" line="317"/>
         <source>Place percent button in number pad</source>
         <translation>პროცენტის ღილაკის მოთავსება ციფრულ კლავიატურაზე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="316"/>
+        <location filename="../src/preferencesdialog.cpp" line="318"/>
         <source>Indicate repeating decimals:</source>
         <translation>განმეორებად ათწილადებზე მითითება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="319"/>
+        <location filename="../src/preferencesdialog.cpp" line="321"/>
         <source>Ellipsis</source>
         <translation>მრავალწერტილი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="320"/>
+        <location filename="../src/preferencesdialog.cpp" line="322"/>
         <source>Overline</source>
         <translation>ხაზი ზემოდან</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="324"/>
+        <location filename="../src/preferencesdialog.cpp" line="326"/>
         <source>Digit grouping:</source>
         <translation>ციფრების დაჯგუფება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="326"/>
+        <location filename="../src/preferencesdialog.cpp" line="328"/>
         <source>None</source>
         <translation>არცერთი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="327"/>
+        <location filename="../src/preferencesdialog.cpp" line="329"/>
         <source>Standard</source>
         <translation>სტანდარტული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="328"/>
+        <location filename="../src/preferencesdialog.cpp" line="330"/>
         <source>Local</source>
         <translation>ლოკალური</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="329"/>
+        <location filename="../src/preferencesdialog.cpp" line="331"/>
         <source>Custom</source>
         <translation>ხელით</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="338"/>
+        <location filename="../src/preferencesdialog.cpp" line="340"/>
         <source>Automatically group digits in input</source>
         <translation>შეყვანისას ციფრების ავტომატური დაჯგუფება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="339"/>
+        <location filename="../src/preferencesdialog.cpp" line="341"/>
         <source>Interval display:</source>
         <translation>ინტერვალის ჩვენება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="342"/>
+        <location filename="../src/preferencesdialog.cpp" line="344"/>
         <source>Significant digits</source>
         <translation>მნიშვნელოვანი ციფრები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="343"/>
+        <location filename="../src/preferencesdialog.cpp" line="345"/>
         <source>Interval</source>
         <translation>ინტერვალი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="344"/>
+        <location filename="../src/preferencesdialog.cpp" line="346"/>
         <source>Plus/minus</source>
         <translation>პლუს/მინუს</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="345"/>
-        <location filename="../src/preferencesdialog.cpp" line="418"/>
+        <location filename="../src/preferencesdialog.cpp" line="347"/>
+        <location filename="../src/preferencesdialog.cpp" line="420"/>
         <source>Relative</source>
         <translation>ფარდობითი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="346"/>
+        <location filename="../src/preferencesdialog.cpp" line="348"/>
         <source>Concise</source>
         <translation>მოკლე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="347"/>
+        <location filename="../src/preferencesdialog.cpp" line="349"/>
         <source>Midpoint</source>
         <translation>შუა წერტილი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="348"/>
+        <location filename="../src/preferencesdialog.cpp" line="350"/>
         <source>Lower</source>
         <translation>დაწევა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="349"/>
+        <location filename="../src/preferencesdialog.cpp" line="351"/>
         <source>Upper</source>
         <translation>ზედა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="355"/>
+        <location filename="../src/preferencesdialog.cpp" line="357"/>
         <source>Rounding:</source>
         <translation>დამრგვალება:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="357"/>
+        <location filename="../src/preferencesdialog.cpp" line="359"/>
         <source>Round halfway numbers away from zero</source>
         <translation>ნახევრამდე რიცხვების ნულიდან დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="358"/>
+        <location filename="../src/preferencesdialog.cpp" line="360"/>
         <source>Round halfway numbers to even</source>
         <translation>ნახევრამდე რიცხვების ლუწამდე დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="359"/>
+        <location filename="../src/preferencesdialog.cpp" line="361"/>
         <source>Round halfway numbers to odd</source>
         <translation>ნახევრამდე რიცხვების კენტამდე დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="360"/>
+        <location filename="../src/preferencesdialog.cpp" line="362"/>
         <source>Round halfway numbers toward zero</source>
         <translation>ნახევრამდე რიცხვების ნულისკენ დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="361"/>
+        <location filename="../src/preferencesdialog.cpp" line="363"/>
         <source>Round halfway numbers to random</source>
         <translation>ნახევრამდე რიცხვების შემთხვევითამდე დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="362"/>
+        <location filename="../src/preferencesdialog.cpp" line="364"/>
         <source>Round halfway numbers up</source>
         <translation>ნახევრამდე რიცხვების ზემოთ დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="363"/>
+        <location filename="../src/preferencesdialog.cpp" line="365"/>
         <source>Round halfway numbers down</source>
         <translation>ნახევრამდე რიცხვების ქვემოთ დამრგვალება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="364"/>
+        <location filename="../src/preferencesdialog.cpp" line="366"/>
         <source>Round toward zero</source>
         <translation>დამრგვალება ნულისკენ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="365"/>
+        <location filename="../src/preferencesdialog.cpp" line="367"/>
         <source>Round away from zero</source>
         <translation>დამრგვალება ნულიდან</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="366"/>
+        <location filename="../src/preferencesdialog.cpp" line="368"/>
         <source>Round up</source>
         <translation>დამრგვალება ზემოთ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="367"/>
+        <location filename="../src/preferencesdialog.cpp" line="369"/>
         <source>Round down</source>
         <translation>დამრგვალება ქვემოთ</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="371"/>
+        <location filename="../src/preferencesdialog.cpp" line="373"/>
         <source>Complex number form:</source>
         <translation>კომპლექსური რიცხვის ფორმა:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="373"/>
+        <location filename="../src/preferencesdialog.cpp" line="375"/>
         <source>Rectangular</source>
         <translation>მართკუთხედი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="374"/>
+        <location filename="../src/preferencesdialog.cpp" line="376"/>
         <source>Exponential</source>
         <translation>ექსპონენტური</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="375"/>
+        <location filename="../src/preferencesdialog.cpp" line="377"/>
         <source>Polar</source>
         <translation>პოლარული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="376"/>
+        <location filename="../src/preferencesdialog.cpp" line="378"/>
         <source>Angle/phasor</source>
         <translation>კუთხე/ვექტორი</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="384"/>
+        <location filename="../src/preferencesdialog.cpp" line="386"/>
         <source>Enable units</source>
         <translation>ერთეულების ჩართვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="385"/>
+        <location filename="../src/preferencesdialog.cpp" line="387"/>
         <source>Abbreviate names</source>
         <translation>სახელების შემოკლება</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="386"/>
+        <location filename="../src/preferencesdialog.cpp" line="388"/>
         <source>Use binary prefixes for information units</source>
         <translation>ორობითი პრეფიქსების გამოყენება ინფორმაციის ერთეულებისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="387"/>
+        <location filename="../src/preferencesdialog.cpp" line="389"/>
         <source>Automatic unit conversion:</source>
         <translation>ერთეულის ავტომატური გადაყვანა:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="389"/>
+        <location filename="../src/preferencesdialog.cpp" line="391"/>
         <source>No conversion</source>
         <translation>გადაყვანის გარეშე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="390"/>
+        <location filename="../src/preferencesdialog.cpp" line="392"/>
         <source>Base units</source>
         <translation>ძირითადი ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="391"/>
+        <location filename="../src/preferencesdialog.cpp" line="393"/>
         <source>Optimal units</source>
         <translation>ოპტიმალური ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="392"/>
+        <location filename="../src/preferencesdialog.cpp" line="394"/>
         <source>Optimal SI units</source>
         <translation>ოპტიმალური SI ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="396"/>
+        <location filename="../src/preferencesdialog.cpp" line="398"/>
         <source>Convert to mixed units</source>
         <translation>გადაყვანა შერეულ ერთეულებში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="397"/>
+        <location filename="../src/preferencesdialog.cpp" line="399"/>
         <source>Automatic unit prefixes:</source>
         <translation>ავტომატური ერთეულის პრეფიქსები:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="400"/>
+        <location filename="../src/preferencesdialog.cpp" line="402"/>
         <source>No prefixes</source>
         <translation>პრეფიქსების გარეშე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="401"/>
+        <location filename="../src/preferencesdialog.cpp" line="403"/>
         <source>Prefixes for some units</source>
         <translation>პრეფიქსები ზოგიერთი ერთეულისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="402"/>
+        <location filename="../src/preferencesdialog.cpp" line="404"/>
         <source>Prefixes also for currencies</source>
         <translation>პრეფიქსები, ასევე, ვალუტებისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="403"/>
+        <location filename="../src/preferencesdialog.cpp" line="405"/>
         <source>Prefixes for all units</source>
         <translation>პრეფიქსების ყველა ერთეულისთვის</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="411"/>
+        <location filename="../src/preferencesdialog.cpp" line="413"/>
         <source>Enable all SI-prefixes</source>
         <translation>ყველა SI პრეფიქსის ჩართვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="412"/>
+        <location filename="../src/preferencesdialog.cpp" line="414"/>
         <source>Enable denominator prefixes</source>
         <translation>მნიშვნელის პრეფიქსების ჩართვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="413"/>
+        <location filename="../src/preferencesdialog.cpp" line="415"/>
         <source>Enable units in physical constants</source>
         <translation>ერთეულების ჩართვა ფიზიკურ მუდმივებში</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="414"/>
+        <location filename="../src/preferencesdialog.cpp" line="416"/>
         <source>Copy unformatted ASCII without units</source>
         <translation>დაუფორმატებელი ASCII-ის კოპირება ერთეულების გარეშე</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="415"/>
+        <location filename="../src/preferencesdialog.cpp" line="417"/>
         <source>Temperature calculation:</source>
         <translation>ტემპერატურის გამოთვლა:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="417"/>
+        <location filename="../src/preferencesdialog.cpp" line="419"/>
         <source>Absolute</source>
         <translation>აბსოლუტური</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="419"/>
+        <location filename="../src/preferencesdialog.cpp" line="421"/>
         <source>Hybrid</source>
         <translation>ჰიბრიდული</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="427"/>
+        <location filename="../src/preferencesdialog.cpp" line="429"/>
         <source>Exchange rates updates:</source>
         <translation>გაცვლის კურსების განახლება:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/preferencesdialog.cpp" line="430"/>
-        <location filename="../src/preferencesdialog.cpp" line="749"/>
+        <location filename="../src/preferencesdialog.cpp" line="432"/>
+        <location filename="../src/preferencesdialog.cpp" line="752"/>
         <source>%n day(s)</source>
         <translation>
             <numerusform>%n დღე</numerusform>
@@ -3900,57 +3904,57 @@ Do you want to overwrite the function?</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="439"/>
+        <location filename="../src/preferencesdialog.cpp" line="441"/>
         <source>Default currency:</source>
         <translation>ნაგულისხმევი ვალუტა:</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="481"/>
+        <location filename="../src/preferencesdialog.cpp" line="483"/>
         <source>Custom number bases font:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="484"/>
+        <location filename="../src/preferencesdialog.cpp" line="486"/>
         <source>Binary letter spacing:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="485"/>
+        <location filename="../src/preferencesdialog.cpp" line="487"/>
         <source>Use bold binary &quot;1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="501"/>
+        <location filename="../src/preferencesdialog.cpp" line="503"/>
         <source>Look &amp;&amp; Feel</source>
         <translation>გარეგნობა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="502"/>
+        <location filename="../src/preferencesdialog.cpp" line="504"/>
         <source>Fonts</source>
         <translation>ფონტები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="503"/>
+        <location filename="../src/preferencesdialog.cpp" line="505"/>
         <source>Numbers &amp;&amp; Operators</source>
         <translation>რიცხვები &amp;&amp; ოპერატორები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="504"/>
+        <location filename="../src/preferencesdialog.cpp" line="506"/>
         <source>Units</source>
         <translation>საზომი ერთეულები</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="505"/>
+        <location filename="../src/preferencesdialog.cpp" line="507"/>
         <source>Calculation</source>
         <translation>გამოთვლა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="540"/>
+        <location filename="../src/preferencesdialog.cpp" line="543"/>
         <source>Restart required</source>
         <translation>საჭიროა გადატვირთვა</translation>
     </message>
     <message>
-        <location filename="../src/preferencesdialog.cpp" line="540"/>
+        <location filename="../src/preferencesdialog.cpp" line="543"/>
         <source>Please restart the program for the language change to take effect.</source>
         <translation>ენის ცვლილებების ძალაში შესასვლელად გადატვირთეთ პროგრამა.</translation>
     </message>
@@ -4994,7 +4998,7 @@ You can get version %3 at %2.</source>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="509"/>
-        <location filename="../src/qalculatewindow.cpp" line="9759"/>
+        <location filename="../src/qalculatewindow.cpp" line="9738"/>
         <source>Keyboard Shortcuts</source>
         <translation>კლავიატურის მალსახმობები</translation>
     </message>
@@ -5623,66 +5627,66 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="3336"/>
         <location filename="../src/qalculatewindow.cpp" line="3364"/>
         <location filename="../src/qalculatewindow.cpp" line="3428"/>
-        <location filename="../src/qalculatewindow.cpp" line="10380"/>
+        <location filename="../src/qalculatewindow.cpp" line="10359"/>
         <source>%1:</source>
         <translation>%1:</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5084"/>
-        <location filename="../src/qalculatewindow.cpp" line="8661"/>
-        <location filename="../src/qalculatewindow.cpp" line="9664"/>
-        <location filename="../src/qalculatewindow.cpp" line="11128"/>
-        <location filename="../src/qalculatewindow.cpp" line="11141"/>
-        <location filename="../src/qalculatewindow.cpp" line="11151"/>
-        <location filename="../src/qalculatewindow.cpp" line="11171"/>
+        <location filename="../src/qalculatewindow.cpp" line="8640"/>
+        <location filename="../src/qalculatewindow.cpp" line="9643"/>
+        <location filename="../src/qalculatewindow.cpp" line="11107"/>
+        <location filename="../src/qalculatewindow.cpp" line="11120"/>
+        <location filename="../src/qalculatewindow.cpp" line="11130"/>
+        <location filename="../src/qalculatewindow.cpp" line="11150"/>
         <source>Error</source>
         <translation>შეცდომა</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5084"/>
-        <location filename="../src/qalculatewindow.cpp" line="8661"/>
+        <location filename="../src/qalculatewindow.cpp" line="8640"/>
         <source>Couldn&apos;t write definitions</source>
         <translation>აღწერების ჩაწერის შეცდომა</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5642"/>
-        <location filename="../src/qalculatewindow.cpp" line="7144"/>
+        <location filename="../src/qalculatewindow.cpp" line="7122"/>
         <source>hexadecimal</source>
         <translation>თექვსმეტობითი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5645"/>
-        <location filename="../src/qalculatewindow.cpp" line="7147"/>
+        <location filename="../src/qalculatewindow.cpp" line="7125"/>
         <source>octal</source>
         <translation>რვაობითი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5648"/>
-        <location filename="../src/qalculatewindow.cpp" line="7150"/>
+        <location filename="../src/qalculatewindow.cpp" line="7128"/>
         <source>decimal</source>
         <translation>ათობითი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5652"/>
-        <location filename="../src/qalculatewindow.cpp" line="7154"/>
+        <location filename="../src/qalculatewindow.cpp" line="7132"/>
         <source>duodecimal</source>
         <translation>თორმეტობითი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5660"/>
-        <location filename="../src/qalculatewindow.cpp" line="7162"/>
+        <location filename="../src/qalculatewindow.cpp" line="7140"/>
         <source>binary</source>
         <translation>ბინარული</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5663"/>
-        <location filename="../src/qalculatewindow.cpp" line="7165"/>
+        <location filename="../src/qalculatewindow.cpp" line="7143"/>
         <source>roman</source>
         <translation>რომანული</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5666"/>
-        <location filename="../src/qalculatewindow.cpp" line="7168"/>
+        <location filename="../src/qalculatewindow.cpp" line="7146"/>
         <source>bijective</source>
         <translation>ბიექტურობა</translation>
     </message>
@@ -5690,251 +5694,251 @@ You can get version %3 at %2.</source>
         <location filename="../src/qalculatewindow.cpp" line="5672"/>
         <location filename="../src/qalculatewindow.cpp" line="5675"/>
         <location filename="../src/qalculatewindow.cpp" line="5678"/>
-        <location filename="../src/qalculatewindow.cpp" line="7174"/>
-        <location filename="../src/qalculatewindow.cpp" line="7177"/>
-        <location filename="../src/qalculatewindow.cpp" line="7180"/>
+        <location filename="../src/qalculatewindow.cpp" line="7152"/>
+        <location filename="../src/qalculatewindow.cpp" line="7155"/>
+        <location filename="../src/qalculatewindow.cpp" line="7158"/>
         <source>sexagesimal</source>
         <translation>ექვსობითი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5681"/>
         <location filename="../src/qalculatewindow.cpp" line="5684"/>
-        <location filename="../src/qalculatewindow.cpp" line="7183"/>
-        <location filename="../src/qalculatewindow.cpp" line="7186"/>
+        <location filename="../src/qalculatewindow.cpp" line="7161"/>
+        <location filename="../src/qalculatewindow.cpp" line="7164"/>
         <source>latitude</source>
         <translation>განედი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5687"/>
         <location filename="../src/qalculatewindow.cpp" line="5690"/>
-        <location filename="../src/qalculatewindow.cpp" line="7189"/>
-        <location filename="../src/qalculatewindow.cpp" line="7192"/>
+        <location filename="../src/qalculatewindow.cpp" line="7167"/>
+        <location filename="../src/qalculatewindow.cpp" line="7170"/>
         <source>longitude</source>
         <translation>გრძედი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5708"/>
-        <location filename="../src/qalculatewindow.cpp" line="7210"/>
+        <location filename="../src/qalculatewindow.cpp" line="7188"/>
         <source>time</source>
         <translation>დრო</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5714"/>
-        <location filename="../src/qalculatewindow.cpp" line="7216"/>
+        <location filename="../src/qalculatewindow.cpp" line="7194"/>
         <source>scientific</source>
         <translation>სამეცნიერო</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5717"/>
-        <location filename="../src/qalculatewindow.cpp" line="7219"/>
+        <location filename="../src/qalculatewindow.cpp" line="7197"/>
         <source>engineering</source>
         <translation>საინჟინრო</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5720"/>
-        <location filename="../src/qalculatewindow.cpp" line="7222"/>
+        <location filename="../src/qalculatewindow.cpp" line="7200"/>
         <source>simple</source>
         <translation>მარტივი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5767"/>
-        <location filename="../src/qalculatewindow.cpp" line="7263"/>
+        <location filename="../src/qalculatewindow.cpp" line="7241"/>
         <source>Time zone parsing failed.</source>
         <translation>დროის სარტყელის დამუშავების შეცდომა.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5788"/>
-        <location filename="../src/qalculatewindow.cpp" line="7272"/>
+        <location filename="../src/qalculatewindow.cpp" line="7250"/>
         <source>bases</source>
         <translation>ფუძეები</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5797"/>
-        <location filename="../src/qalculatewindow.cpp" line="7275"/>
+        <location filename="../src/qalculatewindow.cpp" line="7253"/>
         <source>calendars</source>
         <translation>კალენდრები</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5806"/>
-        <location filename="../src/qalculatewindow.cpp" line="7278"/>
+        <location filename="../src/qalculatewindow.cpp" line="7256"/>
         <source>rectangular</source>
         <translation>მართკუთხედი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5806"/>
-        <location filename="../src/qalculatewindow.cpp" line="7278"/>
+        <location filename="../src/qalculatewindow.cpp" line="7256"/>
         <source>cartesian</source>
         <translation>დეკარტის</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5818"/>
-        <location filename="../src/qalculatewindow.cpp" line="7282"/>
+        <location filename="../src/qalculatewindow.cpp" line="7260"/>
         <source>exponential</source>
         <translation>ექსპოტენციალური</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5830"/>
-        <location filename="../src/qalculatewindow.cpp" line="7286"/>
+        <location filename="../src/qalculatewindow.cpp" line="7264"/>
         <source>polar</source>
         <translation>პოლარული</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5854"/>
-        <location filename="../src/qalculatewindow.cpp" line="7294"/>
+        <location filename="../src/qalculatewindow.cpp" line="7272"/>
         <source>phasor</source>
         <translation>ფაზური</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5854"/>
-        <location filename="../src/qalculatewindow.cpp" line="7294"/>
+        <location filename="../src/qalculatewindow.cpp" line="7272"/>
         <source>angle</source>
         <translation>angle</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5866"/>
-        <location filename="../src/qalculatewindow.cpp" line="7298"/>
+        <location filename="../src/qalculatewindow.cpp" line="7276"/>
         <source>optimal</source>
         <translation>ოპტიმალური</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5878"/>
-        <location filename="../src/qalculatewindow.cpp" line="7304"/>
+        <location filename="../src/qalculatewindow.cpp" line="7282"/>
         <source>prefix</source>
         <translation>პრეფიქსი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5882"/>
-        <location filename="../src/qalculatewindow.cpp" line="7308"/>
+        <location filename="../src/qalculatewindow.cpp" line="7286"/>
         <source>base</source>
         <comment>base units</comment>
         <translation>ბაზა</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5894"/>
-        <location filename="../src/qalculatewindow.cpp" line="7314"/>
+        <location filename="../src/qalculatewindow.cpp" line="7292"/>
         <source>mixed</source>
         <translation>შერეული</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5906"/>
-        <location filename="../src/qalculatewindow.cpp" line="7320"/>
+        <location filename="../src/qalculatewindow.cpp" line="7298"/>
         <source>factors</source>
         <translation>factors</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5917"/>
-        <location filename="../src/qalculatewindow.cpp" line="7325"/>
+        <location filename="../src/qalculatewindow.cpp" line="7303"/>
         <source>partial fraction</source>
         <translation>ნაწილობრივი წილადი</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5928"/>
-        <location filename="../src/qalculatewindow.cpp" line="7330"/>
+        <location filename="../src/qalculatewindow.cpp" line="7308"/>
         <source>base</source>
         <comment>number base</comment>
         <translation>ბაზა</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5932"/>
-        <location filename="../src/qalculatewindow.cpp" line="7334"/>
+        <location filename="../src/qalculatewindow.cpp" line="7312"/>
         <source>decimals</source>
         <translation>ათწილადები</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5938"/>
-        <location filename="../src/qalculatewindow.cpp" line="7340"/>
+        <location filename="../src/qalculatewindow.cpp" line="7318"/>
         <source>fraction</source>
         <translation>ნაწილი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5990"/>
-        <location filename="../src/qalculatewindow.cpp" line="7379"/>
+        <location filename="../src/qalculatewindow.cpp" line="5991"/>
+        <location filename="../src/qalculatewindow.cpp" line="7358"/>
         <source>factorize</source>
         <translation>მამრავლებად დაშლა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="5995"/>
-        <location filename="../src/qalculatewindow.cpp" line="7384"/>
+        <location filename="../src/qalculatewindow.cpp" line="5996"/>
+        <location filename="../src/qalculatewindow.cpp" line="7363"/>
         <source>expand</source>
         <translation>ამოკეცვა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6178"/>
         <location filename="../src/qalculatewindow.cpp" line="6179"/>
         <location filename="../src/qalculatewindow.cpp" line="6180"/>
-        <location filename="../src/qalculatewindow.cpp" line="6614"/>
+        <location filename="../src/qalculatewindow.cpp" line="6181"/>
+        <location filename="../src/qalculatewindow.cpp" line="6615"/>
         <source>Calculating…</source>
         <translation>გამოთვლა…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6179"/>
-        <location filename="../src/qalculatewindow.cpp" line="6623"/>
-        <location filename="../src/qalculatewindow.cpp" line="8072"/>
+        <location filename="../src/qalculatewindow.cpp" line="6180"/>
+        <location filename="../src/qalculatewindow.cpp" line="6624"/>
+        <location filename="../src/qalculatewindow.cpp" line="8051"/>
         <source>Cancel</source>
         <translation>გაუქმება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6227"/>
-        <location filename="../src/qalculatewindow.cpp" line="7913"/>
+        <location filename="../src/qalculatewindow.cpp" line="6228"/>
+        <location filename="../src/qalculatewindow.cpp" line="7892"/>
         <source>RPN Operation</source>
         <translation>RPN ოპერაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6602"/>
+        <location filename="../src/qalculatewindow.cpp" line="6603"/>
         <source>Factorizing…</source>
         <translation>ფაქტორიზაცია…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6606"/>
+        <location filename="../src/qalculatewindow.cpp" line="6607"/>
         <source>Expanding partial fractions…</source>
         <translation>წილადი რიცხვების გაფართოება…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6610"/>
+        <location filename="../src/qalculatewindow.cpp" line="6611"/>
         <source>Expanding…</source>
         <translation>გაფართოება…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6618"/>
+        <location filename="../src/qalculatewindow.cpp" line="6619"/>
         <source>Converting…</source>
         <translation>გადაყვანა…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="6766"/>
+        <location filename="../src/qalculatewindow.cpp" line="6767"/>
         <source>Bit %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="7909"/>
+        <location filename="../src/qalculatewindow.cpp" line="7888"/>
         <source>RPN Register Moved</source>
         <translation>RPM რეგისტრი გადატანილია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8071"/>
-        <location filename="../src/qalculatewindow.cpp" line="8072"/>
-        <location filename="../src/qalculatewindow.cpp" line="8073"/>
+        <location filename="../src/qalculatewindow.cpp" line="8050"/>
+        <location filename="../src/qalculatewindow.cpp" line="8051"/>
+        <location filename="../src/qalculatewindow.cpp" line="8052"/>
         <source>Processing…</source>
         <translation>დამუშავება…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8219"/>
-        <location filename="../src/qalculatewindow.cpp" line="10698"/>
+        <location filename="../src/qalculatewindow.cpp" line="8198"/>
+        <location filename="../src/qalculatewindow.cpp" line="10677"/>
         <source>Matrix</source>
         <translation>მატრიცა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8379"/>
+        <location filename="../src/qalculatewindow.cpp" line="8358"/>
         <source>Unknown variables (e.g. x, y, z) are by default assumed real.</source>
         <translation>უცნობი ცვლადები (მაგ: x, y, z) ნაგულისხმევად ითვლება რეალურად.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8400"/>
-        <location filename="../src/qalculatewindow.cpp" line="8445"/>
+        <location filename="../src/qalculatewindow.cpp" line="8379"/>
+        <location filename="../src/qalculatewindow.cpp" line="8424"/>
         <source>Temperature Calculation Mode</source>
         <translation>ტემპერატურის გამოთვლის რეჟიმი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8406"/>
+        <location filename="../src/qalculatewindow.cpp" line="8385"/>
         <source>The expression is ambiguous.
 Please select temperature calculation mode
 (the mode can later be changed in preferences).</source>
@@ -5943,93 +5947,93 @@ Please select temperature calculation mode
 (რეჟიმის შეცვლა მოგვიანებით, მორგების ფანჯარაში შეგიძლიათ).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8409"/>
+        <location filename="../src/qalculatewindow.cpp" line="8388"/>
         <source>Absolute</source>
         <translation>აბსოლუტური</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8413"/>
+        <location filename="../src/qalculatewindow.cpp" line="8392"/>
         <source>Relative</source>
         <translation>ფარდობითი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8417"/>
+        <location filename="../src/qalculatewindow.cpp" line="8396"/>
         <source>Hybrid</source>
         <translation>ჰიბრიდული</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8451"/>
+        <location filename="../src/qalculatewindow.cpp" line="8430"/>
         <source>Please select desired variant of the sinc function.</source>
         <translation>აირჩიეთ sinc ფუნქციის სასურველი ვარიანტი.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8454"/>
+        <location filename="../src/qalculatewindow.cpp" line="8433"/>
         <source>Unnormalized</source>
         <translation>დაუნორმალიზებელი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8458"/>
+        <location filename="../src/qalculatewindow.cpp" line="8437"/>
         <source>Normalized</source>
         <translation>ნორმალიზებულია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8493"/>
+        <location filename="../src/qalculatewindow.cpp" line="8472"/>
         <source>Interpretation of dots</source>
         <translation>წერტილების ინტერპრეტაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8493"/>
+        <location filename="../src/qalculatewindow.cpp" line="8472"/>
         <source>Interpretation of comma</source>
         <translation>მძიმის ინტერპრეტაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8499"/>
+        <location filename="../src/qalculatewindow.cpp" line="8478"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
         <translation>აირჩიეთ მძიმის (&quot;,&quot;) ინტერპრეტაცია.
 (ამის შეცვლა მოგვიანებით, მორგების ფანჯარაში შეგიძლიათ).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8499"/>
+        <location filename="../src/qalculatewindow.cpp" line="8478"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
         <translation>აირჩიეთ წერტილის (&quot;.&quot;) ინტერპრეტაცია.
 (ამის შეცვლა მოგვიანებით, მორგების ფანჯარაში შეგიძლიათ).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8502"/>
+        <location filename="../src/qalculatewindow.cpp" line="8481"/>
         <source>Both dot and comma as decimal separators</source>
         <translation>ორივე, წერტილიც და მძიმეც, როგორც წილადის გამყოფი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8506"/>
+        <location filename="../src/qalculatewindow.cpp" line="8485"/>
         <source>Dot as thousands separator</source>
         <translation>წერტილი, როგორც ათასების გამყოფი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8506"/>
+        <location filename="../src/qalculatewindow.cpp" line="8485"/>
         <source>Comma as thousands separator</source>
         <translation>მძიმე, როგორც ათასების გამყოფი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8510"/>
+        <location filename="../src/qalculatewindow.cpp" line="8489"/>
         <source>Only dot as decimal separator</source>
         <translation>წილადების გამყოფად მხოლოდ წერტილის გამოყენება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8510"/>
+        <location filename="../src/qalculatewindow.cpp" line="8489"/>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
         <translation>მძიმე, როგორც გამყოფი ფუნქციის არგუმენტებისთვის
 და მატრიცის/ვექტორის ელემენტებისთვის</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8558"/>
+        <location filename="../src/qalculatewindow.cpp" line="8537"/>
         <source>Parsing Mode</source>
         <translation>ანალიზის რეჟიმი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8564"/>
+        <location filename="../src/qalculatewindow.cpp" line="8543"/>
         <source>The expression is ambiguous.
 Please select interpretation of expressions with implicit multiplication
 (this can later be changed in preferences).</source>
@@ -6038,221 +6042,221 @@ Please select interpretation of expressions with implicit multiplication
 (ამის შეცვლა მოგვიანებით, მორგების ფანჯარაში შეგიძლიათ).</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8569"/>
+        <location filename="../src/qalculatewindow.cpp" line="8548"/>
         <source>Implicit multiplication first</source>
         <translation>ჯერ მოხდება არაცხადი გამრავლებების ანალიზი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8576"/>
+        <location filename="../src/qalculatewindow.cpp" line="8555"/>
         <source>Conventional</source>
         <translation>მიღებული</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8582"/>
+        <location filename="../src/qalculatewindow.cpp" line="8561"/>
         <source>Adaptive</source>
         <translation>შეგუებადი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8608"/>
+        <location filename="../src/qalculatewindow.cpp" line="8587"/>
         <source>Percentage Interpretation</source>
         <translation>პროცენტების ინტერპრეტაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8614"/>
+        <location filename="../src/qalculatewindow.cpp" line="8593"/>
         <source>Please select interpretation of percentage addition</source>
         <translation>აირჩიეთ პროცენტების მიმატების ინტერპრეტაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8617"/>
+        <location filename="../src/qalculatewindow.cpp" line="8596"/>
         <source>Add percentage of original value</source>
         <translation>ორიგინალი მნიშვნელობის პროცენტების მიმატება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="8622"/>
+        <location filename="../src/qalculatewindow.cpp" line="8601"/>
         <source>Add percentage multiplied by 1/100</source>
         <translation>1/100-ზე გამრავლებული პროცენტების მიმატება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9453"/>
-        <location filename="../src/qalculatewindow.cpp" line="9608"/>
+        <location filename="../src/qalculatewindow.cpp" line="9432"/>
+        <location filename="../src/qalculatewindow.cpp" line="9587"/>
         <source>Add Action (%1)</source>
         <translation>ქმედების დამატება (%1)</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9551"/>
+        <location filename="../src/qalculatewindow.cpp" line="9530"/>
         <source>Edit Keyboard Shortcut</source>
         <translation>კლავიატურის მალსახმობის ჩასწორება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9551"/>
+        <location filename="../src/qalculatewindow.cpp" line="9530"/>
         <source>New Keyboard Shortcut</source>
         <translation>ახალი კლავიატურის მალსახმობი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9557"/>
-        <location filename="../src/qalculatewindow.cpp" line="9767"/>
+        <location filename="../src/qalculatewindow.cpp" line="9536"/>
+        <location filename="../src/qalculatewindow.cpp" line="9746"/>
         <source>Action</source>
         <translation>ქმედება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9598"/>
+        <location filename="../src/qalculatewindow.cpp" line="9577"/>
         <source>Value:</source>
         <translation>მნიშვნელობა:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9643"/>
+        <location filename="../src/qalculatewindow.cpp" line="9622"/>
         <source>Set key combination</source>
         <translation>ღილაკების მიმდევრობის დაყენება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9646"/>
+        <location filename="../src/qalculatewindow.cpp" line="9625"/>
         <source>Press the key combination you wish to use for the action.</source>
         <translation>დააჭირეთ ღილაკების კომბინაციას, რომელიც გნებავთ, ქმედებისთვის გამოიყენოთ.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9664"/>
+        <location filename="../src/qalculatewindow.cpp" line="9643"/>
         <source>Reserved key combination</source>
         <translation>დაცული ღილაკების კომბინაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9671"/>
+        <location filename="../src/qalculatewindow.cpp" line="9650"/>
         <source>Question</source>
         <translation>კითხვა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9671"/>
+        <location filename="../src/qalculatewindow.cpp" line="9650"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
         <translation>ღილაკების კომბინაცია უკვე გამოიყენება.
 გნებავთ მიმდინარე ქმედების (%1) ჩანაცვლება?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9767"/>
+        <location filename="../src/qalculatewindow.cpp" line="9746"/>
         <source>Key combination</source>
         <translation>ღილაკების მიმდევრობა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9788"/>
+        <location filename="../src/qalculatewindow.cpp" line="9767"/>
         <source>Add…</source>
         <translation>დამატება…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9791"/>
+        <location filename="../src/qalculatewindow.cpp" line="9770"/>
         <source>Edit…</source>
         <translation>ჩასწორება…</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="9795"/>
+        <location filename="../src/qalculatewindow.cpp" line="9774"/>
         <source>Remove</source>
         <translation>წაშლა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10110"/>
+        <location filename="../src/qalculatewindow.cpp" line="10089"/>
         <source>Gnuplot was not found</source>
         <translation>Gnuplot აღმოჩენილი არაა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10110"/>
+        <location filename="../src/qalculatewindow.cpp" line="10089"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
         <translation>გრაფიკების დასახაზად %1-ის (%2) ცალკე უნდა დააყენოთ და ხელმისაწვდომი უნდა იყოს ძებნის ბილიკში.</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10304"/>
+        <location filename="../src/qalculatewindow.cpp" line="10283"/>
         <source>Example:</source>
         <comment>Example of function usage</comment>
         <translation>მაგალითი:</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10338"/>
+        <location filename="../src/qalculatewindow.cpp" line="10317"/>
         <source>Keep open</source>
         <translation>ღიად დატოვება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10346"/>
+        <location filename="../src/qalculatewindow.cpp" line="10325"/>
         <source>Enter</source>
         <comment>RPN Enter</comment>
         <translation>შესვლა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10346"/>
+        <location filename="../src/qalculatewindow.cpp" line="10325"/>
         <source>Calculate</source>
         <translation>გამოთვლა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10347"/>
-        <location filename="../src/qalculatewindow.cpp" line="10832"/>
+        <location filename="../src/qalculatewindow.cpp" line="10326"/>
+        <location filename="../src/qalculatewindow.cpp" line="10811"/>
         <source>Apply to Stack</source>
         <translation>სტეკზე გადატარება</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10347"/>
-        <location filename="../src/qalculatewindow.cpp" line="10832"/>
+        <location filename="../src/qalculatewindow.cpp" line="10326"/>
+        <location filename="../src/qalculatewindow.cpp" line="10811"/>
         <source>Insert</source>
         <translation>ჩასმა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10363"/>
+        <location filename="../src/qalculatewindow.cpp" line="10342"/>
         <source>Value</source>
         <translation>მნიშვნელობა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10365"/>
+        <location filename="../src/qalculatewindow.cpp" line="10344"/>
         <source>Argument</source>
         <translation>არგუმენტი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10435"/>
+        <location filename="../src/qalculatewindow.cpp" line="10414"/>
         <source>True</source>
         <translation>ჭეშმარიტი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10438"/>
+        <location filename="../src/qalculatewindow.cpp" line="10417"/>
         <source>False</source>
         <translation>მცდარი</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10464"/>
+        <location filename="../src/qalculatewindow.cpp" line="10443"/>
         <source>Info</source>
         <translation>ინფორმაცია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10516"/>
-        <location filename="../src/qalculatewindow.cpp" line="10524"/>
+        <location filename="../src/qalculatewindow.cpp" line="10495"/>
+        <location filename="../src/qalculatewindow.cpp" line="10503"/>
         <source>optional</source>
         <comment>optional argument</comment>
         <translation>არასავალდებულო</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="10895"/>
+        <location filename="../src/qalculatewindow.cpp" line="10874"/>
         <source>Failed to open %1.
 %2</source>
         <translation>%1-ის გახსნის შეცდომა.
 %2</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11128"/>
+        <location filename="../src/qalculatewindow.cpp" line="11107"/>
         <source>Failed to open workspace</source>
         <translation>სამუშაო სივრცის გახსნა ჩავარდა</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11141"/>
-        <location filename="../src/qalculatewindow.cpp" line="11151"/>
-        <location filename="../src/qalculatewindow.cpp" line="11171"/>
+        <location filename="../src/qalculatewindow.cpp" line="11120"/>
+        <location filename="../src/qalculatewindow.cpp" line="11130"/>
+        <location filename="../src/qalculatewindow.cpp" line="11150"/>
         <source>Couldn&apos;t save workspace</source>
         <translation>სამუშაო სივრცის შენახვა შეუძლებელია</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11162"/>
+        <location filename="../src/qalculatewindow.cpp" line="11141"/>
         <source>Save file?</source>
         <translation>შევინახო ფაილი?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11162"/>
+        <location filename="../src/qalculatewindow.cpp" line="11141"/>
         <source>Do you want to save the current workspace?</source>
         <translation>გნებავთ მიმდინარე სამუშაო სივრცის შენახვა?</translation>
     </message>
     <message>
-        <location filename="../src/qalculatewindow.cpp" line="11163"/>
+        <location filename="../src/qalculatewindow.cpp" line="11142"/>
         <source>Do not ask again</source>
         <translation>აღარ მკითხო</translation>
     </message>
@@ -6356,7 +6360,7 @@ Do you wish to replace the current action (%1)?</source>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="112"/>
-        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
+        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and kelvin).</source>
         <translation>საბაზისო ერთეულთან ურთიერთობა. წრფივი ურთიერთობებისთვის ეს უბრალოდ რიცხვი უნდა იყოს.&lt;br&gt;&lt;br&gt;არაწრფივი ურთიერთობებისთვის გამოიყენეთ \x მამრავლისთვის და \y ხარისხისთვის (მაგ &quot;\x + 273.15&quot; ცელსიუსსა და კელვინს შორის ურთიერთობისთვის).</translation>
     </message>
     <message>
@@ -6553,9 +6557,64 @@ Do you want to overwrite it?</source>
         <translation>ტიპი:</translation>
     </message>
     <message>
+        <location filename="../src/unknowneditdialog.cpp" line="49"/>
+        <source>Number</source>
+        <translation type="unfinished">რიცხვი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="50"/>
+        <source>Real number</source>
+        <translation type="unfinished">რეალური რიცხვი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="51"/>
+        <source>Rational number</source>
+        <translation type="unfinished">რაციონალური რიცხვი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="52"/>
+        <source>Integer</source>
+        <translation type="unfinished">მთელი რიცხვი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="53"/>
+        <source>Boolean</source>
+        <translation type="unfinished">ბულევი</translation>
+    </message>
+    <message>
         <location filename="../src/unknowneditdialog.cpp" line="55"/>
         <source>Sign:</source>
         <translation>შესვლა:</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="57"/>
+        <source>Unknown</source>
+        <translation type="unfinished">უცნობი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="58"/>
+        <source>Non-zero</source>
+        <translation type="unfinished">არა-ნულოვანი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="59"/>
+        <source>Positive</source>
+        <translation type="unfinished">დადებითი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="60"/>
+        <source>Non-negative</source>
+        <translation type="unfinished">არა-უარყოფითი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="61"/>
+        <source>Negative</source>
+        <translation type="unfinished">უარყოფითი</translation>
+    </message>
+    <message>
+        <location filename="../src/unknowneditdialog.cpp" line="62"/>
+        <source>Non-positive</source>
+        <translation type="unfinished">არა-დადებითი</translation>
     </message>
     <message>
         <location filename="../src/unknowneditdialog.cpp" line="64"/>
@@ -6654,13 +6713,13 @@ Do you want to overwrite it?</source>
 გნებავთ გადააწეროთ თავზე?</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="337"/>
+        <location filename="../src/variableeditdialog.cpp" line="338"/>
         <source>Edit Variable</source>
         <translation>ცვლადის ჩასწორება</translation>
     </message>
     <message>
-        <location filename="../src/variableeditdialog.cpp" line="351"/>
-        <location filename="../src/variableeditdialog.cpp" line="397"/>
+        <location filename="../src/variableeditdialog.cpp" line="352"/>
+        <location filename="../src/variableeditdialog.cpp" line="398"/>
         <source>New Variable</source>
         <translation>ახალი ცვლადი</translation>
     </message>

@@ -1427,7 +1427,7 @@ Do you want to overwrite the function?</source>
     </message>
     <message>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
+        <translation type="vanished">Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «инфо» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
     <message>
         <source>Example:</source>
@@ -1489,6 +1489,10 @@ Do you want to overwrite the function?</source>
     <message>
         <source>Inactive</source>
         <translation>Неактивные</translation>
+    </message>
+    <message>
+        <source>Retrieves data from the %1 data set for a given object and property. If &quot;%2&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
+        <translation>Извлекает данные из набора данных %1 для заданного объекта и свойства. Если «%2» введено как свойство, появится диалоговое окно со всеми свойствами объекта.</translation>
     </message>
 </context>
 <context>
@@ -4986,8 +4990,8 @@ and matrix/vector elements</source>
         <translation>Отношение:</translation>
     </message>
     <message>
-        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
-        <translation>Отношение к основной единице измерения. Для линейных отношений это должно быть просто число.&lt;br&gt;&lt;br&gt;Для нелинейных отношений используйте \\ x для множителя и \\ y для показателя степени (например, «\\x + 273,15» для отношения между градусами Цельсия и Кельвина).</translation>
+        <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and kelvin).</source>
+        <translation>Отношение к основной единице измерения. Для линейных отношений это должно быть просто число.&lt;br&gt;&lt;br&gt;Для нелинейных отношений используйте \\ x для множителя и \\ y для показателя степени (например, «\\x + 273,15» для отношения между градусами Цельсия и кельвина).</translation>
     </message>
     <message>
         <source>Inverse relation:</source>
@@ -5159,6 +5163,50 @@ Do you want to overwrite it?</source>
     <message>
         <source>Temporary</source>
         <translation>Временная</translation>
+    </message>
+    <message>
+        <source>Number</source>
+        <translation type="unfinished">Число</translation>
+    </message>
+    <message>
+        <source>Real number</source>
+        <translation type="unfinished">Действительное число</translation>
+    </message>
+    <message>
+        <source>Rational number</source>
+        <translation type="unfinished">Рациональное число</translation>
+    </message>
+    <message>
+        <source>Integer</source>
+        <translation type="unfinished">Целое</translation>
+    </message>
+    <message>
+        <source>Boolean</source>
+        <translation type="unfinished">Логическое</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Неизвестное</translation>
+    </message>
+    <message>
+        <source>Non-zero</source>
+        <translation type="unfinished">Ненулевое</translation>
+    </message>
+    <message>
+        <source>Positive</source>
+        <translation type="unfinished">Положительное</translation>
+    </message>
+    <message>
+        <source>Non-negative</source>
+        <translation type="unfinished">Неотрицательное</translation>
+    </message>
+    <message>
+        <source>Negative</source>
+        <translation type="unfinished">Отрицательное</translation>
+    </message>
+    <message>
+        <source>Non-positive</source>
+        <translation type="unfinished">Не положительное</translation>
     </message>
 </context>
 <context>

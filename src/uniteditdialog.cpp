@@ -109,7 +109,7 @@ UnitEditDialog::UnitEditDialog(QWidget *parent) : QDialog(parent) {
 	relationLabel = new QLabel(tr("Relation:"), this);
 	grid->addWidget(relationLabel, 3, 0);
 	relationEdit = new MathLineEdit(this);
-	relationEdit->setToolTip("<div>" + tr("Relation to the base unit. For linear relations this should just be a number.<br><br>For non-linear relations use \\x for the factor and \\y for the exponent (e.g. \"\\x + 273.15\" for the relation between degrees Celsius and Kelvin).") + "<div>");
+	relationEdit->setToolTip("<div>" + tr("Relation to the base unit. For linear relations this should just be a number.<br><br>For non-linear relations use \\x for the factor and \\y for the exponent (e.g. \"\\x + 273.15\" for the relation between degrees Celsius and kelvin).") + "<div>");
 	grid->addWidget(relationEdit, 3, 1);
 	inverseLabel = new QLabel(tr("Inverse relation:"), this);
 	grid->addWidget(inverseLabel, 4, 0);
