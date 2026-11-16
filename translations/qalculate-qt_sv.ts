@@ -6063,7 +6063,7 @@ Enkel</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="577"/>
         <source>Number</source>
-        <translation>Nummer</translation>
+        <translation>Tal</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="578"/>
@@ -6098,7 +6098,7 @@ Enkel</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="584"/>
         <source>Boolean</source>
-        <translation>Boolesk</translation>
+        <translation>Booleskt värde</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="585"/>
@@ -6133,7 +6133,7 @@ Enkel</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="592"/>
         <source>Enable rules and type test</source>
-        <translation>Aktivera villkor- och klass-test</translation>
+        <translation>Aktivera regler och typkontroll</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="594"/>
@@ -6143,7 +6143,7 @@ Enkel</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="596"/>
         <source>For example if argument is a matrix that must have equal number of rows and columns: rows(\x) = columns(\x)</source>
-        <translation>Till exempel om parametern är en matris och måste ha lika antal rader och kolumner: rows(\x) = columns(\x)</translation>
+        <translation>Till exempel om parametern är en matris som måste ha lika många rader och kolumner: rows(\x) = columns(\x)</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="598"/>
@@ -6163,7 +6163,7 @@ Enkel</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="603"/>
         <source>Calculate function for each separate element in vector.</source>
-        <translation>Beräkna funktionen för varje separat element i vektor.</translation>
+        <translation>Beräkna funktionen för varje separat element i vektorn.</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="605"/>
@@ -6337,13 +6337,13 @@ Vill du ersätta den?</translation>
         <location filename="../src/calendarconversiondialog.cpp" line="35"/>
         <location filename="../src/calendarconversiondialog.cpp" line="132"/>
         <source>Islamic (Hijri)</source>
-        <translation>Muslimsk</translation>
+        <translation>Muslimsk (hijri)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="36"/>
         <location filename="../src/calendarconversiondialog.cpp" line="133"/>
         <source>Persian (Solar Hijri)</source>
-        <translation>Persisk</translation>
+        <translation>Persisk (solbaserad hijri)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="37"/>
@@ -6367,7 +6367,7 @@ Vill du ersätta den?</translation>
         <location filename="../src/calendarconversiondialog.cpp" line="40"/>
         <location filename="../src/calendarconversiondialog.cpp" line="137"/>
         <source>Revised Julian (Milanković)</source>
-        <translation>Reviderad juliansk</translation>
+        <translation>Reviderad juliansk (Milanković)</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="41"/>
@@ -6396,7 +6396,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="98"/>
         <source>Conversion to Gregorian calendar failed.</source>
-        <translation>Omvandling to gregoriansk kalender misslyckades.</translation>
+        <translation>Omvandling till gregoriansk kalender misslyckades.</translation>
     </message>
     <message>
         <location filename="../src/calendarconversiondialog.cpp" line="143"/>
@@ -6471,7 +6471,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="58"/>
         <source>Number</source>
-        <translation>Nummer</translation>
+        <translation>Tal</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="59"/>
@@ -6491,7 +6491,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="67"/>
         <source>Case sensitive value</source>
-        <translation>Storlekskänsligt värde</translation>
+        <translation>Skiftlägeskänsligt värde</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="69"/>
@@ -6501,7 +6501,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="71"/>
         <source>Value uses brackets</source>
-        <translation>Värdet använder klammrar</translation>
+        <translation>Värdet använder klamrar</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="74"/>
@@ -6623,7 +6623,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="321"/>
         <source>number</source>
-        <translation>nummer</translation>
+        <translation>tal</translation>
     </message>
     <message>
         <location filename="../src/dataseteditdialog.cpp" line="329"/>
@@ -6808,7 +6808,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1420"/>
         <source>number</source>
-        <translation>nummer</translation>
+        <translation>tal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1421"/>
@@ -7064,27 +7064,27 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="1662"/>
         <source>16-bit Floating Point Binary Format</source>
-        <translation>16-bit binärt flyttal</translation>
+        <translation>16-bitars binärt flyttalsformat</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1664"/>
         <source>32-bit Floating Point Binary Format</source>
-        <translation>32-bit binärt flyttal</translation>
+        <translation>32-bitars binärt flyttalsformat</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1666"/>
         <source>64-bit Floating Point Binary Format</source>
-        <translation>64-bit binärt flyttal</translation>
+        <translation>64-bitars binärt flyttalsformat</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1668"/>
         <source>80-bit (x86) Floating Point Binary Format</source>
-        <translation>80-bit (x86) binärt flyttal</translation>
+        <translation>80-bitars binärt flyttalsformat (x86)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1670"/>
         <source>128-bit Floating Point Binary Format</source>
-        <translation>128-bit binärt flyttal</translation>
+        <translation>128-bitars binärt flyttalsformat</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="1676"/>
@@ -7303,13 +7303,13 @@ Vill du ersätta den?</translation>
         <location filename="../src/expressionedit.cpp" line="2887"/>
         <location filename="../src/expressionedit.cpp" line="2889"/>
         <source>M+ (memory plus)</source>
-        <translation>M+ (minnesoperation)</translation>
+        <translation>M+ (addera till minnet)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2897"/>
         <location filename="../src/expressionedit.cpp" line="2899"/>
         <source>M− (memory minus)</source>
-        <translation>M− (minnesoperation)</translation>
+        <translation>M− (subtrahera från minnet)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="2913"/>
@@ -7399,7 +7399,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="3273"/>
         <source>binary-coded decimal</source>
-        <translation>BCD</translation>
+        <translation>binärkodat decimalt tal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3274"/>
@@ -7426,27 +7426,27 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/expressionedit.cpp" line="3281"/>
         <source>32-bit floating point</source>
-        <translation>32-bit flyttal</translation>
+        <translation>32-bitars flyttal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3283"/>
         <source>64-bit floating point</source>
-        <translation>64-bit flyttal</translation>
+        <translation>64-bitars flyttal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3285"/>
         <source>16-bit floating point</source>
-        <translation>16-bit flyttal</translation>
+        <translation>16-bitars flyttal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3287"/>
         <source>80-bit (x86) floating point</source>
-        <translation>80-bit (x86) flyttal</translation>
+        <translation>80-bitars flyttal (x86)</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3289"/>
         <source>128-bit floating point</source>
-        <translation>128-bit flyttal</translation>
+        <translation>128-bitars flyttal</translation>
     </message>
     <message>
         <location filename="../src/expressionedit.cpp" line="3290"/>
@@ -7721,37 +7721,37 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="33"/>
         <source>16-bit (half precision)</source>
-        <translation type="unfinished"></translation>
+        <translation>16 bitar (halv precision)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="34"/>
         <source>32-bit (single precision)</source>
-        <translation type="unfinished"></translation>
+        <translation>32 bitar (enkel precision)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="35"/>
         <source>64-bit (double precision)</source>
-        <translation type="unfinished"></translation>
+        <translation>64 bitar (dubbel precision)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="36"/>
         <source>80-bit (x86 extended format)</source>
-        <translation type="unfinished"></translation>
+        <translation>80 bitar (utökat x86-format)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="37"/>
         <source>128-bit (quadruple precision)</source>
-        <translation type="unfinished"></translation>
+        <translation>128 bitar (fyrdubbel precision)</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="38"/>
         <source>Microchip 24-bit</source>
-        <translation type="unfinished"></translation>
+        <translation>Microchip 24 bitar</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="39"/>
         <source>Microchip 32-bit</source>
-        <translation type="unfinished"></translation>
+        <translation>Microchip 32 bitar</translation>
     </message>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="41"/>
@@ -7780,7 +7780,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/fpconversiondialog.cpp" line="64"/>
         <source>Conversion error</source>
-        <translation>Förlorad precision</translation>
+        <translation>Omvandlingsfel</translation>
     </message>
 </context>
 <context>
@@ -7877,7 +7877,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="893"/>
         <source>Condition that must be true for the function (e.g. if the second argument must be greater than the first: &quot;\y &gt; \x&quot;)</source>
-        <translation>Förutsättning som måste infrias för funktionen (t.ex. om den andra parametern måste var större än den första: &quot;\y &gt; \x&quot;)</translation>
+        <translation>Förutsättning som måste vara uppfylld för funktionen (t.ex. om den andra parametern måste vara större än den första: &quot;\y &gt; \x&quot;)</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="895"/>
@@ -7943,7 +7943,7 @@ Vill du ersätta den?</translation>
         <location filename="../src/functioneditdialog.cpp" line="992"/>
         <location filename="../src/functioneditdialog.cpp" line="1053"/>
         <source>Conversion (using &quot;to&quot;) is not supported in functions.</source>
-        <translation>Omvandling (med \&quot;till\&quot;) stöds inte i funktioner.</translation>
+        <translation>Omvandling (med &quot;till&quot;) stöds inte i funktioner.</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="999"/>
@@ -8038,7 +8038,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/functionsdialog.cpp" line="420"/>
         <source>Retrieves data from the %1 data set for a given object and property. If &quot;info&quot; is typed as property, a dialog window will pop up with all properties of the object.</source>
-        <translation>Hämtar data från dataset %1 för ett givet objekt och egenskap. Om &quot;info&quot; är angivet som egenskap, ett dialogfönster öppnas med alla objektets egenskaper.</translation>
+        <translation>Hämtar data från dataset %1 för ett givet objekt och en given egenskap. Om &quot;info&quot; anges som egenskap öppnas ett dialogfönster med alla objektets egenskaper.</translation>
     </message>
     <message>
         <location filename="../src/functionsdialog.cpp" line="430"/>
@@ -8228,7 +8228,7 @@ och tryck på entertangenten.</translation>
         <location filename="../src/historyview.cpp" line="1322"/>
         <location filename="../src/historyview.cpp" line="1334"/>
         <source>Add Comment…</source>
-        <translation>Lägg till kommenar…</translation>
+        <translation>Lägg till kommentar…</translation>
     </message>
     <message>
         <location filename="../src/historyview.cpp" line="1285"/>
@@ -8307,7 +8307,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="226"/>
         <source>Memory recall</source>
-        <translation>Återkalla minne</translation>
+        <translation>Hämta från minnet</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="232"/>
@@ -8422,12 +8422,12 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="409"/>
         <source>Bitwise Left Shift</source>
-        <translation>Bitvist högerskift</translation>
+        <translation>Bitvist vänsterskift</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="411"/>
         <source>Bitwise Right Shift</source>
-        <translation>Bitvist vänsterskift</translation>
+        <translation>Bitvist högerskift</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="412"/>
@@ -8465,7 +8465,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="921"/>
         <source>Enable units in physical constants</source>
-        <translation>Aktivera enheter i fysiska konstanter</translation>
+        <translation>Aktivera enheter i fysikaliska konstanter</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="923"/>
@@ -8546,7 +8546,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1511"/>
         <source>Allow concise uncertainty input</source>
-        <translation>Tillåt koncis notation för inmatning av osäkerhet</translation>
+        <translation>Tillåt inmatning av osäkerhet i koncis form</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1551"/>
@@ -8593,7 +8593,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1581"/>
         <source>Number</source>
-        <translation>Nummer</translation>
+        <translation>Tal</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1583"/>
@@ -8613,7 +8613,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1589"/>
         <source>Boolean</source>
-        <translation>Boolesk</translation>
+        <translation>Booleskt värde</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="1593"/>
@@ -8810,7 +8810,7 @@ och tryck på entertangenten.</translation>
         <location filename="../src/keypadwidget.cpp" line="680"/>
         <location filename="../src/keypadwidget.cpp" line="683"/>
         <source>Subtraction</source>
-        <translation>Subraktion</translation>
+        <translation>Subtraktion</translation>
     </message>
     <message>
         <location filename="../src/keypadwidget.cpp" line="680"/>
@@ -8873,7 +8873,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="344"/>
         <source>Avoid input</source>
-        <translation>Undvik input</translation>
+        <translation>Undvik vid inmatning</translation>
     </message>
     <message>
         <source>Unicode</source>
@@ -8887,7 +8887,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="346"/>
         <source>Case sensitive</source>
-        <translation>Storlekskänslig</translation>
+        <translation>Skiftlägeskänslig</translation>
     </message>
     <message>
         <location filename="../src/functioneditdialog.cpp" line="347"/>
@@ -8975,7 +8975,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="60"/>
         <source>Enter two values, of which at most one is a percentage, and the others will be calculated for you.</source>
-        <translation>Ange två värden, av vilka högst en får vara ett procenttal, och de övriga kommer att beräknas åt dig.</translation>
+        <translation>Ange två värden, av vilka högst ett får vara ett procenttal, och de övriga kommer att beräknas åt dig.</translation>
     </message>
     <message>
         <location filename="../src/percentagecalculationdialog.cpp" line="67"/>
@@ -9078,7 +9078,7 @@ och tryck på entertangenten.</translation>
         <location filename="../src/plotdialog.cpp" line="56"/>
         <location filename="../src/plotdialog.cpp" line="151"/>
         <source>Title:</source>
-        <translation>Rubrik:</translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="58"/>
@@ -9230,7 +9230,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/plotdialog.cpp" line="115"/>
         <source>Title</source>
-        <translation>Rubrik</translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="115"/>
@@ -9255,7 +9255,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/plotdialog.cpp" line="130"/>
         <source>Sampling rate:</source>
-        <translation>Frekvens:</translation>
+        <translation>Samplingsfrekvens:</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="136"/>
@@ -9290,7 +9290,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/plotdialog.cpp" line="162"/>
         <source>Maximum y value:</source>
-        <translation>Högst y-värde:</translation>
+        <translation>Högsta y-värde:</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="167"/>
@@ -9353,7 +9353,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/plotdialog.cpp" line="184"/>
         <source>Legend placement:</source>
-        <translation>Textplacering:</translation>
+        <translation>Placering av teckenförklaring:</translation>
     </message>
     <message>
         <location filename="../src/plotdialog.cpp" line="187"/>
@@ -9404,7 +9404,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="503"/>
         <source>Numbers &amp;&amp; Operators</source>
-        <translation>Nummer och operatorer</translation>
+        <translation>Tal och operatorer</translation>
     </message>
     <message>
         <source>Units &amp;&amp; Currencies</source>
@@ -9442,7 +9442,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="129"/>
         <source>Use caret for bitwise XOR</source>
-        <translation>Använd insättningstecken för bitvis XOR</translation>
+        <translation>Använd cirkumflex (^) för bitvis XOR</translation>
     </message>
     <message>
         <source>Close application with Esc key</source>
@@ -9608,7 +9608,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="197"/>
         <source>Status tooltip delay:</source>
-        <translation>Fördröjning för statusverktygsstips:</translation>
+        <translation>Fördröjning för statusverktygstips:</translation>
     </message>
     <message>
         <source>Calculate-as-you-type delay:</source>
@@ -9622,7 +9622,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="252"/>
         <source>Allow concise uncertainty input</source>
-        <translation>Tillåt koncis notation för inmatning av osäkerhet</translation>
+        <translation>Tillåt inmatning av osäkerhet i koncis form</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="254"/>
@@ -9670,25 +9670,25 @@ och tryck på entertangenten.</translation>
         <location filename="../src/preferencesdialog.cpp" line="294"/>
         <source>multiplication sign</source>
         <extracomment>Unicode character name</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>multiplikationstecken</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="296"/>
         <source>dot operator</source>
         <extracomment>Unicode character name</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>punktoperator</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="298"/>
         <source>middle dot</source>
         <extracomment>Unicode character name</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>centrerad punkt</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="300"/>
         <source>asterisk</source>
         <extracomment>Unicode character name</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>asterisk</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="315"/>
@@ -9722,27 +9722,27 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="359"/>
         <source>Round halfway numbers to odd</source>
-        <translation>Avrunda mittemellan-tal till udda siffra</translation>
+        <translation>Avrunda tal mitt emellan till udda</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="360"/>
         <source>Round halfway numbers toward zero</source>
-        <translation>Avrunda mittemellan-mot noll</translation>
+        <translation>Avrunda tal mitt emellan mot noll</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="361"/>
         <source>Round halfway numbers to random</source>
-        <translation>Avrunda mittemellan-tal slumpmässigt</translation>
+        <translation>Avrunda tal mitt emellan slumpmässigt</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="362"/>
         <source>Round halfway numbers up</source>
-        <translation>Avrunda mittemellan-tal uppåt</translation>
+        <translation>Avrunda tal mitt emellan uppåt</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="363"/>
         <source>Round halfway numbers down</source>
-        <translation>Avrunda mittemellan-tal nedåt</translation>
+        <translation>Avrunda tal mitt emellan nedåt</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="364"/>
@@ -9812,7 +9812,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="540"/>
         <source>Please restart the program for the language change to take effect.</source>
-        <translation>Vängligen starta om programmet för att språkändringen skall ha effekt.</translation>
+        <translation>Starta om programmet för att språkändringen ska träda i kraft.</translation>
     </message>
     <message>
         <source>Custom result font</source>
@@ -9880,12 +9880,12 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="233"/>
         <source>Replace with result</source>
-        <translation>Ersätt med resultatet</translation>
+        <translation>Ersätt med resultat</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="234"/>
         <source>Replace with result if shorter</source>
-        <translation>Ersätt med resultatet om kortare</translation>
+        <translation>Ersätt med resultat om kortare</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="128"/>
@@ -9968,7 +9968,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="289"/>
         <source>Use lower case letters in non-decimal numbers</source>
-        <translation>Använd små bokstäver i icke-decimala nummer</translation>
+        <translation>Använd små bokstäver i icke-decimala tal</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="290"/>
@@ -9992,7 +9992,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="180"/>
         <source>Format result</source>
-        <translation>Formattera resultat</translation>
+        <translation>Formatera resultat</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="202"/>
@@ -10032,12 +10032,12 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="310"/>
         <source>Ignore comma in numbers</source>
-        <translation>Bortse från komma i nummer</translation>
+        <translation>Bortse från komma i tal</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="311"/>
         <source>Ignore dots in numbers</source>
-        <translation>Bortse från punkter i nummer</translation>
+        <translation>Bortse från punkter i tal</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="314"/>
@@ -10047,12 +10047,12 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="357"/>
         <source>Round halfway numbers away from zero</source>
-        <translation>Avrunda mittemellan-tal bort från noll</translation>
+        <translation>Avrunda tal mitt emellan bort från noll</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="358"/>
         <source>Round halfway numbers to even</source>
-        <translation>Avrunda mittemellan-tal till jämn siffra</translation>
+        <translation>Avrunda tal mitt emellan till jämnt</translation>
     </message>
     <message>
         <source>Indicate repeating decimals</source>
@@ -10110,7 +10110,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="338"/>
         <source>Automatically group digits in input</source>
-        <translation>Gruppera siffor automatiskt i indata</translation>
+        <translation>Gruppera siffror automatiskt i indata</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="339"/>
@@ -10135,7 +10135,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="347"/>
         <source>Midpoint</source>
-        <translation>Medelpunkt</translation>
+        <translation>Mittpunkt</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="348"/>
@@ -10306,7 +10306,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="413"/>
         <source>Enable units in physical constants</source>
-        <translation>Aktivera enheter i fysiska konstanter</translation>
+        <translation>Aktivera enheter i fysikaliska konstanter</translation>
     </message>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="415"/>
@@ -10332,7 +10332,7 @@ och tryck på entertangenten.</translation>
     <message>
         <location filename="../src/preferencesdialog.cpp" line="427"/>
         <source>Exchange rates updates:</source>
-        <translation>Växelkursuppdateringer:</translation>
+        <translation>Växelkursuppdatering:</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/preferencesdialog.cpp" line="430"/>
@@ -10411,11 +10411,11 @@ och tryck på entertangenten.</translation>
 If multiple instances are opened simultaneously, only the definitions (variables, functions, etc.), mode, preferences, and history of the last closed window will be saved.
 
 Do you, despite this, want to change the default behavior and allow multiple simultaneous instances?</source>
-        <translation>Enligt förinställningar tillåts enbart en instans av %1.
+        <translation>Som standard tillåts endast en instans (ett huvudfönster) av %1.
 
-Om flera instanser är öppna samtidigt, kommer enbart definitioner (variabler, funktioner, etc.) , läge, inställningar och historik för det sist stängda fönstret att sparas.
+Om flera instanser är öppna samtidigt sparas endast definitioner (variabler, funktioner osv.), läge, inställningar och historik från det fönster som stängs sist.
 
-Vill du trots det ändra förinställt beteende och tillåta flera samtidiga instanser?</translation>
+Vill du trots detta ändra standardbeteendet och tillåta flera samtidiga instanser?</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="167"/>
@@ -10558,7 +10558,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="1376"/>
         <source>Contains the result of the most recent calculation. Multiple results of an equation is represented as a vector. Access separate solutions using ans(n) (e.g. ans(1) for the first solution).</source>
-        <translation>Håller värdet av den senaste beräkningen. Multipla resultat av en ekvation representeras av en vektor. För åtkomst till separata lösningar använd ans(n) (t.ex. ans(1) för den först lösningen).</translation>
+        <translation>Innehåller resultatet av den senaste beräkningen. Flera lösningar till en ekvation representeras som en vektor. Använd ans(n) för att komma åt enskilda lösningar (t.ex. ans(1) för den första lösningen).</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2112"/>
@@ -10603,7 +10603,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
         <location filename="../src/qalculateqtsettings.cpp" line="2220"/>
         <source>Failed to run update script.
 %1</source>
-        <translation>Misslyckades med att köra sriptet.
+        <translation>Misslyckades med att köra uppdateringsskriptet.
 %1</translation>
     </message>
     <message>
@@ -10774,17 +10774,17 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2366"/>
         <source>Set angle unit to degrees</source>
-        <translation>Ange vinkelenhet till grader</translation>
+        <translation>Ange grader som vinkelenhet</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2367"/>
         <source>Set angle unit to radians</source>
-        <translation>Ange vinkelenhet till radianer</translation>
+        <translation>Ange radianer som vinkelenhet</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2368"/>
         <source>Set angle unit to gradians</source>
-        <translation>Ange vinkelenhet till gradienter</translation>
+        <translation>Ange nygrader som vinkelenhet</translation>
     </message>
     <message>
         <source>Active normal display mode</source>
@@ -10818,17 +10818,17 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2374"/>
         <source>Toggle max decimals</source>
-        <translation>(Av)aktivera max decmaler</translation>
+        <translation>(Av)aktivera max decimaler</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2375"/>
         <source>Toggle min decimals</source>
-        <translation>(Av)aktivera min decmaler</translation>
+        <translation>(Av)aktivera min decimaler</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2376"/>
         <source>Toggle max/min decimals</source>
-        <translation>(Av)aktivera min/max decmaler</translation>
+        <translation>(Av)aktivera min/max decimaler</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2377"/>
@@ -10838,7 +10838,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2378"/>
         <source>Show general keypad</source>
-        <translation>Visa/dölj generell knappsats</translation>
+        <translation>Visa generell knappsats</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2379"/>
@@ -10848,7 +10848,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2380"/>
         <source>Toggle algebra keypad</source>
-        <translation>Visa/dölj alegbraknappsatsen</translation>
+        <translation>Visa/dölj algebraknappsatsen</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2381"/>
@@ -10858,7 +10858,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2382"/>
         <source>Show/hide keypad</source>
-        <translation>Visa/göm knappsatsen</translation>
+        <translation>Visa/dölj knappsats</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2383"/>
@@ -10903,7 +10903,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2391"/>
         <source>MR (memory recall)</source>
-        <translation>MR (återkalla minne)</translation>
+        <translation>MR (hämta från minnet)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2392"/>
@@ -10913,12 +10913,12 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2393"/>
         <source>M+ (memory plus)</source>
-        <translation>M+ (minnesoperation)</translation>
+        <translation>M+ (addera till minnet)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2394"/>
         <source>M− (memory minus)</source>
-        <translation>M− (minnesoperation)</translation>
+        <translation>M− (subtrahera från minnet)</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2395"/>
@@ -10933,12 +10933,12 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2397"/>
         <source>Open plot functions/data</source>
-        <translation>Öppna rita funktions-/datadiagram</translation>
+        <translation>Öppna dialogen för funktions-/datadiagram</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2398"/>
         <source>Open convert number bases</source>
-        <translation>Öppna omvandla mellan talbaser</translation>
+        <translation>Öppna omvandling mellan talbaser</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2399"/>
@@ -11003,7 +11003,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2411"/>
         <source>Toggle keep above</source>
-        <translation>(Av)aktivera placera överst</translation>
+        <translation>(Av)aktivera placering överst</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2412"/>
@@ -11083,7 +11083,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2427"/>
         <source>Open functions menu</source>
-        <translation>Öppna functionsmenyn</translation>
+        <translation>Öppna funktionsmenyn</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2428"/>
@@ -11098,7 +11098,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2430"/>
         <source>Toggle fraction format in current result</source>
-        <translation>Växla bråktal i nuvarande resultat</translation>
+        <translation>Växla bråkformat i nuvarande resultat</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2436"/>
@@ -11158,7 +11158,7 @@ Vill du uppdatera växelkurserna nu?</numerusform>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2245"/>
         <source>No updates found.</source>
-        <translation>Inga uppdatering hittades.</translation>
+        <translation>Inga uppdateringar hittades.</translation>
     </message>
     <message>
         <location filename="../src/qalculateqtsettings.cpp" line="2251"/>
@@ -11414,7 +11414,7 @@ Du kan hämta version %3 på %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="551"/>
         <source>Gradians</source>
-        <translation>Gradienter</translation>
+        <translation>Nygrader</translation>
     </message>
     <message>
         <source>Approximation</source>
@@ -11441,7 +11441,7 @@ Du kan hämta version %3 på %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="567"/>
         <source>Approximate</source>
-        <translation>Approximerad</translation>
+        <translation>Approximera</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="572"/>
@@ -11457,7 +11457,7 @@ Du kan hämta version %3 på %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="575"/>
         <source>Number</source>
-        <translation>Nummer</translation>
+        <translation>Tal</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="577"/>
@@ -11477,7 +11477,7 @@ Du kan hämta version %3 på %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="583"/>
         <source>Boolean</source>
-        <translation>Boolesk</translation>
+        <translation>Booleskt värde</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="585"/>
@@ -12116,7 +12116,7 @@ Du kan hämta version %3 på %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="1529"/>
         <location filename="../src/qalculatewindow.cpp" line="1638"/>
         <source>Conversion operator</source>
-        <translation>Omvandlingsoperand</translation>
+        <translation>Omvandlingsoperator</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="5917"/>
@@ -12155,7 +12155,7 @@ Du kan hämta version %3 på %2.</translation>
         <location filename="../src/qalculatewindow.cpp" line="6227"/>
         <location filename="../src/qalculatewindow.cpp" line="7913"/>
         <source>RPN Operation</source>
-        <translation>RPN operation</translation>
+        <translation>RPN-operation</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="6602"/>
@@ -12186,7 +12186,7 @@ Du kan hämta version %3 på %2.</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8451"/>
         <source>Please select desired variant of the sinc function.</source>
-        <translation>Vänligen välj önskad variant av sinc-funktionen.</translation>
+        <translation>Vänligen ange önskad variant av sinc-funktionen.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8454"/>
@@ -12203,7 +12203,7 @@ Du kan hämta version %3 på %2.</translation>
         <source>Comma as separator for function arguments
 and matrix/vector elements</source>
         <translation>Komma som avgränsare för funktionsparametrar
-och matrix-/vektorelement</translation>
+och matris-/vektorelement</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8558"/>
@@ -12267,7 +12267,7 @@ Vänligen välj tolkning av uttryck med implicit multiplikation
     <message>
         <location filename="../src/qalculatewindow.cpp" line="9646"/>
         <source>Press the key combination you wish to use for the action.</source>
-        <translation>Tryck tangentkombinationen som du önskar använda för åtgärden.</translation>
+        <translation>Tryck på tangentkombinationen som du vill använda för åtgärden.</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="9664"/>
@@ -12278,7 +12278,8 @@ Vänligen välj tolkning av uttryck med implicit multiplikation
         <location filename="../src/qalculatewindow.cpp" line="9671"/>
         <source>The key combination is already in use.
 Do you wish to replace the current action (%1)?</source>
-        <translation>Tangentkombinationen används redan. Vill du ersätta den nuvarande åtgärden (%1)?</translation>
+        <translation>Tangentkombinationen används redan.
+Vill du ersätta den nuvarande åtgärden (%1)?</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="9671"/>
@@ -12363,7 +12364,7 @@ Do you wish to replace the current action (%1)?</source>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="433"/>
         <source>Show toolbar</source>
-        <translation>Visa vertkygsfält</translation>
+        <translation>Visa verktygsfält</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="476"/>
@@ -12597,7 +12598,7 @@ Do you wish to replace the current action (%1)?</source>
         <location filename="../src/qalculatewindow.cpp" line="1539"/>
         <location filename="../src/qalculatewindow.cpp" line="1618"/>
         <source>Swap the top two values or move the selected value to the top of the stack</source>
-        <translation>Byt plats på de två översta värdena eller flytta markerat värdet till toppen av stacken</translation>
+        <translation>Byt plats på de två översta värdena eller flytta det markerade värdet till toppen av stacken</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="1496"/>
@@ -12714,14 +12715,14 @@ Vänligen välj ett läge för temperaturberäkningar
         <location filename="../src/qalculatewindow.cpp" line="8499"/>
         <source>Please select interpretation of comma (&quot;,&quot;)
 (this can later be changed in preferences).</source>
-        <translation>Vänligen välj hur komma ska tolkas
+        <translation>Vänligen välj hur komma (&quot;,&quot;) ska tolkas
 (detta kan senare ändras i inställningarna).</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8499"/>
         <source>Please select interpretation of dots (&quot;.&quot;)
 (this can later be changed in preferences).</source>
-        <translation>Vänligen välj hur punkter ska tolkas
+        <translation>Vänligen välj hur punkter (&quot;.&quot;) ska tolkas
 (detta kan senare ändras i inställningarna).</translation>
     </message>
     <message>
@@ -12767,7 +12768,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="8622"/>
         <source>Add percentage multiplied by 1/100</source>
-        <translation>Addera procentenheter multiplicerade med 1/100</translation>
+        <translation>Addera procenttalet multiplicerat med 1/100</translation>
     </message>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="9557"/>
@@ -12788,7 +12789,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/qalculatewindow.cpp" line="10110"/>
         <source>%1 (%2) needs to be installed separately, and found in the executable search path, for plotting to work.</source>
-        <translation>%1 (%2) måste installeras separat, och hittas i sökvägen för binärer, för att för att diagram ska kunna visas.</translation>
+        <translation>%1 (%2) måste installeras separat och finnas i sökvägen för körbara filer för att diagramritning ska fungera.</translation>
     </message>
     <message>
         <source>Example:</source>
@@ -12938,7 +12939,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="101"/>
         <source>Unit (for named derived unit) or unit expression (for unnamed derived unit) that this unit is defined in relation to</source>
-        <translation>Enhet (för namngivna härledda enheter) eller enheter (för icke namngivna härledda enheter) som enheten är definierad i förhållande till</translation>
+        <translation>Enhet (för en namngiven härledd enhet) eller enhetsuttryck (för en icke namngiven härledd enhet) som enheten är definierad i förhållande till</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="103"/>
@@ -12953,7 +12954,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="112"/>
         <source>Relation to the base unit. For linear relations this should just be a number.&lt;br&gt;&lt;br&gt;For non-linear relations use \x for the factor and \y for the exponent (e.g. &quot;\x + 273.15&quot; for the relation between degrees Celsius and Kelvin).</source>
-        <translation>Förhållande till baseenheten. Utgör för linjära förhållanden enbart ett nummer.&lt;br&gt;&lt;br&gt;För icke-linjära förhållanden, används \x för faktorn och \y för exponenten (t.ex. &quot;\x + 273,15&quot; för relationen mellan grader Celsius och Kelvin).</translation>
+        <translation>Relation till basenheten. För linjära relationer ska detta bara vara ett tal.&lt;br&gt;&lt;br&gt;För icke-linjära relationer används \x för faktorn och \y för exponenten (t.ex. &quot;\x + 273,15&quot; för relationen mellan grader Celsius och kelvin).</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="114"/>
@@ -12978,7 +12979,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="124"/>
         <source>Example: priority of the unit &quot;hand&quot; is set to 2, while priority of ft (foot) and in (inch) is set to 1, which results in &quot;17 in = 1 ft + 5 in&quot;, instead of &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</source>
-        <translation>Exempel: prioritet för enheten hand är 2, medan prioritet för ft (fot) och in (tum) är 1, vilket resulterar i &quot;17 in = 1 ft + 5 in&quot;, istället för &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</translation>
+        <translation>Exempel: prioritet för enheten &quot;hand&quot; är 2, medan prioritet för ft (fot) och in (tum) är 1, vilket resulterar i &quot;17 in = 1 ft + 5 in&quot;, istället för &quot;17 in = 1 ft + 1 hand + 1 in&quot;.</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="128"/>
@@ -12988,7 +12989,7 @@ och matrix-/vektorelement</translation>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="131"/>
         <source>Example: minimum base unit number of yd (yard) is set to 12, which results in &quot;3 × 3 ft = 9 ft&quot; (instead of &quot;3 yd&quot;) and &quot;4 × 3 ft = 4 yd&quot;.</source>
-        <translation>Exempel: minsta antal av basenhet för yd (yard) är 12, vilket resulterar i &quot;3 × 3 ft = 9 ft&quot; (istället for &quot;3 yd&quot;) och &quot;4 × 3 ft = 4 yd&quot;.</translation>
+        <translation>Exempel: minsta antal av basenhet för yd (yard) är 12, vilket resulterar i &quot;3 × 3 ft = 9 ft&quot; (istället för &quot;3 yd&quot;) och &quot;4 × 3 ft = 4 yd&quot;.</translation>
     </message>
     <message>
         <location filename="../src/uniteditdialog.cpp" line="135"/>
@@ -13240,7 +13241,7 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="96"/>
         <source>Hide variable</source>
-        <translation>Dölj variabeln</translation>
+        <translation>Göm variabel</translation>
     </message>
     <message>
         <location filename="../src/variableeditdialog.cpp" line="98"/>
@@ -13362,27 +13363,27 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/variablesdialog.cpp" line="445"/>
         <source>positive</source>
-        <translation>positiv</translation>
+        <translation>positivt</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="446"/>
         <source>non-positive</source>
-        <translation>ej positiv</translation>
+        <translation>ej positivt</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="447"/>
         <source>negative</source>
-        <translation>negativ</translation>
+        <translation>negativt</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="448"/>
         <source>non-negative</source>
-        <translation>ej negativ</translation>
+        <translation>ej negativt</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="449"/>
         <source>non-zero</source>
-        <translation>ej noll</translation>
+        <translation>nollskilt</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="455"/>
@@ -13392,32 +13393,32 @@ Vill du ersätta den?</translation>
     <message>
         <location filename="../src/variablesdialog.cpp" line="456"/>
         <source>boolean</source>
-        <translation>boolesk</translation>
+        <translation>booleskt värde</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="457"/>
         <source>rational</source>
-        <translation>rationell</translation>
+        <translation>rationellt tal</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="458"/>
         <source>real</source>
-        <translation>reell</translation>
+        <translation>reellt tal</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="459"/>
         <source>complex</source>
-        <translation>komplex</translation>
+        <translation>komplext tal</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="460"/>
         <source>number</source>
-        <translation>nummer</translation>
+        <translation>tal</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="461"/>
         <source>not matrix</source>
-        <translation>ej matris</translation>
+        <translation>värde som inte är en matris</translation>
     </message>
     <message>
         <location filename="../src/variablesdialog.cpp" line="612"/>

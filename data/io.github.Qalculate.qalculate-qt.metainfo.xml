@@ -12,7 +12,7 @@
  <name xml:lang="pt_PT">Qalculate! (Qt UI)</name>
  <name xml:lang="ru">Qalculate! (Интерфейс Qt)</name>
  <name xml:lang="sl">Qalculate! (vmesnik Qt)</name>
- <name xml:lang="sv">Qalculate! (Qt UI)</name>
+ <name xml:lang="sv">Qalculate! (Qt-gränssnitt)</name>
  <name xml:lang="zh_CN">Qalculate! (Qt UI)</name>
  <name xml:lang="zh_TW">Qalculate! (Qt UI)</name>
  <summary>Powerful and easy to use calculator</summary>
@@ -38,6 +38,7 @@
   <p xml:lang="pt_PT">Qalculate! é uma calculadora multiplataforma e multiuso. É simples de usar, mas fornece poder e versatilidade normalmente vistas em pacotes de matemática complicados, além de ferramentas úteis para as necessidades diárias (como conversão de moeda e cálculo de percentagem).</p>
   <p xml:lang="ru">Qalculate! - это универсальный кроссплатформенный настольный калькулятор. Он прост в использовании, но обеспечивает мощность и универсальность, обычно присущие сложным математическим программам, а также полезные инструменты для повседневных нужд (таких как конвертация валют и расчёт процентов).</p>
   <p xml:lang="sl">Qalculate! je večnamensko namizno računalo, ki deluje na več platformah. Je preprosto za uporabo, prinaša pa tako napredna orodja, ponavadi značilna le za kompleksno matematično programje, kot tudi uporabna orodja za vsakodnevne potrebe (npr. pretvorbe valut ali izračun odstotkov).</p>
+  <p xml:lang="sv">Qalculate! är en mångsidig skrivbordskalkylator som fungerar på flera plattformar. Den är enkel att använda men erbjuder kraftfulla och flexibla funktioner som vanligtvis bara finns i avancerade matematikprogram, samt praktiska verktyg för vardagen (till exempel valutaomvandling och procentberäkning).</p>
   <p xml:lang="zh_CN">Qalculate!是一款多功能的跨平台桌面计算器。它简单易用，但却具有通常复杂的数学软件包所需的强大功能和多样性，以及满足日常所需的实用工具(如货币换算和百分比计算)。</p>
   <p xml:lang="zh_TW">Qalculate!是一款多功能的跨平台桌面計算器。它使用簡單然而提供了通常為複雜的數學套件保留的能力和多功能性，以及滿足日常需求的實用工具(例如貨幣轉換和百分比計算)。</p>
   <p>Features include a large library of customizable functions, unit calculations and conversion, physical constants, symbolic calculations (including integrals and equations), arbitrary precision, uncertainty propagation, interval arithmetic, plotting, and a user-friendly interface.</p>
@@ -49,6 +50,7 @@
   <p xml:lang="pt_PT">Os recursos incluem uma grande biblioteca de funções personalizáveis, cálculos e conversão de unidades, constantes físicas, cálculos simbólicos (incluindo integrais e equações), precisão arbitrária, propagação de erros, aritmética de intervalos, parcela e uma interface amigável.</p>
   <p xml:lang="ru">Возможности включают большую библиотеку настраиваемых функций, расчёт и преобразование единиц измерения, физические константы, символьные вычисления, включая интегралы и уравнения, произвольную точность, распространение неопределенности, интервальную арифметику, построение графиков и удобный интерфейс.</p>
   <p xml:lang="sl">Program vsebuje obsežno knjižnjico prilagodljivih funkcij, enot, izračunov in pretvorb, fizikalnih konstant, simbolnih izračunov (tudi integrale in enačbe), poljubno natančnost, statistično negotovost, intervalno aritmetiko, grafe in uporabniku prijazen vmesnik.</p>
+  <p xml:lang="sv">Bland funktionerna finns ett stort bibliotek med anpassningsbara funktioner, beräkningar med och omvandling av enheter, fysikaliska konstanter, symboliska beräkningar (inklusive integraler och ekvationer), godtycklig precision, fortplantning av osäkerhet, intervallaritmetik, diagramritning och ett användarvänligt gränssnitt.</p>
   <p xml:lang="zh_CN">功能包括大量可定制函数库、单位计算与换算、物理常数、符号计算(包括积分和方程)、高精度计算、误差传递、区间运算、绘图和用户友好的界面。</p>
   <p xml:lang="zh_TW">功能包括龐大的可自訂函式庫、單位計算和轉換、物理常數、符號計算(包括積分和方程式)、任意精確度、誤差傳播、區間算術、繪圖和用戶友好的介面。</p>
  </description>
@@ -56,6 +58,7 @@
   <screenshot type="default">
    <image>https://raw.githubusercontent.com/Qalculate/qalculate-qt/master/data/io.github.Qalculate.qalculate-qt.png</image>
    <caption>The main window (with keypad hidden)</caption>
+   <caption xml:lang="sv">Huvudfönstret (med dold knappsats)</caption>
   </screenshot>
  </screenshots>
  <url type="homepage">https://qalculate.github.io</url>
