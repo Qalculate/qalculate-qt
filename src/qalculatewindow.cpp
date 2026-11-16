@@ -3648,7 +3648,7 @@ void QalculateWindow::onMMinusClicked() {
 	if(expressionEdit->expressionHasChanged()) calculate();
 	if(!mstruct) return;
 	MathStructure m = settings->v_memory->get();
-	m.calculateAdd(*mstruct, settings->evalops);
+	m.calculateSubtract(*mstruct, settings->evalops);
 	settings->v_memory->set(m);
 	if(!expressionEdit->hasFocus()) expressionEdit->setFocus();
 }
